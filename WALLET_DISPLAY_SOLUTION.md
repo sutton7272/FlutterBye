@@ -15,7 +15,7 @@
 ##### **Primary Metadata Endpoint** (`/api/metadata/:mintAddress`)
 ```json
 {
-  "name": "FLBY-MSG",
+  "name": "YourMessage",
   "symbol": "FLBY-MSG",
   "description": "Flutterbye Message Token: \"YourMessage\"",
   "image": "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0...",
