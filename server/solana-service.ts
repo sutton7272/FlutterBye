@@ -15,7 +15,7 @@ export class SolanaBackendService {
   private keypair: Keypair;
 
   constructor() {
-    const rpcUrl = process.env.SOLANA_RPC_URL || 'https://api.devnet.solana.com';
+    const rpcUrl = process.env.SOLANA_RPC_URL || 'https://devnet.helius-rpc.com/?api-key=070d7528-d275-45b4-bec6-2bfd09926d7d';
     this.connection = new Connection(rpcUrl, 'confirmed');
     
     if (!process.env.SOLANA_PRIVATE_KEY) {

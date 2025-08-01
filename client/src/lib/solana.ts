@@ -12,7 +12,7 @@ import {
 } from '@solana/spl-token';
 
 // Solana configuration - Using DevNet for testing
-const SOLANA_RPC_URL = import.meta.env.VITE_SOLANA_RPC_URL || 'https://api.devnet.solana.com';
+const SOLANA_RPC_URL = import.meta.env.VITE_SOLANA_RPC_URL || 'https://devnet.helius-rpc.com/?api-key=070d7528-d275-45b4-bec6-2bfd09926d7d';
 const connection = new Connection(SOLANA_RPC_URL, 'confirmed');
 
 export interface TokenCreationParams {
