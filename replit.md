@@ -9,7 +9,7 @@ Flutterbye is a blockchain-powered messaging and value distribution protocol bui
 - **Consolidated Value Attachment**: Single unified system for attaching value pools to tokens with automatic per-token calculation
 - **Expiration Date System**: Value-attached tokens can have expiration dates for time-limited redemption
 - **Free Flutterbye Mint System**: Special mint type with redeemable codes for promotional distribution
-- **Enhanced Admin Dashboard**: Comprehensive monitoring and management tools
+- **Comprehensive Admin Dashboard**: Full backend administration with pricing controls, user management, data export, code generation, and activity logging
 
 ## User Preferences
 
@@ -32,6 +32,7 @@ Preferred communication style: Simple, everyday language.
 - **Development Setup**: Vite middleware for development with HMR support
 - **Error Handling**: Centralized error handling with structured error responses
 - **Logging**: Custom request/response logging with performance metrics
+- **Admin Panel**: Comprehensive backend dashboard with pricing controls, user management, analytics, and data export capabilities
 
 ### Data Storage Solutions
 - **Database**: PostgreSQL with Drizzle ORM for type-safe database operations

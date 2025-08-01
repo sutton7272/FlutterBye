@@ -575,6 +575,145 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Enhanced Admin Dashboard Routes
+  app.get("/api/admin/stats", async (req, res) => {
+    try {
+      // Mock comprehensive platform statistics
+      const mockStats = {
+        totalUsers: 1847,
+        totalTokens: 12394,
+        totalValueEscrowed: 2847.392,
+        totalRedemptions: 8291,
+        activeUsers24h: 342,
+        revenueToday: 12.847,
+        topTokens: [
+          { id: "1", message: "StakeNowForYield", attachedValue: 150.25, redemptions: 89 },
+          { id: "2", message: "HODLToTheMoon", attachedValue: 98.75, redemptions: 67 },
+          { id: "3", message: "DeFiRevolution", attachedValue: 87.50, redemptions: 45 },
+          { id: "4", message: "SolanaSpeed", attachedValue: 76.25, redemptions: 38 },
+          { id: "5", message: "Web3Future", attachedValue: 65.00, redemptions: 29 }
+        ]
+      };
+      res.json(mockStats);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch admin stats" });
+    }
+  });
+
+  app.get("/api/admin/users", async (req, res) => {
+    try {
+      // Mock user data with analytics
+      const mockUsers = Array.from({ length: 50 }, (_, i) => ({
+        id: `user_${i + 1}`,
+        walletAddress: `${Math.random().toString(36).substr(2, 9)}${Math.random().toString(36).substr(2, 35)}`,
+        totalTokensMinted: Math.floor(Math.random() * 100) + 1,
+        totalValueAttached: Math.random() * 50 + 0.1,
+        totalRedemptions: Math.floor(Math.random() * 20),
+        joinedAt: new Date(Date.now() - Math.random() * 365 * 24 * 60 * 60 * 1000).toISOString(),
+        lastActive: new Date(Date.now() - Math.random() * 7 * 24 * 60 * 60 * 1000).toISOString(),
+        isBlocked: Math.random() < 0.05, // 5% blocked
+        riskScore: Math.floor(Math.random() * 100)
+      }));
+      res.json(mockUsers);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch users" });
+    }
+  });
+
+  app.get("/api/admin/logs", async (req, res) => {
+    try {
+      // Mock admin logs
+      const mockLogs = Array.from({ length: 20 }, (_, i) => ({
+        id: `log_${i + 1}`,
+        adminId: `admin_${Math.floor(Math.random() * 5) + 1}`,
+        action: ["user_blocked", "settings_updated", "token_flagged", "code_generated", "data_exported"][Math.floor(Math.random() * 5)],
+        targetType: ["user", "token", "setting", "code"][Math.floor(Math.random() * 4)],
+        targetId: `target_${i + 1}`,
+        details: { reason: "Automated action", value: Math.random() * 100 },
+        timestamp: new Date(Date.now() - Math.random() * 7 * 24 * 60 * 60 * 1000).toISOString()
+      }));
+      res.json(mockLogs);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch admin logs" });
+    }
+  });
+
+  app.get("/api/admin/settings", async (req, res) => {
+    try {
+      const mockSettings = {
+        baseMintingFee: 0.01,
+        imageUploadFee: 0.005,
+        maxMessageLength: 27,
+        maxImageSize: 5,
+        platformEnabled: true,
+        maintenanceMode: false,
+        allowedCurrencies: ["SOL", "USDC"],
+        minValueAttachment: 0.001,
+        maxValueAttachment: 100,
+        redemptionTimeoutHours: 24
+      };
+      res.json(mockSettings);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch settings" });
+    }
+  });
+
+  app.put("/api/admin/settings", async (req, res) => {
+    try {
+      const newSettings = req.body;
+      // In real implementation, save to database
+      res.json({ success: true, settings: newSettings });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to update settings" });
+    }
+  });
+
+  app.patch("/api/admin/users/:userId/block", async (req, res) => {
+    try {
+      const { userId } = req.params;
+      const { blocked } = req.body;
+      // In real implementation, update user in database
+      res.json({ success: true, userId, blocked });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to update user status" });
+    }
+  });
+
+  app.post("/api/admin/codes/generate", async (req, res) => {
+    try {
+      const { type, count } = req.body;
+      // Generate mock codes
+      const codes = Array.from({ length: count }, (_, i) => ({
+        code: `${type.toUpperCase().replace('_', '-')}-${Math.random().toString(36).substr(2, 6).toUpperCase()}`,
+        type,
+        createdAt: new Date().toISOString()
+      }));
+      res.json({ success: true, count: codes.length, codes });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to generate codes" });
+    }
+  });
+
+  app.post("/api/admin/export", async (req, res) => {
+    try {
+      const { dataType } = req.body;
+      // Mock export data based on type
+      const mockData = {
+        exportType: dataType,
+        timestamp: new Date().toISOString(),
+        data: Array.from({ length: 100 }, (_, i) => ({
+          id: i + 1,
+          type: dataType,
+          value: Math.random() * 100,
+          date: new Date().toISOString()
+        }))
+      };
+      res.json(mockData);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to export data" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }
