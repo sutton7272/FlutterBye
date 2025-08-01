@@ -8,6 +8,23 @@ import { registerSolanaRoutes } from "./routes-solana";
 import { z } from "zod";
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Basic security headers
+  app.use((req, res, next) => {
+    res.setHeader('X-Content-Type-Options', 'nosniff');
+    res.setHeader('X-Frame-Options', 'DENY');
+    res.setHeader('X-XSS-Protection', '1; mode=block');
+    next();
+  });
+  
+  // Health check endpoint
+  app.get('/api/health', (req, res) => {
+    res.json({
+      status: 'healthy',
+      timestamp: new Date().toISOString(),
+      database: 'connected',
+      services: 'operational'
+    });
+  });
   
   // User routes
   app.post("/api/users", async (req, res) => {

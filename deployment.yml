@@ -1,0 +1,120 @@
+# Replit Deployment Configuration for Flutterbye
+name: flutterbye-production
+build:
+  # Build command
+  command: "npm run build"
+  
+  # Environment variables for build
+  env:
+    NODE_ENV: "production"
+    
+  # Build output directory
+  output: "dist"
+
+# Runtime configuration
+run:
+  # Start command
+  command: "npm start"
+  
+  # Environment variables for runtime
+  env:
+    NODE_ENV: "production"
+    PORT: "3000"
+    ENABLE_RATE_LIMITING: "true"
+    ENABLE_MONITORING: "true"
+    ENABLE_ADMIN_PANEL: "true"
+    DEFAULT_MINTING_FEE_PERCENTAGE: "2.5"
+    DEFAULT_REDEMPTION_FEE_PERCENTAGE: "1.0"
+
+# Health check configuration
+health:
+  path: "/api/health"
+  port: 3000
+  interval: 30s
+  timeout: 10s
+  retries: 3
+
+# Auto-scaling configuration
+scale:
+  min: 1
+  max: 5
+  cpu_threshold: 80
+  memory_threshold: 80
+
+# Security configuration
+security:
+  # Force HTTPS
+  force_https: true
+  
+  # Security headers
+  headers:
+    - "X-Content-Type-Options: nosniff"
+    - "X-Frame-Options: DENY"
+    - "X-XSS-Protection: 1; mode=block"
+    - "Strict-Transport-Security: max-age=31536000; includeSubDomains"
+
+# Database configuration
+database:
+  # PostgreSQL database will be automatically connected
+  type: "postgresql"
+  auto_migrate: true
+
+# Monitoring configuration  
+monitoring:
+  # Application Performance Monitoring
+  apm: true
+  
+  # Log aggregation
+  logs: true
+  
+  # Metrics collection
+  metrics: true
+  
+  # Error tracking
+  errors: true
+
+# Features configuration
+features:
+  # Enable WebSocket support for real-time features
+  websockets: true
+  
+  # Enable file uploads (for token images)
+  uploads: true
+  
+  # Enable custom domains
+  custom_domain: true
+  
+  # Enable SSL certificates
+  ssl: true
+
+# Resource limits
+resources:
+  # CPU limits
+  cpu: "1000m"  # 1 CPU core
+  
+  # Memory limits
+  memory: "1Gi"  # 1GB RAM
+  
+  # Disk space
+  disk: "10Gi"  # 10GB storage
+
+# Environment-specific configurations
+environments:
+  staging:
+    env:
+      NODE_ENV: "staging"
+      SOLANA_RPC_URL: "https://api.devnet.solana.com"
+    scale:
+      min: 1
+      max: 2
+      
+  production:
+    env:
+      NODE_ENV: "production"
+      SOLANA_RPC_URL: "https://api.mainnet-beta.solana.com"
+    scale:
+      min: 2
+      max: 10
+    resources:
+      cpu: "2000m"  # 2 CPU cores
+      memory: "2Gi"  # 2GB RAM
