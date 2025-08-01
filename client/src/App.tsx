@@ -21,6 +21,7 @@ import { WalletManagementPage } from "@/pages/wallet-management";
 import { RewardsPage } from "@/pages/rewards";
 import JourneyPage from "@/pages/journey";
 import BadgesPage from "@/pages/badges";
+import AdminContentPage from "@/pages/admin-content";
 import Navbar from "@/components/navbar";
 import { FloatingActionHub } from "@/components/floating-action-hub";
 
@@ -46,6 +47,7 @@ function Router() {
         <Route path="/journey" component={JourneyPage} />
         <Route path="/heatmap" component={TransactionHeatmapPage} />
         <Route path="/badges" component={BadgesPage} />
+        <Route path="/admin/content" component={AdminContentPage} />
         <Route component={NotFound} />
       </Switch>
       <FloatingActionHub />

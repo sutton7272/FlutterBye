@@ -718,3 +718,6 @@ export type InsertCustomBadgeShare = z.infer<typeof insertCustomBadgeShareSchema
 
 export type CustomBadgeTemplate = typeof customBadgeTemplates.$inferSelect;
 export type InsertCustomBadgeTemplate = z.infer<typeof insertCustomBadgeTemplateSchema>;
+
+// Re-export content management schemas
+export * from "./content-schema";

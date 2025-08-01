@@ -1585,5 +1585,103 @@ export async function registerRoutes(app: Express): Promise<Server> {
     return Array.from({length: 64}, () => chars[Math.floor(Math.random() * chars.length)]).join('');
   }
 
+  // ============= CONTENT MANAGEMENT SYSTEM ROUTES =============
+  
+  // Content sections management  
+  app.get("/api/admin/content/sections", requireAdmin, async (req, res) => {
+    try {
+      const { contentService } = await import("./content-management");
+      const sections = await contentService.getAllContentSections();
+      res.json(sections);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch content sections" });
+    }
+  });
+
+  app.put("/api/admin/content/sections/:id", requireAdmin, async (req, res) => {
+    try {
+      const { contentService } = await import("./content-management");
+      const section = await contentService.updateContentSection(req.params.id, req.body);
+      res.json(section);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to update content section" });
+    }
+  });
+
+  // Text content management
+  app.get("/api/admin/content/text", requireAdmin, async (req, res) => {
+    try {
+      const { contentService } = await import("./content-management");
+      const textContent = await contentService.getAllTextContent();
+      res.json(textContent);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch text content" });
+    }
+  });
+
+  app.put("/api/admin/content/text", requireAdmin, async (req, res) => {
+    try {
+      const { contentService } = await import("./content-management");
+      const textContent = await contentService.upsertTextContent(req.body);
+      res.json(textContent);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to update text content" });
+    }
+  });
+
+  // Image assets management
+  app.get("/api/admin/content/images", requireAdmin, async (req, res) => {
+    try {
+      const { contentService } = await import("./content-management");
+      const images = await contentService.getAllImageAssets();
+      res.json(images);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch image assets" });
+    }
+  });
+
+  // Theme settings management
+  app.get("/api/admin/content/theme", requireAdmin, async (req, res) => {
+    try {
+      const { contentService } = await import("./content-management");
+      const theme = await contentService.getThemeSettings();
+      res.json(theme);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch theme settings" });
+    }
+  });
+
+  app.put("/api/admin/content/theme", requireAdmin, async (req, res) => {
+    try {
+      const { contentService } = await import("./content-management");  
+      const theme = await contentService.updateThemeSettings(req.body);
+      res.json(theme);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to update theme settings" });
+    }
+  });
+
+  // Layout configurations
+  app.get("/api/admin/content/layouts", requireAdmin, async (req, res) => {
+    try {
+      const { contentService } = await import("./content-management");
+      const layouts = await contentService.getAllLayoutConfigs();
+      res.json(layouts);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch layout configs" });
+    }
+  });
+
+  // Export all content
+  app.get("/api/admin/content/export", requireAdmin, async (req, res) => {
+    try {
+      const { contentService } = await import("./content-management");
+      const exportData = await contentService.exportAllContent();
+      res.json(exportData);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to export content" });
+    }
+  });
+
   return httpServer;
 }
