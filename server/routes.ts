@@ -239,6 +239,104 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Admin fee configuration endpoints
+  app.get("/api/admin/fee-config", async (req, res) => {
+    try {
+      // In real app, fetch from database
+      const feeConfig = {
+        valueCreationFees: {
+          percentage: 2.5,
+          minimumFee: 0.0005,
+          maximumFee: 0.05,
+          isActive: true
+        },
+        redemptionFees: {
+          percentage: 5,
+          minimumFee: 0.001,
+          maximumFee: 0.1,
+          isActive: true
+        },
+        platformFees: {
+          mintingFeePercentage: 1,
+          valueAttachmentFeePercentage: 2.5,
+          redemptionFeePercentage: 5,
+          minimumPlatformFee: 0.0001,
+          maximumPlatformFee: 0.2,
+          feeWalletAddress: "11111111111111111111111111111111"
+        }
+      };
+      res.json(feeConfig);
+    } catch (error) {
+      console.error("Error fetching fee config:", error);
+      res.status(500).json({ error: "Failed to fetch fee configuration" });
+    }
+  });
+
+  app.put("/api/admin/fee-config", async (req, res) => {
+    try {
+      const { valueCreationFees, redemptionFees, platformFees } = req.body;
+      
+      // Validate fee configuration
+      if (valueCreationFees.percentage < 0 || valueCreationFees.percentage > 50) {
+        return res.status(400).json({ error: "Creation fee percentage must be between 0-50%" });
+      }
+      
+      if (redemptionFees.percentage < 0 || redemptionFees.percentage > 50) {
+        return res.status(400).json({ error: "Redemption fee percentage must be between 0-50%" });
+      }
+
+      // In real app, save to database and validate wallet address
+      console.log("Updating fee configuration:", { valueCreationFees, redemptionFees, platformFees });
+      
+      res.json({
+        success: true,
+        message: "Fee configuration updated successfully",
+        feeConfig: { valueCreationFees, redemptionFees, platformFees }
+      });
+    } catch (error) {
+      console.error("Error updating fee config:", error);
+      res.status(500).json({ error: "Failed to update fee configuration" });
+    }
+  });
+
+  // Calculate fees for value operations
+  app.post("/api/calculate-fees", async (req, res) => {
+    try {
+      const { operation, amount, currency = "SOL" } = req.body;
+      
+      // Mock fee rates - in real app, fetch from database
+      const feeRates = {
+        creation: { percentage: 2.5, min: 0.0005, max: 0.05 },
+        redemption: { percentage: 5, min: 0.001, max: 0.1 },
+        platform: { percentage: 1, min: 0.0001, max: 0.2 }
+      };
+
+      const rate = feeRates[operation as keyof typeof feeRates];
+      if (!rate) {
+        return res.status(400).json({ error: "Invalid operation type" });
+      }
+
+      const calculatedFee = Math.min(
+        Math.max((parseFloat(amount) * rate.percentage / 100), rate.min),
+        rate.max
+      );
+
+      const netAmount = parseFloat(amount) - calculatedFee;
+
+      res.json({
+        operation,
+        originalAmount: amount,
+        calculatedFee: calculatedFee.toFixed(6),
+        netAmount: netAmount.toFixed(6),
+        currency,
+        feePercentage: rate.percentage
+      });
+    } catch (error) {
+      console.error("Error calculating fees:", error);
+      res.status(500).json({ error: "Failed to calculate fees" });
+    }
+  });
+
   // Token holdings routes
   app.get("/api/users/:userId/holdings", async (req, res) => {
     try {

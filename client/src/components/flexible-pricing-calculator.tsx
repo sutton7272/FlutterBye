@@ -28,11 +28,16 @@ interface PricingCalculation {
   discount: string;
   gasFeeIncluded: boolean;
   appliedTier: string;
+  platformFee?: string;
+  valueAttachmentFee?: string;
+  totalWithFees?: string;
 }
 
 interface FlexiblePricingCalculatorProps {
   onPricingChange: (calculation: PricingCalculation) => void;
   quantity: number;
+  hasAttachedValue?: boolean;
+  attachedValue?: string;
 }
 
 // Mock pricing tiers - in real app, fetch from admin settings
@@ -43,7 +48,12 @@ const PRICING_TIERS: PricingTier[] = [
   { name: "Enterprise", minQuantity: 2000, maxQuantity: 10000, basePrice: "0.007", discount: "30", color: "green" }
 ];
 
-export function FlexiblePricingCalculator({ onPricingChange, quantity }: FlexiblePricingCalculatorProps) {
+export function FlexiblePricingCalculator({ 
+  onPricingChange, 
+  quantity, 
+  hasAttachedValue, 
+  attachedValue = "0" 
+}: FlexiblePricingCalculatorProps) {
   const [calculation, setCalculation] = useState<PricingCalculation>({
     quantity: 1,
     pricePerToken: "0.01",
@@ -55,7 +65,7 @@ export function FlexiblePricingCalculator({ onPricingChange, quantity }: Flexibl
 
   useEffect(() => {
     calculatePricing(quantity);
-  }, [quantity]);
+  }, [quantity, hasAttachedValue, attachedValue]);
 
   const calculatePricing = (qty: number) => {
     if (qty <= 0) qty = 1;
@@ -64,7 +74,23 @@ export function FlexiblePricingCalculator({ onPricingChange, quantity }: Flexibl
     const tier = PRICING_TIERS.find(t => qty >= t.minQuantity && qty <= t.maxQuantity) || PRICING_TIERS[0];
     
     const pricePerToken = parseFloat(tier.basePrice);
-    const totalCost = (pricePerToken * qty).toFixed(6);
+    const baseCost = pricePerToken * qty;
+    
+    // Calculate fees if value is attached
+    let platformFee = 0;
+    let valueAttachmentFee = 0;
+    
+    if (hasAttachedValue && parseFloat(attachedValue) > 0) {
+      // Platform fee on minting cost (1%)
+      platformFee = baseCost * 0.01;
+      
+      // Value attachment fee (2.5%)
+      const attachedValueNum = parseFloat(attachedValue);
+      valueAttachmentFee = Math.min(Math.max(attachedValueNum * 0.025, 0.0005), 0.05);
+    }
+    
+    const totalCost = baseCost.toFixed(6);
+    const totalWithFees = (baseCost + platformFee + valueAttachmentFee).toFixed(6);
     
     const newCalculation: PricingCalculation = {
       quantity: qty,
@@ -72,7 +98,10 @@ export function FlexiblePricingCalculator({ onPricingChange, quantity }: Flexibl
       totalCost,
       discount: tier.discount,
       gasFeeIncluded: true,
-      appliedTier: tier.name
+      appliedTier: tier.name,
+      platformFee: platformFee > 0 ? platformFee.toFixed(6) : undefined,
+      valueAttachmentFee: valueAttachmentFee > 0 ? valueAttachmentFee.toFixed(6) : undefined,
+      totalWithFees: hasAttachedValue ? totalWithFees : totalCost
     };
     
     setCalculation(newCalculation);
@@ -116,8 +145,8 @@ export function FlexiblePricingCalculator({ onPricingChange, quantity }: Flexibl
               <p className="text-2xl font-bold">{calculation.pricePerToken} SOL</p>
             </div>
             <div>
-              <p className="text-sm text-muted-foreground">Total Cost</p>
-              <p className="text-2xl font-bold text-green-600">{calculation.totalCost} SOL</p>
+              <p className="text-sm text-muted-foreground">Base Cost</p>
+              <p className="text-2xl font-bold">{calculation.totalCost} SOL</p>
             </div>
             <div>
               <p className="text-sm text-muted-foreground">Tier</p>
@@ -126,6 +155,33 @@ export function FlexiblePricingCalculator({ onPricingChange, quantity }: Flexibl
               </Badge>
             </div>
           </div>
+          
+          {hasAttachedValue && (calculation.platformFee || calculation.valueAttachmentFee) && (
+            <>
+              <Separator />
+              <div className="space-y-3">
+                <h4 className="font-medium text-sm">Fee Breakdown</h4>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                  {calculation.platformFee && (
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Platform Fee (1%):</span>
+                      <span className="font-medium">{calculation.platformFee} SOL</span>
+                    </div>
+                  )}
+                  {calculation.valueAttachmentFee && (
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Value Attachment Fee:</span>
+                      <span className="font-medium">{calculation.valueAttachmentFee} SOL</span>
+                    </div>
+                  )}
+                  <div className="flex justify-between font-semibold">
+                    <span>Total with Fees:</span>
+                    <span className="text-green-600">{calculation.totalWithFees} SOL</span>
+                  </div>
+                </div>
+              </div>
+            </>
+          )}
           
           {parseFloat(calculation.discount) > 0 && (
             <div className="flex items-center gap-2 p-3 bg-green-50 dark:bg-green-950/20 border border-green-200 dark:border-green-800 rounded-lg">

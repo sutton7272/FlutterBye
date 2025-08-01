@@ -37,6 +37,22 @@ interface RedemptionFeeConfig {
   isActive: boolean;
 }
 
+interface ValueCreationFeeConfig {
+  percentage: number;
+  minimumFee: number;
+  maximumFee: number;
+  isActive: boolean;
+}
+
+interface PlatformFeeConfig {
+  mintingFeePercentage: number;
+  valueAttachmentFeePercentage: number;
+  redemptionFeePercentage: number;
+  minimumPlatformFee: number;
+  maximumPlatformFee: number;
+  feeWalletAddress: string;
+}
+
 export function AdminPricingManagement() {
   const [pricingTiers, setPricingTiers] = useState<PricingTier[]>([
     { id: "1", name: "Starter", minQuantity: 1, maxQuantity: 99, basePrice: 0.01, discount: 0, isActive: true },
@@ -50,6 +66,22 @@ export function AdminPricingManagement() {
     minimumFee: 0.001,
     maximumFee: 0.1,
     isActive: true
+  });
+
+  const [valueCreationFees, setValueCreationFees] = useState<ValueCreationFeeConfig>({
+    percentage: 2.5,
+    minimumFee: 0.0005,
+    maximumFee: 0.05,
+    isActive: true
+  });
+
+  const [platformFees, setPlatformFees] = useState<PlatformFeeConfig>({
+    mintingFeePercentage: 1,
+    valueAttachmentFeePercentage: 2.5,
+    redemptionFeePercentage: 5,
+    minimumPlatformFee: 0.0001,
+    maximumPlatformFee: 0.2,
+    feeWalletAddress: "11111111111111111111111111111111"
   });
 
   const [globalSettings, setGlobalSettings] = useState({
@@ -95,7 +127,13 @@ export function AdminPricingManagement() {
     await new Promise(resolve => setTimeout(resolve, 1000));
     
     // In real app, would save to backend
-    console.log("Saving pricing settings:", { pricingTiers, redemptionFees, globalSettings });
+    console.log("Saving pricing settings:", { 
+      pricingTiers, 
+      redemptionFees, 
+      valueCreationFees, 
+      platformFees, 
+      globalSettings 
+    });
     
     setIsSaving(false);
     setIsEditing(null);
@@ -112,9 +150,10 @@ export function AdminPricingManagement() {
     <div className="space-y-6">
       
       <Tabs defaultValue="tiers" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-3">
+        <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="tiers">Pricing Tiers</TabsTrigger>
-          <TabsTrigger value="fees">Redemption Fees</TabsTrigger>
+          <TabsTrigger value="creation-fees">Creation Fees</TabsTrigger>
+          <TabsTrigger value="redemption-fees">Redemption Fees</TabsTrigger>
           <TabsTrigger value="global">Global Settings</TabsTrigger>
         </TabsList>
 
@@ -258,8 +297,225 @@ export function AdminPricingManagement() {
           </Card>
         </TabsContent>
 
+        {/* Value Creation Fees Tab */}
+        <TabsContent value="creation-fees" className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Plus className="h-5 w-5" />
+                Value Attachment Creation Fees
+              </CardTitle>
+              <CardDescription>
+                Configure platform fees when users attach value to newly created tokens
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="space-y-2">
+                  <Label>Creation Fee Percentage</Label>
+                  <div className="flex items-center gap-2">
+                    <Input
+                      type="number"
+                      step="0.1"
+                      value={valueCreationFees.percentage}
+                      onChange={(e) => setValueCreationFees({
+                        ...valueCreationFees,
+                        percentage: parseFloat(e.target.value)
+                      })}
+                      className="flex-1"
+                    />
+                    <span className="text-sm text-muted-foreground">%</span>
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    Fee charged when attaching value to tokens during creation
+                  </p>
+                </div>
+                <div className="space-y-2">
+                  <Label>Minimum Creation Fee (SOL)</Label>
+                  <Input
+                    type="number"
+                    step="0.0001"
+                    value={valueCreationFees.minimumFee}
+                    onChange={(e) => setValueCreationFees({
+                      ...valueCreationFees,
+                      minimumFee: parseFloat(e.target.value)
+                    })}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>Maximum Creation Fee (SOL)</Label>
+                  <Input
+                    type="number"
+                    step="0.001"
+                    value={valueCreationFees.maximumFee}
+                    onChange={(e) => setValueCreationFees({
+                      ...valueCreationFees,
+                      maximumFee: parseFloat(e.target.value)
+                    })}
+                  />
+                </div>
+              </div>
+
+              <div className="flex items-center justify-between">
+                <div>
+                  <Label>Enable Value Creation Fees</Label>
+                  <p className="text-sm text-muted-foreground">
+                    Charge fees when users attach value to tokens during minting
+                  </p>
+                </div>
+                <Switch
+                  checked={valueCreationFees.isActive}
+                  onCheckedChange={(checked) => setValueCreationFees({
+                    ...valueCreationFees,
+                    isActive: checked
+                  })}
+                />
+              </div>
+
+              <Separator />
+
+              <div className="bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
+                <h4 className="font-medium flex items-center gap-2 mb-2">
+                  <AlertTriangle className="h-4 w-4 text-blue-600" />
+                  Creation Fee Calculation Preview
+                </h4>
+                <div className="text-sm space-y-1">
+                  <p>• Attaching 0.1 SOL: Fee = {Math.min(Math.max((0.1 * valueCreationFees.percentage / 100), valueCreationFees.minimumFee), valueCreationFees.maximumFee).toFixed(4)} SOL</p>
+                  <p>• Attaching 0.5 SOL: Fee = {Math.min(Math.max((0.5 * valueCreationFees.percentage / 100), valueCreationFees.minimumFee), valueCreationFees.maximumFee).toFixed(4)} SOL</p>
+                  <p>• Attaching 2 SOL: Fee = {Math.min(Math.max((2 * valueCreationFees.percentage / 100), valueCreationFees.minimumFee), valueCreationFees.maximumFee).toFixed(4)} SOL</p>
+                </div>
+                <Separator className="my-3" />
+                <p className="text-xs text-blue-800 dark:text-blue-200">
+                  Creation fees are deducted from the attached value before it's distributed to the escrow wallet.
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Platform Fee Collection */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Settings className="h-5 w-5" />
+                Platform Fee Collection Settings
+              </CardTitle>
+              <CardDescription>
+                Configure comprehensive platform fee structure and collection wallet
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="space-y-2">
+                  <Label>Token Minting Fee (%)</Label>
+                  <Input
+                    type="number"
+                    step="0.1"
+                    value={platformFees.mintingFeePercentage}
+                    onChange={(e) => setPlatformFees({
+                      ...platformFees,
+                      mintingFeePercentage: parseFloat(e.target.value)
+                    })}
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    Fee on base token minting cost
+                  </p>
+                </div>
+                <div className="space-y-2">
+                  <Label>Value Attachment Fee (%)</Label>
+                  <Input
+                    type="number"
+                    step="0.1"
+                    value={platformFees.valueAttachmentFeePercentage}
+                    onChange={(e) => setPlatformFees({
+                      ...platformFees,
+                      valueAttachmentFeePercentage: parseFloat(e.target.value)
+                    })}
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    Fee when attaching value during creation
+                  </p>
+                </div>
+                <div className="space-y-2">
+                  <Label>Value Redemption Fee (%)</Label>
+                  <Input
+                    type="number"
+                    step="0.1"
+                    value={platformFees.redemptionFeePercentage}
+                    onChange={(e) => setPlatformFees({
+                      ...platformFees,
+                      redemptionFeePercentage: parseFloat(e.target.value)
+                    })}
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    Fee when burning tokens to redeem value
+                  </p>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label>Minimum Platform Fee (SOL)</Label>
+                  <Input
+                    type="number"
+                    step="0.0001"
+                    value={platformFees.minimumPlatformFee}
+                    onChange={(e) => setPlatformFees({
+                      ...platformFees,
+                      minimumPlatformFee: parseFloat(e.target.value)
+                    })}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>Maximum Platform Fee (SOL)</Label>
+                  <Input
+                    type="number"
+                    step="0.01"
+                    value={platformFees.maximumPlatformFee}
+                    onChange={(e) => setPlatformFees({
+                      ...platformFees,
+                      maximumPlatformFee: parseFloat(e.target.value)
+                    })}
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label>Platform Fee Collection Wallet Address</Label>
+                <Input
+                  value={platformFees.feeWalletAddress}
+                  onChange={(e) => setPlatformFees({
+                    ...platformFees,
+                    feeWalletAddress: e.target.value
+                  })}
+                  placeholder="Solana wallet address for fee collection"
+                  className="font-mono text-sm"
+                />
+                <p className="text-xs text-muted-foreground">
+                  All platform fees will be automatically transferred to this wallet address
+                </p>
+              </div>
+
+              <div className="bg-yellow-50 dark:bg-yellow-950/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4">
+                <h4 className="font-medium flex items-center gap-2 mb-2">
+                  <DollarSign className="h-4 w-4 text-yellow-600" />
+                  Revenue Calculation Example
+                </h4>
+                <div className="text-sm space-y-1">
+                  <p><strong>Scenario:</strong> User mints 1000 tokens at 0.01 SOL each with 1 SOL attached value</p>
+                  <p>• Minting cost: 10 SOL → Platform fee: {(10 * platformFees.mintingFeePercentage / 100).toFixed(4)} SOL</p>
+                  <p>• Value attachment: 1 SOL → Platform fee: {(1 * platformFees.valueAttachmentFeePercentage / 100).toFixed(4)} SOL</p>
+                  <p>• Later redemption: 1 SOL → Platform fee: {(1 * platformFees.redemptionFeePercentage / 100).toFixed(4)} SOL</p>
+                  <p className="font-medium text-yellow-800 dark:text-yellow-200">
+                    <strong>Total potential revenue: {((10 * platformFees.mintingFeePercentage / 100) + (1 * platformFees.valueAttachmentFeePercentage / 100) + (1 * platformFees.redemptionFeePercentage / 100)).toFixed(4)} SOL</strong>
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
         {/* Redemption Fees Tab */}
-        <TabsContent value="fees" className="space-y-6">
+        <TabsContent value="redemption-fees" className="space-y-6">
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
@@ -330,13 +586,17 @@ export function AdminPricingManagement() {
               <div className="bg-yellow-50 dark:bg-yellow-950/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4">
                 <h4 className="font-medium flex items-center gap-2 mb-2">
                   <AlertTriangle className="h-4 w-4 text-yellow-600" />
-                  Fee Calculation Preview
+                  Redemption Fee Calculation Preview
                 </h4>
                 <div className="text-sm space-y-1">
                   <p>• Redeeming 0.01 SOL: Fee = {((0.01 * redemptionFees.percentage / 100)).toFixed(4)} SOL</p>
                   <p>• Redeeming 0.1 SOL: Fee = {Math.min(Math.max((0.1 * redemptionFees.percentage / 100), redemptionFees.minimumFee), redemptionFees.maximumFee).toFixed(4)} SOL</p>
                   <p>• Redeeming 1 SOL: Fee = {Math.min(Math.max((1 * redemptionFees.percentage / 100), redemptionFees.minimumFee), redemptionFees.maximumFee).toFixed(4)} SOL</p>
                 </div>
+                <Separator className="my-3" />
+                <p className="text-xs text-yellow-800 dark:text-yellow-200">
+                  Redemption fees are deducted from the value being redeemed before transfer to the user.
+                </p>
               </div>
             </CardContent>
           </Card>
