@@ -6,6 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { toast } from '@/hooks/use-toast';
 import { Coins, Clock, CheckCircle, AlertCircle, Flame } from 'lucide-react';
 import { apiRequest } from '@/lib/queryClient';
+import { TransactionSuccessOverlay } from "@/components/confetti-celebration";
 
 interface Token {
   id: string;
@@ -30,6 +31,14 @@ interface UserHolding {
 export default function RedeemPage() {
   const [selectedWallet, setSelectedWallet] = useState<string>('');
   const queryClient = useQueryClient();
+  
+  // Confetti celebration state
+  const [showSuccessOverlay, setShowSuccessOverlay] = useState(false);
+  const [successData, setSuccessData] = useState<{
+    message: string;
+    amount: string;
+    type: string;
+  } | null>(null);
 
   const { data: userHoldings = [], isLoading: holdingsLoading } = useQuery({
     queryKey: ['/api/token-holdings', selectedWallet],
@@ -281,6 +290,18 @@ export default function RedeemPage() {
           </>
         )}
       </div>
+      
+      {/* Success Overlay with Confetti */}
+      <TransactionSuccessOverlay
+        isVisible={showSuccessOverlay}
+        onClose={() => {
+          setShowSuccessOverlay(false);
+          setSuccessData(null);
+        }}
+        transactionType={successData?.type || 'Transaction'}
+        amount={successData?.amount}
+        message={successData?.message}
+      />
     </div>
   );
 }

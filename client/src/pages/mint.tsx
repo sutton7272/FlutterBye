@@ -21,6 +21,7 @@ import { ViralMechanics } from "@/components/ViralMechanics";
 import { NetworkEffects } from "@/components/NetworkEffects";
 import { type InsertToken } from "@shared/schema";
 import TokenHolderAnalysis from "@/components/token-holder-analysis";
+import { TransactionSuccessOverlay } from "@/components/confetti-celebration";
 
 export default function Mint() {
   const { toast } = useToast();
@@ -41,17 +42,29 @@ export default function Mint() {
   const [memo, setMemo] = useState("");
   const [expirationDate, setExpirationDate] = useState("");
   const [isFreeFlutterbye, setIsFreeFlutterbye] = useState(false);
+  
+  // Confetti celebration state
+  const [showSuccessOverlay, setShowSuccessOverlay] = useState(false);
+  const [successData, setSuccessData] = useState<{
+    message: string;
+    amount: string;
+    type: string;
+  } | null>(null);
 
   const mintToken = useMutation({
     mutationFn: async (data: InsertToken) => {
       const response = await apiRequest("POST", "/api/tokens", data);
       return response.json();
     },
-    onSuccess: () => {
-      toast({
-        title: "Token Minted Successfully!",
-        description: "Your FlBY-MSG token has been created and distributed",
+    onSuccess: (data) => {
+      // Show confetti celebration
+      setSuccessData({
+        message: message,
+        amount: `${mintAmount} tokens${attachValue ? ` • ${attachedValue} ${currency} value` : ''}`,
+        type: 'Token Mint'
       });
+      setShowSuccessOverlay(true);
+      
       // Reset form
       setMessage("");
       setMintAmount("");
@@ -551,6 +564,18 @@ export default function Mint() {
           )}
         </div>
       </div>
+      
+      {/* Success Overlay with Confetti */}
+      <TransactionSuccessOverlay
+        isVisible={showSuccessOverlay}
+        onClose={() => {
+          setShowSuccessOverlay(false);
+          setSuccessData(null);
+        }}
+        transactionType={successData?.type || 'Transaction'}
+        amount={successData?.amount}
+        message={successData?.message}
+      />
     </div>
   );
 }
