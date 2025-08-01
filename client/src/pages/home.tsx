@@ -4,6 +4,10 @@ import { Badge } from "@/components/ui/badge";
 import { Link } from "wouter";
 import { ArrowRight, MessageSquare, Coins, Zap, TrendingUp, Users, Target } from "lucide-react";
 import flutterbeyeLogoPath from "@assets/image_1754068877999.png";
+import { QuickActionPanel } from "@/components/quick-action-panel";
+import { InteractiveStatsDashboard } from "@/components/interactive-stats-dashboard";
+import { EngagementBooster } from "@/components/engagement-booster";
+import { ViralSharingAssistant } from "@/components/viral-sharing-assistant";
 
 interface RecentActivity {
   id: string;
@@ -101,43 +105,35 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Stats Section */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-16">
-          <Card className="bg-gradient-to-br from-purple-900/40 to-blue-900/40 border-purple-500/20 backdrop-blur-sm">
-            <CardContent className="p-6 text-center">
-              <div className="text-3xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent mb-2">
-                10,847
-              </div>
-              <div className="text-gray-400 text-sm font-medium">TOKENS MINTED</div>
-            </CardContent>
-          </Card>
-          
-          <Card className="bg-gradient-to-br from-green-900/40 to-emerald-900/40 border-green-500/20 backdrop-blur-sm">
-            <CardContent className="p-6 text-center">
-              <div className="text-3xl font-bold bg-gradient-to-r from-green-400 to-emerald-400 bg-clip-text text-transparent mb-2">
-                2,341
-              </div>
-              <div className="text-gray-400 text-sm font-medium">SMS SENT</div>
-            </CardContent>
-          </Card>
-          
-          <Card className="bg-gradient-to-br from-blue-900/40 to-cyan-900/40 border-blue-500/20 backdrop-blur-sm">
-            <CardContent className="p-6 text-center">
-              <div className="text-3xl font-bold bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent mb-2">
-                $47.2K
-              </div>
-              <div className="text-gray-400 text-sm font-medium">VALUE DISTRIBUTED</div>
-            </CardContent>
-          </Card>
-          
-          <Card className="bg-gradient-to-br from-pink-900/40 to-rose-900/40 border-pink-500/20 backdrop-blur-sm">
-            <CardContent className="p-6 text-center">
-              <div className="text-3xl font-bold bg-gradient-to-r from-pink-400 to-rose-400 bg-clip-text text-transparent mb-2">
-                892
-              </div>
-              <div className="text-gray-400 text-sm font-medium">ACTIVE DEGENS</div>
-            </CardContent>
-          </Card>
+        {/* Interactive Stats Dashboard */}
+        <div className="mb-16">
+          <InteractiveStatsDashboard />
+        </div>
+
+        {/* Quick Actions Panel */}
+        <div className="mb-16">
+          <QuickActionPanel />
+        </div>
+
+        {/* Engagement Features */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-16">
+          <div className="lg:col-span-2">
+            {/* Activity Feed already here */}
+          </div>
+          <div className="space-y-6">
+            <div>
+              <h3 className="text-xl font-bold mb-4 bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+                Daily Challenges
+              </h3>
+              <EngagementBooster />
+            </div>
+            <div>
+              <h3 className="text-xl font-bold mb-4 bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent">
+                Viral Assistant
+              </h3>
+              <ViralSharingAssistant />
+            </div>
+          </div>
         </div>
 
         {/* Live Activity Feed */}

@@ -34,6 +34,7 @@ import {
 import AITextOptimizer from "@/components/ai-text-optimizer";
 import { EnhancedMetadataForm } from "@/components/enhanced-metadata-form";
 import { FlexiblePricingCalculator } from "@/components/flexible-pricing-calculator";
+import { SocialShowcaseGenerator } from "@/components/social-showcase-generator";
 import { type InsertToken } from "@shared/schema";
 import TokenHolderAnalysis from "@/components/token-holder-analysis";
 
@@ -91,17 +92,33 @@ export default function MintEnhanced() {
   const [targetType, setTargetType] = useState("manual");
   const [manualWallets, setManualWallets] = useState("");
   const [csvFile, setCsvFile] = useState<File | null>(null);
+  
+  // Social showcase
+  const [showSocialGenerator, setShowSocialGenerator] = useState(false);
+  const [lastMintedToken, setLastMintedToken] = useState<any>(null);
 
   const mintToken = useMutation({
     mutationFn: async (data: any) => {
       const response = await apiRequest("POST", "/api/tokens/enhanced", data);
       return response.json();
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
       toast({
         title: "Enhanced Token Minted Successfully!",
         description: "Your FlBY-MSG token with enhanced metadata has been created",
       });
+      
+      // Store last minted token for social sharing
+      setLastMintedToken({
+        message,
+        quantity: parseInt(mintAmount) || 1,
+        valueAttached: attachValue ? attachedValue : undefined,
+        tokenImage,
+        solscanUrl: `https://solscan.io/token/${data.tokenAddress || 'example'}`
+      });
+      
+      // Show social showcase generator
+      setShowSocialGenerator(true);
       
       // Reset form
       setMessage("");
@@ -380,6 +397,8 @@ export default function MintEnhanced() {
                 <FlexiblePricingCalculator
                   onPricingChange={handlePricingChange}
                   quantity={parseInt(mintAmount) || 1}
+                  hasAttachedValue={attachValue}
+                  attachedValue={attachedValue}
                 />
               </CardContent>
             </Card>
@@ -555,6 +574,13 @@ export default function MintEnhanced() {
             </div>
           </CardContent>
         </Card>
+
+        {/* Social Showcase Generator */}
+        <SocialShowcaseGenerator
+          tokenData={lastMintedToken}
+          isOpen={showSocialGenerator}
+          onClose={() => setShowSocialGenerator(false)}
+        />
       </div>
     </div>
   );

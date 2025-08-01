@@ -22,6 +22,7 @@ import { RewardsPage } from "@/pages/rewards";
 import JourneyPage from "@/pages/journey";
 import BadgesPage from "@/pages/badges";
 import Navbar from "@/components/navbar";
+import { FloatingActionHub } from "@/components/floating-action-hub";
 
 function Router() {
   return (
@@ -47,6 +48,7 @@ function Router() {
         <Route path="/badges" component={BadgesPage} />
         <Route component={NotFound} />
       </Switch>
+      <FloatingActionHub />
     </div>
   );
 }
