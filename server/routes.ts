@@ -1186,5 +1186,77 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   const httpServer = createServer(app);
+
+  // WebSocket server for real-time heatmap data
+  const { WebSocketServer, WebSocket } = await import('ws');
+  const wss = new WebSocketServer({ server: httpServer, path: '/ws' });
+
+  wss.on('connection', (ws) => {
+    console.log('Client connected to heatmap WebSocket');
+    
+    // Send initial data
+    ws.send(JSON.stringify({
+      type: 'init',
+      data: {
+        nodes: [],
+        connections: [],
+        stats: {
+          activeNodes: 0,
+          totalVolume: 0,
+          peakActivity: 0,
+          networkDensity: 0
+        }
+      }
+    }));
+
+    // Simulate real-time transaction data
+    const interval = setInterval(() => {
+      if (ws.readyState === WebSocket.OPEN) {
+        const transactionTypes = ['mint', 'transfer', 'redeem', 'sms'];
+        const messages = [
+          'thinking of you always',
+          'good morning sunshine', 
+          'StakeForRewards',
+          'HodlTillMoon',
+          'sorry about yesterday',
+          'you got this champ',
+          'BullMarketVibes',
+          'happy birthday friend'
+        ];
+
+        ws.send(JSON.stringify({
+          type: 'transaction',
+          data: {
+            id: `tx_${Date.now()}_${Math.random()}`,
+            type: transactionTypes[Math.floor(Math.random() * transactionTypes.length)],
+            message: messages[Math.floor(Math.random() * messages.length)],
+            value: Math.floor(Math.random() * 200) + 1,
+            walletAddress: generateRandomWallet(),
+            timestamp: new Date().toISOString(),
+            x: Math.random() * 800,
+            y: Math.random() * 400
+          }
+        }));
+      }
+    }, 2000 + Math.random() * 3000);
+
+    ws.on('close', () => {
+      console.log('Client disconnected from heatmap WebSocket');
+      clearInterval(interval);
+    });
+
+    ws.on('error', (error) => {
+      console.error('WebSocket error:', error);
+      clearInterval(interval);
+    });
+  });
+
+  function generateRandomWallet(): string {
+    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz123456789';
+    const start = Array.from({length: 4}, () => chars[Math.floor(Math.random() * chars.length)]).join('');
+    const end = Array.from({length: 4}, () => chars[Math.floor(Math.random() * chars.length)]).join('');
+    return `${start}...${end}`;
+  }
+
   return httpServer;
 }

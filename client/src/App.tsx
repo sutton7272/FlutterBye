@@ -14,6 +14,7 @@ import Explore from "@/pages/explore";
 import HowItWorks from "@/pages/how-it-works";
 import FreeCodes from "@/pages/free-codes";
 import Admin from "@/pages/admin";
+import TransactionHeatmapPage from "@/pages/heatmap";
 import { SmsIntegrationPage } from "@/pages/sms-integration";
 import { WalletManagementPage } from "@/pages/wallet-management";
 import { RewardsPage } from "@/pages/rewards";
@@ -39,6 +40,7 @@ function Router() {
         <Route path="/wallets" component={WalletManagementPage} />
         <Route path="/rewards" component={RewardsPage} />
         <Route path="/journey" component={JourneyPage} />
+        <Route path="/heatmap" component={TransactionHeatmapPage} />
         <Route component={NotFound} />
       </Switch>
     </div>

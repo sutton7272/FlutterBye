@@ -23,6 +23,7 @@ const navigation = [
   { name: 'Portfolio', href: '/portfolio', icon: Wallet },
   { name: 'Marketplace', href: '/marketplace', icon: ShoppingBag },
   { name: 'Activity', href: '/activity', icon: Activity },
+  { name: 'Heat Map', href: '/heatmap', icon: Activity },
   { name: 'Rewards', href: '/rewards', icon: Trophy },
   { name: 'Journey', href: '/journey', icon: Route },
   { name: 'Free Codes', href: '/free-codes', icon: Gift },

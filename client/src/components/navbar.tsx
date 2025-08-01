@@ -13,6 +13,7 @@ export default function Navbar() {
     { href: "/redeem", label: "Redeem" },
     { href: "/explore", label: "Explore" },
     { href: "/activity", label: "Activity" },
+    { href: "/heatmap", label: "Heat Map" },
     { href: "/how-it-works", label: "How It Works" },
     { href: "/free-codes", label: "Free Codes" },
     { href: "/sms", label: "SMS Integration" },
