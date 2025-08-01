@@ -151,7 +151,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         success: true,
         mintAddress: solanaResult.mintAddress,
         transactionSignature: solanaResult.signature,
-        blockchainUrl: `https://explorer.solana.com/tx/${solanaResult.signature}?cluster=devnet`
+        blockchainUrl: `https://explorer.solana.com/tx/${solanaResult.signature}?cluster=devnet`,
+        metadataUrl: `${req.protocol}://${req.get('host')}/api/metadata/${solanaResult.mintAddress}`
       });
     } catch (error) {
       res.status(400).json({ message: error instanceof Error ? error.message : "Invalid token data" });
@@ -1705,6 +1706,36 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(exportData);
     } catch (error) {
       res.status(500).json({ message: "Failed to export content" });
+    }
+  });
+
+  // Token metadata endpoint for wallets
+  app.get("/api/metadata/:mintAddress", async (req, res) => {
+    try {
+      const { mintAddress } = req.params;
+      
+      // Find token by mint address
+      const token = await storage.getTokenByMintAddress(mintAddress);
+      if (!token) {
+        return res.status(404).json({ error: "Token not found" });
+      }
+
+      // Import Solana service for metadata generation
+      const { SolanaBackendService } = await import("./solana-service");
+      const solanaService = new SolanaBackendService();
+      
+      // Generate metadata JSON
+      const metadata = solanaService.createTokenMetadataJson({
+        mintAddress,
+        message: token.message,
+        totalSupply: token.totalSupply,
+        imageUrl: token.imageUrl || undefined
+      });
+
+      res.json(metadata);
+    } catch (error) {
+      console.error("Error serving token metadata:", error);
+      res.status(500).json({ error: "Failed to fetch token metadata" });
     }
   });
 

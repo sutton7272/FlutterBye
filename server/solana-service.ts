@@ -71,6 +71,10 @@ export class SolanaBackendService {
         )
       );
 
+      // For now, tokens will show as "Unknown Token" in wallets
+      // To fix this, we need proper Metaplex metadata which requires additional setup
+      // The tokens are valid SPL tokens and can be tracked by mint address
+
       // If no target wallet specified, mint to admin wallet for now
       const recipientWallets = params.recipientWallets || [];
       
@@ -147,6 +151,53 @@ export class SolanaBackendService {
         error: error instanceof Error ? error.message : 'Unknown error occurred'
       };
     }
+  }
+
+  // Create metadata endpoint to serve token information
+  // This creates a JSON metadata file that can be hosted and referenced
+  createTokenMetadataJson(params: {
+    mintAddress: string;
+    message: string;
+    totalSupply: number;
+    imageUrl?: string;
+  }) {
+    return {
+      name: "FLBY-MSG",
+      symbol: "FLBY-MSG", 
+      description: `Flutterbye Message Token: "${params.message}"`,
+      image: params.imageUrl || "https://flutterbye.app/assets/token-icon.png",
+      animation_url: "",
+      external_url: "https://flutterbye.app",
+      attributes: [
+        {
+          trait_type: "Message",
+          value: params.message
+        },
+        {
+          trait_type: "Total Supply", 
+          value: params.totalSupply
+        },
+        {
+          trait_type: "Token Type",
+          value: "FLBY-MSG"
+        }
+      ],
+      properties: {
+        files: [
+          {
+            uri: params.imageUrl || "https://flutterbye.app/assets/token-icon.png",
+            type: "image/png"
+          }
+        ],
+        category: "token",
+        creators: [
+          {
+            address: this.keypair.publicKey.toString(),
+            share: 100
+          }
+        ]
+      }
+    };
   }
 
   // Get token holder information
