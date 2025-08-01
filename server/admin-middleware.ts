@@ -47,6 +47,18 @@ export const authenticateWallet = async (req: Request, res: Response, next: Next
 
 // Middleware to check if user is admin
 export const requireAdmin = (req: Request, res: Response, next: NextFunction) => {
+  // TEMPORARY: Allow admin access for testing (remove in production)
+  if (process.env.NODE_ENV === 'development') {
+    req.user = req.user || {
+      id: 'temp-admin',
+      walletAddress: 'temp',
+      role: 'super_admin',
+      isAdmin: true,
+      adminPermissions: ['pricing', 'content', 'users', 'analytics', 'system']
+    };
+    return next();
+  }
+  
   if (!req.user?.isAdmin) {
     return res.status(403).json({ 
       message: "Admin access required. Contact a system administrator to request access.",
