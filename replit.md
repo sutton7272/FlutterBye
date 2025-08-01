@@ -17,13 +17,13 @@ Preferred communication style: Simple, everyday language.
 - **Styling**: Tailwind CSS with custom CSS variables, dark mode support.
 - **State Management**: TanStack React Query for server state management.
 - **Form Handling**: React Hook Form with Zod validation.
-- **UI/UX Decisions**: "boop.fun"-inspired design with black backgrounds, vibrant gradients, meme culture language, scrolling marquee text, live activity feeds, and a purple/pink/cyan color scheme. Emphasis on gamified engagement with points, badges, levels, streaks, and leaderboards. Comprehensive admin interface for dynamic content management (text, images, layout, themes) with live preview. Limited Edition Token interface with creation dialogs, progress bars, rarity badges, and minting controls.
+- **UI/UX Decisions**: "boop.fun"-inspired design with black backgrounds, vibrant gradients, meme culture language, scrolling marquee text, live activity feeds, and a purple/pink/cyan color scheme. Emphasis on gamified engagement with points, badges, levels, streaks, and leaderboards. Comprehensive admin interface for dynamic content management (text, images, layout, themes) with live preview, advanced marketing analytics with user acquisition tracking, behavioral insights, revenue analytics, and comprehensive user engagement metrics. Limited Edition Token interface with creation dialogs, progress bars, rarity badges, and minting controls.
 
 ### Backend Architecture
 - **Runtime**: Node.js with Express.js.
 - **Language**: TypeScript with ES modules.
 - **API Design**: RESTful API.
-- **Admin Panel**: Comprehensive dashboard for pricing controls, user management, analytics, data export, and dynamic content editing.
+- **Admin Panel**: Comprehensive dashboard for pricing controls, user management, advanced marketing analytics, user behavior insights, revenue analytics, data export, and dynamic content editing.
 - **Fee Management**: Configurable percentage fees for value creation (minting) and redemption, with automatic fee collection to an admin-specified wallet.
 - **Authentication and Authorization**: Wallet-based authentication using Solana wallet adapters. Admin role-based access control with granular permissions.
 

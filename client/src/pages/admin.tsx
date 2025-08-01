@@ -35,7 +35,8 @@ import {
   TrendingUp,
   Activity,
   UserCheck,
-  Coins
+  Coins,
+  Globe
 } from "lucide-react";
 
 interface AdminSettings {
@@ -75,6 +76,99 @@ interface PlatformStats {
     message: string;
     attachedValue: number;
     redemptions: number;
+  }>;
+}
+
+interface MarketingAnalytics {
+  userAcquisition: {
+    totalSignups: number;
+    signupsLast7Days: number;
+    signupsLast30Days: number;
+    acquisitionChannels: Array<{
+      channel: string;
+      users: number;
+      percentage: number;
+    }>;
+  };
+  userEngagement: {
+    dailyActiveUsers: number;
+    weeklyActiveUsers: number;
+    monthlyActiveUsers: number;
+    averageSessionDuration: number;
+    retentionRates: {
+      day1: number;
+      day7: number;
+      day30: number;
+    };
+  };
+  tokenMetrics: {
+    averageTokensPerUser: number;
+    totalValueAttached: number;
+    averageValuePerToken: number;
+    redemptionRate: number;
+    topMessageCategories: Array<{
+      category: string;
+      count: number;
+      totalValue: number;
+    }>;
+  };
+  geographicData: Array<{
+    region: string;
+    users: number;
+    tokens: number;
+    revenue: number;
+  }>;
+  deviceData: Array<{
+    device: string;
+    users: number;
+    percentage: number;
+  }>;
+}
+
+interface UserBehaviorInsights {
+  mostActiveTimeSlots: Array<{
+    hour: number;
+    activityCount: number;
+  }>;
+  popularFeatures: Array<{
+    feature: string;
+    usageCount: number;
+    conversionRate: number;
+  }>;
+  userJourneyFunnels: {
+    signupToFirstMint: number;
+    firstMintToSecondMint: number;
+    mintToValueAttachment: number;
+    valueAttachmentToRedemption: number;
+  };
+  churnAnalysis: {
+    churnRate: number;
+    atRiskUsers: number;
+    topChurnReasons: Array<{
+      reason: string;
+      percentage: number;
+    }>;
+  };
+}
+
+interface RevenueAnalytics {
+  totalRevenue: number;
+  revenueGrowth: {
+    daily: number;
+    weekly: number;
+    monthly: number;
+  };
+  revenueByFeature: Array<{
+    feature: string;
+    revenue: number;
+    percentage: number;
+  }>;
+  averageRevenuePerUser: number;
+  lifetimeValue: number;
+  paymentMethods: Array<{
+    method: string;
+    usage: number;
+    revenue: number;
   }>;
 }
 
@@ -120,6 +214,18 @@ export default function AdminDashboard() {
 
   const { data: adminLogs = [], isLoading: logsLoading } = useQuery<AdminLog[]>({
     queryKey: ["/api/admin/logs"],
+  });
+
+  const { data: marketingData, isLoading: marketingLoading } = useQuery<MarketingAnalytics>({
+    queryKey: ["/api/admin/marketing"],
+  });
+
+  const { data: behaviorData, isLoading: behaviorLoading } = useQuery<UserBehaviorInsights>({
+    queryKey: ["/api/admin/behavior"],
+  });
+
+  const { data: revenueData, isLoading: revenueLoading } = useQuery<RevenueAnalytics>({
+    queryKey: ["/api/admin/revenue"],
   });
 
   const { data: currentSettings, isLoading: settingsLoading } = useQuery<AdminSettings>({
@@ -227,7 +333,7 @@ export default function AdminDashboard() {
         </div>
 
         <Tabs defaultValue="overview" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-8 bg-slate-800/50">
+          <TabsList className="grid w-full grid-cols-10 bg-slate-800/50">
             <TabsTrigger value="overview" className="flex items-center gap-2">
               <BarChart3 className="w-4 h-4" />
               Overview
@@ -243,6 +349,14 @@ export default function AdminDashboard() {
             <TabsTrigger value="content" className="flex items-center gap-2">
               <Edit className="w-4 h-4" />
               Content
+            </TabsTrigger>
+            <TabsTrigger value="marketing" className="flex items-center gap-2">
+              <TrendingUp className="w-4 h-4" />
+              Marketing
+            </TabsTrigger>
+            <TabsTrigger value="analytics" className="flex items-center gap-2">
+              <BarChart3 className="w-4 h-4" />
+              Analytics
             </TabsTrigger>
             <TabsTrigger value="users" className="flex items-center gap-2">
               <Users className="w-4 h-4" />
@@ -1039,6 +1153,437 @@ export default function AdminDashboard() {
                 </Table>
               </CardContent>
             </Card>
+          </TabsContent>
+
+          {/* Marketing Tab */}
+          <TabsContent value="marketing" className="space-y-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* User Acquisition */}
+              <Card className="glassmorphism">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <UserCheck className="w-5 h-5" />
+                    User Acquisition
+                  </CardTitle>
+                  <CardDescription>Track how users discover and join Flutterbye</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  {marketingLoading ? (
+                    <div>Loading marketing data...</div>
+                  ) : marketingData ? (
+                    <>
+                      <div className="grid grid-cols-3 gap-4">
+                        <div className="text-center">
+                          <div className="text-2xl font-bold text-electric-blue">
+                            {marketingData.userAcquisition.totalSignups.toLocaleString()}
+                          </div>
+                          <div className="text-sm text-gray-400">Total Signups</div>
+                        </div>
+                        <div className="text-center">
+                          <div className="text-2xl font-bold text-green-400">
+                            {marketingData.userAcquisition.signupsLast7Days.toLocaleString()}
+                          </div>
+                          <div className="text-sm text-gray-400">Last 7 Days</div>
+                        </div>
+                        <div className="text-center">
+                          <div className="text-2xl font-bold text-cyan-400">
+                            {marketingData.userAcquisition.signupsLast30Days.toLocaleString()}
+                          </div>
+                          <div className="text-sm text-gray-400">Last 30 Days</div>
+                        </div>
+                      </div>
+                      <div className="space-y-2">
+                        <h4 className="font-semibold">Acquisition Channels</h4>
+                        {marketingData.userAcquisition.acquisitionChannels.map((channel) => (
+                          <div key={channel.channel} className="flex justify-between items-center">
+                            <span className="capitalize">{channel.channel}</span>
+                            <div className="flex items-center gap-2">
+                              <span className="text-sm">{channel.users} users</span>
+                              <Badge variant="secondary">{channel.percentage}%</Badge>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </>
+                  ) : (
+                    <div className="text-gray-400">No marketing data available</div>
+                  )}
+                </CardContent>
+              </Card>
+
+              {/* User Engagement */}
+              <Card className="glassmorphism">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Activity className="w-5 h-5" />
+                    User Engagement
+                  </CardTitle>
+                  <CardDescription>Monitor user activity and retention</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  {marketingLoading ? (
+                    <div>Loading engagement data...</div>
+                  ) : marketingData ? (
+                    <>
+                      <div className="grid grid-cols-3 gap-4">
+                        <div className="text-center">
+                          <div className="text-2xl font-bold text-electric-blue">
+                            {marketingData.userEngagement.dailyActiveUsers.toLocaleString()}
+                          </div>
+                          <div className="text-sm text-gray-400">Daily Active</div>
+                        </div>
+                        <div className="text-center">
+                          <div className="text-2xl font-bold text-green-400">
+                            {marketingData.userEngagement.weeklyActiveUsers.toLocaleString()}
+                          </div>
+                          <div className="text-sm text-gray-400">Weekly Active</div>
+                        </div>
+                        <div className="text-center">
+                          <div className="text-2xl font-bold text-cyan-400">
+                            {marketingData.userEngagement.monthlyActiveUsers.toLocaleString()}
+                          </div>
+                          <div className="text-sm text-gray-400">Monthly Active</div>
+                        </div>
+                      </div>
+                      <div className="space-y-2">
+                        <h4 className="font-semibold">Retention Rates</h4>
+                        <div className="grid grid-cols-3 gap-4 text-center">
+                          <div>
+                            <div className="text-lg font-bold text-green-400">
+                              {(marketingData.userEngagement.retentionRates.day1 * 100).toFixed(1)}%
+                            </div>
+                            <div className="text-xs text-gray-400">Day 1</div>
+                          </div>
+                          <div>
+                            <div className="text-lg font-bold text-yellow-400">
+                              {(marketingData.userEngagement.retentionRates.day7 * 100).toFixed(1)}%
+                            </div>
+                            <div className="text-xs text-gray-400">Day 7</div>
+                          </div>
+                          <div>
+                            <div className="text-lg font-bold text-red-400">
+                              {(marketingData.userEngagement.retentionRates.day30 * 100).toFixed(1)}%
+                            </div>
+                            <div className="text-xs text-gray-400">Day 30</div>
+                          </div>
+                        </div>
+                      </div>
+                    </>
+                  ) : (
+                    <div className="text-gray-400">No engagement data available</div>
+                  )}
+                </CardContent>
+              </Card>
+
+              {/* Token Metrics */}
+              <Card className="glassmorphism">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Coins className="w-5 h-5" />
+                    Token Performance
+                  </CardTitle>
+                  <CardDescription>Analyze token creation and value patterns</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  {marketingLoading ? (
+                    <div>Loading token metrics...</div>
+                  ) : marketingData ? (
+                    <>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="text-center">
+                          <div className="text-2xl font-bold text-electric-blue">
+                            {marketingData.tokenMetrics.averageTokensPerUser.toFixed(1)}
+                          </div>
+                          <div className="text-sm text-gray-400">Avg Tokens/User</div>
+                        </div>
+                        <div className="text-center">
+                          <div className="text-2xl font-bold text-green-400">
+                            {(marketingData.tokenMetrics.redemptionRate * 100).toFixed(1)}%
+                          </div>
+                          <div className="text-sm text-gray-400">Redemption Rate</div>
+                        </div>
+                      </div>
+                      <div className="space-y-2">
+                        <h4 className="font-semibold">Top Message Categories</h4>
+                        {marketingData.tokenMetrics.topMessageCategories.map((category) => (
+                          <div key={category.category} className="flex justify-between items-center">
+                            <span className="capitalize">{category.category}</span>
+                            <div className="flex items-center gap-2">
+                              <span className="text-sm">{category.count} tokens</span>
+                              <Badge variant="secondary">{category.totalValue.toFixed(3)} SOL</Badge>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </>
+                  ) : (
+                    <div className="text-gray-400">No token data available</div>
+                  )}
+                </CardContent>
+              </Card>
+
+              {/* Geographic Distribution */}
+              <Card className="glassmorphism">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Globe className="w-5 h-5" />
+                    Geographic Distribution
+                  </CardTitle>
+                  <CardDescription>User distribution by region</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  {marketingLoading ? (
+                    <div>Loading geographic data...</div>
+                  ) : marketingData ? (
+                    <div className="space-y-2">
+                      {marketingData.geographicData.map((region) => (
+                        <div key={region.region} className="flex justify-between items-center">
+                          <span>{region.region}</span>
+                          <div className="flex items-center gap-3">
+                            <span className="text-sm">{region.users} users</span>
+                            <span className="text-sm text-green-400">{region.tokens} tokens</span>
+                            <Badge variant="secondary">{region.revenue.toFixed(3)} SOL</Badge>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="text-gray-400">No geographic data available</div>
+                  )}
+                </CardContent>
+              </Card>
+            </div>
+          </TabsContent>
+
+          {/* Analytics Tab */}
+          <TabsContent value="analytics" className="space-y-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* User Behavior Insights */}
+              <Card className="glassmorphism">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <TrendingUp className="w-5 h-5" />
+                    User Behavior Insights
+                  </CardTitle>
+                  <CardDescription>Deep dive into user interaction patterns</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  {behaviorLoading ? (
+                    <div>Loading behavior data...</div>
+                  ) : behaviorData ? (
+                    <>
+                      <div className="space-y-2">
+                        <h4 className="font-semibold">User Journey Conversion</h4>
+                        <div className="grid grid-cols-2 gap-4 text-sm">
+                          <div className="flex justify-between">
+                            <span>Signup → First Mint:</span>
+                            <Badge variant="secondary">
+                              {(behaviorData.userJourneyFunnels.signupToFirstMint * 100).toFixed(1)}%
+                            </Badge>
+                          </div>
+                          <div className="flex justify-between">
+                            <span>First → Second Mint:</span>
+                            <Badge variant="secondary">
+                              {(behaviorData.userJourneyFunnels.firstMintToSecondMint * 100).toFixed(1)}%
+                            </Badge>
+                          </div>
+                          <div className="flex justify-between">
+                            <span>Mint → Value Attach:</span>
+                            <Badge variant="secondary">
+                              {(behaviorData.userJourneyFunnels.mintToValueAttachment * 100).toFixed(1)}%
+                            </Badge>
+                          </div>
+                          <div className="flex justify-between">
+                            <span>Value → Redemption:</span>
+                            <Badge variant="secondary">
+                              {(behaviorData.userJourneyFunnels.valueAttachmentToRedemption * 100).toFixed(1)}%
+                            </Badge>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="space-y-2">
+                        <h4 className="font-semibold">Popular Features</h4>
+                        {behaviorData.popularFeatures.map((feature) => (
+                          <div key={feature.feature} className="flex justify-between items-center">
+                            <span className="capitalize">{feature.feature}</span>
+                            <div className="flex items-center gap-2">
+                              <span className="text-sm">{feature.usageCount} uses</span>
+                              <Badge variant="secondary">
+                                {(feature.conversionRate * 100).toFixed(1)}% conv
+                              </Badge>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </>
+                  ) : (
+                    <div className="text-gray-400">No behavior data available</div>
+                  )}
+                </CardContent>
+              </Card>
+
+              {/* Churn Analysis */}
+              <Card className="glassmorphism">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <AlertTriangle className="w-5 h-5" />
+                    Churn Analysis
+                  </CardTitle>
+                  <CardDescription>Identify at-risk users and retention opportunities</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  {behaviorLoading ? (
+                    <div>Loading churn data...</div>
+                  ) : behaviorData ? (
+                    <>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="text-center">
+                          <div className="text-2xl font-bold text-red-400">
+                            {(behaviorData.churnAnalysis.churnRate * 100).toFixed(1)}%
+                          </div>
+                          <div className="text-sm text-gray-400">Churn Rate</div>
+                        </div>
+                        <div className="text-center">
+                          <div className="text-2xl font-bold text-yellow-400">
+                            {behaviorData.churnAnalysis.atRiskUsers}
+                          </div>
+                          <div className="text-sm text-gray-400">At Risk Users</div>
+                        </div>
+                      </div>
+                      <div className="space-y-2">
+                        <h4 className="font-semibold">Top Churn Reasons</h4>
+                        {behaviorData.churnAnalysis.topChurnReasons.map((reason) => (
+                          <div key={reason.reason} className="flex justify-between items-center">
+                            <span className="capitalize">{reason.reason}</span>
+                            <Badge variant="destructive">{reason.percentage}%</Badge>
+                          </div>
+                        ))}
+                      </div>
+                    </>
+                  ) : (
+                    <div className="text-gray-400">No churn data available</div>
+                  )}
+                </CardContent>
+              </Card>
+
+              {/* Revenue Analytics */}
+              <Card className="glassmorphism">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <DollarSign className="w-5 h-5" />
+                    Revenue Analytics
+                  </CardTitle>
+                  <CardDescription>Track revenue trends and monetization efficiency</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  {revenueLoading ? (
+                    <div>Loading revenue data...</div>
+                  ) : revenueData ? (
+                    <>
+                      <div className="grid grid-cols-3 gap-4">
+                        <div className="text-center">
+                          <div className="text-2xl font-bold text-green-400">
+                            {revenueData.totalRevenue.toFixed(3)}
+                          </div>
+                          <div className="text-sm text-gray-400">Total Revenue (SOL)</div>
+                        </div>
+                        <div className="text-center">
+                          <div className="text-2xl font-bold text-blue-400">
+                            {revenueData.averageRevenuePerUser.toFixed(4)}
+                          </div>
+                          <div className="text-sm text-gray-400">ARPU (SOL)</div>
+                        </div>
+                        <div className="text-center">
+                          <div className="text-2xl font-bold text-purple-400">
+                            {revenueData.lifetimeValue.toFixed(3)}
+                          </div>
+                          <div className="text-sm text-gray-400">LTV (SOL)</div>
+                        </div>
+                      </div>
+                      <div className="space-y-2">
+                        <h4 className="font-semibold">Revenue Growth</h4>
+                        <div className="grid grid-cols-3 gap-4 text-center">
+                          <div>
+                            <div className="text-lg font-bold text-green-400">
+                              {(revenueData.revenueGrowth.daily * 100).toFixed(1)}%
+                            </div>
+                            <div className="text-xs text-gray-400">Daily</div>
+                          </div>
+                          <div>
+                            <div className="text-lg font-bold text-blue-400">
+                              {(revenueData.revenueGrowth.weekly * 100).toFixed(1)}%
+                            </div>
+                            <div className="text-xs text-gray-400">Weekly</div>
+                          </div>
+                          <div>
+                            <div className="text-lg font-bold text-purple-400">
+                              {(revenueData.revenueGrowth.monthly * 100).toFixed(1)}%
+                            </div>
+                            <div className="text-xs text-gray-400">Monthly</div>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="space-y-2">
+                        <h4 className="font-semibold">Revenue by Feature</h4>
+                        {revenueData.revenueByFeature.map((feature) => (
+                          <div key={feature.feature} className="flex justify-between items-center">
+                            <span className="capitalize">{feature.feature}</span>
+                            <div className="flex items-center gap-2">
+                              <span className="text-sm">{feature.revenue.toFixed(3)} SOL</span>
+                              <Badge variant="secondary">{feature.percentage}%</Badge>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </>
+                  ) : (
+                    <div className="text-gray-400">No revenue data available</div>
+                  )}
+                </CardContent>
+              </Card>
+
+              {/* Real-time Activity Monitor */}
+              <Card className="glassmorphism">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Activity className="w-5 h-5" />
+                    Real-time Activity
+                  </CardTitle>
+                  <CardDescription>Monitor live platform activity</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  {behaviorLoading ? (
+                    <div>Loading activity data...</div>
+                  ) : behaviorData ? (
+                    <>
+                      <div className="space-y-2">
+                        <h4 className="font-semibold">Peak Activity Hours</h4>
+                        <div className="grid grid-cols-4 gap-2 text-xs">
+                          {behaviorData.mostActiveTimeSlots.map((slot) => (
+                            <div key={slot.hour} className="text-center p-2 rounded bg-slate-800/50">
+                              <div className="font-bold">{slot.hour}:00</div>
+                              <div className="text-gray-400">{slot.activityCount}</div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                      <div className="space-y-2">
+                        <Button variant="outline" className="w-full justify-start">
+                          <RefreshCw className="w-4 h-4 mr-2" />
+                          Refresh Live Data
+                        </Button>
+                        <Button variant="outline" className="w-full justify-start">
+                          <Download className="w-4 h-4 mr-2" />
+                          Export Analytics Report
+                        </Button>
+                      </div>
+                    </>
+                  ) : (
+                    <div className="text-gray-400">No activity data available</div>
+                  )}
+                </CardContent>
+              </Card>
+            </div>
           </TabsContent>
         </Tabs>
       </div>

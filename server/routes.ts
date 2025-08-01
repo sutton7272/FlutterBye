@@ -680,6 +680,232 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // ============ MARKETING ANALYTICS API ENDPOINTS ============
+
+  // Marketing Analytics API Endpoints
+  app.get("/api/admin/marketing", authenticateWallet, requirePermission('dashboard'), async (req, res) => {
+    try {
+      // In production, this would aggregate real user data
+      const marketingData = {
+        userAcquisition: {
+          totalSignups: 1247,
+          signupsLast7Days: 89,
+          signupsLast30Days: 342,
+          acquisitionChannels: [
+            { channel: "organic_search", users: 456, percentage: 36.6 },
+            { channel: "social_media", users: 298, percentage: 23.9 },
+            { channel: "referral", users: 234, percentage: 18.8 },
+            { channel: "direct", users: 189, percentage: 15.2 },
+            { channel: "email", users: 70, percentage: 5.6 }
+          ]
+        },
+        userEngagement: {
+          dailyActiveUsers: 342,
+          weeklyActiveUsers: 856,
+          monthlyActiveUsers: 1134,
+          averageSessionDuration: 8.4,
+          retentionRates: {
+            day1: 0.78,
+            day7: 0.45,
+            day30: 0.23
+          }
+        },
+        tokenMetrics: {
+          averageTokensPerUser: 3.8,
+          totalValueAttached: 45.67,
+          averageValuePerToken: 0.012,
+          redemptionRate: 0.67,
+          topMessageCategories: [
+            { category: "emotional", count: 456, totalValue: 12.34 },
+            { category: "celebration", count: 234, totalValue: 8.90 },
+            { category: "apology", count: 189, totalValue: 6.78 },
+            { category: "encouragement", count: 167, totalValue: 5.43 },
+            { category: "gratitude", count: 134, totalValue: 4.21 }
+          ]
+        },
+        geographicData: [
+          { region: "North America", users: 456, tokens: 1789, revenue: 23.45 },
+          { region: "Europe", users: 342, tokens: 1234, revenue: 18.90 },
+          { region: "Asia", users: 289, tokens: 987, revenue: 15.67 },
+          { region: "South America", users: 98, tokens: 345, revenue: 6.78 },
+          { region: "Oceania", users: 62, tokens: 234, revenue: 4.32 }
+        ],
+        deviceData: [
+          { device: "mobile", users: 789, percentage: 63.3 },
+          { device: "desktop", users: 345, percentage: 27.7 },
+          { device: "tablet", users: 113, percentage: 9.1 }
+        ]
+      };
+      
+      res.json(marketingData);
+    } catch (error) {
+      console.error("Error fetching marketing data:", error);
+      res.status(500).json({ error: "Failed to fetch marketing analytics" });
+    }
+  });
+
+  app.get("/api/admin/behavior", authenticateWallet, requirePermission('dashboard'), async (req, res) => {
+    try {
+      const behaviorData = {
+        mostActiveTimeSlots: [
+          { hour: 9, activityCount: 145 },
+          { hour: 12, activityCount: 189 },
+          { hour: 15, activityCount: 167 },
+          { hour: 18, activityCount: 234 },
+          { hour: 21, activityCount: 198 },
+          { hour: 22, activityCount: 156 }
+        ],
+        popularFeatures: [
+          { feature: "token_minting", usageCount: 2345, conversionRate: 0.78 },
+          { feature: "value_attachment", usageCount: 1567, conversionRate: 0.67 },
+          { feature: "sms_integration", usageCount: 987, conversionRate: 0.45 },
+          { feature: "limited_edition", usageCount: 654, conversionRate: 0.89 },
+          { feature: "chat_rooms", usageCount: 432, conversionRate: 0.34 }
+        ],
+        userJourneyFunnels: {
+          signupToFirstMint: 0.74,
+          firstMintToSecondMint: 0.56,
+          mintToValueAttachment: 0.43,
+          valueAttachmentToRedemption: 0.67
+        },
+        churnAnalysis: {
+          churnRate: 0.18,
+          atRiskUsers: 89,
+          topChurnReasons: [
+            { reason: "lack_of_engagement", percentage: 34 },
+            { reason: "high_fees", percentage: 28 },
+            { reason: "complex_interface", percentage: 22 },
+            { reason: "limited_features", percentage: 16 }
+          ]
+        }
+      };
+      
+      res.json(behaviorData);
+    } catch (error) {
+      console.error("Error fetching behavior data:", error);
+      res.status(500).json({ error: "Failed to fetch behavior analytics" });
+    }
+  });
+
+  app.get("/api/admin/revenue", authenticateWallet, requirePermission('dashboard'), async (req, res) => {
+    try {
+      const revenueData = {
+        totalRevenue: 156.78,
+        revenueGrowth: {
+          daily: 0.045,
+          weekly: 0.12,
+          monthly: 0.34
+        },
+        revenueByFeature: [
+          { feature: "minting_fees", revenue: 67.89, percentage: 43.3 },
+          { feature: "value_attachment", revenue: 45.67, percentage: 29.1 },
+          { feature: "limited_edition", revenue: 23.45, percentage: 15.0 },
+          { feature: "premium_features", revenue: 12.34, percentage: 7.9 },
+          { feature: "transaction_fees", revenue: 7.43, percentage: 4.7 }
+        ],
+        averageRevenuePerUser: 0.1257,
+        lifetimeValue: 2.456,
+        paymentMethods: [
+          { method: "SOL", usage: 789, revenue: 123.45 },
+          { method: "USDC", usage: 345, revenue: 33.33 }
+        ]
+      };
+      
+      res.json(revenueData);
+    } catch (error) {
+      console.error("Error fetching revenue data:", error);
+      res.status(500).json({ error: "Failed to fetch revenue analytics" });
+    }
+  });
+
+  app.get("/api/admin/stats", authenticateWallet, requirePermission('dashboard'), async (req, res) => {
+    try {
+      const stats = {
+        totalUsers: 1247,
+        totalTokens: 4567,
+        totalValueEscrowed: 234.56,
+        totalRedemptions: 1789,
+        activeUsers24h: 342,
+        revenueToday: 12.34,
+        topTokens: [
+          { id: "1", message: "thinking of you always", attachedValue: 0.5, redemptions: 23 },
+          { id: "2", message: "happy birthday friend", attachedValue: 0.3, redemptions: 18 },
+          { id: "3", message: "sorry about yesterday", attachedValue: 0.25, redemptions: 15 },
+          { id: "4", message: "you got this champ", attachedValue: 0.2, redemptions: 12 }
+        ]
+      };
+      
+      res.json(stats);
+    } catch (error) {
+      console.error("Error fetching platform stats:", error);
+      res.status(500).json({ error: "Failed to fetch platform statistics" });
+    }
+  });
+
+  app.get("/api/admin/users", authenticateWallet, requirePermission('users'), async (req, res) => {
+    try {
+      const users = [
+        {
+          id: "1",
+          walletAddress: "5Kzx...9Fgh",
+          totalTokensMinted: 23,
+          totalValueAttached: 2.34,
+          totalRedemptions: 12,
+          joinedAt: "2024-01-15",
+          lastActive: "2024-08-01",
+          isBlocked: false,
+          riskScore: 0.15
+        },
+        {
+          id: "2", 
+          walletAddress: "7Bce...2Klm",
+          totalTokensMinted: 45,
+          totalValueAttached: 5.67,
+          totalRedemptions: 28,
+          joinedAt: "2024-02-03",
+          lastActive: "2024-08-01",
+          isBlocked: false,
+          riskScore: 0.08
+        }
+      ];
+      
+      res.json(users);
+    } catch (error) {
+      console.error("Error fetching users:", error);
+      res.status(500).json({ error: "Failed to fetch user data" });
+    }
+  });
+
+  app.get("/api/admin/logs", authenticateWallet, requirePermission('dashboard'), async (req, res) => {
+    try {
+      const logs = [
+        {
+          id: "1",
+          adminId: "admin_123",
+          action: "USER_BLOCKED",
+          targetType: "user",
+          targetId: "user_456",
+          details: { reason: "spam", duration: "24h" },
+          timestamp: "2024-08-01T10:30:00Z"
+        },
+        {
+          id: "2",
+          adminId: "admin_123", 
+          action: "SETTINGS_UPDATED",
+          targetType: "platform",
+          targetId: "config",
+          details: { field: "baseMintingFee", oldValue: 0.01, newValue: 0.015 },
+          timestamp: "2024-08-01T09:15:00Z"
+        }
+      ];
+      
+      res.json(logs);
+    } catch (error) {
+      console.error("Error fetching admin logs:", error);
+      res.status(500).json({ error: "Failed to fetch admin logs" });
+    }
+  });
+
   // ============ PHASE 2: NEW API ROUTES ============
 
   // Token value and escrow routes
