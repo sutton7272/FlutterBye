@@ -41,10 +41,15 @@ app.use((req, res, next) => {
 
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
     const status = err.status || err.statusCode || 500;
-    const message = err.message || "Internal Server Error";
+    let message = err.message || "Internal Server Error";
+    
+    // Handle specific payload too large error
+    if (err.type === 'entity.too.large') {
+      message = "File too large. Maximum size is 50MB.";
+    }
 
     res.status(status).json({ message });
-    throw err;
+    console.error('Server error:', err);
   });
 
   // importantly only setup vite in development and after
