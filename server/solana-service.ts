@@ -1,6 +1,6 @@
 import { Connection, PublicKey, Keypair, Transaction, SystemProgram, LAMPORTS_PER_SOL } from '@solana/web3.js';
 import { 
-  TOKEN_PROGRAM_ID, 
+  TOKEN_PROGRAM_ID,
   createInitializeMintInstruction, 
   createMintToInstruction,
   getMinimumBalanceForRentExemptMint,
@@ -8,8 +8,7 @@ import {
   getAssociatedTokenAddress,
   createAssociatedTokenAccountInstruction
 } from '@solana/spl-token';
-// Import the Metaplex program ID as a string since the library exports it differently
-const TOKEN_METADATA_PROGRAM_ID = new PublicKey('metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s');
+import { Metaplex, keypairIdentity, bundlrStorage } from '@metaplex-foundation/js';
 import bs58 from 'bs58';
 
 export class SolanaBackendService {
@@ -47,21 +46,49 @@ export class SolanaBackendService {
       // Generate new mint keypair
       const mintKeypair = Keypair.generate();
       
-      // Calculate rent for mint account
-      const lamports = await getMinimumBalanceForRentExemptMint(this.connection);
+      // Define token metadata
+      const metadata: TokenMetadata = {
+        mint: mintKeypair.publicKey,
+        name: "FLBY-MSG",
+        symbol: "FLBY-MSG",
+        uri: `http://localhost:5000/api/metadata/${mintKeypair.publicKey.toString()}`,
+        additionalMetadata: [
+          ["message", params.message],
+          ["totalSupply", params.totalSupply.toString()],
+          ["tokenType", "FLBY-MSG"],
+          ["description", `Flutterbye Message Token: "${params.message}"`]
+        ],
+      };
+
+      // Calculate space needed for mint with metadata extension
+      const metadataExtension = TYPE_SIZE + LENGTH_SIZE + pack(metadata).length;
+      const mintLen = getMintLen([ExtensionType.MetadataPointer]);
+      const lamports = await this.connection.getMinimumBalanceForRentExemption(
+        mintLen + metadataExtension
+      );
       
       // Create transaction
       const transaction = new Transaction();
       
-      // Add create mint account instruction
+      // Add create mint account instruction for Token-2022
       transaction.add(
         SystemProgram.createAccount({
           fromPubkey: this.keypair.publicKey,
           newAccountPubkey: mintKeypair.publicKey,
-          space: MINT_SIZE,
+          space: mintLen + metadataExtension,
           lamports,
-          programId: TOKEN_PROGRAM_ID,
+          programId: TOKEN_2022_PROGRAM_ID,
         })
+      );
+
+      // Add initialize metadata pointer instruction
+      transaction.add(
+        createInitializeMetadataPointerInstruction(
+          mintKeypair.publicKey,
+          this.keypair.publicKey,
+          mintKeypair.publicKey, // Metadata account same as mint
+          TOKEN_2022_PROGRAM_ID
+        )
       );
       
       // Add initialize mint instruction (0 decimals for whole numbers only)
@@ -70,9 +97,37 @@ export class SolanaBackendService {
           mintKeypair.publicKey,
           0, // Decimals = 0 for whole number tokens
           this.keypair.publicKey,
-          this.keypair.publicKey
+          this.keypair.publicKey,
+          TOKEN_2022_PROGRAM_ID
         )
       );
+
+      // Add initialize metadata instruction
+      transaction.add(
+        createInitializeInstruction({
+          programId: TOKEN_2022_PROGRAM_ID,
+          mint: mintKeypair.publicKey,
+          metadata: mintKeypair.publicKey,
+          name: metadata.name,
+          symbol: metadata.symbol,
+          uri: metadata.uri,
+          mintAuthority: this.keypair.publicKey,
+          updateAuthority: this.keypair.publicKey,
+        })
+      );
+
+      // Add additional metadata fields
+      for (const [key, value] of metadata.additionalMetadata || []) {
+        transaction.add(
+          createUpdateFieldInstruction({
+            programId: TOKEN_2022_PROGRAM_ID,
+            metadata: mintKeypair.publicKey,
+            updateAuthority: this.keypair.publicKey,
+            field: key,
+            value,
+          })
+        );
+      }
 
       // Note: Metaplex metadata creation temporarily disabled due to deprecated API
       // Tokens will work properly but may show as "Unknown Token" in wallets
@@ -114,16 +169,19 @@ export class SolanaBackendService {
         const recipientPubkey = new PublicKey(recipientAddress);
         const associatedTokenAddress = await getAssociatedTokenAddress(
           mintKeypair.publicKey,
-          recipientPubkey
+          recipientPubkey,
+          false,
+          TOKEN_2022_PROGRAM_ID
         );
 
-        // Create associated token account
+        // Create associated token account for Token-2022
         transaction.add(
           createAssociatedTokenAccountInstruction(
             this.keypair.publicKey,
             associatedTokenAddress,
             recipientPubkey,
-            mintKeypair.publicKey
+            mintKeypair.publicKey,
+            TOKEN_2022_PROGRAM_ID
           )
         );
 
@@ -133,7 +191,9 @@ export class SolanaBackendService {
             mintKeypair.publicKey,
             associatedTokenAddress,
             this.keypair.publicKey,
-            1 // Always 1 token per distribution wallet
+            1, // Always 1 token per distribution wallet
+            [],
+            TOKEN_2022_PROGRAM_ID
           )
         );
       }
@@ -143,16 +203,19 @@ export class SolanaBackendService {
         const minterPubkey = new PublicKey(minterWallet);
         const minterTokenAddress = await getAssociatedTokenAddress(
           mintKeypair.publicKey,
-          minterPubkey
+          minterPubkey,
+          false,
+          TOKEN_2022_PROGRAM_ID
         );
 
-        // Create associated token account for minter
+        // Create associated token account for minter (Token-2022)
         transaction.add(
           createAssociatedTokenAccountInstruction(
             this.keypair.publicKey,
             minterTokenAddress,
             minterPubkey,
-            mintKeypair.publicKey
+            mintKeypair.publicKey,
+            TOKEN_2022_PROGRAM_ID
           )
         );
 
@@ -162,7 +225,9 @@ export class SolanaBackendService {
             mintKeypair.publicKey,
             minterTokenAddress,
             this.keypair.publicKey,
-            surplusTokens
+            surplusTokens,
+            [],
+            TOKEN_2022_PROGRAM_ID
           )
         );
       }

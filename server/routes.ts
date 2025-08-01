@@ -103,8 +103,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Message must be 27 characters or less" });
       }
 
-      // Import Solana service
-      const { SolanaBackendService } = await import("./solana-service");
+      // Import Solana service (standard SPL tokens)
+      const { SolanaBackendService } = await import("./solana-service-wallet-fix");
       const solanaService = new SolanaBackendService();
 
       // Debug: Log received data to see what fields are available
@@ -1728,22 +1728,111 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ error: "Token not found" });
       }
 
-      // Import Solana service for metadata generation
-      const { SolanaBackendService } = await import("./solana-service");
-      const solanaService = new SolanaBackendService();
-      
-      // Generate metadata JSON
-      const metadata = solanaService.createTokenMetadataJson({
-        mintAddress,
-        message: token.message,
-        totalSupply: token.totalSupply,
-        imageUrl: token.imageUrl || undefined
-      });
+      // Return metadata in standard format
+      const metadata = {
+        name: "FLBY-MSG",
+        symbol: "FLBY-MSG",
+        description: `Flutterbye Message Token: "${token.message}"`,
+        image: token.imageUrl || "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDIwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjMzMzIiByeD0iMTAiLz4KPHR5cGUgdGV4dC1hbmNob3I9Im1pZGRsZSIgeD0iMTAwIiB5PSIxMDAiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxOCIgZmlsbD0iI0ZGRiI+RkxCWS1NU0c8L3R5cGU+Cjwvc3ZnPg==",
+        external_url: `https://flutterbye.app/token/${mintAddress}`,
+        attributes: [
+          {
+            trait_type: "Message",
+            value: token.message
+          },
+          {
+            trait_type: "Supply", 
+            value: token.totalSupply
+          }
+        ],
+        properties: {
+          category: "fungible",
+          decimals: 0
+        }
+      };
 
       res.json(metadata);
     } catch (error) {
       console.error("Error serving token metadata:", error);
       res.status(500).json({ error: "Failed to fetch token metadata" });
+    }
+  });
+
+  // **CRITICAL WALLET DISPLAY FIX**: Token List endpoint for wallet recognition
+  app.get("/api/token-list", async (req, res) => {
+    try {
+      // Get all tokens from database
+      const allTokens = await storage.getAllTokens();
+      
+      // Return in Solana Token List format that wallets recognize
+      const tokenList = {
+        name: "Flutterbye Token List",
+        logoURI: "https://flutterbye.app/logo.png",
+        keywords: ["flutterbye", "messaging", "tokens"],
+        tags: {
+          "flutterbye": {
+            "name": "Flutterbye Message Tokens",
+            "description": "Tokenized messages from the Flutterbye platform"
+          }
+        },
+        timestamp: new Date().toISOString(),
+        tokens: allTokens.map((token: any) => ({
+          chainId: 103, // Solana Devnet
+          address: token.mintAddress,
+          name: "FLBY-MSG",
+          symbol: "FLBY-MSG",
+          decimals: 0,
+          logoURI: token.imageUrl || "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDIwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjMzMzIiByeD0iMTAiLz4KPHR5cGUgdGV4dC1hbmNob3I9Im1pZGRsZSIgeD0iMTAwIiB5PSIxMDAiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxOCIgZmlsbD0iI0ZGRiI+RkxCWS1NU0c8L3R5cGU+Cjwvc3ZnPg==",
+          tags: ["flutterbye"],
+          extensions: {
+            message: token.message,
+            website: "https://flutterbye.app",
+            description: `Flutterbye Message Token: "${token.message}"`
+          }
+        }))
+      };
+      
+      res.json(tokenList);
+    } catch (error) {
+      console.error("Error generating token list:", error);
+      res.status(500).json({ error: "Failed to generate token list" });
+    }
+  });
+
+  // Individual token info endpoint for wallet integration
+  app.get("/api/token-info/:mintAddress", async (req, res) => {
+    try {
+      const { mintAddress } = req.params;
+      
+      // Find token by mint address
+      const token = await storage.getTokenByMintAddress(mintAddress);
+      if (!token) {
+        return res.status(404).json({ error: "Token not found" });
+      }
+
+      // Return in token info format that wallets use for display
+      const tokenInfo = {
+        chainId: 103, // Solana DevNet
+        address: mintAddress,
+        name: "FLBY-MSG",
+        symbol: "FLBY-MSG", 
+        decimals: 0,
+        logoURI: token.imageUrl || "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDIwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi0vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjMzMzIiByeD0iMTAiLz4KPHR5cGUgdGV4dC1hbmNob3I9Im1pZGRsZSIgeD0iMTAwIiB5PSIxMDAiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxOCIgZmlsbD0iI0ZGRiI+RkxCWS1NU0c8L3R5cGU+Cjwvc3ZnPg==",
+        tags: ["flutterbye"],
+        extensions: {
+          message: token.message,
+          totalSupply: token.totalSupply,
+          creator: token.creatorId,
+          platform: "flutterbye",
+          website: "https://flutterbye.app",
+          description: `Flutterbye Message Token: "${token.message}"`
+        }
+      };
+
+      res.json(tokenInfo);
+    } catch (error) {
+      console.error("Error serving token info:", error);
+      res.status(500).json({ error: "Failed to fetch token info" });
     }
   });
 
