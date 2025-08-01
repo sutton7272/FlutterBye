@@ -14,7 +14,8 @@ import { apiRequest } from "@/lib/queryClient";
 import ImageUpload from "@/components/image-upload";
 import { LoadingSpinner } from "@/components/loading-spinner";
 import { validateTokenQuantity, validateWholeNumber } from "@/lib/validators";
-import { Coins, Upload, Calculator, DollarSign, Lock, Globe, Gift, AlertCircle } from "lucide-react";
+import { Coins, Upload, Calculator, DollarSign, Lock, Globe, Gift, AlertCircle, Wand2 } from "lucide-react";
+import AITextOptimizer from "@/components/ai-text-optimizer";
 import { type InsertToken } from "@shared/schema";
 import TokenHolderAnalysis from "@/components/token-holder-analysis";
 
@@ -172,6 +173,14 @@ export default function Mint() {
                   <p className="text-xs text-muted-foreground mt-1">
                     Your message will become the token name with FlBY-MSG symbol
                   </p>
+                </div>
+                
+                {/* AI Text Optimizer */}
+                <div className="bg-gradient-to-r from-primary/5 to-cyan/5 rounded-lg p-1">
+                  <AITextOptimizer 
+                    onOptimizedTextSelect={(optimizedText) => setMessage(optimizedText)}
+                    className="border-0 bg-transparent"
+                  />
                 </div>
                 
                 <div className="space-y-4">
