@@ -12,7 +12,9 @@ import { useToast } from "@/hooks/use-toast";
 import { useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import ImageUpload from "@/components/image-upload";
-import { Coins, Upload, Calculator, DollarSign, Lock, Globe, Gift } from "lucide-react";
+import { LoadingSpinner } from "@/components/loading-spinner";
+import { validateTokenQuantity, validateWholeNumber } from "@/lib/validators";
+import { Coins, Upload, Calculator, DollarSign, Lock, Globe, Gift, AlertCircle } from "lucide-react";
 import { type InsertToken } from "@shared/schema";
 import TokenHolderAnalysis from "@/components/token-holder-analysis";
 
@@ -20,6 +22,7 @@ export default function Mint() {
   const { toast } = useToast();
   const [message, setMessage] = useState("");
   const [mintAmount, setMintAmount] = useState("");
+  const [mintAmountError, setMintAmountError] = useState("");
   const [valuePerToken, setValuePerToken] = useState("");
   const [targetType, setTargetType] = useState("manual");
   const [manualWallets, setManualWallets] = useState("");
@@ -178,11 +181,25 @@ export default function Mint() {
                       id="mintAmount"
                       type="number"
                       min="1"
+                      step="1"
                       value={mintAmount}
-                      onChange={(e) => setMintAmount(e.target.value)}
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        setMintAmount(value);
+                        
+                        if (value) {
+                          const validation = validateTokenQuantity(value);
+                          setMintAmountError(validation.isValid ? "" : validation.error || "");
+                        } else {
+                          setMintAmountError("");
+                        }
+                      }}
                       required
                       placeholder="1000"
                     />
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Only whole numbers allowed - no fractional tokens
+                    </p>
                   </div>
                 </div>
                 

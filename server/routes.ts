@@ -67,6 +67,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Message must be 27 characters or less" });
       }
       
+      // Validate whole number tokens
+      if (!Number.isInteger(tokenData.totalSupply) || tokenData.totalSupply <= 0) {
+        return res.status(400).json({ message: "Total supply must be a whole number greater than 0" });
+      }
+      
+      if (!Number.isInteger(tokenData.availableSupply) || tokenData.availableSupply < 0) {
+        return res.status(400).json({ message: "Available supply must be a whole number" });
+      }
+      
       // Set FlBY-MSG as default symbol
       tokenData.symbol = "FlBY-MSG";
       

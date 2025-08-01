@@ -332,7 +332,11 @@ export const insertUserSchema = createInsertSchema(users).omit({
   createdAt: true,
 });
 
-export const insertTokenSchema = createInsertSchema(tokens).omit({
+export const insertTokenSchema = createInsertSchema(tokens, {
+  totalSupply: z.number().int().positive().min(1).max(1000000),
+  availableSupply: z.number().int().positive().min(0).max(1000000),
+  message: z.string().min(1).max(27)
+}).omit({
   id: true,
   createdAt: true,
   mintAddress: true,
@@ -340,12 +344,16 @@ export const insertTokenSchema = createInsertSchema(tokens).omit({
   imageFile: z.string().optional(), // Base64 encoded image data
 });
 
-export const insertTokenHoldingSchema = createInsertSchema(tokenHoldings).omit({
+export const insertTokenHoldingSchema = createInsertSchema(tokenHoldings, {
+  quantity: z.number().int().positive().min(1)
+}).omit({
   id: true,
   acquiredAt: true,
 });
 
-export const insertTransactionSchema = createInsertSchema(transactions).omit({
+export const insertTransactionSchema = createInsertSchema(transactions, {
+  quantity: z.number().int().positive().min(1)
+}).omit({
   id: true,
   createdAt: true,
 });
@@ -355,7 +363,9 @@ export const insertAirdropSignupSchema = createInsertSchema(airdropSignups).omit
   createdAt: true,
 });
 
-export const insertMarketListingSchema = createInsertSchema(marketListings).omit({
+export const insertMarketListingSchema = createInsertSchema(marketListings, {
+  quantity: z.number().int().positive().min(1)
+}).omit({
   id: true,
   createdAt: true,
 });
