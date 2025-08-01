@@ -123,6 +123,61 @@ export const adminLogs = pgTable("admin_logs", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
+// Admin settings table for platform configuration
+export const adminSettings = pgTable("admin_settings", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  key: text("key").unique().notNull(),
+  value: text("value").notNull(),
+  type: text("type").notNull(), // 'number', 'boolean', 'string', 'array'
+  description: text("description"),
+  updatedAt: timestamp("updated_at").defaultNow(),
+  updatedBy: varchar("updated_by").references(() => adminUsers.id),
+});
+
+// Platform statistics tracking
+export const platformStats = pgTable("platform_stats", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  date: timestamp("date").defaultNow(),
+  totalUsers: integer("total_users").default(0),
+  totalTokens: integer("total_tokens").default(0),
+  totalValueEscrowed: decimal("total_value_escrowed", { precision: 18, scale: 9 }).default("0"),
+  totalRedemptions: integer("total_redemptions").default(0),
+  activeUsers24h: integer("active_users_24h").default(0),
+  revenueToday: decimal("revenue_today", { precision: 18, scale: 9 }).default("0"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// User analytics and behavior tracking
+export const userAnalytics = pgTable("user_analytics", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").references(() => users.id),
+  event: text("event").notNull(), // 'login', 'token_mint', 'value_attach', etc.
+  data: json("data").$type<Record<string, any>>(),
+  timestamp: timestamp("timestamp").defaultNow(),
+});
+
+// Redeemable codes for Free Flutterbye system
+export const redeemableCodes = pgTable("redeemable_codes", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  code: text("code").unique().notNull(),
+  type: text("type").notNull(), // 'free_flutterbye', 'premium_bonus', etc.
+  value: decimal("value", { precision: 18, scale: 9 }).default("0"),
+  maxUses: integer("max_uses").default(1),
+  currentUses: integer("current_uses").default(0),
+  expiresAt: timestamp("expires_at"),
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+  createdBy: varchar("created_by").references(() => adminUsers.id),
+});
+
+// Updated code redemptions tracking
+export const codeRedemptions = pgTable("code_redemptions", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  codeId: varchar("code_id").references(() => redeemableCodes.id).notNull(),
+  userId: varchar("user_id").references(() => users.id).notNull(),
+  redeemedAt: timestamp("redeemed_at").defaultNow(),
+});
+
 export const analytics = pgTable("analytics", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   date: timestamp("date").notNull(),
@@ -130,29 +185,6 @@ export const analytics = pgTable("analytics", {
   value: decimal("value", { precision: 18, scale: 9 }).notNull(),
   metadata: json("metadata").$type<Record<string, any>>(),
   createdAt: timestamp("created_at").defaultNow(),
-});
-
-// Redeemable codes for green flutterbye mints
-export const redeemableCodes = pgTable("redeemable_codes", {
-  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  code: text("code").notNull().unique(),
-  tokenId: varchar("token_id").references(() => tokens.id),
-  codeType: text("code_type").notNull(), // green_flutterbye, special_mint, promo
-  isActive: boolean("is_active").default(true),
-  maxUses: integer("max_uses").default(1),
-  currentUses: integer("current_uses").default(0),
-  expiresAt: timestamp("expires_at"),
-  metadata: json("metadata").$type<Record<string, any>>(),
-  createdAt: timestamp("created_at").defaultNow(),
-});
-
-export const codeRedemptions = pgTable("code_redemptions", {
-  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  codeId: varchar("code_id").references(() => redeemableCodes.id).notNull(),
-  userId: varchar("user_id").references(() => users.id).notNull(),
-  tokenId: varchar("token_id").references(() => tokens.id),
-  redeemedAt: timestamp("redeemed_at").defaultNow(),
-  metadata: json("metadata").$type<Record<string, any>>(),
 });
 
 // Insert schemas
@@ -223,6 +255,21 @@ export const insertRedeemableCodeSchema = createInsertSchema(redeemableCodes).om
 export const insertCodeRedemptionSchema = createInsertSchema(codeRedemptions).omit({
   id: true,
   redeemedAt: true,
+});
+
+export const insertAdminSettingsSchema = createInsertSchema(adminSettings).omit({
+  id: true,
+  updatedAt: true,
+});
+
+export const insertPlatformStatsSchema = createInsertSchema(platformStats).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertUserAnalyticsSchema = createInsertSchema(userAnalytics).omit({
+  id: true,
+  timestamp: true,
 });
 
 // Types
