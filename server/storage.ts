@@ -26,6 +26,12 @@ import {
   type InsertAdminLog,
   type Analytics,
   type InsertAnalytics,
+  type ChatRoom,
+  type InsertChatRoom,
+  type ChatMessage,
+  type InsertChatMessage,
+  type ChatParticipant,
+  type InsertChatParticipant,
 } from "@shared/schema";
 
 // Storage interface for both in-memory and database implementations
@@ -107,6 +113,16 @@ export interface IStorage {
     totalTransactions: number;
     activeUsers: number;
   }>;
+
+  // Chat methods
+  createChatRoom(data: InsertChatRoom): Promise<ChatRoom>;
+  getChatRoom(id: string): Promise<ChatRoom | undefined>;
+  getChatRooms(): Promise<ChatRoom[]>;
+  createChatMessage(data: InsertChatMessage): Promise<ChatMessage>;
+  getChatMessages(roomId: string, limit?: number): Promise<ChatMessage[]>;
+  joinChatRoom(data: InsertChatParticipant): Promise<ChatParticipant>;
+  updateChatParticipant(userId: string, roomId: string, updates: Partial<ChatParticipant>): Promise<void>;
+  getChatParticipants(roomId: string): Promise<ChatParticipant[]>;
 }
 
 // In-memory storage implementation
@@ -124,6 +140,9 @@ export class MemStorage implements IStorage {
   private adminUsers: Map<string, AdminUser> = new Map();
   private adminLogs: Map<string, AdminLog> = new Map();
   private analytics: Map<string, Analytics> = new Map();
+  private chatRooms: Map<string, ChatRoom> = new Map();
+  private chatMessages: Map<string, ChatMessage> = new Map();
+  private chatParticipants: Map<string, ChatParticipant> = new Map();
 
   // User operations
   async getUser(id: string): Promise<User | undefined> {
@@ -508,6 +527,94 @@ export class MemStorage implements IStorage {
       totalTransactions: this.transactions.size,
       activeUsers: Math.floor(this.users.size * 0.3) // Simulate active users
     };
+  }
+
+  // Chat methods
+  async createChatRoom(data: InsertChatRoom): Promise<ChatRoom> {
+    const id = randomUUID();
+    const room: ChatRoom = {
+      ...data,
+      id,
+      createdAt: new Date(),
+    };
+    this.chatRooms.set(id, room);
+    return room;
+  }
+
+  async getChatRoom(id: string): Promise<ChatRoom | undefined> {
+    return this.chatRooms.get(id);
+  }
+
+  async getChatRooms(): Promise<ChatRoom[]> {
+    return Array.from(this.chatRooms.values()).filter(room => room.isPublic);
+  }
+
+  async createChatMessage(data: InsertChatMessage): Promise<ChatMessage> {
+    const id = randomUUID();
+    const message: ChatMessage = {
+      ...data,
+      id,
+      createdAt: new Date(),
+      isEdited: false,
+      isDeleted: false,
+    };
+    this.chatMessages.set(id, message);
+    return message;
+  }
+
+  async getChatMessages(roomId: string, limit: number = 50): Promise<ChatMessage[]> {
+    return Array.from(this.chatMessages.values())
+      .filter(msg => msg.roomId === roomId && !msg.isDeleted)
+      .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
+      .slice(0, limit);
+  }
+
+  async joinChatRoom(data: InsertChatParticipant): Promise<ChatParticipant> {
+    // Check if participant already exists
+    const existing = Array.from(this.chatParticipants.values())
+      .find(p => p.roomId === data.roomId && p.userId === data.userId);
+
+    if (existing) {
+      // Update to online
+      const updated: ChatParticipant = {
+        ...existing,
+        isOnline: true,
+        lastSeenAt: new Date(),
+      };
+      this.chatParticipants.set(existing.id, updated);
+      return updated;
+    }
+
+    // Create new participant
+    const id = randomUUID();
+    const participant: ChatParticipant = {
+      ...data,
+      id,
+      joinedAt: new Date(),
+      lastSeenAt: new Date(),
+      isOnline: true,
+    };
+    this.chatParticipants.set(id, participant);
+    return participant;
+  }
+
+  async updateChatParticipant(userId: string, roomId: string, updates: Partial<ChatParticipant>): Promise<void> {
+    const participant = Array.from(this.chatParticipants.values())
+      .find(p => p.userId === userId && p.roomId === roomId);
+    
+    if (participant) {
+      const updated: ChatParticipant = {
+        ...participant,
+        ...updates,
+        lastSeenAt: new Date(),
+      };
+      this.chatParticipants.set(participant.id, updated);
+    }
+  }
+
+  async getChatParticipants(roomId: string): Promise<ChatParticipant[]> {
+    return Array.from(this.chatParticipants.values())
+      .filter(p => p.roomId === roomId);
   }
 }
 

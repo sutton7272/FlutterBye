@@ -70,6 +70,52 @@ export const tokens = pgTable("tokens", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
+// Blockchain Chat System
+export const chatRooms = pgTable("chat_rooms", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  name: text("name").notNull(),
+  description: text("description"),
+  isPublic: boolean("is_public").default(true),
+  maxParticipants: integer("max_participants").default(50),
+  createdBy: varchar("created_by").references(() => users.id).notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const chatMessages = pgTable("chat_messages", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  roomId: varchar("room_id").references(() => chatRooms.id).notNull(),
+  senderId: varchar("sender_id").references(() => users.id).notNull(),
+  senderWallet: text("sender_wallet").notNull(),
+  message: text("message").notNull(),
+  messageType: text("message_type").default("text"), // text, token_share, gif, image
+  
+  // Blockchain integration
+  blockchainHash: text("blockchain_hash"), // Transaction hash when message is committed to blockchain
+  blockchainStatus: text("blockchain_status").default("pending"), // pending, confirmed, failed
+  mintAddress: text("mint_address"), // If sharing a token
+  
+  // Message features
+  isEdited: boolean("is_edited").default(false),
+  editedAt: timestamp("edited_at"),
+  replyToMessageId: varchar("reply_to_message_id").references((): any => chatMessages.id),
+  
+  // Moderation
+  isDeleted: boolean("is_deleted").default(false),
+  deletedAt: timestamp("deleted_at"),
+  
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const chatParticipants = pgTable("chat_participants", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  roomId: varchar("room_id").references(() => chatRooms.id).notNull(),
+  userId: varchar("user_id").references(() => users.id).notNull(),
+  walletAddress: text("wallet_address").notNull(),
+  joinedAt: timestamp("joined_at").defaultNow(),
+  lastSeenAt: timestamp("last_seen_at").defaultNow(),
+  isOnline: boolean("is_online").default(false),
+});
+
 export const tokenHoldings = pgTable("token_holdings", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   userId: varchar("user_id").references(() => users.id).notNull(),
@@ -478,6 +524,24 @@ export const insertPhoneWalletMappingSchema = createInsertSchema(phoneWalletMapp
   verifiedAt: true,
 });
 
+// Chat System Schemas
+export const insertChatRoomSchema = createInsertSchema(chatRooms).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertChatMessageSchema = createInsertSchema(chatMessages).omit({
+  id: true,
+  createdAt: true,
+  editedAt: true,
+  deletedAt: true,
+});
+
+export const insertChatParticipantSchema = createInsertSchema(chatParticipants).omit({
+  id: true,
+  joinedAt: true,
+});
+
 export const insertEmotionalInteractionSchema = createInsertSchema(emotionalInteractions).omit({
   id: true,
   createdAt: true,
@@ -648,6 +712,16 @@ export type InsertEmotionalInteraction = z.infer<typeof insertEmotionalInteracti
 
 export type SmsDelivery = typeof smsDeliveries.$inferSelect;
 export type InsertSmsDelivery = z.infer<typeof insertSmsDeliverySchema>;
+
+// Chat System Types
+export type ChatRoom = typeof chatRooms.$inferSelect;
+export type InsertChatRoom = z.infer<typeof insertChatRoomSchema>;
+
+export type ChatMessage = typeof chatMessages.$inferSelect;
+export type InsertChatMessage = z.infer<typeof insertChatMessageSchema>;
+
+export type ChatParticipant = typeof chatParticipants.$inferSelect;
+export type InsertChatParticipant = z.infer<typeof insertChatParticipantSchema>;
 
 // Custom Badge System Tables
 export const customUserBadges = pgTable("custom_user_badges", {

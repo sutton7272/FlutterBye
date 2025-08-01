@@ -1,8 +1,9 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertUserSchema, insertTokenSchema, insertAirdropSignupSchema, insertTransactionSchema, insertMarketListingSchema, insertRedemptionSchema, insertEscrowWalletSchema, insertAdminUserSchema, insertAdminLogSchema, insertAnalyticsSchema } from "@shared/schema";
+import { insertUserSchema, insertTokenSchema, insertAirdropSignupSchema, insertTransactionSchema, insertMarketListingSchema, insertRedemptionSchema, insertEscrowWalletSchema, insertAdminUserSchema, insertAdminLogSchema, insertAnalyticsSchema, insertChatRoomSchema, insertChatMessageSchema } from "@shared/schema";
 import { authenticateWallet, requireAdmin, requirePermission, requireSuperAdmin } from "./admin-middleware";
+import { chatService } from "./chat-service";
 import { z } from "zod";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -1394,12 +1395,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   const httpServer = createServer(app);
 
-  // WebSocket server for real-time heatmap data
+  // WebSocket server for real-time heatmap data and chat
   const { WebSocketServer, WebSocket } = await import('ws');
   const wss = new WebSocketServer({ server: httpServer, path: '/ws' });
 
-  wss.on('connection', (ws) => {
-    console.log('Client connected to heatmap WebSocket');
+  wss.on('connection', (ws, request) => {
+    const url = new URL(request.url!, `http://${request.headers.host}`);
+    const isChat = url.pathname === '/ws' && url.searchParams.has('wallet');
+    
+    if (isChat) {
+      // Handle chat connection
+      console.log('Client connected to chat WebSocket');
+      chatService.handleWebSocketConnection(ws, request);
+    } else {
+      // Handle heatmap connection
+      console.log('Client connected to heatmap WebSocket');
     
     // Send initial data
     ws.send(JSON.stringify({
@@ -1456,6 +1466,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.error('WebSocket error:', error);
       clearInterval(interval);
     });
+    }
   });
 
   function generateRandomWallet(): string {
@@ -1836,5 +1847,53 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Chat routes
+  app.get('/api/chat/rooms', async (req, res) => {
+    try {
+      const rooms = await storage.getChatRooms();
+      res.json(rooms);
+    } catch (error) {
+      console.error('Error fetching chat rooms:', error);
+      res.status(500).json({ error: 'Failed to fetch chat rooms' });
+    }
+  });
+
+  app.post('/api/chat/rooms', async (req, res) => {
+    try {
+      const roomData = insertChatRoomSchema.parse(req.body);
+      const room = await storage.createChatRoom(roomData);
+      res.json(room);
+    } catch (error) {
+      console.error('Error creating chat room:', error);
+      res.status(500).json({ error: 'Failed to create chat room' });
+    }
+  });
+
+  app.get('/api/chat/rooms/:roomId/messages', async (req, res) => {
+    try {
+      const { roomId } = req.params;
+      const limit = parseInt(req.query.limit as string) || 50;
+      const messages = await storage.getChatMessages(roomId, limit);
+      res.json(messages);
+    } catch (error) {
+      console.error('Error fetching chat messages:', error);
+      res.status(500).json({ error: 'Failed to fetch chat messages' });
+    }
+  });
+
+  app.get('/api/chat/rooms/:roomId/participants', async (req, res) => {
+    try {
+      const { roomId } = req.params;
+      const participants = await storage.getChatParticipants(roomId);
+      res.json(participants);
+    } catch (error) {
+      console.error('Error fetching chat participants:', error);
+      res.status(500).json({ error: 'Failed to fetch chat participants' });
+    }
+  });
+
+  // Initialize chat service heartbeat
+  chatService.startHeartbeat();
+  
   return httpServer;
 }
