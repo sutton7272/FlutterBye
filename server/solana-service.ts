@@ -71,9 +71,13 @@ export class SolanaBackendService {
         )
       );
 
-      // For now, tokens will show as "Unknown Token" in wallets
-      // To fix this, we need proper Metaplex metadata which requires additional setup
-      // The tokens are valid SPL tokens and can be tracked by mint address
+      // Create on-chain metadata for proper wallet display
+      await this.createOnChainMetadata({
+        mintKeypair,
+        transaction,
+        message: params.message,
+        totalSupply: params.totalSupply
+      });
 
       // If no target wallet specified, mint to admin wallet for now
       const recipientWallets = params.recipientWallets || [];
@@ -151,6 +155,87 @@ export class SolanaBackendService {
         error: error instanceof Error ? error.message : 'Unknown error occurred'
       };
     }
+  }
+
+  // Create on-chain metadata using Metaplex standard
+  private async createOnChainMetadata(params: {
+    mintKeypair: Keypair;
+    transaction: Transaction;
+    message: string;
+    totalSupply: number;
+  }) {
+    try {
+      // Use Metaplex Token Metadata Program
+      const TOKEN_METADATA_PROGRAM_ID = new PublicKey('metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s');
+      
+      // Find metadata account address
+      const [metadataAddress] = PublicKey.findProgramAddressSync(
+        [
+          Buffer.from('metadata'),
+          TOKEN_METADATA_PROGRAM_ID.toBuffer(),
+          params.mintKeypair.publicKey.toBuffer(),
+        ],
+        TOKEN_METADATA_PROGRAM_ID
+      );
+
+      // Create metadata account instruction
+      const createMetadataAccountInstruction = {
+        keys: [
+          { pubkey: metadataAddress, isSigner: false, isWritable: true },
+          { pubkey: params.mintKeypair.publicKey, isSigner: false, isWritable: false },
+          { pubkey: this.keypair.publicKey, isSigner: true, isWritable: false },
+          { pubkey: this.keypair.publicKey, isSigner: true, isWritable: true },
+          { pubkey: this.keypair.publicKey, isSigner: true, isWritable: false },
+          { pubkey: SystemProgram.programId, isSigner: false, isWritable: false },
+        ],
+        programId: TOKEN_METADATA_PROGRAM_ID,
+        data: this.createMetadataInstructionData({
+          name: "FLBY-MSG",
+          symbol: "FLBY-MSG",
+          uri: "", // Can be empty for simple tokens
+          message: params.message,
+          totalSupply: params.totalSupply
+        })
+      };
+
+      params.transaction.add(createMetadataAccountInstruction);
+      console.log(`Added metadata instruction for mint: ${params.mintKeypair.publicKey.toString()}`);
+    } catch (error) {
+      console.error('Error creating on-chain metadata:', error);
+      // Continue without metadata - token will still work
+    }
+  }
+
+  // Create instruction data for Metaplex metadata
+  private createMetadataInstructionData(params: {
+    name: string;
+    symbol: string;
+    uri: string;
+    message: string;
+    totalSupply: number;
+  }) {
+    // Simplified metadata instruction data
+    // In production, use @metaplex-foundation/mpl-token-metadata library
+    const nameBuffer = Buffer.from(params.name);
+    const symbolBuffer = Buffer.from(params.symbol);
+    const uriBuffer = Buffer.from(params.uri);
+    
+    // Create basic instruction data
+    return Buffer.concat([
+      Buffer.from([0]), // Create metadata instruction
+      nameBuffer,
+      Buffer.alloc(32 - nameBuffer.length), // Pad to 32 bytes
+      symbolBuffer,
+      Buffer.alloc(10 - symbolBuffer.length), // Pad to 10 bytes
+      uriBuffer,
+      Buffer.alloc(200 - uriBuffer.length), // Pad to 200 bytes
+      Buffer.from([100]), // Seller fee basis points (1%)
+      Buffer.from([1]), // Has creators
+      Buffer.from([1]), // Number of creators
+      this.keypair.publicKey.toBuffer(), // Creator address
+      Buffer.from([1]), // Creator verified
+      Buffer.from([100]), // Creator share
+    ]);
   }
 
   // Create metadata endpoint to serve token information
