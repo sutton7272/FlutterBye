@@ -93,7 +93,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Token routes
+  // Token routes - Real Solana minting
   app.post("/api/tokens", async (req, res) => {
     try {
       const tokenData = insertTokenSchema.parse(req.body);
@@ -102,32 +102,57 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (tokenData.message.length > 27) {
         return res.status(400).json({ message: "Message must be 27 characters or less" });
       }
-      
-      // Validate whole number tokens
+
+      // Import Solana service
+      const { SolanaBackendService } = await import("./solana-service");
+      const solanaService = new SolanaBackendService();
+
+      // Mint actual token on Solana DevNet
+      const solanaResult = await solanaService.createFlutterbyeToken({
+        message: tokenData.message,
+        totalSupply: tokenData.totalSupply,
+        targetWallet: tokenData.creatorWallet || tokenData.creatorId // Use connected wallet or fallback
+      });
+
+      if (!solanaResult.success) {
+        return res.status(500).json({ 
+          message: "Failed to mint token on Solana blockchain",
+          error: solanaResult.error 
+        });
+      }
+
+      // Validate whole number tokens  
       if (!Number.isInteger(tokenData.totalSupply) || tokenData.totalSupply <= 0) {
         return res.status(400).json({ message: "Total supply must be a whole number greater than 0" });
       }
       
-      if (!Number.isInteger(tokenData.availableSupply) || tokenData.availableSupply < 0) {
-        return res.status(400).json({ message: "Available supply must be a whole number" });
-      }
-      
-      // Set FLBY-MSG as default symbol
-      tokenData.symbol = "FLBY-MSG";
-      
-      // Handle image upload if provided
-      if (tokenData.imageFile) {
-        // In a real implementation, you would save the image to a file storage service
-        // For now, we'll just store the base64 data as the imageUrl
-        const imageUrl = `data:image/png;base64,${tokenData.imageFile}`;
-        tokenData.imageUrl = imageUrl;
-      }
-      
-      // Remove imageFile from the data before saving
-      const { imageFile, ...finalTokenData } = tokenData;
+      // Create token with blockchain data using actual schema fields
+      const finalTokenData = {
+        message: tokenData.message,
+        symbol: "FLBY-MSG",
+        mintAddress: solanaResult.mintAddress,
+        creatorId: tokenData.creatorId || "user-1", // Default for development
+        totalSupply: tokenData.totalSupply,
+        availableSupply: tokenData.totalSupply, // Available equals total initially
+        valuePerToken: tokenData.valuePerToken || "0",
+        imageUrl: tokenData.imageFile ? `data:image/png;base64,${tokenData.imageFile}` : tokenData.imageUrl,
+        metadata: {
+          transactionSignature: solanaResult.signature,
+          blockchainStatus: 'minted',
+          solscanUrl: `https://explorer.solana.com/tx/${solanaResult.signature}?cluster=devnet`
+        }
+      };
       
       const token = await storage.createToken(finalTokenData);
-      res.json(token);
+      
+      // Return successful response with blockchain info
+      res.json({
+        ...token,
+        success: true,
+        mintAddress: solanaResult.mintAddress,
+        transactionSignature: solanaResult.signature,
+        blockchainUrl: `https://explorer.solana.com/tx/${solanaResult.signature}?cluster=devnet`
+      });
     } catch (error) {
       res.status(400).json({ message: error instanceof Error ? error.message : "Invalid token data" });
     }

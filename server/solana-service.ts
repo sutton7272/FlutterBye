@@ -26,7 +26,9 @@ export class SolanaBackendService {
       // Decode the base58 private key
       const privateKeyBytes = bs58.decode(process.env.SOLANA_PRIVATE_KEY);
       this.keypair = Keypair.fromSecretKey(privateKeyBytes);
+      console.log('Solana admin wallet loaded:', this.keypair.publicKey.toString());
     } catch (error) {
+      console.error('Error loading Solana private key:', error);
       throw new Error('Invalid SOLANA_PRIVATE_KEY format. Must be base58 encoded.');
     }
   }
@@ -35,7 +37,8 @@ export class SolanaBackendService {
   async createFlutterbyeToken(params: {
     message: string;
     totalSupply: number;
-    recipientWallets: string[];
+    recipientWallets?: string[];
+    targetWallet?: string; // Wallet to mint tokens to
   }) {
     try {
       // Generate new mint keypair
@@ -68,8 +71,26 @@ export class SolanaBackendService {
         )
       );
 
+      // If no target wallet specified, mint to admin wallet for now
+      const recipientWallets = params.recipientWallets || [];
+      
+      // Validate and add target wallet if it's a valid Solana address
+      if (params.targetWallet) {
+        try {
+          new PublicKey(params.targetWallet); // Validate it's a valid Solana address
+          recipientWallets.push(params.targetWallet);
+        } catch (error) {
+          console.log(`Invalid target wallet address: ${params.targetWallet}, using admin wallet instead`);
+        }
+      }
+      
+      // If no recipients, mint to admin wallet (development mode)
+      if (recipientWallets.length === 0) {
+        recipientWallets.push(this.keypair.publicKey.toString());
+      }
+
       // Create associated token accounts and mint tokens to recipients
-      for (const recipientAddress of params.recipientWallets) {
+      for (const recipientAddress of recipientWallets) {
         const recipientPubkey = new PublicKey(recipientAddress);
         const associatedTokenAddress = await getAssociatedTokenAddress(
           mintKeypair.publicKey,
@@ -123,7 +144,7 @@ export class SolanaBackendService {
         mintAddress: '',
         signature: '',
         success: false,
-        error: error instanceof Error ? error.message : 'Unknown error'
+        error: error instanceof Error ? error.message : 'Unknown error occurred'
       };
     }
   }
