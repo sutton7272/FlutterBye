@@ -31,6 +31,8 @@ export default function Mint() {
   const [currency, setCurrency] = useState("SOL");
   const [isPublic, setIsPublic] = useState(false);
   const [memo, setMemo] = useState("");
+  const [expirationDate, setExpirationDate] = useState("");
+  const [isGreenFlutterbye, setIsGreenFlutterbye] = useState(false);
 
   const mintToken = useMutation({
     mutationFn: async (data: InsertToken) => {
@@ -54,6 +56,8 @@ export default function Mint() {
       setCurrency("SOL");
       setIsPublic(false);
       setMemo("");
+      setExpirationDate("");
+      setIsGreenFlutterbye(false);
     },
     onError: (error) => {
       toast({
@@ -87,13 +91,15 @@ export default function Mint() {
       symbol: "FlBY-MSG", // Always FlBY-MSG
       creatorId: "user-1", // Mock user ID
       totalSupply: parseInt(mintAmount) || 0,
+      availableSupply: parseInt(mintAmount) || 0,
+      mintAddress: `mint_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
       // Phase 2: Value attachment
       hasAttachedValue: attachValue,
       attachedValue: attachValue ? attachedValue : "0",
       currency: currency,
       isPublic: isPublic,
-      metadata: memo ? { memo } : undefined,
-      availableSupply: parseInt(mintAmount) || 0,
+      expiresAt: attachValue && expirationDate ? new Date(expirationDate) : undefined,
+      metadata: memo ? { memo, isGreenFlutterbye } : { isGreenFlutterbye },
       valuePerToken: valuePerToken || "0",
       imageFile: tokenImage || undefined,
     };

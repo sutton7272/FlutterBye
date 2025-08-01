@@ -132,6 +132,29 @@ export const analytics = pgTable("analytics", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
+// Redeemable codes for green flutterbye mints
+export const redeemableCodes = pgTable("redeemable_codes", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  code: text("code").notNull().unique(),
+  tokenId: varchar("token_id").references(() => tokens.id),
+  codeType: text("code_type").notNull(), // green_flutterbye, special_mint, promo
+  isActive: boolean("is_active").default(true),
+  maxUses: integer("max_uses").default(1),
+  currentUses: integer("current_uses").default(0),
+  expiresAt: timestamp("expires_at"),
+  metadata: json("metadata").$type<Record<string, any>>(),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const codeRedemptions = pgTable("code_redemptions", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  codeId: varchar("code_id").references(() => redeemableCodes.id).notNull(),
+  userId: varchar("user_id").references(() => users.id).notNull(),
+  tokenId: varchar("token_id").references(() => tokens.id),
+  redeemedAt: timestamp("redeemed_at").defaultNow(),
+  metadata: json("metadata").$type<Record<string, any>>(),
+});
+
 // Insert schemas
 export const insertUserSchema = createInsertSchema(users).omit({
   id: true,
@@ -192,6 +215,16 @@ export const insertAnalyticsSchema = createInsertSchema(analytics).omit({
   createdAt: true,
 });
 
+export const insertRedeemableCodeSchema = createInsertSchema(redeemableCodes).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertCodeRedemptionSchema = createInsertSchema(codeRedemptions).omit({
+  id: true,
+  redeemedAt: true,
+});
+
 // Types
 export type User = typeof users.$inferSelect;
 export type InsertUser = z.infer<typeof insertUserSchema>;
@@ -225,3 +258,9 @@ export type InsertAdminLog = z.infer<typeof insertAdminLogSchema>;
 
 export type Analytics = typeof analytics.$inferSelect;
 export type InsertAnalytics = z.infer<typeof insertAnalyticsSchema>;
+
+export type RedeemableCode = typeof redeemableCodes.$inferSelect;
+export type InsertRedeemableCode = z.infer<typeof insertRedeemableCodeSchema>;
+
+export type CodeRedemption = typeof codeRedemptions.$inferSelect;
+export type InsertCodeRedemption = z.infer<typeof insertCodeRedemptionSchema>;
