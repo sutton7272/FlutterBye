@@ -93,7 +93,7 @@ export default function Mint() {
       creatorId: "user-1", // Mock user ID
       totalSupply: parseInt(mintAmount) || 0,
       availableSupply: parseInt(mintAmount) || 0,
-      mintAddress: `mint_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+
       // Phase 2: Value attachment
       hasAttachedValue: attachValue,
       attachedValue: attachValue ? attachedValue : "0",

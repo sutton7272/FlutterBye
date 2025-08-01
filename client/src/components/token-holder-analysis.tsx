@@ -32,7 +32,7 @@ export default function TokenHolderAnalysis({ onHoldersSelected }: TokenHolderAn
   const analyzeToken = useMutation({
     mutationFn: async ({ token, count }: { token: string; count: number }): Promise<TokenHolder[]> => {
       const response = await apiRequest("POST", "/api/tokens/analyze-holders", { token, count });
-      return response as TokenHolder[];
+      return response as unknown as TokenHolder[];
     },
     onSuccess: (data: TokenHolder[]) => {
       setHolders(data);
