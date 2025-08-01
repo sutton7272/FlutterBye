@@ -680,6 +680,95 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // ============ AI EMOTION ANALYSIS API ENDPOINTS ============
+
+  // AI Emotion Analysis
+  app.post("/api/ai/analyze-emotion", async (req, res) => {
+    try {
+      const { message, recipientCount } = req.body;
+      
+      if (!message || typeof message !== 'string') {
+        return res.status(400).json({ error: "Message is required" });
+      }
+
+      const { aiEmotionService } = await import("./ai-emotion-service");
+      const analysis = await aiEmotionService.analyzeMessageEmotion(
+        message, 
+        recipientCount || 1
+      );
+      
+      res.json(analysis);
+    } catch (error) {
+      console.error("Error in emotion analysis:", error);
+      res.status(500).json({ error: "Failed to analyze emotion" });
+    }
+  });
+
+  // AI Value Suggestion
+  app.post("/api/ai/suggest-value", async (req, res) => {
+    try {
+      const { message, recipientCount, senderHistory } = req.body;
+      
+      if (!message || typeof message !== 'string') {
+        return res.status(400).json({ error: "Message is required" });
+      }
+
+      const { aiEmotionService } = await import("./ai-emotion-service");
+      const suggestion = await aiEmotionService.generateValueSuggestion(
+        message,
+        recipientCount || 1,
+        senderHistory
+      );
+      
+      res.json(suggestion);
+    } catch (error) {
+      console.error("Error in value suggestion:", error);
+      res.status(500).json({ error: "Failed to generate value suggestion" });
+    }
+  });
+
+  // AI Viral Analysis
+  app.post("/api/ai/analyze-viral", async (req, res) => {
+    try {
+      const { message } = req.body;
+      
+      if (!message || typeof message !== 'string') {
+        return res.status(400).json({ error: "Message is required" });
+      }
+
+      const { aiEmotionService } = await import("./ai-emotion-service");
+      const analysis = await aiEmotionService.analyzeViralPotential(message);
+      
+      res.json(analysis);
+    } catch (error) {
+      console.error("Error in viral analysis:", error);
+      res.status(500).json({ error: "Failed to analyze viral potential" });
+    }
+  });
+
+  // AI Personalized Suggestions
+  app.post("/api/ai/personalized-suggestions", async (req, res) => {
+    try {
+      const { recipientWallet, senderWallet, context } = req.body;
+      
+      if (!recipientWallet || !senderWallet) {
+        return res.status(400).json({ error: "Recipient and sender wallets are required" });
+      }
+
+      const { aiEmotionService } = await import("./ai-emotion-service");
+      const suggestions = await aiEmotionService.generatePersonalizedSuggestions(
+        recipientWallet,
+        senderWallet,
+        context
+      );
+      
+      res.json({ suggestions });
+    } catch (error) {
+      console.error("Error in personalized suggestions:", error);
+      res.status(500).json({ error: "Failed to generate suggestions" });
+    }
+  });
+
   // ============ MARKETING ANALYTICS API ENDPOINTS ============
 
   // Marketing Analytics API Endpoints

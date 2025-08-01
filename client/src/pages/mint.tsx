@@ -16,6 +16,9 @@ import { LoadingSpinner } from "@/components/loading-spinner";
 import { validateTokenQuantity, validateWholeNumber } from "@/lib/validators";
 import { Coins, Upload, Calculator, DollarSign, Lock, Globe, Gift, AlertCircle, Wand2 } from "lucide-react";
 import AITextOptimizer from "@/components/ai-text-optimizer";
+import { EmotionAnalyzer } from "@/components/EmotionAnalyzer";
+import { ViralMechanics } from "@/components/ViralMechanics";
+import { NetworkEffects } from "@/components/NetworkEffects";
 import { type InsertToken } from "@shared/schema";
 import TokenHolderAnalysis from "@/components/token-holder-analysis";
 
@@ -514,6 +517,38 @@ export default function Mint() {
               </div>
             </CardContent>
           </Card>
+
+          {/* Game-Changing AI Features */}
+          {message.trim() && (
+            <div className="space-y-4">
+              {/* AI Emotion Analysis (placeholder for when API key is available) */}
+              <EmotionAnalyzer 
+                message={message}
+                recipientCount={parseInt(mintAmount) || 1}
+                onValueSuggestion={(value) => setValuePerToken(value.toString())}
+                onOptimizedMessage={(optimized) => setMessage(optimized)}
+              />
+              
+              {/* Viral Mechanics Engine */}
+              <ViralMechanics 
+                message={message}
+                recipientCount={parseInt(mintAmount) || 1}
+                valuePerToken={parseFloat(valuePerToken) || 0}
+                onBoostSuggestion={(boost) => {
+                  // Apply viral boost suggestions
+                  console.log("Viral boost suggestion:", boost);
+                }}
+              />
+              
+              {/* Network Effects Engine */}
+              <NetworkEffects 
+                senderWallet="connected-wallet" // Would be actual connected wallet
+                recipientCount={parseInt(mintAmount) || 1}
+                valuePerToken={parseFloat(valuePerToken) || 0}
+                messageCategory="other" // Would be determined by AI
+              />
+            </div>
+          )}
         </div>
       </div>
     </div>
