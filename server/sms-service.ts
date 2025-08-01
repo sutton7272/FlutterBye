@@ -7,7 +7,7 @@ import {
   tokens,
   users
 } from "@shared/schema";
-import { eq, desc } from "drizzle-orm";
+import { eq, desc, sql } from "drizzle-orm";
 
 interface EmotionMapping {
   keywords: string[];
@@ -376,7 +376,7 @@ export class SmsService {
       const emotionBreakdown = await db
         .select({
           emotionType: smsMessages.emotionType,
-          count: smsMessages.id
+          count: sql<number>`count(*)::int`
         })
         .from(smsMessages)
         .groupBy(smsMessages.emotionType);
