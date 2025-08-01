@@ -23,14 +23,14 @@ export default function Navbar() {
   const isActive = (href: string) => location === href;
 
   return (
-    <nav className="border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50">
+    <nav className="border-b border-blue-500/20 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50">
       <div className="container flex h-16 items-center">
         <div className="mr-4 hidden md:flex">
           <Link href="/" className="mr-6 flex items-center space-x-3">
-            <div className="w-8 h-8 bg-gradient-to-br from-flutter-purple via-flutter-cyan to-flutter-pink rounded-lg flex items-center justify-center shadow-lg animate-pulse">
-              <span className="text-sm font-bold text-background">F</span>
+            <div className="w-8 h-8 bg-gradient-to-br from-electric-blue to-electric-green rounded-full flex items-center justify-center">
+              <span className="text-xs font-bold text-background">F</span>
             </div>
-            <span className="hidden font-bold text-xl sm:inline-block flutter-gradient">
+            <span className="hidden font-bold text-xl sm:inline-block bg-gradient-to-r from-electric-blue to-electric-green bg-clip-text text-transparent">
               Flutterbye
             </span>
           </Link>
@@ -40,10 +40,10 @@ export default function Navbar() {
                 <Button
                   variant={isActive(item.href) ? "default" : "ghost"}
                   size="sm"
-                  className={`flex items-center gap-2 ${
+                  className={`flex items-center gap-2 cyber-glow ${
                     isActive(item.href) 
-                      ? "bg-primary text-primary-foreground" 
-                      : "text-muted-foreground hover:text-foreground"
+                      ? "bg-gradient-to-r from-blue-600 to-green-600 text-background hover:from-blue-500 hover:to-green-500" 
+                      : "hover:bg-blue-600/10 hover:text-blue-400"
                   }`}
                 >
                   <item.icon className="h-4 w-4" />
