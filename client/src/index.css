@@ -79,11 +79,16 @@
 }
 
 @layer components {
-  /* Fun vibrant cards */
+  /* Fun vibrant cards with cyber effects */
   .card {
-    @apply bg-card text-card-foreground border border-border;
-    box-shadow: 0 4px 6px -1px rgba(168, 85, 247, 0.2), 0 2px 4px -1px rgba(6, 182, 212, 0.15);
+    @apply bg-card text-card-foreground border;
+    border: 2px solid transparent;
     background: linear-gradient(135deg, hsl(var(--card)) 0%, hsl(240, 8%, 10%) 100%);
+    background-clip: padding-box;
+    box-shadow: 
+      0 8px 32px rgba(168, 85, 247, 0.3),
+      0 4px 16px rgba(6, 182, 212, 0.2),
+      inset 0 1px 0 rgba(255, 255, 255, 0.1);
     position: relative;
     overflow: hidden;
   }
@@ -91,16 +96,24 @@
   .card::before {
     content: '';
     position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(168, 85, 247, 0.1), transparent);
-    transition: left 0.5s ease-in-out;
+    inset: 0;
+    padding: 2px;
+    background: linear-gradient(45deg, 
+      hsl(var(--flutter-purple)),
+      hsl(var(--flutter-cyan)),
+      hsl(var(--flutter-pink)),
+      hsl(var(--flutter-purple))
+    );
+    background-size: 400% 400%;
+    border-radius: inherit;
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask-composite: xor;
+    animation: gradient-rotate 4s ease infinite;
   }
   
-  .card:hover::before {
-    left: 100%;
+  @keyframes gradient-rotate {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
   }
   
   /* Fun vibrant buttons */
@@ -123,10 +136,23 @@
     100% { box-shadow: 0 0 25px rgba(236, 72, 153, 0.4), 0 0 15px rgba(168, 85, 247, 0.3); }
   }
   
-  /* Modern navigation */
+  /* Cyber navigation */
   .navbar {
-    @apply bg-background/80 border-b border-border backdrop-blur-lg;
-    background: linear-gradient(90deg, hsl(var(--background)) 0%, hsl(240, 8%, 6%) 100%);
+    @apply border-b backdrop-blur-lg;
+    background: linear-gradient(90deg, 
+      rgba(14, 15, 23, 0.9) 0%, 
+      rgba(30, 20, 40, 0.9) 50%, 
+      rgba(14, 15, 23, 0.9) 100%
+    );
+    border-image: linear-gradient(90deg, 
+      hsl(var(--flutter-purple)), 
+      hsl(var(--flutter-cyan)), 
+      hsl(var(--flutter-pink))
+    ) 1;
+    box-shadow: 
+      0 4px 6px -1px rgba(168, 85, 247, 0.2),
+      0 2px 4px -1px rgba(6, 182, 212, 0.1),
+      inset 0 1px 0 rgba(255, 255, 255, 0.1);
   }
   
   /* Fun neon effects */

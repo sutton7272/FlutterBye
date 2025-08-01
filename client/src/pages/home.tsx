@@ -79,21 +79,41 @@ export default function ProfessionalHome() {
       </div>
 
       {/* Hero Section */}
-      <section className="relative z-10 bg-gradient-to-b from-background/80 to-muted/20 py-20">
+      <section className="relative z-10 py-20" style={{
+        background: `
+          radial-gradient(circle at 20% 50%, rgba(168, 85, 247, 0.3) 0%, transparent 50%),
+          radial-gradient(circle at 80% 20%, rgba(6, 182, 212, 0.3) 0%, transparent 50%),
+          radial-gradient(circle at 40% 80%, rgba(236, 72, 153, 0.2) 0%, transparent 50%),
+          linear-gradient(135deg, hsl(var(--background)) 0%, rgba(30, 30, 46, 0.8) 100%)
+        `
+      }}>
         <div className="container mx-auto px-6">
           <div className="max-w-4xl mx-auto text-center space-y-6">
-            <Badge variant="secondary" className="mb-4 blockchain-glow">
-              <span className="solana-accent font-semibold">Solana Blockchain</span> • SPL Tokens
+            <Badge variant="secondary" className="mb-4 relative overflow-hidden" style={{
+              background: 'linear-gradient(45deg, rgba(168, 85, 247, 0.2), rgba(6, 182, 212, 0.2))',
+              border: '1px solid rgba(168, 85, 247, 0.5)',
+              boxShadow: '0 0 20px rgba(168, 85, 247, 0.4), 0 0 40px rgba(6, 182, 212, 0.2)',
+              animation: 'cyber-pulse 2s ease-in-out infinite alternate'
+            }}>
+              <span className="relative z-10">
+                <span className="solana-accent font-semibold">⚡ Solana Blockchain</span> • 🎯 SPL Tokens
+              </span>
             </Badge>
             
             <h1 className="text-4xl lg:text-6xl font-bold tracking-tight">
-              Tokenized Messaging for{" "}
-              <span className="flutter-gradient">Web3</span>
+              🚀 Tokenized Messaging for{" "}
+              <span className="flutter-gradient relative">
+                <span className="relative z-10">Web3</span>
+                <span className="absolute inset-0 bg-gradient-to-r from-flutter-purple via-flutter-cyan to-flutter-pink opacity-20 blur-xl"></span>
+              </span> 
+              🌟
             </h1>
             
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              Create 27-character tokenized messages as SPL tokens, attach value, 
-              and enable seamless communication with built-in financial utility on Solana.
+            <p className="text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
+              💫 Create <span className="text-flutter-cyan font-semibold">27-character</span> tokenized messages as 
+              <span className="text-flutter-purple font-semibold"> SPL tokens</span>, attach value, 
+              and enable seamless communication with built-in financial utility on 
+              <span className="text-solana-green font-semibold">Solana</span>. 🔥
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center mt-8">
