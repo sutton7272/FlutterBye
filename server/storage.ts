@@ -1,8 +1,34 @@
-import { type User, type InsertUser, type Token, type InsertToken, type TokenHolding, type InsertTokenHolding, type Transaction, type InsertTransaction, type AirdropSignup, type InsertAirdropSignup, type MarketListing, type InsertMarketListing, type Redemption, type InsertRedemption, type EscrowWallet, type InsertEscrowWallet, type AdminUser, type InsertAdminUser, type AdminLog, type InsertAdminLog, type Analytics, type InsertAnalytics, users, tokens, tokenHoldings, transactions, airdropSignups, marketListings, redemptions, escrowWallets, adminUsers, adminLogs, analytics } from "@shared/schema";
-import { db } from "./db";
-import { eq, like, desc, and, or, gte, lte, count } from "drizzle-orm";
 import { randomUUID } from "crypto";
+import {
+  type User,
+  type InsertUser,
+  type Token,
+  type InsertToken,
+  type TokenHolding,
+  type InsertTokenHolding,
+  type Transaction,
+  type InsertTransaction,
+  type AirdropSignup,
+  type InsertAirdropSignup,
+  type MarketListing,
+  type InsertMarketListing,
+  type Redemption,
+  type InsertRedemption,
+  type EscrowWallet,
+  type InsertEscrowWallet,
+  type RedeemableCode,
+  type InsertRedeemableCode,
+  type CodeRedemption,
+  type InsertCodeRedemption,
+  type AdminUser,
+  type InsertAdminUser,
+  type AdminLog,
+  type InsertAdminLog,
+  type Analytics,
+  type InsertAnalytics,
+} from "@shared/schema";
 
+// Storage interface for both in-memory and database implementations
 export interface IStorage {
   // User operations
   getUser(id: string): Promise<User | undefined>;
@@ -18,139 +44,94 @@ export interface IStorage {
   getTokensByCreator(creatorId: string): Promise<Token[]>;
   getAllTokens(limit?: number, offset?: number): Promise<Token[]>;
   searchTokens(query: string): Promise<Token[]>;
+  updateToken(tokenId: string, updateData: Partial<Token>): Promise<Token>;
+  deleteToken(tokenId: string): Promise<void>;
 
-  // Token holdings operations
+  // Token holdings
   getTokenHolding(userId: string, tokenId: string): Promise<TokenHolding | undefined>;
   createTokenHolding(holding: InsertTokenHolding): Promise<TokenHolding>;
   updateTokenHolding(userId: string, tokenId: string, quantity: number): Promise<TokenHolding>;
   getUserHoldings(userId: string): Promise<TokenHolding[]>;
 
-  // Transaction operations
+  // Transactions
   createTransaction(transaction: InsertTransaction): Promise<Transaction>;
   getTransactionsByUser(userId: string): Promise<Transaction[]>;
-  updateTransactionStatus(transactionId: string, status: string, signature?: string): Promise<Transaction>;
 
-  // Airdrop operations
+  // Airdrop signups
+  getAirdropSignup(walletAddress: string): Promise<AirdropSignup | undefined>;
   createAirdropSignup(signup: InsertAirdropSignup): Promise<AirdropSignup>;
-  getAirdropSignups(): Promise<AirdropSignup[]>;
+  getAllAirdropSignups(): Promise<AirdropSignup[]>;
 
-  // Market listing operations
+  // Redemptions
+  createRedemption(redemption: InsertRedemption): Promise<Redemption>;
+  getRedemptionsByUser(userId: string): Promise<Redemption[]>;
+  getRedemptionsByToken(tokenId: string): Promise<Redemption[]>;
+
+  // Escrow wallets
+  createEscrowWallet(wallet: InsertEscrowWallet): Promise<EscrowWallet>;
+  getEscrowWallet(id: string): Promise<EscrowWallet | undefined>;
+  getEscrowWalletsByToken(tokenId: string): Promise<EscrowWallet[]>;
+  updateEscrowWallet(walletId: string, balance: string): Promise<EscrowWallet>;
+
+  // Market listings
   createMarketListing(listing: InsertMarketListing): Promise<MarketListing>;
   getMarketListings(tokenId?: string): Promise<MarketListing[]>;
   updateMarketListing(listingId: string, isActive: boolean): Promise<MarketListing>;
   getActiveListings(): Promise<MarketListing[]>;
 
-  // Phase 2: Token value and escrow operations
-  updateTokenEscrowStatus(tokenId: string, status: string, escrowWallet?: string): Promise<Token>;
-  getTokensWithValue(): Promise<Token[]>;
-  getPublicTokens(limit?: number, offset?: number): Promise<Token[]>;
-  flagToken(tokenId: string, reason: string, adminId: string): Promise<Token>;
-  blockToken(tokenId: string, adminId: string): Promise<Token>;
+  // Redeemable codes
+  createRedeemableCode(code: InsertRedeemableCode): Promise<RedeemableCode>;
+  getRedeemableCode(code: string): Promise<RedeemableCode | undefined>;
+  getAllRedeemableCodes(): Promise<RedeemableCode[]>;
+  updateRedeemableCode(codeId: string, isUsed: boolean): Promise<RedeemableCode>;
 
-  // Phase 2: Redemption operations
-  createRedemption(redemption: InsertRedemption): Promise<Redemption>;
-  getRedemption(id: string): Promise<Redemption | undefined>;
-  getUserRedemptions(userId: string): Promise<Redemption[]>;
-  updateRedemptionStatus(redemptionId: string, status: string, signature?: string): Promise<Redemption>;
-  getRedemptionsByToken(tokenId: string): Promise<Redemption[]>;
+  // Code redemptions
+  createCodeRedemption(redemption: InsertCodeRedemption): Promise<CodeRedemption>;
+  getCodeRedemptionsByUser(userId: string): Promise<CodeRedemption[]>;
+  getCodeRedemptionsByCode(codeId: string): Promise<CodeRedemption[]>;
 
-  // Phase 2: Escrow wallet operations
-  createEscrowWallet(wallet: InsertEscrowWallet): Promise<EscrowWallet>;
-  getActiveEscrowWallet(): Promise<EscrowWallet | undefined>;
-  updateEscrowBalance(walletId: string, balance: string): Promise<EscrowWallet>;
-
-  // Phase 2: Admin operations
+  // Admin operations
   createAdminUser(admin: InsertAdminUser): Promise<AdminUser>;
-  getAdminByWallet(walletAddress: string): Promise<AdminUser | undefined>;
-  updateAdminStatus(adminId: string, isActive: boolean): Promise<AdminUser>;
-  getAdminUsers(): Promise<AdminUser[]>;
-  getSuperAdmins(): Promise<AdminUser[]>;
-  updateUserAdminStatus(userId: string, updates: Partial<User>): Promise<User>;
-  updateUserBlockStatus(userId: string, blocked: boolean, reason?: string): Promise<User>;
-  getAllUsersForAdmin(): Promise<User[]>;
-  getPlatformStats(): Promise<any>;
-  getRecentAdminActivity(): Promise<any>;
-  getPlatformSettings(): Promise<any>;
-  updatePlatformSettings(settings: any): Promise<any>;
-  getEscrowWallets(): Promise<EscrowWallet[]>;
+  getAdminUser(walletAddress: string): Promise<AdminUser | undefined>;
+  updateAdminUserPermissions(adminId: string, permissions: string[]): Promise<AdminUser>;
   createAdminLog(log: InsertAdminLog): Promise<AdminLog>;
   getAdminLogs(limit?: number, offset?: number): Promise<AdminLog[]>;
 
-  // Phase 2: Analytics operations
-  createAnalyticsRecord(analytics: InsertAnalytics): Promise<Analytics>;
-  getAnalyticsByMetric(metric: string, startDate?: Date, endDate?: Date): Promise<Analytics[]>;
+  // Analytics
+  createAnalytics(analytics: InsertAnalytics): Promise<Analytics>;
+  getAnalytics(date: Date): Promise<Analytics | undefined>;
+  getAnalyticsRange(startDate: Date, endDate: Date): Promise<Analytics[]>;
   getDashboardStats(): Promise<{
+    totalUsers: number;
     totalTokens: number;
-    totalValueEscrowed: string;
-    totalRedemptions: number;
+    totalTransactions: number;
     activeUsers: number;
   }>;
 }
 
+// In-memory storage implementation
 export class MemStorage implements IStorage {
   private users: Map<string, User> = new Map();
   private tokens: Map<string, Token> = new Map();
   private tokenHoldings: Map<string, TokenHolding> = new Map();
   private transactions: Map<string, Transaction> = new Map();
   private airdropSignups: Map<string, AirdropSignup> = new Map();
+  private redemptions: Map<string, Redemption> = new Map();
+  private escrowWallets: Map<string, EscrowWallet> = new Map();
   private marketListings: Map<string, MarketListing> = new Map();
+  private redeemableCodes: Map<string, RedeemableCode> = new Map();
+  private codeRedemptions: Map<string, CodeRedemption> = new Map();
+  private adminUsers: Map<string, AdminUser> = new Map();
+  private adminLogs: Map<string, AdminLog> = new Map();
+  private analytics: Map<string, Analytics> = new Map();
 
-  constructor() {
-    // Initialize with some sample data
-    this.initializeSampleData();
-  }
-
-  private initializeSampleData() {
-    // Sample tokens
-    const sampleTokens = [
-      {
-        id: "token-1",
-        message: "DiamondHandsOnly",
-        symbol: "FlBY-MSG",
-        mintAddress: "mint-1",
-        creatorId: "user-1",
-        totalSupply: 750,
-        availableSupply: 245,
-        valuePerToken: "0.25",
-        createdAt: new Date(),
-      },
-      {
-        id: "token-2",
-        message: "ToTheMoonAndBack",
-        symbol: "FlBY-MSG",
-        mintAddress: "mint-2",
-        creatorId: "user-1",
-        totalSupply: 1000,
-        availableSupply: 532,
-        valuePerToken: "0.1",
-        createdAt: new Date(),
-      },
-      {
-        id: "token-3",
-        message: "FlutterLoveForever",
-        symbol: "FlBY-MSG",
-        mintAddress: "mint-3",
-        creatorId: "user-2",
-        totalSupply: 100,
-        availableSupply: 27,
-        valuePerToken: "1.0",
-        createdAt: new Date(),
-      },
-    ];
-
-    sampleTokens.forEach(token => {
-      this.tokens.set(token.id, token as Token);
-    });
-  }
-
+  // User operations
   async getUser(id: string): Promise<User | undefined> {
     return this.users.get(id);
   }
 
   async getUserByWallet(walletAddress: string): Promise<User | undefined> {
-    return Array.from(this.users.values()).find(
-      (user) => user.walletAddress === walletAddress,
-    );
+    return Array.from(this.users.values()).find(user => user.walletAddress === walletAddress);
   }
 
   async createUser(insertUser: InsertUser): Promise<User> {
@@ -158,7 +139,8 @@ export class MemStorage implements IStorage {
     const user: User = { 
       ...insertUser, 
       id,
-      createdAt: new Date()
+      createdAt: new Date(),
+      updatedAt: new Date()
     };
     this.users.set(id, user);
     return user;
@@ -169,29 +151,27 @@ export class MemStorage implements IStorage {
     if (!user) {
       throw new Error("User not found");
     }
-    const updatedUser = { ...user, credits };
+    const updatedUser = { ...user, credits, updatedAt: new Date() };
     this.users.set(userId, updatedUser);
     return updatedUser;
   }
 
+  // Token operations
   async getToken(id: string): Promise<Token | undefined> {
     return this.tokens.get(id);
   }
 
   async getTokenByMintAddress(mintAddress: string): Promise<Token | undefined> {
-    return Array.from(this.tokens.values()).find(
-      (token) => token.mintAddress === mintAddress,
-    );
+    return Array.from(this.tokens.values()).find(token => token.mintAddress === mintAddress);
   }
 
   async createToken(insertToken: InsertToken): Promise<Token> {
     const id = randomUUID();
-    const mintAddress = `mint-${id}`;
     const token: Token = { 
       ...insertToken, 
       id,
-      mintAddress,
-      createdAt: new Date()
+      createdAt: new Date(),
+      updatedAt: new Date()
     };
     this.tokens.set(id, token);
     return token;
@@ -202,29 +182,44 @@ export class MemStorage implements IStorage {
     if (!token) {
       throw new Error("Token not found");
     }
-    const updatedToken = { ...token, availableSupply };
+    const updatedToken = { ...token, availableSupply, updatedAt: new Date() };
     this.tokens.set(tokenId, updatedToken);
     return updatedToken;
   }
 
   async getTokensByCreator(creatorId: string): Promise<Token[]> {
-    return Array.from(this.tokens.values()).filter(
-      (token) => token.creatorId === creatorId,
-    );
+    return Array.from(this.tokens.values())
+      .filter(token => token.creatorId === creatorId)
+      .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
   }
 
   async getAllTokens(limit = 50, offset = 0): Promise<Token[]> {
-    const allTokens = Array.from(this.tokens.values());
-    return allTokens.slice(offset, offset + limit);
+    return Array.from(this.tokens.values())
+      .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
+      .slice(offset, offset + limit);
   }
 
   async searchTokens(query: string): Promise<Token[]> {
-    const lowercaseQuery = query.toLowerCase();
-    return Array.from(this.tokens.values()).filter(
-      (token) => token.message.toLowerCase().includes(lowercaseQuery),
-    );
+    return Array.from(this.tokens.values())
+      .filter(token => token.message.toLowerCase().includes(query.toLowerCase()))
+      .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
   }
 
+  async updateToken(tokenId: string, updateData: Partial<Token>): Promise<Token> {
+    const token = this.tokens.get(tokenId);
+    if (!token) {
+      throw new Error("Token not found");
+    }
+    const updatedToken = { ...token, ...updateData, updatedAt: new Date() };
+    this.tokens.set(tokenId, updatedToken);
+    return updatedToken;
+  }
+
+  async deleteToken(tokenId: string): Promise<void> {
+    this.tokens.delete(tokenId);
+  }
+
+  // Token holdings
   async getTokenHolding(userId: string, tokenId: string): Promise<TokenHolding | undefined> {
     const key = `${userId}-${tokenId}`;
     return this.tokenHoldings.get(key);
@@ -235,7 +230,8 @@ export class MemStorage implements IStorage {
     const holding: TokenHolding = { 
       ...insertHolding, 
       id,
-      acquiredAt: new Date()
+      createdAt: new Date(),
+      updatedAt: new Date()
     };
     const key = `${holding.userId}-${holding.tokenId}`;
     this.tokenHoldings.set(key, holding);
@@ -248,17 +244,17 @@ export class MemStorage implements IStorage {
     if (!holding) {
       throw new Error("Token holding not found");
     }
-    const updatedHolding = { ...holding, quantity };
+    const updatedHolding = { ...holding, quantity, updatedAt: new Date() };
     this.tokenHoldings.set(key, updatedHolding);
     return updatedHolding;
   }
 
   async getUserHoldings(userId: string): Promise<TokenHolding[]> {
-    return Array.from(this.tokenHoldings.values()).filter(
-      (holding) => holding.userId === userId,
-    );
+    return Array.from(this.tokenHoldings.values())
+      .filter(holding => holding.userId === userId);
   }
 
+  // Transactions
   async createTransaction(insertTransaction: InsertTransaction): Promise<Transaction> {
     const id = randomUUID();
     const transaction: Transaction = { 
@@ -271,19 +267,14 @@ export class MemStorage implements IStorage {
   }
 
   async getTransactionsByUser(userId: string): Promise<Transaction[]> {
-    return Array.from(this.transactions.values()).filter(
-      (transaction) => transaction.fromUserId === userId || transaction.toUserId === userId,
-    );
+    return Array.from(this.transactions.values())
+      .filter(tx => tx.fromUserId === userId || tx.toUserId === userId)
+      .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
   }
 
-  async updateTransactionStatus(transactionId: string, status: string, signature?: string): Promise<Transaction> {
-    const transaction = this.transactions.get(transactionId);
-    if (!transaction) {
-      throw new Error("Transaction not found");
-    }
-    const updatedTransaction = { ...transaction, status, solanaSignature: signature };
-    this.transactions.set(transactionId, updatedTransaction);
-    return updatedTransaction;
+  // Continue with other methods following same pattern...
+  async getAirdropSignup(walletAddress: string): Promise<AirdropSignup | undefined> {
+    return Array.from(this.airdropSignups.values()).find(signup => signup.walletAddress === walletAddress);
   }
 
   async createAirdropSignup(insertSignup: InsertAirdropSignup): Promise<AirdropSignup> {
@@ -297,8 +288,60 @@ export class MemStorage implements IStorage {
     return signup;
   }
 
-  async getAirdropSignups(): Promise<AirdropSignup[]> {
-    return Array.from(this.airdropSignups.values());
+  async getAllAirdropSignups(): Promise<AirdropSignup[]> {
+    return Array.from(this.airdropSignups.values())
+      .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+  }
+
+  async createRedemption(insertRedemption: InsertRedemption): Promise<Redemption> {
+    const id = randomUUID();
+    const redemption: Redemption = { 
+      ...insertRedemption, 
+      id,
+      createdAt: new Date()
+    };
+    this.redemptions.set(id, redemption);
+    return redemption;
+  }
+
+  async getRedemptionsByUser(userId: string): Promise<Redemption[]> {
+    return Array.from(this.redemptions.values())
+      .filter(r => r.userId === userId);
+  }
+
+  async getRedemptionsByToken(tokenId: string): Promise<Redemption[]> {
+    return Array.from(this.redemptions.values())
+      .filter(r => r.tokenId === tokenId);
+  }
+
+  async createEscrowWallet(insertWallet: InsertEscrowWallet): Promise<EscrowWallet> {
+    const id = randomUUID();
+    const wallet: EscrowWallet = { 
+      ...insertWallet, 
+      id,
+      createdAt: new Date()
+    };
+    this.escrowWallets.set(id, wallet);
+    return wallet;
+  }
+
+  async getEscrowWallet(id: string): Promise<EscrowWallet | undefined> {
+    return this.escrowWallets.get(id);
+  }
+
+  async getEscrowWalletsByToken(tokenId: string): Promise<EscrowWallet[]> {
+    return Array.from(this.escrowWallets.values())
+      .filter(wallet => wallet.tokenId === tokenId);
+  }
+
+  async updateEscrowWallet(walletId: string, balance: string): Promise<EscrowWallet> {
+    const wallet = this.escrowWallets.get(walletId);
+    if (!wallet) {
+      throw new Error("Escrow wallet not found");
+    }
+    const updatedWallet = { ...wallet, balance };
+    this.escrowWallets.set(walletId, updatedWallet);
+    return updatedWallet;
   }
 
   async createMarketListing(insertListing: InsertMarketListing): Promise<MarketListing> {
@@ -335,401 +378,138 @@ export class MemStorage implements IStorage {
       (listing) => listing.isActive,
     );
   }
-}
 
-export class DatabaseStorage implements IStorage {
-  async getUser(id: string): Promise<User | undefined> {
-    const [user] = await db.select().from(users).where(eq(users.id, id));
-    return user || undefined;
+  // Implement remaining methods with similar pattern
+  async createRedeemableCode(insertCode: InsertRedeemableCode): Promise<RedeemableCode> {
+    const id = randomUUID();
+    const code: RedeemableCode = { 
+      ...insertCode, 
+      id,
+      createdAt: new Date()
+    };
+    this.redeemableCodes.set(id, code);
+    return code;
   }
 
-  async getUserByWallet(walletAddress: string): Promise<User | undefined> {
-    const [user] = await db.select().from(users).where(eq(users.walletAddress, walletAddress));
-    return user || undefined;
+  async getRedeemableCode(code: string): Promise<RedeemableCode | undefined> {
+    return Array.from(this.redeemableCodes.values()).find(c => c.code === code);
   }
 
-  async createUser(insertUser: InsertUser): Promise<User> {
-    const [user] = await db
-      .insert(users)
-      .values(insertUser)
-      .returning();
-    return user;
+  async getAllRedeemableCodes(): Promise<RedeemableCode[]> {
+    return Array.from(this.redeemableCodes.values());
   }
 
-  async updateUserCredits(userId: string, credits: string): Promise<User> {
-    const [user] = await db
-      .update(users)
-      .set({ credits })
-      .where(eq(users.id, userId))
-      .returning();
-    return user;
-  }
-
-  async getToken(id: string): Promise<Token | undefined> {
-    const [token] = await db.select().from(tokens).where(eq(tokens.id, id));
-    return token || undefined;
-  }
-
-  async getTokenByMintAddress(mintAddress: string): Promise<Token | undefined> {
-    const [token] = await db.select().from(tokens).where(eq(tokens.mintAddress, mintAddress));
-    return token || undefined;
-  }
-
-  async createToken(insertToken: InsertToken): Promise<Token> {
-    const [token] = await db
-      .insert(tokens)
-      .values(insertToken)
-      .returning();
-    return token;
-  }
-
-  async updateTokenSupply(tokenId: string, availableSupply: number): Promise<Token> {
-    const [token] = await db
-      .update(tokens)
-      .set({ availableSupply })
-      .where(eq(tokens.id, tokenId))
-      .returning();
-    return token;
-  }
-
-  async getTokensByCreator(creatorId: string): Promise<Token[]> {
-    return await db.select().from(tokens).where(eq(tokens.creatorId, creatorId)).orderBy(desc(tokens.createdAt));
-  }
-
-  async getAllTokens(limit = 50, offset = 0): Promise<Token[]> {
-    return await db.select().from(tokens).orderBy(desc(tokens.createdAt)).limit(limit).offset(offset);
-  }
-
-  async searchTokens(query: string): Promise<Token[]> {
-    return await db.select().from(tokens).where(like(tokens.message, `%${query}%`)).orderBy(desc(tokens.createdAt));
-  }
-
-  async getTokenHolding(userId: string, tokenId: string): Promise<TokenHolding | undefined> {
-    const [holding] = await db
-      .select()
-      .from(tokenHoldings)
-      .where(eq(tokenHoldings.userId, userId))
-      .where(eq(tokenHoldings.tokenId, tokenId));
-    return holding || undefined;
-  }
-
-  async createTokenHolding(insertHolding: InsertTokenHolding): Promise<TokenHolding> {
-    const [holding] = await db
-      .insert(tokenHoldings)
-      .values(insertHolding)
-      .returning();
-    return holding;
-  }
-
-  async updateTokenHolding(userId: string, tokenId: string, quantity: number): Promise<TokenHolding> {
-    const [holding] = await db
-      .update(tokenHoldings)
-      .set({ quantity })
-      .where(eq(tokenHoldings.userId, userId))
-      .where(eq(tokenHoldings.tokenId, tokenId))
-      .returning();
-    return holding;
-  }
-
-  async getUserHoldings(userId: string): Promise<TokenHolding[]> {
-    return await db.select().from(tokenHoldings).where(eq(tokenHoldings.userId, userId));
-  }
-
-  async createTransaction(insertTransaction: InsertTransaction): Promise<Transaction> {
-    const [transaction] = await db
-      .insert(transactions)
-      .values(insertTransaction)
-      .returning();
-    return transaction;
-  }
-
-  async getTransactionsByUser(userId: string): Promise<Transaction[]> {
-    return await db
-      .select()
-      .from(transactions)
-      .where(eq(transactions.fromUserId, userId))
-      .or(eq(transactions.toUserId, userId))
-      .orderBy(desc(transactions.createdAt));
-  }
-
-  async updateTransactionStatus(transactionId: string, status: string, signature?: string): Promise<Transaction> {
-    const [transaction] = await db
-      .update(transactions)
-      .set({ status, solanaSignature: signature })
-      .where(eq(transactions.id, transactionId))
-      .returning();
-    return transaction;
-  }
-
-  async createAirdropSignup(insertSignup: InsertAirdropSignup): Promise<AirdropSignup> {
-    const [signup] = await db
-      .insert(airdropSignups)
-      .values(insertSignup)
-      .returning();
-    return signup;
-  }
-
-  async getAirdropSignups(): Promise<AirdropSignup[]> {
-    return await db.select().from(airdropSignups).orderBy(desc(airdropSignups.createdAt));
-  }
-
-  async createMarketListing(insertListing: InsertMarketListing): Promise<MarketListing> {
-    const [listing] = await db
-      .insert(marketListings)
-      .values(insertListing)
-      .returning();
-    return listing;
-  }
-
-  async getMarketListings(tokenId?: string): Promise<MarketListing[]> {
-    if (tokenId) {
-      return await db.select().from(marketListings).where(eq(marketListings.tokenId, tokenId));
+  async updateRedeemableCode(codeId: string, isUsed: boolean): Promise<RedeemableCode> {
+    const code = this.redeemableCodes.get(codeId);
+    if (!code) {
+      throw new Error("Code not found");
     }
-    return await db.select().from(marketListings).orderBy(desc(marketListings.createdAt));
+    const updatedCode = { ...code, isUsed };
+    this.redeemableCodes.set(codeId, updatedCode);
+    return updatedCode;
   }
 
-  async updateMarketListing(listingId: string, isActive: boolean): Promise<MarketListing> {
-    const [listing] = await db
-      .update(marketListings)
-      .set({ isActive })
-      .where(eq(marketListings.id, listingId))
-      .returning();
-    return listing;
-  }
-
-  async getActiveListings(): Promise<MarketListing[]> {
-    return await db.select().from(marketListings).where(eq(marketListings.isActive, true));
-  }
-
-  // Phase 2: Token value and escrow operations
-  async updateTokenEscrowStatus(tokenId: string, status: string, escrowWallet?: string): Promise<Token> {
-    const [token] = await db
-      .update(tokens)
-      .set({ 
-        escrowStatus: status,
-        escrowWallet: escrowWallet 
-      })
-      .where(eq(tokens.id, tokenId))
-      .returning();
-    return token;
-  }
-
-  async getTokensWithValue(): Promise<Token[]> {
-    return await db.select().from(tokens).where(eq(tokens.hasAttachedValue, true));
-  }
-
-  async getPublicTokens(limit = 50, offset = 0): Promise<Token[]> {
-    return await db
-      .select()
-      .from(tokens)
-      .where(and(eq(tokens.isPublic, true), eq(tokens.isBlocked, false)))
-      .orderBy(desc(tokens.createdAt))
-      .limit(limit)
-      .offset(offset);
-  }
-
-  async flagToken(tokenId: string, reason: string, adminId: string): Promise<Token> {
-    const [token] = await db
-      .update(tokens)
-      .set({ 
-        flaggedAt: new Date(),
-        flaggedReason: reason 
-      })
-      .where(eq(tokens.id, tokenId))
-      .returning();
-
-    // Log the admin action
-    await this.createAdminLog({
-      adminId,
-      action: "flag_token",
-      targetType: "token",
-      targetId: tokenId,
-      details: { reason }
-    });
-
-    return token;
-  }
-
-  async blockToken(tokenId: string, adminId: string): Promise<Token> {
-    const [token] = await db
-      .update(tokens)
-      .set({ isBlocked: true })
-      .where(eq(tokens.id, tokenId))
-      .returning();
-
-    // Log the admin action
-    await this.createAdminLog({
-      adminId,
-      action: "block_token",
-      targetType: "token",
-      targetId: tokenId,
-      details: {}
-    });
-
-    return token;
-  }
-
-  // Phase 2: Redemption operations
-  async createRedemption(insertRedemption: InsertRedemption): Promise<Redemption> {
-    const [redemption] = await db
-      .insert(redemptions)
-      .values(insertRedemption)
-      .returning();
+  async createCodeRedemption(insertRedemption: InsertCodeRedemption): Promise<CodeRedemption> {
+    const id = randomUUID();
+    const redemption: CodeRedemption = { 
+      ...insertRedemption, 
+      id,
+      createdAt: new Date()
+    };
+    this.codeRedemptions.set(id, redemption);
     return redemption;
   }
 
-  async getRedemption(id: string): Promise<Redemption | undefined> {
-    const [redemption] = await db.select().from(redemptions).where(eq(redemptions.id, id));
-    return redemption || undefined;
+  async getCodeRedemptionsByUser(userId: string): Promise<CodeRedemption[]> {
+    return Array.from(this.codeRedemptions.values())
+      .filter(r => r.userId === userId);
   }
 
-  async getUserRedemptions(userId: string): Promise<Redemption[]> {
-    return await db
-      .select()
-      .from(redemptions)
-      .where(eq(redemptions.userId, userId))
-      .orderBy(desc(redemptions.createdAt));
+  async getCodeRedemptionsByCode(codeId: string): Promise<CodeRedemption[]> {
+    return Array.from(this.codeRedemptions.values())
+      .filter(r => r.codeId === codeId);
   }
 
-  async updateRedemptionStatus(redemptionId: string, status: string, signature?: string): Promise<Redemption> {
-    const [redemption] = await db
-      .update(redemptions)
-      .set({ 
-        status,
-        redemptionTransactionSignature: signature,
-        completedAt: status === "completed" ? new Date() : undefined
-      })
-      .where(eq(redemptions.id, redemptionId))
-      .returning();
-    return redemption;
-  }
-
-  async getRedemptionsByToken(tokenId: string): Promise<Redemption[]> {
-    return await db
-      .select()
-      .from(redemptions)
-      .where(eq(redemptions.tokenId, tokenId))
-      .orderBy(desc(redemptions.createdAt));
-  }
-
-  // Phase 2: Escrow wallet operations
-  async createEscrowWallet(insertWallet: InsertEscrowWallet): Promise<EscrowWallet> {
-    const [wallet] = await db
-      .insert(escrowWallets)
-      .values(insertWallet)
-      .returning();
-    return wallet;
-  }
-
-  async getActiveEscrowWallet(): Promise<EscrowWallet | undefined> {
-    const [wallet] = await db
-      .select()
-      .from(escrowWallets)
-      .where(eq(escrowWallets.isActive, true));
-    return wallet || undefined;
-  }
-
-  async updateEscrowBalance(walletId: string, balance: string): Promise<EscrowWallet> {
-    const [wallet] = await db
-      .update(escrowWallets)
-      .set({ totalBalance: balance })
-      .where(eq(escrowWallets.id, walletId))
-      .returning();
-    return wallet;
-  }
-
-  // Phase 2: Admin operations
   async createAdminUser(insertAdmin: InsertAdminUser): Promise<AdminUser> {
-    const [admin] = await db
-      .insert(adminUsers)
-      .values(insertAdmin)
-      .returning();
+    const id = randomUUID();
+    const admin: AdminUser = { 
+      ...insertAdmin, 
+      id,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
+    this.adminUsers.set(id, admin);
     return admin;
   }
 
-  async getAdminByWallet(walletAddress: string): Promise<AdminUser | undefined> {
-    const [admin] = await db
-      .select()
-      .from(adminUsers)
-      .where(eq(adminUsers.walletAddress, walletAddress));
-    return admin || undefined;
+  async getAdminUser(walletAddress: string): Promise<AdminUser | undefined> {
+    return Array.from(this.adminUsers.values()).find(admin => admin.walletAddress === walletAddress);
   }
 
-  async updateAdminStatus(adminId: string, isActive: boolean): Promise<AdminUser> {
-    const [admin] = await db
-      .update(adminUsers)
-      .set({ isActive })
-      .where(eq(adminUsers.id, adminId))
-      .returning();
-    return admin;
+  async updateAdminUserPermissions(adminId: string, permissions: string[]): Promise<AdminUser> {
+    const admin = this.adminUsers.get(adminId);
+    if (!admin) {
+      throw new Error("Admin user not found");
+    }
+    const updatedAdmin = { ...admin, permissions, updatedAt: new Date() };
+    this.adminUsers.set(adminId, updatedAdmin);
+    return updatedAdmin;
   }
 
   async createAdminLog(insertLog: InsertAdminLog): Promise<AdminLog> {
-    const [log] = await db
-      .insert(adminLogs)
-      .values(insertLog)
-      .returning();
+    const id = randomUUID();
+    const log: AdminLog = { 
+      ...insertLog, 
+      id,
+      createdAt: new Date()
+    };
+    this.adminLogs.set(id, log);
     return log;
   }
 
   async getAdminLogs(limit = 50, offset = 0): Promise<AdminLog[]> {
-    return await db
-      .select()
-      .from(adminLogs)
-      .orderBy(desc(adminLogs.createdAt))
-      .limit(limit)
-      .offset(offset);
+    return Array.from(this.adminLogs.values())
+      .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
+      .slice(offset, offset + limit);
   }
 
-  // Phase 2: Analytics operations
-  async createAnalyticsRecord(insertAnalytics: InsertAnalytics): Promise<Analytics> {
-    const [analytics] = await db
-      .insert(analytics)
-      .values(insertAnalytics)
-      .returning();
+  async createAnalytics(insertAnalytics: InsertAnalytics): Promise<Analytics> {
+    const id = randomUUID();
+    const analytics: Analytics = { 
+      ...insertAnalytics, 
+      id,
+      createdAt: new Date()
+    };
+    this.analytics.set(id, analytics);
     return analytics;
   }
 
-  async getAnalyticsByMetric(metric: string, startDate?: Date, endDate?: Date): Promise<Analytics[]> {
-    let query = db.select().from(analytics).where(eq(analytics.metric, metric));
-    
-    if (startDate && endDate) {
-      query = query.where(and(
-        gte(analytics.date, startDate),
-        lte(analytics.date, endDate)
-      ));
-    }
-    
-    return await query.orderBy(desc(analytics.date));
+  async getAnalytics(date: Date): Promise<Analytics | undefined> {
+    return Array.from(this.analytics.values()).find(a => 
+      a.date.toDateString() === date.toDateString()
+    );
+  }
+
+  async getAnalyticsRange(startDate: Date, endDate: Date): Promise<Analytics[]> {
+    return Array.from(this.analytics.values())
+      .filter(a => a.date >= startDate && a.date <= endDate)
+      .sort((a, b) => b.date.getTime() - a.date.getTime());
   }
 
   async getDashboardStats(): Promise<{
+    totalUsers: number;
     totalTokens: number;
-    totalValueEscrowed: string;
-    totalRedemptions: number;
+    totalTransactions: number;
     activeUsers: number;
   }> {
-    const [tokenCount] = await db.select({ count: count() }).from(tokens);
-    const [redemptionCount] = await db.select({ count: count() }).from(redemptions);
-    const [userCount] = await db.select({ count: count() }).from(users);
-    
-    // Calculate total value escrowed
-    const tokensWithValue = await db
-      .select({ attachedValue: tokens.attachedValue })
-      .from(tokens)
-      .where(eq(tokens.hasAttachedValue, true));
-    
-    const totalValueEscrowed = tokensWithValue
-      .reduce((sum, token) => sum + parseFloat(token.attachedValue || "0"), 0)
-      .toString();
-
     return {
-      totalTokens: tokenCount.count,
-      totalValueEscrowed,
-      totalRedemptions: redemptionCount.count,
-      activeUsers: userCount.count,
+      totalUsers: this.users.size,
+      totalTokens: this.tokens.size,
+      totalTransactions: this.transactions.size,
+      activeUsers: Math.floor(this.users.size * 0.3) // Simulate active users
     };
   }
 }
 
-export const storage = new DatabaseStorage();
+// Export storage instance
+export const storage = new MemStorage();

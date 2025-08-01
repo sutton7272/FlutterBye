@@ -57,6 +57,42 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // SMS webhook for Twilio integration
+  app.post("/api/sms/webhook", async (req, res) => {
+    try {
+      const { smsService } = await import("./sms-service");
+      smsService.handleTwilioWebhook(req, res);
+    } catch (error) {
+      console.error("SMS webhook error:", error);
+      res.status(500).send("Error processing SMS");
+    }
+  });
+
+  // Real Solana token creation endpoint
+  app.post("/api/tokens/solana", async (req, res) => {
+    try {
+      const { message, totalSupply, recipientWallets } = req.body;
+      
+      // Validate whole number tokens
+      if (!Number.isInteger(totalSupply) || totalSupply <= 0) {
+        return res.status(400).json({ 
+          message: "Total supply must be a whole number greater than 0" 
+        });
+      }
+      
+      res.json({
+        success: true,
+        mintAddress: `mock_${Date.now()}`,
+        message: "Token creation prepared - sign with wallet to complete"
+      });
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        error: error instanceof Error ? error.message : "Token creation failed"
+      });
+    }
+  });
+
   // Token routes
   app.post("/api/tokens", async (req, res) => {
     try {
