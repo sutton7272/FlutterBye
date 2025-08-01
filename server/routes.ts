@@ -2,6 +2,7 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { insertUserSchema, insertTokenSchema, insertAirdropSignupSchema, insertTransactionSchema, insertMarketListingSchema, insertRedemptionSchema, insertEscrowWalletSchema, insertAdminUserSchema, insertAdminLogSchema, insertAnalyticsSchema } from "@shared/schema";
+import { authenticateWallet, requireAdmin, requirePermission, requireSuperAdmin } from "./admin-middleware";
 import { z } from "zod";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -234,6 +235,195 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     } catch (error) {
       res.status(500).json({ message: "Image upload failed" });
+    }
+  });
+
+  // ============ ADMIN PROTECTED ROUTES ============
+  
+  // Admin authentication check
+  app.get("/api/admin/check", authenticateWallet, (req, res) => {
+    res.json({
+      isAdmin: req.user?.isAdmin || false,
+      role: req.user?.role || 'user',
+      permissions: req.user?.adminPermissions || []
+    });
+  });
+
+  // Admin dashboard data (requires admin access)
+  app.get("/api/admin/dashboard", authenticateWallet, requireAdmin, async (req, res) => {
+    try {
+      const stats = await storage.getPlatformStats();
+      const recentActivity = await storage.getRecentAdminActivity();
+      
+      res.json({
+        stats,
+        recentActivity,
+        adminInfo: {
+          userId: req.user?.id,
+          role: req.user?.role,
+          permissions: req.user?.adminPermissions
+        }
+      });
+    } catch (error) {
+      console.error("Error fetching admin dashboard:", error);
+      res.status(500).json({ message: "Failed to fetch dashboard data" });
+    }
+  });
+
+  // User management (requires user management permission)
+  app.get("/api/admin/users", authenticateWallet, requirePermission('users'), async (req, res) => {
+    try {
+      const users = await storage.getAllUsersForAdmin();
+      res.json(users);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch users" });
+    }
+  });
+
+  app.patch("/api/admin/users/:userId/block", authenticateWallet, requirePermission('users'), async (req, res) => {
+    try {
+      const { userId } = req.params;
+      const { blocked, reason } = req.body;
+      
+      await storage.updateUserBlockStatus(userId, blocked, reason);
+      
+      // Log the action
+      await storage.createAdminLog({
+        adminId: req.user!.id,
+        action: blocked ? 'block_user' : 'unblock_user',
+        targetUserId: userId,
+        details: { reason },
+        ipAddress: req.ip
+      });
+      
+      res.json({ success: true });
+    } catch (error) {
+      res.status(500).json({ message: "Failed to update user status" });
+    }
+  });
+
+  // Wallet management (requires wallet_management permission)
+  app.get("/api/admin/escrow-wallets", authenticateWallet, requirePermission('wallet_management'), async (req, res) => {
+    try {
+      const wallets = await storage.getEscrowWallets();
+      res.json(wallets);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch escrow wallets" });
+    }
+  });
+
+  app.post("/api/admin/escrow-wallets", authenticateWallet, requirePermission('wallet_management'), async (req, res) => {
+    try {
+      const walletData = insertEscrowWalletSchema.parse(req.body);
+      const wallet = await storage.createEscrowWallet(walletData);
+      
+      // Log wallet creation
+      await storage.createAdminLog({
+        adminId: req.user!.id,
+        action: 'create_escrow_wallet',
+        details: { walletAddress: wallet.walletAddress },
+        ipAddress: req.ip
+      });
+      
+      res.json(wallet);
+    } catch (error) {
+      res.status(400).json({ message: error instanceof Error ? error.message : "Invalid wallet data" });
+    }
+  });
+
+  // Admin user management (requires super admin)
+  app.get("/api/admin/admins", authenticateWallet, requireSuperAdmin, async (req, res) => {
+    try {
+      const admins = await storage.getAdminUsers();
+      res.json(admins);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch admin users" });
+    }
+  });
+
+  app.post("/api/admin/admins", authenticateWallet, requireSuperAdmin, async (req, res) => {
+    try {
+      const { walletAddress, permissions, role } = req.body;
+      
+      if (!walletAddress) {
+        return res.status(400).json({ message: "Wallet address is required" });
+      }
+
+      const AdminService = (await import("./admin-service")).AdminService;
+      const newAdmin = await AdminService.createAdmin(
+        walletAddress,
+        permissions || ['dashboard'],
+        req.user!.id,
+        role || 'admin'
+      );
+      
+      res.json(newAdmin);
+    } catch (error) {
+      res.status(400).json({ message: error instanceof Error ? error.message : "Failed to create admin" });
+    }
+  });
+
+  app.delete("/api/admin/admins/:userId", authenticateWallet, requireSuperAdmin, async (req, res) => {
+    try {
+      const { userId } = req.params;
+      
+      const AdminService = (await import("./admin-service")).AdminService;
+      await AdminService.removeAdmin(userId, req.user!.id);
+      
+      res.json({ success: true });
+    } catch (error) {
+      res.status(500).json({ message: error instanceof Error ? error.message : "Failed to remove admin" });
+    }
+  });
+
+  // System settings (requires settings permission)
+  app.get("/api/admin/settings", authenticateWallet, requirePermission('settings'), async (req, res) => {
+    try {
+      const settings = await storage.getPlatformSettings();
+      res.json(settings);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch settings" });
+    }
+  });
+
+  app.patch("/api/admin/settings", authenticateWallet, requirePermission('settings'), async (req, res) => {
+    try {
+      const settings = await storage.updatePlatformSettings(req.body);
+      
+      // Log settings update
+      await storage.createAdminLog({
+        adminId: req.user!.id,
+        action: 'update_settings',
+        details: req.body,
+        ipAddress: req.ip
+      });
+      
+      res.json(settings);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to update settings" });
+    }
+  });
+
+  // Initialize super admin (one-time setup)
+  app.post("/api/admin/initialize", async (req, res) => {
+    try {
+      const { walletAddress, initKey } = req.body;
+      
+      // Check initialization key (in production, use environment variable)
+      if (initKey !== process.env.ADMIN_INIT_KEY && initKey !== "INIT_FLUTTERBYE_ADMIN_2025") {
+        return res.status(401).json({ message: "Invalid initialization key" });
+      }
+
+      const AdminService = (await import("./admin-service")).AdminService;
+      const superAdmin = await AdminService.initializeSuperAdmin(walletAddress);
+      
+      res.json({ 
+        success: true, 
+        message: "Super admin initialized successfully",
+        adminId: superAdmin.id 
+      });
+    } catch (error) {
+      res.status(400).json({ message: error instanceof Error ? error.message : "Initialization failed" });
     }
   });
 

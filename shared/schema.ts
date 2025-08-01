@@ -10,6 +10,12 @@ export const users = pgTable("users", {
   email: text("email"),
   airdropPreferences: json("airdrop_preferences").$type<string[]>(),
   credits: decimal("credits", { precision: 18, scale: 9 }).default("0"),
+  // Admin role management
+  role: text("role").default("user"), // 'user', 'admin', 'super_admin'
+  isAdmin: boolean("is_admin").default(false),
+  adminPermissions: json("admin_permissions").$type<string[]>(), // ['dashboard', 'users', 'wallet_management', 'settings']
+  adminAddedBy: varchar("admin_added_by").references(() => users.id),
+  adminAddedAt: timestamp("admin_added_at"),
   createdAt: timestamp("created_at").defaultNow(),
 });
 
