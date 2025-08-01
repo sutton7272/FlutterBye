@@ -25,6 +25,8 @@ import BadgesPage from "@/pages/badges";
 
 import { Chat } from "@/pages/chat";
 import LimitedEdition from "@/pages/limited-edition";
+import AdvancedSearch from "@/pages/advanced-search";
+import AdminSystem from "@/pages/admin-system";
 import Navbar from "@/components/navbar";
 import { FloatingActionHub } from "@/components/floating-action-hub";
 import { WalletProvider } from "@/components/wallet-adapter";
@@ -55,6 +57,8 @@ function Router() {
 
         <Route path="/chat" component={Chat} />
         <Route path="/limited-edition" component={LimitedEdition} />
+        <Route path="/search" component={AdvancedSearch} />
+        <Route path="/admin-system" component={AdminSystem} />
         <Route component={NotFound} />
       </Switch>
       <FloatingActionHub />

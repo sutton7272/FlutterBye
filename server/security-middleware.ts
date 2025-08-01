@@ -1,126 +1,109 @@
 // Production security middleware
 import type { Request, Response, NextFunction } from 'express';
-import { PublicKey } from '@solana/web3.js';
-
-// Input sanitization
-export function sanitizeInput(req: Request, res: Response, next: NextFunction) {
-  // Remove any potentially dangerous characters from string inputs
-  const sanitizeString = (str: string): string => {
-    return str.replace(/[<>'"]/g, '').trim();
-  };
-
-  // Recursively sanitize object properties
-  const sanitizeObject = (obj: any): any => {
-    if (typeof obj === 'string') {
-      return sanitizeString(obj);
-    }
-    if (Array.isArray(obj)) {
-      return obj.map(sanitizeObject);
-    }
-    if (obj && typeof obj === 'object') {
-      const sanitized: any = {};
-      for (const [key, value] of Object.entries(obj)) {
-        sanitized[key] = sanitizeObject(value);
-      }
-      return sanitized;
-    }
-    return obj;
-  };
-
-  if (req.body) {
-    req.body = sanitizeObject(req.body);
-  }
-  
-  next();
-}
-
-// Validate Solana wallet addresses
-export function validateWalletAddress(address: string): boolean {
-  try {
-    new PublicKey(address);
-    return true;
-  } catch {
-    return false;
-  }
-}
-
-// Validate message content
-export function validateMessage(message: string): { isValid: boolean; error?: string } {
-  if (!message || typeof message !== 'string') {
-    return { isValid: false, error: 'Message is required' };
-  }
-  
-  if (message.length === 0) {
-    return { isValid: false, error: 'Message cannot be empty' };
-  }
-  
-  if (message.length > 27) {
-    return { isValid: false, error: 'Message must be 27 characters or less' };
-  }
-  
-  // Check for potentially harmful content
-  const bannedPatterns = [
-    /javascript:/i,
-    /<script/i,
-    /vbscript:/i,
-    /data:text\/html/i
-  ];
-  
-  if (bannedPatterns.some(pattern => pattern.test(message))) {
-    return { isValid: false, error: 'Message contains invalid content' };
-  }
-  
-  return { isValid: true };
-}
-
-// Validate numeric values
-export function validateNumericValue(value: any, min = 0, max = Number.MAX_SAFE_INTEGER): boolean {
-  const num = Number(value);
-  return !isNaN(num) && num >= min && num <= max && Number.isFinite(num);
-}
+import { z } from 'zod';
 
 // Security headers middleware
-export function securityHeaders(req: Request, res: Response, next: NextFunction) {
-  // Set security headers
+export const securityHeaders = (req: Request, res: Response, next: NextFunction) => {
+  // Basic security headers
   res.setHeader('X-Content-Type-Options', 'nosniff');
   res.setHeader('X-Frame-Options', 'DENY');
   res.setHeader('X-XSS-Protection', '1; mode=block');
-  res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
   res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+  res.setHeader('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
   
-  // Remove potentially revealing headers
-  res.removeHeader('X-Powered-By');
+  // Content Security Policy
+  const csp = [
+    "default-src 'self'",
+    "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net",
+    "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+    "font-src 'self' https://fonts.gstatic.com",
+    "img-src 'self' data: blob: https:",
+    "connect-src 'self' https: wss:",
+    "frame-ancestors 'none'",
+    "base-uri 'self'",
+    "form-action 'self'"
+  ].join('; ');
+  
+  res.setHeader('Content-Security-Policy', csp);
+  
+  // HSTS for HTTPS
+  if (req.secure) {
+    res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains; preload');
+  }
   
   next();
+};
+
+// Input sanitization middleware
+export const sanitizeInput = (req: Request, res: Response, next: NextFunction) => {
+  // Sanitize query parameters
+  if (req.query) {
+    for (const [key, value] of Object.entries(req.query)) {
+      if (typeof value === 'string') {
+        req.query[key] = sanitizeString(value);
+      }
+    }
+  }
+  
+  // Sanitize body parameters
+  if (req.body && typeof req.body === 'object') {
+    sanitizeObject(req.body);
+  }
+  
+  next();
+};
+
+// String sanitization
+function sanitizeString(input: string): string {
+  return input
+    .replace(/[<>]/g, '') // Remove < and >
+    .replace(/javascript:/gi, '') // Remove javascript: protocol
+    .replace(/on\w+=/gi, '') // Remove event handlers
+    .trim()
+    .slice(0, 1000); // Limit length
+}
+
+// Object sanitization
+function sanitizeObject(obj: any): void {
+  for (const [key, value] of Object.entries(obj)) {
+    if (typeof value === 'string') {
+      obj[key] = sanitizeString(value);
+    } else if (typeof value === 'object' && value !== null) {
+      sanitizeObject(value);
+    }
+  }
 }
 
 // Request validation middleware factory
-export function validateRequest(schema: {
+export const validateRequest = (validation: {
   body?: (body: any) => { isValid: boolean; errors?: string[] };
   query?: (query: any) => { isValid: boolean; errors?: string[] };
   params?: (params: any) => { isValid: boolean; errors?: string[] };
-}) {
+}) => {
   return (req: Request, res: Response, next: NextFunction) => {
     const errors: string[] = [];
     
-    if (schema.body && req.body) {
-      const result = schema.body(req.body);
-      if (!result.isValid && result.errors) {
-        errors.push(...result.errors);
+    // Validate body
+    if (validation.body && req.body) {
+      const bodyValidation = validation.body(req.body);
+      if (!bodyValidation.isValid) {
+        errors.push(...(bodyValidation.errors || ['Invalid body']));
       }
     }
     
-    if (schema.query && req.query) {
-      const result = schema.query(req.query);
-      if (!result.isValid && result.errors) {
-        errors.push(...result.errors);
+    // Validate query
+    if (validation.query && req.query) {
+      const queryValidation = validation.query(req.query);
+      if (!queryValidation.isValid) {
+        errors.push(...(queryValidation.errors || ['Invalid query parameters']));
       }
     }
     
-    if (schema.params && req.params) {
-      const result = schema.params(req.params);
-      if (!result.isValid && result.errors) {
-        errors.push(...result.errors);
+    // Validate params
+    if (validation.params && req.params) {
+      const paramsValidation = validation.params(req.params);
+      if (!paramsValidation.isValid) {
+        errors.push(...(paramsValidation.errors || ['Invalid URL parameters']));
       }
     }
     
@@ -133,22 +116,95 @@ export function validateRequest(schema: {
     
     next();
   };
-}
+};
 
-// Content Security Policy
-export function contentSecurityPolicy(req: Request, res: Response, next: NextFunction) {
-  const csp = [
-    "default-src 'self'",
-    "script-src 'self' 'unsafe-inline' https://replit.com",
-    "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
-    "font-src 'self' https://fonts.gstatic.com",
-    "img-src 'self' data: https:",
-    "connect-src 'self' https://api.devnet.solana.com wss: ws:",
-    "frame-ancestors 'none'",
-    "object-src 'none'",
-    "base-uri 'self'"
-  ].join('; ');
+// Message validation
+export const validateMessage = (message: string): { isValid: boolean; error?: string } => {
+  if (!message || typeof message !== 'string') {
+    return { isValid: false, error: 'Message is required and must be a string' };
+  }
   
-  res.setHeader('Content-Security-Policy', csp);
+  if (message.length === 0) {
+    return { isValid: false, error: 'Message cannot be empty' };
+  }
+  
+  if (message.length > 27) {
+    return { isValid: false, error: 'Message must be 27 characters or less' };
+  }
+  
+  // Check for prohibited content
+  const prohibited = ['script', 'javascript:', 'data:', 'vbscript:', 'onload', 'onerror'];
+  const lowerMessage = message.toLowerCase();
+  
+  for (const term of prohibited) {
+    if (lowerMessage.includes(term)) {
+      return { isValid: false, error: 'Message contains prohibited content' };
+    }
+  }
+  
+  return { isValid: true };
+};
+
+// Wallet address validation
+export const validateWalletAddress = (address: string): boolean => {
+  if (!address || typeof address !== 'string') {
+    return false;
+  }
+  
+  // Solana wallet addresses are base58 encoded and typically 44 characters
+  const base58Regex = /^[1-9A-HJ-NP-Za-km-z]{32,44}$/;
+  return base58Regex.test(address);
+};
+
+// Numeric validation
+export const validateNumeric = (value: any, options: {
+  min?: number;
+  max?: number;
+  integer?: boolean;
+} = {}): { isValid: boolean; error?: string } => {
+  const num = parseFloat(value);
+  
+  if (isNaN(num)) {
+    return { isValid: false, error: 'Must be a valid number' };
+  }
+  
+  if (options.integer && !Number.isInteger(num)) {
+    return { isValid: false, error: 'Must be an integer' };
+  }
+  
+  if (options.min !== undefined && num < options.min) {
+    return { isValid: false, error: `Must be at least ${options.min}` };
+  }
+  
+  if (options.max !== undefined && num > options.max) {
+    return { isValid: false, error: `Must be at most ${options.max}` };
+  }
+  
+  return { isValid: true };
+};
+
+// CORS middleware for production
+export const corsMiddleware = (req: Request, res: Response, next: NextFunction) => {
+  const allowedOrigins = [
+    'https://flutterbye.replit.app',
+    'https://flutterbye-production.replit.app',
+    process.env.NODE_ENV === 'development' ? 'http://localhost:5000' : null
+  ].filter(Boolean);
+  
+  const origin = req.headers.origin;
+  
+  if (origin && allowedOrigins.includes(origin)) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+  }
+  
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With');
+  res.setHeader('Access-Control-Allow-Credentials', 'true');
+  res.setHeader('Access-Control-Max-Age', '86400'); // 24 hours
+  
+  if (req.method === 'OPTIONS') {
+    return res.sendStatus(200);
+  }
+  
   next();
-}
+};
