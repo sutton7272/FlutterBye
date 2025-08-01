@@ -30,6 +30,13 @@ export const tokens = pgTable("tokens", {
   valuePerToken: decimal("value_per_token", { precision: 18, scale: 9 }).default("0"),
   imageUrl: text("image_url"),
   metadata: json("metadata").$type<Record<string, any>>(),
+  
+  // Enhanced metadata for Solscan display
+  additionalMessages: json("additional_messages").$type<string[]>(), // Array of additional text messages
+  links: json("links").$type<Array<{url: string, title: string}>>(), // Array of {url, title} objects
+  gifs: json("gifs").$type<string[]>(), // Array of GIF URLs
+  solscanMetadata: json("solscan_metadata").$type<Record<string, any>>(), // Custom metadata for blockchain display
+  
   // Phase 2: Value attachment
   hasAttachedValue: boolean("has_attached_value").default(false),
   attachedValue: decimal("attached_value", { precision: 18, scale: 9 }).default("0"),
@@ -37,6 +44,13 @@ export const tokens = pgTable("tokens", {
   escrowStatus: text("escrow_status").default("none"), // none, escrowed, redeemed, refunded
   escrowWallet: text("escrow_wallet"),
   expiresAt: timestamp("expires_at"),
+  
+  // Pricing and fee information
+  mintingCostPerToken: decimal("minting_cost_per_token", { precision: 18, scale: 9 }).default("0.01"), // Base cost per token including gas
+  gasFeeIncluded: boolean("gas_fee_included").default(true),
+  bulkDiscountApplied: decimal("bulk_discount_applied", { precision: 5, scale: 2 }).default("0"), // Percentage discount applied
+  totalMintingCost: decimal("total_minting_cost", { precision: 18, scale: 9 }).default("0"), // Total cost paid by user
+  
   // SMS Integration Features
   smsOrigin: boolean("sms_origin").default(false), // Created via SMS
   senderPhone: text("sender_phone"), // Phone number of sender (encrypted)
@@ -104,6 +118,9 @@ export const redemptions = pgTable("redemptions", {
   userId: varchar("user_id").references(() => users.id).notNull(),
   burnTransactionSignature: text("burn_transaction_signature").notNull(),
   redeemedAmount: decimal("redeemed_amount", { precision: 18, scale: 9 }).notNull(),
+  platformFee: decimal("platform_fee", { precision: 18, scale: 9 }).notNull(), // Fee paid to Flutterbye
+  feePercentage: decimal("fee_percentage", { precision: 5, scale: 2 }).notNull(), // Percentage charged
+  netAmount: decimal("net_amount", { precision: 18, scale: 9 }).notNull(), // Amount after fees
   currency: text("currency").notNull(),
   redemptionTransactionSignature: text("redemption_transaction_signature"),
   status: text("status").default("pending"), // pending, completed, failed
@@ -146,6 +163,33 @@ export const adminSettings = pgTable("admin_settings", {
   key: text("key").unique().notNull(),
   value: text("value").notNull(),
   type: text("type").notNull(), // 'number', 'boolean', 'string', 'array'
+  description: text("description"),
+  updatedAt: timestamp("updated_at").defaultNow(),
+  updatedBy: varchar("updated_by").references(() => adminUsers.id),
+});
+
+// Pricing configuration table for flexible pricing management
+export const pricingTiers = pgTable("pricing_tiers", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  tierName: text("tier_name").notNull().unique(), // 'base', 'bulk_100', 'bulk_500', etc.
+  minQuantity: integer("min_quantity").notNull().default(1),
+  maxQuantity: integer("max_quantity"), // null for unlimited
+  basePricePerToken: decimal("base_price_per_token", { precision: 18, scale: 9 }).notNull(),
+  discountPercentage: decimal("discount_percentage", { precision: 5, scale: 2 }).default("0"), // 0-100%
+  gasFeeIncluded: boolean("gas_fee_included").default(true),
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Platform fee configuration
+export const platformFees = pgTable("platform_fees", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  feeType: text("fee_type").notNull().unique(), // 'value_redemption', 'minting', 'marketplace'
+  feePercentage: decimal("fee_percentage", { precision: 5, scale: 2 }).notNull(), // 0-100%
+  minimumFee: decimal("minimum_fee", { precision: 18, scale: 9 }).default("0"),
+  maximumFee: decimal("maximum_fee", { precision: 18, scale: 9 }), // null for unlimited
+  isActive: boolean("is_active").default(true),
   description: text("description"),
   updatedAt: timestamp("updated_at").defaultNow(),
   updatedBy: varchar("updated_by").references(() => adminUsers.id),

@@ -164,6 +164,81 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Enhanced token minting endpoint with metadata and pricing
+  app.post("/api/tokens/enhanced", async (req, res) => {
+    try {
+      const {
+        message,
+        totalSupply,
+        imageUrl,
+        additionalMessages,
+        links,
+        gifs,
+        solscanMetadata,
+        mintingCostPerToken,
+        gasFeeIncluded,
+        bulkDiscountApplied,
+        totalMintingCost,
+        hasAttachedValue,
+        attachedValue,  
+        valuePerToken,
+        currency,
+        isPublic,
+        expiresAt,
+        metadata,
+        targetType,
+        targetWallets
+      } = req.body;
+
+      const enhancedTokenData: any = {
+        message,
+        symbol: "FlBY-MSG",
+        mintAddress: `enhanced_mint_${Date.now()}`,
+        creatorId: "user_123",
+        totalSupply: parseInt(totalSupply),
+        availableSupply: parseInt(totalSupply),
+        imageUrl,
+        hasAttachedValue: hasAttachedValue || false,
+        attachedValue: attachedValue || "0",
+        valuePerToken: valuePerToken || "0",
+        currency: currency || "SOL",
+        isPublic: isPublic || false,
+        expiresAt: expiresAt ? new Date(expiresAt) : null,
+        metadata: {
+          ...metadata,
+          enhanced: true,
+          additionalMessages: additionalMessages || [],
+          links: links || [],
+          gifs: gifs || [],
+          solscanMetadata: solscanMetadata || {},
+          mintingCostPerToken: mintingCostPerToken || "0.01",
+          gasFeeIncluded: gasFeeIncluded !== false,
+          bulkDiscountApplied: bulkDiscountApplied || "0",
+          totalMintingCost: totalMintingCost || "0.01"
+        },
+        createdAt: new Date()
+      };
+
+      const newToken = await storage.createToken(enhancedTokenData);
+
+      res.json({
+        success: true,
+        token: newToken,
+        message: "Enhanced token created successfully with metadata",
+        distribution: {
+          targetType,
+          walletCount: targetWallets?.length || 0
+        }
+      });
+    } catch (error) {
+      console.error("Error creating enhanced token:", error);
+      res.status(500).json({ 
+        error: "Failed to create enhanced token",
+        details: error.message 
+      });
+    }
+  });
+
   // Token holdings routes
   app.get("/api/users/:userId/holdings", async (req, res) => {
     try {

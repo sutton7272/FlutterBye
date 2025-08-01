@@ -8,6 +8,7 @@ import Home from "@/pages/home";
 import Marketplace from "@/pages/marketplace";
 import Portfolio from "@/pages/portfolio";
 import Mint from "@/pages/mint";
+import MintEnhanced from "@/pages/mint-enhanced";
 import Redeem from "@/pages/redeem";
 import Activity from "@/pages/activity";
 import Explore from "@/pages/explore";
@@ -31,6 +32,7 @@ function Router() {
         <Route path="/marketplace" component={Marketplace} />
         <Route path="/portfolio" component={Portfolio} />
         <Route path="/mint" component={Mint} />
+        <Route path="/mint-enhanced" component={MintEnhanced} />
         <Route path="/redeem" component={Redeem} />
         <Route path="/activity" component={Activity} />
         <Route path="/explore" component={Explore} />

@@ -13,6 +13,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { useAdminAuth } from "@/hooks/use-admin-auth";
+import { AdminPricingManagement } from "@/components/admin-pricing-management";
 import { 
   Settings, 
   Users, 
@@ -220,7 +221,7 @@ export default function AdminDashboard() {
         </div>
 
         <Tabs defaultValue="overview" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-6 bg-slate-800/50">
+          <TabsList className="grid w-full grid-cols-7 bg-slate-800/50">
             <TabsTrigger value="overview" className="flex items-center gap-2">
               <BarChart3 className="w-4 h-4" />
               Overview
@@ -228,6 +229,10 @@ export default function AdminDashboard() {
             <TabsTrigger value="settings" className="flex items-center gap-2">
               <Settings className="w-4 h-4" />
               Settings
+            </TabsTrigger>
+            <TabsTrigger value="pricing" className="flex items-center gap-2">
+              <TrendingUp className="w-4 h-4" />
+              Pricing
             </TabsTrigger>
             <TabsTrigger value="users" className="flex items-center gap-2">
               <Users className="w-4 h-4" />
@@ -488,6 +493,24 @@ export default function AdminDashboard() {
                     </>
                   )}
                 </Button>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Pricing Management Tab */}
+          <TabsContent value="pricing" className="space-y-6">
+            <Card className="glassmorphism">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <TrendingUp className="w-5 h-5" />
+                  Pricing & Fee Management
+                </CardTitle>
+                <CardDescription>
+                  Configure flexible pricing tiers, bulk discounts, and platform fees
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <AdminPricingManagement />
               </CardContent>
             </Card>
           </TabsContent>
