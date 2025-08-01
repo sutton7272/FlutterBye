@@ -2,7 +2,7 @@
 
 ## Overview
 
-Flutterbye is a Solana blockchain-powered platform for tokenized messaging and value distribution. It allows users to create 27-character tokenized messages, each becoming a unique SPL token ("FLBY-MSG"). The platform integrates messaging with token economics, enabling value attachment to messages, token distribution to specific wallets, custom token image uploads, and the creation of viral, meme-driven communication in Web3. Key capabilities include analyzing token holders for targeted marketing, a consolidated system for attaching value to tokens with expiration dates, and a free token minting system for promotional distribution. Future concepts include an SMS-to-blockchain integration for minting "emotional" tokens, with features like time-locked messages and burn-to-read mechanisms to onboard non-crypto users.
+Flutterbye is a Solana blockchain-powered platform for tokenized messaging and value distribution. It allows users to create 27-character tokenized messages, each becoming a unique SPL token ("FLBY-MSG"). The platform integrates messaging with token economics, enabling value attachment to messages, token distribution to specific wallets, custom token image uploads, and the creation of viral, meme-driven communication in Web3. Key capabilities include analyzing token holders for targeted marketing, a consolidated system for attaching value to tokens with expiration dates, a free token minting system for promotional distribution, and Limited Edition Token sets where users can create exclusive collections with predetermined quantities and special pricing. The platform features real-time blockchain chat functionality, SMS-to-blockchain integration for minting "emotional" tokens, comprehensive gamified rewards system, and complete admin content management tools.
 
 ## User Preferences
 
@@ -17,7 +17,7 @@ Preferred communication style: Simple, everyday language.
 - **Styling**: Tailwind CSS with custom CSS variables, dark mode support.
 - **State Management**: TanStack React Query for server state management.
 - **Form Handling**: React Hook Form with Zod validation.
-- **UI/UX Decisions**: "boop.fun"-inspired design with black backgrounds, vibrant gradients, meme culture language, scrolling marquee text, live activity feeds, and a purple/pink/cyan color scheme. Emphasis on gamified engagement with points, badges, levels, streaks, and leaderboards. Comprehensive admin interface for dynamic content management (text, images, layout, themes) with live preview.
+- **UI/UX Decisions**: "boop.fun"-inspired design with black backgrounds, vibrant gradients, meme culture language, scrolling marquee text, live activity feeds, and a purple/pink/cyan color scheme. Emphasis on gamified engagement with points, badges, levels, streaks, and leaderboards. Comprehensive admin interface for dynamic content management (text, images, layout, themes) with live preview. Limited Edition Token interface with creation dialogs, progress bars, rarity badges, and minting controls.
 
 ### Backend Architecture
 - **Runtime**: Node.js with Express.js.
@@ -29,7 +29,7 @@ Preferred communication style: Simple, everyday language.
 
 ### Data Storage Solutions
 - **Database**: PostgreSQL with Drizzle ORM.
-- **Schema**: Comprehensive schema for users, tokens, holdings, transactions, airdrop signups, market listings, redeemable codes, and content management.
+- **Schema**: Comprehensive schema for users, tokens, holdings, transactions, airdrop signups, market listings, redeemable codes, limited edition sets, chat rooms/messages, SMS integration, and content management.
 - **Connection**: Neon Database serverless PostgreSQL.
 - **Migrations**: Drizzle Kit.
 - **Image Storage**: Base64 encoding with resizing and validation.
