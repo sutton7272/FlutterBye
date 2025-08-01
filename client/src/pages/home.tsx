@@ -103,10 +103,10 @@ export default function Home() {
           </p>
           
           <div className="flex flex-col sm:flex-row gap-6 justify-center mb-16">
-            <Link href="/mint">
+            <Link href="/mint-solana">
               <Button size="lg" className="text-xl px-10 py-6 bg-gradient-to-r from-electric-blue to-electric-green hover:from-electric-cyan hover:to-bright-mint text-background font-bold rounded-2xl cyber-glow pulse-electric">
                 <Coins className="mr-3 h-6 w-6" />
-                START MINTING NOW
+                MINT FLBY-MSG TOKEN
               </Button>
             </Link>
             

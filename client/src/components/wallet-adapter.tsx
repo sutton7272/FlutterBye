@@ -2,25 +2,56 @@ import { useState, useEffect, createContext, useContext, ReactNode } from 'react
 import { PublicKey } from '@solana/web3.js';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { Wallet, Link, Unlink } from 'lucide-react';
+import { Wallet, Link, Unlink, AlertTriangle } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
+
+// Extend window object for Solana wallets
+declare global {
+  interface Window {
+    solana?: {
+      isPhantom?: boolean;
+      connect: (options?: { onlyIfTrusted?: boolean }) => Promise<{ publicKey: { toString: () => string } }>;
+      disconnect: () => Promise<void>;
+      signTransaction: (transaction: any) => Promise<any>;
+      signAllTransactions: (transactions: any[]) => Promise<any[]>;
+      on: (event: string, callback: (args: any) => void) => void;
+      off: (event: string, callback: (args: any) => void) => void;
+      publicKey?: { toString: () => string };
+      isConnected?: boolean;
+    };
+    solflare?: {
+      isSolflare?: boolean;
+      connect: () => Promise<{ publicKey: { toString: () => string } }>;
+      disconnect: () => Promise<void>;
+      signTransaction: (transaction: any) => Promise<any>;
+      signAllTransactions: (transactions: any[]) => Promise<any[]>;
+      publicKey?: { toString: () => string };
+      isConnected?: boolean;
+    };
+  }
+}
 
 // Wallet context and provider for Solana integration
 interface WalletContextType {
   publicKey: PublicKey | null;
   connected: boolean;
   connecting: boolean;
-  connect: () => Promise<void>;
+  walletName: string | null;
+  connect: (walletName?: string) => Promise<void>;
   disconnect: () => void;
   signTransaction: (transaction: any) => Promise<any>;
+  signAllTransactions: (transactions: any[]) => Promise<any[]>;
 }
 
 const WalletContext = createContext<WalletContextType>({
   publicKey: null,
   connected: false,
   connecting: false,
+  walletName: null,
   connect: async () => {},
   disconnect: () => {},
-  signTransaction: async () => {}
+  signTransaction: async () => {},
+  signAllTransactions: async () => []
 });
 
 export function useWallet() {
@@ -35,76 +66,222 @@ export function WalletProvider({ children }: WalletProviderProps) {
   const [publicKey, setPublicKey] = useState<PublicKey | null>(null);
   const [connected, setConnected] = useState(false);
   const [connecting, setConnecting] = useState(false);
+  const [walletName, setWalletName] = useState<string | null>(null);
+  const { toast } = useToast();
 
   useEffect(() => {
     // Check if wallet is already connected
     checkWalletConnection();
+    
+    // Set up wallet event listeners
+    setupWalletEventListeners();
+    
+    return () => {
+      // Cleanup listeners
+      cleanupWalletEventListeners();
+    };
   }, []);
 
-  const checkWalletConnection = async () => {
-    try {
-      const { solana } = window as any;
-      if (solana?.isPhantom && solana.isConnected) {
-        const response = await solana.connect({ onlyIfTrusted: true });
-        setPublicKey(new PublicKey(response.publicKey.toString()));
-        setConnected(true);
-      }
-    } catch (error) {
-      console.log('Wallet not auto-connected:', error);
+  const setupWalletEventListeners = () => {
+    if (window.solana) {
+      window.solana.on('connect', handleWalletConnect);
+      window.solana.on('disconnect', handleWalletDisconnect);
+      window.solana.on('accountChanged', handleAccountChanged);
     }
   };
 
-  const connect = async () => {
+  const cleanupWalletEventListeners = () => {
+    if (window.solana) {
+      window.solana.off('connect', handleWalletConnect);
+      window.solana.off('disconnect', handleWalletDisconnect);
+      window.solana.off('accountChanged', handleAccountChanged);
+    }
+  };
+
+  const handleWalletConnect = (publicKey: PublicKey) => {
+    setPublicKey(publicKey);
+    setConnected(true);
+    console.log('Wallet connected:', publicKey.toBase58());
+  };
+
+  const handleWalletDisconnect = () => {
+    setPublicKey(null);
+    setConnected(false);
+    setWalletName(null);
+    console.log('Wallet disconnected');
+  };
+
+  const handleAccountChanged = (publicKey: PublicKey | null) => {
+    if (publicKey) {
+      setPublicKey(publicKey);
+      console.log('Account changed:', publicKey.toBase58());
+    } else {
+      handleWalletDisconnect();
+    }
+  };
+
+  const checkWalletConnection = async () => {
+    try {
+      // Check Phantom
+      if (window.solana?.isPhantom && window.solana.isConnected && window.solana.publicKey) {
+        setPublicKey(new PublicKey(window.solana.publicKey.toString()));
+        setConnected(true);
+        setWalletName('Phantom');
+        return;
+      }
+      
+      // Check Solflare
+      if (window.solflare?.isSolflare && window.solflare.isConnected && window.solflare.publicKey) {
+        setPublicKey(new PublicKey(window.solflare.publicKey.toString()));
+        setConnected(true);
+        setWalletName('Solflare');
+        return;
+      }
+      
+      // Try auto-connect with trusted permissions
+      if (window.solana?.isPhantom) {
+        try {
+          const response = await window.solana.connect({ onlyIfTrusted: true });
+          setPublicKey(new PublicKey(response.publicKey.toString()));
+          setConnected(true);
+          setWalletName('Phantom');
+        } catch {
+          // Auto-connect failed, wallet not trusted
+        }
+      }
+    } catch (error) {
+      console.log('Wallet auto-connection failed:', error);
+    }
+  };
+
+  const connect = async (preferredWallet: string = 'phantom') => {
     try {
       setConnecting(true);
-      const { solana } = window as any;
       
-      if (!solana) {
-        throw new Error('Phantom wallet not found! Please install Phantom wallet.');
-      }
+      if (preferredWallet === 'phantom') {
+        if (!window.solana) {
+          toast({
+            title: "Phantom Wallet Not Found",
+            description: "Please install Phantom wallet to continue",
+            variant: "destructive",
+          });
+          window.open('https://phantom.app/', '_blank');
+          return;
+        }
 
-      const response = await solana.connect();
-      setPublicKey(new PublicKey(response.publicKey.toString()));
-      setConnected(true);
-    } catch (error) {
+        const response = await window.solana.connect();
+        setPublicKey(new PublicKey(response.publicKey.toString()));
+        setConnected(true);
+        setWalletName('Phantom');
+        
+        toast({
+          title: "Wallet Connected",
+          description: `Connected to ${response.publicKey.toString().slice(0, 4)}...${response.publicKey.toString().slice(-4)}`,
+        });
+      } else if (preferredWallet === 'solflare') {
+        if (!window.solflare) {
+          toast({
+            title: "Solflare Wallet Not Found",
+            description: "Please install Solflare wallet to continue",
+            variant: "destructive",
+          });
+          window.open('https://solflare.com/', '_blank');
+          return;
+        }
+
+        const response = await window.solflare.connect();
+        setPublicKey(new PublicKey(response.publicKey.toString()));
+        setConnected(true);
+        setWalletName('Solflare');
+        
+        toast({
+          title: "Wallet Connected",
+          description: `Connected to ${response.publicKey.toString().slice(0, 4)}...${response.publicKey.toString().slice(-4)}`,
+        });
+      }
+    } catch (error: any) {
       console.error('Wallet connection failed:', error);
+      toast({
+        title: "Connection Failed",
+        description: error.message || "Failed to connect wallet. Please try again.",
+        variant: "destructive",
+      });
       throw error;
     } finally {
       setConnecting(false);
     }
   };
 
-  const disconnect = () => {
-    const { solana } = window as any;
-    if (solana) {
-      solana.disconnect();
+  const disconnect = async () => {
+    try {
+      if (walletName === 'Phantom' && window.solana) {
+        await window.solana.disconnect();
+      } else if (walletName === 'Solflare' && window.solflare) {
+        await window.solflare.disconnect();
+      }
+      
+      setPublicKey(null);
+      setConnected(false);
+      setWalletName(null);
+      
+      toast({
+        title: "Wallet Disconnected",
+        description: "Your wallet has been disconnected successfully",
+      });
+    } catch (error) {
+      console.error('Wallet disconnection failed:', error);
     }
-    setPublicKey(null);
-    setConnected(false);
   };
 
   const signTransaction = async (transaction: any) => {
+    if (!connected || !publicKey) {
+      throw new Error('Wallet not connected');
+    }
+    
     try {
-      const { solana } = window as any;
-      if (!solana) {
-        throw new Error('Wallet not connected');
+      if (walletName === 'Phantom' && window.solana) {
+        return await window.solana.signTransaction(transaction);
+      } else if (walletName === 'Solflare' && window.solflare) {
+        return await window.solflare.signTransaction(transaction);
       }
-      return await solana.signTransaction(transaction);
+      throw new Error('No wallet available for signing');
     } catch (error) {
       console.error('Transaction signing failed:', error);
       throw error;
     }
   };
 
+  const signAllTransactions = async (transactions: any[]) => {
+    if (!connected || !publicKey) {
+      throw new Error('Wallet not connected');
+    }
+    
+    try {
+      if (walletName === 'Phantom' && window.solana) {
+        return await window.solana.signAllTransactions(transactions);
+      } else if (walletName === 'Solflare' && window.solflare) {
+        return await window.solflare.signAllTransactions(transactions);
+      }
+      throw new Error('No wallet available for signing');
+    } catch (error) {
+      console.error('Transaction signing failed:', error);
+      throw error;
+    }
+  };
+
+  const value = {
+    publicKey,
+    connected,
+    connecting,
+    walletName,
+    connect,
+    disconnect,
+    signTransaction,
+    signAllTransactions
+  };
+
   return (
-    <WalletContext.Provider value={{
-      publicKey,
-      connected,
-      connecting,
-      connect,
-      disconnect,
-      signTransaction
-    }}>
+    <WalletContext.Provider value={value}>
       {children}
     </WalletContext.Provider>
   );
@@ -125,7 +302,7 @@ export function WalletButton() {
 
   return (
     <Button 
-      onClick={connect} 
+      onClick={() => connect()} 
       disabled={connecting}
       className="gap-2"
     >

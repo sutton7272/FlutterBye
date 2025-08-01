@@ -9,6 +9,7 @@ import Marketplace from "@/pages/marketplace";
 import Portfolio from "@/pages/portfolio";
 import Mint from "@/pages/mint";
 import MintEnhanced from "@/pages/mint-enhanced";
+import MintSolana from "@/pages/mint-solana";
 import Redeem from "@/pages/redeem";
 import Activity from "@/pages/activity";
 import Explore from "@/pages/explore";
@@ -26,6 +27,7 @@ import { Chat } from "@/pages/chat";
 import LimitedEdition from "@/pages/limited-edition";
 import Navbar from "@/components/navbar";
 import { FloatingActionHub } from "@/components/floating-action-hub";
+import { WalletProvider } from "@/components/wallet-adapter";
 
 function Router() {
   return (
@@ -37,6 +39,7 @@ function Router() {
         <Route path="/portfolio" component={Portfolio} />
         <Route path="/mint" component={Mint} />
         <Route path="/mint-enhanced" component={MintEnhanced} />
+        <Route path="/mint-solana" component={MintSolana} />
         <Route path="/redeem" component={Redeem} />
         <Route path="/activity" component={Activity} />
         <Route path="/explore" component={Explore} />
@@ -62,10 +65,12 @@ function Router() {
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <Toaster />
-        <Router />
-      </TooltipProvider>
+      <WalletProvider>
+        <TooltipProvider>
+          <Toaster />
+          <Router />
+        </TooltipProvider>
+      </WalletProvider>
     </QueryClientProvider>
   );
 }

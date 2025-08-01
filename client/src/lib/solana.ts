@@ -1,19 +1,18 @@
 import { Connection, PublicKey, Keypair, Transaction, SystemProgram, LAMPORTS_PER_SOL } from '@solana/web3.js';
 import { 
-  TOKEN_PROGRAM_ID, 
+  TOKEN_PROGRAM_ID,
   createInitializeMintInstruction, 
-  createCreateAccountInstruction,
   createMintToInstruction,
-  createTransferInstruction,
   getMinimumBalanceForRentExemptMint,
   MINT_SIZE,
   getAssociatedTokenAddress,
-  createAssociatedTokenAccountInstruction
+  createAssociatedTokenAccountInstruction,
+  getAccount
 } from '@solana/spl-token';
+// Note: Buffer polyfill handled by build system
 
-// Solana configuration - Using DevNet for testing
-const SOLANA_RPC_URL = import.meta.env.VITE_SOLANA_RPC_URL || 'https://devnet.helius-rpc.com/?api-key=070d7528-d275-45b4-bec6-2bfd09926d7d';
-const connection = new Connection(SOLANA_RPC_URL, 'confirmed');
+// Solana DevNet RPC endpoint
+const SOLANA_RPC_URL = 'https://api.devnet.solana.com';
 
 export interface TokenCreationParams {
   message: string;
@@ -29,11 +28,38 @@ export interface TokenCreationResult {
   error?: string;
 }
 
-export class SolanaTokenService {
+export class SolanaService {
   private connection: Connection;
 
   constructor() {
     this.connection = new Connection(SOLANA_RPC_URL, 'confirmed');
+  }
+
+  // Check if wallet address is valid format
+  isValidWalletAddress(address: string): boolean {
+    try {
+      new PublicKey(address);
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  // Get SOL balance for a wallet
+  async getWalletBalance(address: string): Promise<number> {
+    try {
+      const publicKey = new PublicKey(address);
+      const balance = await this.connection.getBalance(publicKey);
+      return balance / LAMPORTS_PER_SOL; // Convert lamports to SOL
+    } catch (error) {
+      console.error('Error getting wallet balance:', error);
+      throw new Error('Failed to get wallet balance');
+    }
+  }
+
+  // Get connection for external use
+  getConnection(): Connection {
+    return this.connection;
   }
 
   // Create FLBY-MSG SPL token
@@ -59,21 +85,21 @@ export class SolanaTokenService {
         })
       );
       
-      // Add initialize mint instruction
+      // Add initialize mint instruction (0 decimals for whole tokens)
       transaction.add(
         createInitializeMintInstruction(
           mintKeypair.publicKey,
-          0, // Decimals = 0 for whole number tokens only
+          0, // decimals
           params.creatorWallet,
           params.creatorWallet
         )
       );
-
-      // Distribute tokens to recipients
-      for (const recipientWallet of params.recipientWallets) {
+      
+      // Create associated token accounts and mint tokens for recipients
+      for (const recipient of params.recipientWallets) {
         const associatedTokenAddress = await getAssociatedTokenAddress(
           mintKeypair.publicKey,
-          recipientWallet
+          recipient
         );
         
         // Create associated token account
@@ -81,39 +107,37 @@ export class SolanaTokenService {
           createAssociatedTokenAccountInstruction(
             params.creatorWallet,
             associatedTokenAddress,
-            recipientWallet,
+            recipient,
             mintKeypair.publicKey
           )
         );
         
-        // Mint tokens to recipient (whole numbers only)
-        const tokensPerRecipient = Math.floor(params.totalSupply / params.recipientWallets.length);
+        // Mint tokens to recipient
         transaction.add(
           createMintToInstruction(
             mintKeypair.publicKey,
             associatedTokenAddress,
             params.creatorWallet,
-            tokensPerRecipient // Guaranteed whole number
+            1 // Always mint 1 token (whole number)
           )
         );
       }
-
-      // Set recent blockhash
+      
+      // Set recent blockhash and fee payer
       const { blockhash } = await this.connection.getLatestBlockhash();
       transaction.recentBlockhash = blockhash;
       transaction.feePayer = params.creatorWallet;
       
-      // Partial sign with mint keypair
-      transaction.partialSign(mintKeypair);
-
+      // This would be signed by the frontend wallet
+      // For now, return the transaction structure
       return {
-        mintAddress: mintKeypair.publicKey.toString(),
-        signature: '', // Will be completed after wallet signs
+        mintAddress: mintKeypair.publicKey.toBase58(),
+        signature: 'pending_wallet_signature',
         success: true
       };
       
     } catch (error) {
-      console.error('Solana token creation error:', error);
+      console.error('Error creating Flutterbye token:', error);
       return {
         mintAddress: '',
         signature: '',
@@ -123,21 +147,11 @@ export class SolanaTokenService {
     }
   }
 
-  // Validate wallet address
-  validateWalletAddress(address: string): boolean {
+  // Get token balance for a specific wallet and mint
+  async getTokenBalance(walletAddress: string, mintAddress: string): Promise<number> {
     try {
-      new PublicKey(address);
-      return true;
-    } catch {
-      return false;
-    }
-  }
-
-  // Get token balance for whole number verification
-  async getTokenBalance(mintAddress: string, walletAddress: string): Promise<number> {
-    try {
-      const mintPubkey = new PublicKey(mintAddress);
       const walletPubkey = new PublicKey(walletAddress);
+      const mintPubkey = new PublicKey(mintAddress);
       
       const associatedTokenAddress = await getAssociatedTokenAddress(
         mintPubkey,
@@ -151,7 +165,7 @@ export class SolanaTokenService {
     }
   }
 
-  // Verify token metadata matches FlBY-MSG standard
+  // Verify token metadata matches FLBY-MSG standard
   async verifyFlutterbyeToken(mintAddress: string): Promise<boolean> {
     try {
       const mintPubkey = new PublicKey(mintAddress);
@@ -168,6 +182,25 @@ export class SolanaTokenService {
       return false;
     }
   }
+
+  // Get token info (placeholder for when real integration is complete)
+  async getTokenInfo(mintAddress: string): Promise<any> {
+    // This will be implemented when real blockchain integration is active
+    throw new Error('Token info not available - requires wallet connection');
+  }
+
+  // Placeholder methods for future blockchain operations
+  async createToken(params: any): Promise<any> {
+    throw new Error('Token creation requires wallet connection');
+  }
+
+  async transferToken(params: any): Promise<any> {
+    throw new Error('Token transfer requires wallet connection');
+  }
+
+  async burnToken(params: any): Promise<any> {
+    throw new Error('Token burning requires wallet connection');
+  }
 }
 
-export const solanaService = new SolanaTokenService();
+export const solanaService = new SolanaService();

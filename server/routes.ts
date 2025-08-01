@@ -4,6 +4,7 @@ import { storage } from "./storage";
 import { insertUserSchema, insertTokenSchema, insertAirdropSignupSchema, insertTransactionSchema, insertMarketListingSchema, insertRedemptionSchema, insertEscrowWalletSchema, insertAdminUserSchema, insertAdminLogSchema, insertAnalyticsSchema, insertChatRoomSchema, insertChatMessageSchema } from "@shared/schema";
 import { authenticateWallet, requireAdmin, requirePermission, requireSuperAdmin } from "./admin-middleware";
 import { chatService } from "./chat-service";
+import { registerSolanaRoutes } from "./routes-solana";
 import { z } from "zod";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -2313,6 +2314,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: 'Failed to fetch tokens' });
     }
   });
+
+  // Register Solana blockchain integration routes
+  registerSolanaRoutes(app);
 
   // Initialize chat service heartbeat
   chatService.startHeartbeat();

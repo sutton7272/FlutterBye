@@ -195,7 +195,7 @@ export class MemStorage implements IStorage {
     return Array.from(this.tokens.values()).find(token => token.mintAddress === mintAddress);
   }
 
-  async createToken(insertToken: InsertToken): Promise<Token> {
+  async createToken(insertToken: InsertToken | any): Promise<Token> {
     const id = randomUUID();
     const token: Token = { 
       ...insertToken, 
@@ -205,6 +205,67 @@ export class MemStorage implements IStorage {
     };
     this.tokens.set(id, token);
     return token;
+  }
+
+  // Additional methods for Solana integration
+  async getTokensByCreatorWallet(walletAddress: string): Promise<Token[]> {
+    return Array.from(this.tokens.values())
+      .filter(token => (token as any).creatorWallet === walletAddress);
+  }
+
+  async getTokensByRecipient(walletAddress: string): Promise<Token[]> {
+    return Array.from(this.tokens.values())
+      .filter(token => {
+        const recipients = (token as any).recipients;
+        return recipients && recipients.includes(walletAddress);
+      });
+  }
+
+  async createRedemption(redemption: any): Promise<any> {
+    const id = randomUUID();
+    const newRedemption = {
+      id,
+      ...redemption,
+      createdAt: new Date()
+    };
+    if (!this.redemptions) {
+      this.redemptions = new Map();
+    }
+    this.redemptions.set(id, newRedemption);
+    return newRedemption;
+  }
+
+  async getRedemptionsByWallet(walletAddress: string): Promise<any[]> {
+    if (!this.redemptions) return [];
+    return Array.from(this.redemptions.values())
+      .filter(redemption => redemption.walletAddress === walletAddress);
+  }
+
+  async getAllTokensWithOptions(options: {
+    limit: number;
+    offset: number;
+    search?: string;
+    sortBy?: string;
+  }): Promise<Token[]> {
+    let filtered = Array.from(this.tokens.values());
+    
+    if (options.search) {
+      const searchLower = options.search.toLowerCase();
+      filtered = filtered.filter(token => {
+        const tokenData = token as any;
+        return tokenData.message?.toLowerCase().includes(searchLower) ||
+               tokenData.creatorWallet?.toLowerCase().includes(searchLower);
+      });
+    }
+    
+    // Sort by specified field
+    if (options.sortBy === 'createdAt') {
+      filtered.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+    } else if (options.sortBy === 'value') {
+      filtered.sort((a, b) => ((b as any).value || 0) - ((a as any).value || 0));
+    }
+    
+    return filtered.slice(options.offset, options.offset + options.limit);
   }
 
   async updateTokenSupply(tokenId: string, availableSupply: number): Promise<Token> {
