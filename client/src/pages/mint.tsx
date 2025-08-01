@@ -1,16 +1,18 @@
 import { useState } from "react";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Badge } from "@/components/ui/badge";
+import { Switch } from "@/components/ui/switch";
+import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
 import { useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import ImageUpload from "@/components/image-upload";
-import { Coins, Upload, Calculator } from "lucide-react";
+import { Coins, Upload, Calculator, DollarSign, Lock, Globe } from "lucide-react";
 import { type InsertToken } from "@shared/schema";
 
 export default function Mint() {
@@ -22,6 +24,13 @@ export default function Mint() {
   const [manualWallets, setManualWallets] = useState("");
   const [csvFile, setCsvFile] = useState<File | null>(null);
   const [tokenImage, setTokenImage] = useState<string>("");
+  
+  // Phase 2: Value attachment features
+  const [attachValue, setAttachValue] = useState(false);
+  const [attachedValue, setAttachedValue] = useState("");
+  const [currency, setCurrency] = useState("SOL");
+  const [isPublic, setIsPublic] = useState(false);
+  const [memo, setMemo] = useState("");
 
   const mintToken = useMutation({
     mutationFn: async (data: InsertToken) => {
@@ -40,6 +49,11 @@ export default function Mint() {
       setManualWallets("");
       setCsvFile(null);
       setTokenImage("");
+      setAttachValue(false);
+      setAttachedValue("");
+      setCurrency("SOL");
+      setIsPublic(false);
+      setMemo("");
     },
     onError: (error) => {
       toast({
@@ -73,6 +87,12 @@ export default function Mint() {
       symbol: "FlBY-MSG", // Always FlBY-MSG
       creatorId: "user-1", // Mock user ID
       totalSupply: parseInt(mintAmount) || 0,
+      // Phase 2: Value attachment
+      hasAttachedValue: attachValue,
+      attachedValue: attachValue ? attachedValue : "0",
+      currency: currency,
+      isPublic: isPublic,
+      metadata: memo ? { memo } : undefined,
       availableSupply: parseInt(mintAmount) || 0,
       valuePerToken: valuePerToken || "0",
       imageFile: tokenImage || undefined,

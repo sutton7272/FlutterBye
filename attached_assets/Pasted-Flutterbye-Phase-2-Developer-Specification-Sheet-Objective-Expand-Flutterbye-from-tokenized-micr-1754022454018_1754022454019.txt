@@ -1,0 +1,207 @@
+Flutterbye Phase 2 – Developer Specification Sheet
+
+Objective: Expand Flutterbye from tokenized micro-messaging to a fully featured, value-bearing, monetizable messaging platform with backend analytics, secure redemption mechanics, and a public-facing UI redesign.
+
+🚀 1. Core New Features
+
+🪙 A. Attach Value to Fluttercoins
+
+Goal: Let users attach SOL or USDC value to each minted Fluttercoin.
+
+Requirements:
+
+UI toggle: "Attach Value"
+
+Input field: Value amount
+
+Validate user funds
+
+Funds sent to a Flutterbye-controlled escrow wallet
+
+Backend ledger maps token ID to escrow value
+
+Works for both single and batch mints
+
+🔐 B. Escrow Wallet Logic
+
+Goal: Securely hold and release attached value.
+
+Requirements:
+
+Central (or multisig) wallet holds funds
+
+Store mapping: Token ID → amount + status
+
+Expiration logic (optional)
+
+Refund process for expired/unclaimed tokens
+
+🔥 C. Burn-to-Redeem from Flutterbye Website
+
+Goal: Allow token holders to redeem attached value by burning tokens.
+
+Requirements:
+
+Redemption Page:
+
+Connect wallet
+
+List valid Flutterbye tokens (filter by mint address)
+
+Show messages + value
+
+On "Redeem":
+
+Burn token
+
+Backend validates burn tx
+
+Escrow wallet releases funds to user
+
+📟 D. Redemption History & Tracking
+
+Goal: Transparent logs for users.
+
+Features:
+
+My Activity page:
+
+Sent / Received tokens
+
+Status: Claimed, Unclaimed, Refunded
+
+Filters: Date, Value, Message
+
+CSV export
+
+🎨 2. UI/UX and Website Enhancements
+
+🏠 A. New Home Page
+
+Goal: Communicate Flutterbye’s value proposition clearly.
+
+Features:
+
+Hero section with motion/animation
+
+Tagline: “Say It With a Token”
+
+Live counters (minted tokens, redeemed value)
+
+CTA buttons: Create | Redeem | Explore
+
+📄 B. New Pages
+
+How It Works: Token system + escrow + redemption
+
+Explore: Public token wall (if user consents)
+
+Pricing: Bulk tiers, paid options
+
+FAQ: Wallets, value, refunds
+
+Terms: Legal/compliance
+
+🛍 C. Mint UX Enhancements
+
+Image upload preview
+
+27-character live validator
+
+Cost estimator (e.g., “$1 + 0.05 SOL”)
+
+Confirmation screen
+
+📱 D. Mobile Optimization
+
+Responsive design
+
+Touch-friendly UI
+
+Mobile wallet connect (Phantom, Solflare)
+
+⚖️ 3. Infrastructure & Token Mechanics
+
+Token Behavior:
+
+Single mint address: FLBY-MSG
+
+Token name = 27-char message
+
+Metadata: Message, optional image, optional memo
+
+Backend:
+
+Token ledger
+
+Value mapping
+
+Redemption logs
+
+Webhooks to monitor burns
+
+Admin-triggered refunds (manual + rules-based)
+
+📆 4. Admin Dashboard: Minter Analytics & Token Oversight
+
+📊 A. Minter Analytics Panel
+
+
+
+Track wallet activity:
+
+Tokens minted
+
+Avg. message length
+
+Value per token
+
+Redemption stats
+
+Filters: Date, top minters, high-value senders
+
+Graphs: Activity heatmap, mint volume, value trends
+
+🔍 B. Token Explorer
+
+View any token by ID:
+
+Message
+
+Minter/receiver
+
+Value
+
+Redemption status
+
+⚖️ C. Moderation Tools
+
+Flag token / Invalidate / Block wallet
+
+Force refund if malicious or disputed
+
+Admin logs for all actions
+
+💳 D. Financial Dashboard
+
+Total value escrowed / redeemed / refunded
+
+Currency breakdown (SOL/USDC)
+
+Redemption funnel chart (Minted → Burned → Redeemed)
+
+⚙️ E. Admin Infra
+
+Role-based access
+
+Secure login via wallet or credentials
+
+Exportable reports
+
+Alerts for:
+
+Unusual activity
+
+Flagged messages
+
+Expiry/refund thresholds

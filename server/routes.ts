@@ -1,7 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertUserSchema, insertTokenSchema, insertAirdropSignupSchema, insertTransactionSchema, insertMarketListingSchema } from "@shared/schema";
+import { insertUserSchema, insertTokenSchema, insertAirdropSignupSchema, insertTransactionSchema, insertMarketListingSchema, insertRedemptionSchema, insertEscrowWalletSchema, insertAdminUserSchema, insertAdminLogSchema, insertAnalyticsSchema } from "@shared/schema";
 import { z } from "zod";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -234,6 +234,233 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     } catch (error) {
       res.status(500).json({ message: "Image upload failed" });
+    }
+  });
+
+  // ============ PHASE 2: NEW API ROUTES ============
+
+  // Token value and escrow routes
+  app.patch("/api/tokens/:tokenId/escrow", async (req, res) => {
+    try {
+      const { tokenId } = req.params;
+      const { status, escrowWallet } = req.body;
+      
+      const token = await storage.updateTokenEscrowStatus(tokenId, status, escrowWallet);
+      res.json(token);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to update escrow status" });
+    }
+  });
+
+  app.get("/api/tokens/with-value", async (req, res) => {
+    try {
+      const tokens = await storage.getTokensWithValue();
+      res.json(tokens);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch tokens with value" });
+    }
+  });
+
+  app.get("/api/tokens/public", async (req, res) => {
+    try {
+      const { limit = 50, offset = 0 } = req.query;
+      const tokens = await storage.getPublicTokens(Number(limit), Number(offset));
+      res.json(tokens);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch public tokens" });
+    }
+  });
+
+  // Redemption routes
+  app.post("/api/redemptions", async (req, res) => {
+    try {
+      const redemptionData = insertRedemptionSchema.parse(req.body);
+      const redemption = await storage.createRedemption(redemptionData);
+      res.json(redemption);
+    } catch (error) {
+      res.status(400).json({ message: error instanceof Error ? error.message : "Invalid redemption data" });
+    }
+  });
+
+  app.get("/api/redemptions/:id", async (req, res) => {
+    try {
+      const redemption = await storage.getRedemption(req.params.id);
+      if (!redemption) {
+        return res.status(404).json({ message: "Redemption not found" });
+      }
+      res.json(redemption);
+    } catch (error) {
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.get("/api/users/:userId/redemptions", async (req, res) => {
+    try {
+      const redemptions = await storage.getUserRedemptions(req.params.userId);
+      res.json(redemptions);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch user redemptions" });
+    }
+  });
+
+  app.patch("/api/redemptions/:id/status", async (req, res) => {
+    try {
+      const { id } = req.params;
+      const { status, signature } = req.body;
+      
+      const redemption = await storage.updateRedemptionStatus(id, status, signature);
+      res.json(redemption);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to update redemption status" });
+    }
+  });
+
+  app.get("/api/tokens/:tokenId/redemptions", async (req, res) => {
+    try {
+      const redemptions = await storage.getRedemptionsByToken(req.params.tokenId);
+      res.json(redemptions);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch token redemptions" });
+    }
+  });
+
+  // Escrow wallet routes
+  app.post("/api/escrow-wallets", async (req, res) => {
+    try {
+      const walletData = insertEscrowWalletSchema.parse(req.body);
+      const wallet = await storage.createEscrowWallet(walletData);
+      res.json(wallet);
+    } catch (error) {
+      res.status(400).json({ message: error instanceof Error ? error.message : "Invalid wallet data" });
+    }
+  });
+
+  app.get("/api/escrow-wallets/active", async (req, res) => {
+    try {
+      const wallet = await storage.getActiveEscrowWallet();
+      if (!wallet) {
+        return res.status(404).json({ message: "No active escrow wallet found" });
+      }
+      res.json(wallet);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch active escrow wallet" });
+    }
+  });
+
+  app.patch("/api/escrow-wallets/:id/balance", async (req, res) => {
+    try {
+      const { id } = req.params;
+      const { balance } = req.body;
+      
+      const wallet = await storage.updateEscrowBalance(id, balance);
+      res.json(wallet);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to update escrow balance" });
+    }
+  });
+
+  // Admin routes
+  app.post("/api/admin/users", async (req, res) => {
+    try {
+      const adminData = insertAdminUserSchema.parse(req.body);
+      const admin = await storage.createAdminUser(adminData);
+      res.json(admin);
+    } catch (error) {
+      res.status(400).json({ message: error instanceof Error ? error.message : "Invalid admin data" });
+    }
+  });
+
+  app.get("/api/admin/users/:walletAddress", async (req, res) => {
+    try {
+      const admin = await storage.getAdminByWallet(req.params.walletAddress);
+      if (!admin) {
+        return res.status(404).json({ message: "Admin not found" });
+      }
+      res.json(admin);
+    } catch (error) {
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.patch("/api/admin/users/:id/status", async (req, res) => {
+    try {
+      const { id } = req.params;
+      const { isActive } = req.body;
+      
+      const admin = await storage.updateAdminStatus(id, isActive);
+      res.json(admin);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to update admin status" });
+    }
+  });
+
+  // Admin action routes
+  app.post("/api/admin/tokens/:tokenId/flag", async (req, res) => {
+    try {
+      const { tokenId } = req.params;
+      const { reason, adminId } = req.body;
+      
+      const token = await storage.flagToken(tokenId, reason, adminId);
+      res.json(token);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to flag token" });
+    }
+  });
+
+  app.post("/api/admin/tokens/:tokenId/block", async (req, res) => {
+    try {
+      const { tokenId } = req.params;
+      const { adminId } = req.body;
+      
+      const token = await storage.blockToken(tokenId, adminId);
+      res.json(token);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to block token" });
+    }
+  });
+
+  app.get("/api/admin/logs", async (req, res) => {
+    try {
+      const { limit = 50, offset = 0 } = req.query;
+      const logs = await storage.getAdminLogs(Number(limit), Number(offset));
+      res.json(logs);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch admin logs" });
+    }
+  });
+
+  // Analytics routes
+  app.post("/api/analytics", async (req, res) => {
+    try {
+      const analyticsData = insertAnalyticsSchema.parse(req.body);
+      const analytics = await storage.createAnalyticsRecord(analyticsData);
+      res.json(analytics);
+    } catch (error) {
+      res.status(400).json({ message: error instanceof Error ? error.message : "Invalid analytics data" });
+    }
+  });
+
+  app.get("/api/analytics/:metric", async (req, res) => {
+    try {
+      const { metric } = req.params;
+      const { startDate, endDate } = req.query;
+      
+      const start = startDate ? new Date(startDate as string) : undefined;
+      const end = endDate ? new Date(endDate as string) : undefined;
+      
+      const analytics = await storage.getAnalyticsByMetric(metric, start, end);
+      res.json(analytics);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch analytics" });
+    }
+  });
+
+  app.get("/api/dashboard/stats", async (req, res) => {
+    try {
+      const stats = await storage.getDashboardStats();
+      res.json(stats);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch dashboard stats" });
     }
   });
 

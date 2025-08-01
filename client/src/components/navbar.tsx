@@ -10,6 +10,10 @@ export default function Navbar() {
     { href: "/mint", label: "Mint" },
     { href: "/marketplace", label: "Marketplace" },
     { href: "/portfolio", label: "Portfolio" },
+    { href: "/redeem", label: "Redeem" },
+    { href: "/explore", label: "Explore" },
+    { href: "/activity", label: "Activity" },
+    { href: "/how-it-works", label: "How It Works" },
   ];
 
   return (

@@ -8,6 +8,10 @@ import Home from "@/pages/home";
 import Marketplace from "@/pages/marketplace";
 import Portfolio from "@/pages/portfolio";
 import Mint from "@/pages/mint";
+import Redeem from "@/pages/redeem";
+import Activity from "@/pages/activity";
+import Explore from "@/pages/explore";
+import HowItWorks from "@/pages/how-it-works";
 import Navbar from "@/components/navbar";
 
 function Router() {
@@ -19,6 +23,10 @@ function Router() {
         <Route path="/marketplace" component={Marketplace} />
         <Route path="/portfolio" component={Portfolio} />
         <Route path="/mint" component={Mint} />
+        <Route path="/redeem" component={Redeem} />
+        <Route path="/activity" component={Activity} />
+        <Route path="/explore" component={Explore} />
+        <Route path="/how-it-works" component={HowItWorks} />
         <Route component={NotFound} />
       </Switch>
     </div>

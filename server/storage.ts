@@ -1,6 +1,6 @@
-import { type User, type InsertUser, type Token, type InsertToken, type TokenHolding, type InsertTokenHolding, type Transaction, type InsertTransaction, type AirdropSignup, type InsertAirdropSignup, type MarketListing, type InsertMarketListing, users, tokens, tokenHoldings, transactions, airdropSignups, marketListings } from "@shared/schema";
+import { type User, type InsertUser, type Token, type InsertToken, type TokenHolding, type InsertTokenHolding, type Transaction, type InsertTransaction, type AirdropSignup, type InsertAirdropSignup, type MarketListing, type InsertMarketListing, type Redemption, type InsertRedemption, type EscrowWallet, type InsertEscrowWallet, type AdminUser, type InsertAdminUser, type AdminLog, type InsertAdminLog, type Analytics, type InsertAnalytics, users, tokens, tokenHoldings, transactions, airdropSignups, marketListings, redemptions, escrowWallets, adminUsers, adminLogs, analytics } from "@shared/schema";
 import { db } from "./db";
-import { eq, like, desc } from "drizzle-orm";
+import { eq, like, desc, and, or, gte, lte, count } from "drizzle-orm";
 import { randomUUID } from "crypto";
 
 export interface IStorage {
@@ -39,6 +39,42 @@ export interface IStorage {
   getMarketListings(tokenId?: string): Promise<MarketListing[]>;
   updateMarketListing(listingId: string, isActive: boolean): Promise<MarketListing>;
   getActiveListings(): Promise<MarketListing[]>;
+
+  // Phase 2: Token value and escrow operations
+  updateTokenEscrowStatus(tokenId: string, status: string, escrowWallet?: string): Promise<Token>;
+  getTokensWithValue(): Promise<Token[]>;
+  getPublicTokens(limit?: number, offset?: number): Promise<Token[]>;
+  flagToken(tokenId: string, reason: string, adminId: string): Promise<Token>;
+  blockToken(tokenId: string, adminId: string): Promise<Token>;
+
+  // Phase 2: Redemption operations
+  createRedemption(redemption: InsertRedemption): Promise<Redemption>;
+  getRedemption(id: string): Promise<Redemption | undefined>;
+  getUserRedemptions(userId: string): Promise<Redemption[]>;
+  updateRedemptionStatus(redemptionId: string, status: string, signature?: string): Promise<Redemption>;
+  getRedemptionsByToken(tokenId: string): Promise<Redemption[]>;
+
+  // Phase 2: Escrow wallet operations
+  createEscrowWallet(wallet: InsertEscrowWallet): Promise<EscrowWallet>;
+  getActiveEscrowWallet(): Promise<EscrowWallet | undefined>;
+  updateEscrowBalance(walletId: string, balance: string): Promise<EscrowWallet>;
+
+  // Phase 2: Admin operations
+  createAdminUser(admin: InsertAdminUser): Promise<AdminUser>;
+  getAdminByWallet(walletAddress: string): Promise<AdminUser | undefined>;
+  updateAdminStatus(adminId: string, isActive: boolean): Promise<AdminUser>;
+  createAdminLog(log: InsertAdminLog): Promise<AdminLog>;
+  getAdminLogs(limit?: number, offset?: number): Promise<AdminLog[]>;
+
+  // Phase 2: Analytics operations
+  createAnalyticsRecord(analytics: InsertAnalytics): Promise<Analytics>;
+  getAnalyticsByMetric(metric: string, startDate?: Date, endDate?: Date): Promise<Analytics[]>;
+  getDashboardStats(): Promise<{
+    totalTokens: number;
+    totalValueEscrowed: string;
+    totalRedemptions: number;
+    activeUsers: number;
+  }>;
 }
 
 export class MemStorage implements IStorage {
@@ -453,6 +489,236 @@ export class DatabaseStorage implements IStorage {
 
   async getActiveListings(): Promise<MarketListing[]> {
     return await db.select().from(marketListings).where(eq(marketListings.isActive, true));
+  }
+
+  // Phase 2: Token value and escrow operations
+  async updateTokenEscrowStatus(tokenId: string, status: string, escrowWallet?: string): Promise<Token> {
+    const [token] = await db
+      .update(tokens)
+      .set({ 
+        escrowStatus: status,
+        escrowWallet: escrowWallet 
+      })
+      .where(eq(tokens.id, tokenId))
+      .returning();
+    return token;
+  }
+
+  async getTokensWithValue(): Promise<Token[]> {
+    return await db.select().from(tokens).where(eq(tokens.hasAttachedValue, true));
+  }
+
+  async getPublicTokens(limit = 50, offset = 0): Promise<Token[]> {
+    return await db
+      .select()
+      .from(tokens)
+      .where(and(eq(tokens.isPublic, true), eq(tokens.isBlocked, false)))
+      .orderBy(desc(tokens.createdAt))
+      .limit(limit)
+      .offset(offset);
+  }
+
+  async flagToken(tokenId: string, reason: string, adminId: string): Promise<Token> {
+    const [token] = await db
+      .update(tokens)
+      .set({ 
+        flaggedAt: new Date(),
+        flaggedReason: reason 
+      })
+      .where(eq(tokens.id, tokenId))
+      .returning();
+
+    // Log the admin action
+    await this.createAdminLog({
+      adminId,
+      action: "flag_token",
+      targetType: "token",
+      targetId: tokenId,
+      details: { reason }
+    });
+
+    return token;
+  }
+
+  async blockToken(tokenId: string, adminId: string): Promise<Token> {
+    const [token] = await db
+      .update(tokens)
+      .set({ isBlocked: true })
+      .where(eq(tokens.id, tokenId))
+      .returning();
+
+    // Log the admin action
+    await this.createAdminLog({
+      adminId,
+      action: "block_token",
+      targetType: "token",
+      targetId: tokenId,
+      details: {}
+    });
+
+    return token;
+  }
+
+  // Phase 2: Redemption operations
+  async createRedemption(insertRedemption: InsertRedemption): Promise<Redemption> {
+    const [redemption] = await db
+      .insert(redemptions)
+      .values(insertRedemption)
+      .returning();
+    return redemption;
+  }
+
+  async getRedemption(id: string): Promise<Redemption | undefined> {
+    const [redemption] = await db.select().from(redemptions).where(eq(redemptions.id, id));
+    return redemption || undefined;
+  }
+
+  async getUserRedemptions(userId: string): Promise<Redemption[]> {
+    return await db
+      .select()
+      .from(redemptions)
+      .where(eq(redemptions.userId, userId))
+      .orderBy(desc(redemptions.createdAt));
+  }
+
+  async updateRedemptionStatus(redemptionId: string, status: string, signature?: string): Promise<Redemption> {
+    const [redemption] = await db
+      .update(redemptions)
+      .set({ 
+        status,
+        redemptionTransactionSignature: signature,
+        completedAt: status === "completed" ? new Date() : undefined
+      })
+      .where(eq(redemptions.id, redemptionId))
+      .returning();
+    return redemption;
+  }
+
+  async getRedemptionsByToken(tokenId: string): Promise<Redemption[]> {
+    return await db
+      .select()
+      .from(redemptions)
+      .where(eq(redemptions.tokenId, tokenId))
+      .orderBy(desc(redemptions.createdAt));
+  }
+
+  // Phase 2: Escrow wallet operations
+  async createEscrowWallet(insertWallet: InsertEscrowWallet): Promise<EscrowWallet> {
+    const [wallet] = await db
+      .insert(escrowWallets)
+      .values(insertWallet)
+      .returning();
+    return wallet;
+  }
+
+  async getActiveEscrowWallet(): Promise<EscrowWallet | undefined> {
+    const [wallet] = await db
+      .select()
+      .from(escrowWallets)
+      .where(eq(escrowWallets.isActive, true));
+    return wallet || undefined;
+  }
+
+  async updateEscrowBalance(walletId: string, balance: string): Promise<EscrowWallet> {
+    const [wallet] = await db
+      .update(escrowWallets)
+      .set({ totalBalance: balance })
+      .where(eq(escrowWallets.id, walletId))
+      .returning();
+    return wallet;
+  }
+
+  // Phase 2: Admin operations
+  async createAdminUser(insertAdmin: InsertAdminUser): Promise<AdminUser> {
+    const [admin] = await db
+      .insert(adminUsers)
+      .values(insertAdmin)
+      .returning();
+    return admin;
+  }
+
+  async getAdminByWallet(walletAddress: string): Promise<AdminUser | undefined> {
+    const [admin] = await db
+      .select()
+      .from(adminUsers)
+      .where(eq(adminUsers.walletAddress, walletAddress));
+    return admin || undefined;
+  }
+
+  async updateAdminStatus(adminId: string, isActive: boolean): Promise<AdminUser> {
+    const [admin] = await db
+      .update(adminUsers)
+      .set({ isActive })
+      .where(eq(adminUsers.id, adminId))
+      .returning();
+    return admin;
+  }
+
+  async createAdminLog(insertLog: InsertAdminLog): Promise<AdminLog> {
+    const [log] = await db
+      .insert(adminLogs)
+      .values(insertLog)
+      .returning();
+    return log;
+  }
+
+  async getAdminLogs(limit = 50, offset = 0): Promise<AdminLog[]> {
+    return await db
+      .select()
+      .from(adminLogs)
+      .orderBy(desc(adminLogs.createdAt))
+      .limit(limit)
+      .offset(offset);
+  }
+
+  // Phase 2: Analytics operations
+  async createAnalyticsRecord(insertAnalytics: InsertAnalytics): Promise<Analytics> {
+    const [analytics] = await db
+      .insert(analytics)
+      .values(insertAnalytics)
+      .returning();
+    return analytics;
+  }
+
+  async getAnalyticsByMetric(metric: string, startDate?: Date, endDate?: Date): Promise<Analytics[]> {
+    let query = db.select().from(analytics).where(eq(analytics.metric, metric));
+    
+    if (startDate && endDate) {
+      query = query.where(and(
+        gte(analytics.date, startDate),
+        lte(analytics.date, endDate)
+      ));
+    }
+    
+    return await query.orderBy(desc(analytics.date));
+  }
+
+  async getDashboardStats(): Promise<{
+    totalTokens: number;
+    totalValueEscrowed: string;
+    totalRedemptions: number;
+    activeUsers: number;
+  }> {
+    const [tokenCount] = await db.select({ count: count() }).from(tokens);
+    const [redemptionCount] = await db.select({ count: count() }).from(redemptions);
+    const [userCount] = await db.select({ count: count() }).from(users);
+    
+    // Calculate total value escrowed
+    const tokensWithValue = await db
+      .select({ attachedValue: tokens.attachedValue })
+      .from(tokens)
+      .where(eq(tokens.hasAttachedValue, true));
+    
+    const totalValueEscrowed = tokensWithValue
+      .reduce((sum, token) => sum + parseFloat(token.attachedValue || "0"), 0)
+      .toString();
+
+    return {
+      totalTokens: tokenCount.count,
+      totalValueEscrowed,
+      totalRedemptions: redemptionCount.count,
+      activeUsers: userCount.count,
+    };
   }
 }
 

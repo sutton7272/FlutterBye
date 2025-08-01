@@ -23,6 +23,19 @@ export const tokens = pgTable("tokens", {
   valuePerToken: decimal("value_per_token", { precision: 18, scale: 9 }).default("0"),
   imageUrl: text("image_url"),
   metadata: json("metadata").$type<Record<string, any>>(),
+  // Phase 2: Value attachment
+  hasAttachedValue: boolean("has_attached_value").default(false),
+  attachedValue: decimal("attached_value", { precision: 18, scale: 9 }).default("0"),
+  currency: text("currency").default("SOL"), // SOL or USDC
+  escrowStatus: text("escrow_status").default("none"), // none, escrowed, redeemed, refunded
+  escrowWallet: text("escrow_wallet"),
+  expiresAt: timestamp("expires_at"),
+  // Public visibility
+  isPublic: boolean("is_public").default(false),
+  // Moderation
+  isBlocked: boolean("is_blocked").default(false),
+  flaggedAt: timestamp("flagged_at"),
+  flaggedReason: text("flagged_reason"),
   createdAt: timestamp("created_at").defaultNow(),
 });
 
@@ -67,6 +80,58 @@ export const marketListings = pgTable("market_listings", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
+// Phase 2: New tables for redemption, analytics, and admin
+export const redemptions = pgTable("redemptions", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  tokenId: varchar("token_id").references(() => tokens.id).notNull(),
+  userId: varchar("user_id").references(() => users.id).notNull(),
+  burnTransactionSignature: text("burn_transaction_signature").notNull(),
+  redeemedAmount: decimal("redeemed_amount", { precision: 18, scale: 9 }).notNull(),
+  currency: text("currency").notNull(),
+  redemptionTransactionSignature: text("redemption_transaction_signature"),
+  status: text("status").default("pending"), // pending, completed, failed
+  createdAt: timestamp("created_at").defaultNow(),
+  completedAt: timestamp("completed_at"),
+});
+
+export const escrowWallets = pgTable("escrow_wallets", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  walletAddress: text("wallet_address").notNull().unique(),
+  privateKey: text("private_key").notNull(), // Encrypted
+  isActive: boolean("is_active").default(true),
+  totalBalance: decimal("total_balance", { precision: 18, scale: 9 }).default("0"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const adminUsers = pgTable("admin_users", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  walletAddress: text("wallet_address").notNull().unique(),
+  email: text("email"),
+  role: text("role").notNull().default("admin"), // admin, moderator, viewer
+  permissions: json("permissions").$type<string[]>(),
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const adminLogs = pgTable("admin_logs", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  adminId: varchar("admin_id").references(() => adminUsers.id).notNull(),
+  action: text("action").notNull(), // flag_token, block_wallet, force_refund, etc.
+  targetType: text("target_type").notNull(), // token, user, transaction
+  targetId: varchar("target_id").notNull(),
+  details: json("details").$type<Record<string, any>>(),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const analytics = pgTable("analytics", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  date: timestamp("date").notNull(),
+  metric: text("metric").notNull(), // tokens_minted, value_escrowed, redemptions_completed
+  value: decimal("value", { precision: 18, scale: 9 }).notNull(),
+  metadata: json("metadata").$type<Record<string, any>>(),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
 // Insert schemas
 export const insertUserSchema = createInsertSchema(users).omit({
   id: true,
@@ -101,6 +166,32 @@ export const insertMarketListingSchema = createInsertSchema(marketListings).omit
   createdAt: true,
 });
 
+export const insertRedemptionSchema = createInsertSchema(redemptions).omit({
+  id: true,
+  createdAt: true,
+  completedAt: true,
+});
+
+export const insertEscrowWalletSchema = createInsertSchema(escrowWallets).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertAdminUserSchema = createInsertSchema(adminUsers).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertAdminLogSchema = createInsertSchema(adminLogs).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertAnalyticsSchema = createInsertSchema(analytics).omit({
+  id: true,
+  createdAt: true,
+});
+
 // Types
 export type User = typeof users.$inferSelect;
 export type InsertUser = z.infer<typeof insertUserSchema>;
@@ -119,3 +210,18 @@ export type InsertAirdropSignup = z.infer<typeof insertAirdropSignupSchema>;
 
 export type MarketListing = typeof marketListings.$inferSelect;
 export type InsertMarketListing = z.infer<typeof insertMarketListingSchema>;
+
+export type Redemption = typeof redemptions.$inferSelect;
+export type InsertRedemption = z.infer<typeof insertRedemptionSchema>;
+
+export type EscrowWallet = typeof escrowWallets.$inferSelect;
+export type InsertEscrowWallet = z.infer<typeof insertEscrowWalletSchema>;
+
+export type AdminUser = typeof adminUsers.$inferSelect;
+export type InsertAdminUser = z.infer<typeof insertAdminUserSchema>;
+
+export type AdminLog = typeof adminLogs.$inferSelect;
+export type InsertAdminLog = z.infer<typeof insertAdminLogSchema>;
+
+export type Analytics = typeof analytics.$inferSelect;
+export type InsertAnalytics = z.infer<typeof insertAnalyticsSchema>;
