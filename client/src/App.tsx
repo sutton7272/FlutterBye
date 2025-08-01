@@ -15,6 +15,7 @@ import HowItWorks from "@/pages/how-it-works";
 import FreeCodes from "@/pages/free-codes";
 import Admin from "@/pages/admin";
 import { SmsIntegrationPage } from "@/pages/sms-integration";
+import { WalletManagementPage } from "@/pages/wallet-management";
 import Navbar from "@/components/navbar";
 
 function Router() {
@@ -33,6 +34,7 @@ function Router() {
         <Route path="/free-codes" component={FreeCodes} />
         <Route path="/admin" component={Admin} />
         <Route path="/sms" component={SmsIntegrationPage} />
+        <Route path="/wallets" component={WalletManagementPage} />
         <Route component={NotFound} />
       </Switch>
     </div>

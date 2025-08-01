@@ -16,6 +16,7 @@ export default function Navbar() {
     { href: "/how-it-works", label: "How It Works" },
     { href: "/free-codes", label: "Free Codes" },
     { href: "/sms", label: "SMS Integration" },
+    { href: "/wallets", label: "Wallet Management" },
     { href: "/admin", label: "Admin" },
   ];
 
