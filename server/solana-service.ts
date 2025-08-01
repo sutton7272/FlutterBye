@@ -15,7 +15,7 @@ export class SolanaBackendService {
   private keypair: Keypair;
 
   constructor() {
-    const rpcUrl = process.env.SOLANA_RPC_URL || 'https://api.mainnet-beta.solana.com';
+    const rpcUrl = process.env.SOLANA_RPC_URL || 'https://api.devnet.solana.com';
     this.connection = new Connection(rpcUrl, 'confirmed');
     
     if (!process.env.SOLANA_PRIVATE_KEY) {
@@ -31,7 +31,7 @@ export class SolanaBackendService {
     }
   }
 
-  // Create FlBY-MSG token on mainnet
+  // Create FlBY-MSG token on DevNet
   async createFlutterbyeToken(params: {
     message: string;
     totalSupply: number;

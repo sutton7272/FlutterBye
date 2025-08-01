@@ -11,8 +11,8 @@ import {
   createAssociatedTokenAccountInstruction
 } from '@solana/spl-token';
 
-// Solana configuration - Using mainnet for production
-const SOLANA_RPC_URL = import.meta.env.VITE_SOLANA_RPC_URL || 'https://api.mainnet-beta.solana.com';
+// Solana configuration - Using DevNet for testing
+const SOLANA_RPC_URL = import.meta.env.VITE_SOLANA_RPC_URL || 'https://api.devnet.solana.com';
 const connection = new Connection(SOLANA_RPC_URL, 'confirmed');
 
 export interface TokenCreationParams {
