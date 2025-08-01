@@ -183,7 +183,7 @@ export class SMSService {
       MessageSid: req.body.MessageSid
     }).then(result => {
       if (result.success) {
-        twiml.message('Your message has been tokenized! Check your wallet for your FlBY-MSG token.');
+        twiml.message('Your message has been tokenized! Check your wallet for your FLBY-MSG token.');
       } else {
         twiml.message('Sorry, there was an error processing your message. Please try again.');
       }

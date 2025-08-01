@@ -138,7 +138,7 @@ export default function HowItWorksPage() {
           <CardHeader>
             <CardTitle className="text-2xl text-center">Token Economics</CardTitle>
             <CardDescription className="text-center">
-              Understanding FlBY-MSG tokens and value attachment
+              Understanding FLBY-MSG tokens and value attachment
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
@@ -149,7 +149,7 @@ export default function HowItWorksPage() {
                   Token Creation
                 </h3>
                 <ul className="space-y-1 text-sm text-muted-foreground">
-                  <li>• Standard symbol: FlBY-MSG</li>
+                  <li>• Standard symbol: FLBY-MSG</li>
                   <li>• 27-character message limit</li>
                   <li>• Optional SOL/USDC attachment</li>
                   <li>• Custom image support</li>

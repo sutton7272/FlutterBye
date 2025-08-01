@@ -152,7 +152,7 @@ export default function Portfolio() {
                               </div>
                               <div>
                                 <h4 className="font-semibold">{token.message}</h4>
-                                <p className="text-sm text-muted-foreground">FlBY-MSG • Qty: {quantity}</p>
+                                <p className="text-sm text-muted-foreground">FLBY-MSG • Qty: {quantity}</p>
                               </div>
                             </div>
                             <div className="text-right">

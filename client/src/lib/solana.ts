@@ -36,7 +36,7 @@ export class SolanaTokenService {
     this.connection = new Connection(SOLANA_RPC_URL, 'confirmed');
   }
 
-  // Create FlBY-MSG SPL token
+  // Create FLBY-MSG SPL token
   async createFlutterbyeToken(params: TokenCreationParams): Promise<TokenCreationResult> {
     try {
       // Generate mint keypair

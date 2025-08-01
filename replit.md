@@ -2,7 +2,7 @@
 
 ## Overview
 
-Flutterbye is a Solana blockchain-powered platform for tokenized messaging and value distribution. It allows users to create 27-character tokenized messages, each becoming a unique SPL token ("FlBY-MSG"). The platform integrates messaging with token economics, enabling value attachment to messages, token distribution to specific wallets, custom token image uploads, and the creation of viral, meme-driven communication in Web3. Key capabilities include analyzing token holders for targeted marketing, a consolidated system for attaching value to tokens with expiration dates, and a free token minting system for promotional distribution. Future concepts include an SMS-to-blockchain integration for minting "emotional" tokens, with features like time-locked messages and burn-to-read mechanisms to onboard non-crypto users.
+Flutterbye is a Solana blockchain-powered platform for tokenized messaging and value distribution. It allows users to create 27-character tokenized messages, each becoming a unique SPL token ("FLBY-MSG"). The platform integrates messaging with token economics, enabling value attachment to messages, token distribution to specific wallets, custom token image uploads, and the creation of viral, meme-driven communication in Web3. Key capabilities include analyzing token holders for targeted marketing, a consolidated system for attaching value to tokens with expiration dates, and a free token minting system for promotional distribution. Future concepts include an SMS-to-blockchain integration for minting "emotional" tokens, with features like time-locked messages and burn-to-read mechanisms to onboard non-crypto users.
 
 ## User Preferences
 

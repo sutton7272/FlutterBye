@@ -112,8 +112,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Available supply must be a whole number" });
       }
       
-      // Set FlBY-MSG as default symbol
-      tokenData.symbol = "FlBY-MSG";
+      // Set FLBY-MSG as default symbol
+      tokenData.symbol = "FLBY-MSG";
       
       // Handle image upload if provided
       if (tokenData.imageFile) {
@@ -192,7 +192,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const enhancedTokenData: any = {
         message,
-        symbol: "FlBY-MSG",
+        symbol: "FLBY-MSG",
         mintAddress: `enhanced_mint_${Date.now()}`,
         creatorId: "user_123",
         totalSupply: parseInt(totalSupply),

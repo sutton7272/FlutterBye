@@ -236,7 +236,7 @@ export default function FreeCodesPage() {
                   <div className="text-sm">
                     <div className="font-medium text-blue-700 dark:text-blue-300">Free Flutterbye Benefits:</div>
                     <ul className="text-green-600 dark:text-green-400 mt-1 space-y-1">
-                      <li>• Exclusive special edition FlBY-MSG token</li>
+                      <li>• Exclusive special edition FLBY-MSG token</li>
                       <li>• Unique green-themed design and metadata</li>
                       <li>• Limited availability through codes only</li>
                       <li>• May include bonus value attachment</li>

@@ -284,7 +284,7 @@ export default function AdminDashboard() {
                     <Coins className="w-8 h-8 text-green-400" />
                   </div>
                   <p className="text-xs text-muted-foreground mt-2">
-                    FlBY-MSG tokens minted
+                    FLBY-MSG tokens minted
                   </p>
                 </CardContent>
               </Card>

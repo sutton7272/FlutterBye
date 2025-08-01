@@ -31,7 +31,7 @@ export class SolanaBackendService {
     }
   }
 
-  // Create FlBY-MSG token on DevNet
+  // Create FLBY-MSG token on DevNet
   async createFlutterbyeToken(params: {
     message: string;
     totalSupply: number;

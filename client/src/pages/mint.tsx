@@ -143,7 +143,7 @@ export default function Mint() {
     <div className="min-h-screen pt-20 pb-12">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold mb-4">Mint FlBY-MSG Tokens</h1>
+          <h1 className="text-4xl font-bold mb-4">Mint FLBY-MSG Tokens</h1>
           <p className="text-xl text-muted-foreground">Create tokenized messages and distribute them to your target audience</p>
         </div>
         
@@ -171,7 +171,7 @@ export default function Mint() {
                     className={remainingChars < 0 ? "border-destructive" : ""}
                   />
                   <p className="text-xs text-muted-foreground mt-1">
-                    Your message will become the token name with FlBY-MSG symbol
+                    Your message will become the token name with FLBY-MSG symbol
                   </p>
                 </div>
                 
@@ -474,7 +474,7 @@ export default function Mint() {
                     {message || "Your Message Token"}
                   </h4>
                   <Badge variant="secondary" className="mb-4">
-                    FlBY-MSG
+                    FLBY-MSG
                   </Badge>
                   <div className="space-y-2 text-sm">
                     <div className="flex justify-between">

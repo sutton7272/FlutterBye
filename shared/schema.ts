@@ -22,7 +22,7 @@ export const users = pgTable("users", {
 export const tokens = pgTable("tokens", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   message: text("message").notNull(),
-  symbol: text("symbol").notNull().default("FlBY-MSG"),
+  symbol: text("symbol").notNull().default("FLBY-MSG"),
   mintAddress: text("mint_address").notNull().unique(),
   creatorId: varchar("creator_id").references(() => users.id).notNull(),
   totalSupply: integer("total_supply").notNull(),

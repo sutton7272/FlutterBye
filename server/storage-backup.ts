@@ -139,7 +139,7 @@ export class DatabaseStorage implements IStorage {
     const tokenData = {
       ...insertToken,
       mintAddress,
-      symbol: "FlBY-MSG"
+      symbol: "FLBY-MSG"
     };
 
     const [token] = await db
@@ -196,7 +196,7 @@ export class MemStorage implements IStorage {
       {
         id: "token-1",
         message: "DiamondHandsOnly",
-        symbol: "FlBY-MSG",
+        symbol: "FLBY-MSG",
         mintAddress: "mint-1",
         creatorId: "user-1",
         totalSupply: 750,
@@ -207,7 +207,7 @@ export class MemStorage implements IStorage {
       {
         id: "token-2",
         message: "ToTheMoonAndBack",
-        symbol: "FlBY-MSG",
+        symbol: "FLBY-MSG",
         mintAddress: "mint-2",
         creatorId: "user-1",
         totalSupply: 1000,
@@ -218,7 +218,7 @@ export class MemStorage implements IStorage {
       {
         id: "token-3",
         message: "FlutterLoveForever",
-        symbol: "FlBY-MSG",
+        symbol: "FLBY-MSG",
         mintAddress: "mint-3",
         creatorId: "user-2",
         totalSupply: 100,

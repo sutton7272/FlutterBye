@@ -58,7 +58,7 @@ export default function Marketplace() {
     <div className="min-h-screen pt-20 pb-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold mb-4">FlBY-MSG Token Marketplace</h1>
+          <h1 className="text-4xl font-bold mb-4">FLBY-MSG Token Marketplace</h1>
           <p className="text-xl text-muted-foreground">Discover, trade, and collect unique message tokens</p>
         </div>
         
