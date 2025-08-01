@@ -19,6 +19,7 @@ import { SmsIntegrationPage } from "@/pages/sms-integration";
 import { WalletManagementPage } from "@/pages/wallet-management";
 import { RewardsPage } from "@/pages/rewards";
 import JourneyPage from "@/pages/journey";
+import BadgesPage from "@/pages/badges";
 import Navbar from "@/components/navbar";
 
 function Router() {
@@ -41,6 +42,7 @@ function Router() {
         <Route path="/rewards" component={RewardsPage} />
         <Route path="/journey" component={JourneyPage} />
         <Route path="/heatmap" component={TransactionHeatmapPage} />
+        <Route path="/badges" component={BadgesPage} />
         <Route component={NotFound} />
       </Switch>
     </div>

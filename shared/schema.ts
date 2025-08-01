@@ -604,3 +604,73 @@ export type InsertEmotionalInteraction = z.infer<typeof insertEmotionalInteracti
 
 export type SmsDelivery = typeof smsDeliveries.$inferSelect;
 export type InsertSmsDelivery = z.infer<typeof insertSmsDeliverySchema>;
+
+// Custom Badge System Tables
+export const customUserBadges = pgTable("custom_user_badges", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").notNull(),
+  name: varchar("name", { length: 50 }).notNull(),
+  description: varchar("description", { length: 200 }),
+  backgroundColor: varchar("background_color", { length: 7 }).default("#1a1a1a"),
+  textColor: varchar("text_color", { length: 7 }).default("#ffffff"),
+  borderColor: varchar("border_color", { length: 7 }).default("#8b5cf6"),
+  icon: varchar("icon", { length: 50 }).default("star"),
+  pattern: varchar("pattern", { length: 20 }).default("solid"),
+  mintAddress: varchar("mint_address"),
+  isNFT: boolean("is_nft").default(false),
+  shareableUrl: varchar("shareable_url"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const customBadgeShares = pgTable("custom_badge_shares", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  badgeId: varchar("badge_id").notNull(),
+  sharedBy: varchar("shared_by").notNull(),
+  sharedWith: varchar("shared_with"),
+  platform: varchar("platform", { length: 20 }), // twitter, discord, telegram
+  shareCount: integer("share_count").default(1),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const customBadgeTemplates = pgTable("custom_badge_templates", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  name: varchar("name", { length: 50 }).notNull(),
+  description: varchar("description", { length: 200 }),
+  category: varchar("category", { length: 30 }).notNull(), // achievement, social, custom
+  backgroundColor: varchar("background_color", { length: 7 }).notNull(),
+  textColor: varchar("text_color", { length: 7 }).notNull(),
+  borderColor: varchar("border_color", { length: 7 }).notNull(),
+  icon: varchar("icon", { length: 50 }).notNull(),
+  pattern: varchar("pattern", { length: 20 }).notNull(),
+  isPublic: boolean("is_public").default(true),
+  usageCount: integer("usage_count").default(0),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Custom Badge insert schemas
+export const insertCustomUserBadgeSchema = createInsertSchema(customUserBadges).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertCustomBadgeShareSchema = createInsertSchema(customBadgeShares).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertCustomBadgeTemplateSchema = createInsertSchema(customBadgeTemplates).omit({
+  id: true,
+  createdAt: true,
+});
+
+// Custom Badge types
+export type CustomUserBadge = typeof customUserBadges.$inferSelect;
+export type InsertCustomUserBadge = z.infer<typeof insertCustomUserBadgeSchema>;
+
+export type CustomBadgeShare = typeof customBadgeShares.$inferSelect;
+export type InsertCustomBadgeShare = z.infer<typeof insertCustomBadgeShareSchema>;
+
+export type CustomBadgeTemplate = typeof customBadgeTemplates.$inferSelect;
+export type InsertCustomBadgeTemplate = z.infer<typeof insertCustomBadgeTemplateSchema>;

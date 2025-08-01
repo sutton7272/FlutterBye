@@ -13,9 +13,10 @@ import {
   Route,
   Trophy,
   Settings,
-  MessageSquare
+  MessageSquare,
+  Award
 } from 'lucide-react';
-import { useMobile } from '@/hooks/use-mobile';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 const navigation = [
   { name: 'Home', href: '/', icon: Home },
@@ -24,6 +25,7 @@ const navigation = [
   { name: 'Marketplace', href: '/marketplace', icon: ShoppingBag },
   { name: 'Activity', href: '/activity', icon: Activity },
   { name: 'Heat Map', href: '/heatmap', icon: Activity },
+  { name: 'Badge Studio', href: '/badges', icon: Award },
   { name: 'Rewards', href: '/rewards', icon: Trophy },
   { name: 'Journey', href: '/journey', icon: Route },
   { name: 'Free Codes', href: '/free-codes', icon: Gift },
@@ -34,7 +36,7 @@ const navigation = [
 export function MobileNav() {
   const [location] = useLocation();
   const [open, setOpen] = useState(false);
-  const isMobile = useMobile();
+  const isMobile = useIsMobile();
 
   if (!isMobile) return null;
 
@@ -52,6 +54,34 @@ export function MobileNav() {
       
       {open && (
         <div className="absolute top-16 left-0 right-0 bg-background border-b shadow-lg z-50 p-4">
+          <Link href="/" onClick={() => setOpen(false)}>
+            <span className="font-bold text-xl bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+              Flutterbye
+            </span>
+          </Link>
+          <div className="my-4 pb-10 pl-6">
+            <div className="flex flex-col space-y-2">
+              {navigation.map((item) => {
+                const Icon = item.icon;
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    onClick={() => setOpen(false)}
+                    className="flex items-center space-x-2 rounded-md px-3 py-2 text-sm font-medium transition-colors hover:bg-accent"
+                  >
+                    <Icon className="h-5 w-5" />
+                    <span>{item.name}</span>
+                  </Link>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
         <MobileLink
           href="/"
           className="flex items-center"

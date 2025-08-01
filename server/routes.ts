@@ -1258,5 +1258,159 @@ export async function registerRoutes(app: Express): Promise<Server> {
     return `${start}...${end}`;
   }
 
+  // Custom Badge Routes
+  app.get('/api/badges/custom', async (req, res) => {
+    try {
+      // In production, this would get user-specific badges
+      const mockBadges = [
+        {
+          id: '1',
+          userId: 'user123',
+          name: 'Pioneer Badge',
+          description: 'First badge created in Flutterbye',
+          backgroundColor: '#8b5cf6',
+          textColor: '#ffffff',
+          borderColor: '#a78bfa',
+          icon: 'star',
+          pattern: 'gradient',
+          isNFT: true,
+          mintAddress: 'Bb8Y5F2L9xM3nP4qR6sT8uV0wX2zA4bC6dE8fG0hI2jK4L',
+          shareableUrl: `${req.protocol}://${req.hostname}/badges/shared/1`,
+          createdAt: new Date().toISOString()
+        },
+        {
+          id: '2',
+          userId: 'user123',
+          name: 'Creative Master',
+          description: 'Awarded for exceptional badge design skills',
+          backgroundColor: '#f59e0b',
+          textColor: '#1f2937',
+          borderColor: '#fbbf24',
+          icon: 'crown',
+          pattern: 'solid',
+          isNFT: false,
+          shareableUrl: `${req.protocol}://${req.hostname}/badges/shared/2`,
+          createdAt: new Date().toISOString()
+        }
+      ];
+      
+      res.json(mockBadges);
+    } catch (error) {
+      console.error('Error fetching custom badges:', error);
+      res.status(500).json({ error: 'Failed to fetch badges' });
+    }
+  });
+
+  app.post('/api/badges/custom', async (req, res) => {
+    try {
+      const badgeData = req.body;
+      
+      // Validate badge data
+      if (!badgeData.name || badgeData.name.length > 50) {
+        return res.status(400).json({ error: 'Invalid badge name' });
+      }
+
+      // In production, save to database
+      const savedBadge = {
+        id: `badge_${Date.now()}`,
+        userId: 'user123', // Would get from auth
+        ...badgeData,
+        shareableUrl: `${req.protocol}://${req.hostname}/badges/shared/badge_${Date.now()}`,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      };
+
+      res.json(savedBadge);
+    } catch (error) {
+      console.error('Error saving custom badge:', error);
+      res.status(500).json({ error: 'Failed to save badge' });
+    }
+  });
+
+  app.post('/api/badges/custom/:badgeId/mint', async (req, res) => {
+    try {
+      const { badgeId } = req.params;
+      
+      // In production, mint as NFT on Solana
+      const mintAddress = generateMockMintAddress();
+      
+      // Update badge as NFT
+      const nftData = {
+        badgeId,
+        mintAddress,
+        isNFT: true,
+        transactionSignature: generateMockTransactionSignature()
+      };
+
+      res.json(nftData);
+    } catch (error) {
+      console.error('Error minting badge NFT:', error);
+      res.status(500).json({ error: 'Failed to mint NFT' });
+    }
+  });
+
+  app.get('/badges/shared/:badgeId', async (req, res) => {
+    try {
+      const { badgeId } = req.params;
+      
+      // In production, fetch badge from database
+      const sharedBadge = {
+        id: badgeId,
+        name: 'Shared Badge',
+        description: 'This is a shared custom badge from Flutterbye',
+        backgroundColor: '#8b5cf6',
+        textColor: '#ffffff',
+        borderColor: '#a78bfa',
+        icon: 'star',
+        pattern: 'gradient'
+      };
+
+      // Render a simple HTML page showing the badge
+      const html = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <title>${sharedBadge.name} - Flutterbye Badge</title>
+          <meta name="description" content="${sharedBadge.description}">
+          <meta property="og:title" content="${sharedBadge.name} - Flutterbye Badge">
+          <meta property="og:description" content="${sharedBadge.description}">
+          <meta property="og:image" content="${req.protocol}://${req.hostname}/api/badges/shared/${badgeId}/image">
+          <style>
+            body { font-family: system-ui; text-align: center; padding: 40px; background: #1a1a1a; color: white; }
+            .badge { width: 200px; height: 200px; border-radius: 50%; margin: 0 auto 20px; display: flex; align-items: center; justify-content: center; font-size: 48px; }
+            .cta { margin-top: 30px; }
+            .cta a { background: #8b5cf6; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; }
+          </style>
+        </head>
+        <body>
+          <div class="badge" style="background: ${sharedBadge.backgroundColor}; color: ${sharedBadge.textColor}; border: 4px solid ${sharedBadge.borderColor};">
+            ★
+          </div>
+          <h1>${sharedBadge.name}</h1>
+          <p>${sharedBadge.description}</p>
+          <div class="cta">
+            <a href="${req.protocol}://${req.hostname}/badges">Create Your Own Badge</a>
+          </div>
+        </body>
+        </html>
+      `;
+      
+      res.send(html);
+    } catch (error) {
+      console.error('Error serving shared badge:', error);
+      res.status(500).send('Badge not found');
+    }
+  });
+
+  function generateMockMintAddress(): string {
+    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz123456789';
+    return Array.from({length: 44}, () => chars[Math.floor(Math.random() * chars.length)]).join('');
+  }
+
+  function generateMockTransactionSignature(): string {
+    const chars = '0123456789abcdef';
+    return Array.from({length: 64}, () => chars[Math.floor(Math.random() * chars.length)]).join('');
+  }
+
   return httpServer;
 }
