@@ -1,0 +1,121 @@
+# Flutterbye Whitepaper
+
+Version 1.3 – July 2025
+*“Text. Share. Give.”*
+
+---
+
+## 1. Introduction
+
+Flutterbye is a blockchain-powered messaging and value distribution protocol built on the Solana network. It enables users to create and send 27-character tokenized messages, each minted as a custom SPL coin. These micro-messages—called Fluttercoins**—can carry value, emotion, or calls to action in an elegant, viral, and programmable form.
+
+Flutterbye is not just a messaging app—it's a new medium for value-rich communication, airdrops, virality, and engagement in Web3.
+
+---
+
+## **2. What Makes Flutterbye Unique?
+
+* 🪶 Each message is a coin: Every message up to 27 characters becomes the name of a new SPL token.
+* 🎯 Targeted minting: Send tokens to specific wallets via top-holder targeting or CSV upload.
+* 💸 Value attachment: Minted tokens can carry SOL or SPL token value (optional).
+* 🔄 Refund-to-credit system: Unclaimed tokens can be reclaimed and turned into credits for future mints.
+* 🧠 Anti-spam design: Human-readable, meme-worthy tokens reduce bot filtering and increase wallet attention.
+* 🌍 Composable and open: Designed for integrations with DeFi protocols, social tools, and marketing platforms.
+
+---
+
+## 3. Use Cases
+
+* Viral Growth Campaigns
+  Mint tokens like “JoinTheHiveNow” or “Stake4Rewards” and drop them to high-value wallets.
+
+* Gift or Tip with Purpose
+  Send “YouAreAwesome” coins with \$1 of SOL to a friend. Redeemable, collectible, and social.
+
+* Airdrop with Personality
+  Replace bland airdrops with meme-driven, emotionally engaging messages people remember.
+
+* Referral Rewards
+  Share “MyRefCode123” coins; receivers who redeem trigger affiliate logic.
+
+* Coupon Distribution
+  Businesses can mint tokens like “Save10Today” that act as redeemable coupons or discount tokens.
+
+---
+
+## 4. How It Works
+
+### Step 1: Mint a Message Token
+
+* Enter a message (max 27 characters)
+* Choose:
+
+  * Custom image (optional)
+  * Amount to mint
+  * Value per token (optional)
+  * Target wallets (CSV upload, top holder API, or manual entry)
+
+> Example:
+> Message: “StakeNowForYield”
+> Value: 0.25 SOL
+> Targets: Top 500 stakers of SOL
+
+All unused minted tokens are automatically returned to the sender’s connected wallet.
+
+---
+
+### Step 2: Distribution Logic
+
+#### Targeting Options
+
+* 📊 Top Wallet Holders: Query API to find top holders of a given token.
+* 📥 CSV Upload: Upload wallet address list.
+* 📋 Manual Entry: Paste individual wallet addresses.
+
+#### Distribution Methods
+
+* Instant airdrop via Solana transaction
+* Scheduled dispersal
+* Public link share or QR code (optional, in Phase 2)
+
+---
+
+### Step 3: Redemption & Refund-to-Credit
+
+* If a user claims the token, they receive:
+
+  * The message token (collectible or tradable)
+  * Any attached SOL or SPL value
+* If not claimed within X days:
+
+  * Sender receives credit in their account for future minting
+  * Flutterbye earns a fee (e.g. 10%) from expired value
+
+---
+
+## 5. Token Standards & Protocol Design
+
+* Tokens are SPL standard and readable on SolScan and Phantom.
+* Each coin name = the 27-character message (e.g., IMISSYOUFLYHIGHBABY)
+* Optional metadata includes:
+
+  * Custom image
+  * Attached memo
+  * Creator wallet address
+* All minted tokens are fully transferable and visible in wallet interfaces.
+
+---
+
+## 6. Monetization & Fees
+
+| Action                     | Fee                                  |
+| -------------------------- | ------------------------------------ |
+| Token Minting              | 0.01 SOL + optional value per token  |
+| Image Upload (optional)    | 0.005 SOL per message                |
+| Refund-to-Credit (Expired) | 10% of unclaimed value               |
+| Top Holder API Query       | Free up to 100; tiered pricing above |
+| Premium Distribution Tools | Coming soon (Phase 2)                |
+
+---
+
+## 7. Anti-Spam & Visibility Strategy
