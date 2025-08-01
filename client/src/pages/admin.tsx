@@ -124,8 +124,14 @@ export default function AdminDashboard() {
 
   const { data: currentSettings, isLoading: settingsLoading } = useQuery<AdminSettings>({
     queryKey: ["/api/admin/settings"],
-    onSuccess: (data) => setSettings(data),
   });
+
+  // Update settings when currentSettings changes
+  useEffect(() => {
+    if (currentSettings) {
+      setSettings(currentSettings);
+    }
+  }, [currentSettings]);
 
   // Mutations for admin actions
   const updateSettingsMutation = useMutation({
@@ -221,7 +227,7 @@ export default function AdminDashboard() {
         </div>
 
         <Tabs defaultValue="overview" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-7 bg-slate-800/50">
+          <TabsList className="grid w-full grid-cols-8 bg-slate-800/50">
             <TabsTrigger value="overview" className="flex items-center gap-2">
               <BarChart3 className="w-4 h-4" />
               Overview
@@ -233,6 +239,10 @@ export default function AdminDashboard() {
             <TabsTrigger value="pricing" className="flex items-center gap-2">
               <TrendingUp className="w-4 h-4" />
               Pricing
+            </TabsTrigger>
+            <TabsTrigger value="content" className="flex items-center gap-2">
+              <Edit className="w-4 h-4" />
+              Content
             </TabsTrigger>
             <TabsTrigger value="users" className="flex items-center gap-2">
               <Users className="w-4 h-4" />
@@ -511,6 +521,232 @@ export default function AdminDashboard() {
               </CardHeader>
               <CardContent>
                 <AdminPricingManagement />
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Content Management Tab */}
+          <TabsContent value="content" className="space-y-6">
+            <Card className="glassmorphism">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Edit className="w-5 h-5" />
+                  Content Management System
+                </CardTitle>
+                <CardDescription>
+                  Manage all frontend content, layouts, and styling across the platform
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-6">
+                  <div className="flex items-center justify-between">
+                    <div className="flex gap-2">
+                      <Button variant="outline" size="sm">
+                        <Eye className="w-4 h-4 mr-2" />
+                        Preview Mode
+                      </Button>
+                      <Button variant="outline" size="sm">
+                        <Download className="w-4 h-4 mr-2" />
+                        Export Content
+                      </Button>
+                      <Button variant="outline" size="sm">
+                        <Upload className="w-4 h-4 mr-2" />
+                        Import Content
+                      </Button>
+                    </div>
+                  </div>
+
+                  <Tabs defaultValue="text" className="space-y-4">
+                    <TabsList className="grid w-full grid-cols-4">
+                      <TabsTrigger value="text">Text Content</TabsTrigger>
+                      <TabsTrigger value="images">Images</TabsTrigger>
+                      <TabsTrigger value="layout">Layouts</TabsTrigger>
+                      <TabsTrigger value="theme">Theme</TabsTrigger>
+                    </TabsList>
+
+                    <TabsContent value="text" className="space-y-4">
+                      <Card>
+                        <CardHeader>
+                          <CardTitle className="text-lg">Text Content Management</CardTitle>
+                          <CardDescription>Edit headlines, descriptions, and copy across all pages</CardDescription>
+                        </CardHeader>
+                        <CardContent className="space-y-4">
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div className="space-y-2">
+                              <Label>Page</Label>
+                              <Select defaultValue="home">
+                                <SelectTrigger>
+                                  <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="home">Home</SelectItem>
+                                  <SelectItem value="mint">Mint</SelectItem>
+                                  <SelectItem value="portfolio">Portfolio</SelectItem>
+                                  <SelectItem value="marketplace">Marketplace</SelectItem>
+                                  <SelectItem value="limited-edition">Limited Edition</SelectItem>
+                                </SelectContent>
+                              </Select>
+                            </div>
+                            <div className="space-y-2">
+                              <Label>Content Type</Label>
+                              <Select defaultValue="headline">
+                                <SelectTrigger>
+                                  <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="headline">Headlines</SelectItem>
+                                  <SelectItem value="description">Descriptions</SelectItem>
+                                  <SelectItem value="cta">Call-to-Action</SelectItem>
+                                  <SelectItem value="navigation">Navigation</SelectItem>
+                                </SelectContent>
+                              </Select>
+                            </div>
+                          </div>
+                          
+                          <div className="space-y-2">
+                            <Label>Content</Label>
+                            <Textarea
+                              placeholder="Enter content text..."
+                              className="min-h-[100px]"
+                            />
+                          </div>
+                          
+                          <Button className="w-full">
+                            <Save className="w-4 h-4 mr-2" />
+                            Save Changes
+                          </Button>
+                        </CardContent>
+                      </Card>
+                    </TabsContent>
+
+                    <TabsContent value="images" className="space-y-4">
+                      <Card>
+                        <CardHeader>
+                          <CardTitle className="text-lg">Image Asset Management</CardTitle>
+                          <CardDescription>Upload and manage images, icons, and graphics</CardDescription>
+                        </CardHeader>
+                        <CardContent className="space-y-4">
+                          <div className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-8 text-center">
+                            <div className="mx-auto w-12 h-12 mb-4 text-muted-foreground">
+                              <Upload className="w-full h-full" />
+                            </div>
+                            <p className="text-sm text-muted-foreground mb-4">
+                              Drop images here or click to upload
+                            </p>
+                            <Button variant="outline">
+                              Choose Files
+                            </Button>
+                          </div>
+                          
+                          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                            <div className="aspect-square bg-muted rounded-lg p-2 flex items-center justify-center">
+                              <span className="text-xs text-muted-foreground">No images</span>
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    </TabsContent>
+
+                    <TabsContent value="layout" className="space-y-4">
+                      <Card>
+                        <CardHeader>
+                          <CardTitle className="text-lg">Layout Configuration</CardTitle>
+                          <CardDescription>Adjust page layouts and component positioning</CardDescription>
+                        </CardHeader>
+                        <CardContent className="space-y-4">
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div className="space-y-2">
+                              <Label>Page Layout</Label>
+                              <Select defaultValue="default">
+                                <SelectTrigger>
+                                  <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="default">Default</SelectItem>
+                                  <SelectItem value="full-width">Full Width</SelectItem>
+                                  <SelectItem value="sidebar">With Sidebar</SelectItem>
+                                  <SelectItem value="centered">Centered</SelectItem>
+                                </SelectContent>
+                              </Select>
+                            </div>
+                            <div className="space-y-2">
+                              <Label>Component Spacing</Label>
+                              <Select defaultValue="normal">
+                                <SelectTrigger>
+                                  <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="tight">Tight</SelectItem>
+                                  <SelectItem value="normal">Normal</SelectItem>
+                                  <SelectItem value="loose">Loose</SelectItem>
+                                </SelectContent>
+                              </Select>
+                            </div>
+                          </div>
+                          
+                          <Button className="w-full">
+                            <Save className="w-4 h-4 mr-2" />
+                            Apply Layout Changes
+                          </Button>
+                        </CardContent>
+                      </Card>
+                    </TabsContent>
+
+                    <TabsContent value="theme" className="space-y-4">
+                      <Card>
+                        <CardHeader>
+                          <CardTitle className="text-lg">Theme Customization</CardTitle>
+                          <CardDescription>Adjust colors, fonts, and visual styling</CardDescription>
+                        </CardHeader>
+                        <CardContent className="space-y-4">
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div className="space-y-2">
+                              <Label>Primary Color</Label>
+                              <div className="flex gap-2">
+                                <Input
+                                  type="color"
+                                  defaultValue="#0066FF"
+                                  className="w-16 h-10"
+                                />
+                                <Input defaultValue="#0066FF" className="flex-1" />
+                              </div>
+                            </div>
+                            <div className="space-y-2">
+                              <Label>Secondary Color</Label>
+                              <div className="flex gap-2">
+                                <Input
+                                  type="color"
+                                  defaultValue="#00CC66"
+                                  className="w-16 h-10"
+                                />
+                                <Input defaultValue="#00CC66" className="flex-1" />
+                              </div>
+                            </div>
+                          </div>
+                          
+                          <div className="space-y-2">
+                            <Label>Font Family</Label>
+                            <Select defaultValue="inter">
+                              <SelectTrigger>
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="inter">Inter</SelectItem>
+                                <SelectItem value="roboto">Roboto</SelectItem>
+                                <SelectItem value="system">System Default</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </div>
+                          
+                          <Button className="w-full">
+                            <Save className="w-4 h-4 mr-2" />
+                            Save Theme Changes
+                          </Button>
+                        </CardContent>
+                      </Card>
+                    </TabsContent>
+                  </Tabs>
+                </div>
               </CardContent>
             </Card>
           </TabsContent>

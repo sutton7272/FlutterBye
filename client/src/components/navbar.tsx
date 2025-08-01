@@ -17,7 +17,7 @@ export default function Navbar() {
     { href: "/rewards", label: "Rewards", icon: Trophy },
     { href: "/journey", label: "Journey", icon: Users },
     { href: "/sms", label: "SMS", icon: MessageSquare },
-    { href: "/admin/content", label: "Content", icon: Settings },
+    { href: "/admin", label: "Admin", icon: Settings },
   ];
 
   const isActive = (href: string) => location === href;

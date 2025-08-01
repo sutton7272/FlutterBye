@@ -21,7 +21,7 @@ import { WalletManagementPage } from "@/pages/wallet-management";
 import { RewardsPage } from "@/pages/rewards";
 import JourneyPage from "@/pages/journey";
 import BadgesPage from "@/pages/badges";
-import AdminContentPage from "@/pages/admin-content";
+
 import { Chat } from "@/pages/chat";
 import LimitedEdition from "@/pages/limited-edition";
 import Navbar from "@/components/navbar";
@@ -49,7 +49,7 @@ function Router() {
         <Route path="/journey" component={JourneyPage} />
         <Route path="/heatmap" component={TransactionHeatmapPage} />
         <Route path="/badges" component={BadgesPage} />
-        <Route path="/admin/content" component={AdminContentPage} />
+
         <Route path="/chat" component={Chat} />
         <Route path="/limited-edition" component={LimitedEdition} />
         <Route component={NotFound} />
