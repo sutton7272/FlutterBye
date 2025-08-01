@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { Link, useLocation } from 'wouter';
 import { Button } from '@/components/ui/button';
-// import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { 
   Menu, 
   Home, 
@@ -14,33 +13,49 @@ import {
   Trophy,
   Settings,
   MessageSquare,
-  Award
+  Award,
+  Compass,
+  Wrench
 } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
 
+// Consolidated navigation for better UX
 const navigation = [
   { name: 'Home', href: '/', icon: Home },
-  { name: 'Mint', href: '/mint', icon: Coins },
-  { name: 'Portfolio', href: '/portfolio', icon: Wallet },
-  { name: 'Marketplace', href: '/marketplace', icon: ShoppingBag },
-  { name: 'Activity', href: '/activity', icon: Activity },
-  { name: 'Heat Map', href: '/heatmap', icon: Activity },
-  { name: 'Badge Studio', href: '/badges', icon: Award },
-  { name: 'Rewards', href: '/rewards', icon: Trophy },
-  { name: 'Journey', href: '/journey', icon: Route },
-  { name: 'Free Codes', href: '/free-codes', icon: Gift },
-  { name: 'SMS Integration', href: '/sms-integration', icon: MessageSquare },
-  { name: 'How It Works', href: '/how-it-works', icon: Settings },
+  { name: 'Create', href: '/mint', icon: Coins },
+  { name: 'Explore', href: '/explore', icon: Compass, submenu: [
+    { name: 'Marketplace', href: '/marketplace' },
+    { name: 'Activity', href: '/activity' },
+    { name: 'Heat Map', href: '/heatmap' }
+  ]},
+  { name: 'Portfolio', href: '/portfolio', icon: Wallet, submenu: [
+    { name: 'Holdings', href: '/portfolio' },
+    { name: 'Rewards', href: '/rewards' },
+    { name: 'Journey', href: '/journey' }
+  ]},
+  { name: 'Tools', href: '/badges', icon: Wrench, submenu: [
+    { name: 'Badge Studio', href: '/badges' },
+    { name: 'SMS Integration', href: '/sms' },
+    { name: 'Wallet Management', href: '/wallets' }
+  ]},
+  { name: 'Learn', href: '/how-it-works', icon: Settings, submenu: [
+    { name: 'How It Works', href: '/how-it-works' },
+    { name: 'Free Codes', href: '/free-codes' }
+  ]}
 ];
 
 export function MobileNav() {
   const [location] = useLocation();
   const [open, setOpen] = useState(false);
+  const [expandedMenu, setExpandedMenu] = useState<string | null>(null);
   const isMobile = useIsMobile();
 
   if (!isMobile) return null;
 
-  // Simplified mobile nav without Sheet component for now
+  const toggleSubmenu = (menuName: string) => {
+    setExpandedMenu(expandedMenu === menuName ? null : menuName);
+  };
+
   return (
     <div className="md:hidden">
       <Button
@@ -53,22 +68,62 @@ export function MobileNav() {
       </Button>
       
       {open && (
-        <div className="absolute top-16 left-0 right-0 bg-background border-b shadow-lg z-50 p-4">
+        <div className="absolute top-16 left-0 right-0 bg-background/95 backdrop-blur-lg border-b shadow-lg z-50 p-4 max-h-[80vh] overflow-y-auto">
           <Link href="/" onClick={() => setOpen(false)}>
             <span className="font-bold text-xl bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
               Flutterbye
             </span>
           </Link>
-          <div className="my-4 pb-10 pl-6">
-            <div className="flex flex-col space-y-2">
+          <div className="my-4 pb-6">
+            <div className="flex flex-col space-y-1">
               {navigation.map((item) => {
                 const Icon = item.icon;
+                const isActive = location === item.href;
+                
+                if (item.submenu) {
+                  return (
+                    <div key={item.name}>
+                      <button
+                        onClick={() => toggleSubmenu(item.name)}
+                        className="w-full flex items-center justify-between space-x-2 rounded-md px-3 py-2 text-sm font-medium transition-colors hover:bg-accent text-left"
+                      >
+                        <div className="flex items-center space-x-2">
+                          <Icon className="h-5 w-5" />
+                          <span>{item.name}</span>
+                        </div>
+                        <span className="text-xs">
+                          {expandedMenu === item.name ? '−' : '+'}
+                        </span>
+                      </button>
+                      
+                      {expandedMenu === item.name && (
+                        <div className="ml-6 mt-1 space-y-1">
+                          {item.submenu.map((subItem) => (
+                            <Link
+                              key={subItem.href}
+                              href={subItem.href}
+                              onClick={() => setOpen(false)}
+                              className={`block rounded-md px-3 py-2 text-sm transition-colors hover:bg-accent ${
+                                location === subItem.href ? 'bg-primary/10 text-primary' : ''
+                              }`}
+                            >
+                              {subItem.name}
+                            </Link>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  );
+                }
+                
                 return (
                   <Link
                     key={item.href}
                     href={item.href}
                     onClick={() => setOpen(false)}
-                    className="flex items-center space-x-2 rounded-md px-3 py-2 text-sm font-medium transition-colors hover:bg-accent"
+                    className={`flex items-center space-x-2 rounded-md px-3 py-2 text-sm font-medium transition-colors hover:bg-accent ${
+                      isActive ? 'bg-primary/10 text-primary' : ''
+                    }`}
                   >
                     <Icon className="h-5 w-5" />
                     <span>{item.name}</span>
@@ -82,32 +137,6 @@ export function MobileNav() {
     </div>
   );
 }
-        <MobileLink
-          href="/"
-          className="flex items-center"
-          onOpenChange={setOpen}
-        >
-          <span className="font-bold text-xl bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-            Flutterbye
-          </span>
-        </MobileLink>
-        <div className="my-4 h-[calc(100vh-8rem)] pb-10 pl-6">
-          <div className="flex flex-col space-y-2">
-            {navigation.map((item) => {
-              const isActive = location === item.href;
-              return (
-                <MobileLink
-                  key={item.href}
-                  href={item.href}
-                  onOpenChange={setOpen}
-                  className={`flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
-                    isActive
-                      ? 'bg-primary text-primary-foreground'
-                      : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground'
-                  }`}
-                >
-                  <item.icon className="h-4 w-4" />
-                  {item.name}
                 </MobileLink>
               );
             })}

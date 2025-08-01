@@ -6,21 +6,13 @@ import { Button } from "@/components/ui/button";
 export default function Navbar() {
   const [location] = useLocation();
 
+  // Consolidated navigation for better UX
   const navItems = [
-    { href: "/mint", label: "Mint" },
-    { href: "/marketplace", label: "Marketplace" },
-    { href: "/portfolio", label: "Portfolio" },
-    { href: "/redeem", label: "Redeem" },
+    { href: "/mint", label: "Create" },
     { href: "/explore", label: "Explore" },
-    { href: "/activity", label: "Activity" },
-    { href: "/heatmap", label: "Heat Map" },
-    { href: "/badges", label: "Badge Studio" },
-    { href: "/how-it-works", label: "How It Works" },
-    { href: "/free-codes", label: "Free Codes" },
-    { href: "/sms", label: "SMS Integration" },
-    { href: "/wallets", label: "Wallet Management" },
-    { href: "/rewards", label: "Rewards" },
-    { href: "/journey", label: "Journey" },
+    { href: "/portfolio", label: "Portfolio" },
+    { href: "/badges", label: "Tools" },
+    { href: "/how-it-works", label: "Learn" },
     { href: "/admin", label: "Admin" },
   ];
 
