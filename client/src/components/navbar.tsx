@@ -27,8 +27,8 @@ export default function Navbar() {
       <div className="container flex h-16 items-center">
         <div className="mr-4 hidden md:flex">
           <Link href="/" className="mr-6 flex items-center space-x-3">
-            <div className="w-8 h-8 bg-gradient-to-br from-electric-blue via-flutter-green to-flutter-purple rounded-lg flex items-center justify-center shadow-lg">
-              <span className="text-sm font-bold text-white">F</span>
+            <div className="w-8 h-8 bg-gradient-to-br from-flutter-purple via-flutter-cyan to-flutter-pink rounded-lg flex items-center justify-center shadow-lg animate-pulse">
+              <span className="text-sm font-bold text-background">F</span>
             </div>
             <span className="hidden font-bold text-xl sm:inline-block flutter-gradient">
               Flutterbye

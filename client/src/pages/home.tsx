@@ -70,11 +70,12 @@ export default function ProfessionalHome() {
 
   return (
     <div className="min-h-screen bg-background relative overflow-hidden">
-      {/* Blockchain-inspired background */}
-      <div className="fixed inset-0 pointer-events-none opacity-20">
-        <div className="absolute top-20 left-10 w-72 h-72 bg-electric-blue/10 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute bottom-20 right-10 w-96 h-96 bg-flutter-green/10 rounded-full blur-3xl animate-pulse delay-1000"></div>
-        <div className="absolute top-1/2 left-1/2 w-64 h-64 bg-flutter-purple/8 rounded-full blur-2xl animate-pulse delay-500"></div>
+      {/* Fun vibrant background */}
+      <div className="fixed inset-0 pointer-events-none opacity-30">
+        <div className="absolute top-20 left-10 w-72 h-72 bg-flutter-purple/20 rounded-full blur-3xl animate-bounce"></div>
+        <div className="absolute bottom-20 right-10 w-96 h-96 bg-flutter-cyan/20 rounded-full blur-3xl animate-pulse delay-1000"></div>
+        <div className="absolute top-1/2 left-1/2 w-64 h-64 bg-flutter-pink/15 rounded-full blur-2xl animate-ping delay-500"></div>
+        <div className="absolute top-40 right-20 w-48 h-48 bg-neon-green/10 rounded-full blur-2xl animate-pulse delay-700"></div>
       </div>
 
       {/* Hero Section */}
@@ -168,10 +169,10 @@ export default function ProfessionalHome() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {features.map((feature, index) => (
               <Card key={index} className="group hover-lift blockchain-glow relative overflow-hidden">
-                <div className="absolute inset-0 bg-gradient-to-br from-electric-blue/5 via-flutter-green/3 to-flutter-purple/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                <div className="absolute inset-0 bg-gradient-to-br from-flutter-purple/10 via-flutter-cyan/8 to-flutter-pink/10 opacity-0 group-hover:opacity-100 transition-opacity"></div>
                 <CardHeader className="relative z-10">
                   <div className="flex items-center space-x-3">
-                    <div className="p-3 bg-gradient-to-br from-electric-blue/20 via-flutter-green/15 to-flutter-purple/20 rounded-lg text-accent border border-accent/20 group-hover:shadow-lg transition-shadow">
+                    <div className="p-3 bg-gradient-to-br from-flutter-purple/30 via-flutter-cyan/25 to-flutter-pink/30 rounded-lg text-accent border border-accent/20 group-hover:shadow-xl group-hover:animate-pulse transition-all">
                       {feature.icon}
                     </div>
                     <CardTitle className="text-xl group-hover:flutter-gradient transition-all">{feature.title}</CardTitle>
@@ -287,8 +288,8 @@ export default function ProfessionalHome() {
 
       {/* Call to Action */}
       <section className="py-20 relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-r from-electric-blue/20 via-flutter-green/10 to-flutter-purple/20"></div>
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent to-background/80"></div>
+        <div className="absolute inset-0 bg-gradient-to-r from-flutter-purple/30 via-flutter-cyan/20 to-flutter-pink/30 animate-pulse"></div>
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent to-background/70"></div>
         <div className="container mx-auto px-6 text-center relative z-10">
           <h2 className="text-3xl font-bold mb-4 flutter-gradient">
             Ready to Start Creating?
