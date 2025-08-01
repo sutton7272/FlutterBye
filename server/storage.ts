@@ -1,4 +1,6 @@
-import { type User, type InsertUser, type Token, type InsertToken, type TokenHolding, type InsertTokenHolding, type Transaction, type InsertTransaction, type AirdropSignup, type InsertAirdropSignup, type MarketListing, type InsertMarketListing } from "@shared/schema";
+import { type User, type InsertUser, type Token, type InsertToken, type TokenHolding, type InsertTokenHolding, type Transaction, type InsertTransaction, type AirdropSignup, type InsertAirdropSignup, type MarketListing, type InsertMarketListing, users, tokens, tokenHoldings, transactions, airdropSignups, marketListings } from "@shared/schema";
+import { db } from "./db";
+import { eq, like, desc } from "drizzle-orm";
 import { randomUUID } from "crypto";
 
 export interface IStorage {
@@ -289,4 +291,169 @@ export class MemStorage implements IStorage {
   }
 }
 
-export const storage = new MemStorage();
+export class DatabaseStorage implements IStorage {
+  async getUser(id: string): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.id, id));
+    return user || undefined;
+  }
+
+  async getUserByWallet(walletAddress: string): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.walletAddress, walletAddress));
+    return user || undefined;
+  }
+
+  async createUser(insertUser: InsertUser): Promise<User> {
+    const [user] = await db
+      .insert(users)
+      .values(insertUser)
+      .returning();
+    return user;
+  }
+
+  async updateUserCredits(userId: string, credits: string): Promise<User> {
+    const [user] = await db
+      .update(users)
+      .set({ credits })
+      .where(eq(users.id, userId))
+      .returning();
+    return user;
+  }
+
+  async getToken(id: string): Promise<Token | undefined> {
+    const [token] = await db.select().from(tokens).where(eq(tokens.id, id));
+    return token || undefined;
+  }
+
+  async getTokenByMintAddress(mintAddress: string): Promise<Token | undefined> {
+    const [token] = await db.select().from(tokens).where(eq(tokens.mintAddress, mintAddress));
+    return token || undefined;
+  }
+
+  async createToken(insertToken: InsertToken): Promise<Token> {
+    const [token] = await db
+      .insert(tokens)
+      .values(insertToken)
+      .returning();
+    return token;
+  }
+
+  async updateTokenSupply(tokenId: string, availableSupply: number): Promise<Token> {
+    const [token] = await db
+      .update(tokens)
+      .set({ availableSupply })
+      .where(eq(tokens.id, tokenId))
+      .returning();
+    return token;
+  }
+
+  async getTokensByCreator(creatorId: string): Promise<Token[]> {
+    return await db.select().from(tokens).where(eq(tokens.creatorId, creatorId)).orderBy(desc(tokens.createdAt));
+  }
+
+  async getAllTokens(limit = 50, offset = 0): Promise<Token[]> {
+    return await db.select().from(tokens).orderBy(desc(tokens.createdAt)).limit(limit).offset(offset);
+  }
+
+  async searchTokens(query: string): Promise<Token[]> {
+    return await db.select().from(tokens).where(like(tokens.message, `%${query}%`)).orderBy(desc(tokens.createdAt));
+  }
+
+  async getTokenHolding(userId: string, tokenId: string): Promise<TokenHolding | undefined> {
+    const [holding] = await db
+      .select()
+      .from(tokenHoldings)
+      .where(eq(tokenHoldings.userId, userId))
+      .where(eq(tokenHoldings.tokenId, tokenId));
+    return holding || undefined;
+  }
+
+  async createTokenHolding(insertHolding: InsertTokenHolding): Promise<TokenHolding> {
+    const [holding] = await db
+      .insert(tokenHoldings)
+      .values(insertHolding)
+      .returning();
+    return holding;
+  }
+
+  async updateTokenHolding(userId: string, tokenId: string, quantity: number): Promise<TokenHolding> {
+    const [holding] = await db
+      .update(tokenHoldings)
+      .set({ quantity })
+      .where(eq(tokenHoldings.userId, userId))
+      .where(eq(tokenHoldings.tokenId, tokenId))
+      .returning();
+    return holding;
+  }
+
+  async getUserHoldings(userId: string): Promise<TokenHolding[]> {
+    return await db.select().from(tokenHoldings).where(eq(tokenHoldings.userId, userId));
+  }
+
+  async createTransaction(insertTransaction: InsertTransaction): Promise<Transaction> {
+    const [transaction] = await db
+      .insert(transactions)
+      .values(insertTransaction)
+      .returning();
+    return transaction;
+  }
+
+  async getTransactionsByUser(userId: string): Promise<Transaction[]> {
+    return await db
+      .select()
+      .from(transactions)
+      .where(eq(transactions.fromUserId, userId))
+      .or(eq(transactions.toUserId, userId))
+      .orderBy(desc(transactions.createdAt));
+  }
+
+  async updateTransactionStatus(transactionId: string, status: string, signature?: string): Promise<Transaction> {
+    const [transaction] = await db
+      .update(transactions)
+      .set({ status, solanaSignature: signature })
+      .where(eq(transactions.id, transactionId))
+      .returning();
+    return transaction;
+  }
+
+  async createAirdropSignup(insertSignup: InsertAirdropSignup): Promise<AirdropSignup> {
+    const [signup] = await db
+      .insert(airdropSignups)
+      .values(insertSignup)
+      .returning();
+    return signup;
+  }
+
+  async getAirdropSignups(): Promise<AirdropSignup[]> {
+    return await db.select().from(airdropSignups).orderBy(desc(airdropSignups.createdAt));
+  }
+
+  async createMarketListing(insertListing: InsertMarketListing): Promise<MarketListing> {
+    const [listing] = await db
+      .insert(marketListings)
+      .values(insertListing)
+      .returning();
+    return listing;
+  }
+
+  async getMarketListings(tokenId?: string): Promise<MarketListing[]> {
+    if (tokenId) {
+      return await db.select().from(marketListings).where(eq(marketListings.tokenId, tokenId));
+    }
+    return await db.select().from(marketListings).orderBy(desc(marketListings.createdAt));
+  }
+
+  async updateMarketListing(listingId: string, isActive: boolean): Promise<MarketListing> {
+    const [listing] = await db
+      .update(marketListings)
+      .set({ isActive })
+      .where(eq(marketListings.id, listingId))
+      .returning();
+    return listing;
+  }
+
+  async getActiveListings(): Promise<MarketListing[]> {
+    return await db.select().from(marketListings).where(eq(marketListings.isActive, true));
+  }
+}
+
+export const storage = new DatabaseStorage();
