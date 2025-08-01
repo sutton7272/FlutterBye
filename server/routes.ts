@@ -1588,7 +1588,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // ============= CONTENT MANAGEMENT SYSTEM ROUTES =============
   
   // Content sections management  
-  app.get("/api/admin/content/sections", requireAdmin, async (req, res) => {
+  app.get("/api/admin/content/sections", authenticateWallet, requireAdmin, async (req, res) => {
     try {
       const { contentService } = await import("./content-management");
       const sections = await contentService.getAllContentSections();
