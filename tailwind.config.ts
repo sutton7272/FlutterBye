@@ -51,6 +51,13 @@ export default {
           "4": "var(--chart-4)",
           "5": "var(--chart-5)",
         },
+        // Deeper Electric Flutterbye colors
+        'electric-blue': 'hsl(210, 100%, 45%)',
+        'electric-cyan': 'hsl(190, 80%, 40%)', 
+        'electric-green': 'hsl(140, 100%, 40%)',
+        'neon-pink': 'hsl(320, 100%, 60%)',
+        'cyber-purple': 'hsl(270, 100%, 60%)',
+        'bright-mint': 'hsl(155, 90%, 38%)',
         sidebar: {
           DEFAULT: "var(--sidebar-background)",
           foreground: "var(--sidebar-foreground)",

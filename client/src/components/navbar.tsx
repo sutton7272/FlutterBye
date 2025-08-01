@@ -23,7 +23,7 @@ export default function Navbar() {
   const isActive = (href: string) => location === href;
 
   return (
-    <nav className="border-b border-electric-cyan/20 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50">
+    <nav className="border-b border-blue-500/20 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50">
       <div className="container flex h-16 items-center">
         <div className="mr-4 hidden md:flex">
           <Link href="/" className="mr-6 flex items-center space-x-3">
@@ -42,8 +42,8 @@ export default function Navbar() {
                   size="sm"
                   className={`flex items-center gap-2 cyber-glow ${
                     isActive(item.href) 
-                      ? "bg-gradient-to-r from-electric-blue to-electric-green text-background hover:from-electric-cyan hover:to-bright-mint" 
-                      : "hover:bg-electric-blue/10 hover:text-electric-cyan"
+                      ? "bg-gradient-to-r from-blue-600 to-green-600 text-background hover:from-blue-500 hover:to-green-500" 
+                      : "hover:bg-blue-600/10 hover:text-blue-400"
                   }`}
                 >
                   <item.icon className="h-4 w-4" />
@@ -81,8 +81,8 @@ export default function Navbar() {
                     variant={isActive(item.href) ? "default" : "ghost"}
                     className={`w-full justify-start gap-3 h-12 cyber-glow ${
                       isActive(item.href) 
-                        ? "bg-gradient-to-r from-electric-blue to-electric-green text-background" 
-                        : "hover:bg-electric-blue/10 hover:text-electric-cyan"
+                        ? "bg-gradient-to-r from-blue-600 to-green-600 text-background" 
+                        : "hover:bg-blue-600/10 hover:text-blue-400"
                     }`}
                     onClick={() => setIsOpen(false)}
                   >

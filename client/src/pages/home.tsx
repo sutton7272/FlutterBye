@@ -54,10 +54,10 @@ export default function Home() {
 
   const getActivityColor = (type: string) => {
     switch (type) {
-      case 'sms': return 'from-electric-blue to-electric-cyan';
-      case 'mint': return 'from-electric-green to-bright-mint';
+      case 'sms': return 'from-blue-600 to-blue-400';
+      case 'mint': return 'from-green-600 to-green-400';
       case 'redeem': return 'from-cyber-purple to-neon-pink';
-      default: return 'from-electric-cyan to-electric-green';
+      default: return 'from-blue-500 to-green-500';
     }
   };
 

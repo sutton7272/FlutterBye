@@ -123,11 +123,11 @@ export default function LimitedEdition() {
   const getRarityColor = (rarity: string) => {
     const colors = {
       common: 'bg-gradient-to-r from-gray-500 to-gray-600',
-      rare: 'bg-gradient-to-r from-electric-blue to-electric-cyan',
+      rare: 'bg-gradient-to-r from-blue-600 to-blue-500',
       epic: 'bg-gradient-to-r from-cyber-purple to-neon-pink',
-      legendary: 'bg-gradient-to-r from-electric-green to-bright-mint',
+      legendary: 'bg-gradient-to-r from-green-600 to-green-500',
     };
-    return colors[rarity as keyof typeof colors] || 'bg-gradient-to-r from-electric-cyan to-electric-green';
+    return colors[rarity as keyof typeof colors] || 'bg-gradient-to-r from-blue-600 to-green-600';
   };
 
   const getProgressPercentage = (minted: number, total: number) => {
