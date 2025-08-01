@@ -3,7 +3,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { WalletConnect } from "@/components/wallet-connect";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { Menu, Home, Coins, Trophy, Users, MessageSquare, Settings } from "lucide-react";
+import { Menu, Home, Coins, Trophy, Users, MessageSquare, Settings, Sparkles } from "lucide-react";
 
 export default function Navbar() {
   const [location] = useLocation();
@@ -12,6 +12,7 @@ export default function Navbar() {
   const navItems = [
     { href: "/", label: "Home", icon: Home },
     { href: "/mint", label: "Mint", icon: Coins },
+    { href: "/limited-edition", label: "Limited Edition", icon: Sparkles },
     { href: "/chat", label: "Chat", icon: MessageSquare },
     { href: "/rewards", label: "Rewards", icon: Trophy },
     { href: "/journey", label: "Journey", icon: Users },
