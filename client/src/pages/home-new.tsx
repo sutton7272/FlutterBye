@@ -1,9 +1,11 @@
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { useQuery } from "@tanstack/react-query";
 import { Link } from "wouter";
+import ButterflyLogo from "@/components/butterfly-logo";
 import { ArrowRight, MessageSquare, Coins, Zap, TrendingUp, Users, Target } from "lucide-react";
-import flutterbeyeLogoPath from "@assets/image_1754068877999.png";
 
 interface RecentActivity {
   id: string;
@@ -74,12 +76,11 @@ export default function Home() {
         {/* Hero Section */}
         <div className="text-center mb-16">
           <div className="flex justify-center mb-8">
-            <img 
-              src={flutterbeyeLogoPath} 
-              alt="Flutterbye Logo" 
-              className="h-32 md:h-40 object-contain animate-pulse-custom"
-            />
+            <ButterflyLogo size="xl" animate className="mb-4" />
           </div>
+          <h1 className="text-6xl md:text-8xl font-black bg-gradient-to-r from-purple-400 via-pink-400 to-cyan-400 bg-clip-text text-transparent mb-6 tracking-tight">
+            FLUTTERBYE
+          </h1>
           <p className="text-xl md:text-2xl text-gray-300 max-w-4xl mx-auto mb-4 font-medium">
             THE REVOLUTIONARY SMS-TO-BLOCKCHAIN PROTOCOL
           </p>
@@ -93,7 +94,7 @@ export default function Home() {
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
             </Link>
-            <Link href="/sms-integration">
+            <Link href="/sms">
               <Button variant="outline" size="lg" className="text-lg px-8 py-6 border-purple-500 text-purple-300 hover:bg-purple-500/10 font-bold">
                 TEXT TO TOKENIZE
               </Button>
@@ -263,7 +264,7 @@ export default function Home() {
 
       {/* Bottom Scrolling Marquee */}
       <div className="border-t border-purple-500/20 bg-gradient-to-r from-blue-900/20 to-purple-900/20 py-4 mt-16 overflow-hidden">
-        <div className="flex animate-marquee whitespace-nowrap text-xl font-bold text-blue-300">
+        <div className="flex animate-marquee whitespace-nowrap text-xl font-bold text-blue-300" style={{ animationDirection: 'reverse' }}>
           {[...marqueeText.slice().reverse(), ...marqueeText.slice().reverse()].map((text, i) => (
             <span key={`bottom-${i}`} className="mx-8 flex-shrink-0">{text}</span>
           ))}
