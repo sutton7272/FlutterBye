@@ -31,13 +31,13 @@ interface CodeRedemption {
   metadata?: Record<string, any>;
 }
 
-export default function GreenCodesPage() {
+export default function FreeCodesPage() {
   const [redeemCode, setRedeemCode] = useState('');
   const [userWallet, setUserWallet] = useState('');
   const queryClient = useQueryClient();
 
   const { data: availableCodes = [], isLoading: codesLoading } = useQuery({
-    queryKey: ['/api/codes/green-flutterbye'],
+    queryKey: ['/api/codes/free-flutterbye'],
   });
 
   const { data: userRedemptions = [], isLoading: redemptionsLoading } = useQuery({
@@ -50,15 +50,15 @@ export default function GreenCodesPage() {
       return await apiRequest(`/api/codes/redeem`, 'POST', {
         code,
         userId,
-        codeType: 'green_flutterbye'
+        codeType: 'free_flutterbye'
       });
     },
-    onSuccess: (data) => {
+    onSuccess: (data: any) => {
       toast({
-        title: "Green Flutterbye Claimed!",
-        description: `Successfully claimed your Green Flutterbye mint: ${data.tokenId}`,
+        title: "Free Flutterbye Claimed!",
+        description: `Successfully claimed your Free Flutterbye mint: ${data.tokenId}`,
       });
-      queryClient.invalidateQueries({ queryKey: ['/api/codes/green-flutterbye'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/codes/free-flutterbye'] });
       queryClient.invalidateQueries({ queryKey: ['/api/codes/redemptions', userWallet] });
       setRedeemCode('');
     },
@@ -77,7 +77,7 @@ export default function GreenCodesPage() {
     setUserWallet(mockWallet);
     toast({
       title: "Wallet Connected",
-      description: "Ready to claim Green Flutterbye mints!",
+      description: "Ready to claim Free Flutterbye mints!",
     });
   };
 
@@ -134,12 +134,12 @@ export default function GreenCodesPage() {
         <div className="text-center mb-8">
           <div className="flex items-center justify-center mb-4">
             <Sparkles className="w-8 h-8 mr-3 text-green-500" />
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-green-400 to-emerald-500 bg-clip-text text-transparent">
-              Green Flutterbye Codes
+            <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
+              Free Flutterbye Codes
             </h1>
           </div>
           <p className="text-lg text-muted-foreground">
-            Claim exclusive Green Flutterbye mints with special redemption codes
+            Claim free Flutterbye mints with special redemption codes
           </p>
         </div>
 
@@ -151,7 +151,7 @@ export default function GreenCodesPage() {
               Wallet Connection
             </CardTitle>
             <CardDescription>
-              Connect your wallet to claim Green Flutterbye mints
+              Connect your wallet to claim free Flutterbye mints
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -185,7 +185,7 @@ export default function GreenCodesPage() {
                 Redeem Code
               </CardTitle>
               <CardDescription>
-                Enter your Green Flutterbye redemption code to claim your mint
+                Enter your Free Flutterbye redemption code to claim your mint
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -195,7 +195,7 @@ export default function GreenCodesPage() {
                   id="redemption-code"
                   value={redeemCode}
                   onChange={(e) => setRedeemCode(e.target.value.toUpperCase())}
-                  placeholder="GREEN-XXXXXX"
+                  placeholder="FREE-XXXXXX"
                   className="font-mono text-center text-lg"
                 />
               </div>
@@ -215,7 +215,7 @@ export default function GreenCodesPage() {
                   ) : (
                     <>
                       <Sparkles className="w-4 h-4 mr-2" />
-                      Claim Green Flutterbye
+                      Claim Free Flutterbye
                     </>
                   )}
                 </Button>
@@ -234,7 +234,7 @@ export default function GreenCodesPage() {
                 <div className="flex items-start space-x-2">
                   <Sparkles className="w-5 h-5 text-green-500 mt-0.5" />
                   <div className="text-sm">
-                    <div className="font-medium text-green-700 dark:text-green-300">Green Flutterbye Benefits:</div>
+                    <div className="font-medium text-blue-700 dark:text-blue-300">Free Flutterbye Benefits:</div>
                     <ul className="text-green-600 dark:text-green-400 mt-1 space-y-1">
                       <li>• Exclusive special edition FlBY-MSG token</li>
                       <li>• Unique green-themed design and metadata</li>

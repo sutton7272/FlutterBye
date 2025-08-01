@@ -14,6 +14,8 @@ export default function Navbar() {
     { href: "/explore", label: "Explore" },
     { href: "/activity", label: "Activity" },
     { href: "/how-it-works", label: "How It Works" },
+    { href: "/free-codes", label: "Free Codes" },
+    { href: "/admin", label: "Admin" },
   ];
 
   return (

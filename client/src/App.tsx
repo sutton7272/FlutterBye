@@ -12,6 +12,8 @@ import Redeem from "@/pages/redeem";
 import Activity from "@/pages/activity";
 import Explore from "@/pages/explore";
 import HowItWorks from "@/pages/how-it-works";
+import FreeCodes from "@/pages/free-codes";
+import Admin from "@/pages/admin";
 import Navbar from "@/components/navbar";
 
 function Router() {
@@ -27,6 +29,8 @@ function Router() {
         <Route path="/activity" component={Activity} />
         <Route path="/explore" component={Explore} />
         <Route path="/how-it-works" component={HowItWorks} />
+        <Route path="/free-codes" component={FreeCodes} />
+        <Route path="/admin" component={Admin} />
         <Route component={NotFound} />
       </Switch>
     </div>

@@ -464,6 +464,85 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Free Flutterbye Code Routes
+  app.get("/api/codes/free-flutterbye", async (req, res) => {
+    try {
+      // Mock data for demo - in real app would query database
+      const mockCodes = [
+        {
+          id: "1",
+          code: "FREE-ABC123",
+          codeType: "free_flutterbye",
+          isActive: true,
+          maxUses: 1,
+          currentUses: 0,
+          expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+          createdAt: new Date().toISOString()
+        },
+        {
+          id: "2",
+          code: "FREE-XYZ789",
+          codeType: "free_flutterbye",
+          isActive: true,
+          maxUses: 5,
+          currentUses: 2,
+          expiresAt: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString(),
+          createdAt: new Date().toISOString()
+        }
+      ];
+      res.json(mockCodes);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch codes" });
+    }
+  });
+
+  app.post("/api/codes/redeem", async (req, res) => {
+    try {
+      const { code, userId, codeType } = req.body;
+      
+      // Mock redemption logic
+      if (code.startsWith("FREE-")) {
+        const tokenId = `token_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+        
+        // In real app: verify code, check expiration, create token, update usage count
+        const redemption = {
+          id: `redemption_${Date.now()}`,
+          codeId: "mock_code_id",
+          userId,
+          tokenId,
+          redeemedAt: new Date().toISOString()
+        };
+        
+        res.json({ success: true, tokenId, redemption });
+      } else {
+        res.status(400).json({ error: "Invalid redemption code" });
+      }
+    } catch (error) {
+      res.status(500).json({ error: "Failed to redeem code" });
+    }
+  });
+
+  app.get("/api/codes/redemptions/:userId", async (req, res) => {
+    try {
+      const { userId } = req.params;
+      
+      // Mock user redemptions
+      const mockRedemptions = [
+        {
+          id: "1",
+          codeId: "code1",
+          userId,
+          tokenId: "token_abc123",
+          redeemedAt: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()
+        }
+      ];
+      
+      res.json(mockRedemptions);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch redemptions" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

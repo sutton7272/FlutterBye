@@ -12,7 +12,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import ImageUpload from "@/components/image-upload";
-import { Coins, Upload, Calculator, DollarSign, Lock, Globe } from "lucide-react";
+import { Coins, Upload, Calculator, DollarSign, Lock, Globe, Gift } from "lucide-react";
 import { type InsertToken } from "@shared/schema";
 
 export default function Mint() {
@@ -32,7 +32,7 @@ export default function Mint() {
   const [isPublic, setIsPublic] = useState(false);
   const [memo, setMemo] = useState("");
   const [expirationDate, setExpirationDate] = useState("");
-  const [isGreenFlutterbye, setIsGreenFlutterbye] = useState(false);
+  const [isFreeFlutterbye, setIsFreeFlutterbye] = useState(false);
 
   const mintToken = useMutation({
     mutationFn: async (data: InsertToken) => {
@@ -57,7 +57,7 @@ export default function Mint() {
       setIsPublic(false);
       setMemo("");
       setExpirationDate("");
-      setIsGreenFlutterbye(false);
+      setIsFreeFlutterbye(false);
     },
     onError: (error) => {
       toast({
@@ -99,7 +99,7 @@ export default function Mint() {
       currency: currency,
       isPublic: isPublic,
       expiresAt: attachValue && expirationDate ? new Date(expirationDate) : undefined,
-      metadata: memo ? { memo, isGreenFlutterbye } : { isGreenFlutterbye },
+      metadata: memo ? { memo, isFreeFlutterbye } : { isFreeFlutterbye },
       valuePerToken: valuePerToken || "0",
       imageFile: tokenImage || undefined,
     };
@@ -259,6 +259,117 @@ export default function Mint() {
                   selectedImage={tokenImage}
                   disabled={mintToken.isPending}
                 />
+
+                {/* Phase 2: Value Attachment Section */}
+                <Separator />
+                
+                <div className="space-y-4">
+                  <h4 className="text-lg font-semibold flex items-center">
+                    <DollarSign className="w-5 h-5 mr-2 text-blue-500" />
+                    Value Attachment (Phase 2)
+                  </h4>
+                  
+                  <div className="flex items-center space-x-2">
+                    <Switch
+                      id="attach-value"
+                      checked={attachValue}
+                      onCheckedChange={setAttachValue}
+                    />
+                    <Label htmlFor="attach-value">Attach value to this token</Label>
+                  </div>
+
+                  {attachValue && (
+                    <div className="space-y-4 ml-6 border-l-2 border-blue-200 pl-4">
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="attached-value">Attached Value</Label>
+                          <Input
+                            id="attached-value"
+                            type="number"
+                            step="0.001"
+                            min="0"
+                            value={attachedValue}
+                            onChange={(e) => setAttachedValue(e.target.value)}
+                            placeholder="0.1"
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="currency">Currency</Label>
+                          <select
+                            id="currency"
+                            value={currency}
+                            onChange={(e) => setCurrency(e.target.value)}
+                            className="w-full px-3 py-2 border rounded-md dark:bg-slate-800 dark:border-slate-600"
+                          >
+                            <option value="SOL">SOL</option>
+                            <option value="USDC">USDC</option>
+                          </select>
+                        </div>
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="expiration-date">Expiration Date (Optional)</Label>
+                        <Input
+                          id="expiration-date"
+                          type="datetime-local"
+                          value={expirationDate}
+                          onChange={(e) => setExpirationDate(e.target.value)}
+                          min={new Date().toISOString().slice(0, 16)}
+                        />
+                        <p className="text-xs text-muted-foreground">
+                          If set, attached value can only be claimed before this date
+                        </p>
+                      </div>
+
+                      <div className="flex items-center space-x-2">
+                        <Switch
+                          id="is-public"
+                          checked={isPublic}
+                          onCheckedChange={setIsPublic}
+                        />
+                        <Label htmlFor="is-public">Make token publicly visible</Label>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Free Flutterbye Section */}
+                <Separator />
+                
+                <div className="space-y-4">
+                  <h4 className="text-lg font-semibold flex items-center">
+                    <Gift className="w-5 h-5 mr-2 text-purple-500" />
+                    Special Mint Options
+                  </h4>
+                  
+                  <div className="flex items-center space-x-2">
+                    <Switch
+                      id="free-flutterbye"
+                      checked={isFreeFlutterbye}
+                      onCheckedChange={setIsFreeFlutterbye}
+                    />
+                    <Label htmlFor="free-flutterbye">Create as Free Flutterbye mint</Label>
+                  </div>
+                  
+                  {isFreeFlutterbye && (
+                    <div className="ml-6 p-3 bg-purple-50 dark:bg-purple-950/20 border border-purple-200 dark:border-purple-800 rounded-lg">
+                      <p className="text-sm text-purple-700 dark:text-purple-300">
+                        This token will be created as a special Free Flutterbye mint, eligible for redemption codes and special distribution.
+                      </p>
+                    </div>
+                  )}
+
+                  <div className="space-y-2">
+                    <Label htmlFor="memo">Memo (Optional)</Label>
+                    <Textarea
+                      id="memo"
+                      value={memo}
+                      onChange={(e) => setMemo(e.target.value)}
+                      placeholder="Add any notes or special instructions for this token..."
+                      rows={3}
+                    />
+                  </div>
+                </div>
                 
                 <Card className="bg-slate-700/50">
                   <CardContent className="p-4">
