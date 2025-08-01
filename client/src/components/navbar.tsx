@@ -9,52 +9,70 @@ export default function Navbar() {
   const [location] = useLocation();
   const [isOpen, setIsOpen] = useState(false);
 
-  const navItems = [
+  // Simplified navigation - Primary items only
+  const primaryNavItems = [
     { href: "/", label: "Home", icon: Home },
     { href: "/mint", label: "Mint", icon: Coins },
-    { href: "/limited-edition", label: "Limited Edition", icon: Sparkles },
+    { href: "/portfolio", label: "Portfolio", icon: Trophy },
+    { href: "/explore", label: "Explore", icon: Sparkles },
+  ];
+
+  // Secondary items for mobile/dropdown
+  const secondaryNavItems = [
     { href: "/chat", label: "Chat", icon: MessageSquare },
     { href: "/rewards", label: "Rewards", icon: Trophy },
     { href: "/journey", label: "Journey", icon: Users },
-    { href: "/sms", label: "SMS", icon: MessageSquare },
+    { href: "/confetti-demo", label: "Demo", icon: Sparkles },
     { href: "/admin", label: "Admin", icon: Settings },
   ];
 
   const isActive = (href: string) => location === href;
 
   return (
-    <nav className="border-b border-blue-500/20 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50">
+    <nav className="glassmorphism border-b border-border sticky top-0 z-50">
       <div className="container flex h-16 items-center">
-        <div className="mr-4 hidden md:flex">
-          <Link href="/" className="mr-6 flex items-center space-x-3">
-            <div className="w-8 h-8 bg-gradient-to-br from-electric-blue to-electric-green rounded-full flex items-center justify-center">
-              <span className="text-xs font-bold text-background">F</span>
+        {/* Logo */}
+        <div className="mr-8 flex items-center">
+          <Link href="/" className="flex items-center space-x-3">
+            <div className="w-9 h-9 modern-gradient rounded-xl flex items-center justify-center">
+              <span className="text-sm font-bold text-white">F</span>
             </div>
-            <span className="hidden font-bold text-xl sm:inline-block bg-gradient-to-r from-electric-blue to-electric-green bg-clip-text text-transparent">
+            <span className="hidden font-bold text-xl sm:inline-block text-gradient">
               Flutterbye
             </span>
           </Link>
-          <nav className="flex items-center space-x-2 text-sm font-medium">
-            {navItems.map((item) => (
-              <Link key={item.href} href={item.href}>
-                <Button
-                  variant={isActive(item.href) ? "default" : "ghost"}
-                  size="sm"
-                  className={`flex items-center gap-2 cyber-glow ${
-                    isActive(item.href) 
-                      ? "bg-gradient-to-r from-blue-600 to-green-600 text-background hover:from-blue-500 hover:to-green-500" 
-                      : "hover:bg-blue-600/10 hover:text-blue-400"
-                  }`}
-                >
-                  <item.icon className="h-4 w-4" />
-                  {item.label}
-                </Button>
-              </Link>
-            ))}
-          </nav>
+        </div>
+
+        {/* Primary Navigation - Desktop */}
+        <nav className="hidden md:flex items-center space-x-1">
+          {primaryNavItems.map((item) => (
+            <Link key={item.href} href={item.href}>
+              <Button
+                variant={isActive(item.href) ? "default" : "ghost"}
+                size="sm"
+                className={`flex items-center gap-2 h-9 px-4 ${
+                  isActive(item.href) 
+                    ? "modern-gradient text-white shadow-lg" 
+                    : "text-text-secondary hover:text-text-primary hover:bg-muted"
+                }`}
+              >
+                <item.icon className="h-4 w-4" />
+                {item.label}
+              </Button>
+            </Link>
+          ))}
+        </nav>
+
+        {/* Trust Indicator */}
+        <div className="hidden lg:flex ml-4">
+          <div className="trust-indicator">
+            <div className="w-2 h-2 bg-accent rounded-full"></div>
+            Testnet
+          </div>
         </div>
         
-        <div className="ml-auto flex items-center space-x-2">
+        {/* Right Side Actions */}
+        <div className="ml-auto flex items-center space-x-3">
           <WalletConnect />
         </div>
         
@@ -65,28 +83,45 @@ export default function Navbar() {
               <span className="sr-only">Toggle menu</span>
             </Button>
           </SheetTrigger>
-          <SheetContent side="left" className="w-72 glassmorphism">
+          <SheetContent side="left" className="w-72 premium-card border-l">
             <Link href="/" className="flex items-center space-x-3 mb-8">
-              <div className="w-8 h-8 bg-gradient-to-br from-electric-blue to-electric-green rounded-full flex items-center justify-center">
-                <span className="text-xs font-bold text-background">F</span>
+              <div className="w-9 h-9 modern-gradient rounded-xl flex items-center justify-center">
+                <span className="text-sm font-bold text-white">F</span>
               </div>
-              <span className="font-bold text-xl bg-gradient-to-r from-electric-blue to-electric-green bg-clip-text text-transparent">
+              <span className="font-bold text-xl text-gradient">
                 Flutterbye
               </span>
             </Link>
-            <nav className="flex flex-col space-y-3">
-              {navItems.map((item) => (
+            <nav className="flex flex-col space-y-1">
+              {/* Primary Items */}
+              {primaryNavItems.map((item) => (
                 <Link key={item.href} href={item.href}>
                   <Button
                     variant={isActive(item.href) ? "default" : "ghost"}
-                    className={`w-full justify-start gap-3 h-12 cyber-glow ${
+                    className={`w-full justify-start h-11 ${
                       isActive(item.href) 
-                        ? "bg-gradient-to-r from-blue-600 to-green-600 text-background" 
-                        : "hover:bg-blue-600/10 hover:text-blue-400"
+                        ? "modern-gradient text-white" 
+                        : "text-text-secondary hover:text-text-primary hover:bg-muted"
                     }`}
                     onClick={() => setIsOpen(false)}
                   >
-                    <item.icon className="h-5 w-5" />
+                    <item.icon className="h-4 w-4 mr-3" />
+                    {item.label}
+                  </Button>
+                </Link>
+              ))}
+              
+              <div className="border-t border-border my-4"></div>
+              
+              {/* Secondary Items */}
+              {secondaryNavItems.map((item) => (
+                <Link key={item.href} href={item.href}>
+                  <Button
+                    variant="ghost"
+                    className="w-full justify-start h-10 text-text-secondary hover:text-text-primary hover:bg-muted"
+                    onClick={() => setIsOpen(false)}
+                  >
+                    <item.icon className="h-4 w-4 mr-3" />
                     {item.label}
                   </Button>
                 </Link>
