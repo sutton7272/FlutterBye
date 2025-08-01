@@ -1892,6 +1892,113 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Limited Edition Sets API
+  app.post('/api/limited-edition-sets', async (req, res) => {
+    try {
+      const setData = req.body;
+      // Add creator ID from the authenticated user (mock for now)
+      setData.creatorId = req.body.creatorId || 'mock-user-id';
+      
+      const limitedSet = await storage.createLimitedEditionSet(setData);
+      res.json(limitedSet);
+    } catch (error) {
+      console.error('Error creating limited edition set:', error);
+      res.status(500).json({ error: 'Failed to create limited edition set' });
+    }
+  });
+
+  app.get('/api/limited-edition-sets', async (req, res) => {
+    try {
+      const { creatorId } = req.query;
+      const sets = await storage.getLimitedEditionSets(creatorId as string);
+      res.json(sets);
+    } catch (error) {
+      console.error('Error fetching limited edition sets:', error);
+      res.status(500).json({ error: 'Failed to fetch limited edition sets' });
+    }
+  });
+
+  app.get('/api/limited-edition-sets/:id', async (req, res) => {
+    try {
+      const { id } = req.params;
+      const set = await storage.getLimitedEditionSet(id);
+      if (!set) {
+        return res.status(404).json({ error: 'Limited edition set not found' });
+      }
+      res.json(set);
+    } catch (error) {
+      console.error('Error fetching limited edition set:', error);
+      res.status(500).json({ error: 'Failed to fetch limited edition set' });
+    }
+  });
+
+  app.post('/api/limited-edition-sets/:id/mint', async (req, res) => {
+    try {
+      const { id } = req.params;
+      const { walletAddress } = req.body;
+      
+      const set = await storage.getLimitedEditionSet(id);
+      if (!set) {
+        return res.status(404).json({ error: 'Limited edition set not found' });
+      }
+
+      if (set.mintedEditions >= set.totalEditions) {
+        return res.status(400).json({ error: 'All editions have been minted' });
+      }
+
+      // Check if sale is active
+      const now = new Date();
+      if (set.saleStartsAt && now < set.saleStartsAt) {
+        return res.status(400).json({ error: 'Sale has not started yet' });
+      }
+      if (set.saleEndsAt && now > set.saleEndsAt) {
+        return res.status(400).json({ error: 'Sale has ended' });
+      }
+
+      // Create the limited edition token
+      const editionNumber = set.mintedEditions + 1;
+      const tokenMessage = `${set.baseMessage} ${set.editionPrefix}${editionNumber}`;
+      
+      const tokenData = {
+        creatorId: set.creatorId,
+        message: tokenMessage,
+        symbol: 'FLBY-MSG',
+        totalSupply: 1,
+        availableSupply: 1,
+        valuePerToken: set.pricePerEdition,
+        imageUrl: set.imageUrl,
+        isLimitedEdition: true,
+        editionNumber,
+        limitedEditionSetId: set.id,
+        category: set.category,
+        mintAddress: `LE${set.id.slice(0, 8)}E${editionNumber}`, // Mock mint address
+      };
+
+      const token = await storage.createToken(tokenData);
+      await storage.incrementMintedEditions(id);
+
+      res.json({
+        token,
+        editionNumber,
+        remainingEditions: set.totalEditions - editionNumber,
+      });
+    } catch (error) {
+      console.error('Error minting limited edition:', error);
+      res.status(500).json({ error: 'Failed to mint limited edition' });
+    }
+  });
+
+  app.get('/api/limited-edition-sets/:id/tokens', async (req, res) => {
+    try {
+      const { id } = req.params;
+      const tokens = await storage.getLimitedEditionTokens(id);
+      res.json(tokens);
+    } catch (error) {
+      console.error('Error fetching limited edition tokens:', error);
+      res.status(500).json({ error: 'Failed to fetch tokens' });
+    }
+  });
+
   // Initialize chat service heartbeat
   chatService.startHeartbeat();
   

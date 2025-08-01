@@ -32,6 +32,8 @@ import {
   type InsertChatMessage,
   type ChatParticipant,
   type InsertChatParticipant,
+  type LimitedEditionSet,
+  type InsertLimitedEditionSet,
 } from "@shared/schema";
 
 // Storage interface for both in-memory and database implementations
@@ -123,6 +125,14 @@ export interface IStorage {
   joinChatRoom(data: InsertChatParticipant): Promise<ChatParticipant>;
   updateChatParticipant(userId: string, roomId: string, updates: Partial<ChatParticipant>): Promise<void>;
   getChatParticipants(roomId: string): Promise<ChatParticipant[]>;
+
+  // Limited Edition Set methods
+  createLimitedEditionSet(set: InsertLimitedEditionSet): Promise<LimitedEditionSet>;
+  getLimitedEditionSet(id: string): Promise<LimitedEditionSet | undefined>;
+  getLimitedEditionSets(creatorId?: string): Promise<LimitedEditionSet[]>;
+  updateLimitedEditionSet(setId: string, updates: Partial<LimitedEditionSet>): Promise<LimitedEditionSet>;
+  incrementMintedEditions(setId: string): Promise<LimitedEditionSet>;
+  getLimitedEditionTokens(setId: string): Promise<Token[]>;
 }
 
 // In-memory storage implementation
@@ -143,6 +153,7 @@ export class MemStorage implements IStorage {
   private chatRooms: Map<string, ChatRoom> = new Map();
   private chatMessages: Map<string, ChatMessage> = new Map();
   private chatParticipants: Map<string, ChatParticipant> = new Map();
+  private limitedEditionSets: Map<string, LimitedEditionSet> = new Map();
 
   // User operations
   async getUser(id: string): Promise<User | undefined> {
@@ -615,6 +626,55 @@ export class MemStorage implements IStorage {
   async getChatParticipants(roomId: string): Promise<ChatParticipant[]> {
     return Array.from(this.chatParticipants.values())
       .filter(p => p.roomId === roomId);
+  }
+
+  // Limited Edition Set methods
+  async createLimitedEditionSet(set: InsertLimitedEditionSet): Promise<LimitedEditionSet> {
+    const newSet: LimitedEditionSet = {
+      id: randomUUID(),
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      mintedEditions: 0,
+      ...set,
+    };
+    this.limitedEditionSets.set(newSet.id, newSet);
+    return newSet;
+  }
+
+  async getLimitedEditionSet(id: string): Promise<LimitedEditionSet | undefined> {
+    return this.limitedEditionSets.get(id);
+  }
+
+  async getLimitedEditionSets(creatorId?: string): Promise<LimitedEditionSet[]> {
+    const sets = Array.from(this.limitedEditionSets.values());
+    if (creatorId) {
+      return sets.filter(set => set.creatorId === creatorId);
+    }
+    return sets;
+  }
+
+  async updateLimitedEditionSet(setId: string, updates: Partial<LimitedEditionSet>): Promise<LimitedEditionSet> {
+    const existingSet = this.limitedEditionSets.get(setId);
+    if (!existingSet) {
+      throw new Error("Limited edition set not found");
+    }
+    const updatedSet = { ...existingSet, ...updates, updatedAt: new Date() };
+    this.limitedEditionSets.set(setId, updatedSet);
+    return updatedSet;
+  }
+
+  async incrementMintedEditions(setId: string): Promise<LimitedEditionSet> {
+    const set = this.limitedEditionSets.get(setId);
+    if (!set) {
+      throw new Error("Limited edition set not found");
+    }
+    const updatedSet = { ...set, mintedEditions: set.mintedEditions + 1, updatedAt: new Date() };
+    this.limitedEditionSets.set(setId, updatedSet);
+    return updatedSet;
+  }
+
+  async getLimitedEditionTokens(setId: string): Promise<Token[]> {
+    return Array.from(this.tokens.values()).filter(token => token.limitedEditionSetId === setId);
   }
 }
 

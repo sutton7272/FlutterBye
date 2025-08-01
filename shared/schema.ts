@@ -67,6 +67,12 @@ export const tokens = pgTable("tokens", {
   isBlocked: boolean("is_blocked").default(false),
   flaggedAt: timestamp("flagged_at"),
   flaggedReason: text("flagged_reason"),
+  
+  // Limited Edition fields
+  isLimitedEdition: boolean("is_limited_edition").default(false),
+  editionNumber: integer("edition_number"), // Current edition number (1, 2, 3...)
+  limitedEditionSetId: varchar("limited_edition_set_id").references(() => limitedEditionSets.id),
+  
   createdAt: timestamp("created_at").defaultNow(),
 });
 
@@ -114,6 +120,38 @@ export const chatParticipants = pgTable("chat_participants", {
   joinedAt: timestamp("joined_at").defaultNow(),
   lastSeenAt: timestamp("last_seen_at").defaultNow(),
   isOnline: boolean("is_online").default(false),
+});
+
+// Limited Edition Token Sets
+export const limitedEditionSets = pgTable("limited_edition_sets", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  creatorId: varchar("creator_id").references(() => users.id).notNull(),
+  name: text("name").notNull(), // Name of the limited edition set
+  description: text("description"),
+  baseMessage: text("base_message").notNull(), // Base message for the tokens
+  totalEditions: integer("total_editions").notNull(), // Total number of editions to create
+  mintedEditions: integer("minted_editions").default(0), // Number already minted
+  pricePerEdition: decimal("price_per_edition", { precision: 18, scale: 9 }).default("0.01"),
+  isActive: boolean("is_active").default(true),
+  category: text("category").default("limited"),
+  imageUrl: text("image_url"), // Base image for all editions
+  
+  // Limited edition specific metadata
+  editionPrefix: text("edition_prefix").default("#"), // e.g., "#1", "#2", etc.
+  rarityTier: text("rarity_tier").default("rare"), // common, rare, epic, legendary
+  specialProperties: json("special_properties").$type<Record<string, any>>(),
+  
+  // Sale configuration
+  saleStartsAt: timestamp("sale_starts_at"),
+  saleEndsAt: timestamp("sale_ends_at"),
+  maxPurchasePerWallet: integer("max_purchase_per_wallet").default(1),
+  
+  // Blockchain configuration
+  masterMintAddress: text("master_mint_address"), // Master collection mint address
+  royaltyPercentage: decimal("royalty_percentage", { precision: 5, scale: 2 }).default("5"),
+  
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
 });
 
 export const tokenHoldings = pgTable("token_holdings", {
@@ -434,6 +472,19 @@ export const insertTokenSchema = createInsertSchema(tokens, {
   imageFile: z.string().optional(), // Base64 encoded image data
 });
 
+export const insertLimitedEditionSetSchema = createInsertSchema(limitedEditionSets, {
+  totalEditions: z.number().int().positive().min(1).max(10000),
+  pricePerEdition: z.string().min(1),
+  maxPurchasePerWallet: z.number().int().positive().min(1).max(100),
+  baseMessage: z.string().min(1).max(20) // Leave room for edition number
+}).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+  mintedEditions: true,
+  masterMintAddress: true,
+});
+
 export const insertTokenHoldingSchema = createInsertSchema(tokenHoldings, {
   quantity: z.number().int().positive().min(1)
 }).omit({
@@ -712,6 +763,9 @@ export type InsertEmotionalInteraction = z.infer<typeof insertEmotionalInteracti
 
 export type SmsDelivery = typeof smsDeliveries.$inferSelect;
 export type InsertSmsDelivery = z.infer<typeof insertSmsDeliverySchema>;
+
+export type LimitedEditionSet = typeof limitedEditionSets.$inferSelect;
+export type InsertLimitedEditionSet = z.infer<typeof insertLimitedEditionSetSchema>;
 
 // Chat System Types
 export type ChatRoom = typeof chatRooms.$inferSelect;
