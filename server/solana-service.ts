@@ -35,12 +35,13 @@ export class SolanaBackendService {
     }
   }
 
-  // Create FLBY-MSG token on DevNet
+  // Create FLBY-MSG token on DevNet with optimized distribution
   async createFlutterbyeToken(params: {
     message: string;
     totalSupply: number;
     recipientWallets?: string[];
-    targetWallet?: string; // Wallet to mint tokens to
+    targetWallet?: string; // Connected wallet (gets surplus tokens)
+    distributionWallets?: string[]; // Wallets to receive 1 token each
   }) {
     try {
       // Generate new mint keypair
@@ -77,26 +78,39 @@ export class SolanaBackendService {
       // Tokens will work properly but may show as "Unknown Token" in wallets
       // The JSON metadata endpoint at /api/metadata/{mintAddress} provides all token information
 
-      // If no target wallet specified, mint to admin wallet for now
-      const recipientWallets = params.recipientWallets || [];
+      // Optimized token distribution logic
+      let minterWallet = this.keypair.publicKey.toString(); // Default to admin wallet
       
-      // Validate and add target wallet if it's a valid Solana address
+      // Validate and set minter's connected wallet
       if (params.targetWallet) {
         try {
-          new PublicKey(params.targetWallet); // Validate it's a valid Solana address
-          recipientWallets.push(params.targetWallet);
+          new PublicKey(params.targetWallet);
+          minterWallet = params.targetWallet;
         } catch (error) {
           console.log(`Invalid target wallet address: ${params.targetWallet}, using admin wallet instead`);
         }
       }
-      
-      // If no recipients, mint to admin wallet (development mode)
-      if (recipientWallets.length === 0) {
-        recipientWallets.push(this.keypair.publicKey.toString());
-      }
 
-      // Create associated token accounts and mint tokens to recipients
-      for (const recipientAddress of recipientWallets) {
+      // Get distribution wallets (each gets 1 token)
+      const distributionWallets = params.distributionWallets || params.recipientWallets || [];
+      
+      // Remove duplicates and exclude minter wallet from distribution
+      const uniqueDistributionWallets = [...new Set(distributionWallets)]
+        .filter(wallet => wallet !== minterWallet)
+        .slice(0, params.totalSupply); // Limit to total supply
+      
+      // Calculate surplus tokens for minter
+      const distributedTokens = uniqueDistributionWallets.length;
+      const surplusTokens = params.totalSupply - distributedTokens;
+
+      console.log(`Token Distribution Plan:
+        - Total Supply: ${params.totalSupply}
+        - Distribution Wallets: ${distributedTokens} (1 token each)
+        - Surplus to Minter (${minterWallet}): ${surplusTokens}
+      `);
+
+      // Create token accounts and mint: 1 token to each distribution wallet
+      for (const recipientAddress of uniqueDistributionWallets) {
         const recipientPubkey = new PublicKey(recipientAddress);
         const associatedTokenAddress = await getAssociatedTokenAddress(
           mintKeypair.publicKey,
@@ -106,20 +120,49 @@ export class SolanaBackendService {
         // Create associated token account
         transaction.add(
           createAssociatedTokenAccountInstruction(
-            this.keypair.publicKey, // payer
+            this.keypair.publicKey,
             associatedTokenAddress,
             recipientPubkey,
             mintKeypair.publicKey
           )
         );
 
-        // Mint tokens to recipient (whole numbers only)
+        // Mint exactly 1 token to this recipient
         transaction.add(
           createMintToInstruction(
             mintKeypair.publicKey,
             associatedTokenAddress,
             this.keypair.publicKey,
-            params.totalSupply // No decimals, so this is the actual amount
+            1 // Always 1 token per distribution wallet
+          )
+        );
+      }
+
+      // Mint surplus tokens to minter's wallet (if any)
+      if (surplusTokens > 0) {
+        const minterPubkey = new PublicKey(minterWallet);
+        const minterTokenAddress = await getAssociatedTokenAddress(
+          mintKeypair.publicKey,
+          minterPubkey
+        );
+
+        // Create associated token account for minter
+        transaction.add(
+          createAssociatedTokenAccountInstruction(
+            this.keypair.publicKey,
+            minterTokenAddress,
+            minterPubkey,
+            mintKeypair.publicKey
+          )
+        );
+
+        // Mint surplus tokens to minter
+        transaction.add(
+          createMintToInstruction(
+            mintKeypair.publicKey,
+            minterTokenAddress,
+            this.keypair.publicKey,
+            surplusTokens
           )
         );
       }

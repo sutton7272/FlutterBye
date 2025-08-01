@@ -107,11 +107,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { SolanaBackendService } = await import("./solana-service");
       const solanaService = new SolanaBackendService();
 
-      // Mint actual token on Solana DevNet
+      // Debug: Log received data to see what fields are available
+      console.log('Token creation request data:', {
+        ...tokenData,
+        recipientWallets: (req.body as any).recipientWallets,
+        creatorWallet: (req.body as any).creatorWallet
+      });
+
+      // Mint actual token on Solana DevNet with optimized distribution
       const solanaResult = await solanaService.createFlutterbyeToken({
         message: tokenData.message,
         totalSupply: tokenData.totalSupply,
-        targetWallet: tokenData.creatorWallet || tokenData.creatorId // Use connected wallet or fallback
+        targetWallet: (req.body as any).creatorWallet || tokenData.creatorId, // Minter's wallet (gets surplus)
+        distributionWallets: (req.body as any).recipientWallets || [] // Each gets 1 token
       });
 
       if (!solanaResult.success) {
