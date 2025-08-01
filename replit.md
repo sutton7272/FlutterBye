@@ -2,7 +2,14 @@
 
 ## Overview
 
-Flutterbye is a blockchain-powered messaging and value distribution protocol built on the Solana network. It enables users to create and send 27-character tokenized messages, where each message becomes a custom SPL token. The platform combines messaging with token economics, allowing users to attach value to messages, distribute tokens to specific wallets, upload custom token images, and create viral, meme-driven communication experiences in Web3.
+Flutterbye is a blockchain-powered messaging and value distribution protocol built on the Solana network. It enables users to create and send 27-character tokenized messages, where each message becomes a custom SPL token with the symbol "FlBY-MSG". The platform combines messaging with token economics, allowing users to attach value to messages, distribute tokens to specific wallets, upload custom token images, and create viral, meme-driven communication experiences in Web3.
+
+### Phase 2 Features (Latest)
+- **Token Holder Analysis**: Input any Solana token address/symbol to analyze top 25-500 wallet holders for targeted marketing campaigns
+- **Consolidated Value Attachment**: Single unified system for attaching value pools to tokens with automatic per-token calculation
+- **Expiration Date System**: Value-attached tokens can have expiration dates for time-limited redemption
+- **Free Flutterbye Mint System**: Special mint type with redeemable codes for promotional distribution
+- **Enhanced Admin Dashboard**: Comprehensive monitoring and management tools
 
 ## User Preferences
 
@@ -28,7 +35,7 @@ Preferred communication style: Simple, everyday language.
 
 ### Data Storage Solutions
 - **Database**: PostgreSQL with Drizzle ORM for type-safe database operations
-- **Schema**: Comprehensive database schema including users, tokens, token holdings, transactions, airdrop signups, and market listings
+- **Schema**: Comprehensive database schema including users, tokens, token holdings, transactions, airdrop signups, market listings, redeemable codes, and code redemptions
 - **Connection**: Neon Database serverless PostgreSQL for cloud hosting
 - **Migrations**: Drizzle Kit for database schema migrations and management
 - **Development Storage**: In-memory storage implementation for development/testing

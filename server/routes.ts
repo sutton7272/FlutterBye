@@ -543,6 +543,38 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Token holder analysis endpoint
+  app.post("/api/tokens/analyze-holders", async (req, res) => {
+    try {
+      const { token, count } = req.body;
+      
+      if (!token) {
+        return res.status(400).json({ error: "Token address or symbol is required" });
+      }
+
+      // Mock token holder data - in real implementation would call Solana RPC/APIs
+      const mockHolders = Array.from({ length: Math.min(count, 100) }, (_, i) => ({
+        address: `${Math.random().toString(36).substr(2, 9)}${Math.random().toString(36).substr(2, 35)}`,
+        balance: Math.floor(Math.random() * 1000000) + 1000,
+        percentage: Math.random() * 10 + 0.1,
+        rank: i + 1
+      }));
+
+      // Sort by balance descending
+      mockHolders.sort((a, b) => b.balance - a.balance);
+      
+      // Recalculate percentages to be realistic
+      const totalSupply = mockHolders.reduce((sum, holder) => sum + holder.balance, 0);
+      mockHolders.forEach(holder => {
+        holder.percentage = (holder.balance / totalSupply) * 100;
+      });
+
+      res.json(mockHolders);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to analyze token holders" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

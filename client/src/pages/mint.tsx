@@ -14,6 +14,7 @@ import { apiRequest } from "@/lib/queryClient";
 import ImageUpload from "@/components/image-upload";
 import { Coins, Upload, Calculator, DollarSign, Lock, Globe, Gift } from "lucide-react";
 import { type InsertToken } from "@shared/schema";
+import TokenHolderAnalysis from "@/components/token-holder-analysis";
 
 export default function Mint() {
   const { toast } = useToast();
@@ -99,8 +100,9 @@ export default function Mint() {
       currency: currency,
       isPublic: isPublic,
       expiresAt: attachValue && expirationDate ? new Date(expirationDate) : undefined,
-      metadata: memo ? { memo, isFreeFlutterbye } : { isFreeFlutterbye },
-      valuePerToken: valuePerToken || "0",
+      metadata: memo ? { memo: [memo], isFreeFlutterbye: [isFreeFlutterbye] } : { isFreeFlutterbye: [isFreeFlutterbye] },
+      valuePerToken: attachValue && attachedValue && mintAmount ? 
+        (parseFloat(attachedValue) / parseInt(mintAmount)).toString() : "0",
       imageFile: tokenImage || undefined,
     };
 
@@ -127,9 +129,8 @@ export default function Mint() {
   const calculateTotalCost = () => {
     const baseFee = 0.01;
     const imageFee = tokenImage ? 0.005 : 0;
-    const tokenValue = parseFloat(valuePerToken) || 0;
-    const amount = parseInt(mintAmount) || 0;
-    return baseFee + imageFee + (tokenValue * amount);
+    const totalValue = attachValue ? parseFloat(attachedValue) || 0 : 0;
+    return baseFee + imageFee + totalValue;
   };
 
   const remainingChars = 27 - message.length;
@@ -170,7 +171,7 @@ export default function Mint() {
                   </p>
                 </div>
                 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-4">
                   <div>
                     <Label htmlFor="mintAmount">Mint Amount</Label>
                     <Input
@@ -181,18 +182,6 @@ export default function Mint() {
                       onChange={(e) => setMintAmount(e.target.value)}
                       required
                       placeholder="1000"
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="valuePerToken">SOL Value per Token (Optional)</Label>
-                    <Input
-                      id="valuePerToken"
-                      type="number"
-                      step="0.001"
-                      min="0"
-                      value={valuePerToken}
-                      onChange={(e) => setValuePerToken(e.target.value)}
-                      placeholder="0.25"
                     />
                   </div>
                 </div>
@@ -207,6 +196,10 @@ export default function Mint() {
                     <div className="flex items-center space-x-2">
                       <RadioGroupItem value="csv" id="csv" />
                       <Label htmlFor="csv">CSV Upload</Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="holders" id="holders" />
+                      <Label htmlFor="holders">Top Token Holders</Label>
                     </div>
                   </RadioGroup>
                   
@@ -251,6 +244,14 @@ export default function Mint() {
                       </p>
                     </div>
                   )}
+                  
+                  {targetType === "holders" && (
+                    <TokenHolderAnalysis 
+                      onHoldersSelected={(holders) => {
+                        setManualWallets(holders.map(h => h.address).join('\n'));
+                      }}
+                    />
+                  )}
                 </div>
                 
                 <ImageUpload
@@ -266,7 +267,7 @@ export default function Mint() {
                 <div className="space-y-4">
                   <h4 className="text-lg font-semibold flex items-center">
                     <DollarSign className="w-5 h-5 mr-2 text-blue-500" />
-                    Value Attachment (Phase 2)
+                    Value & Distribution Settings
                   </h4>
                   
                   <div className="flex items-center space-x-2">
@@ -282,7 +283,7 @@ export default function Mint() {
                     <div className="space-y-4 ml-6 border-l-2 border-blue-200 pl-4">
                       <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-2">
-                          <Label htmlFor="attached-value">Attached Value</Label>
+                          <Label htmlFor="attached-value">Total Value Pool</Label>
                           <Input
                             id="attached-value"
                             type="number"
@@ -290,8 +291,11 @@ export default function Mint() {
                             min="0"
                             value={attachedValue}
                             onChange={(e) => setAttachedValue(e.target.value)}
-                            placeholder="0.1"
+                            placeholder="10.0"
                           />
+                          <p className="text-xs text-muted-foreground">
+                            Total value to distribute among all tokens
+                          </p>
                         </div>
                         <div className="space-y-2">
                           <Label htmlFor="currency">Currency</Label>
@@ -305,6 +309,13 @@ export default function Mint() {
                             <option value="USDC">USDC</option>
                           </select>
                         </div>
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label>Value Per Token: {attachedValue && mintAmount ? (parseFloat(attachedValue) / parseInt(mintAmount)).toFixed(6) : '0'} {currency}</Label>
+                        <p className="text-xs text-muted-foreground">
+                          Automatically calculated based on total pool and mint amount
+                        </p>
                       </div>
 
                       <div className="space-y-2">
@@ -388,10 +399,12 @@ export default function Mint() {
                           <span>0.005 SOL</span>
                         </div>
                       )}
-                      <div className="flex justify-between">
-                        <span className="text-muted-foreground">Token Value:</span>
-                        <span>{((parseFloat(valuePerToken) || 0) * (parseInt(mintAmount) || 0)).toFixed(3)} SOL</span>
-                      </div>
+                      {attachValue && (
+                        <div className="flex justify-between">
+                          <span className="text-muted-foreground">Total Value Pool:</span>
+                          <span>{(parseFloat(attachedValue) || 0).toFixed(3)} {currency}</span>
+                        </div>
+                      )}
                       <div className="flex justify-between font-semibold border-t border-slate-600 pt-2">
                         <span>Total Cost:</span>
                         <span className="text-primary">{calculateTotalCost().toFixed(3)} SOL</span>
