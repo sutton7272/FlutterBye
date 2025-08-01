@@ -18,7 +18,7 @@ export class AdminService {
           walletAddress,
           role,
           isAdmin: true,
-          adminPermissions: permissions,
+          adminPermissions: permissions as any,
           adminAddedBy: addedByUserId,
           adminAddedAt: new Date()
         });
@@ -27,7 +27,7 @@ export class AdminService {
         user = await storage.updateUserAdminStatus(user.id, {
           role,
           isAdmin: true,
-          adminPermissions: permissions,
+          adminPermissions: permissions as any,
           adminAddedBy: addedByUserId,
           adminAddedAt: new Date()
         });
@@ -38,7 +38,7 @@ export class AdminService {
         adminId: addedByUserId,
         action: 'create_admin',
         targetUserId: user.id,
-        details: { permissions, role },
+        details: { permissions, role } as any,
         ipAddress: 'server'
       });
 
@@ -55,7 +55,7 @@ export class AdminService {
       const user = await storage.updateUserAdminStatus(userId, {
         role: 'user',
         isAdmin: false,
-        adminPermissions: [],
+        adminPermissions: [] as any,
         adminAddedBy: null,
         adminAddedAt: null
       });
@@ -65,7 +65,7 @@ export class AdminService {
         adminId: removedByUserId,
         action: 'remove_admin',
         targetUserId: userId,
-        details: { reason: 'Admin access revoked' },
+        details: { reason: 'Admin access revoked' } as any,
         ipAddress: 'server'
       });
 
@@ -84,7 +84,7 @@ export class AdminService {
   ) {
     try {
       const user = await storage.updateUserAdminStatus(userId, {
-        adminPermissions: permissions
+        adminPermissions: permissions as any
       });
 
       // Log permission update
@@ -92,7 +92,7 @@ export class AdminService {
         adminId: updatedByUserId,
         action: 'update_permissions',
         targetUserId: userId,
-        details: { newPermissions: permissions },
+        details: { newPermissions: permissions } as any,
         ipAddress: 'server'
       });
 

@@ -63,6 +63,16 @@ export interface IStorage {
   createAdminUser(admin: InsertAdminUser): Promise<AdminUser>;
   getAdminByWallet(walletAddress: string): Promise<AdminUser | undefined>;
   updateAdminStatus(adminId: string, isActive: boolean): Promise<AdminUser>;
+  getAdminUsers(): Promise<AdminUser[]>;
+  getSuperAdmins(): Promise<AdminUser[]>;
+  updateUserAdminStatus(userId: string, updates: Partial<User>): Promise<User>;
+  updateUserBlockStatus(userId: string, blocked: boolean, reason?: string): Promise<User>;
+  getAllUsersForAdmin(): Promise<User[]>;
+  getPlatformStats(): Promise<any>;
+  getRecentAdminActivity(): Promise<any>;
+  getPlatformSettings(): Promise<any>;
+  updatePlatformSettings(settings: any): Promise<any>;
+  getEscrowWallets(): Promise<EscrowWallet[]>;
   createAdminLog(log: InsertAdminLog): Promise<AdminLog>;
   getAdminLogs(limit?: number, offset?: number): Promise<AdminLog[]>;
 

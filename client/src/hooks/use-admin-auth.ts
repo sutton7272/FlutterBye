@@ -1,5 +1,4 @@
 import { useQuery } from "@tanstack/react-query";
-import { apiRequest } from "@/lib/queryClient";
 
 interface AdminAuthData {
   isAdmin: boolean;
@@ -10,18 +9,24 @@ interface AdminAuthData {
 export function useAdminAuth() {
   const { data, isLoading, error } = useQuery<AdminAuthData>({
     queryKey: ["/api/admin/check"],
-    queryFn: async () => {
+    queryFn: async (): Promise<AdminAuthData> => {
       const walletAddress = localStorage.getItem('walletAddress');
       if (!walletAddress) {
         throw new Error('No wallet connected');
       }
 
-      return apiRequest("/api/admin/check", {
+      const response = await fetch("/api/admin/check", {
         method: "GET",
         headers: {
           'X-Wallet-Address': walletAddress
         }
       });
+
+      if (!response.ok) {
+        throw new Error('Failed to check admin status');
+      }
+
+      return response.json();
     },
     retry: false,
     staleTime: 5 * 60 * 1000, // 5 minutes
