@@ -668,6 +668,108 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // SMS-to-Blockchain Integration Routes
+  const { smsService } = await import("./sms-service");
+
+  // Webhook for incoming SMS messages (Twilio webhook)
+  app.post("/api/sms/webhook", async (req, res) => {
+    try {
+      const { From, To, Body, MessageSid } = req.body;
+      
+      console.log(`Incoming SMS from ${From} to ${To}: ${Body}`);
+      
+      const smsMessage = await smsService.processIncomingSms(From, To, Body, MessageSid);
+      
+      // Send TwiML response
+      res.set('Content-Type', 'text/xml');
+      res.send(`<?xml version="1.0" encoding="UTF-8"?>
+        <Response>
+          <Message>Your message has been minted as an emotional token! 🔗</Message>
+        </Response>`);
+    } catch (error) {
+      console.error("Error processing SMS webhook:", error);
+      res.status(500).send("Error processing message");
+    }
+  });
+
+  // Register phone number with wallet
+  app.post("/api/sms/register", async (req, res) => {
+    try {
+      const { phoneNumber, walletAddress } = req.body;
+      
+      if (!phoneNumber || !walletAddress) {
+        return res.status(400).json({ error: "Phone number and wallet address required" });
+      }
+      
+      const mapping = await smsService.registerPhoneWallet(phoneNumber, walletAddress);
+      res.json({ success: true, verificationRequired: true });
+    } catch (error) {
+      console.error("Error registering phone wallet:", error);
+      res.status(500).json({ error: "Failed to register phone number" });
+    }
+  });
+
+  // Verify phone number with code
+  app.post("/api/sms/verify", async (req, res) => {
+    try {
+      const { phoneNumber, verificationCode } = req.body;
+      
+      if (!phoneNumber || !verificationCode) {
+        return res.status(400).json({ error: "Phone number and verification code required" });
+      }
+      
+      const result = await smsService.verifyPhone(phoneNumber, verificationCode);
+      res.json(result);
+    } catch (error) {
+      console.error("Error verifying phone:", error);
+      res.status(400).json({ error: error.message || "Failed to verify phone number" });
+    }
+  });
+
+  // Handle token interactions (burn to read, reply, etc.)
+  app.post("/api/tokens/:tokenId/interact", async (req, res) => {
+    try {
+      const { tokenId } = req.params;
+      const { interactionType, data } = req.body;
+      const userId = req.headers.authorization || "user-1"; // TODO: Get from auth
+      
+      const interaction = await smsService.handleTokenInteraction(tokenId, userId, interactionType, data);
+      res.json({ success: true, interaction });
+    } catch (error) {
+      console.error("Error handling token interaction:", error);
+      res.status(500).json({ error: "Failed to process interaction" });
+    }
+  });
+
+  // Get SMS analytics for admin
+  app.get("/api/admin/sms/analytics", async (req, res) => {
+    try {
+      const analytics = await smsService.getSmsAnalytics();
+      res.json(analytics);
+    } catch (error) {
+      console.error("Error fetching SMS analytics:", error);
+      res.status(500).json({ error: "Failed to fetch SMS analytics" });
+    }
+  });
+
+  // Send test SMS (for development)
+  app.post("/api/sms/test", async (req, res) => {
+    try {
+      const { fromPhone, toPhone, message } = req.body;
+      
+      const smsMessage = await smsService.processIncomingSms(
+        fromPhone || "+1234567890",
+        toPhone || "+1987654321", 
+        message || "Test emotional message 💕"
+      );
+      
+      res.json({ success: true, smsMessage });
+    } catch (error) {
+      console.error("Error sending test SMS:", error);
+      res.status(500).json({ error: "Failed to send test SMS" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

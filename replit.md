@@ -11,9 +11,28 @@ Flutterbye is a blockchain-powered messaging and value distribution protocol bui
 - **Free Flutterbye Mint System**: Special mint type with redeemable codes for promotional distribution
 - **Comprehensive Admin Dashboard**: Full backend administration with pricing controls, user management, data export, code generation, and activity logging
 
+### SMS-to-Blockchain Integration (New Concept)
+- **Text-to-Token System**: Users text messages to +1 (844) BYE-TEXT, automatically minting emotional tokens
+- **Emotional Detection**: AI-powered emotion analysis creates specialized token types (hug, heart, apology, celebration)
+- **Time-Locked Tokens**: Messages can be locked for specific durations (24 hours for apologies)
+- **Burn-to-Read Mechanism**: Intimate messages require burning the token to reveal content
+- **Reply-Gated System**: Some tokens require responses to unlock or complete the interaction
+- **Crypto Onboarding Funnel**: Non-crypto users receive SMS notifications to claim their tokens
+- **Phone-Wallet Registration**: Users can register phone numbers with Solana wallets for seamless delivery
+
 ## User Preferences
 
 Preferred communication style: Simple, everyday language.
+
+## Recent Changes (Latest Session)
+
+**SMS-to-Blockchain Integration Implementation (January 1, 2025)**
+- Added comprehensive SMS messaging system with emotional token creation
+- Implemented database schema for SMS messages, phone-wallet mappings, and emotional interactions
+- Created SMS service with emotion detection, time-locking, and burn-to-read features
+- Built SMS integration UI page with phone registration and verification system
+- Added SMS analytics and admin controls for monitoring text-to-token activity
+- Established foundation for +1 (844) BYE-TEXT concept with automated token delivery
 
 ## System Architecture
 

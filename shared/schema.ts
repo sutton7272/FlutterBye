@@ -1,6 +1,7 @@
 import { sql } from "drizzle-orm";
-import { pgTable, text, varchar, integer, decimal, timestamp, boolean, json } from "drizzle-orm/pg-core";
+import { pgTable, text, varchar, integer, decimal, timestamp, boolean, json, jsonb } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
+import { relations } from "drizzle-orm";
 import { z } from "zod";
 
 export const users = pgTable("users", {
@@ -30,6 +31,16 @@ export const tokens = pgTable("tokens", {
   escrowStatus: text("escrow_status").default("none"), // none, escrowed, redeemed, refunded
   escrowWallet: text("escrow_wallet"),
   expiresAt: timestamp("expires_at"),
+  // SMS Integration Features
+  smsOrigin: boolean("sms_origin").default(false), // Created via SMS
+  senderPhone: text("sender_phone"), // Phone number of sender (encrypted)
+  recipientPhone: text("recipient_phone"), // Phone number of recipient (encrypted)
+  emotionType: text("emotion_type"), // hug, heart, apology, celebration, etc.
+  isTimeLocked: boolean("is_time_locked").default(false),
+  unlocksAt: timestamp("unlocks_at"),
+  isBurnToRead: boolean("is_burn_to_read").default(false),
+  isReplyGated: boolean("is_reply_gated").default(false),
+  requiresReply: boolean("requires_reply").default(false),
   // Public visibility
   isPublic: boolean("is_public").default(false),
   // Moderation
@@ -178,6 +189,59 @@ export const codeRedemptions = pgTable("code_redemptions", {
   redeemedAt: timestamp("redeemed_at").defaultNow(),
 });
 
+// SMS Integration Tables
+export const smsMessages = pgTable("sms_messages", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  fromPhone: text("from_phone").notNull(), // Encrypted phone number
+  toPhone: text("to_phone").notNull(), // Encrypted phone number
+  messageBody: text("message_body").notNull(),
+  tokenId: varchar("token_id").references(() => tokens.id),
+  emotionType: text("emotion_type"), // hug, heart, apology, celebration
+  status: text("status").default("pending"), // pending, minted, delivered, failed
+  twilioSid: text("twilio_sid"), // Twilio message SID for tracking
+  deliveryStatus: text("delivery_status"), // sent, delivered, failed, undelivered
+  recipientWallet: text("recipient_wallet"), // Auto-discovered or manually provided
+  createdAt: timestamp("created_at").defaultNow(),
+  processedAt: timestamp("processed_at"),
+});
+
+// Phone to wallet mappings (users can register their phone with wallet)
+export const phoneWalletMappings = pgTable("phone_wallet_mappings", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  phoneNumber: text("phone_number").unique().notNull(), // Encrypted
+  walletAddress: text("wallet_address").notNull(),
+  isVerified: boolean("is_verified").default(false),
+  verificationCode: text("verification_code"), // For SMS verification
+  verificationExpiry: timestamp("verification_expiry"),
+  createdAt: timestamp("created_at").defaultNow(),
+  verifiedAt: timestamp("verified_at"),
+});
+
+// Emotional token interactions (reactions, burns, replies)
+export const emotionalInteractions = pgTable("emotional_interactions", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  tokenId: varchar("token_id").references(() => tokens.id).notNull(),
+  userId: varchar("user_id").references(() => users.id).notNull(),
+  interactionType: text("interaction_type").notNull(), // burn_to_read, reply, reaction
+  interactionData: jsonb("interaction_data"), // Stores reply message, reaction type, etc.
+  burnTransactionSig: text("burn_transaction_sig"), // If token was burned to read
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// SMS delivery tracking
+export const smsDeliveries = pgTable("sms_deliveries", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  smsMessageId: varchar("sms_message_id").references(() => smsMessages.id).notNull(),
+  tokenId: varchar("token_id").references(() => tokens.id),
+  recipientPhone: text("recipient_phone").notNull(), // Encrypted
+  deliveryUrl: text("delivery_url"), // flutterbye.io/view?id=xyz
+  notificationSent: boolean("notification_sent").default(false),
+  notificationSid: text("notification_sid"), // Twilio SID for notification SMS
+  viewed: boolean("viewed").default(false),
+  viewedAt: timestamp("viewed_at"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
 export const analytics = pgTable("analytics", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   date: timestamp("date").notNull(),
@@ -272,6 +336,30 @@ export const insertUserAnalyticsSchema = createInsertSchema(userAnalytics).omit(
   timestamp: true,
 });
 
+// SMS Integration Schemas
+export const insertSmsMessageSchema = createInsertSchema(smsMessages).omit({
+  id: true,
+  createdAt: true,
+  processedAt: true,
+});
+
+export const insertPhoneWalletMappingSchema = createInsertSchema(phoneWalletMappings).omit({
+  id: true,
+  createdAt: true,
+  verifiedAt: true,
+});
+
+export const insertEmotionalInteractionSchema = createInsertSchema(emotionalInteractions).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertSmsDeliverySchema = createInsertSchema(smsDeliveries).omit({
+  id: true,
+  createdAt: true,
+  viewedAt: true,
+});
+
 // Types
 export type User = typeof users.$inferSelect;
 export type InsertUser = z.infer<typeof insertUserSchema>;
@@ -311,3 +399,25 @@ export type InsertRedeemableCode = z.infer<typeof insertRedeemableCodeSchema>;
 
 export type CodeRedemption = typeof codeRedemptions.$inferSelect;
 export type InsertCodeRedemption = z.infer<typeof insertCodeRedemptionSchema>;
+
+export type AdminSettings = typeof adminSettings.$inferSelect;
+export type InsertAdminSettings = z.infer<typeof insertAdminSettingsSchema>;
+
+export type PlatformStats = typeof platformStats.$inferSelect;
+export type InsertPlatformStats = z.infer<typeof insertPlatformStatsSchema>;
+
+export type UserAnalytics = typeof userAnalytics.$inferSelect;
+export type InsertUserAnalytics = z.infer<typeof insertUserAnalyticsSchema>;
+
+// SMS Integration Types
+export type SmsMessage = typeof smsMessages.$inferSelect;
+export type InsertSmsMessage = z.infer<typeof insertSmsMessageSchema>;
+
+export type PhoneWalletMapping = typeof phoneWalletMappings.$inferSelect;
+export type InsertPhoneWalletMapping = z.infer<typeof insertPhoneWalletMappingSchema>;
+
+export type EmotionalInteraction = typeof emotionalInteractions.$inferSelect;
+export type InsertEmotionalInteraction = z.infer<typeof insertEmotionalInteractionSchema>;
+
+export type SmsDelivery = typeof smsDeliveries.$inferSelect;
+export type InsertSmsDelivery = z.infer<typeof insertSmsDeliverySchema>;
