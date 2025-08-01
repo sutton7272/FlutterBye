@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Link } from "wouter";
-import { ArrowRight, MessageSquare, Coins, Zap, TrendingUp, Users, Target } from "lucide-react";
+import { ArrowRight, MessageSquare, Coins, Zap, TrendingUp, Users, Target, Sparkles } from "lucide-react";
 import flutterbeyeLogoPath from "@assets/image_1754068877999.png";
 import { QuickActionPanel } from "@/components/quick-action-panel";
 import { InteractiveStatsDashboard } from "@/components/interactive-stats-dashboard";
@@ -54,21 +54,23 @@ export default function Home() {
 
   const getActivityColor = (type: string) => {
     switch (type) {
-      case 'sms': return 'from-blue-500 to-cyan-500';
-      case 'mint': return 'from-green-500 to-emerald-500';
-      case 'redeem': return 'from-purple-500 to-pink-500';
-      default: return 'from-gray-500 to-slate-500';
+      case 'sms': return 'from-electric-blue to-electric-cyan';
+      case 'mint': return 'from-electric-green to-bright-mint';
+      case 'redeem': return 'from-cyber-purple to-neon-pink';
+      default: return 'from-electric-cyan to-electric-green';
     }
   };
 
   return (
-    <div className="min-h-screen bg-black text-white pt-16 overflow-hidden">
+    <div className="min-h-screen gradient-bg text-white pt-20 overflow-hidden">
       
       {/* Top Scrolling Marquee */}
-      <div className="border-y border-purple-500/20 bg-gradient-to-r from-purple-900/20 to-blue-900/20 py-4 mb-8 overflow-hidden">
-        <div className="flex animate-marquee whitespace-nowrap text-2xl font-bold text-purple-300">
+      <div className="border-y border-electric-cyan/30 electric-gradient py-6 mb-12 overflow-hidden">
+        <div className="flex animate-marquee whitespace-nowrap text-3xl font-bold text-white neon-text">
           {[...marqueeText, ...marqueeText].map((text, i) => (
-            <span key={i} className="mx-8 flex-shrink-0">{text}</span>
+            <span key={i} className="mx-12 flex-shrink-0 flutter-animate" style={{animationDelay: `${i * 0.2}s`}}>
+              {text}
+            </span>
           ))}
         </div>
       </div>
@@ -76,29 +78,48 @@ export default function Home() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         
         {/* Hero Section */}
-        <div className="text-center mb-16">
-          <div className="flex justify-center mb-8">
-            <img 
-              src={flutterbeyeLogoPath} 
-              alt="Flutterbye Logo" 
-              className="h-32 md:h-40 object-contain animate-pulse-custom"
-            />
+        <div className="text-center mb-20">
+          <div className="flex justify-center mb-10">
+            <div className="relative">
+              <img 
+                src={flutterbeyeLogoPath} 
+                alt="Flutterbye Logo" 
+                className="h-36 md:h-44 object-contain flutter-animate pulse-electric"
+              />
+              <div className="absolute inset-0 bg-gradient-to-r from-electric-blue to-electric-green opacity-20 rounded-full blur-3xl"></div>
+            </div>
           </div>
-          <p className="text-xl md:text-2xl text-gray-300 max-w-4xl mx-auto mb-4 font-medium">
-            THE REVOLUTIONARY SMS-TO-BLOCKCHAIN PROTOCOL
+          
+          <h1 className="text-6xl md:text-8xl font-black mb-8 bg-gradient-to-r from-electric-blue via-electric-cyan to-electric-green bg-clip-text text-transparent neon-text">
+            FLUTTERBYE
+          </h1>
+          
+          <p className="text-2xl md:text-3xl text-electric-cyan mb-6 font-bold neon-text">
+            Turn Messages Into Money
           </p>
-          <p className="text-lg text-gray-400 max-w-3xl mx-auto mb-8">
+          
+          <p className="text-lg md:text-xl text-gray-300 max-w-4xl mx-auto mb-12 leading-relaxed">
             Transform 27-character messages into SPL tokens. Build cults, distribute value, get rewarded even if you get rugged.
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
+          
+          <div className="flex flex-col sm:flex-row gap-6 justify-center mb-16">
             <Link href="/mint">
-              <Button size="lg" className="text-lg px-8 py-6 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 border-0 font-bold">
+              <Button size="lg" className="text-xl px-10 py-6 bg-gradient-to-r from-electric-blue to-electric-green hover:from-electric-cyan hover:to-bright-mint text-background font-bold rounded-2xl cyber-glow pulse-electric">
+                <Coins className="mr-3 h-6 w-6" />
                 START MINTING NOW
-                <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
             </Link>
-            <Link href="/sms-integration">
-              <Button variant="outline" size="lg" className="text-lg px-8 py-6 border-purple-500 text-purple-300 hover:bg-purple-500/10 font-bold">
+            
+            <Link href="/limited-edition">
+              <Button size="lg" className="text-xl px-10 py-6 bg-gradient-to-r from-cyber-purple to-neon-pink hover:from-purple-500 hover:to-pink-500 text-white font-bold rounded-2xl cyber-glow">
+                <Sparkles className="mr-3 h-6 w-6" />
+                LIMITED EDITION
+              </Button>
+            </Link>
+            
+            <Link href="/sms">
+              <Button variant="outline" size="lg" className="text-xl px-10 py-6 border-2 border-electric-cyan text-electric-cyan hover:bg-electric-cyan/10 hover:border-electric-green font-bold rounded-2xl cyber-glow electric-border">
+                <MessageSquare className="mr-3 h-6 w-6" />
                 TEXT TO TOKENIZE
               </Button>
             </Link>

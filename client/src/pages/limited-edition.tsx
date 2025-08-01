@@ -55,10 +55,7 @@ export default function LimitedEdition() {
   // Create new limited edition set
   const createSetMutation = useMutation({
     mutationFn: async (setData: any) => {
-      return apiRequest('/api/limited-edition-sets', {
-        method: 'POST',
-        body: JSON.stringify(setData),
-      });
+      return apiRequest('/api/limited-edition-sets', 'POST', setData);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/limited-edition-sets'] });
@@ -80,16 +77,13 @@ export default function LimitedEdition() {
   // Mint a limited edition token
   const mintTokenMutation = useMutation({
     mutationFn: async ({ setId, walletAddress }: { setId: string; walletAddress: string }) => {
-      return apiRequest(`/api/limited-edition-sets/${setId}/mint`, {
-        method: 'POST',
-        body: JSON.stringify({ walletAddress }),
-      });
+      return apiRequest(`/api/limited-edition-sets/${setId}/mint`, 'POST', { walletAddress });
     },
-    onSuccess: (data) => {
+    onSuccess: (data: any) => {
       queryClient.invalidateQueries({ queryKey: ['/api/limited-edition-sets'] });
       toast({
         title: "Limited Edition Minted!",
-        description: `Successfully minted edition #${data.editionNumber}. ${data.remainingEditions} editions remaining.`,
+        description: `Successfully minted edition #${data.editionNumber || 'N/A'}. ${data.remainingEditions || 0} editions remaining.`,
       });
     },
     onError: (error: any) => {
@@ -128,12 +122,12 @@ export default function LimitedEdition() {
 
   const getRarityColor = (rarity: string) => {
     const colors = {
-      common: 'bg-gray-500',
-      rare: 'bg-blue-500',
-      epic: 'bg-purple-500',
-      legendary: 'bg-yellow-500',
+      common: 'bg-gradient-to-r from-gray-500 to-gray-600',
+      rare: 'bg-gradient-to-r from-electric-blue to-electric-cyan',
+      epic: 'bg-gradient-to-r from-cyber-purple to-neon-pink',
+      legendary: 'bg-gradient-to-r from-electric-green to-bright-mint',
     };
-    return colors[rarity as keyof typeof colors] || 'bg-gray-500';
+    return colors[rarity as keyof typeof colors] || 'bg-gradient-to-r from-electric-cyan to-electric-green';
   };
 
   const getProgressPercentage = (minted: number, total: number) => {
@@ -142,10 +136,10 @@ export default function LimitedEdition() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-black text-white p-6">
+      <div className="min-h-screen gradient-bg text-white p-6 pt-24">
         <div className="max-w-6xl mx-auto">
           <div className="flex items-center justify-center h-64">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-500"></div>
+            <div className="animate-spin rounded-full h-12 w-12 border-b-4 border-electric-cyan"></div>
           </div>
         </div>
       </div>
@@ -153,25 +147,35 @@ export default function LimitedEdition() {
   }
 
   return (
-    <div className="min-h-screen bg-black text-white p-6">
-      <div className="max-w-6xl mx-auto space-y-8">
+    <div className="min-h-screen gradient-bg text-white p-6 pt-24">
+      <div className="max-w-6xl mx-auto space-y-12">
         {/* Header */}
-        <div className="flex items-center justify-between">
-          <div className="space-y-2">
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
-              Limited Edition Sets
-            </h1>
-            <p className="text-gray-400">Create exclusive token collections with predetermined quantities</p>
+        <div className="text-center mb-16">
+          <div className="flex justify-center mb-6">
+            <div className="relative">
+              <Sparkles className="h-16 w-16 text-electric-cyan flutter-animate pulse-electric" />
+              <div className="absolute inset-0 bg-gradient-to-r from-electric-cyan to-electric-green opacity-20 rounded-full blur-2xl"></div>
+            </div>
           </div>
+          
+          <h1 className="text-5xl md:text-7xl font-black mb-6 bg-gradient-to-r from-electric-cyan via-cyber-purple to-neon-pink bg-clip-text text-transparent neon-text">
+            LIMITED EDITION
+          </h1>
+          <h2 className="text-3xl md:text-4xl font-bold mb-4 bg-gradient-to-r from-electric-blue to-electric-green bg-clip-text text-transparent">
+            Exclusive Token Collections
+          </h2>
+          <p className="text-xl text-gray-300 mb-12 max-w-3xl mx-auto leading-relaxed">
+            Create exclusive token collections with predetermined quantities, special pricing, and unique rarity tiers
+          </p>
           
           <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
             <DialogTrigger asChild>
-              <Button className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700">
-                <Plus className="w-4 h-4 mr-2" />
-                Create Limited Set
+              <Button size="lg" className="bg-gradient-to-r from-cyber-purple to-neon-pink hover:from-purple-500 hover:to-pink-500 text-white font-bold py-6 px-12 rounded-2xl text-xl cyber-glow pulse-electric">
+                <Plus className="mr-3 h-6 w-6" />
+                Create Your First Set
               </Button>
             </DialogTrigger>
-            <DialogContent className="bg-gray-900 border-gray-700 text-white max-w-2xl">
+            <DialogContent className="glassmorphism border-electric-cyan/30 text-white max-w-2xl">
               <DialogHeader>
                 <DialogTitle>Create Limited Edition Set</DialogTitle>
                 <DialogDescription>
@@ -322,25 +326,31 @@ export default function LimitedEdition() {
         </div>
 
         {/* Limited Edition Sets Grid */}
-        {limitedSets.length === 0 ? (
-          <Card className="bg-gray-900 border-gray-700 text-center py-16">
-            <CardContent>
-              <Sparkles className="w-16 h-16 mx-auto mb-4 text-purple-500" />
-              <h3 className="text-xl font-semibold mb-2 text-white">No Limited Edition Sets Yet</h3>
-              <p className="text-gray-400 mb-6">Create your first limited edition token collection to get started.</p>
-              <Button 
-                onClick={() => setIsCreateDialogOpen(true)}
-                className="bg-gradient-to-r from-purple-600 to-pink-600"
-              >
-                <Plus className="w-4 h-4 mr-2" />
-                Create Your First Set
-              </Button>
-            </CardContent>
-          </Card>
+        {(limitedSets as LimitedEditionSet[]).length === 0 ? (
+          <div className="text-center py-20">
+            <div className="relative mb-8">
+              <Sparkles className="h-24 w-24 text-electric-cyan mx-auto flutter-animate pulse-electric" />
+              <div className="absolute inset-0 bg-gradient-to-r from-electric-cyan to-electric-green opacity-20 rounded-full blur-3xl"></div>
+            </div>
+            <h3 className="text-4xl font-bold text-white mb-6 bg-gradient-to-r from-electric-blue to-electric-green bg-clip-text text-transparent">
+              No Limited Edition Sets Yet
+            </h3>
+            <p className="text-xl text-gray-300 mb-12 max-w-2xl mx-auto leading-relaxed">
+              Create your first limited edition set to start building exclusive token collections with predetermined quantities and special pricing.
+            </p>
+            <Button 
+              onClick={() => setIsCreateDialogOpen(true)}
+              size="lg"
+              className="bg-gradient-to-r from-cyber-purple to-neon-pink hover:from-purple-500 hover:to-pink-500 text-white font-bold py-6 px-12 rounded-2xl text-xl cyber-glow pulse-electric"
+            >
+              <Plus className="w-6 h-6 mr-3" />
+              Create Your First Set
+            </Button>
+          </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {limitedSets.map((set: LimitedEditionSet) => (
-              <Card key={set.id} className="bg-gray-900 border-gray-700 hover:border-purple-500 transition-colors">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {(limitedSets as LimitedEditionSet[]).map((set: LimitedEditionSet) => (
+              <Card key={set.id} className="glassmorphism border-electric-cyan/30 hover:border-electric-green transition-all duration-500 cyber-glow token-card">
                 <CardHeader>
                   <div className="flex items-start justify-between">
                     <div className="space-y-1">

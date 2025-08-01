@@ -3,54 +3,58 @@
 @tailwind utilities;
 
 :root {
-  --background: hsl(222, 84%, 5%);
+  --background: hsl(220, 100%, 3%);
   --foreground: hsl(210, 40%, 98%);
-  --muted: hsl(217, 32%, 17%);
+  --muted: hsl(215, 40%, 12%);
   --muted-foreground: hsl(215, 20%, 65%);
-  --popover: hsl(222, 84%, 5%);
+  --popover: hsl(220, 100%, 3%);
   --popover-foreground: hsl(210, 40%, 98%);
-  --card: hsl(222, 84%, 5%);
+  --card: hsl(220, 50%, 6%);
   --card-foreground: hsl(210, 40%, 98%);
-  --border: hsl(217, 32%, 17%);
-  --input: hsl(217, 32%, 17%);
-  --primary: hsl(190, 100%, 50%);
-  --primary-foreground: hsl(222, 84%, 5%);
-  --secondary: hsl(217, 32%, 17%);
-  --secondary-foreground: hsl(210, 40%, 98%);
-  --accent: hsl(217, 32%, 17%);
-  --accent-foreground: hsl(210, 40%, 98%);
+  --border: hsl(195, 100%, 25%);
+  --input: hsl(215, 40%, 12%);
+  --primary: hsl(195, 100%, 50%);
+  --primary-foreground: hsl(220, 100%, 3%);
+  --secondary: hsl(150, 100%, 40%);
+  --secondary-foreground: hsl(220, 100%, 3%);
+  --accent: hsl(270, 100%, 60%);
+  --accent-foreground: hsl(220, 100%, 3%);
   --destructive: hsl(0, 62.8%, 30.6%);
   --destructive-foreground: hsl(210, 40%, 98%);
-  --ring: hsl(190, 100%, 50%);
-  --radius: 0.5rem;
+  --ring: hsl(195, 100%, 50%);
+  --radius: 0.75rem;
   
-  /* Custom Flutterbye colors */
-  --flutter-cyan: hsl(190, 100%, 50%);
-  --flutter-navy: hsl(222, 84%, 5%);
-  --flutter-blue: hsl(207, 90%, 54%);
-  --flutter-dark-blue: hsl(217, 32%, 17%);
+  /* Enhanced Electric Flutterbye colors */
+  --electric-blue: hsl(195, 100%, 50%);
+  --electric-cyan: hsl(180, 100%, 50%);
+  --electric-green: hsl(150, 100%, 50%);
+  --neon-pink: hsl(320, 100%, 60%);
+  --cyber-purple: hsl(270, 100%, 60%);
+  --deep-space: hsl(220, 100%, 3%);
+  --dark-slate: hsl(215, 40%, 12%);
+  --bright-mint: hsl(165, 100%, 45%);
 }
 
 .dark {
-  --background: hsl(222, 84%, 5%);
+  --background: hsl(220, 100%, 3%);
   --foreground: hsl(210, 40%, 98%);
-  --muted: hsl(217, 32%, 17%);
+  --muted: hsl(215, 40%, 12%);
   --muted-foreground: hsl(215, 20%, 65%);
-  --popover: hsl(222, 84%, 5%);
+  --popover: hsl(220, 100%, 3%);
   --popover-foreground: hsl(210, 40%, 98%);
-  --card: hsl(222, 84%, 5%);
+  --card: hsl(220, 50%, 6%);
   --card-foreground: hsl(210, 40%, 98%);
-  --border: hsl(217, 32%, 17%);
-  --input: hsl(217, 32%, 17%);
-  --primary: hsl(190, 100%, 50%);
-  --primary-foreground: hsl(222, 84%, 5%);
-  --secondary: hsl(217, 32%, 17%);
-  --secondary-foreground: hsl(210, 40%, 98%);
-  --accent: hsl(217, 32%, 17%);
-  --accent-foreground: hsl(210, 40%, 98%);
+  --border: hsl(195, 100%, 25%);
+  --input: hsl(215, 40%, 12%);
+  --primary: hsl(195, 100%, 50%);
+  --primary-foreground: hsl(220, 100%, 3%);
+  --secondary: hsl(150, 100%, 40%);
+  --secondary-foreground: hsl(220, 100%, 3%);
+  --accent: hsl(270, 100%, 60%);
+  --accent-foreground: hsl(220, 100%, 3%);
   --destructive: hsl(0, 62.8%, 30.6%);
   --destructive-foreground: hsl(210, 40%, 98%);
-  --ring: hsl(190, 100%, 50%);
+  --ring: hsl(195, 100%, 50%);
 }
 
 @layer base {
@@ -60,46 +64,86 @@
 
   body {
     @apply font-sans antialiased bg-background text-foreground;
-    background: linear-gradient(135deg, hsl(222, 84%, 5%) 0%, hsl(217, 32%, 17%) 50%, hsl(215, 25%, 27%) 100%);
+    background: linear-gradient(135deg, 
+      hsl(220, 100%, 3%) 0%, 
+      hsl(215, 50%, 8%) 25%,
+      hsl(195, 80%, 8%) 50%, 
+      hsl(180, 60%, 10%) 75%,
+      hsl(150, 40%, 12%) 100%);
     min-height: 100vh;
   }
 }
 
 @layer components {
   .gradient-bg {
-    background: linear-gradient(135deg, hsl(222, 84%, 5%) 0%, hsl(217, 32%, 17%) 50%, hsl(215, 25%, 27%) 100%);
+    background: linear-gradient(135deg, 
+      hsl(220, 100%, 3%) 0%, 
+      hsl(215, 50%, 8%) 25%,
+      hsl(195, 80%, 8%) 50%, 
+      hsl(180, 60%, 10%) 75%,
+      hsl(150, 40%, 12%) 100%);
+  }
+  
+  .electric-gradient {
+    background: linear-gradient(45deg, 
+      hsl(195, 100%, 50%) 0%, 
+      hsl(180, 100%, 50%) 25%,
+      hsl(150, 100%, 50%) 50%, 
+      hsl(270, 100%, 60%) 75%,
+      hsl(320, 100%, 60%) 100%);
   }
   
   .glassmorphism {
-    background: rgba(255, 255, 255, 0.05);
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(0, 255, 255, 0.05);
+    backdrop-filter: blur(15px);
+    border: 1px solid rgba(0, 255, 255, 0.2);
   }
   
   .cyber-glow {
-    transition: all 0.3s ease;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    border-radius: 12px;
   }
   
   .cyber-glow:hover {
-    box-shadow: 0 0 20px rgba(0, 212, 255, 0.5);
-    transform: translateY(-2px);
+    box-shadow: 
+      0 0 30px rgba(0, 255, 255, 0.6),
+      0 0 60px rgba(0, 255, 127, 0.4),
+      inset 0 0 20px rgba(0, 255, 255, 0.1);
+    transform: translateY(-3px) scale(1.02);
   }
   
   .token-card {
-    transition: all 0.3s ease;
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    border-radius: 16px;
   }
   
   .token-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 10px 30px rgba(0, 212, 255, 0.2);
+    transform: translateY(-8px) rotate(1deg);
+    box-shadow: 
+      0 20px 40px rgba(0, 255, 255, 0.3),
+      0 0 40px rgba(0, 255, 127, 0.2);
   }
   
   .flutter-animate {
-    animation: flutter 3s ease-in-out infinite;
+    animation: flutter 4s ease-in-out infinite;
   }
   
-  .pulse-cyan {
-    animation: pulse-cyan 2s ease-in-out infinite;
+  .pulse-electric {
+    animation: pulse-electric 3s ease-in-out infinite;
+  }
+  
+  .neon-text {
+    text-shadow: 
+      0 0 5px currentColor,
+      0 0 10px currentColor,
+      0 0 15px currentColor,
+      0 0 20px currentColor;
+  }
+  
+  .electric-border {
+    border: 2px solid transparent;
+    background: linear-gradient(hsl(220, 50%, 6%), hsl(220, 50%, 6%)) padding-box,
+                linear-gradient(45deg, hsl(195, 100%, 50%), hsl(150, 100%, 50%)) border-box;
   }
 }
 
@@ -108,19 +152,55 @@
     transform: translateY(0px) rotate(0deg); 
   }
   25% { 
-    transform: translateY(-10px) rotate(2deg); 
+    transform: translateY(-12px) rotate(3deg); 
+  }
+  50% {
+    transform: translateY(-8px) rotate(0deg);
   }
   75% { 
-    transform: translateY(-5px) rotate(-1deg); 
+    transform: translateY(-6px) rotate(-2deg); 
   }
 }
 
-@keyframes pulse-cyan {
+@keyframes pulse-electric {
   0%, 100% { 
-    box-shadow: 0 0 0 0 rgba(0, 212, 255, 0.7); 
+    box-shadow: 
+      0 0 0 0 rgba(0, 255, 255, 0.8),
+      0 0 0 0 rgba(0, 255, 127, 0.6); 
   }
   50% { 
-    box-shadow: 0 0 0 10px rgba(0, 212, 255, 0); 
+    box-shadow: 
+      0 0 0 15px rgba(0, 255, 255, 0),
+      0 0 0 30px rgba(0, 255, 127, 0); 
+  }
+}
+
+@keyframes electric-flow {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+@keyframes bounce-in {
+  0% {
+    transform: scale(0.3) rotate(-10deg);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.05) rotate(5deg);
+  }
+  70% {
+    transform: scale(0.9) rotate(-2deg);
+  }
+  100% {
+    transform: scale(1) rotate(0deg);
+    opacity: 1;
   }
 }
 

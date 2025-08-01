@@ -23,19 +23,28 @@ export default function Navbar() {
   const isActive = (href: string) => location === href;
 
   return (
-    <nav className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container flex h-14 items-center">
+    <nav className="border-b border-electric-cyan/20 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50">
+      <div className="container flex h-16 items-center">
         <div className="mr-4 hidden md:flex">
-          <Link href="/" className="mr-6 flex items-center space-x-2">
-            <span className="hidden font-bold sm:inline-block">Flutterbye</span>
+          <Link href="/" className="mr-6 flex items-center space-x-3">
+            <div className="w-8 h-8 bg-gradient-to-br from-electric-blue to-electric-green rounded-full flex items-center justify-center">
+              <span className="text-xs font-bold text-background">F</span>
+            </div>
+            <span className="hidden font-bold text-xl sm:inline-block bg-gradient-to-r from-electric-blue to-electric-green bg-clip-text text-transparent">
+              Flutterbye
+            </span>
           </Link>
-          <nav className="flex items-center space-x-6 text-sm font-medium">
+          <nav className="flex items-center space-x-2 text-sm font-medium">
             {navItems.map((item) => (
               <Link key={item.href} href={item.href}>
                 <Button
                   variant={isActive(item.href) ? "default" : "ghost"}
                   size="sm"
-                  className="flex items-center gap-2"
+                  className={`flex items-center gap-2 cyber-glow ${
+                    isActive(item.href) 
+                      ? "bg-gradient-to-r from-electric-blue to-electric-green text-background hover:from-electric-cyan hover:to-bright-mint" 
+                      : "hover:bg-electric-blue/10 hover:text-electric-cyan"
+                  }`}
                 >
                   <item.icon className="h-4 w-4" />
                   {item.label}
@@ -56,19 +65,28 @@ export default function Navbar() {
               <span className="sr-only">Toggle menu</span>
             </Button>
           </SheetTrigger>
-          <SheetContent side="left" className="w-72">
-            <Link href="/" className="flex items-center space-x-2 mb-6">
-              <span className="font-bold text-xl">Flutterbye</span>
+          <SheetContent side="left" className="w-72 glassmorphism">
+            <Link href="/" className="flex items-center space-x-3 mb-8">
+              <div className="w-8 h-8 bg-gradient-to-br from-electric-blue to-electric-green rounded-full flex items-center justify-center">
+                <span className="text-xs font-bold text-background">F</span>
+              </div>
+              <span className="font-bold text-xl bg-gradient-to-r from-electric-blue to-electric-green bg-clip-text text-transparent">
+                Flutterbye
+              </span>
             </Link>
-            <nav className="flex flex-col space-y-2">
+            <nav className="flex flex-col space-y-3">
               {navItems.map((item) => (
                 <Link key={item.href} href={item.href}>
                   <Button
                     variant={isActive(item.href) ? "default" : "ghost"}
-                    className="w-full justify-start gap-2"
+                    className={`w-full justify-start gap-3 h-12 cyber-glow ${
+                      isActive(item.href) 
+                        ? "bg-gradient-to-r from-electric-blue to-electric-green text-background" 
+                        : "hover:bg-electric-blue/10 hover:text-electric-cyan"
+                    }`}
                     onClick={() => setIsOpen(false)}
                   >
-                    <item.icon className="h-4 w-4" />
+                    <item.icon className="h-5 w-5" />
                     {item.label}
                   </Button>
                 </Link>
