@@ -77,6 +77,8 @@ export const insertTokenSchema = createInsertSchema(tokens).omit({
   id: true,
   createdAt: true,
   mintAddress: true,
+}).extend({
+  imageFile: z.string().optional(), // Base64 encoded image data
 });
 
 export const insertTokenHoldingSchema = createInsertSchema(tokenHoldings).omit({

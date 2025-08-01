@@ -36,7 +36,8 @@ export default function TokenCard({
     return colors[hash % colors.length];
   };
 
-  const formatValue = (value: string) => {
+  const formatValue = (value: string | null) => {
+    if (!value) return "Free";
     const num = parseFloat(value);
     return num === 0 ? "Free" : `${num} SOL`;
   };
@@ -45,9 +46,19 @@ export default function TokenCard({
     <Card className="glassmorphism token-card cursor-pointer">
       <CardContent className="p-6">
         <div className="text-center mb-4">
-          <div className={`w-12 h-12 mx-auto mb-3 bg-gradient-to-r ${getIconColor(token.message)} rounded-full flex items-center justify-center`}>
-            <Coins className="text-xl text-white" />
-          </div>
+          {token.imageUrl ? (
+            <div className="w-12 h-12 mx-auto mb-3 rounded-full overflow-hidden">
+              <img 
+                src={token.imageUrl}
+                alt={token.message || "Token"}
+                className="w-full h-full object-cover"
+              />
+            </div>
+          ) : (
+            <div className={`w-12 h-12 mx-auto mb-3 bg-gradient-to-r ${getIconColor(token.message)} rounded-full flex items-center justify-center`}>
+              <Coins className="text-xl text-white" />
+            </div>
+          )}
           <h3 className="font-bold text-lg truncate" title={token.message}>
             {token.message}
           </h3>

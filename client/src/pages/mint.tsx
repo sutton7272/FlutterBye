@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
+import ImageUpload from "@/components/image-upload";
 import { Coins, Upload, Calculator } from "lucide-react";
 import { type InsertToken } from "@shared/schema";
 
@@ -20,6 +21,7 @@ export default function Mint() {
   const [targetType, setTargetType] = useState("manual");
   const [manualWallets, setManualWallets] = useState("");
   const [csvFile, setCsvFile] = useState<File | null>(null);
+  const [tokenImage, setTokenImage] = useState<string>("");
 
   const mintToken = useMutation({
     mutationFn: async (data: InsertToken) => {
@@ -37,6 +39,7 @@ export default function Mint() {
       setValuePerToken("");
       setManualWallets("");
       setCsvFile(null);
+      setTokenImage("");
     },
     onError: (error) => {
       toast({
@@ -65,13 +68,14 @@ export default function Mint() {
       // Basic wallet validation would go here
     }
 
-    const tokenData: InsertToken = {
+    const tokenData: InsertToken & { imageFile?: string } = {
       message,
       symbol: "FlBY-MSG", // Always FlBY-MSG
       creatorId: "user-1", // Mock user ID
       totalSupply: parseInt(mintAmount) || 0,
       availableSupply: parseInt(mintAmount) || 0,
       valuePerToken: valuePerToken || "0",
+      imageFile: tokenImage || undefined,
     };
 
     mintToken.mutate(tokenData);
@@ -96,9 +100,10 @@ export default function Mint() {
 
   const calculateTotalCost = () => {
     const baseFee = 0.01;
+    const imageFee = tokenImage ? 0.005 : 0;
     const tokenValue = parseFloat(valuePerToken) || 0;
     const amount = parseInt(mintAmount) || 0;
-    return baseFee + (tokenValue * amount);
+    return baseFee + imageFee + (tokenValue * amount);
   };
 
   const remainingChars = 27 - message.length;
@@ -222,6 +227,13 @@ export default function Mint() {
                   )}
                 </div>
                 
+                <ImageUpload
+                  onImageSelect={setTokenImage}
+                  onImageRemove={() => setTokenImage("")}
+                  selectedImage={tokenImage}
+                  disabled={mintToken.isPending}
+                />
+                
                 <Card className="bg-slate-700/50">
                   <CardContent className="p-4">
                     <div className="flex items-center gap-2 mb-2">
@@ -233,6 +245,12 @@ export default function Mint() {
                         <span className="text-muted-foreground">Base Minting Fee:</span>
                         <span>0.01 SOL</span>
                       </div>
+                      {tokenImage && (
+                        <div className="flex justify-between">
+                          <span className="text-muted-foreground">Image Upload Fee:</span>
+                          <span>0.005 SOL</span>
+                        </div>
+                      )}
                       <div className="flex justify-between">
                         <span className="text-muted-foreground">Token Value:</span>
                         <span>{((parseFloat(valuePerToken) || 0) * (parseInt(mintAmount) || 0)).toFixed(3)} SOL</span>
@@ -263,9 +281,19 @@ export default function Mint() {
               
               <div className="bg-slate-700/50 p-6 rounded-xl border-2 border-dashed border-slate-600">
                 <div className="text-center">
-                  <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-r from-primary to-blue-500 rounded-full flex items-center justify-center">
-                    <Coins className="text-2xl text-white" />
-                  </div>
+                  {tokenImage ? (
+                    <div className="w-16 h-16 mx-auto mb-4 rounded-full overflow-hidden">
+                      <img 
+                        src={`data:image/png;base64,${tokenImage}`}
+                        alt="Token preview"
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  ) : (
+                    <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-r from-primary to-blue-500 rounded-full flex items-center justify-center">
+                      <Coins className="text-2xl text-white" />
+                    </div>
+                  )}
                   <h4 className="text-lg font-bold mb-2">
                     {message || "Your Message Token"}
                   </h4>

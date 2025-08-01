@@ -69,7 +69,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Set FlBY-MSG as default symbol
       tokenData.symbol = "FlBY-MSG";
       
-      const token = await storage.createToken(tokenData);
+      // Handle image upload if provided
+      if (tokenData.imageFile) {
+        // In a real implementation, you would save the image to a file storage service
+        // For now, we'll just store the base64 data as the imageUrl
+        const imageUrl = `data:image/png;base64,${tokenData.imageFile}`;
+        tokenData.imageUrl = imageUrl;
+      }
+      
+      // Remove imageFile from the data before saving
+      const { imageFile, ...finalTokenData } = tokenData;
+      
+      const token = await storage.createToken(finalTokenData);
       res.json(token);
     } catch (error) {
       res.status(400).json({ message: error instanceof Error ? error.message : "Invalid token data" });
@@ -197,6 +208,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     } catch (error) {
       res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Image upload endpoint
+  app.post("/api/upload-image", async (req, res) => {
+    try {
+      const { imageData, tokenId } = req.body;
+      
+      if (!imageData) {
+        return res.status(400).json({ message: "Image data is required" });
+      }
+      
+      // In a real implementation, you would:
+      // 1. Validate image format and size
+      // 2. Upload to cloud storage (AWS S3, Cloudinary, etc.)
+      // 3. Return the public URL
+      
+      // For now, return a mock URL based on the image data
+      const imageUrl = `data:image/png;base64,${imageData}`;
+      
+      res.json({ 
+        imageUrl,
+        message: "Image uploaded successfully" 
+      });
+    } catch (error) {
+      res.status(500).json({ message: "Image upload failed" });
     }
   });
 

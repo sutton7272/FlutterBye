@@ -2,7 +2,7 @@
 
 ## Overview
 
-Flutterbye is a blockchain-powered messaging and value distribution protocol built on the Solana network. It enables users to create and send 27-character tokenized messages, where each message becomes a custom SPL token. The platform combines messaging with token economics, allowing users to attach value to messages, distribute tokens to specific wallets, and create viral, meme-driven communication experiences in Web3.
+Flutterbye is a blockchain-powered messaging and value distribution protocol built on the Solana network. It enables users to create and send 27-character tokenized messages, where each message becomes a custom SPL token. The platform combines messaging with token economics, allowing users to attach value to messages, distribute tokens to specific wallets, upload custom token images, and create viral, meme-driven communication experiences in Web3.
 
 ## User Preferences
 
@@ -32,6 +32,7 @@ Preferred communication style: Simple, everyday language.
 - **Connection**: Neon Database serverless PostgreSQL for cloud hosting
 - **Migrations**: Drizzle Kit for database schema migrations and management
 - **Development Storage**: In-memory storage implementation for development/testing
+- **Image Storage**: Base64 encoding for token images with built-in resizing and validation
 
 ### Authentication and Authorization
 - **Wallet Integration**: Solana wallet adapter integration (Phantom, Solflare support)
