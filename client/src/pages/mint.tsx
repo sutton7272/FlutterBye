@@ -1,0 +1,317 @@
+import { useState } from "react";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Badge } from "@/components/ui/badge";
+import { useToast } from "@/hooks/use-toast";
+import { useMutation } from "@tanstack/react-query";
+import { apiRequest } from "@/lib/queryClient";
+import { Coins, Upload, Calculator } from "lucide-react";
+import { type InsertToken } from "@shared/schema";
+
+export default function Mint() {
+  const { toast } = useToast();
+  const [message, setMessage] = useState("");
+  const [mintAmount, setMintAmount] = useState("");
+  const [valuePerToken, setValuePerToken] = useState("");
+  const [targetType, setTargetType] = useState("manual");
+  const [manualWallets, setManualWallets] = useState("");
+  const [csvFile, setCsvFile] = useState<File | null>(null);
+
+  const mintToken = useMutation({
+    mutationFn: async (data: InsertToken) => {
+      const response = await apiRequest("POST", "/api/tokens", data);
+      return response.json();
+    },
+    onSuccess: () => {
+      toast({
+        title: "Token Minted Successfully!",
+        description: "Your FlBY-MSG token has been created and distributed",
+      });
+      // Reset form
+      setMessage("");
+      setMintAmount("");
+      setValuePerToken("");
+      setManualWallets("");
+      setCsvFile(null);
+    },
+    onError: (error) => {
+      toast({
+        title: "Minting Failed",
+        description: error.message || "Failed to mint token. Please try again.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (message.length > 27) {
+      toast({
+        title: "Message too long",
+        description: "Message must be 27 characters or less",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Validate wallets if manual entry
+    if (targetType === "manual" && manualWallets) {
+      const wallets = manualWallets.split('\n').filter(w => w.trim());
+      // Basic wallet validation would go here
+    }
+
+    const tokenData: InsertToken = {
+      message,
+      symbol: "FlBY-MSG", // Always FlBY-MSG
+      creatorId: "user-1", // Mock user ID
+      totalSupply: parseInt(mintAmount) || 0,
+      availableSupply: parseInt(mintAmount) || 0,
+      valuePerToken: valuePerToken || "0",
+    };
+
+    mintToken.mutate(tokenData);
+  };
+
+  const handleCsvUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file && file.type === "text/csv") {
+      setCsvFile(file);
+      toast({
+        title: "CSV Uploaded",
+        description: `${file.name} ready for processing`,
+      });
+    } else {
+      toast({
+        title: "Invalid file",
+        description: "Please upload a valid CSV file",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const calculateTotalCost = () => {
+    const baseFee = 0.01;
+    const tokenValue = parseFloat(valuePerToken) || 0;
+    const amount = parseInt(mintAmount) || 0;
+    return baseFee + (tokenValue * amount);
+  };
+
+  const remainingChars = 27 - message.length;
+
+  return (
+    <div className="min-h-screen pt-20 pb-12">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="text-center mb-12">
+          <h1 className="text-4xl font-bold mb-4">Mint FlBY-MSG Tokens</h1>
+          <p className="text-xl text-muted-foreground">Create tokenized messages and distribute them to your target audience</p>
+        </div>
+        
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          {/* Minting Form */}
+          <Card className="glassmorphism">
+            <CardContent className="p-8">
+              <h3 className="text-2xl font-bold mb-6">Create Your Message Token</h3>
+              
+              <form onSubmit={handleSubmit} className="space-y-6">
+                <div>
+                  <div className="flex justify-between items-center mb-2">
+                    <Label htmlFor="message">Message (Max 27 characters)</Label>
+                    <Badge variant={remainingChars < 0 ? "destructive" : "secondary"}>
+                      {remainingChars}/27
+                    </Badge>
+                  </div>
+                  <Input
+                    id="message"
+                    value={message}
+                    onChange={(e) => setMessage(e.target.value)}
+                    maxLength={27}
+                    required
+                    placeholder="StakeNowForYield"
+                    className={remainingChars < 0 ? "border-destructive" : ""}
+                  />
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Your message will become the token name with FlBY-MSG symbol
+                  </p>
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="mintAmount">Mint Amount</Label>
+                    <Input
+                      id="mintAmount"
+                      type="number"
+                      min="1"
+                      value={mintAmount}
+                      onChange={(e) => setMintAmount(e.target.value)}
+                      required
+                      placeholder="1000"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="valuePerToken">SOL Value per Token (Optional)</Label>
+                    <Input
+                      id="valuePerToken"
+                      type="number"
+                      step="0.001"
+                      min="0"
+                      value={valuePerToken}
+                      onChange={(e) => setValuePerToken(e.target.value)}
+                      placeholder="0.25"
+                    />
+                  </div>
+                </div>
+                
+                <div>
+                  <Label>Target Distribution</Label>
+                  <RadioGroup value={targetType} onValueChange={setTargetType} className="mt-2">
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="manual" id="manual" />
+                      <Label htmlFor="manual">Manual Entry</Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="csv" id="csv" />
+                      <Label htmlFor="csv">CSV Upload</Label>
+                    </div>
+                  </RadioGroup>
+                  
+                  {targetType === "manual" && (
+                    <div className="mt-4">
+                      <Textarea
+                        value={manualWallets}
+                        onChange={(e) => setManualWallets(e.target.value)}
+                        placeholder="Enter wallet addresses, one per line"
+                        rows={4}
+                      />
+                    </div>
+                  )}
+                  
+                  {targetType === "csv" && (
+                    <div className="mt-4">
+                      <div className="border-2 border-dashed border-border rounded-lg p-6 text-center">
+                        <Upload className="w-8 h-8 mx-auto text-muted-foreground mb-2" />
+                        <p className="text-sm text-muted-foreground mb-2">
+                          Upload CSV file with wallet addresses
+                        </p>
+                        <input
+                          type="file"
+                          accept=".csv"
+                          onChange={handleCsvUpload}
+                          className="hidden"
+                          id="csv-upload"
+                        />
+                        <Label htmlFor="csv-upload" className="cursor-pointer">
+                          <Button type="button" variant="outline" size="sm">
+                            Choose File
+                          </Button>
+                        </Label>
+                        {csvFile && (
+                          <p className="text-xs text-primary mt-2">
+                            Selected: {csvFile.name}
+                          </p>
+                        )}
+                      </div>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        CSV should contain wallet addresses in first column
+                      </p>
+                    </div>
+                  )}
+                </div>
+                
+                <Card className="bg-slate-700/50">
+                  <CardContent className="p-4">
+                    <div className="flex items-center gap-2 mb-2">
+                      <Calculator className="w-4 h-4" />
+                      <h4 className="font-semibold">Fee Structure</h4>
+                    </div>
+                    <div className="text-sm space-y-1">
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">Base Minting Fee:</span>
+                        <span>0.01 SOL</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">Token Value:</span>
+                        <span>{((parseFloat(valuePerToken) || 0) * (parseInt(mintAmount) || 0)).toFixed(3)} SOL</span>
+                      </div>
+                      <div className="flex justify-between font-semibold border-t border-slate-600 pt-2">
+                        <span>Total Cost:</span>
+                        <span className="text-primary">{calculateTotalCost().toFixed(3)} SOL</span>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+                
+                <Button 
+                  type="submit" 
+                  disabled={mintToken.isPending || remainingChars < 0}
+                  className="w-full bg-gradient-to-r from-primary to-blue-500 hover:from-blue-500 hover:to-primary py-4 text-lg cyber-glow"
+                >
+                  {mintToken.isPending ? "Minting..." : "Mint Tokens"}
+                </Button>
+              </form>
+            </CardContent>
+          </Card>
+          
+          {/* Preview */}
+          <Card className="glassmorphism">
+            <CardContent className="p-8">
+              <h3 className="text-2xl font-bold mb-6">Token Preview</h3>
+              
+              <div className="bg-slate-700/50 p-6 rounded-xl border-2 border-dashed border-slate-600">
+                <div className="text-center">
+                  <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-r from-primary to-blue-500 rounded-full flex items-center justify-center">
+                    <Coins className="text-2xl text-white" />
+                  </div>
+                  <h4 className="text-lg font-bold mb-2">
+                    {message || "Your Message Token"}
+                  </h4>
+                  <Badge variant="secondary" className="mb-4">
+                    FlBY-MSG
+                  </Badge>
+                  <div className="space-y-2 text-sm">
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Total Supply:</span>
+                      <span>{mintAmount || "0"}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Value per Token:</span>
+                      <span>{valuePerToken ? `${valuePerToken} SOL` : "Free"}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Creator:</span>
+                      <span className="text-primary">Connected Wallet</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="mt-6">
+                <h4 className="font-semibold mb-3">Recent Mints</h4>
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between bg-slate-700/50 p-3 rounded-lg">
+                    <div>
+                      <p className="font-semibold">HodlForDiamondHands</p>
+                      <p className="text-xs text-muted-foreground">FlBY-MSG • 500 tokens</p>
+                    </div>
+                    <span className="text-primary font-semibold">0.1 SOL</span>
+                  </div>
+                  <div className="flex items-center justify-between bg-slate-700/50 p-3 rounded-lg">
+                    <div>
+                      <p className="font-semibold">JoinTheHiveNow</p>
+                      <p className="text-xs text-muted-foreground">FlBY-MSG • 1000 tokens</p>
+                    </div>
+                    <span className="text-primary font-semibold">0.05 SOL</span>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    </div>
+  );
+}
