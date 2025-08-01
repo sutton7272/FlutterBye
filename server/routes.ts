@@ -670,6 +670,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // SMS-to-Blockchain Integration Routes
   const { smsService } = await import("./sms-service");
+  const { rewardsService } = await import("./rewards-service");
 
   // Webhook for incoming SMS messages (Twilio webhook)
   app.post("/api/sms/webhook", async (req, res) => {
@@ -679,6 +680,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log(`Incoming SMS from ${From} to ${To}: ${Body}`);
       
       const smsMessage = await smsService.processIncomingSms(From, To, Body, MessageSid);
+      
+      // Award rewards for SMS action
+      if (smsMessage && smsMessage.userId) {
+        await rewardsService.processSmsAction(smsMessage.userId, smsMessage.id);
+      }
       
       // Send TwiML response
       res.set('Content-Type', 'text/xml');
@@ -719,6 +725,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       const result = await smsService.verifyPhone(phoneNumber, verificationCode);
+      
+      // Award rewards for successful phone verification
+      if (result.success) {
+        // TODO: Get actual user ID from authentication
+        const userId = "user-1"; // Mock user ID for now
+        await rewardsService.processPhoneRegistrationAction(userId);
+      }
+      
       res.json(result);
     } catch (error) {
       console.error("Error verifying phone:", error);
@@ -767,6 +781,107 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error sending test SMS:", error);
       res.status(500).json({ error: "Failed to send test SMS" });
+    }
+  });
+
+  // Gamified Rewards System Routes
+  
+  // Initialize user rewards profile
+  app.post("/api/rewards/initialize/:userId", async (req, res) => {
+    try {
+      const { userId } = req.params;
+      const userReward = await rewardsService.initializeUserRewards(userId);
+      res.json(userReward);
+    } catch (error) {
+      console.error("Error initializing user rewards:", error);
+      res.status(500).json({ error: "Failed to initialize user rewards" });
+    }
+  });
+
+  // Get user rewards profile
+  app.get("/api/rewards/user/:userId", async (req, res) => {
+    try {
+      const { userId } = req.params;
+      const userReward = await rewardsService.getUserRewards(userId);
+      if (!userReward) {
+        return res.status(404).json({ error: "User rewards not found" });
+      }
+      res.json(userReward);
+    } catch (error) {
+      console.error("Error fetching user rewards:", error);
+      res.status(500).json({ error: "Failed to fetch user rewards" });
+    }
+  });
+
+  // Get user badges
+  app.get("/api/rewards/user/:userId/badges", async (req, res) => {
+    try {
+      const { userId } = req.params;
+      const badges = await rewardsService.getUserBadges(userId);
+      res.json(badges);
+    } catch (error) {
+      console.error("Error fetching user badges:", error);
+      res.status(500).json({ error: "Failed to fetch user badges" });
+    }
+  });
+
+  // Get user transaction history
+  app.get("/api/rewards/user/:userId/transactions", async (req, res) => {
+    try {
+      const { userId } = req.params;
+      const limit = parseInt(req.query.limit as string) || 50;
+      const transactions = await rewardsService.getUserTransactions(userId, limit);
+      res.json(transactions);
+    } catch (error) {
+      console.error("Error fetching user transactions:", error);
+      res.status(500).json({ error: "Failed to fetch user transactions" });
+    }
+  });
+
+  // Get leaderboard
+  app.get("/api/rewards/leaderboard", async (req, res) => {
+    try {
+      const limit = parseInt(req.query.limit as string) || 100;
+      const leaderboard = await rewardsService.getLeaderboard(limit);
+      res.json(leaderboard);
+    } catch (error) {
+      console.error("Error fetching leaderboard:", error);
+      res.status(500).json({ error: "Failed to fetch leaderboard" });
+    }
+  });
+
+  // Get active daily challenges
+  app.get("/api/rewards/challenges", async (req, res) => {
+    try {
+      const challenges = await rewardsService.getActiveDailyChallenges();
+      res.json(challenges);
+    } catch (error) {
+      console.error("Error fetching daily challenges:", error);
+      res.status(500).json({ error: "Failed to fetch daily challenges" });
+    }
+  });
+
+  // Get user challenge progress
+  app.get("/api/rewards/user/:userId/challenges", async (req, res) => {
+    try {
+      const { userId } = req.params;
+      const progress = await rewardsService.getUserChallengeProgress(userId);
+      res.json(progress);
+    } catch (error) {
+      console.error("Error fetching user challenge progress:", error);
+      res.status(500).json({ error: "Failed to fetch user challenge progress" });
+    }
+  });
+
+  // Process daily login
+  app.post("/api/rewards/user/:userId/login", async (req, res) => {
+    try {
+      const { userId } = req.params;
+      await rewardsService.processDailyLoginAction(userId);
+      res.json({ success: true, message: "Daily login processed" });
+    } catch (error) {
+      console.error("Error processing daily login:", error);
+      res.status(500).json({ error: "Failed to process daily login" });
     }
   });
 

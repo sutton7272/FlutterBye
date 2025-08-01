@@ -167,6 +167,75 @@ export const userAnalytics = pgTable("user_analytics", {
   timestamp: timestamp("timestamp").defaultNow(),
 });
 
+// Gamified Rewards System Tables
+export const userRewards = pgTable("user_rewards", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").references(() => users.id).notNull(),
+  totalPoints: integer("total_points").default(0),
+  currentLevel: integer("current_level").default(1),
+  currentStreak: integer("current_streak").default(0), // consecutive days active
+  longestStreak: integer("longest_streak").default(0),
+  totalSmsMessages: integer("total_sms_messages").default(0),
+  totalTokensMinted: integer("total_tokens_minted").default(0),
+  totalValueAttached: decimal("total_value_attached", { precision: 18, scale: 9 }).default("0"),
+  lastActivityDate: timestamp("last_activity_date"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const badges = pgTable("badges", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  name: text("name").notNull().unique(),
+  description: text("description").notNull(),
+  iconUrl: text("icon_url"),
+  category: text("category").notNull(), // 'sms', 'trading', 'social', 'milestone'
+  requiredCondition: text("required_condition").notNull(), // 'sms_count:10', 'streak:7', etc.
+  pointsReward: integer("points_reward").default(0),
+  rarity: text("rarity").notNull().default("common"), // common, rare, epic, legendary
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const userBadges = pgTable("user_badges", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").references(() => users.id).notNull(),
+  badgeId: varchar("badge_id").references(() => badges.id).notNull(),
+  earnedAt: timestamp("earned_at").defaultNow(),
+  notificationShown: boolean("notification_shown").default(false),
+});
+
+export const rewardTransactions = pgTable("reward_transactions", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").references(() => users.id).notNull(),
+  type: text("type").notNull(), // 'earn', 'spend', 'bonus'
+  action: text("action").notNull(), // 'sms_sent', 'token_minted', 'daily_login', etc.
+  pointsChange: integer("points_change").notNull(),
+  description: text("description").notNull(),
+  relatedId: varchar("related_id"), // token_id, sms_id, etc.
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const dailyChallenges = pgTable("daily_challenges", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  date: timestamp("date").notNull(),
+  challengeType: text("challenge_type").notNull(), // 'sms_count', 'token_mint', 'value_attach'
+  targetValue: integer("target_value").notNull(),
+  description: text("description").notNull(),
+  pointsReward: integer("points_reward").notNull(),
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const userChallengeProgress = pgTable("user_challenge_progress", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").references(() => users.id).notNull(),
+  challengeId: varchar("challenge_id").references(() => dailyChallenges.id).notNull(),
+  currentProgress: integer("current_progress").default(0),
+  isCompleted: boolean("is_completed").default(false),
+  completedAt: timestamp("completed_at"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
 // Redeemable codes for Free Flutterbye system
 export const redeemableCodes = pgTable("redeemable_codes", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
@@ -398,6 +467,31 @@ export type RedeemableCode = typeof redeemableCodes.$inferSelect;
 export type InsertRedeemableCode = z.infer<typeof insertRedeemableCodeSchema>;
 
 export type CodeRedemption = typeof codeRedemptions.$inferSelect;
+
+// Gamified Rewards System Types
+export const insertUserRewardSchema = createInsertSchema(userRewards).omit({ id: true, createdAt: true, updatedAt: true });
+export type InsertUserReward = z.infer<typeof insertUserRewardSchema>;
+export type UserReward = typeof userRewards.$inferSelect;
+
+export const insertBadgeSchema = createInsertSchema(badges).omit({ id: true, createdAt: true });
+export type InsertBadge = z.infer<typeof insertBadgeSchema>;
+export type Badge = typeof badges.$inferSelect;
+
+export const insertUserBadgeSchema = createInsertSchema(userBadges).omit({ id: true, earnedAt: true });
+export type InsertUserBadge = z.infer<typeof insertUserBadgeSchema>;
+export type UserBadge = typeof userBadges.$inferSelect;
+
+export const insertRewardTransactionSchema = createInsertSchema(rewardTransactions).omit({ id: true, createdAt: true });
+export type InsertRewardTransaction = z.infer<typeof insertRewardTransactionSchema>;
+export type RewardTransaction = typeof rewardTransactions.$inferSelect;
+
+export const insertDailyChallengeSchema = createInsertSchema(dailyChallenges).omit({ id: true, createdAt: true });
+export type InsertDailyChallenge = z.infer<typeof insertDailyChallengeSchema>;
+export type DailyChallenge = typeof dailyChallenges.$inferSelect;
+
+export const insertUserChallengeProgressSchema = createInsertSchema(userChallengeProgress).omit({ id: true, createdAt: true });
+export type InsertUserChallengeProgress = z.infer<typeof insertUserChallengeProgressSchema>;
+export type UserChallengeProgress = typeof userChallengeProgress.$inferSelect;
 export type InsertCodeRedemption = z.infer<typeof insertCodeRedemptionSchema>;
 
 export type AdminSettings = typeof adminSettings.$inferSelect;
