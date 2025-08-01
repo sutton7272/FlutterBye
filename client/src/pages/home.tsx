@@ -69,18 +69,25 @@ export default function ProfessionalHome() {
   ];
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background relative overflow-hidden">
+      {/* Blockchain-inspired background */}
+      <div className="fixed inset-0 pointer-events-none opacity-20">
+        <div className="absolute top-20 left-10 w-72 h-72 bg-flutter-purple/10 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute bottom-20 right-10 w-96 h-96 bg-flutter-cyan/10 rounded-full blur-3xl animate-pulse delay-1000"></div>
+        <div className="absolute top-1/2 left-1/2 w-64 h-64 bg-solana-green/5 rounded-full blur-2xl animate-pulse delay-500"></div>
+      </div>
+
       {/* Hero Section */}
-      <section className="bg-gradient-to-b from-background to-muted/20 py-20">
+      <section className="relative z-10 bg-gradient-to-b from-background/80 to-muted/20 py-20">
         <div className="container mx-auto px-6">
           <div className="max-w-4xl mx-auto text-center space-y-6">
-            <Badge variant="secondary" className="mb-4">
-              Solana Blockchain • SPL Tokens
+            <Badge variant="secondary" className="mb-4 blockchain-glow">
+              <span className="solana-accent font-semibold">Solana Blockchain</span> • SPL Tokens
             </Badge>
             
             <h1 className="text-4xl lg:text-6xl font-bold tracking-tight">
               Tokenized Messaging for{" "}
-              <span className="text-primary">Web3</span>
+              <span className="flutter-gradient">Web3</span>
             </h1>
             
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
@@ -89,7 +96,7 @@ export default function ProfessionalHome() {
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center mt-8">
-              <Button asChild size="lg" className="text-lg px-8">
+              <Button asChild size="lg" className="text-lg px-8 btn-primary">
                 <Link href="/mint">
                   <MessageSquare className="w-5 h-5 mr-2" />
                   Create Token Message
@@ -160,23 +167,24 @@ export default function ProfessionalHome() {
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {features.map((feature, index) => (
-              <Card key={index} className="group hover:shadow-md transition-shadow">
-                <CardHeader>
+              <Card key={index} className="group hover-lift blockchain-glow relative overflow-hidden">
+                <div className="absolute inset-0 bg-gradient-to-br from-flutter-purple/5 to-flutter-cyan/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                <CardHeader className="relative z-10">
                   <div className="flex items-center space-x-3">
-                    <div className="p-2 bg-primary/10 rounded-lg text-primary">
+                    <div className="p-3 bg-gradient-to-br from-flutter-purple/20 to-flutter-cyan/20 rounded-lg text-accent border border-accent/20 group-hover:shadow-lg transition-shadow">
                       {feature.icon}
                     </div>
-                    <CardTitle className="text-xl">{feature.title}</CardTitle>
+                    <CardTitle className="text-xl group-hover:flutter-gradient transition-all">{feature.title}</CardTitle>
                   </div>
                 </CardHeader>
-                <CardContent className="space-y-4">
+                <CardContent className="space-y-4 relative z-10">
                   <CardDescription className="text-base">
                     {feature.description}
                   </CardDescription>
-                  <Button variant="ghost" asChild className="group-hover:bg-primary/5">
+                  <Button variant="ghost" asChild className="group-hover:bg-primary/10 hover:text-accent transition-all">
                     <Link href={feature.href}>
                       {feature.action}
-                      <ArrowRight className="w-4 h-4 ml-2" />
+                      <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
                     </Link>
                   </Button>
                 </CardContent>
@@ -278,15 +286,17 @@ export default function ProfessionalHome() {
       </section>
 
       {/* Call to Action */}
-      <section className="py-20 bg-primary text-primary-foreground">
-        <div className="container mx-auto px-6 text-center">
-          <h2 className="text-3xl font-bold mb-4">
+      <section className="py-20 relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-r from-flutter-purple/20 via-background to-flutter-cyan/20"></div>
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent to-background/80"></div>
+        <div className="container mx-auto px-6 text-center relative z-10">
+          <h2 className="text-3xl font-bold mb-4 flutter-gradient">
             Ready to Start Creating?
           </h2>
-          <p className="text-xl mb-8 opacity-90">
-            Join the tokenized messaging revolution on Solana
+          <p className="text-xl mb-8 text-muted-foreground">
+            Join the tokenized messaging revolution on <span className="solana-accent font-semibold">Solana</span>
           </p>
-          <Button size="lg" variant="secondary" asChild>
+          <Button size="lg" className="btn-primary text-lg px-8" asChild>
             <Link href="/mint">
               Create Your First Token
               <ArrowRight className="w-5 h-5 ml-2" />
