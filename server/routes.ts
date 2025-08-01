@@ -671,6 +671,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // SMS-to-Blockchain Integration Routes
   const { smsService } = await import("./sms-service");
   const { rewardsService } = await import("./rewards-service");
+  const { journeyService } = await import("./journey-service");
 
   // Webhook for incoming SMS messages (Twilio webhook)
   app.post("/api/sms/webhook", async (req, res) => {
@@ -882,6 +883,70 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error processing daily login:", error);
       res.status(500).json({ error: "Failed to process daily login" });
+    }
+  });
+
+  // Blockchain Journey Dashboard Routes
+  
+  // Get user's complete journey dashboard
+  app.get("/api/journey/dashboard/:userId", async (req, res) => {
+    try {
+      const { userId } = req.params;
+      const dashboard = await journeyService.getUserJourneyDashboard(userId);
+      res.json(dashboard);
+    } catch (error) {
+      console.error("Error fetching journey dashboard:", error);
+      res.status(500).json({ error: "Failed to fetch journey dashboard" });
+    }
+  });
+
+  // Get user preferences
+  app.get("/api/journey/preferences/:userId", async (req, res) => {
+    try {
+      const { userId } = req.params;
+      const preferences = await journeyService.getUserPreferences(userId);
+      res.json(preferences);
+    } catch (error) {
+      console.error("Error fetching user preferences:", error);
+      res.status(500).json({ error: "Failed to fetch user preferences" });
+    }
+  });
+
+  // Update user preferences
+  app.patch("/api/journey/preferences/:userId", async (req, res) => {
+    try {
+      const { userId } = req.params;
+      const updates = req.body;
+      const preferences = await journeyService.updateUserPreferences(userId, updates);
+      res.json(preferences);
+    } catch (error) {
+      console.error("Error updating user preferences:", error);
+      res.status(500).json({ error: "Failed to update user preferences" });
+    }
+  });
+
+  // Mark insight as read
+  app.patch("/api/journey/insights/:insightId/read", async (req, res) => {
+    try {
+      const { insightId } = req.params;
+      const { userId } = req.body;
+      await journeyService.markInsightAsRead(userId, insightId);
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error marking insight as read:", error);
+      res.status(500).json({ error: "Failed to mark insight as read" });
+    }
+  });
+
+  // Generate personalized insights
+  app.post("/api/journey/insights/:userId/generate", async (req, res) => {
+    try {
+      const { userId } = req.params;
+      await journeyService.generatePersonalizedInsights(userId);
+      res.json({ success: true, message: "Insights generated successfully" });
+    } catch (error) {
+      console.error("Error generating insights:", error);
+      res.status(500).json({ error: "Failed to generate insights" });
     }
   });
 

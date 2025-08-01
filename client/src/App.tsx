@@ -17,6 +17,7 @@ import Admin from "@/pages/admin";
 import { SmsIntegrationPage } from "@/pages/sms-integration";
 import { WalletManagementPage } from "@/pages/wallet-management";
 import { RewardsPage } from "@/pages/rewards";
+import JourneyPage from "@/pages/journey";
 import Navbar from "@/components/navbar";
 
 function Router() {
@@ -37,6 +38,7 @@ function Router() {
         <Route path="/sms" component={SmsIntegrationPage} />
         <Route path="/wallets" component={WalletManagementPage} />
         <Route path="/rewards" component={RewardsPage} />
+        <Route path="/journey" component={JourneyPage} />
         <Route component={NotFound} />
       </Switch>
     </div>

@@ -492,6 +492,79 @@ export type DailyChallenge = typeof dailyChallenges.$inferSelect;
 export const insertUserChallengeProgressSchema = createInsertSchema(userChallengeProgress).omit({ id: true, createdAt: true });
 export type InsertUserChallengeProgress = z.infer<typeof insertUserChallengeProgressSchema>;
 export type UserChallengeProgress = typeof userChallengeProgress.$inferSelect;
+
+// Blockchain Journey Dashboard Tables
+export const journeyMilestones = pgTable("journey_milestones", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  name: text("name").notNull(),
+  description: text("description").notNull(),
+  category: text("category").notNull(), // 'onboarding', 'engagement', 'mastery', 'social', 'value'
+  requiredCondition: text("required_condition").notNull(), // 'sms_count:1', 'tokens_minted:5', etc.
+  order: integer("order").notNull(), // Display order within category
+  iconUrl: text("icon_url"),
+  pointsReward: integer("points_reward").default(0),
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const userJourneyProgress = pgTable("user_journey_progress", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").references(() => users.id).notNull(),
+  milestoneId: varchar("milestone_id").references(() => journeyMilestones.id).notNull(),
+  achievedAt: timestamp("achieved_at").defaultNow(),
+  notificationShown: boolean("notification_shown").default(false),
+});
+
+export const journeyInsights = pgTable("journey_insights", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").references(() => users.id).notNull(),
+  insightType: text("insight_type").notNull(), // 'weekly_summary', 'personal_best', 'trend_analysis'
+  title: text("title").notNull(),
+  description: text("description").notNull(),
+  data: json("data").$type<Record<string, any>>(),
+  isRead: boolean("is_read").default(false),
+  validUntil: timestamp("valid_until"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const userPreferences = pgTable("user_preferences", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").references(() => users.id).notNull(),
+  dashboardLayout: text("dashboard_layout").default("default"), // 'default', 'compact', 'detailed'
+  notificationSettings: json("notification_settings").$type<{
+    milestones: boolean;
+    insights: boolean;
+    challenges: boolean;
+    badges: boolean;
+  }>().default({
+    milestones: true,
+    insights: true,
+    challenges: true,
+    badges: true,
+  }),
+  favoriteCategories: text("favorite_categories").array().default(sql`ARRAY[]::text[]`),
+  privacyLevel: text("privacy_level").default("public"), // 'public', 'friends', 'private'
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Blockchain Journey Dashboard Types
+export const insertJourneyMilestoneSchema = createInsertSchema(journeyMilestones).omit({ id: true, createdAt: true });
+export type InsertJourneyMilestone = z.infer<typeof insertJourneyMilestoneSchema>;
+export type JourneyMilestone = typeof journeyMilestones.$inferSelect;
+
+export const insertUserJourneyProgressSchema = createInsertSchema(userJourneyProgress).omit({ id: true, achievedAt: true });
+export type InsertUserJourneyProgress = z.infer<typeof insertUserJourneyProgressSchema>;
+export type UserJourneyProgress = typeof userJourneyProgress.$inferSelect;
+
+export const insertJourneyInsightSchema = createInsertSchema(journeyInsights).omit({ id: true, createdAt: true });
+export type InsertJourneyInsight = z.infer<typeof insertJourneyInsightSchema>;
+export type JourneyInsight = typeof journeyInsights.$inferSelect;
+
+export const insertUserPreferencesSchema = createInsertSchema(userPreferences).omit({ id: true, createdAt: true, updatedAt: true });
+export type InsertUserPreferences = z.infer<typeof insertUserPreferencesSchema>;
+export type UserPreferences = typeof userPreferences.$inferSelect;
+
 export type InsertCodeRedemption = z.infer<typeof insertCodeRedemptionSchema>;
 
 export type AdminSettings = typeof adminSettings.$inferSelect;

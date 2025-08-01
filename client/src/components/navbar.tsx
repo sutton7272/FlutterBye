@@ -18,6 +18,7 @@ export default function Navbar() {
     { href: "/sms", label: "SMS Integration" },
     { href: "/wallets", label: "Wallet Management" },
     { href: "/rewards", label: "Rewards" },
+    { href: "/journey", label: "Journey" },
     { href: "/admin", label: "Admin" },
   ];
 
