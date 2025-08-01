@@ -1,6 +1,7 @@
 import { Link, useLocation } from "wouter";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { WalletConnect } from "@/components/wallet-connect";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Menu, Home, Coins, Trophy, Users, MessageSquare, Settings } from "lucide-react";
 
@@ -40,6 +41,10 @@ export default function Navbar() {
               </Link>
             ))}
           </nav>
+        </div>
+        
+        <div className="ml-auto flex items-center space-x-2">
+          <WalletConnect />
         </div>
         
         <Sheet open={isOpen} onOpenChange={setIsOpen}>
