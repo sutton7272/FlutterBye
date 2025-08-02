@@ -364,19 +364,20 @@ export default function Mint() {
                 </div>
                 
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Minting Form */}
-          <Card id="mint-form" className="premium-card electric-frame">
-            <CardContent className="p-8">
-              <h3 className="text-2xl font-bold mb-6 text-gradient">Create Your Message Token</h3>
-              <div className="mb-6 p-4 bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-800 rounded-lg">
-                <h4 className="font-semibold text-blue-700 dark:text-blue-300 mb-2">Message Structure</h4>
-                <div className="text-sm text-blue-600 dark:text-blue-400 space-y-1">
-                  <p><strong>Token Name:</strong> 27 characters max - becomes the official token identifier</p>
-                  <p><strong>Token Image:</strong> Main visual for the token (separate from message media)</p>
-                  <p><strong>Extended Message:</strong> Up to 500 characters - for longer descriptions and context</p>
-                  <p><strong>Message Media:</strong> Add images, GIFs, or QR codes within your extended message</p>
+          {/* Left Column - Basic Token Creation */}
+          <div className="space-y-6">
+            <Card id="mint-form" className="premium-card electric-frame">
+              <CardContent className="p-8">
+                <h3 className="text-2xl font-bold mb-6 text-gradient">Create Your Message Token</h3>
+                <div className="mb-6 p-4 bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+                  <h4 className="font-semibold text-blue-700 dark:text-blue-300 mb-2">Message Structure</h4>
+                  <div className="text-sm text-blue-600 dark:text-blue-400 space-y-1">
+                    <p><strong>Token Name:</strong> 27 characters max - becomes the official token identifier</p>
+                    <p><strong>Token Image:</strong> Main visual for the token (separate from message media)</p>
+                    <p><strong>Extended Message:</strong> Up to 500 characters - for longer descriptions and context</p>
+                    <p><strong>Message Media:</strong> Add images, GIFs, or QR codes within your extended message</p>
+                  </div>
                 </div>
-              </div>
               
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div className="electric-frame p-4 bg-gradient-to-r from-electric-blue/5 to-electric-green/5">
@@ -986,6 +987,7 @@ export default function Mint() {
               />
             </div>
           )}
+                  </div>
                 </div>
               </TabsContent>
 
