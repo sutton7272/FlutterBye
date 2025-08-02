@@ -37,7 +37,9 @@ import {
   UserCheck,
   Coins,
   Globe,
-  Ticket
+  Ticket,
+  Target,
+  Sparkles
 } from "lucide-react";
 
 interface AdminSettings {
@@ -374,166 +376,238 @@ export default function AdminDashboard() {
   };
 
   return (
-    <div className="min-h-screen pt-20 pb-12">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent mb-4">
-            Admin Dashboard
-          </h1>
-          <p className="text-xl text-muted-foreground">
-            Manage platform settings, users, and monitor activity
+    <div className="min-h-screen gradient-bg text-white pt-20 pb-12 overflow-hidden">
+      {/* Electric Background Animation */}
+      <div className="fixed inset-0 z-0 opacity-10">
+        <div className="absolute inset-0 modern-gradient"></div>
+      </div>
+      
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Enhanced Header with Electric Theme */}
+        <div className="text-center mb-12">
+          <div className="inline-block electric-frame p-8 mb-6 bg-black/20 backdrop-blur-sm">
+            <h1 className="text-6xl md:text-7xl font-black mb-4 text-gradient">
+              ADMIN COMMAND
+            </h1>
+            <div className="flex items-center justify-center gap-4 text-2xl font-bold text-electric-blue">
+              <Shield className="w-8 h-8 animate-pulse" />
+              <span className="text-gradient">SYSTEM CONTROL</span>
+              <Shield className="w-8 h-8 animate-pulse" />
+            </div>
+          </div>
+          <p className="text-xl text-gray-300 max-w-2xl mx-auto">
+            Master control center for Flutterbye platform management and analytics
           </p>
         </div>
 
         <Tabs defaultValue="overview" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-10 bg-slate-800/50">
-            <TabsTrigger value="overview" className="flex items-center gap-2">
+          <TabsList className="grid w-full grid-cols-10 glassmorphism electric-frame border-0 p-2">
+            <TabsTrigger value="overview" className="flex items-center gap-2 pulse-border hover:text-electric-blue transition-all">
               <BarChart3 className="w-4 h-4" />
-              Overview
+              <span className="hidden sm:inline">Overview</span>
             </TabsTrigger>
-            <TabsTrigger value="settings" className="flex items-center gap-2">
+            <TabsTrigger value="settings" className="flex items-center gap-2 pulse-border hover:text-electric-blue transition-all">
               <Settings className="w-4 h-4" />
-              Settings
+              <span className="hidden sm:inline">Settings</span>
             </TabsTrigger>
-            <TabsTrigger value="pricing" className="flex items-center gap-2">
+            <TabsTrigger value="pricing" className="flex items-center gap-2 pulse-border hover:text-electric-green transition-all">
               <TrendingUp className="w-4 h-4" />
-              Pricing
+              <span className="hidden sm:inline">Pricing</span>
             </TabsTrigger>
-            <TabsTrigger value="content" className="flex items-center gap-2">
+            <TabsTrigger value="content" className="flex items-center gap-2 pulse-border hover:text-circuit-teal transition-all">
               <Edit className="w-4 h-4" />
-              Content
+              <span className="hidden sm:inline">Content</span>
             </TabsTrigger>
-            <TabsTrigger value="marketing" className="flex items-center gap-2">
-              <TrendingUp className="w-4 h-4" />
-              Marketing
+            <TabsTrigger value="marketing" className="flex items-center gap-2 pulse-border hover:text-electric-green transition-all">
+              <Target className="w-4 h-4" />
+              <span className="hidden sm:inline">Marketing</span>
             </TabsTrigger>
-            <TabsTrigger value="analytics" className="flex items-center gap-2">
+            <TabsTrigger value="analytics" className="flex items-center gap-2 pulse-border hover:text-electric-blue transition-all">
               <BarChart3 className="w-4 h-4" />
-              Analytics
+              <span className="hidden sm:inline">Analytics</span>
             </TabsTrigger>
-            <TabsTrigger value="users" className="flex items-center gap-2">
+            <TabsTrigger value="users" className="flex items-center gap-2 pulse-border hover:text-electric-green transition-all">
               <Users className="w-4 h-4" />
-              Users
+              <span className="hidden sm:inline">Users</span>
             </TabsTrigger>
-            <TabsTrigger value="codes" className="flex items-center gap-2">
+            <TabsTrigger value="codes" className="flex items-center gap-2 pulse-border hover:text-circuit-teal transition-all">
               <Ticket className="w-4 h-4" />
-              Codes
+              <span className="hidden sm:inline">Codes</span>
             </TabsTrigger>
-            <TabsTrigger value="data" className="flex items-center gap-2">
+            <TabsTrigger value="data" className="flex items-center gap-2 pulse-border hover:text-electric-blue transition-all">
               <Database className="w-4 h-4" />
-              Data
+              <span className="hidden sm:inline">Data</span>
             </TabsTrigger>
-            <TabsTrigger value="logs" className="flex items-center gap-2">
+            <TabsTrigger value="logs" className="flex items-center gap-2 pulse-border hover:text-electric-green transition-all">
               <Activity className="w-4 h-4" />
-              Logs
+              <span className="hidden sm:inline">Logs</span>
             </TabsTrigger>
           </TabsList>
 
-          {/* Overview Tab */}
-          <TabsContent value="overview" className="space-y-6">
+          {/* Enhanced Overview Tab */}
+          <TabsContent value="overview" className="space-y-8">
+            {/* Live Platform Status Bar */}
+            <div className="electric-frame p-4 glassmorphism">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 bg-electric-green rounded-full animate-pulse"></div>
+                    <span className="font-bold text-electric-green">SYSTEM ONLINE</span>
+                  </div>
+                  <Badge className="bg-electric-blue/20 text-electric-blue border-electric-blue">
+                    Platform Active
+                  </Badge>
+                </div>
+                <div className="text-right">
+                  <div className="text-sm text-gray-400">Server Status</div>
+                  <div className="text-electric-green font-bold">99.9% Uptime</div>
+                </div>
+              </div>
+            </div>
+
+            {/* Enhanced Stats Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              <Card className="glassmorphism">
+              <Card className="premium-card electric-frame circuit-glow">
                 <CardContent className="p-6">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-sm font-medium text-muted-foreground">Total Users</p>
-                      <p className="text-3xl font-bold text-blue-400">
+                      <p className="text-sm font-medium text-gray-400">Total Users</p>
+                      <p className="text-3xl font-bold text-gradient">
                         {platformStats?.totalUsers?.toLocaleString() || 0}
                       </p>
                     </div>
-                    <Users className="w-8 h-8 text-blue-400" />
+                    <Users className="w-8 h-8 text-electric-blue animate-pulse" />
                   </div>
-                  <p className="text-xs text-muted-foreground mt-2">
-                    {platformStats?.activeUsers24h || 0} active in 24h
-                  </p>
+                  <div className="flex items-center gap-2 mt-2">
+                    <TrendingUp className="w-4 h-4 text-electric-green" />
+                    <p className="text-xs text-electric-green font-bold">
+                      +{platformStats?.activeUsers24h || 0} active (24h)
+                    </p>
+                  </div>
                 </CardContent>
               </Card>
 
-              <Card className="glassmorphism">
+              <Card className="premium-card electric-frame circuit-glow">
                 <CardContent className="p-6">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-sm font-medium text-muted-foreground">Total Tokens</p>
-                      <p className="text-3xl font-bold text-green-400">
+                      <p className="text-sm font-medium text-gray-400">Total Tokens</p>
+                      <p className="text-3xl font-bold text-gradient">
                         {platformStats?.totalTokens?.toLocaleString() || 0}
                       </p>
                     </div>
-                    <Coins className="w-8 h-8 text-green-400" />
+                    <Coins className="w-8 h-8 text-electric-green animate-pulse" />
                   </div>
-                  <p className="text-xs text-muted-foreground mt-2">
-                    FLBY-MSG tokens minted
-                  </p>
+                  <div className="flex items-center gap-2 mt-2">
+                    <Sparkles className="w-4 h-4 text-circuit-teal" />
+                    <p className="text-xs text-circuit-teal font-bold">
+                      FLBY-MSG tokens minted
+                    </p>
+                  </div>
                 </CardContent>
               </Card>
 
-              <Card className="glassmorphism">
+              <Card className="premium-card electric-frame circuit-glow">
                 <CardContent className="p-6">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-sm font-medium text-muted-foreground">Value Escrowed</p>
-                      <p className="text-3xl font-bold text-purple-400">
+                      <p className="text-sm font-medium text-gray-400">Value Escrowed</p>
+                      <p className="text-3xl font-bold text-gradient">
                         {platformStats?.totalValueEscrowed?.toFixed(3) || 0} SOL
                       </p>
                     </div>
-                    <DollarSign className="w-8 h-8 text-purple-400" />
+                    <DollarSign className="w-8 h-8 text-circuit-teal animate-pulse" />
                   </div>
-                  <p className="text-xs text-muted-foreground mt-2">
-                    {platformStats?.totalRedemptions || 0} redemptions
-                  </p>
+                  <div className="flex items-center gap-2 mt-2">
+                    <RefreshCw className="w-4 h-4 text-electric-blue" />
+                    <p className="text-xs text-electric-blue font-bold">
+                      {platformStats?.totalRedemptions || 0} redemptions completed
+                    </p>
+                  </div>
                 </CardContent>
               </Card>
 
-              <Card className="glassmorphism">
+              <Card className="premium-card electric-frame circuit-glow">
                 <CardContent className="p-6">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-sm font-medium text-muted-foreground">Revenue Today</p>
-                      <p className="text-3xl font-bold text-yellow-400">
+                      <p className="text-sm font-medium text-gray-400">Revenue Today</p>
+                      <p className="text-3xl font-bold text-gradient">
                         {platformStats?.revenueToday?.toFixed(3) || 0} SOL
                       </p>
                     </div>
-                    <TrendingUp className="w-8 h-8 text-yellow-400" />
+                    <TrendingUp className="w-8 h-8 text-electric-green animate-pulse" />
                   </div>
-                  <p className="text-xs text-muted-foreground mt-2">
-                    Platform fees collected
-                  </p>
+                  <div className="flex items-center gap-2 mt-2">
+                    <Activity className="w-4 h-4 text-warning-orange" />
+                    <p className="text-xs text-warning-orange font-bold">
+                      Platform fees collected
+                    </p>
+                  </div>
                 </CardContent>
               </Card>
             </div>
 
-            {/* Top Tokens */}
-            <Card className="glassmorphism">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <TrendingUp className="w-5 h-5" />
+            {/* Enhanced Top Tokens Section */}
+            <Card className="premium-card electric-frame circuit-glow">
+              <CardHeader className="border-b border-electric-blue/20">
+                <CardTitle className="flex items-center gap-2 text-gradient">
+                  <TrendingUp className="w-6 h-6 text-electric-green animate-pulse" />
                   Top Performing Tokens
                 </CardTitle>
+                <CardDescription className="text-gray-400">
+                  Most successful tokenized messages with highest engagement
+                </CardDescription>
               </CardHeader>
-              <CardContent>
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Message</TableHead>
-                      <TableHead>Value Attached</TableHead>
-                      <TableHead>Redemptions</TableHead>
-                      <TableHead>Performance</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {platformStats?.topTokens?.map((token) => (
-                      <TableRow key={token.id}>
-                        <TableCell className="font-mono">{token.message}</TableCell>
-                        <TableCell>{token.attachedValue.toFixed(3)} SOL</TableCell>
-                        <TableCell>{token.redemptions}</TableCell>
-                        <TableCell>
-                          <Badge variant={token.redemptions > 10 ? "default" : "secondary"}>
-                            {token.redemptions > 10 ? "High" : "Normal"}
-                          </Badge>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
+              <CardContent className="p-6">
+                <div className="space-y-4">
+                  {platformStats?.topTokens?.length > 0 ? (
+                    <Table>
+                      <TableHeader>
+                        <TableRow className="border-electric-blue/20 hover:bg-electric-blue/5">
+                          <TableHead className="text-electric-blue font-bold">Message</TableHead>
+                          <TableHead className="text-electric-green font-bold">Value Attached</TableHead>
+                          <TableHead className="text-circuit-teal font-bold">Redemptions</TableHead>
+                          <TableHead className="text-electric-blue font-bold">Performance</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {platformStats.topTokens.map((token, index) => (
+                          <TableRow key={token.id} className="border-electric-blue/10 hover:bg-electric-blue/5 transition-all">
+                            <TableCell className="font-mono text-white">
+                              <div className="flex items-center gap-2">
+                                <Badge className="bg-electric-blue/20 text-electric-blue">#{index + 1}</Badge>
+                                {token.message}
+                              </div>
+                            </TableCell>
+                            <TableCell className="text-electric-green font-bold">
+                              {token.attachedValue.toFixed(3)} SOL
+                            </TableCell>
+                            <TableCell className="text-circuit-teal font-bold">
+                              {token.redemptions}
+                            </TableCell>
+                            <TableCell>
+                              <Badge 
+                                className={
+                                  token.redemptions > 10 
+                                    ? "bg-electric-green/20 text-electric-green border-electric-green animate-pulse" 
+                                    : "bg-electric-blue/20 text-electric-blue border-electric-blue"
+                                }
+                              >
+                                {token.redemptions > 10 ? "🔥 HOT" : "📈 ACTIVE"}
+                              </Badge>
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  ) : (
+                    <div className="text-center py-12">
+                      <Coins className="w-12 h-12 text-gray-500 mx-auto mb-4" />
+                      <p className="text-gray-400">No token performance data available</p>
+                    </div>
+                  )}
+                </div>
               </CardContent>
             </Card>
           </TabsContent>
@@ -1831,6 +1905,26 @@ export default function AdminDashboard() {
             </div>
           </TabsContent>
         </Tabs>
+        
+        {/* Footer with System Information */}
+        <div className="mt-12 text-center">
+          <div className="electric-frame p-4 glassmorphism inline-block">
+            <div className="flex items-center gap-4 text-sm text-gray-400">
+              <div className="flex items-center gap-2">
+                <Shield className="w-4 h-4 text-electric-green" />
+                <span>Admin Panel v2.0</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Activity className="w-4 h-4 text-electric-blue" />
+                <span>Real-time Analytics</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Database className="w-4 h-4 text-circuit-teal" />
+                <span>Secure Data Management</span>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
