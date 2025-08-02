@@ -15,7 +15,7 @@ import { apiRequest } from "@/lib/queryClient";
 import ImageUpload from "@/components/image-upload";
 import { LoadingSpinner } from "@/components/loading-spinner";
 import { validateTokenQuantity, validateWholeNumber } from "@/lib/validators";
-import { Coins, Upload, Calculator, DollarSign, Lock, Globe, Gift, AlertCircle, Wand2, Star, Sparkles, Users, Target } from "lucide-react";
+import { Coins, Upload, Calculator, DollarSign, Lock, Globe, Gift, AlertCircle, Wand2, Star, Sparkles, Users, Target, ImageIcon, FileImage, QrCode, Plus, X } from "lucide-react";
 import AITextOptimizer from "@/components/ai-text-optimizer";
 import { EmotionAnalyzer } from "@/components/EmotionAnalyzer";
 import { ViralMechanics } from "@/components/ViralMechanics";
@@ -41,6 +41,12 @@ export default function Mint() {
   const [currency, setCurrency] = useState("SOL");
   const [isPublic, setIsPublic] = useState(false);
   const [memo, setMemo] = useState("");
+  const [messageMedia, setMessageMedia] = useState<Array<{
+    id: string;
+    type: 'image' | 'gif' | 'qr';
+    url: string;
+    name: string;
+  }>>([]);
   const [expirationDate, setExpirationDate] = useState("");
   const [isFreeFlutterbye, setIsFreeFlutterbye] = useState(false);
   
@@ -80,6 +86,7 @@ export default function Mint() {
       setMemo("");
       setExpirationDate("");
       setIsFreeFlutterbye(false);
+      setMessageMedia([]);
     },
     onError: (error) => {
       toast({
@@ -121,13 +128,60 @@ export default function Mint() {
       currency: currency,
       isPublic: isPublic,
       expiresAt: attachValue && expirationDate ? new Date(expirationDate) : undefined,
-      metadata: memo ? { memo: [memo], isFreeFlutterbye: [isFreeFlutterbye] } : { isFreeFlutterbye: [isFreeFlutterbye] },
+      metadata: { 
+        memo: memo ? [memo] : undefined, 
+        isFreeFlutterbye: [isFreeFlutterbye],
+        messageMedia: messageMedia.length > 0 ? [JSON.stringify(messageMedia)] : undefined
+      },
       valuePerToken: attachValue && attachedValue && mintAmount ? 
         (parseFloat(attachedValue) / parseInt(mintAmount)).toString() : "0",
       imageFile: tokenImage || undefined,
     };
 
     mintToken.mutate(tokenData);
+  };
+
+  const handleMessageMediaUpload = (e: React.ChangeEvent<HTMLInputElement>, type: 'image' | 'gif' | 'qr') => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Validate file type
+    const validTypes = {
+      image: ['image/jpeg', 'image/png', 'image/webp'],
+      gif: ['image/gif'],
+      qr: ['image/jpeg', 'image/png', 'image/webp']
+    };
+
+    if (!validTypes[type].includes(file.type)) {
+      toast({
+        title: "Invalid file type",
+        description: `Please upload a valid ${type} file`,
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Convert to base64 and add to messageMedia
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const url = event.target?.result as string;
+      const newMedia = {
+        id: Math.random().toString(36).substr(2, 9),
+        type,
+        url,
+        name: file.name
+      };
+      setMessageMedia(prev => [...prev, newMedia]);
+      toast({
+        title: "Media added",
+        description: `${type} has been added to your message`,
+      });
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const removeMessageMedia = (id: string) => {
+    setMessageMedia(prev => prev.filter(media => media.id !== id));
   };
 
   const handleCsvUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -199,8 +253,9 @@ export default function Mint() {
                 <h4 className="font-semibold text-blue-700 dark:text-blue-300 mb-2">Message Structure</h4>
                 <div className="text-sm text-blue-600 dark:text-blue-400 space-y-1">
                   <p><strong>Token Name:</strong> 27 characters max - becomes the official token identifier</p>
+                  <p><strong>Token Image:</strong> Main visual for the token (separate from message media)</p>
                   <p><strong>Extended Message:</strong> Up to 500 characters - for longer descriptions and context</p>
-                  <p><strong>Custom Image:</strong> Visual attachment to make your token memorable</p>
+                  <p><strong>Message Media:</strong> Add images, GIFs, or QR codes within your extended message</p>
                 </div>
               </div>
               
@@ -465,19 +520,112 @@ export default function Mint() {
                     </div>
                   )}
 
-                  <div className="space-y-2">
-                    <Label htmlFor="memo">Extended Message (Optional)</Label>
-                    <Textarea
-                      id="memo"
-                      value={memo}
-                      onChange={(e) => setMemo(e.target.value)}
-                      placeholder="Add a longer message, detailed description, or special instructions for this token. This text will be stored with your token and can be much longer than the 27-character token name..."
-                      rows={4}
-                      maxLength={500}
-                    />
-                    <p className="text-xs text-muted-foreground">
-                      Use this for longer messages, detailed descriptions, or context that doesn't fit in the 27-character token name. {memo.length}/500 characters
-                    </p>
+                  <div className="space-y-4">
+                    <div>
+                      <Label htmlFor="memo">Extended Message (Optional)</Label>
+                      <Textarea
+                        id="memo"
+                        value={memo}
+                        onChange={(e) => setMemo(e.target.value)}
+                        placeholder="Add a longer message, detailed description, or special instructions for this token. This text will be stored with your token and can be much longer than the 27-character token name..."
+                        rows={4}
+                        maxLength={500}
+                      />
+                      <p className="text-xs text-muted-foreground">
+                        Use this for longer messages, detailed descriptions, or context that doesn't fit in the 27-character token name. {memo.length}/500 characters
+                      </p>
+                    </div>
+
+                    {/* Message Media Upload Section */}
+                    <div className="space-y-3">
+                      <Label>Add Media to Message</Label>
+                      <p className="text-sm text-muted-foreground">
+                        Attach images, GIFs, or QR codes to enhance your extended message
+                      </p>
+                      
+                      <div className="flex gap-2">
+                        <div className="relative">
+                          <input
+                            type="file"
+                            accept="image/jpeg,image/png,image/webp"
+                            onChange={(e) => handleMessageMediaUpload(e, 'image')}
+                            className="hidden"
+                            id="message-image-upload"
+                          />
+                          <Label htmlFor="message-image-upload" className="cursor-pointer">
+                            <Button type="button" variant="outline" size="sm">
+                              <ImageIcon className="w-4 h-4 mr-2" />
+                              Add Image
+                            </Button>
+                          </Label>
+                        </div>
+                        
+                        <div className="relative">
+                          <input
+                            type="file"
+                            accept="image/gif"
+                            onChange={(e) => handleMessageMediaUpload(e, 'gif')}
+                            className="hidden"
+                            id="message-gif-upload"
+                          />
+                          <Label htmlFor="message-gif-upload" className="cursor-pointer">
+                            <Button type="button" variant="outline" size="sm">
+                              <FileImage className="w-4 h-4 mr-2" />
+                              Add GIF
+                            </Button>
+                          </Label>
+                        </div>
+                        
+                        <div className="relative">
+                          <input
+                            type="file"
+                            accept="image/jpeg,image/png,image/webp"
+                            onChange={(e) => handleMessageMediaUpload(e, 'qr')}
+                            className="hidden"
+                            id="message-qr-upload"
+                          />
+                          <Label htmlFor="message-qr-upload" className="cursor-pointer">
+                            <Button type="button" variant="outline" size="sm">
+                              <QrCode className="w-4 h-4 mr-2" />
+                              Add QR Code
+                            </Button>
+                          </Label>
+                        </div>
+                      </div>
+
+                      {/* Display uploaded media */}
+                      {messageMedia.length > 0 && (
+                        <div className="space-y-2">
+                          <Label>Attached Media ({messageMedia.length})</Label>
+                          <div className="grid grid-cols-2 gap-3">
+                            {messageMedia.map((media) => (
+                              <div key={media.id} className="relative border border-slate-200 dark:border-slate-700 rounded-lg p-2">
+                                <div className="flex items-center gap-2">
+                                  <div className="w-12 h-12 bg-slate-100 dark:bg-slate-800 rounded flex items-center justify-center overflow-hidden">
+                                    {media.type === 'image' && <ImageIcon className="w-6 h-6 text-blue-500" />}
+                                    {media.type === 'gif' && <FileImage className="w-6 h-6 text-green-500" />}
+                                    {media.type === 'qr' && <QrCode className="w-6 h-6 text-purple-500" />}
+                                  </div>
+                                  <div className="flex-1 min-w-0">
+                                    <p className="text-sm font-medium truncate">{media.name}</p>
+                                    <p className="text-xs text-muted-foreground capitalize">{media.type}</p>
+                                  </div>
+                                  <Button
+                                    type="button"
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => removeMessageMedia(media.id)}
+                                    className="w-6 h-6 p-0 text-red-500 hover:text-red-700"
+                                  >
+                                    <X className="w-4 h-4" />
+                                  </Button>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </div>
                 
