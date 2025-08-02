@@ -43,14 +43,27 @@ import TokenHolderMapPage from "@/pages/token-holder-map";
 import Navbar from "@/components/navbar";
 import { FloatingActionHub } from "@/components/floating-action-hub";
 import { WalletProvider } from "@/components/wallet-adapter";
-import { CosmicBackground } from "@/components/cosmic-background";
-
+import { TestImage } from "@/components/test-image";
 function Router() {
   return (
-    <div className="dark min-h-screen relative">
-      <CosmicBackground />
-      <div className="relative z-10">
-      <Switch>
+    <div 
+      className="dark min-h-screen"
+      style={{
+        backgroundImage: 'url(/images/cosmic-butterfly.png)',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat',
+        backgroundAttachment: 'fixed'
+      }}
+    >
+      <div 
+        className="min-h-screen"
+        style={{
+          backgroundColor: 'rgba(0, 0, 0, 0.4)'
+        }}
+      >
+        <TestImage />
+        <Switch>
         <Route path="/" component={LaunchCountdown} />
         <Route path="/launch" component={LaunchCountdown} />
         
@@ -273,7 +286,7 @@ function Router() {
           </>
         )} />
         <Route component={NotFound} />
-      </Switch>
+        </Switch>
       </div>
     </div>
   );
