@@ -80,7 +80,15 @@ function Router() {
   return (
     <div className="dark min-h-screen" style={{ background: 'transparent' }}>
       <Switch>
-        <Route path="/" component={LaunchCountdown} />
+        <Route path="/" component={() => (
+          <>
+            <Navbar />
+            <Suspense fallback={<PageLoader />}>
+              <Home />
+            </Suspense>
+            <FloatingActionHub />
+          </>
+        )} />
         <Route path="/launch" component={LaunchCountdown} />
         
         {/* Routes with navbar - only accessible when authenticated */}
