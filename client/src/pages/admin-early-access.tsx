@@ -88,7 +88,8 @@ export default function AdminEarlyAccess() {
 
   const grantEarlyAccessMutation = useMutation({
     mutationFn: async (entryId: string) => {
-      return apiRequest(`/api/admin/early-access/grant`, "POST", { entryId });
+      const result = await apiRequest("POST", `/api/admin/early-access/grant`, { entryId });
+      return result.json();
     },
     onSuccess: () => {
       toast({
@@ -107,10 +108,11 @@ export default function AdminEarlyAccess() {
 
   const addEarlyUserMutation = useMutation({
     mutationFn: async () => {
-      return apiRequest("/api/admin/early-access/add", "POST", { 
+      const result = await apiRequest("POST", "/api/admin/early-access/add", { 
         email: newUserEmail, 
         walletAddress: newUserWallet 
       });
+      return result.json();
     },
     onSuccess: () => {
       setNewUserEmail("");
@@ -131,7 +133,8 @@ export default function AdminEarlyAccess() {
 
   const toggleLaunchModeMutation = useMutation({
     mutationFn: async (enabled: boolean) => {
-      return apiRequest("/api/admin/launch-mode", "POST", { enabled });
+      const result = await apiRequest("POST", "/api/admin/launch-mode", { enabled });
+      return result.json();
     },
     onSuccess: (_, enabled) => {
       setLaunchMode(enabled);
@@ -153,7 +156,8 @@ export default function AdminEarlyAccess() {
 
   const addAccessCodeMutation = useMutation({
     mutationFn: async (code: string) => {
-      return apiRequest("/api/admin/access-codes", "POST", { code });
+      const result = await apiRequest("POST", "/api/admin/access-codes", { code });
+      return result.json();
     },
     onSuccess: () => {
       setAccessCodes([...accessCodes, newAccessCode]);
@@ -174,7 +178,8 @@ export default function AdminEarlyAccess() {
 
   const removeAccessCodeMutation = useMutation({
     mutationFn: async (code: string) => {
-      return apiRequest("/api/admin/access-codes", "DELETE", { code });
+      const result = await apiRequest("DELETE", "/api/admin/access-codes", { code });
+      return result.json();
     },
     onSuccess: (_, code) => {
       setAccessCodes(accessCodes.filter(c => c !== code));
@@ -194,7 +199,8 @@ export default function AdminEarlyAccess() {
 
   const addAuthorizedEmailMutation = useMutation({
     mutationFn: async (email: string) => {
-      return apiRequest("/api/admin/authorized-emails", "POST", { email });
+      const result = await apiRequest("POST", "/api/admin/authorized-emails", { email });
+      return result.json();
     },
     onSuccess: () => {
       setAuthorizedEmails([...authorizedEmails, newAuthorizedEmail]);
@@ -215,7 +221,8 @@ export default function AdminEarlyAccess() {
 
   const removeAuthorizedEmailMutation = useMutation({
     mutationFn: async (email: string) => {
-      return apiRequest("/api/admin/authorized-emails", "DELETE", { email });
+      const result = await apiRequest("DELETE", "/api/admin/authorized-emails", { email });
+      return result.json();
     },
     onSuccess: (_, email) => {
       setAuthorizedEmails(authorizedEmails.filter(e => e !== email));

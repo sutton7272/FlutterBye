@@ -68,9 +68,13 @@ export default function LaunchCountdown() {
 
   const signupMutation = useMutation({
     mutationFn: async () => {
-      return apiRequest("/api/launch/waitlist", "POST", { email, walletAddress });
+      console.log("Submitting waitlist signup:", { email, walletAddress });
+      const result = await apiRequest("POST", "/api/launch/waitlist", { email, walletAddress });
+      console.log("Waitlist signup result:", result);
+      return result.json();
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
+      console.log("Signup successful:", data);
       setSubmitted(true);
       toast({
         title: "Welcome to the Revolution!",
@@ -78,9 +82,10 @@ export default function LaunchCountdown() {
       });
     },
     onError: (error) => {
+      console.error("Signup error:", error);
       toast({
         title: "Error",
-        description: "Failed to join waitlist. Please try again.",
+        description: `Failed to join waitlist: ${error.message || 'Please try again.'}`,
         variant: "destructive"
       });
     }
@@ -88,7 +93,9 @@ export default function LaunchCountdown() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email) {
+    console.log("Form submitted with:", { email, walletAddress });
+    
+    if (!email || email.trim() === "") {
       toast({
         title: "Email Required",
         description: "Please enter your email address.",
@@ -96,6 +103,19 @@ export default function LaunchCountdown() {
       });
       return;
     }
+
+    // Basic email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      toast({
+        title: "Invalid Email",
+        description: "Please enter a valid email address.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    console.log("Starting mutation...");
     signupMutation.mutate();
   };
 
@@ -286,10 +306,13 @@ export default function LaunchCountdown() {
                   <Button 
                     type="submit" 
                     className="w-full"
-                    disabled={signupMutation.isPending}
+                    disabled={signupMutation.isPending || !email}
                   >
                     {signupMutation.isPending ? (
-                      "Joining..."
+                      <>
+                        <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2"></div>
+                        Joining...
+                      </>
                     ) : (
                       <>
                         <Mail className="w-4 h-4 mr-2" />

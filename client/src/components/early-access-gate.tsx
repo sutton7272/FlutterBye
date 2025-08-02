@@ -28,7 +28,8 @@ export function EarlyAccessGate({ onAccessGranted }: EarlyAccessGateProps) {
 
   const checkAccessMutation = useMutation({
     mutationFn: async () => {
-      return apiRequest("/api/admin/check-access", "POST", { accessCode, email });
+      const result = await apiRequest("POST", "/api/admin/check-access", { accessCode, email });
+      return result.json();
     },
     onSuccess: (data: any) => {
       if (data.hasAccess) {
