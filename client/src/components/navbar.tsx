@@ -24,8 +24,6 @@ export default function Navbar() {
   const secondaryNavItems = [
     { href: "/activity", label: "Activity", icon: Activity },
     { href: "/portfolio", label: "Portfolio", icon: Trophy },
-    { href: "/badges", label: "Badges", icon: Award },
-    { href: "/limited-edition", label: "Limited Edition", icon: Star },
     { href: "/chat", label: "Chat", icon: MessageSquare },
     { href: "/token-map", label: "Token Map", icon: MapPin },
     { href: "/rewards", label: "Rewards", icon: Trophy },

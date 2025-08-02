@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { toast } from '@/hooks/use-toast';
-import { Coins, Clock, CheckCircle, AlertCircle, Flame, TrendingUp, User, Calendar, DollarSign, ArrowUpCircle, ArrowDownCircle } from 'lucide-react';
+import { Coins, Clock, CheckCircle, AlertCircle, Flame, TrendingUp, User, Calendar, DollarSign, ArrowUpCircle, ArrowDownCircle, Award, Star, Zap, Target, Trophy } from 'lucide-react';
 import { apiRequest } from '@/lib/queryClient';
 import { TransactionSuccessOverlay } from "@/components/confetti-celebration";
 import { format, differenceInDays, isAfter } from 'date-fns';
@@ -289,7 +289,7 @@ export default function RedeemPage() {
 
         {/* Tabbed Interface */}
         <Tabs defaultValue="redeem" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4 bg-slate-800/50">
+          <TabsList className="grid w-full grid-cols-5 bg-slate-800/50">
             <TabsTrigger value="redeem" className="flex items-center gap-2">
               <ArrowDownCircle className="w-4 h-4" />
               Redeem
@@ -301,6 +301,10 @@ export default function RedeemPage() {
             <TabsTrigger value="holdings" className="flex items-center gap-2">
               <Coins className="w-4 h-4" />
               Holdings
+            </TabsTrigger>
+            <TabsTrigger value="badges" className="flex items-center gap-2">
+              <Award className="w-4 h-4" />
+              Badges
             </TabsTrigger>
             <TabsTrigger value="stats" className="flex items-center gap-2">
               <TrendingUp className="w-4 h-4" />
@@ -502,6 +506,184 @@ export default function RedeemPage() {
                             Details
                           </Button>
                         </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Badges Tab */}
+          <TabsContent value="badges" className="space-y-4">
+            <Card className="glassmorphism">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Award className="w-5 h-5" />
+                  Achievement Badges
+                </CardTitle>
+                <CardDescription>
+                  Your earned badges and achievements in the Flutterbye ecosystem
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                  <Card className="border border-yellow-500/20 bg-yellow-500/5">
+                    <CardContent className="p-4 text-center">
+                      <div className="w-12 h-12 bg-yellow-500/20 rounded-full flex items-center justify-center mx-auto mb-2">
+                        <Star className="w-6 h-6 text-yellow-400" />
+                      </div>
+                      <p className="text-sm text-muted-foreground">Total Badges</p>
+                      <p className="text-2xl font-bold text-yellow-400">12</p>
+                    </CardContent>
+                  </Card>
+                  
+                  <Card className="border border-blue-500/20 bg-blue-500/5">
+                    <CardContent className="p-4 text-center">
+                      <div className="w-12 h-12 bg-blue-500/20 rounded-full flex items-center justify-center mx-auto mb-2">
+                        <Zap className="w-6 h-6 text-blue-400" />
+                      </div>
+                      <p className="text-sm text-muted-foreground">Rare Badges</p>
+                      <p className="text-2xl font-bold text-blue-400">3</p>
+                    </CardContent>
+                  </Card>
+                  
+                  <Card className="border border-purple-500/20 bg-purple-500/5">
+                    <CardContent className="p-4 text-center">
+                      <div className="w-12 h-12 bg-purple-500/20 rounded-full flex items-center justify-center mx-auto mb-2">
+                        <Target className="w-6 h-6 text-purple-400" />
+                      </div>
+                      <p className="text-sm text-muted-foreground">Points Earned</p>
+                      <p className="text-2xl font-bold text-purple-400">2,450</p>
+                    </CardContent>
+                  </Card>
+                  
+                  <Card className="border border-green-500/20 bg-green-500/5">
+                    <CardContent className="p-4 text-center">
+                      <div className="w-12 h-12 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-2">
+                        <Trophy className="w-6 h-6 text-green-400" />
+                      </div>
+                      <p className="text-sm text-muted-foreground">Achievements</p>
+                      <p className="text-2xl font-bold text-green-400">8</p>
+                    </CardContent>
+                  </Card>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {[
+                    {
+                      name: 'First Token Creator',
+                      description: 'Created your first FLBY-MSG token',
+                      icon: '🎯',
+                      rarity: 'Common',
+                      earned: true,
+                      progress: 100,
+                      points: 100
+                    },
+                    {
+                      name: 'Token Collector',
+                      description: 'Own 10+ different tokens',
+                      icon: '💎',
+                      rarity: 'Uncommon',
+                      earned: true,
+                      progress: 100,
+                      points: 250
+                    },
+                    {
+                      name: 'Value Creator',
+                      description: 'Created tokens worth 5+ SOL',
+                      icon: '⚡',
+                      rarity: 'Rare',
+                      earned: true,
+                      progress: 100,
+                      points: 500
+                    },
+                    {
+                      name: 'Early Adopter',
+                      description: 'Joined Flutterbye in beta',
+                      icon: '🚀',
+                      rarity: 'Epic',
+                      earned: true,
+                      progress: 100,
+                      points: 1000
+                    },
+                    {
+                      name: 'Community Builder',
+                      description: 'Invite 5 friends to the platform',
+                      icon: '🌟',
+                      rarity: 'Rare',
+                      earned: false,
+                      progress: 60,
+                      points: 750
+                    },
+                    {
+                      name: 'Token Master',
+                      description: 'Create 100 tokens',
+                      icon: '👑',
+                      rarity: 'Legendary',
+                      earned: false,
+                      progress: 8,
+                      points: 2500
+                    }
+                  ].map((badge, index) => (
+                    <Card key={index} className={`border transition-all duration-300 ${
+                      badge.earned 
+                        ? 'border-green-500/30 bg-green-500/5' 
+                        : 'border-slate-700 bg-slate-800/20'
+                    }`}>
+                      <CardContent className="p-4">
+                        <div className="flex items-start gap-3 mb-3">
+                          <div className={`text-2xl ${badge.earned ? 'grayscale-0' : 'grayscale opacity-50'}`}>
+                            {badge.icon}
+                          </div>
+                          <div className="flex-1">
+                            <h3 className={`font-medium ${badge.earned ? 'text-white' : 'text-muted-foreground'}`}>
+                              {badge.name}
+                            </h3>
+                            <p className="text-xs text-muted-foreground mb-2">
+                              {badge.description}
+                            </p>
+                            <div className="flex items-center gap-2">
+                              <Badge 
+                                variant="outline" 
+                                className={`text-xs ${
+                                  badge.rarity === 'Legendary' ? 'border-orange-500 text-orange-400' :
+                                  badge.rarity === 'Epic' ? 'border-purple-500 text-purple-400' :
+                                  badge.rarity === 'Rare' ? 'border-blue-500 text-blue-400' :
+                                  badge.rarity === 'Uncommon' ? 'border-green-500 text-green-400' :
+                                  'border-gray-500 text-gray-400'
+                                }`}
+                              >
+                                {badge.rarity}
+                              </Badge>
+                              <span className="text-xs text-yellow-400">
+                                {badge.points} pts
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                        
+                        {!badge.earned && (
+                          <div className="space-y-1">
+                            <div className="flex justify-between text-xs">
+                              <span>Progress</span>
+                              <span>{badge.progress}%</span>
+                            </div>
+                            <div className="w-full bg-slate-700 rounded-full h-1.5">
+                              <div 
+                                className="bg-blue-500 h-1.5 rounded-full transition-all duration-300"
+                                style={{ width: `${badge.progress}%` }}
+                              ></div>
+                            </div>
+                          </div>
+                        )}
+                        
+                        {badge.earned && (
+                          <Badge className="w-full justify-center bg-green-600 hover:bg-green-700">
+                            <CheckCircle className="w-3 h-3 mr-1" />
+                            Earned
+                          </Badge>
+                        )}
                       </CardContent>
                     </Card>
                   ))}

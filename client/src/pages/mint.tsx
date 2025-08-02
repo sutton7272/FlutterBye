@@ -8,13 +8,14 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
 import { Separator } from "@/components/ui/separator";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import ImageUpload from "@/components/image-upload";
 import { LoadingSpinner } from "@/components/loading-spinner";
 import { validateTokenQuantity, validateWholeNumber } from "@/lib/validators";
-import { Coins, Upload, Calculator, DollarSign, Lock, Globe, Gift, AlertCircle, Wand2 } from "lucide-react";
+import { Coins, Upload, Calculator, DollarSign, Lock, Globe, Gift, AlertCircle, Wand2, Star, Sparkles } from "lucide-react";
 import AITextOptimizer from "@/components/ai-text-optimizer";
 import { EmotionAnalyzer } from "@/components/EmotionAnalyzer";
 import { ViralMechanics } from "@/components/ViralMechanics";
@@ -159,11 +160,24 @@ export default function Mint() {
     <div className="min-h-screen pt-20 pb-12">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold mb-4 text-gradient">Mint FLBY-MSG Tokens</h1>
-          <p className="text-xl text-muted-foreground">Create tokenized messages and distribute them to your target audience</p>
+          <h1 className="text-4xl font-bold mb-4 text-gradient">Token Creation Center</h1>
+          <p className="text-xl text-muted-foreground">Create individual tokens or limited edition collections</p>
         </div>
-        
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+
+        <Tabs defaultValue="individual" className="space-y-6">
+          <TabsList className="grid w-full grid-cols-2 bg-slate-800/50">
+            <TabsTrigger value="individual" className="flex items-center gap-2">
+              <Coins className="w-4 h-4" />
+              Individual Token
+            </TabsTrigger>
+            <TabsTrigger value="limited" className="flex items-center gap-2">
+              <Star className="w-4 h-4" />
+              Limited Edition
+            </TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="individual" className="space-y-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Minting Form */}
           <Card className="premium-card electric-frame">
             <CardContent className="p-8">
@@ -562,7 +576,51 @@ export default function Mint() {
               />
             </div>
           )}
-        </div>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="limited" className="space-y-6">
+            <Card className="premium-card electric-frame">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Sparkles className="w-5 h-5" />
+                  Limited Edition Collections
+                </CardTitle>
+                <CardDescription>
+                  Create exclusive, limited-supply token collections with unique attributes
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="p-6">
+                <div className="text-center py-12">
+                  <Star className="w-16 h-16 mx-auto text-yellow-400 mb-4" />
+                  <h3 className="text-xl font-semibold mb-2">Limited Edition Coming Soon</h3>
+                  <p className="text-muted-foreground mb-6">
+                    Create exclusive token sets with limited supply, special artwork, and rarity tiers. 
+                    Perfect for collectibles, event badges, and premium offerings.
+                  </p>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-2xl mx-auto">
+                    <div className="border border-purple-500/20 bg-purple-500/5 rounded-lg p-4">
+                      <h4 className="font-medium text-purple-400 mb-2">Rarity Tiers</h4>
+                      <p className="text-sm text-muted-foreground">Common, Rare, Epic, Legendary</p>
+                    </div>
+                    <div className="border border-blue-500/20 bg-blue-500/5 rounded-lg p-4">
+                      <h4 className="font-medium text-blue-400 mb-2">Limited Supply</h4>
+                      <p className="text-sm text-muted-foreground">Set maximum editions</p>
+                    </div>
+                    <div className="border border-green-500/20 bg-green-500/5 rounded-lg p-4">
+                      <h4 className="font-medium text-green-400 mb-2">Custom Artwork</h4>
+                      <p className="text-sm text-muted-foreground">Unique visuals per tier</p>
+                    </div>
+                  </div>
+                  <Button className="mt-6" variant="outline" disabled>
+                    <Star className="w-4 h-4 mr-2" />
+                    Coming Soon
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
       </div>
       
       {/* Success Overlay with Confetti */}
