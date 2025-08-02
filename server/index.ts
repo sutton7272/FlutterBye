@@ -13,6 +13,9 @@ import { ProductionConfigValidator, getHealthStatus } from "./production-config"
 
 const app = express();
 
+// Trust proxy for proper IP detection
+app.set('trust proxy', 1);
+
 // Security middleware - must be first
 app.use(securityHeaders);
 app.use(cors(corsOptions));
