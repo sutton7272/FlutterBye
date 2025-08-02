@@ -74,12 +74,15 @@ export default function ExplorePage() {
     <div className="container mx-auto px-4 py-8 min-h-screen pt-20">
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold mb-4 text-gradient">
-            Explore FLBY-MSG Tokens
+          <h1 className="text-4xl font-bold mb-4 bg-gradient-to-r from-red-400 via-orange-400 to-yellow-400 bg-clip-text text-transparent electric-frame">
+            Discover What's Trending
           </h1>
-          <p className="text-lg text-muted-foreground">
-            Discover public tokens and their messages from the community
+          <p className="text-lg text-muted-foreground mb-2">
+            Revolutionary viral tracking and community discovery
           </p>
+          <Badge variant="outline" className="border-red-500 text-red-400 animate-pulse">
+            🔥 Live Viral Analytics Active
+          </Badge>
         </div>
 
         {/* Platform Stats */}
@@ -175,11 +178,13 @@ export default function ExplorePage() {
         </Card>
 
         {/* Token Exploration Tabs */}
-        <Tabs defaultValue="public" className="w-full">
+        <Tabs defaultValue="viral" className="w-full">
           <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="public">Public Wall</TabsTrigger>
+            <TabsTrigger value="viral" className="bg-gradient-to-r from-red-500/20 to-orange-500/20 border border-red-500/30 text-red-400 hover:text-red-300">
+              🚀 Viral Trending <Badge variant="destructive" className="ml-2 text-xs animate-pulse">HOT</Badge>
+            </TabsTrigger>
+            <TabsTrigger value="public">Community Wall</TabsTrigger>
             <TabsTrigger value="valued">High Value</TabsTrigger>
-            <TabsTrigger value="viral">🚀 Viral Trending</TabsTrigger>
           </TabsList>
 
           <TabsContent value="public" className="mt-6">
