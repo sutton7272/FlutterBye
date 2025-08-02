@@ -58,8 +58,14 @@ interface ChatMessageExtended extends ChatMessage {
   isPinned?: boolean;
 }
 
-// Mock wallet address for now - in production this would come from wallet connection
+// TODO: Replace with real wallet authentication from useWallet hook
+// This is a critical production issue that needs immediate fixing
 const MOCK_WALLET = "4xY2D8F3nQ9sM1pR6tZ5bV7wX0aH8cJ2kL4mN7oP9qS3uT";
+
+// Production authentication integration needed:
+// import { useWallet } from '@/components/wallet-adapter';
+// const { publicKey, connected } = useWallet();
+// const userWallet = publicKey?.toBase58() || null;
 
 export function Chat() {
   const [selectedRoom, setSelectedRoom] = useState<string>('general');
@@ -91,11 +97,23 @@ export function Chat() {
   const [isRecording, setIsRecording] = useState(false);
   const [showGifPicker, setShowGifPicker] = useState(false);
   const [currentTypingMode, setCurrentTypingMode] = useState<'normal' | 'premium' | 'ai'>('normal');
+  const [isMobile, setIsMobile] = useState(false);
   
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const messageInputRef = useRef<HTMLTextAreaElement>(null);
   const queryClient = useQueryClient();
   const { toast } = useToast();
+
+  // Mobile detection
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   // Fetch available chat rooms
   const { data: rooms, isLoading: roomsLoading } = useQuery({
@@ -146,10 +164,15 @@ export function Chat() {
     }
   }, [messages]);
 
-  // WebSocket connection with enhanced features
-  useEffect(() => {
+  // Enhanced WebSocket connection with reconnection logic
+  const [connectionStatus, setConnectionStatus] = useState<'connecting' | 'connected' | 'disconnected' | 'error'>('disconnected');
+  const [reconnectAttempts, setReconnectAttempts] = useState(0);
+  const reconnectIntervalRef = useRef<NodeJS.Timeout | null>(null);
+
+  const connectWebSocket = useCallback(() => {
     if (!selectedRoom) return;
 
+    setConnectionStatus('connecting');
     const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
     const wsUrl = `${protocol}//${window.location.host}/ws?wallet=${MOCK_WALLET}&room=${selectedRoom}`;
     
@@ -158,6 +181,8 @@ export function Chat() {
     ws.onopen = () => {
       console.log('Connected to chat WebSocket');
       setSocket(ws);
+      setConnectionStatus('connected');
+      setReconnectAttempts(0);
       toast({
         title: "Connected",
         description: `Joined ${selectedRoom} room`,
@@ -233,21 +258,48 @@ export function Chat() {
     ws.onclose = () => {
       console.log('Disconnected from chat WebSocket');
       setSocket(null);
+      setConnectionStatus('disconnected');
+      
+      // Attempt reconnection if not intentional
+      if (reconnectAttempts < 5) {
+        const delay = Math.min(1000 * Math.pow(2, reconnectAttempts), 10000); // Exponential backoff
+        reconnectIntervalRef.current = setTimeout(() => {
+          setReconnectAttempts(prev => prev + 1);
+          connectWebSocket();
+        }, delay);
+      } else {
+        setConnectionStatus('error');
+        toast({
+          title: "Connection Failed",
+          description: "Unable to maintain chat connection. Please refresh.",
+          variant: "destructive"
+        });
+      }
     };
 
     ws.onerror = (error) => {
       console.error('WebSocket error:', error);
-      toast({
-        title: "Connection Error",
-        description: "Failed to connect to chat. Please refresh the page.",
-        variant: "destructive"
-      });
+      setConnectionStatus('error');
     };
 
     return () => {
+      if (reconnectIntervalRef.current) {
+        clearTimeout(reconnectIntervalRef.current);
+      }
       ws.close();
     };
-  }, [selectedRoom, toast, playNotificationSound]);
+  }, [selectedRoom, playNotificationSound, toast]);
+
+  // WebSocket connection effect
+  useEffect(() => {
+    connectWebSocket();
+    
+    return () => {
+      if (reconnectIntervalRef.current) {
+        clearTimeout(reconnectIntervalRef.current);
+      }
+    };
+  }, [connectWebSocket]);
 
   // Scroll to bottom when new messages arrive
   useEffect(() => {
@@ -310,10 +362,8 @@ export function Chat() {
   // Create new room
   const createRoom = useMutation({
     mutationFn: async (roomData: { name: string; description?: string }) => {
-      return apiRequest('/api/chat/rooms', {
-        method: 'POST',
-        body: JSON.stringify(roomData)
-      });
+      const response = await apiRequest('POST', '/api/chat/rooms', roomData);
+      return response.json();
     },
     onSuccess: (room) => {
       toast({
@@ -459,6 +509,22 @@ export function Chat() {
                 
                 {/* Enhanced Chat Controls */}
                 <div className="flex items-center gap-2">
+                  {/* Connection Status Indicator */}
+                  <div className="flex items-center gap-1">
+                    <div className={`w-2 h-2 rounded-full ${
+                      connectionStatus === 'connected' ? 'bg-green-500 animate-pulse' :
+                      connectionStatus === 'connecting' ? 'bg-yellow-500 animate-spin' :
+                      connectionStatus === 'disconnected' ? 'bg-gray-500' :
+                      'bg-red-500 animate-pulse'
+                    }`} />
+                    <span className="text-xs text-slate-400">
+                      {connectionStatus === 'connected' ? 'Online' :
+                       connectionStatus === 'connecting' ? 'Connecting...' :
+                       connectionStatus === 'disconnected' ? 'Offline' :
+                       'Error'}
+                    </span>
+                  </div>
+
                   {/* Unread messages indicator */}
                   {unreadCount > 0 && (
                     <Badge className="bg-red-500 text-white animate-pulse">
