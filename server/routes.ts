@@ -4441,21 +4441,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Initialize WebSocket server for real-time monitoring on existing httpServer
   realTimeMonitor.initialize(httpServer);
 
-  // Initialize collaborative WebSocket server  
-  const collaborativeWss = new WebSocketServer({
-    server: httpServer,
-    path: '/collaborative-ws',
-    verifyClient: (info) => {
-      return true;
-    }
-  });
-
-  // Handle WebSocket connections for collaborative token creation
-  collaborativeWss.on('connection', (ws, request) => {
-    collaborativeTokenService.handleWebSocketConnection(ws, request);
-  });
-
-  // Start heartbeat for collaborative service
+  // Start heartbeat for collaborative service (integrate with existing chat WebSocket)
   collaborativeTokenService.startHeartbeat();
   
   // Monitor real-time events
