@@ -147,7 +147,7 @@ export default function Mint() {
         await new Promise(resolve => setTimeout(resolve, 2000));
         
         // Step 3: Image processing (if applicable)
-        if (data.image) {
+        if (data.imageFile) {
           setMintingStep("image");
           await new Promise(resolve => setTimeout(resolve, 3000));
         }
@@ -305,8 +305,6 @@ export default function Mint() {
       valuePerToken: attachValue && attachedValue && mintAmount ? 
         (parseFloat(attachedValue) / parseInt(mintAmount)).toString() : "0",
       imageFile: tokenImage || undefined,
-      redemptionCode: validatedCode ? redemptionCode : undefined,
-      isFreeMode: isFreeMode,
     };
 
     mintToken.mutate(tokenData);
