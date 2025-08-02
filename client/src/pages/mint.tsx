@@ -958,7 +958,7 @@ export default function Mint() {
                     <Button 
                       className="w-full" 
                       size="sm"
-                      onClick={() => navigate('/token-holder-map')}
+                      onClick={() => navigate('/token-map')}
                     >
                       <Users className="w-3 h-3 mr-1" />
                       View Token Map
