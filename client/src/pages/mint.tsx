@@ -408,7 +408,7 @@ export default function Mint() {
                 </div>
                 
                 {/* AI Text Optimizer */}
-                <div className="bg-gradient-to-r from-primary/5 to-cyan/5 rounded-lg p-1">
+                <div className="bg-slate-700/20 rounded-lg p-1">
                   <AITextOptimizer 
                     onOptimizedTextSelect={(optimizedText) => setMessage(optimizedText)}
                     className="border-0 bg-transparent"
@@ -882,7 +882,7 @@ export default function Mint() {
                 <Button 
                   type="submit" 
                   disabled={mintToken.isPending || remainingChars < 0}
-                  className="w-full bg-gradient-to-r from-primary to-blue-500 hover:from-blue-500 hover:to-primary py-4 text-lg cyber-glow"
+                  className="w-full bg-electric-blue hover:bg-blue-600 py-4 text-lg cyber-glow"
                 >
                   {mintToken.isPending ? "Minting..." : "Mint Tokens"}
                 </Button>

@@ -140,7 +140,7 @@
     background-clip: border-box;
     border-radius: inherit;
     pointer-events: none;
-    animation: borderPulse 4s ease-in-out infinite;
+    /* animation disabled */
   }
   
   .cyber-glow {
@@ -191,7 +191,7 @@
       hsla(200, 100%, 50%, 0.1), 
       hsla(140, 100%, 40%, 0.1), 
       transparent);
-    transition: left 0.5s ease;
+    /* transition disabled */
   }
   
   .premium-card:hover {
@@ -202,7 +202,7 @@
   }
   
   .premium-card:hover::before {
-    left: 100%;
+    left: -100%;
   }
   
   .trust-indicator {
