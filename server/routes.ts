@@ -939,9 +939,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // ============ AI EMOTION ANALYSIS API ENDPOINTS ============
+  // ============ PHASE 1 ANALYSIS API ENDPOINTS (No AI Dependencies) ============
+  // Phase 2 AI features moved to roadmap - these are simple rule-based implementations
 
-  // AI Emotion Analysis
+  // Simple Emotion Analysis (Phase 1 - No OpenAI required)
   app.post("/api/ai/analyze-emotion", async (req, res) => {
     try {
       const { message, recipientCount } = req.body;
@@ -950,11 +951,56 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: "Message is required" });
       }
 
-      const { aiEmotionService } = await import("./ai-emotion-service");
-      const analysis = await aiEmotionService.analyzeMessageEmotion(
-        message, 
-        recipientCount || 1
-      );
+      // Phase 1: Simple rule-based emotion analysis
+      const messageText = message.toLowerCase();
+      
+      let primaryEmotion = 'neutral';
+      let sentiment = 'neutral';
+      let category = 'other';
+      let suggestedValue = 0.01;
+      
+      // Emotion detection based on keywords and emojis
+      if (messageText.includes('❤️') || messageText.includes('love') || messageText.includes('💕')) {
+        primaryEmotion = 'love';
+        sentiment = 'positive';
+        category = 'romantic';
+        suggestedValue = 0.05;
+      } else if (messageText.includes('🎉') || messageText.includes('congratulations') || messageText.includes('celebrate')) {
+        primaryEmotion = 'joy';
+        sentiment = 'positive';
+        category = 'celebration';
+        suggestedValue = 0.03;
+      } else if (messageText.includes('thanks') || messageText.includes('thank you') || messageText.includes('grateful')) {
+        primaryEmotion = 'gratitude';
+        sentiment = 'positive';
+        category = 'gratitude';
+        suggestedValue = 0.02;
+      } else if (messageText.includes('sorry') || messageText.includes('apologize') || messageText.includes('😢')) {
+        primaryEmotion = 'sadness';
+        sentiment = 'negative';
+        category = 'apology';
+        suggestedValue = 0.025;
+      } else if (messageText.includes('gm') || messageText.includes('good morning') || messageText.includes('hello')) {
+        primaryEmotion = 'friendliness';
+        sentiment = 'positive';
+        category = 'friendship';
+        suggestedValue = 0.005;
+      }
+      
+      // Adjust for recipient count
+      const recipientMultiplier = recipientCount > 10 ? 1.5 : recipientCount > 5 ? 1.2 : 1.0;
+      suggestedValue *= recipientMultiplier;
+      
+      const analysis = {
+        primaryEmotion,
+        emotionScore: sentiment === 'positive' ? 0.7 : sentiment === 'negative' ? 0.4 : 0.5,
+        sentiment,
+        intensity: messageText.includes('!!!') || messageText.includes('🔥') ? 'high' : 'medium',
+        category,
+        suggestedValue: Math.min(suggestedValue, 0.1),
+        viralityScore: messageText.includes('🚀') || messageText.includes('💎') ? 0.6 : 0.3,
+        marketingTags: ['tokenized-message', 'blockchain-communication']
+      };
       
       res.json(analysis);
     } catch (error) {
@@ -963,7 +1009,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // AI Value Suggestion
+  // Simple Value Suggestion (Phase 1 - No OpenAI required)
   app.post("/api/ai/suggest-value", async (req, res) => {
     try {
       const { message, recipientCount, senderHistory } = req.body;
@@ -972,12 +1018,39 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: "Message is required" });
       }
 
-      const { aiEmotionService } = await import("./ai-emotion-service");
-      const suggestion = await aiEmotionService.generateValueSuggestion(
-        message,
-        recipientCount || 1,
-        senderHistory
-      );
+      // Phase 1: Rule-based value suggestions
+      const messageText = message.toLowerCase();
+      let baseValue = 0.01;
+      let reasoning = "Standard message pricing";
+      
+      // Category-based pricing
+      if (messageText.includes('❤️') || messageText.includes('love')) {
+        baseValue = 0.05;
+        reasoning = "Romantic message - higher emotional value";
+      } else if (messageText.includes('congratulations') || messageText.includes('🎉')) {
+        baseValue = 0.03;
+        reasoning = "Celebration message - special occasion";
+      } else if (messageText.includes('thanks') || messageText.includes('thank you')) {
+        baseValue = 0.02;
+        reasoning = "Gratitude message - appreciative gesture";
+      } else if (messageText.includes('sorry') || messageText.includes('apologize')) {
+        baseValue = 0.025;
+        reasoning = "Apology message - sincere gesture";
+      } else if (messageText.includes('gm') || messageText.includes('hello')) {
+        baseValue = 0.005;
+        reasoning = "Greeting message - casual interaction";
+      }
+      
+      // Recipient count multiplier
+      const emotionMultiplier = recipientCount > 10 ? 1.5 : recipientCount > 5 ? 1.2 : 1.0;
+      const finalSuggestion = Math.min(baseValue * emotionMultiplier, 0.2);
+      
+      const suggestion = {
+        baseValue,
+        emotionMultiplier,
+        finalSuggestion,
+        reasoning
+      };
       
       res.json(suggestion);
     } catch (error) {
@@ -986,7 +1059,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // AI Viral Analysis
+  // Simple Viral Analysis (Phase 1 - No OpenAI required)
   app.post("/api/ai/analyze-viral", async (req, res) => {
     try {
       const { message } = req.body;
@@ -995,8 +1068,37 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: "Message is required" });
       }
 
-      const { aiEmotionService } = await import("./ai-emotion-service");
-      const analysis = await aiEmotionService.analyzeViralPotential(message);
+      // Phase 1: Simple viral potential scoring
+      const messageText = message.toLowerCase();
+      let score = 0.3; // Base score
+      const suggestions = [];
+      
+      // Crypto/Web3 indicators
+      if (messageText.includes('🚀') || messageText.includes('moon')) score += 0.2;
+      if (messageText.includes('💎') || messageText.includes('diamond')) score += 0.15;
+      if (messageText.includes('hodl') || messageText.includes('lfg')) score += 0.15;
+      if (messageText.includes('gm') || messageText.includes('wagmi')) score += 0.1;
+      if (messageText.includes('!')) score += 0.05;
+      
+      // Generate suggestions based on missing elements
+      if (score < 0.5) {
+        suggestions.push("Add crypto slang like WAGMI, LFG, or GM for higher engagement");
+      }
+      if (!messageText.includes('🚀') && !messageText.includes('💎')) {
+        suggestions.push("Add crypto emojis like 🚀💎 to increase viral potential");
+      }
+      if (!messageText.includes('!')) {
+        suggestions.push("Add excitement with exclamation marks!");
+      }
+      if (messageText.length < 15) {
+        suggestions.push("Consider making the message more expressive");
+      }
+      
+      const analysis = {
+        score: Math.min(score, 1.0),
+        suggestions,
+        optimizedMessage: undefined // Phase 2 feature
+      };
       
       res.json(analysis);
     } catch (error) {
@@ -1005,23 +1107,42 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // AI Personalized Suggestions
+  // Simple Personalized Suggestions (Phase 1 - No OpenAI required)
   app.post("/api/ai/personalized-suggestions", async (req, res) => {
     try {
       const { recipientWallet, senderWallet, context } = req.body;
       
-      if (!recipientWallet || !senderWallet) {
-        return res.status(400).json({ error: "Recipient and sender wallets are required" });
-      }
-
-      const { aiEmotionService } = await import("./ai-emotion-service");
-      const suggestions = await aiEmotionService.generatePersonalizedSuggestions(
-        recipientWallet,
-        senderWallet,
-        context
-      );
+      // Phase 1: Pre-defined suggestion categories
+      const suggestions = [
+        // Crypto-native greetings
+        "GM frens! ☀️",
+        "LFG! 🚀",
+        "WAGMI 💎",
+        "Good vibes only ✨",
+        
+        // Appreciation messages
+        "Thanks anon! 🙏",
+        "Appreciate you! 💜",
+        "You're amazing! ⭐",
+        
+        // Motivational messages
+        "Stay strong 💪",
+        "Diamond hands! 💎🙌",
+        "To the moon! 🌙",
+        "Keep building! 🛠️",
+        
+        // Celebration messages
+        "Congrats! 🎉",
+        "Well done! 👏",
+        "Legendary! 🔥",
+        "Big W! 🏆"
+      ];
       
-      res.json({ suggestions });
+      res.json({ 
+        suggestions: suggestions.slice(0, 8), // Return 8 suggestions
+        categories: ["greeting", "appreciation", "motivation", "celebration"],
+        suggestedValues: [0.005, 0.01, 0.02, 0.05, 0.1]
+      });
     } catch (error) {
       console.error("Error in personalized suggestions:", error);
       res.status(500).json({ error: "Failed to generate suggestions" });
