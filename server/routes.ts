@@ -202,7 +202,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Token routes - Real Solana minting
   app.post("/api/tokens", async (req, res) => {
     try {
-      const tokenData = insertTokenSchema.parse(req.body);
+      const { redemptionCode, isFreeMode, ...rawTokenData } = req.body;
+      
+      // If using free mode with a redemption code, validate and use it
+      if (isFreeMode && redemptionCode) {
+        const validCode = await storage.validateAndUseRedemptionCode(redemptionCode);
+        if (!validCode) {
+          return res.status(400).json({ message: "Invalid or expired redemption code" });
+        }
+        
+        // Log successful free minting
+        console.log(`Free minting using code: ${redemptionCode} (${validCode.type})`);
+      }
+      
+      const tokenData = insertTokenSchema.parse(rawTokenData);
       
       // Validate message length
       if (tokenData.message.length > 27) {
@@ -270,6 +283,51 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     } catch (error) {
       res.status(400).json({ message: error instanceof Error ? error.message : "Invalid token data" });
+    }
+  });
+
+  // Redemption code validation endpoint
+  app.post("/api/validate-redemption-code", async (req, res) => {
+    try {
+      const { code } = req.body;
+      
+      if (!code || typeof code !== 'string') {
+        return res.status(400).json({ error: "Code is required" });
+      }
+
+      // Check if code exists and is valid - first check redeemable codes, then redemption codes
+      let redemptionCode = await storage.getRedeemableCode(code);
+      if (!redemptionCode) {
+        const allRedemptionCodes = await storage.getAllRedemptionCodes();
+        redemptionCode = allRedemptionCodes.find(rc => rc.code === code) || null;
+      }
+      
+      if (!redemptionCode) {
+        return res.status(400).json({ error: "Invalid redemption code" });
+      }
+
+      // Check if code is expired
+      if (redemptionCode.expiresAt && new Date(redemptionCode.expiresAt) < new Date()) {
+        return res.status(400).json({ error: "Redemption code has expired" });
+      }
+
+      // Check if code has remaining uses
+      if (redemptionCode.maxUses && redemptionCode.usedCount >= redemptionCode.maxUses) {
+        return res.status(400).json({ error: "Redemption code has been fully used" });
+      }
+
+      // Return valid code info
+      res.json({
+        id: redemptionCode.id,
+        code: redemptionCode.code,
+        type: redemptionCode.type,
+        value: redemptionCode.value,
+        remainingUses: redemptionCode.maxUses ? redemptionCode.maxUses - redemptionCode.usedCount : null,
+        expiresAt: redemptionCode.expiresAt
+      });
+    } catch (error) {
+      console.error("Error validating redemption code:", error);
+      res.status(500).json({ error: "Internal server error" });
     }
   });
 
@@ -3608,6 +3666,65 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error('Error fetching limited edition tokens:', error);
       res.status(500).json({ error: 'Failed to fetch tokens' });
+    }
+  });
+
+  // Redemption Code Management API
+  app.get("/api/admin/redemption-codes", async (req, res) => {
+    try {
+      const codes = await storage.getAllRedemptionCodes();
+      res.json(codes);
+    } catch (error) {
+      console.error("Error fetching redemption codes:", error);
+      res.status(500).json({ message: "Failed to fetch redemption codes" });
+    }
+  });
+
+  app.post("/api/admin/redemption-codes", async (req, res) => {
+    try {
+      const codeData = req.body;
+      const code = await storage.createRedemptionCode(codeData);
+      res.json(code);
+    } catch (error) {
+      console.error("Error creating redemption code:", error);
+      res.status(500).json({ message: "Failed to create redemption code" });
+    }
+  });
+
+  app.patch("/api/admin/redemption-codes/:id/toggle", async (req, res) => {
+    try {
+      const { id } = req.params;
+      const { isActive } = req.body;
+      const code = await storage.updateRedemptionCode(id, { isActive });
+      res.json(code);
+    } catch (error) {
+      console.error("Error updating redemption code:", error);
+      res.status(500).json({ message: "Failed to update redemption code" });
+    }
+  });
+
+  app.delete("/api/admin/redemption-codes/:id", async (req, res) => {
+    try {
+      const { id } = req.params;
+      await storage.deleteRedemptionCode(id);
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error deleting redemption code:", error);
+      res.status(500).json({ message: "Failed to delete redemption code" });
+    }
+  });
+
+  app.post("/api/redeem-code", async (req, res) => {
+    try {
+      const { code } = req.body;
+      const redemptionCode = await storage.validateAndUseRedemptionCode(code);
+      if (!redemptionCode) {
+        return res.status(400).json({ message: "Invalid or expired redemption code" });
+      }
+      res.json({ valid: true, code: redemptionCode });
+    } catch (error) {
+      console.error("Error validating redemption code:", error);
+      res.status(500).json({ message: "Failed to validate redemption code" });
     }
   });
 

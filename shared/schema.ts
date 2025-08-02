@@ -122,6 +122,21 @@ export const chatParticipants = pgTable("chat_participants", {
   isOnline: boolean("is_online").default(false),
 });
 
+// Redemption Codes
+export const redemptionCodes = pgTable("redemption_codes", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  code: varchar("code", { length: 50 }).notNull().unique(),
+  maxUses: integer("max_uses").notNull().default(1),
+  currentUses: integer("current_uses").notNull().default(0),
+  isActive: boolean("is_active").notNull().default(true),
+  createdBy: varchar("created_by", { length: 255 }).notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+  expiresAt: timestamp("expires_at"),
+});
+
+export type RedemptionCode = typeof redemptionCodes.$inferSelect;
+export type InsertRedemptionCode = typeof redemptionCodes.$inferInsert;
+
 // Limited Edition Token Sets
 export const limitedEditionSets = pgTable("limited_edition_sets", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
@@ -536,6 +551,12 @@ export const insertAnalyticsSchema = createInsertSchema(analytics).omit({
   id: true,
   createdAt: true,
 });
+
+export const insertRedemptionCodeSchema = createInsertSchema(redemptionCodes).omit({
+  id: true,
+  createdAt: true,
+});
+export type InsertRedemptionCodeForm = z.infer<typeof insertRedemptionCodeSchema>;
 
 export const insertRedeemableCodeSchema = createInsertSchema(redeemableCodes).omit({
   id: true,

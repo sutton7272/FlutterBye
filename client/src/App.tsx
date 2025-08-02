@@ -40,6 +40,7 @@ import AdminStaking from "@/pages/admin-staking";
 import ReferralRewards from "@/pages/referral-rewards";
 import LaunchCountdown from "@/pages/launch-countdown";
 import AdminEarlyAccess from "@/pages/admin-early-access";
+import AdminFreeCodes from "@/pages/admin-free-codes";
 import TokenHolderMapPage from "@/pages/token-holder-map";
 import Navbar from "@/components/navbar";
 import { FloatingActionHub } from "@/components/floating-action-hub";
@@ -260,6 +261,13 @@ function Router() {
           <>
             <Navbar />
             <AdminEarlyAccess />
+            <FloatingActionHub />
+          </>
+        )} />
+        <Route path="/admin/free-codes" component={() => (
+          <>
+            <Navbar />
+            <AdminFreeCodes />
             <FloatingActionHub />
           </>
         )} />

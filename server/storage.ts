@@ -34,6 +34,8 @@ import {
   type InsertChatParticipant,
   type LimitedEditionSet,
   type InsertLimitedEditionSet,
+  type RedemptionCode,
+  type InsertRedemptionCodeForm,
 } from "@shared/schema";
 
 // Storage interface for both in-memory and database implementations
@@ -133,6 +135,13 @@ export interface IStorage {
   updateLimitedEditionSet(setId: string, updates: Partial<LimitedEditionSet>): Promise<LimitedEditionSet>;
   incrementMintedEditions(setId: string): Promise<LimitedEditionSet>;
   getLimitedEditionTokens(setId: string): Promise<Token[]>;
+
+  // Redemption code operations  
+  getAllRedemptionCodes(): Promise<RedemptionCode[]>;
+  createRedemptionCode(code: InsertRedemptionCodeForm): Promise<RedemptionCode>;
+  updateRedemptionCode(id: string, updates: Partial<RedemptionCode>): Promise<RedemptionCode>;
+  deleteRedemptionCode(id: string): Promise<void>;
+  validateAndUseRedemptionCode(code: string): Promise<RedemptionCode | null>;
 }
 
 // In-memory storage implementation
@@ -154,6 +163,7 @@ export class MemStorage implements IStorage {
   private chatMessages: Map<string, ChatMessage> = new Map();
   private chatParticipants: Map<string, ChatParticipant> = new Map();
   private limitedEditionSets: Map<string, LimitedEditionSet> = new Map();
+  private redemptionCodes: Map<string, RedemptionCode> = new Map();
 
   // User operations
   async getUser(id: string): Promise<User | undefined> {
@@ -736,6 +746,64 @@ export class MemStorage implements IStorage {
 
   async getLimitedEditionTokens(setId: string): Promise<Token[]> {
     return Array.from(this.tokens.values()).filter(token => token.limitedEditionSetId === setId);
+  }
+
+  // Redemption code operations
+  async getAllRedemptionCodes(): Promise<RedemptionCode[]> {
+    return Array.from(this.redemptionCodes.values()).sort((a, b) => 
+      new Date(b.createdAt!).getTime() - new Date(a.createdAt!).getTime()
+    );
+  }
+
+  async createRedemptionCode(codeData: InsertRedemptionCodeForm): Promise<RedemptionCode> {
+    const id = randomUUID();
+    const code: RedemptionCode = {
+      ...codeData,
+      id,
+      createdAt: new Date(),
+    };
+    this.redemptionCodes.set(id, code);
+    return code;
+  }
+
+  async updateRedemptionCode(id: string, updates: Partial<RedemptionCode>): Promise<RedemptionCode> {
+    const existingCode = this.redemptionCodes.get(id);
+    if (!existingCode) {
+      throw new Error("Redemption code not found");
+    }
+    const updatedCode = { ...existingCode, ...updates };
+    this.redemptionCodes.set(id, updatedCode);
+    return updatedCode;
+  }
+
+  async deleteRedemptionCode(id: string): Promise<void> {
+    this.redemptionCodes.delete(id);
+  }
+
+  async validateAndUseRedemptionCode(code: string): Promise<RedemptionCode | null> {
+    const redemptionCode = Array.from(this.redemptionCodes.values())
+      .find(rc => rc.code === code.toUpperCase());
+    
+    if (!redemptionCode) return null;
+    
+    // Check if code is active
+    if (!redemptionCode.isActive) return null;
+    
+    // Check if expired
+    if (redemptionCode.expiresAt && new Date(redemptionCode.expiresAt) < new Date()) {
+      return null;
+    }
+    
+    // Check if uses exhausted (unlimited uses = -1)
+    if (redemptionCode.maxUses !== -1 && redemptionCode.currentUses >= redemptionCode.maxUses) {
+      return null;
+    }
+    
+    // Increment usage
+    redemptionCode.currentUses += 1;
+    this.redemptionCodes.set(redemptionCode.id, redemptionCode);
+    
+    return redemptionCode;
   }
 }
 

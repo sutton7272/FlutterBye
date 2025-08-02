@@ -36,7 +36,8 @@ import {
   Activity,
   UserCheck,
   Coins,
-  Globe
+  Globe,
+  Ticket
 } from "lucide-react";
 
 interface AdminSettings {
@@ -184,8 +185,7 @@ interface AdminLog {
 
 export default function AdminDashboard() {
   const [selectedUserId, setSelectedUserId] = useState("");
-  const [newCodeType, setNewCodeType] = useState("free_flutterbye");
-  const [codeCount, setCodeCount] = useState(10);
+
   const [showSensitiveData, setShowSensitiveData] = useState(false);
   const [settings, setSettings] = useState<AdminSettings>({
     baseMintingFee: 0.01,
@@ -363,7 +363,7 @@ export default function AdminDashboard() {
               Users
             </TabsTrigger>
             <TabsTrigger value="codes" className="flex items-center gap-2">
-              <Coins className="w-4 h-4" />
+              <Ticket className="w-4 h-4" />
               Codes
             </TabsTrigger>
             <TabsTrigger value="data" className="flex items-center gap-2">
@@ -953,77 +953,40 @@ export default function AdminDashboard() {
             <Card className="glassmorphism">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  <Coins className="w-5 h-5" />
-                  Redemption Code Management
+                  <Ticket className="w-5 h-5" />
+                  Free Message Codes Management
                 </CardTitle>
                 <CardDescription>
-                  Generate and manage Free Flutterbye redemption codes
+                  Access the dedicated admin panel for managing redemption codes
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="codeType">Code Type</Label>
-                    <Select value={newCodeType} onValueChange={setNewCodeType}>
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="free_flutterbye">Free Flutterbye</SelectItem>
-                        <SelectItem value="premium_bonus">Premium Bonus</SelectItem>
-                        <SelectItem value="marketing_campaign">Marketing Campaign</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="codeCount">Number of Codes</Label>
-                    <Input
-                      id="codeCount"
-                      type="number"
-                      min="1"
-                      max="1000"
-                      value={codeCount}
-                      onChange={(e) => setCodeCount(parseInt(e.target.value))}
-                    />
-                  </div>
-
-                  <div className="flex items-end">
-                    <Button
-                      onClick={() => generateCodesMutation.mutate({ type: newCodeType, count: codeCount })}
-                      disabled={generateCodesMutation.isPending}
-                      className="w-full"
-                    >
-                      {generateCodesMutation.isPending ? (
-                        <>
-                          <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
-                          Generating...
-                        </>
-                      ) : (
-                        <>
-                          <Plus className="w-4 h-4 mr-2" />
-                          Generate Codes
-                        </>
-                      )}
-                    </Button>
-                  </div>
+                <div className="text-center p-8">
+                  <Ticket className="w-16 h-16 mx-auto mb-4 text-green-500" />
+                  <h3 className="text-xl font-semibold mb-2">Redemption Code Management</h3>
+                  <p className="text-muted-foreground mb-6">
+                    Generate, track, and manage redemption codes that allow users to mint free Flutterbye messages.
+                  </p>
+                  <Button asChild size="lg" className="w-full max-w-md">
+                    <a href="/admin/free-codes">
+                      <Ticket className="w-5 h-5 mr-2" />
+                      Open Code Management Panel
+                    </a>
+                  </Button>
                 </div>
-
-                <div className="p-4 bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-800 rounded-lg">
-                  <h4 className="font-semibold mb-2">Generated Codes Usage</h4>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
-                    <div>
-                      <span className="text-muted-foreground">Total Generated:</span>
-                      <p className="font-semibold">1,247 codes</p>
-                    </div>
-                    <div>
-                      <span className="text-muted-foreground">Redeemed:</span>
-                      <p className="font-semibold">823 codes (66%)</p>
-                    </div>
-                    <div>
-                      <span className="text-muted-foreground">Remaining:</span>
-                      <p className="font-semibold">424 codes</p>
-                    </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-6 border-t border-slate-200 dark:border-slate-700">
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-green-400">Active</div>
+                    <div className="text-sm text-muted-foreground">Code Status</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-blue-400">Unlimited</div>
+                    <div className="text-sm text-muted-foreground">Usage Options</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-purple-400">Flexible</div>
+                    <div className="text-sm text-muted-foreground">Expiry Settings</div>
                   </div>
                 </div>
               </CardContent>

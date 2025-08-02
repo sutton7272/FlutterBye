@@ -15,7 +15,7 @@ import { apiRequest } from "@/lib/queryClient";
 import ImageUpload from "@/components/image-upload";
 import { LoadingSpinner } from "@/components/loading-spinner";
 import { validateTokenQuantity, validateWholeNumber } from "@/lib/validators";
-import { Coins, Upload, Calculator, DollarSign, Lock, Globe, Gift, AlertCircle, Wand2, Star, Sparkles, Users, Target, ImageIcon, FileImage, QrCode, Plus, X } from "lucide-react";
+import { Coins, Upload, Calculator, DollarSign, Lock, Globe, Gift, AlertCircle, Wand2, Star, Sparkles, Users, Target, ImageIcon, FileImage, QrCode, Plus, X, Ticket } from "lucide-react";
 import AITextOptimizer from "@/components/ai-text-optimizer";
 import { EmotionAnalyzer } from "@/components/EmotionAnalyzer";
 import { ViralMechanics } from "@/components/ViralMechanics";
@@ -48,7 +48,10 @@ export default function Mint() {
     name: string;
   }>>([]);
   const [expirationDate, setExpirationDate] = useState("");
-  const [isFreeFlutterbye, setIsFreeFlutterbye] = useState(false);
+  const [redemptionCode, setRedemptionCode] = useState("");
+  const [isValidatingCode, setIsValidatingCode] = useState(false);
+  const [validatedCode, setValidatedCode] = useState<any>(null);
+  const [isFreeMode, setIsFreeMode] = useState(false);
   
   // Confetti celebration state
   const [showSuccessOverlay, setShowSuccessOverlay] = useState(false);
@@ -85,7 +88,9 @@ export default function Mint() {
       setIsPublic(false);
       setMemo("");
       setExpirationDate("");
-      setIsFreeFlutterbye(false);
+      setRedemptionCode("");
+      setValidatedCode(null);
+      setIsFreeMode(false);
       setMessageMedia([]);
     },
     onError: (error) => {
@@ -96,6 +101,38 @@ export default function Mint() {
       });
     },
   });
+
+  // Validate redemption code
+  const validateRedemptionCode = useMutation({
+    mutationFn: async (code: string) => {
+      const response = await apiRequest("POST", "/api/validate-redemption-code", { code });
+      return response.json();
+    },
+    onSuccess: (data) => {
+      setValidatedCode(data);
+      setIsFreeMode(true);
+      toast({
+        title: "Code Validated",
+        description: "Your redemption code is valid! You can now mint for free.",
+      });
+    },
+    onError: (error) => {
+      setValidatedCode(null);
+      setIsFreeMode(false);
+      toast({
+        title: "Invalid Code",
+        description: error.message || "This redemption code is invalid or expired.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const handleRedemptionCodeValidation = () => {
+    if (!redemptionCode.trim()) return;
+    setIsValidatingCode(true);
+    validateRedemptionCode.mutate(redemptionCode.trim());
+    setIsValidatingCode(false);
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -115,7 +152,7 @@ export default function Mint() {
       // Basic wallet validation would go here
     }
 
-    const tokenData: InsertToken & { imageFile?: string } = {
+    const tokenData: InsertToken & { imageFile?: string; redemptionCode?: string; isFreeMode?: boolean } = {
       message,
       symbol: "FlBY-MSG", // Always FlBY-MSG
       creatorId: "user-1", // Mock user ID
@@ -128,14 +165,16 @@ export default function Mint() {
       currency: currency,
       isPublic: isPublic,
       expiresAt: attachValue && expirationDate ? new Date(expirationDate) : undefined,
-      metadata: { 
-        memo: memo ? [memo] : undefined, 
-        isFreeFlutterbye: [isFreeFlutterbye],
-        messageMedia: messageMedia.length > 0 ? [JSON.stringify(messageMedia)] : undefined
+      metadata: {
+        ...(memo && { memo: [memo] }),
+        ...(redemptionCode && validatedCode && { redemptionCode: [redemptionCode] }),
+        ...(messageMedia.length > 0 && { messageMedia: [JSON.stringify(messageMedia)] })
       },
       valuePerToken: attachValue && attachedValue && mintAmount ? 
         (parseFloat(attachedValue) / parseInt(mintAmount)).toString() : "0",
       imageFile: tokenImage || undefined,
+      redemptionCode: validatedCode ? redemptionCode : undefined,
+      isFreeMode: isFreeMode,
     };
 
     mintToken.mutate(tokenData);
@@ -202,6 +241,7 @@ export default function Mint() {
   };
 
   const calculateTotalCost = () => {
+    if (isFreeMode) return 0;
     const baseFee = 0.01;
     const imageFee = tokenImage ? 0.005 : 0;
     const totalValue = attachValue ? parseFloat(attachedValue) || 0 : 0;
@@ -413,6 +453,52 @@ export default function Mint() {
 
                 {/* Phase 2: Value Attachment Section */}
                 <Separator />
+
+                {/* Redemption Code Section */}
+                <div className="space-y-4">
+                  <h4 className="text-lg font-semibold flex items-center">
+                    <Ticket className="w-5 h-5 mr-2 text-green-500" />
+                    Free Minting Code (Optional)
+                  </h4>
+                  <p className="text-sm text-muted-foreground">
+                    Have a redemption code? Enter it below to mint your message for free.
+                  </p>
+                  
+                  <div className="flex gap-2">
+                    <Input
+                      placeholder="Enter redemption code (e.g., FLBY-FREE-2024)"
+                      value={redemptionCode}
+                      onChange={(e) => setRedemptionCode(e.target.value.toUpperCase())}
+                      disabled={isValidatingCode || isFreeMode}
+                    />
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={handleRedemptionCodeValidation}
+                      disabled={!redemptionCode.trim() || isValidatingCode || isFreeMode}
+                    >
+                      {isValidatingCode ? <Loader2 className="w-4 h-4 animate-spin" /> : "Validate"}
+                    </Button>
+                  </div>
+                  
+                  {validatedCode && isFreeMode && (
+                    <div className="p-4 bg-green-50 dark:bg-green-950/20 border border-green-200 dark:border-green-800 rounded-lg">
+                      <div className="flex items-center">
+                        <Ticket className="w-5 h-5 mr-2 text-green-600" />
+                        <div>
+                          <p className="font-semibold text-green-700 dark:text-green-300">
+                            Code Validated Successfully!
+                          </p>
+                          <p className="text-sm text-green-600 dark:text-green-400">
+                            You can now mint your message completely free. No fees will be charged.
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+                
+                <Separator />
                 
                 <div className="space-y-4">
                   <h4 className="text-lg font-semibold flex items-center">
@@ -494,31 +580,35 @@ export default function Mint() {
                   )}
                 </div>
 
-                {/* Free Flutterbye Section */}
+                {/* Redemption Code Section */}
                 <Separator />
                 
                 <div className="space-y-4">
                   <h4 className="text-lg font-semibold flex items-center">
                     <Gift className="w-5 h-5 mr-2 text-purple-500" />
-                    Special Mint Options
+                    Free Message Redemption
                   </h4>
                   
-                  <div className="flex items-center space-x-2">
-                    <Switch
-                      id="free-flutterbye"
-                      checked={isFreeFlutterbye}
-                      onCheckedChange={setIsFreeFlutterbye}
+                  <div className="p-4 border border-green-200 dark:border-green-800 rounded-lg bg-green-50 dark:bg-green-950/20">
+                    <Label htmlFor="redemptionCode" className="text-green-700 dark:text-green-300">
+                      Redemption Code (Optional)
+                    </Label>
+                    <p className="text-sm text-green-600 dark:text-green-400 mt-1 mb-3">
+                      Enter a valid redemption code to mint this message for free
+                    </p>
+                    <Input
+                      id="redemptionCode"
+                      value={redemptionCode}
+                      onChange={(e) => setRedemptionCode(e.target.value.toUpperCase())}
+                      placeholder="Enter redemption code (e.g., FLBY-FREE-2024-001)"
+                      className="bg-white/90 dark:bg-slate-800/90"
                     />
-                    <Label htmlFor="free-flutterbye">Create as Free Flutterbye mint</Label>
-                  </div>
-                  
-                  {isFreeFlutterbye && (
-                    <div className="ml-6 p-3 bg-purple-50 dark:bg-purple-950/20 border border-purple-200 dark:border-purple-800 rounded-lg">
-                      <p className="text-sm text-purple-700 dark:text-purple-300">
-                        This token will be created as a special Free Flutterbye mint, eligible for redemption codes and special distribution.
+                    {redemptionCode && (
+                      <p className="text-xs text-green-600 dark:text-green-400 mt-2">
+                        Code entered: {redemptionCode}
                       </p>
-                    </div>
-                  )}
+                    )}
+                  </div>
 
                   <div className="space-y-4">
                     <div>
@@ -636,15 +726,36 @@ export default function Mint() {
                       <h4 className="font-semibold">Fee Structure</h4>
                     </div>
                     <div className="text-sm space-y-1">
-                      <div className="flex justify-between">
-                        <span className="text-muted-foreground">Base Minting Fee:</span>
-                        <span>0.01 SOL</span>
-                      </div>
-                      {tokenImage && (
-                        <div className="flex justify-between">
-                          <span className="text-muted-foreground">Image Upload Fee:</span>
-                          <span>0.005 SOL</span>
-                        </div>
+                      {isFreeMode ? (
+                        <>
+                          <div className="flex justify-between text-green-400">
+                            <span>Redemption Code Applied:</span>
+                            <span>FREE MINTING</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-muted-foreground line-through">Base Minting Fee:</span>
+                            <span className="line-through text-muted-foreground">0.01 SOL</span>
+                          </div>
+                          {tokenImage && (
+                            <div className="flex justify-between">
+                              <span className="text-muted-foreground line-through">Image Upload Fee:</span>
+                              <span className="line-through text-muted-foreground">0.005 SOL</span>
+                            </div>
+                          )}
+                        </>
+                      ) : (
+                        <>
+                          <div className="flex justify-between">
+                            <span className="text-muted-foreground">Base Minting Fee:</span>
+                            <span>0.01 SOL</span>
+                          </div>
+                          {tokenImage && (
+                            <div className="flex justify-between">
+                              <span className="text-muted-foreground">Image Upload Fee:</span>
+                              <span>0.005 SOL</span>
+                            </div>
+                          )}
+                        </>
                       )}
                       {attachValue && (
                         <div className="flex justify-between">
@@ -654,7 +765,9 @@ export default function Mint() {
                       )}
                       <div className="flex justify-between font-semibold border-t border-slate-600 pt-2">
                         <span>Total Cost:</span>
-                        <span className="text-primary">{calculateTotalCost().toFixed(3)} SOL</span>
+                        <span className={`${isFreeMode ? 'text-green-400' : 'text-primary'}`}>
+                          {isFreeMode ? 'FREE' : `${calculateTotalCost().toFixed(3)} SOL`}
+                        </span>
                       </div>
                     </div>
                   </CardContent>
