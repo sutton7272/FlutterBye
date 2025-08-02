@@ -350,11 +350,10 @@ export default function Mint() {
 
               <TabsContent value="create" className="space-y-6">
                 {/* Price Comparison Widget */}
-                <div className="mb-8">
+                <div className="mb-6">
                   <TokenPriceComparison 
                     onQuantitySelect={(quantity) => {
                       setMintAmount(quantity.toString());
-                      // Scroll to form
                       document.getElementById('mint-form')?.scrollIntoView({ 
                         behavior: 'smooth',
                         block: 'start'
@@ -363,630 +362,432 @@ export default function Mint() {
                   />
                 </div>
                 
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Left Column - Basic Token Creation */}
-          <div className="space-y-6">
-            <Card id="mint-form" className="premium-card electric-frame">
-              <CardContent className="p-8">
-                <h3 className="text-2xl font-bold mb-6 text-gradient">Create Your Message Token</h3>
-                <div className="mb-6 p-4 bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-800 rounded-lg">
-                  <h4 className="font-semibold text-blue-700 dark:text-blue-300 mb-2">Message Structure</h4>
-                  <div className="text-sm text-blue-600 dark:text-blue-400 space-y-1">
-                    <p><strong>Token Name:</strong> 27 characters max - becomes the official token identifier</p>
-                    <p><strong>Token Image:</strong> Main visual for the token (separate from message media)</p>
-                    <p><strong>Extended Message:</strong> Up to 500 characters - for longer descriptions and context</p>
-                    <p><strong>Message Media:</strong> Add images, GIFs, or QR codes within your extended message</p>
-                  </div>
-                </div>
-              
-              <form onSubmit={handleSubmit} className="space-y-6">
-                <div className="electric-frame p-4 bg-gradient-to-r from-electric-blue/5 to-electric-green/5">
-                  <div className="flex justify-between items-center mb-2">
-                    <Label htmlFor="message" className="text-electric-blue font-semibold flex items-center gap-2">
-                      <Sparkles className="w-4 h-4" />
-                      Message (Max 27 characters)
-                    </Label>
-                    <Badge variant={remainingChars < 0 ? "destructive" : "secondary"} className="border-electric-blue/50">
-                      {remainingChars}/27
-                    </Badge>
-                  </div>
-                  <div className="relative">
-                    <Input
-                      id="message"
-                      value={message}
-                      onChange={(e) => setMessage(e.target.value)}
-                      maxLength={27}
-                      required
-                      placeholder="StakeNowForYield"
-                      className={`${remainingChars < 0 ? "border-destructive" : "border-electric-blue/50"} bg-black/40 text-white placeholder:text-gray-400 focus:border-electric-green focus:ring-electric-green/20`}
-                    />
-                    <div className="absolute inset-0 rounded-md border border-electric-blue/30 pointer-events-none"></div>
-                  </div>
-                  <p className="text-xs text-electric-blue/80 mt-2 flex items-center gap-1">
-                    <Zap className="w-3 h-3" />
-                    Your message will become the token name with FLBY-MSG symbol
-                  </p>
-                </div>
-                
-                {/* AI Text Optimizer */}
-                <div className="bg-slate-700/20 rounded-lg p-1">
-                  <AITextOptimizer 
-                    onOptimizedTextSelect={(optimizedText) => setMessage(optimizedText)}
-                    className="border-0 bg-transparent"
-                  />
-                </div>
-                
-                <div className="space-y-4">
-                  <div>
-                    <Label htmlFor="mintAmount">Mint Amount</Label>
-                    <Input
-                      id="mintAmount"
-                      type="number"
-                      min="1"
-                      step="1"
-                      value={mintAmount}
-                      onChange={(e) => {
-                        const value = e.target.value;
-                        setMintAmount(value);
-                        
-                        if (value) {
-                          const validation = validateTokenQuantity(value);
-                          setMintAmountError(validation.isValid ? "" : validation.error || "");
-                        } else {
-                          setMintAmountError("");
-                        }
-                      }}
-                      required
-                      placeholder="1000"
-                    />
-                    <p className="text-xs text-muted-foreground mt-1">
-                      Only whole numbers allowed - no fractional tokens
-                    </p>
-
-                    {/* Dynamic Pricing Display */}
-                    {priceCalculation && (
-                      <div className="mt-3 p-4 bg-gradient-to-r from-blue-900/30 to-green-900/30 border border-electric-blue/30 rounded-lg">
-                        <div className="flex items-center justify-between">
-                          <div className="space-y-1">
-                            <p className="text-electric-blue font-medium text-sm">Price per Token</p>
-                            <p className="text-xl font-bold text-white">
-                              ${priceCalculation.pricePerToken.toFixed(2)}
-                            </p>
-                            {priceCalculation.tier?.discountPercentage !== "0" && (
-                              <Badge className="bg-green-600/20 text-green-400 border-green-400 text-xs">
-                                {priceCalculation.tier.discountPercentage}% OFF
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  {/* LEFT COLUMN - Core Token Creation */}
+                  <div className="space-y-4">
+                    <Card id="mint-form" className="premium-card electric-frame">
+                      <CardContent className="p-6">
+                        <form onSubmit={handleSubmit} className="space-y-4">
+                          {/* Message Input */}
+                          <div className="electric-frame p-4 bg-slate-800/30">
+                            <div className="flex justify-between items-center mb-2">
+                              <Label htmlFor="message" className="text-electric-blue font-semibold flex items-center gap-2">
+                                <Sparkles className="w-4 h-4" />
+                                Message (Max 27 characters)
+                              </Label>
+                              <Badge variant={remainingChars < 0 ? "destructive" : "secondary"} className="border-electric-blue/50">
+                                {remainingChars}/27
                               </Badge>
-                            )}
-                          </div>
-                          <div className="text-right space-y-1">
-                            <p className="text-circuit-teal font-medium text-sm">Total Cost</p>
-                            <p className="text-xl font-bold text-electric-green">
-                              ${priceCalculation.totalPrice.toFixed(2)}
-                            </p>
-                            <p className="text-xs text-gray-400">
-                              {parseInt(mintAmount)} × ${priceCalculation.pricePerToken.toFixed(2)}
-                            </p>
-                          </div>
-                        </div>
-                        {priceCalculation.tier && (
-                          <div className="mt-2 pt-2 border-t border-electric-blue/20">
-                            <p className="text-xs text-gray-400">
-                              <Sparkles className="w-3 h-3 inline mr-1" />
-                              Using <span className="text-electric-blue font-medium">{priceCalculation.tier.tierName}</span> pricing tier
+                            </div>
+                            <div className="relative">
+                              <Input
+                                id="message"
+                                value={message}
+                                onChange={(e) => setMessage(e.target.value)}
+                                maxLength={27}
+                                required
+                                placeholder="StakeNowForYield"
+                                className={`${remainingChars < 0 ? "border-destructive" : "border-electric-blue/50"} bg-black/40 text-white placeholder:text-gray-400 focus:border-electric-green focus:ring-electric-green/20`}
+                              />
+                            </div>
+                            <p className="text-xs text-electric-blue/80 mt-2 flex items-center gap-1">
+                              <Zap className="w-3 h-3" />
+                              Your message becomes the token name with FLBY-MSG symbol
                             </p>
                           </div>
-                        )}
-                      </div>
-                    )}
-                  </div>
-                </div>
-                
-                <div>
-                  <Label>Target Distribution</Label>
-                  <RadioGroup value={targetType} onValueChange={setTargetType} className="mt-2">
-                    <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="manual" id="manual" />
-                      <Label htmlFor="manual">Manual Entry</Label>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="csv" id="csv" />
-                      <Label htmlFor="csv">CSV Upload</Label>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="holders" id="holders" />
-                      <Label htmlFor="holders">Top Token Holders</Label>
-                    </div>
-                  </RadioGroup>
-                  
-                  {targetType === "manual" && (
-                    <div className="mt-4">
-                      <Textarea
-                        value={manualWallets}
-                        onChange={(e) => setManualWallets(e.target.value)}
-                        placeholder="Enter wallet addresses, one per line"
-                        rows={4}
-                      />
-                    </div>
-                  )}
-                  
-                  {targetType === "csv" && (
-                    <div className="mt-4">
-                      <div className="border-2 border-dashed border-border rounded-lg p-6 text-center">
-                        <Upload className="w-8 h-8 mx-auto text-muted-foreground mb-2" />
-                        <p className="text-sm text-muted-foreground mb-2">
-                          Upload CSV file with wallet addresses
-                        </p>
-                        <input
-                          type="file"
-                          accept=".csv"
-                          onChange={handleCsvUpload}
-                          className="hidden"
-                          id="csv-upload"
-                        />
-                        <Label htmlFor="csv-upload" className="cursor-pointer">
-                          <Button type="button" variant="outline" size="sm">
-                            Choose File
-                          </Button>
-                        </Label>
-                        {csvFile && (
-                          <p className="text-xs text-primary mt-2">
-                            Selected: {csvFile.name}
-                          </p>
-                        )}
-                      </div>
-                      <p className="text-xs text-muted-foreground mt-1">
-                        CSV should contain wallet addresses in first column
-                      </p>
-                    </div>
-                  )}
-                  
-                  {targetType === "holders" && (
-                    <TokenHolderAnalysis 
-                      onHoldersSelected={(holders) => {
-                        setManualWallets(holders.map(h => h.address).join('\n'));
-                      }}
-                    />
-                  )}
-                </div>
-                
-                {/* Token Image Upload Section */}
-                <div className="space-y-4">
-                  <h4 className="text-lg font-semibold flex items-center">
-                    <Upload className="w-5 h-5 mr-2 text-green-500" />
-                    Token Image (Optional)
-                  </h4>
-                  <p className="text-sm text-muted-foreground">
-                    Add a custom image to make your token more engaging and memorable
-                  </p>
-                  <ImageUpload
-                    onImageSelect={setTokenImage}
-                    onImageRemove={() => setTokenImage("")}
-                    selectedImage={tokenImage}
-                    disabled={mintToken.isPending}
-                  />
-                  {tokenImage && (
-                    <div className="p-3 bg-green-50 dark:bg-green-950/20 border border-green-200 dark:border-green-800 rounded-lg">
-                      <p className="text-sm text-green-700 dark:text-green-300 flex items-center">
-                        <Sparkles className="w-4 h-4 mr-2" />
-                        Image attached! Your token will stand out with this custom visual.
-                      </p>
-                    </div>
-                  )}
-                </div>
-
-                {/* Phase 2: Value Attachment Section */}
-                <Separator />
-
-                {/* Redemption Code Section */}
-                <div className="space-y-4">
-                  <h4 className="text-lg font-semibold flex items-center">
-                    <Ticket className="w-5 h-5 mr-2 text-green-500" />
-                    Free Minting Code (Optional)
-                  </h4>
-                  <p className="text-sm text-muted-foreground">
-                    Have a redemption code? Enter it below to mint your message for free.
-                  </p>
-                  
-                  <div className="flex gap-2">
-                    <Input
-                      placeholder="Enter redemption code (e.g., FLBY-EARLY-001)"
-                      value={redemptionCode}
-                      onChange={(e) => setRedemptionCode(e.target.value.toUpperCase())}
-                      disabled={isValidatingCode || isFreeMode}
-                    />
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={handleRedemptionCodeValidation}
-                      disabled={!redemptionCode.trim() || isValidatingCode || isFreeMode}
-                    >
-                      {isValidatingCode ? <Loader2 className="w-4 h-4 animate-spin" /> : "Validate"}
-                    </Button>
-                  </div>
-                  
-                  {validatedCode && isFreeMode && (
-                    <div className="p-4 bg-green-50 dark:bg-green-950/20 border border-green-200 dark:border-green-800 rounded-lg">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center">
-                          <Ticket className="w-5 h-5 mr-2 text-green-600" />
-                          <div>
-                            <p className="font-semibold text-green-700 dark:text-green-300">
-                              Code "{validatedCode.code}" Validated!
-                            </p>
-                            <p className="text-sm text-green-600 dark:text-green-400">
-                              Type: {validatedCode.type} • {validatedCode.remainingUses !== null ? `${validatedCode.remainingUses} uses left` : 'Unlimited uses'}
+                          
+                          {/* AI Text Optimizer - Simple Version */}
+                          <div className="bg-slate-700/20 rounded-lg p-3 text-center">
+                            <p className="text-sm text-muted-foreground">
+                              <Wand2 className="w-4 h-4 inline mr-2" />
+                              AI Text Optimizer available - Phase 1 uses rule-based optimization
                             </p>
                           </div>
-                        </div>
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => {
-                            setRedemptionCode("");
-                            setValidatedCode(null);
-                            setIsFreeMode(false);
-                          }}
-                          className="text-green-600 hover:text-green-700"
-                        >
-                          <X className="w-4 h-4" />
-                        </Button>
-                      </div>
-                    </div>
-                  )}
-                </div>
-                
-                <Separator />
-                
-                <div className="space-y-4">
-                  <h4 className="text-lg font-semibold flex items-center">
-                    <DollarSign className="w-5 h-5 mr-2 text-blue-500" />
-                    Value & Distribution Settings
-                  </h4>
-                  
-                  <div className="flex items-center space-x-2">
-                    <Switch
-                      id="attach-value"
-                      checked={attachValue}
-                      onCheckedChange={setAttachValue}
-                    />
-                    <Label htmlFor="attach-value">Attach value to this token</Label>
-                  </div>
+                          
+                          {/* Amount and Image */}
+                          <div className="grid grid-cols-2 gap-3">
+                            <div>
+                              <Label htmlFor="mintAmount">Amount</Label>
+                              <Input
+                                id="mintAmount"
+                                type="number"
+                                min="1"
+                                step="1"
+                                value={mintAmount}
+                                onChange={(e) => {
+                                  const value = e.target.value;
+                                  setMintAmount(value);
+                                  
+                                  if (value) {
+                                    const validation = validateTokenQuantity(value);
+                                    setMintAmountError(validation.isValid ? "" : validation.error || "");
+                                  } else {
+                                    setMintAmountError("");
+                                  }
+                                }}
+                                required
+                                placeholder="100"
+                              />
+                            </div>
+                            <div>
+                              <Label htmlFor="tokenImage">Image</Label>
+                              <Input
+                                id="tokenImage"
+                                type="file"
+                                accept="image/jpeg,image/png,image/webp"
+                                onChange={handleTokenImageUpload}
+                              />
+                            </div>
+                          </div>
 
-                  {attachValue && (
-                    <div className="space-y-4 ml-6 border-l-2 border-blue-200 pl-4">
-                      <div className="grid grid-cols-2 gap-4">
-                        <div className="space-y-2">
-                          <Label htmlFor="attached-value">Total Value Pool</Label>
-                          <Input
-                            id="attached-value"
-                            type="number"
-                            step="0.001"
-                            min="0"
-                            value={attachedValue}
-                            onChange={(e) => setAttachedValue(e.target.value)}
-                            placeholder="10.0"
-                          />
-                          <p className="text-xs text-muted-foreground">
-                            Total value to distribute among all tokens
-                          </p>
-                        </div>
-                        <div className="space-y-2">
-                          <Label htmlFor="currency">Currency</Label>
-                          <select
-                            id="currency"
-                            value={currency}
-                            onChange={(e) => setCurrency(e.target.value)}
-                            className="w-full px-3 py-2 border rounded-md dark:bg-slate-800 dark:border-slate-600"
-                          >
-                            <option value="SOL">SOL</option>
-                            <option value="USDC">USDC</option>
-                          </select>
-                        </div>
-                      </div>
-
-                      <div className="space-y-2">
-                        <Label>Value Per Token: {attachedValue && mintAmount ? (parseFloat(attachedValue) / parseInt(mintAmount)).toFixed(6) : '0'} {currency}</Label>
-                        <p className="text-xs text-muted-foreground">
-                          Automatically calculated based on total pool and mint amount
-                        </p>
-                      </div>
-
-                      <div className="space-y-2">
-                        <Label htmlFor="expiration-date">Expiration Date (Optional)</Label>
-                        <Input
-                          id="expiration-date"
-                          type="datetime-local"
-                          value={expirationDate}
-                          onChange={(e) => setExpirationDate(e.target.value)}
-                          min={new Date().toISOString().slice(0, 16)}
-                        />
-                        <p className="text-xs text-muted-foreground">
-                          If set, attached value can only be claimed before this date
-                        </p>
-                      </div>
-
-                      <div className="flex items-center space-x-2">
-                        <Switch
-                          id="is-public"
-                          checked={isPublic}
-                          onCheckedChange={setIsPublic}
-                        />
-                        <Label htmlFor="is-public">Make token publicly visible</Label>
-                      </div>
-                    </div>
-                  )}
-                </div>
-
-                <div className="space-y-4">
-                  <div>
-                    <Label htmlFor="memo">Extended Message (Optional)</Label>
-                    <Textarea
-                      id="memo"
-                      value={memo}
-                      onChange={(e) => setMemo(e.target.value)}
-                      placeholder="Add a longer message, detailed description, or special instructions for this token. This text will be stored with your token and can be much longer than the 27-character token name..."
-                      rows={4}
-                      maxLength={500}
-                    />
-                    <p className="text-xs text-muted-foreground">
-                      Use this for longer messages, detailed descriptions, or context that doesn't fit in the 27-character token name. {memo.length}/500 characters
-                    </p>
-                  </div>
-
-                  {/* Message Media Upload Section */}
-                  <div className="space-y-3">
-                    <Label>Add Media to Message</Label>
-                    <p className="text-sm text-muted-foreground">
-                      Attach images, GIFs, or QR codes to enhance your extended message
-                    </p>
-                    
-                    <div className="flex gap-2">
-                      <div className="relative">
-                        <input
-                          type="file"
-                          accept="image/jpeg,image/png,image/webp"
-                          onChange={(e) => handleMessageMediaUpload(e, 'image')}
-                          className="hidden"
-                          id="message-image-upload"
-                        />
-                        <Label htmlFor="message-image-upload" className="cursor-pointer">
-                          <Button type="button" variant="outline" size="sm">
-                            <ImageIcon className="w-4 h-4 mr-2" />
-                            Add Image
-                          </Button>
-                        </Label>
-                      </div>
-                      
-                      <div className="relative">
-                        <input
-                          type="file"
-                          accept="image/gif"
-                          onChange={(e) => handleMessageMediaUpload(e, 'gif')}
-                          className="hidden"
-                          id="message-gif-upload"
-                        />
-                        <Label htmlFor="message-gif-upload" className="cursor-pointer">
-                          <Button type="button" variant="outline" size="sm">
-                            <FileImage className="w-4 h-4 mr-2" />
-                            Add GIF
-                          </Button>
-                        </Label>
-                      </div>
-                      
-                      <div className="relative">
-                        <input
-                          type="file"
-                          accept="image/jpeg,image/png,image/webp"
-                          onChange={(e) => handleMessageMediaUpload(e, 'qr')}
-                          className="hidden"
-                          id="message-qr-upload"
-                        />
-                        <Label htmlFor="message-qr-upload" className="cursor-pointer">
-                          <Button type="button" variant="outline" size="sm">
-                            <QrCode className="w-4 h-4 mr-2" />
-                            Add QR Code
-                          </Button>
-                        </Label>
-                      </div>
-                    </div>
-
-                    {/* Display uploaded media */}
-                    {messageMedia.length > 0 && (
-                      <div className="space-y-2">
-                        <Label>Attached Media ({messageMedia.length})</Label>
-                        <div className="grid grid-cols-2 gap-3">
-                          {messageMedia.map((media) => (
-                            <div key={media.id} className="relative border border-slate-200 dark:border-slate-700 rounded-lg p-2">
-                              <div className="flex items-center gap-2">
-                                <div className="w-12 h-12 bg-slate-100 dark:bg-slate-800 rounded flex items-center justify-center overflow-hidden">
-                                  {media.type === 'image' && <ImageIcon className="w-6 h-6 text-blue-500" />}
-                                  {media.type === 'gif' && <FileImage className="w-6 h-6 text-green-500" />}
-                                  {media.type === 'qr' && <QrCode className="w-6 h-6 text-purple-500" />}
-                                </div>
-                                <div className="flex-1 min-w-0">
-                                  <p className="text-sm font-medium truncate">{media.name}</p>
-                                  <p className="text-xs text-muted-foreground capitalize">{media.type}</p>
-                                </div>
-                                <Button
-                                  type="button"
-                                  variant="ghost"
-                                  size="sm"
-                                  onClick={() => removeMessageMedia(media.id)}
-                                  className="w-6 h-6 p-0 text-red-500 hover:text-red-700"
-                                >
-                                  <X className="w-4 h-4" />
-                                </Button>
+                          {tokenImage && (
+                            <div className="p-2 border border-green-200 dark:border-green-800 rounded-lg bg-green-50 dark:bg-green-950/20">
+                              <div className="flex items-center gap-2 text-green-700 dark:text-green-300">
+                                <CheckCircle className="w-4 h-4" />
+                                <span className="text-sm">Image uploaded successfully</span>
                               </div>
                             </div>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                </div>
-                
-                <Card className="bg-slate-700/50">
-                  <CardContent className="p-4">
-                    <div className="flex items-center gap-2 mb-2">
-                      <Calculator className="w-4 h-4" />
-                      <h4 className="font-semibold">Fee Structure</h4>
-                    </div>
-                    <div className="text-sm space-y-1">
-                      {isFreeMode ? (
-                        <>
-                          <div className="flex justify-between text-green-400">
-                            <span>Redemption Code Applied:</span>
-                            <span>FREE MINTING</span>
-                          </div>
-                          <div className="flex justify-between">
-                            <span className="text-muted-foreground line-through">Base Minting Fee:</span>
-                            <span className="line-through text-muted-foreground">0.01 SOL</span>
-                          </div>
-                          {tokenImage && (
-                            <div className="flex justify-between">
-                              <span className="text-muted-foreground line-through">Image Upload Fee:</span>
-                              <span className="line-through text-muted-foreground">0.005 SOL</span>
-                            </div>
                           )}
-                        </>
-                      ) : (
-                        <>
-                          <div className="flex justify-between">
-                            <span className="text-muted-foreground">Base Minting Fee:</span>
-                            <span>0.01 SOL</span>
-                          </div>
-                          {tokenImage && (
-                            <div className="flex justify-between">
-                              <span className="text-muted-foreground">Image Upload Fee:</span>
-                              <span>0.005 SOL</span>
-                            </div>
-                          )}
-                        </>
-                      )}
-                      {attachValue && (
-                        <div className="flex justify-between">
-                          <span className="text-muted-foreground">Total Value Pool:</span>
-                          <span>{(parseFloat(attachedValue) || 0).toFixed(3)} {currency}</span>
-                        </div>
-                      )}
-                      <div className="flex justify-between font-semibold border-t border-slate-600 pt-2">
-                        <span>Total Cost:</span>
-                        <span className={`${isFreeMode ? 'text-green-400' : 'text-primary'}`}>
-                          {isFreeMode ? 'FREE' : `${calculateTotalCost().toFixed(3)} SOL`}
-                        </span>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-                
-                <Button 
-                  type="submit" 
-                  disabled={mintToken.isPending || remainingChars < 0}
-                  className="w-full bg-electric-blue hover:bg-blue-600 py-4 text-lg cyber-glow"
-                >
-                  {mintToken.isPending ? "Minting..." : "Mint Tokens"}
-                </Button>
-              </form>
-            </CardContent>
-          </Card>
-          
-          {/* Preview */}
-          <Card className="glassmorphism">
-            <CardContent className="p-8">
-              <h3 className="text-2xl font-bold mb-6">Token Preview</h3>
-              
-              <div className="bg-slate-700/50 p-6 rounded-xl border-2 border-dashed border-slate-600">
-                <div className="text-center">
-                  {tokenImage ? (
-                    <div className="w-16 h-16 mx-auto mb-4 rounded-full overflow-hidden">
-                      <img 
-                        src={`data:image/png;base64,${tokenImage}`}
-                        alt="Token preview"
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                  ) : (
-                    <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-r from-primary to-blue-500 rounded-full flex items-center justify-center">
-                      <Coins className="text-2xl text-white" />
-                    </div>
-                  )}
-                  <h4 className="text-lg font-bold mb-2">
-                    {message || "Your Message Token"}
-                  </h4>
-                  <Badge variant="secondary" className="mb-4">
-                    FLBY-MSG
-                  </Badge>
-                  <div className="space-y-2 text-sm">
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">Total Supply:</span>
-                      <span>{mintAmount || "0"}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">Value per Token:</span>
-                      <span>{valuePerToken ? `${valuePerToken} SOL` : "Free"}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">Creator:</span>
-                      <span className="text-primary">Connected Wallet</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              
-              <div className="mt-6">
-                <h4 className="font-semibold mb-3">Recent Mints</h4>
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between bg-slate-700/50 p-3 rounded-lg">
-                    <div>
-                      <p className="font-semibold">HodlForDiamondHands</p>
-                      <p className="text-xs text-muted-foreground">FlBY-MSG • 500 tokens</p>
-                    </div>
-                    <span className="text-primary font-semibold">0.1 SOL</span>
-                  </div>
-                  <div className="flex items-center justify-between bg-slate-700/50 p-3 rounded-lg">
-                    <div>
-                      <p className="font-semibold">JoinTheHiveNow</p>
-                      <p className="text-xs text-muted-foreground">FlBY-MSG • 1000 tokens</p>
-                    </div>
-                    <span className="text-primary font-semibold">0.05 SOL</span>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
 
-          {/* Game-Changing AI Features */}
-          {message.trim() && (
-            <div className="space-y-4">
-              {/* AI Emotion Analysis (placeholder for when API key is available) */}
-              <EmotionAnalyzer 
-                message={message}
-                recipientCount={parseInt(mintAmount) || 1}
-                onValueSuggestion={(value) => setValuePerToken(value.toString())}
-                onOptimizedMessage={(optimized) => setMessage(optimized)}
-              />
-              
-              {/* Viral Mechanics Engine */}
-              <ViralMechanics 
-                message={message}
-                recipientCount={parseInt(mintAmount) || 1}
-                valuePerToken={parseFloat(valuePerToken) || 0}
-                onBoostSuggestion={(boost) => {
-                  // Apply viral boost suggestions
-                  console.log("Viral boost suggestion:", boost);
-                }}
-              />
-              
-              {/* Network Effects Engine */}
-              <NetworkEffects 
-                senderWallet="connected-wallet" // Would be actual connected wallet
-                recipientCount={parseInt(mintAmount) || 1}
-                valuePerToken={parseFloat(valuePerToken) || 0}
-                messageCategory="other" // Would be determined by AI
-              />
-            </div>
-          )}
+                          {/* Free Code */}
+                          <div className="border-t pt-3">
+                            <div className="flex items-center gap-2 mb-2">
+                              <Gift className="w-4 h-4 text-green-500" />
+                              <Label className="text-green-400 font-semibold text-sm">Free Code</Label>
+                            </div>
+                            <div className="flex gap-2">
+                              <Input
+                                value={redemptionCode}
+                                onChange={(e) => setRedemptionCode(e.target.value.toUpperCase())}
+                                placeholder="Enter free minting code"
+                                className="border-green-500/50 focus:border-green-400"
+                              />
+                              <Button
+                                type="button"
+                                onClick={validateRedemptionCode}
+                                disabled={validateCode.isPending}
+                                variant="outline"
+                                size="sm"
+                                className="border-green-500/50 text-green-400 hover:bg-green-500/10"
+                              >
+                                {validateCode.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : "Check"}
+                              </Button>
+                            </div>
+                            {codeValidation && (
+                              <div className={`mt-2 p-2 rounded-lg border text-xs ${
+                                codeValidation.valid 
+                                  ? 'border-green-500/50 bg-green-500/10 text-green-400' 
+                                  : 'border-red-500/50 bg-red-500/10 text-red-400'
+                              }`}>
+                                <div className="flex items-center gap-2">
+                                  {codeValidation.valid ? (
+                                    <CheckCircle className="w-3 h-3" />
+                                  ) : (
+                                    <AlertCircle className="w-3 h-3" />
+                                  )}
+                                  <span className="font-medium">
+                                    {codeValidation.valid ? 'Valid!' : 'Invalid'}
+                                  </span>
+                                </div>
+                                {codeValidation.message && (
+                                  <p className="mt-1 opacity-80">{codeValidation.message}</p>
+                                )}
+                              </div>
+                            )}
+                          </div>
+                          
+                          <Button 
+                            type="submit" 
+                            disabled={mintToken.isPending || remainingChars < 0}
+                            className="w-full bg-electric-blue hover:bg-blue-600 py-3 text-lg cyber-glow"
+                          >
+                            {mintToken.isPending ? "Minting..." : "Mint Tokens"}
+                          </Button>
+                        </form>
+                      </CardContent>
+                    </Card>
+                  </div>
+
+                  {/* RIGHT COLUMN - Advanced Features & Preview */}
+                  <div className="space-y-4">
+                    {/* Token Preview */}
+                    <Card className="glassmorphism">
+                      <CardContent className="p-6">
+                        <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
+                          <Eye className="w-5 h-5" />
+                          Token Preview
+                        </h3>
+                        
+                        <div className="bg-slate-700/50 p-4 rounded-xl border-2 border-dashed border-slate-600">
+                          <div className="text-center">
+                            {tokenImage ? (
+                              <div className="w-12 h-12 mx-auto mb-3 rounded-full overflow-hidden">
+                                <img 
+                                  src={`data:image/png;base64,${tokenImage}`}
+                                  alt="Token preview"
+                                  className="w-full h-full object-cover"
+                                />
+                              </div>
+                            ) : (
+                              <div className="w-12 h-12 mx-auto mb-3 bg-gradient-to-r from-primary to-blue-500 rounded-full flex items-center justify-center">
+                                <Coins className="text-lg text-white" />
+                              </div>
+                            )}
+                            <h4 className="font-bold mb-2">
+                              {message || "Your Message Token"}
+                            </h4>
+                            <Badge variant="secondary" className="mb-3 text-xs">
+                              FLBY-MSG
+                            </Badge>
+                            <div className="space-y-1 text-sm">
+                              <div className="flex justify-between">
+                                <span className="text-muted-foreground">Supply:</span>
+                                <span>{mintAmount || "0"}</span>
+                              </div>
+                              <div className="flex justify-between">
+                                <span className="text-muted-foreground">Value:</span>
+                                <span>{valuePerToken ? `${valuePerToken} SOL` : "Free"}</span>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+
+                    {/* Value & Distribution */}
+                    <Card className="premium-card electric-frame">
+                      <CardContent className="p-5">
+                        <h4 className="font-bold mb-3 flex items-center gap-2">
+                          <DollarSign className="w-4 h-4" />
+                          Value & Distribution
+                        </h4>
+                        
+                        <div className="space-y-3">
+                          <div className="flex items-center gap-2">
+                            <Switch
+                              id="attachValue"
+                              checked={attachValue}
+                              onCheckedChange={setAttachValue}
+                            />
+                            <Label htmlFor="attachValue" className="text-sm">Attach Value to Tokens</Label>
+                          </div>
+                          
+                          {attachValue && (
+                            <div className="space-y-3 pl-6 border-l-2 border-primary/20">
+                              <div>
+                                <Label htmlFor="attachedValue" className="text-sm">Value per Token (SOL)</Label>
+                                <Input
+                                  id="attachedValue"
+                                  type="number"
+                                  min="0"
+                                  step="0.001"
+                                  value={attachedValue}
+                                  onChange={(e) => setAttachedValue(e.target.value)}
+                                  placeholder="0.001"
+                                  className="mt-1"
+                                />
+                              </div>
+
+                              <div>
+                                <Label htmlFor="currency" className="text-sm">Payment Currency</Label>
+                                <Select value={currency} onValueChange={setCurrency}>
+                                  <SelectTrigger className="mt-1">
+                                    <SelectValue />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    <SelectItem value="SOL">SOL (Solana)</SelectItem>
+                                    <SelectItem value="USDC">USDC (Stablecoin)</SelectItem>
+                                    <SelectItem value="FLBY">FLBY (10% discount)</SelectItem>
+                                  </SelectContent>
+                                </Select>
+                              </div>
+
+                              <div>
+                                <Label htmlFor="expirationDate" className="text-sm">Expiration Date</Label>
+                                <Input
+                                  id="expirationDate"
+                                  type="date"
+                                  value={expirationDate}
+                                  onChange={(e) => setExpirationDate(e.target.value)}
+                                  min={new Date().toISOString().split('T')[0]}
+                                  className="mt-1"
+                                />
+                              </div>
+                            </div>
+                          )}
+
+                          <div>
+                            <Label htmlFor="walletAddresses" className="text-sm">Recipient Addresses</Label>
+                            <Textarea
+                              id="walletAddresses"
+                              value={walletAddresses}
+                              onChange={(e) => setWalletAddresses(e.target.value)}
+                              placeholder="Enter wallet addresses (one per line)"
+                              rows={3}
+                              className="mt-1"
+                            />
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+
+                    {/* Extended Message & Media */}
+                    <Card className="premium-card electric-frame">
+                      <CardContent className="p-5">
+                        <h4 className="font-bold mb-3 flex items-center gap-2">
+                          <FileText className="w-4 h-4" />
+                          Extended Message
+                        </h4>
+                        
+                        <div className="space-y-3">
+                          <div>
+                            <Textarea
+                              id="memo"
+                              value={memo}
+                              onChange={(e) => setMemo(e.target.value)}
+                              placeholder="Add detailed description or context for your token..."
+                              rows={3}
+                              maxLength={500}
+                            />
+                            <p className="text-xs text-muted-foreground mt-1">
+                              {memo.length}/500 characters
+                            </p>
+                          </div>
+
+                          <div>
+                            <Label className="text-sm">Add Media</Label>
+                            <div className="flex gap-2 mt-2">
+                              <div className="relative">
+                                <input
+                                  type="file"
+                                  accept="image/jpeg,image/png,image/webp"
+                                  onChange={(e) => handleMessageMediaUpload(e, 'image')}
+                                  className="hidden"
+                                  id="message-image-upload"
+                                />
+                                <Label htmlFor="message-image-upload" className="cursor-pointer">
+                                  <Button type="button" variant="outline" size="sm">
+                                    <ImageIcon className="w-4 h-4 mr-1" />
+                                    Image
+                                  </Button>
+                                </Label>
+                              </div>
+                              
+                              <div className="relative">
+                                <input
+                                  type="file"
+                                  accept="image/gif"
+                                  onChange={(e) => handleMessageMediaUpload(e, 'gif')}
+                                  className="hidden"
+                                  id="message-gif-upload"
+                                />
+                                <Label htmlFor="message-gif-upload" className="cursor-pointer">
+                                  <Button type="button" variant="outline" size="sm">
+                                    <FileImage className="w-4 h-4 mr-1" />
+                                    GIF
+                                  </Button>
+                                </Label>
+                              </div>
+                              
+                              <div className="relative">
+                                <input
+                                  type="file"
+                                  accept="image/jpeg,image/png,image/webp"
+                                  onChange={(e) => handleMessageMediaUpload(e, 'qr')}
+                                  className="hidden"
+                                  id="message-qr-upload"
+                                />
+                                <Label htmlFor="message-qr-upload" className="cursor-pointer">
+                                  <Button type="button" variant="outline" size="sm">
+                                    <QrCode className="w-4 h-4 mr-1" />
+                                    QR
+                                  </Button>
+                                </Label>
+                              </div>
+                            </div>
+
+                            {messageMedia.length > 0 && (
+                              <div className="mt-3 space-y-2">
+                                <Label className="text-sm">Attached Media ({messageMedia.length})</Label>
+                                <div className="space-y-2">
+                                  {messageMedia.map((media) => (
+                                    <div key={media.id} className="flex items-center gap-2 p-2 border border-slate-700 rounded">
+                                      <div className="w-8 h-8 bg-slate-800 rounded flex items-center justify-center">
+                                        {media.type === 'image' && <ImageIcon className="w-4 h-4 text-blue-500" />}
+                                        {media.type === 'gif' && <FileImage className="w-4 h-4 text-green-500" />}
+                                        {media.type === 'qr' && <QrCode className="w-4 h-4 text-purple-500" />}
+                                      </div>
+                                      <div className="flex-1 min-w-0">
+                                        <p className="text-sm font-medium truncate">{media.name}</p>
+                                        <p className="text-xs text-muted-foreground capitalize">{media.type}</p>
+                                      </div>
+                                      <Button
+                                        type="button"
+                                        variant="ghost"
+                                        size="sm"
+                                        onClick={() => removeMessageMedia(media.id)}
+                                        className="w-6 h-6 p-0 text-red-500 hover:text-red-700"
+                                      >
+                                        <X className="w-3 h-3" />
+                                      </Button>
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+
+                    {/* Fee Structure */}
+                    <Card className="bg-slate-700/50">
+                      <CardContent className="p-4">
+                        <div className="flex items-center gap-2 mb-3">
+                          <Calculator className="w-4 h-4" />
+                          <h4 className="font-semibold">Fee Structure</h4>
+                        </div>
+                        <div className="text-sm space-y-1">
+                          {isFreeMode ? (
+                            <>
+                              <div className="flex justify-between text-green-400">
+                                <span>Free Code Applied:</span>
+                                <span>FREE</span>
+                              </div>
+                              <div className="flex justify-between text-muted-foreground line-through">
+                                <span>Base Fee:</span>
+                                <span>0.01 SOL</span>
+                              </div>
+                            </>
+                          ) : (
+                            <>
+                              <div className="flex justify-between">
+                                <span className="text-muted-foreground">Base Fee:</span>
+                                <span>0.01 SOL</span>
+                              </div>
+                              {tokenImage && (
+                                <div className="flex justify-between">
+                                  <span className="text-muted-foreground">Image Fee:</span>
+                                  <span>0.005 SOL</span>
+                                </div>
+                              )}
+                            </>
+                          )}
+                          {attachValue && (
+                            <div className="flex justify-between">
+                              <span className="text-muted-foreground">Value Pool:</span>
+                              <span>{(parseFloat(attachedValue) || 0).toFixed(3)} {currency}</span>
+                            </div>
+                          )}
+                          <div className="flex justify-between font-semibold border-t border-slate-600 pt-2">
+                            <span>Total Cost:</span>
+                            <span className={`${isFreeMode ? 'text-green-400' : 'text-primary'}`}>
+                              {isFreeMode ? 'FREE' : `${calculateTotalCost().toFixed(3)} SOL`}
+                            </span>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
                   </div>
                 </div>
               </TabsContent>
