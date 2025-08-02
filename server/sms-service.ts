@@ -289,12 +289,93 @@ export class SMSService {
   }
 
   // Calculate emotional intensity score
-  private calculateEmotionalIntensity(analysis: EmotionalAnalysis): number {
+  calculateEmotionalIntensity(analysis: EmotionalAnalysis): number {
     const emotionIntensity = Math.abs(analysis.sentiment);
     const urgencyWeight = { low: 0.3, medium: 0.6, high: 1.0 }[analysis.urgency];
     const confidenceWeight = analysis.confidence;
     
     return Math.min(1.0, (emotionIntensity + urgencyWeight + confidenceWeight) / 3);
+  }
+
+  // Calculate viral potential for enhanced features
+  calculateViralPotential(analysis: EmotionalAnalysis, message: string): number {
+    let viralScore = 0;
+
+    // Emotion viral factors
+    const viralEmotions = ['excited', 'love', 'happy', 'grateful'];
+    if (viralEmotions.includes(analysis.emotion)) {
+      viralScore += 0.4;
+    }
+
+    // Message characteristics
+    const exclamationCount = (message.match(/!/g) || []).length;
+    const capsWordsCount = (message.match(/[A-Z]{2,}/g) || []).length;
+    const emojiCount = (message.match(/[\u{1F600}-\u{1F64F}]|[\u{1F300}-\u{1F5FF}]|[\u{1F680}-\u{1F6FF}]|[\u{1F1E0}-\u{1F1FF}]/gu) || []).length;
+
+    viralScore += Math.min(0.2, exclamationCount * 0.05);
+    viralScore += Math.min(0.15, capsWordsCount * 0.03);
+    viralScore += Math.min(0.25, emojiCount * 0.05);
+
+    // Urgency and sentiment boost
+    viralScore += analysis.urgency === 'high' ? 0.3 : analysis.urgency === 'medium' ? 0.15 : 0;
+    viralScore += Math.abs(analysis.sentiment) * 0.2;
+
+    return Math.min(1, viralScore);
+  }
+
+  // Time context analysis
+  getTimeContextAnalysis(hour: number): string {
+    if (hour >= 6 && hour < 12) return 'morning-energy';
+    if (hour >= 12 && hour < 17) return 'afternoon-productive';
+    if (hour >= 17 && hour < 22) return 'evening-social';
+    return 'night-intimate';
+  }
+
+  // Predict market trend based on emotion
+  predictMarketTrend(analysis: EmotionalAnalysis): 'bullish' | 'bearish' | 'neutral' {
+    const bullishEmotions = ['excited', 'love', 'happy', 'grateful'];
+    const bearishEmotions = ['sad', 'worried', 'angry'];
+
+    if (bullishEmotions.includes(analysis.emotion) && analysis.sentiment > 0.3) {
+      return 'bullish';
+    }
+    if (bearishEmotions.includes(analysis.emotion) && analysis.sentiment < -0.3) {
+      return 'bearish';
+    }
+    return 'neutral';
+  }
+
+  // Generate AI suggestions for improvement
+  generateAISuggestions(message: string, analysis: EmotionalAnalysis): string[] {
+    const suggestions: string[] = [];
+
+    // Emotion-specific suggestions
+    if (analysis.emotion === 'neutral') {
+      suggestions.push("Add more emotional words to increase token value");
+    }
+
+    if (analysis.confidence < 0.5) {
+      suggestions.push("Use stronger emotional expressions for better detection");
+    }
+
+    if (message.length < 50) {
+      suggestions.push("Longer messages tend to have higher emotional value");
+    }
+
+    if (!message.includes('!') && analysis.emotion !== 'sad') {
+      suggestions.push("Add exclamation marks to boost viral potential");
+    }
+
+    // Category-specific suggestions
+    if (analysis.category === 'personal') {
+      suggestions.push("Personal messages create stronger emotional bonds");
+    }
+
+    if (analysis.urgency === 'low' && ['excited', 'happy'].includes(analysis.emotion)) {
+      suggestions.push("Express more urgency to increase token value");
+    }
+
+    return suggestions.slice(0, 3); // Return top 3 suggestions
   }
 
   // Hash phone number for privacy

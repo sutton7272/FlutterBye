@@ -50,6 +50,7 @@ import TokenHolderMapPage from "@/pages/token-holder-map";
 import CollaborativeCreation from "@/pages/collaborative-creation";
 import ViralDashboard from "@/pages/viral-dashboard";
 import SMSIntegration from "@/pages/sms-integration";
+import EnhancedSMSIntegration from "@/pages/sms-enhanced";
 import Navbar from "@/components/navbar";
 import { PersonalizedDashboard } from "@/components/PersonalizedDashboard";
 
@@ -145,7 +146,13 @@ function Router() {
         <Route path="/sms" component={() => (
           <>
             <Navbar />
-            <SmsIntegrationPage />
+            <EnhancedSMSIntegration />
+          </>
+        )} />
+        <Route path="/sms-classic" component={() => (
+          <>
+            <Navbar />
+            <SMSIntegration />
           </>
         )} />
         <Route path="/wallets" component={() => (

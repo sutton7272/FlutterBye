@@ -235,38 +235,39 @@ export default function SMSIntegration() {
             {statusLoading ? (
               <div className="text-center py-4 text-gray-400">Loading service status...</div>
             ) : smsStatus ? (
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div className="flex items-center gap-2">
-                  {getStatusIcon(smsStatus.configured)}
-                  <span className="text-gray-300">SMS Service</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  {getStatusIcon(smsStatus.features?.emotionalAnalysis)}
-                  <span className="text-gray-300">Emotion Analysis</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  {getStatusIcon(smsStatus.features?.tokenCreation)}
-                  <span className="text-gray-300">Token Creation</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  {getStatusIcon(smsStatus.features?.confirmationSMS)}
-                  <span className="text-gray-300">SMS Confirmations</span>
-                </div>
-              </div>
-              
-              {smsStatus && smsStatus.twilioPhone && (
-                <div className="mt-4 p-3 bg-blue-900/20 border border-blue-500/20 rounded-lg">
-                  <div className="text-sm text-blue-300">
-                    <strong>Twilio Phone:</strong> {smsStatus.twilioPhone}
+              <>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  <div className="flex items-center gap-2">
+                    {getStatusIcon(smsStatus.configured)}
+                    <span className="text-gray-300">SMS Service</span>
                   </div>
-                  {smsStatus.webhookUrl && (
-                    <div className="text-xs text-blue-400 mt-1">
-                      <strong>Webhook URL:</strong> {smsStatus.webhookUrl}
-                    </div>
-                  )}
+                  <div className="flex items-center gap-2">
+                    {getStatusIcon(smsStatus.features?.emotionalAnalysis)}
+                    <span className="text-gray-300">Emotion Analysis</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    {getStatusIcon(smsStatus.features?.tokenCreation)}
+                    <span className="text-gray-300">Token Creation</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    {getStatusIcon(smsStatus.features?.confirmationSMS)}
+                    <span className="text-gray-300">SMS Confirmations</span>
+                  </div>
                 </div>
-              )}
-              </div>
+                
+                {smsStatus && smsStatus.twilioPhone && (
+                  <div className="mt-4 p-3 bg-blue-900/20 border border-blue-500/20 rounded-lg">
+                    <div className="text-sm text-blue-300">
+                      <strong>Twilio Phone:</strong> {smsStatus.twilioPhone}
+                    </div>
+                    {smsStatus.webhookUrl && (
+                      <div className="text-xs text-blue-400 mt-1">
+                        <strong>Webhook URL:</strong> {smsStatus.webhookUrl}
+                      </div>
+                    )}
+                  </div>
+                )}
+              </>
             ) : (
               <div className="text-red-400">Failed to load service status</div>
             )}

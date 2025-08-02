@@ -3410,6 +3410,65 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // SMS-to-Blockchain Integration Routes
   const { smsService } = await import("./sms-service");
+  
+  // Enhanced SMS API routes
+  app.get('/api/sms/status', async (req, res) => {
+    try {
+      const status = smsService.getServiceStatus();
+      res.json(status);
+    } catch (error) {
+      console.error('Error getting SMS status:', error);
+      res.status(500).json({ error: 'Failed to get SMS status' });
+    }
+  });
+
+  app.post('/api/sms/analyze', async (req, res) => {
+    try {
+      const { message } = req.body;
+      if (!message || typeof message !== 'string') {
+        return res.status(400).json({ error: 'Message is required' });
+      }
+
+      const analysis = await smsService.analyzeEmotionalContent(message);
+      res.json({ success: true, analysis });
+    } catch (error) {
+      console.error('Error analyzing SMS:', error);
+      res.status(500).json({ error: 'Failed to analyze message' });
+    }
+  });
+
+  app.post('/api/sms/create-token', async (req, res) => {
+    try {
+      const { phoneNumber, message, recipientWallet, value, metadata } = req.body;
+      
+      if (!phoneNumber || !message) {
+        return res.status(400).json({ error: 'Phone number and message are required' });
+      }
+
+      const result = await smsService.createTokenFromSMS({
+        phoneNumber,
+        message,
+        recipientWallet,
+        value,
+        metadata
+      });
+
+      res.json(result);
+    } catch (error) {
+      console.error('Error creating token from SMS:', error);
+      res.status(500).json({ error: 'Failed to create token from SMS' });
+    }
+  });
+
+  app.get('/api/sms/analytics', async (req, res) => {
+    try {
+      const analytics = await smsService.getSMSAnalytics();
+      res.json(analytics);
+    } catch (error) {
+      console.error('Error getting SMS analytics:', error);
+      res.status(500).json({ error: 'Failed to get SMS analytics' });
+    }
+  });
   const { rewardsService } = await import("./rewards-service");
   const { journeyService } = await import("./journey-service");
 
