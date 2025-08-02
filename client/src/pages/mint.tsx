@@ -25,6 +25,8 @@ import TokenHolderAnalysis from "@/components/token-holder-analysis";
 import { TransactionSuccessOverlay } from "@/components/confetti-celebration";
 import { ShareSuccessModal } from "@/components/ShareSuccessModal";
 import { TokenPriceComparison } from "@/components/token-price-comparison";
+import { HelpTooltip, HelpPanel, helpContent } from "@/components/contextual-help";
+import { SmartLoading } from "@/components/loading-states";
 
 export default function Mint() {
   const { toast } = useToast();
@@ -101,6 +103,7 @@ export default function Mint() {
   // Confetti celebration state
   const [showSuccessOverlay, setShowSuccessOverlay] = useState(false);
   const [showShareModal, setShowShareModal] = useState(false);
+  const [showHelpPanel, setShowHelpPanel] = useState(false);
   const [successData, setSuccessData] = useState<{
     message: string;
     amount: string;
@@ -1128,6 +1131,13 @@ export default function Mint() {
           mintData={successData}
         />
       )}
+
+      {/* Contextual Help Panel */}
+      <HelpPanel
+        topic="minting"
+        isOpen={showHelpPanel}
+        onClose={() => setShowHelpPanel(false)}
+      />
     </div>
   );
 }

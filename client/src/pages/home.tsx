@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Link } from "wouter";
@@ -9,6 +10,8 @@ import { InteractiveStatsDashboard } from "@/components/interactive-stats-dashbo
 import { EngagementBooster } from "@/components/engagement-booster";
 import { ViralSharingAssistant } from "@/components/viral-sharing-assistant";
 import { TutorialLaunchButton } from "@/components/interactive-tutorial";
+import { WelcomeTour } from "@/components/welcome-tour";
+import { QuickActionsFAB } from "@/components/quick-actions-fab";
 
 interface RecentActivity {
   id: string;
@@ -20,6 +23,7 @@ interface RecentActivity {
 }
 
 export default function Home() {
+  const [showWelcomeTour, setShowWelcomeTour] = useState(true);
   const marqueeText = [
     "TURN MESSAGES INTO MONEY",
     "27 CHARACTERS TO RICHES", 
@@ -308,6 +312,14 @@ export default function Home() {
           ))}
         </div>
       </div>
+
+      {/* Welcome Tour for New Users */}
+      {showWelcomeTour && (
+        <WelcomeTour onComplete={() => setShowWelcomeTour(false)} />
+      )}
+
+      {/* Quick Actions FAB */}
+      <QuickActionsFAB />
     </div>
   );
 }
