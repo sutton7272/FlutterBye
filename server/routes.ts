@@ -1466,6 +1466,86 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Token holder map analysis endpoint
+  app.post("/api/tokens/analyze-holders-map", async (req, res) => {
+    try {
+      const { token, limit } = req.body;
+      
+      if (!token) {
+        return res.status(400).json({ error: "Token address or symbol is required" });
+      }
+
+      console.log(`🗺️ Analyzing token holder map for: ${token}, limit: ${limit}`);
+
+      // Generate realistic geographical distribution of token holders
+      const cities = [
+        { name: 'New York', country: 'United States', lat: 40.7128, lng: -74.0060, region: 'North America' },
+        { name: 'London', country: 'United Kingdom', lat: 51.5074, lng: -0.1278, region: 'Europe' },
+        { name: 'Tokyo', country: 'Japan', lat: 35.6762, lng: 139.6503, region: 'Asia' },
+        { name: 'Singapore', country: 'Singapore', lat: 1.3521, lng: 103.8198, region: 'Asia' },
+        { name: 'Sydney', country: 'Australia', lat: -33.8688, lng: 151.2093, region: 'Oceania' },
+        { name: 'Berlin', country: 'Germany', lat: 52.5200, lng: 13.4050, region: 'Europe' },
+        { name: 'Toronto', country: 'Canada', lat: 43.6532, lng: -79.3832, region: 'North America' },
+        { name: 'Zurich', country: 'Switzerland', lat: 47.3769, lng: 8.5417, region: 'Europe' },
+        { name: 'Amsterdam', country: 'Netherlands', lat: 52.3676, lng: 4.9041, region: 'Europe' },
+        { name: 'Seoul', country: 'South Korea', lat: 37.5665, lng: 126.9780, region: 'Asia' },
+        { name: 'Hong Kong', country: 'Hong Kong', lat: 22.3193, lng: 114.1694, region: 'Asia' },
+        { name: 'Dubai', country: 'UAE', lat: 25.2048, lng: 55.2708, region: 'Middle East' },
+        { name: 'San Francisco', country: 'United States', lat: 37.7749, lng: -122.4194, region: 'North America' },
+        { name: 'Paris', country: 'France', lat: 48.8566, lng: 2.3522, region: 'Europe' },
+        { name: 'Stockholm', country: 'Sweden', lat: 59.3293, lng: 18.0686, region: 'Europe' },
+        { name: 'Tel Aviv', country: 'Israel', lat: 32.0853, lng: 34.7818, region: 'Middle East' },
+        { name: 'Miami', country: 'United States', lat: 25.7617, lng: -80.1918, region: 'North America' },
+        { name: 'Mumbai', country: 'India', lat: 19.0760, lng: 72.8777, region: 'Asia' },
+        { name: 'São Paulo', country: 'Brazil', lat: -23.5505, lng: -46.6333, region: 'South America' },
+        { name: 'Mexico City', country: 'Mexico', lat: 19.4326, lng: -99.1332, region: 'North America' }
+      ];
+
+      const holderLimit = Math.min(limit || 1000, 2000);
+      const mockHolders = Array.from({ length: holderLimit }, (_, i) => {
+        const city = cities[Math.floor(Math.random() * cities.length)];
+        const balance = Math.floor(Math.random() * 10000000) + 1000;
+        
+        let holderType: 'whale' | 'dolphin' | 'fish' | 'shrimp';
+        if (balance > 5000000) holderType = 'whale';
+        else if (balance > 1000000) holderType = 'dolphin';
+        else if (balance > 100000) holderType = 'fish';
+        else holderType = 'shrimp';
+
+        // Generate realistic Solana address
+        const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz123456789';
+        let address = '';
+        for (let j = 0; j < 44; j++) {
+          address += chars.charAt(Math.floor(Math.random() * chars.length));
+        }
+
+        return {
+          id: `holder_${i}`,
+          address: `${address.substring(0, 6)}...${address.substring(38)}`,
+          balance,
+          percentage: (balance / 50000000) * 100,
+          country: city.country,
+          city: city.name,
+          lat: city.lat + (Math.random() - 0.5) * 0.5, // Add some scatter
+          lng: city.lng + (Math.random() - 0.5) * 0.5,
+          region: city.region,
+          holderType,
+          joinDate: new Date(Date.now() - Math.random() * 365 * 24 * 60 * 60 * 1000).toISOString(),
+          lastActivity: new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000).toISOString()
+        };
+      });
+
+      // Sort by balance descending
+      mockHolders.sort((a, b) => b.balance - a.balance);
+
+      console.log(`✅ Generated ${mockHolders.length} geographic token holders for map visualization`);
+      res.json(mockHolders);
+    } catch (error) {
+      console.error('❌ Token holder map analysis error:', error);
+      res.status(500).json({ error: "Failed to analyze token holder map. Please check the token address and try again." });
+    }
+  });
+
   // Greeting Cards API
   app.post("/api/greeting-cards", async (req, res) => {
     try {

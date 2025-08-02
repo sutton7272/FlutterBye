@@ -3,7 +3,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { WalletConnect } from "@/components/wallet-connect";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { Menu, Home, Coins, Trophy, Users, MessageSquare, Settings, Sparkles, Zap, Heart, Building2 } from "lucide-react";
+import { Menu, Home, Coins, Trophy, Users, MessageSquare, Settings, Sparkles, Zap, Heart, Building2, MapPin } from "lucide-react";
 
 export default function Navbar() {
   const [location] = useLocation();
@@ -22,6 +22,7 @@ export default function Navbar() {
   // Secondary items for mobile/dropdown
   const secondaryNavItems = [
     { href: "/chat", label: "Chat", icon: MessageSquare },
+    { href: "/token-map", label: "Token Map", icon: MapPin },
     { href: "/rewards", label: "Rewards", icon: Trophy },
     { href: "/journey", label: "Journey", icon: Users },
     { href: "/flby/staking", label: "FLBY Staking", icon: Zap },

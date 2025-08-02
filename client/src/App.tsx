@@ -39,6 +39,7 @@ import AdminStaking from "@/pages/admin-staking";
 import ReferralRewards from "@/pages/referral-rewards";
 import LaunchCountdown from "@/pages/launch-countdown";
 import AdminEarlyAccess from "@/pages/admin-early-access";
+import TokenHolderMapPage from "@/pages/token-holder-map";
 import Navbar from "@/components/navbar";
 import { FloatingActionHub } from "@/components/floating-action-hub";
 import { WalletProvider } from "@/components/wallet-adapter";
@@ -181,6 +182,13 @@ function Router() {
           <>
             <Navbar />
             <AdvancedSearch />
+            <FloatingActionHub />
+          </>
+        )} />
+        <Route path="/token-map" component={() => (
+          <>
+            <Navbar />
+            <TokenHolderMapPage />
             <FloatingActionHub />
           </>
         )} />
