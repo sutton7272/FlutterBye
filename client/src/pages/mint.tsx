@@ -24,6 +24,7 @@ import { type InsertToken } from "@shared/schema";
 import TokenHolderAnalysis from "@/components/token-holder-analysis";
 import { TransactionSuccessOverlay } from "@/components/confetti-celebration";
 import { ShareSuccessModal } from "@/components/ShareSuccessModal";
+import { TokenPriceComparison } from "@/components/token-price-comparison";
 
 export default function Mint() {
   const { toast } = useToast();
@@ -351,9 +352,23 @@ export default function Mint() {
               </TabsList>
 
               <TabsContent value="create" className="space-y-6">
+                {/* Price Comparison Widget */}
+                <div className="mb-8">
+                  <TokenPriceComparison 
+                    onQuantitySelect={(quantity) => {
+                      setMintAmount(quantity.toString());
+                      // Scroll to form
+                      document.getElementById('mint-form')?.scrollIntoView({ 
+                        behavior: 'smooth',
+                        block: 'start'
+                      });
+                    }}
+                  />
+                </div>
+                
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Minting Form */}
-          <Card className="premium-card electric-frame">
+          <Card id="mint-form" className="premium-card electric-frame">
             <CardContent className="p-8">
               <h3 className="text-2xl font-bold mb-6 text-gradient">Create Your Message Token</h3>
               <div className="mb-6 p-4 bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-800 rounded-lg">
