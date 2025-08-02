@@ -349,85 +349,16 @@ export default function LaunchCountdown() {
         </Card>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-6xl mx-auto">
-          {/* Access Gate or Waitlist Signup */}
+          {/* VIP Waitlist Signup */}
           <Card className="electric-frame">
             <CardHeader>
               <CardTitle className="text-gradient flex items-center gap-2">
-                {!hasAccess ? (
-                  <>
-                    <Lock className="w-6 h-6" />
-                    Early Access Required
-                  </>
-                ) : (
-                  <>
-                    <Sparkles className="w-6 h-6" />
-                    Join the VIP Waitlist
-                  </>
-                )}
+                <Mail className="w-6 h-6" />
+                Join VIP Waitlist
               </CardTitle>
             </CardHeader>
             <CardContent>
-              {!hasAccess ? (
-                <div className="space-y-4">
-                  <p className="text-muted-foreground mb-4">
-                    Enter your credentials to access the platform and join the VIP waitlist.
-                  </p>
-                  
-                  <form onSubmit={handleAccessRequest} className="space-y-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="access-code">Access Code</Label>
-                      <Input
-                        id="access-code"
-                        placeholder="FLBY-EARLY-XXX"
-                        value={accessCode}
-                        onChange={(e) => setAccessCode(e.target.value)}
-                        className="bg-muted/20"
-                      />
-                    </div>
-                    
-                    <div className="text-center text-sm text-muted-foreground">
-                      OR
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <Label htmlFor="authorized-email">Authorized Email</Label>
-                      <Input
-                        id="authorized-email"
-                        type="email"
-                        placeholder="your@email.com"
-                        value={authorizedEmail}
-                        onChange={(e) => setAuthorizedEmail(e.target.value)}
-                        className="bg-muted/20"
-                      />
-                    </div>
-
-                    <Button 
-                      type="submit" 
-                      className="w-full"
-                      disabled={checkAccessMutation.isPending}
-                    >
-                      {checkAccessMutation.isPending ? (
-                        "Verifying..."
-                      ) : (
-                        <>
-                          <Unlock className="w-4 h-4 mr-2" />
-                          Request Access
-                        </>
-                      )}
-                    </Button>
-                  </form>
-
-                  <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-3">
-                    <h4 className="font-medium text-blue-400 mb-2">Early Access Benefits</h4>
-                    <ul className="text-sm text-muted-foreground space-y-1">
-                      <li>• Exclusive FLBY token airdrops</li>
-                      <li>• Beta testing privileges</li>
-                      <li>• VIP community access</li>
-                      <li>• Priority support</li>
-                    </ul>
-                  </div>
-                </div>
-              ) : (
+              {
                 submitted ? (
                 <div className="text-center py-8">
                   <CheckCircle className="w-16 h-16 mx-auto mb-4 text-green-400" />
@@ -513,8 +444,64 @@ export default function LaunchCountdown() {
                       <li>• VIP community access</li>
                     </ul>
                   </div>
+
+                  {/* Early Access Section */}
+                  <div className="bg-purple-500/10 border border-purple-500/20 rounded-lg p-4 mt-6">
+                    <div className="flex items-center gap-2 mb-2">
+                      <Key className="w-4 h-4 text-purple-400" />
+                      <h4 className="font-medium text-purple-400">Want Full Access Now?</h4>
+                    </div>
+                    <p className="text-sm text-muted-foreground mb-3">
+                      Have an early access code or authorized email? Get immediate access to the full platform features.
+                    </p>
+                    
+                    <div className="space-y-3">
+                      <div>
+                        <Label htmlFor="accessCode" className="text-xs">Access Code</Label>
+                        <Input
+                          id="accessCode"
+                          placeholder="FLBY-EARLY-XXX"
+                          value={accessCode}
+                          onChange={(e) => setAccessCode(e.target.value)}
+                          className="bg-muted/20 text-sm"
+                        />
+                      </div>
+
+                      <div className="text-center text-muted-foreground text-xs">OR</div>
+
+                      <div>
+                        <Label htmlFor="authorizedEmail" className="text-xs">Authorized Email</Label>
+                        <Input
+                          id="authorizedEmail"
+                          type="email"
+                          placeholder="your@email.com"
+                          value={authorizedEmail}
+                          onChange={(e) => setAuthorizedEmail(e.target.value)}
+                          className="bg-muted/20 text-sm"
+                        />
+                      </div>
+
+                      <Button 
+                        onClick={handleAccessRequest}
+                        disabled={(!accessCode && !authorizedEmail) || checkAccessMutation.isPending}
+                        className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-sm py-2"
+                        size="sm"
+                      >
+                        {checkAccessMutation.isPending ? (
+                          <>
+                            <div className="w-3 h-3 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2"></div>
+                            Verifying...
+                          </>
+                        ) : (
+                          <>
+                            <Unlock className="w-3 h-3 mr-2" />
+                            Get Early Access
+                          </>
+                        )}
+                      </Button>
+                    </div>
+                  </div>
                 </div>
-              ) 
               )}
             </CardContent>
           </Card>
