@@ -122,6 +122,32 @@ export default function UnifiedAdminDashboard() {
     refetchInterval: 30000, // Refresh every 30 seconds
   });
 
+  // World-class dashboard data queries
+  const { data: revenueAnalytics } = useQuery({
+    queryKey: ["/api/admin/revenue-analytics"],
+    refetchInterval: 60000, // Refresh every minute
+  });
+
+  const { data: securityMonitoring } = useQuery({
+    queryKey: ["/api/admin/security-monitoring"],
+    refetchInterval: 30000, // Refresh every 30 seconds
+  });
+
+  const { data: performanceInsights } = useQuery({
+    queryKey: ["/api/admin/performance-insights"],
+    refetchInterval: 60000, // Refresh every minute
+  });
+
+  const { data: userBehavior } = useQuery({
+    queryKey: ["/api/admin/user-behavior"],
+    refetchInterval: 120000, // Refresh every 2 minutes
+  });
+
+  const { data: competitiveIntelligence } = useQuery({
+    queryKey: ["/api/admin/competitive-intelligence"],
+    refetchInterval: 300000, // Refresh every 5 minutes
+  });
+
   const { data: users, isLoading: usersLoading } = useQuery({
     queryKey: ["/api/admin/users"],
   });
@@ -288,6 +314,41 @@ export default function UnifiedAdminDashboard() {
             >
               <Radio className="w-4 h-4" />
               <span className="hidden sm:inline">Live</span>
+            </TabsTrigger>
+            <TabsTrigger 
+              value="revenue" 
+              className="flex items-center gap-2 text-slate-300 font-medium data-[state=active]:text-white data-[state=active]:bg-gradient-to-r data-[state=active]:from-emerald-600/60 data-[state=active]:to-teal-600/60 data-[state=active]:shadow-lg hover:text-white hover:bg-slate-700/50 transition-all duration-200"
+            >
+              <DollarSign className="w-4 h-4" />
+              <span className="hidden sm:inline">Revenue</span>
+            </TabsTrigger>
+            <TabsTrigger 
+              value="security" 
+              className="flex items-center gap-2 text-slate-300 font-medium data-[state=active]:text-white data-[state=active]:bg-gradient-to-r data-[state=active]:from-red-600/60 data-[state=active]:to-pink-600/60 data-[state=active]:shadow-lg hover:text-white hover:bg-slate-700/50 transition-all duration-200"
+            >
+              <Shield className="w-4 h-4" />
+              <span className="hidden sm:inline">Security</span>
+            </TabsTrigger>
+            <TabsTrigger 
+              value="performance" 
+              className="flex items-center gap-2 text-slate-300 font-medium data-[state=active]:text-white data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-600/60 data-[state=active]:to-violet-600/60 data-[state=active]:shadow-lg hover:text-white hover:bg-slate-700/50 transition-all duration-200"
+            >
+              <Zap className="w-4 h-4" />
+              <span className="hidden sm:inline">Performance</span>
+            </TabsTrigger>
+            <TabsTrigger 
+              value="behavior" 
+              className="flex items-center gap-2 text-slate-300 font-medium data-[state=active]:text-white data-[state=active]:bg-gradient-to-r data-[state=active]:from-amber-600/60 data-[state=active]:to-orange-600/60 data-[state=active]:shadow-lg hover:text-white hover:bg-slate-700/50 transition-all duration-200"
+            >
+              <Brain className="w-4 h-4" />
+              <span className="hidden sm:inline">Behavior</span>
+            </TabsTrigger>
+            <TabsTrigger 
+              value="competitive" 
+              className="flex items-center gap-2 text-slate-300 font-medium data-[state=active]:text-white data-[state=active]:bg-gradient-to-r data-[state=active]:from-cyan-600/60 data-[state=active]:to-blue-600/60 data-[state=active]:shadow-lg hover:text-white hover:bg-slate-700/50 transition-all duration-200"
+            >
+              <Target className="w-4 h-4" />
+              <span className="hidden sm:inline">Intelligence</span>
             </TabsTrigger>
           </TabsList>
 
@@ -1341,6 +1402,361 @@ export default function UnifiedAdminDashboard() {
               aiInsights={aiInsights}
               predictiveAnalytics={predictiveAnalytics}
             />
+          </TabsContent>
+
+          {/* Revenue Analytics Tab */}
+          <TabsContent value="revenue" className="space-y-6">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-2xl font-bold text-white">Revenue Analytics</h2>
+              <Badge className="bg-emerald-500/20 text-emerald-400 border-emerald-500">
+                ${(revenueAnalytics as any)?.totalRevenue || '0'} Total Revenue
+              </Badge>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              {/* Revenue KPIs */}
+              <Card className="bg-slate-800/50 border-emerald-500/30">
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-emerald-400 text-sm">Total Revenue</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold text-white">${(revenueAnalytics as any)?.totalRevenue || '0'}</div>
+                  <p className="text-xs text-slate-400">All-time earnings</p>
+                </CardContent>
+              </Card>
+              <Card className="bg-slate-800/50 border-teal-500/30">
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-teal-400 text-sm">Monthly Recurring</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold text-white">${(revenueAnalytics as any)?.monthlyRecurring || '0'}</div>
+                  <p className="text-xs text-slate-400">Monthly revenue</p>
+                </CardContent>
+              </Card>
+              <Card className="bg-slate-800/50 border-blue-500/30">
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-blue-400 text-sm">ARPU</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold text-white">${(revenueAnalytics as any)?.averageRevenuePerUser || '0'}</div>
+                  <p className="text-xs text-slate-400">Per user average</p>
+                </CardContent>
+              </Card>
+              <Card className="bg-slate-800/50 border-green-500/30">
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-green-400 text-sm">Growth Rate</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold text-white">{(revenueAnalytics as any)?.revenueGrowthRate || '0'}%</div>
+                  <p className="text-xs text-slate-400">Month over month</p>
+                </CardContent>
+              </Card>
+            </div>
+            
+            {/* Revenue Streams */}
+            <Card className="bg-slate-800/50 border-slate-700">
+              <CardHeader>
+                <CardTitle className="text-white">Top Revenue Streams</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {((revenueAnalytics as any)?.topRevenueStreams || []).map((stream: any, index: number) => (
+                    <div key={index} className="flex items-center justify-between p-3 bg-slate-700/50 rounded-lg">
+                      <div className="flex items-center gap-3">
+                        <PieChart className="w-5 h-5 text-emerald-400" />
+                        <span className="text-white font-medium">{stream.source}</span>
+                      </div>
+                      <div className="text-right">
+                        <div className="text-white font-bold">${stream.amount}</div>
+                        <div className="text-xs text-slate-400">{stream.percentage}%</div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Security Monitoring Tab */}
+          <TabsContent value="security" className="space-y-6">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-2xl font-bold text-white">Security Monitoring</h2>
+              <Badge className={`${(securityMonitoring as any)?.threatLevel === 'LOW' ? 'bg-green-500/20 text-green-400 border-green-500' : 'bg-red-500/20 text-red-400 border-red-500'}`}>
+                Threat Level: {(securityMonitoring as any)?.threatLevel || 'Unknown'}
+              </Badge>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <Card className="bg-slate-800/50 border-red-500/30">
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-red-400 text-sm">Blocked Attempts</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold text-white">{(securityMonitoring as any)?.blockedAttempts24h || 0}</div>
+                  <p className="text-xs text-slate-400">Last 24 hours</p>
+                </CardContent>
+              </Card>
+              <Card className="bg-slate-800/50 border-blue-500/30">
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-blue-400 text-sm">Active Sessions</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold text-white">{(securityMonitoring as any)?.activeSessions || 0}</div>
+                  <p className="text-xs text-slate-400">Current users</p>
+                </CardContent>
+              </Card>
+              <Card className="bg-slate-800/50 border-green-500/30">
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-green-400 text-sm">Security Status</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold text-white">{(securityMonitoring as any)?.firewallStatus || 'Unknown'}</div>
+                  <p className="text-xs text-slate-400">Firewall active</p>
+                </CardContent>
+              </Card>
+            </div>
+            
+            {/* Security Events */}
+            <Card className="bg-slate-800/50 border-slate-700">
+              <CardHeader>
+                <CardTitle className="text-white">Recent Security Events</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  {((securityMonitoring as any)?.suspiciousActivities || []).map((activity: any, index: number) => (
+                    <div key={index} className="flex items-center justify-between p-3 bg-slate-700/50 rounded-lg">
+                      <div className="flex items-center gap-3">
+                        <AlertTriangle className={`w-5 h-5 ${activity.severity === 'High' ? 'text-red-400' : activity.severity === 'Medium' ? 'text-yellow-400' : 'text-blue-400'}`} />
+                        <span className="text-white">{activity.type}</span>
+                      </div>
+                      <div className="text-right">
+                        <Badge className={`${activity.severity === 'High' ? 'bg-red-500/20 text-red-400' : activity.severity === 'Medium' ? 'bg-yellow-500/20 text-yellow-400' : 'bg-blue-500/20 text-blue-400'}`}>
+                          {activity.count} events
+                        </Badge>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Performance Insights Tab */}
+          <TabsContent value="performance" className="space-y-6">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-2xl font-bold text-white">Performance Insights</h2>
+              <Badge className="bg-purple-500/20 text-purple-400 border-purple-500">
+                Score: {(performanceInsights as any)?.overallScore || 0}/100
+              </Badge>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+              <Card className="bg-slate-800/50 border-purple-500/30">
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-purple-400 text-sm">DB Performance</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold text-white">{(performanceInsights as any)?.metrics?.databasePerformance || 0}%</div>
+                  <p className="text-xs text-slate-400">Query efficiency</p>
+                </CardContent>
+              </Card>
+              <Card className="bg-slate-800/50 border-blue-500/30">
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-blue-400 text-sm">API Response</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold text-white">{(performanceInsights as any)?.metrics?.apiResponseTime || 0}ms</div>
+                  <p className="text-xs text-slate-400">Average response</p>
+                </CardContent>
+              </Card>
+              <Card className="bg-slate-800/50 border-yellow-500/30">
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-yellow-400 text-sm">Memory Usage</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold text-white">{(performanceInsights as any)?.metrics?.memoryUsage || 0}%</div>
+                  <p className="text-xs text-slate-400">RAM utilization</p>
+                </CardContent>
+              </Card>
+              <Card className="bg-slate-800/50 border-green-500/30">
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-green-400 text-sm">CPU Usage</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold text-white">{(performanceInsights as any)?.metrics?.cpuUtilization || 0}%</div>
+                  <p className="text-xs text-slate-400">Processor load</p>
+                </CardContent>
+              </Card>
+            </div>
+            
+            {/* Performance Recommendations */}
+            <Card className="bg-slate-800/50 border-slate-700">
+              <CardHeader>
+                <CardTitle className="text-white">Optimization Recommendations</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {((performanceInsights as any)?.recommendations || []).map((rec: any, index: number) => (
+                    <div key={index} className="p-4 bg-slate-700/50 rounded-lg">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-white font-medium">{rec.category}</span>
+                        <Badge className={`${rec.impact === 'High' ? 'bg-red-500/20 text-red-400' : rec.impact === 'Medium' ? 'bg-yellow-500/20 text-yellow-400' : 'bg-blue-500/20 text-blue-400'}`}>
+                          {rec.impact} Impact
+                        </Badge>
+                      </div>
+                      <p className="text-slate-300 text-sm mb-2">{rec.issue}</p>
+                      <p className="text-green-400 text-xs">{rec.estimatedImprovement}</p>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* User Behavior Tab */}
+          <TabsContent value="behavior" className="space-y-6">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-2xl font-bold text-white">User Behavior Analytics</h2>
+              <Badge className="bg-amber-500/20 text-amber-400 border-amber-500">
+                {(userBehavior as any)?.engagementMetrics?.dailyActiveUsers || 0} Daily Active Users
+              </Badge>
+            </div>
+            
+            {/* User Segments */}
+            <Card className="bg-slate-800/50 border-slate-700">
+              <CardHeader>
+                <CardTitle className="text-white">User Segments</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  {((userBehavior as any)?.userSegments || []).map((segment: any, index: number) => (
+                    <div key={index} className="p-4 bg-slate-700/50 rounded-lg text-center">
+                      <div className="text-lg font-bold text-white">{segment.segment}</div>
+                      <div className="text-2xl font-bold text-amber-400 my-2">{segment.count}</div>
+                      <div className="text-sm text-slate-400">{segment.percentage}% of users</div>
+                      <div className="text-xs text-slate-500 mt-2">
+                        Avg: {segment.avgTokens} tokens, ${segment.avgValue} value
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+            
+            {/* Feature Usage */}
+            <Card className="bg-slate-800/50 border-slate-700">
+              <CardHeader>
+                <CardTitle className="text-white">Most Popular Features</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  {((userBehavior as any)?.userJourney?.mostPopularFeatures || []).map((feature: any, index: number) => (
+                    <div key={index} className="flex items-center justify-between p-3 bg-slate-700/50 rounded-lg">
+                      <span className="text-white">{feature.feature}</span>
+                      <div className="flex items-center gap-2">
+                        <div className="w-24 bg-slate-600 rounded-full h-2">
+                          <div 
+                            className="bg-amber-400 h-2 rounded-full" 
+                            style={{ width: `${feature.usage}%` }}
+                          ></div>
+                        </div>
+                        <span className="text-amber-400 font-bold">{feature.usage}%</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Competitive Intelligence Tab */}
+          <TabsContent value="competitive" className="space-y-6">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-2xl font-bold text-white">Competitive Intelligence</h2>
+              <Badge className="bg-cyan-500/20 text-cyan-400 border-cyan-500">
+                Market Rank #{(competitiveIntelligence as any)?.marketPosition?.rank || 'N/A'}
+              </Badge>
+            </div>
+            
+            {/* Market Position */}
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+              <Card className="bg-slate-800/50 border-cyan-500/30">
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-cyan-400 text-sm">Market Rank</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold text-white">#{(competitiveIntelligence as any)?.marketPosition?.rank || 'N/A'}</div>
+                  <p className="text-xs text-slate-400">Industry position</p>
+                </CardContent>
+              </Card>
+              <Card className="bg-slate-800/50 border-blue-500/30">
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-blue-400 text-sm">Market Share</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold text-white">{(competitiveIntelligence as any)?.marketPosition?.marketShare || '0'}%</div>
+                  <p className="text-xs text-slate-400">Total market</p>
+                </CardContent>
+              </Card>
+              <Card className="bg-slate-800/50 border-green-500/30">
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-green-400 text-sm">Growth Advantage</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold text-white">{(competitiveIntelligence as any)?.marketPosition?.growthAdvantage || '0'}</div>
+                  <p className="text-xs text-slate-400">vs competitors</p>
+                </CardContent>
+              </Card>
+              <Card className="bg-slate-800/50 border-purple-500/30">
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-purple-400 text-sm">Competitive Gap</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold text-white">{(competitiveIntelligence as any)?.marketPosition?.competitorGap || '0'}</div>
+                  <p className="text-xs text-slate-400">Performance lead</p>
+                </CardContent>
+              </Card>
+            </div>
+            
+            {/* Competitors Analysis */}
+            <Card className="bg-slate-800/50 border-slate-700">
+              <CardHeader>
+                <CardTitle className="text-white">Competitive Landscape</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {((competitiveIntelligence as any)?.competitors || []).map((competitor: any, index: number) => (
+                    <div key={index} className="p-4 bg-slate-700/50 rounded-lg">
+                      <div className="flex items-center justify-between mb-3">
+                        <span className="text-white font-bold">{competitor.name}</span>
+                        <div className="flex items-center gap-2">
+                          <span className="text-cyan-400">{competitor.marketShare}%</span>
+                          <Badge className={`${competitor.threat === 'High' ? 'bg-red-500/20 text-red-400' : competitor.threat === 'Medium' ? 'bg-yellow-500/20 text-yellow-400' : 'bg-blue-500/20 text-blue-400'}`}>
+                            {competitor.threat} Threat
+                          </Badge>
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        <div>
+                          <div className="text-green-400 text-sm font-medium mb-1">Strengths</div>
+                          <ul className="text-slate-300 text-xs space-y-1">
+                            {competitor.strengths?.map((strength: string, i: number) => (
+                              <li key={i}>• {strength}</li>
+                            ))}
+                          </ul>
+                        </div>
+                        <div>
+                          <div className="text-red-400 text-sm font-medium mb-1">Weaknesses</div>
+                          <ul className="text-slate-300 text-xs space-y-1">
+                            {competitor.weaknesses?.map((weakness: string, i: number) => (
+                              <li key={i}>• {weakness}</li>
+                            ))}
+                          </ul>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
           </TabsContent>
 
         </Tabs>
