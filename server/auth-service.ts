@@ -1,4 +1,4 @@
-import jwt from 'jsonwebtoken';
+import * as jwt from 'jsonwebtoken';
 import { Request, Response, NextFunction } from 'express';
 import { storage } from './storage';
 
@@ -138,7 +138,7 @@ export const authenticateWallet = async (walletAddress: string, signature: strin
       walletAddress: user.walletAddress,
       role: user.role || 'user',
       isAdmin: user.isAdmin || false,
-      adminPermissions: user.adminPermissions
+      adminPermissions: user.adminPermissions || []
     };
   } catch (error) {
     console.error('Wallet authentication error:', error);

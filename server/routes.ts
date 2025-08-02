@@ -4160,6 +4160,66 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Personalization Engine routes
+  app.get('/api/personalization/profile', async (req, res) => {
+    try {
+      const { personalizationEngine } = await import('./personalization-engine.js');
+      const userId = req.headers['x-user-id'] as string || 'user-1'; // Mock user ID for development
+      
+      let profile = await personalizationEngine.getProfile(userId);
+      if (!profile) {
+        profile = await personalizationEngine.initializeProfile(userId);
+      }
+      
+      res.json(profile);
+    } catch (error) {
+      console.error('Personalization profile error:', error);
+      res.status(500).json({ error: 'Failed to get personalization profile' });
+    }
+  });
+
+  app.put('/api/personalization/preferences', async (req, res) => {
+    try {
+      const { personalizationEngine } = await import('./personalization-engine.js');
+      const userId = req.headers['x-user-id'] as string || 'user-1';
+      
+      const profile = await personalizationEngine.updatePreferences(userId, req.body);
+      res.json(profile);
+    } catch (error) {
+      console.error('Update preferences error:', error);
+      res.status(500).json({ error: 'Failed to update preferences' });
+    }
+  });
+
+  app.post('/api/personalization/track', async (req, res) => {
+    try {
+      const { personalizationEngine } = await import('./personalization-engine.js');
+      const userId = req.headers['x-user-id'] as string || 'user-1';
+      const { action, metadata } = req.body;
+      
+      await personalizationEngine.trackBehavior(userId, action, metadata);
+      res.json({ success: true });
+    } catch (error) {
+      console.error('Track behavior error:', error);
+      res.status(500).json({ error: 'Failed to track behavior' });
+    }
+  });
+
+  app.get('/api/personalization/recommendations', async (req, res) => {
+    try {
+      const { personalizationEngine } = await import('./personalization-engine.js');
+      const userId = req.headers['x-user-id'] as string || 'user-1';
+      
+      const profile = await personalizationEngine.getProfile(userId);
+      const recommendations = profile ? profile.recommendations : [];
+      
+      res.json({ recommendations });
+    } catch (error) {
+      console.error('Recommendations error:', error);
+      res.status(500).json({ error: 'Failed to get recommendations' });
+    }
+  });
+
   // Register Solana blockchain integration routes
   registerSolanaRoutes(app);
 

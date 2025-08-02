@@ -204,9 +204,9 @@ export class TransactionMonitor {
 
   // Cleanup - stop all monitoring
   cleanup() {
-    for (const timeout of this.monitoringTransactions.values()) {
+    this.monitoringTransactions.forEach((timeout) => {
       clearTimeout(timeout);
-    }
+    });
     this.monitoringTransactions.clear();
   }
 }

@@ -46,6 +46,7 @@ import AdminDefaultImage from "@/pages/admin-default-image";
 import UnifiedAdminDashboard from "@/pages/admin-unified";
 import TokenHolderMapPage from "@/pages/token-holder-map";
 import Navbar from "@/components/navbar";
+import { PersonalizedDashboard } from "@/components/PersonalizedDashboard";
 
 import { WalletProvider } from "@/components/wallet-adapter";
 import { TestImage } from "@/components/test-image";
@@ -271,6 +272,12 @@ function Router() {
           <>
             <Navbar />
             <InfoPage />
+          </>
+        )} />
+        <Route path="/personalization" component={() => (
+          <>
+            <Navbar />
+            <PersonalizedDashboard />
           </>
         )} />
         <Route component={NotFound} />
