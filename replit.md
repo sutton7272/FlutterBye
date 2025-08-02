@@ -38,14 +38,16 @@ Design preference: Electric blue and green color scheme with animated electrical
 - **Security Infrastructure**: Production-grade rate limiting, input sanitization, security headers, Content Security Policy, and comprehensive validation middleware.
 - **Monitoring & Analytics**: Real-time performance monitoring, business metrics tracking, error aggregation, health checks, and comprehensive admin analytics dashboard.
 - **Production Features**: Environment configuration validation, auto-scaling support, SSL enforcement, resource monitoring, and deployment automation.
+- **Default Token Image System**: Automated system using Flutterbye butterfly logo as default for all tokens without custom images, with complete admin controls and API management.
 
 ### Data Storage Solutions
 - **Database**: PostgreSQL with Drizzle ORM (PRODUCTION READY).
-- **Schema**: Comprehensive schema for users, tokens, holdings, transactions, airdrop signups, market listings, redeemable codes, limited edition sets, chat rooms/messages, SMS integration, and content management.
+- **Schema**: Comprehensive schema for users, tokens, holdings, transactions, airdrop signups, market listings, redeemable codes, limited edition sets, chat rooms/messages, SMS integration, content management, and system settings.
 - **Connection**: Neon Database serverless PostgreSQL with connection pooling.
 - **Migrations**: Drizzle Kit with production migration support.
 - **Storage Layer**: DatabaseStorage class with optimized queries and error handling.
 - **Image Storage**: Base64 encoding with resizing and validation.
+- **System Settings**: Dynamic configuration system for default token images and admin-controlled platform settings.
 
 ## External Dependencies
 
@@ -116,6 +118,7 @@ Design preference: Electric blue and green color scheme with animated electrical
 - **Dynamic Token Distribution**: Strategic 1B FLBY allocation with community-first approach (40% community, 25% staking rewards)
 - **Launch Strategy Implementation**: Pre-launch countdown with 30-day timer, VIP waitlist capture, early access management system, and access gate controls
 - **Early Access Administration**: Complete admin panel for managing access codes, authorized emails, waitlist entries, and launch mode controls
+- **Default Token Image System**: Complete integration of butterfly logo as default token image for all tokens without custom uploads, with admin panel controls and full API support
 
 ## API Keys Status for Launch Phases
 

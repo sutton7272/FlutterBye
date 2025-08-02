@@ -1,5 +1,6 @@
 import type { Express, Request, Response } from "express";
 import { storage } from "./storage";
+import { DefaultTokenImageService } from "./default-token-image";
 
 // Enhanced Solana integration routes for token creation and management
 export function registerSolanaRoutes(app: Express) {
@@ -33,16 +34,23 @@ export function registerSolanaRoutes(app: Express) {
       const mockMintAddress = `${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
       const mockSignature = `tx_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
       
-      // Store token in database
-      const tokenId = await storage.createToken({
+      // Prepare token data and apply default image if needed
+      const tokenData = {
         message,
         creatorWallet: walletAddress,
         mintAddress: mockMintAddress,
         value: value || 0,
         recipients: recipients || [],
         signature: mockSignature,
+        image: req.body.image || undefined,
         createdAt: new Date()
-      });
+      };
+
+      // Apply default image if no custom image provided
+      const tokenDataWithImage = await DefaultTokenImageService.applyDefaultImageIfNeeded(tokenData);
+      
+      // Store token in database
+      const tokenId = await storage.createToken(tokenDataWithImage);
       
       res.json({
         success: true,

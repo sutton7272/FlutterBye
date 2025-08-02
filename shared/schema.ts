@@ -494,6 +494,19 @@ export const analytics = pgTable("analytics", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
+// System Settings for Admin Configuration
+export const systemSettings = pgTable("system_settings", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  key: text("key").notNull().unique(), // e.g., "default_token_image", "platform_name", etc.
+  value: text("value"), // Stored as text, can be JSON stringified for complex values
+  category: text("category").default("general"), // general, tokens, pricing, features, etc.
+  description: text("description"), // Human-readable description of the setting
+  dataType: text("data_type").default("string"), // string, number, boolean, json, image_url
+  isEditable: boolean("is_editable").default(true), // Whether admins can edit this setting
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
 // Insert schemas
 export const insertUserSchema = createInsertSchema(users).omit({
   id: true,
@@ -682,6 +695,16 @@ export type AdminLog = typeof adminLogs.$inferSelect;
 export type InsertAdminLog = z.infer<typeof insertAdminLogSchema>;
 
 export type Analytics = typeof analytics.$inferSelect;
+
+// System Settings types
+export type SystemSetting = typeof systemSettings.$inferSelect;
+export type InsertSystemSetting = typeof systemSettings.$inferInsert;
+
+export const insertSystemSettingSchema = createInsertSchema(systemSettings).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
 export type InsertAnalytics = z.infer<typeof insertAnalyticsSchema>;
 
 export type RedeemableCode = typeof redeemableCodes.$inferSelect;

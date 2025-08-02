@@ -1,10 +1,12 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertUserSchema, insertTokenSchema, insertAirdropSignupSchema, insertTransactionSchema, insertMarketListingSchema, insertRedemptionSchema, insertEscrowWalletSchema, insertAdminUserSchema, insertAdminLogSchema, insertAnalyticsSchema, insertChatRoomSchema, insertChatMessageSchema } from "@shared/schema";
+import { insertUserSchema, insertTokenSchema, insertAirdropSignupSchema, insertTransactionSchema, insertMarketListingSchema, insertRedemptionSchema, insertEscrowWalletSchema, insertAdminUserSchema, insertAdminLogSchema, insertAnalyticsSchema, insertChatRoomSchema, insertChatMessageSchema, insertSystemSettingSchema } from "@shared/schema";
+import { DefaultTokenImageService } from "./default-token-image";
 import { authenticateWallet, requireAdmin, requirePermission, requireSuperAdmin } from "./admin-middleware";
 import { chatService } from "./chat-service";
 import { registerSolanaRoutes } from "./routes-solana";
+import { DefaultTokenImageService } from "./default-token-image";
 import { z } from "zod";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -283,7 +285,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       // Create token with blockchain data using actual schema fields
-      const finalTokenData = {
+      const finalTokenDataRaw = {
         message: tokenData.message,
         symbol: "FLBY-MSG",
         mintAddress: solanaResult.mintAddress,
@@ -298,6 +300,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
           solscanUrl: `https://explorer.solana.com/tx/${solanaResult.signature}?cluster=devnet`
         }
       };
+
+      // Apply default image if no custom image provided
+      const finalTokenData = await DefaultTokenImageService.applyDefaultImageIfNeeded(finalTokenDataRaw);
       
       const token = await storage.createToken(finalTokenData);
       
@@ -428,7 +433,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         targetWallets
       } = req.body;
 
-      const enhancedTokenData: any = {
+      const enhancedTokenDataRaw: any = {
         message,
         symbol: "FLBY-MSG",
         mintAddress: `enhanced_mint_${Date.now()}`,
@@ -456,6 +461,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         },
         createdAt: new Date()
       };
+
+      // Apply default image if no custom image provided
+      const enhancedTokenData = await DefaultTokenImageService.applyDefaultImageIfNeeded(enhancedTokenDataRaw);
 
       const newToken = await storage.createToken(enhancedTokenData);
 
@@ -4049,6 +4057,106 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error validating redemption code:", error);
       res.status(500).json({ message: "Failed to validate redemption code" });
+    }
+  });
+
+  // System Settings API routes (Admin only)
+  app.get("/api/admin/system-settings", async (req, res) => {
+    try {
+      const settings = await storage.getAllSystemSettings();
+      res.json({ success: true, settings });
+    } catch (error) {
+      res.status(500).json({ 
+        success: false, 
+        error: error instanceof Error ? error.message : "Failed to fetch system settings" 
+      });
+    }
+  });
+
+  app.get("/api/admin/system-settings/:key", async (req, res) => {
+    try {
+      const setting = await storage.getSystemSetting(req.params.key);
+      if (!setting) {
+        return res.status(404).json({ success: false, error: "Setting not found" });
+      }
+      res.json({ success: true, setting });
+    } catch (error) {
+      res.status(500).json({ 
+        success: false, 
+        error: error instanceof Error ? error.message : "Failed to fetch system setting" 
+      });
+    }
+  });
+
+  app.post("/api/admin/system-settings", async (req, res) => {
+    try {
+      const settingData = insertSystemSettingSchema.parse(req.body);
+      const setting = await storage.createSystemSetting(settingData);
+      res.json({ success: true, setting });
+    } catch (error) {
+      res.status(400).json({ 
+        success: false, 
+        error: error instanceof Error ? error.message : "Invalid system setting data" 
+      });
+    }
+  });
+
+  app.put("/api/admin/system-settings/:key", async (req, res) => {
+    try {
+      const { value } = req.body;
+      if (!value) {
+        return res.status(400).json({ success: false, error: "Value is required" });
+      }
+      
+      const setting = await storage.updateSystemSetting(req.params.key, value);
+      res.json({ success: true, setting });
+    } catch (error) {
+      res.status(400).json({ 
+        success: false, 
+        error: error instanceof Error ? error.message : "Failed to update system setting" 
+      });
+    }
+  });
+
+  app.delete("/api/admin/system-settings/:key", async (req, res) => {
+    try {
+      await storage.deleteSystemSetting(req.params.key);
+      res.json({ success: true, message: "System setting deleted" });
+    } catch (error) {
+      res.status(500).json({ 
+        success: false, 
+        error: error instanceof Error ? error.message : "Failed to delete system setting" 
+      });
+    }
+  });
+
+  // Default token image endpoints
+  app.get("/api/default-token-image", async (req, res) => {
+    try {
+      const defaultImage = await DefaultTokenImageService.getDefaultTokenImage();
+      res.json({ success: true, defaultImage });
+    } catch (error) {
+      res.status(500).json({ 
+        success: false, 
+        error: error instanceof Error ? error.message : "Failed to get default token image" 
+      });
+    }
+  });
+
+  app.put("/api/admin/default-token-image", async (req, res) => {
+    try {
+      const { imageUrl } = req.body;
+      if (!imageUrl) {
+        return res.status(400).json({ success: false, error: "Image URL is required" });
+      }
+      
+      const updatedImage = await DefaultTokenImageService.updateDefaultTokenImage(imageUrl);
+      res.json({ success: true, defaultImage: updatedImage });
+    } catch (error) {
+      res.status(400).json({ 
+        success: false, 
+        error: error instanceof Error ? error.message : "Failed to update default token image" 
+      });
     }
   });
 

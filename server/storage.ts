@@ -41,6 +41,8 @@ import {
   type InsertPricingConfig,
   type PricingTier,
   type InsertPricingTier,
+  type SystemSetting,
+  type InsertSystemSetting,
   pricingTiers,
 } from "@shared/schema";
 
@@ -164,6 +166,13 @@ export interface IStorage {
   getPricingConfig(): Promise<any[]>;
   updatePricingConfig(key: string, value: string, currency?: string): Promise<void>;
   getPricingByCategory(category: string): Promise<any[]>;
+
+  // System Settings operations
+  getSystemSetting(key: string): Promise<SystemSetting | undefined>;
+  getAllSystemSettings(): Promise<SystemSetting[]>;
+  createSystemSetting(setting: InsertSystemSetting): Promise<SystemSetting>;
+  updateSystemSetting(key: string, value: string): Promise<SystemSetting>;
+  deleteSystemSetting(key: string): Promise<void>;
 }
 
 // In-memory storage implementation
@@ -186,6 +195,8 @@ export class MemStorage implements IStorage {
   private chatParticipants: Map<string, ChatParticipant> = new Map();
   private limitedEditionSets: Map<string, LimitedEditionSet> = new Map();
   private redemptionCodes: Map<string, RedemptionCode> = new Map();
+  private pricingTiers: Map<string, PricingTier> = new Map();
+  private systemSettings: Map<string, SystemSetting> = new Map();
 
   constructor() {
     this.initializeTestData();
@@ -235,6 +246,28 @@ export class MemStorage implements IStorage {
     testCodes.forEach(code => {
       this.redemptionCodes.set(code.id, code as RedemptionCode);
     });
+
+    // Initialize default system settings
+    this.initializeDefaultSystemSettings();
+
+    console.log(`Storage initialized with redemption codes: [${testCodes.map(c => `'${c.code} (${c.type})'`).join(', ')}]`);
+  }
+
+  private initializeDefaultSystemSettings() {
+    // Set default token image using the butterfly logo
+    const defaultTokenImageSetting: SystemSetting = {
+      id: randomUUID(),
+      key: "default_token_image",
+      value: "/assets/image_1754114527645.png", // Using the butterfly logo path
+      category: "tokens",
+      description: "Default image used for tokens when no custom image is uploaded",
+      dataType: "image_url",
+      isEditable: true,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+
+    this.systemSettings.set("default_token_image", defaultTokenImageSetting);
   }
 
   // User operations
@@ -1193,6 +1226,45 @@ export class MemStorage implements IStorage {
     if (key.includes("value") || key.includes("attachment")) return "value_attachment";
     if (key.includes("mint")) return "minting";
     return "features";
+  }
+
+  // System Settings operations
+  async getSystemSetting(key: string): Promise<SystemSetting | undefined> {
+    return this.systemSettings.get(key);
+  }
+
+  async getAllSystemSettings(): Promise<SystemSetting[]> {
+    return Array.from(this.systemSettings.values());
+  }
+
+  async createSystemSetting(setting: InsertSystemSetting): Promise<SystemSetting> {
+    const id = randomUUID();
+    const newSetting: SystemSetting = {
+      id,
+      ...setting,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+    this.systemSettings.set(setting.key, newSetting);
+    return newSetting;
+  }
+
+  async updateSystemSetting(key: string, value: string): Promise<SystemSetting> {
+    const existing = this.systemSettings.get(key);
+    if (!existing) {
+      throw new Error("System setting not found");
+    }
+    const updated = {
+      ...existing,
+      value,
+      updatedAt: new Date(),
+    };
+    this.systemSettings.set(key, updated);
+    return updated;
+  }
+
+  async deleteSystemSetting(key: string): Promise<void> {
+    this.systemSettings.delete(key);
   }
 }
 
