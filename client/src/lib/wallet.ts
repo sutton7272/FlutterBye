@@ -1,6 +1,7 @@
 // Comprehensive Solana wallet adapter integration
 // Supporting 9 major wallets for maximum user coverage (96% of Solana users)
 
+import React from 'react';
 import { PublicKey } from '@solana/web3.js';
 
 export interface WalletContextState {
@@ -214,7 +215,7 @@ export const WalletConnectionProvider = ({ children }: { children: React.ReactNo
   //   </WalletProvider>
   // </ConnectionProvider>
   
-  return <>{children}</>;
+  return React.createElement(React.Fragment, null, children);
 };
 
 // Wallet connection modal component
@@ -226,19 +227,15 @@ export const WalletMultiButton = ({ className }: { className?: string }) => {
     // In production, this would trigger the actual wallet connection
   };
   
-  return (
-    <div className={className}>
-      <button 
-        onClick={() => {
-          // This would open the wallet selection modal in production
-          console.log('Opening wallet selection modal...');
-          console.log('Installed wallets:', installedWallets);
-        }}
-        className="bg-gradient-to-r from-electric-blue to-electric-green text-white px-6 py-3 rounded-lg font-semibold hover:opacity-90 transition-opacity"
-      >
-        {installedWallets.length > 0 ? 'Connect Wallet' : 'Select Wallet'}
-      </button>
-    </div>
+  return React.createElement('div', { className }, 
+    React.createElement('button', {
+      onClick: () => {
+        // This would open the wallet selection modal in production
+        console.log('Opening wallet selection modal...');
+        console.log('Installed wallets:', installedWallets);
+      },
+      className: "bg-gradient-to-r from-electric-blue to-electric-green text-white px-6 py-3 rounded-lg font-semibold hover:opacity-90 transition-opacity"
+    }, installedWallets.length > 0 ? 'Connect Wallet' : 'Select Wallet')
   );
 };
 
