@@ -15,6 +15,7 @@ export default function Navbar() {
     { href: "/mint", label: "Mint", icon: Coins },
     { href: "/portfolio", label: "Portfolio", icon: Trophy },
     { href: "/explore", label: "Explore", icon: Sparkles },
+    { href: "/electric-demo", label: "Electric", icon: Zap },
   ];
 
   // Secondary items for mobile/dropdown
