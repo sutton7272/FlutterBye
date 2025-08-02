@@ -65,6 +65,9 @@ import {
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
 import { QRCodeGenerator } from '@/components/QRCodeGenerator';
+import { EmotionPortal } from '@/components/EmotionPortal';
+import { QuantumTimeMachine } from '@/components/QuantumTimeMachine';
+import { NeuroLinkInterface } from '@/components/NeuroLinkInterface';
 
 // Enhanced interfaces with new features
 interface EmotionalAnalysis {
@@ -384,7 +387,7 @@ export default function EnhancedSMSIntegration() {
           </TabsTrigger>
           <TabsTrigger value="analytics" className="flex items-center gap-2">
             <Brain className="w-4 h-4" />
-            AI Insights
+            🚀 REVOLUTIONARY
           </TabsTrigger>
           <TabsTrigger value="social" className="flex items-center gap-2">
             <Share className="w-4 h-4" />
@@ -664,6 +667,52 @@ export default function EnhancedSMSIntegration() {
               </Alert>
             </CardContent>
           </Card>
+        </TabsContent>
+
+        {/* Revolutionary Analytics Tab */}
+        <TabsContent value="analytics" className="space-y-6">
+          <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+            {/* Revolutionary Emotion Portal */}
+            <EmotionPortal 
+              message={message}
+              onEmotionChange={(emotion) => {
+                setAnalysis(prev => ({
+                  ...prev,
+                  emotion: emotion.type,
+                  confidence: emotion.intensity || 0.8,
+                  sentiment: emotion.frequency || 0.7
+                }));
+                toast({
+                  title: "Emotion Detected!",
+                  description: `${emotion.type} emotion field activated with ${Math.round((emotion.intensity || 0) * 100)}% intensity`
+                });
+              }}
+            />
+
+            {/* Quantum Time Machine */}
+            <QuantumTimeMachine
+              message={message}
+              onTimeTravel={(prediction) => {
+                toast({
+                  title: "Time Travel Complete!",
+                  description: `Token value in ${prediction.label}: $${prediction.predictedValue.toFixed(3)}`
+                });
+              }}
+            />
+
+            {/* NeuroLink Interface */}
+            <div className="xl:col-span-2">
+              <NeuroLinkInterface
+                message={message}
+                onNeuroSync={(brainState) => {
+                  toast({
+                    title: "Neural Sync Complete!",
+                    description: `Brain patterns analyzed with ${Math.round(brainState.coherenceIndex)}% coherence`
+                  });
+                }}
+              />
+            </div>
+          </div>
         </TabsContent>
 
         {/* Emotion History Tab */}

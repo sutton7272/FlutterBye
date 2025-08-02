@@ -146,6 +146,12 @@ function Router() {
         <Route path="/sms" component={() => (
           <>
             <Navbar />
+            <SMSIntegration />
+          </>
+        )} />
+        <Route path="/sms-enhanced" component={() => (
+          <>
+            <Navbar />
             <EnhancedSMSIntegration />
           </>
         )} />
@@ -342,12 +348,6 @@ function Router() {
           </>
         )} />
         <Route path="/sms-integration" component={() => (
-          <>
-            <Navbar />
-            <SMSIntegration />
-          </>
-        )} />
-        <Route path="/sms" component={() => (
           <>
             <Navbar />
             <SMSIntegration />
