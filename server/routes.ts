@@ -4438,12 +4438,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Initialize chat service heartbeat
   chatService.startHeartbeat();
   
-  // Initialize WebSocket server for real-time monitoring on existing httpServer
-  realTimeMonitor.initialize(httpServer);
-
-  // Start heartbeat for collaborative service (integrate with existing chat WebSocket)
+  // Start heartbeat for collaborative service
   collaborativeTokenService.startHeartbeat();
   
+  // Real-time monitoring integrated with existing chat WebSocket
   // Monitor real-time events
   realTimeMonitor.on('transaction_update', (data) => {
     console.log(`📊 Transaction update for user ${data.userId}`);
