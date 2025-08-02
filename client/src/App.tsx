@@ -6,12 +6,59 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { WalletProvider } from "@/components/wallet-adapter";
 import Navbar from "@/components/navbar";
 import { FloatingActionHub } from "@/components/floating-action-hub";
+import { EarlyAccessGate } from "@/components/early-access-gate";
+import { useState, useEffect } from "react";
 
 // Import core pages directly to avoid loading issues
 import Home from "@/pages/home";
 import NotFound from "@/pages/not-found";
 
 function App() {
+  const [hasEarlyAccess, setHasEarlyAccess] = useState(false);
+  const [isCheckingAccess, setIsCheckingAccess] = useState(true);
+
+  useEffect(() => {
+    // Temporary: Allow immediate access for development/testing
+    // Check for early access code in localStorage or URL params
+    const urlParams = new URLSearchParams(window.location.search);
+    const codeFromUrl = urlParams.get('code');
+    const savedAccess = localStorage.getItem('flutterbye_early_access');
+    
+    // Grant access immediately for now - remove this line to re-enable gate
+    setHasEarlyAccess(true);
+    
+    if (savedAccess === 'granted' || codeFromUrl) {
+      setHasEarlyAccess(true);
+    }
+    setIsCheckingAccess(false);
+  }, []);
+
+  const handleEarlyAccessGranted = () => {
+    setHasEarlyAccess(true);
+    localStorage.setItem('flutterbye_early_access', 'granted');
+  };
+
+  if (isCheckingAccess) {
+    return (
+      <div className="min-h-screen bg-slate-900 flex items-center justify-center">
+        <div className="animate-pulse text-blue-400">Loading...</div>
+      </div>
+    );
+  }
+
+  if (!hasEarlyAccess) {
+    return (
+      <QueryClientProvider client={queryClient}>
+        <WalletProvider>
+          <TooltipProvider>
+            <EarlyAccessGate onAccessGranted={handleEarlyAccessGranted} />
+            <Toaster />
+          </TooltipProvider>
+        </WalletProvider>
+      </QueryClientProvider>
+    );
+  }
+
   return (
     <QueryClientProvider client={queryClient}>
       <WalletProvider>

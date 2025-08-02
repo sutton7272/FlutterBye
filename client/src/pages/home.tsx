@@ -67,7 +67,9 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen text-white pt-20 overflow-hidden">
+    <div className="min-h-screen text-white pt-20 overflow-hidden bg-gradient-to-br from-slate-900 via-blue-900 to-slate-800 relative">
+      {/* Background Pattern */}
+      <div className="absolute inset-0 opacity-10 bg-circuit-pattern"></div>
       
       {/* Top Scrolling Marquee */}
       <div className="border-y border-primary/30 modern-gradient py-6 mb-12 overflow-hidden electric-frame">
