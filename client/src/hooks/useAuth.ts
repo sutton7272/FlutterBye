@@ -1,13 +1,13 @@
-import { useState, createContext, useContext } from 'react';
+import React, { useState, useEffect, createContext, useContext, type ReactNode } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import type { ReactNode } from 'react';
+import { apiRequest } from '@/lib/queryClient';
 
 interface User {
   id: string;
+  username: string;
   walletAddress: string;
-  role: string;
-  isAdmin: boolean;
-  adminPermissions: string[];
+  email?: string;
+  isAdmin?: boolean;
   createdAt: string;
 }
 
@@ -15,7 +15,7 @@ interface AuthContextType {
   user: User | null;
   isLoading: boolean;
   isAuthenticated: boolean;
-  login: (walletAddress: string, signature: string, message: string) => Promise<boolean>;
+  login: (address: string, signature: string, message: string) => Promise<boolean>;
   logout: () => void;
   walletAddress: string | null;
 }
@@ -24,55 +24,40 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function useAuth() {
   const context = useContext(AuthContext);
-  if (!context) {
+  if (context === undefined) {
     throw new Error('useAuth must be used within an AuthProvider');
   }
   return context;
 }
 
-export function useWalletAuth() {
+function useWalletAuth(): AuthContextType {
   const [walletAddress, setWalletAddress] = useState<string | null>(
-    localStorage.getItem('walletAddress')
+    () => localStorage.getItem('walletAddress')
   );
 
-  const { data: user, isLoading, refetch } = useQuery<User>({
-    queryKey: ["/api/auth/user"],
-    queryFn: async () => {
-      if (!walletAddress) throw new Error('No wallet connected');
-      
-      const response = await fetch("/api/auth/user", {
-        headers: {
-          'X-Wallet-Address': walletAddress
-        }
-      });
-      
-      if (!response.ok) {
-        throw new Error('Authentication failed');
-      }
-      
-      return response.json();
-    },
+  const { 
+    data: user, 
+    isLoading, 
+    refetch 
+  } = useQuery({
+    queryKey: ['/api/user', walletAddress],
     enabled: !!walletAddress,
     retry: false,
   });
 
+  useEffect(() => {
+    if (walletAddress && !isLoading && !user) {
+      localStorage.removeItem('walletAddress');
+      setWalletAddress(null);
+    }
+  }, [walletAddress, isLoading, user]);
+
   const login = async (address: string, signature: string, message: string): Promise<boolean> => {
     try {
-      const response = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          walletAddress: address,
-          signature,
-          message,
-          deviceInfo: {
-            userAgent: navigator.userAgent,
-            platform: navigator.platform,
-            language: navigator.language
-          }
-        })
+      const response = await apiRequest('POST', '/api/auth/verify', {
+        walletAddress: address,
+        signature,
+        message
       });
 
       if (response.ok) {
@@ -106,9 +91,5 @@ export function useWalletAuth() {
 export function AuthProvider({ children }: { children: ReactNode }) {
   const auth = useWalletAuth();
   
-  return (
-    <AuthContext.Provider value={auth}>
-      {children}
-    </AuthContext.Provider>
-  );
+  return React.createElement(AuthContext.Provider, { value: auth }, children);
 }
