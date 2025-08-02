@@ -27,6 +27,10 @@ const FreeCodes = lazy(() => import("@/pages/free-codes"));
 // Lazy load admin pages - consolidated into unified dashboard
 const UnifiedAdminDashboard = lazy(() => import("@/pages/admin-unified"));
 
+// Lazy load viral amplifier features
+const ViralSharing = lazy(() => import("@/pages/viral-sharing"));
+const CelebrityHub = lazy(() => import("@/pages/celebrity-hub"));
+
 // Lazy load additional features
 const Chat = lazy(() => import("@/pages/chat").then(module => ({ default: module.Chat })));
 const LimitedEdition = lazy(() => import("@/pages/limited-edition"));
@@ -87,6 +91,24 @@ function Router() {
             <Navbar />
             <Suspense fallback={<PageLoader />}>
               <Marketplace />
+            </Suspense>
+            <FloatingActionHub />
+          </>
+        )} />
+        <Route path="/viral-sharing" component={() => (
+          <>
+            <Navbar />
+            <Suspense fallback={<PageLoader />}>
+              <ViralSharing />
+            </Suspense>
+            <FloatingActionHub />
+          </>
+        )} />
+        <Route path="/celebrity-hub" component={() => (
+          <>
+            <Navbar />
+            <Suspense fallback={<PageLoader />}>
+              <CelebrityHub />
             </Suspense>
             <FloatingActionHub />
           </>
