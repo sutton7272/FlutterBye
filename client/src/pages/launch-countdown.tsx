@@ -387,7 +387,7 @@ export default function LaunchCountdown() {
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       required
-                      className="bg-muted/20"
+                      className="bg-slate-800/80 border-slate-600 text-white placeholder:text-slate-400 focus:border-cyan-400 focus:ring-cyan-400/20"
                     />
                     {email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) && (
                       <p className="text-yellow-400 text-xs">Please enter a valid email address</p>
@@ -401,7 +401,7 @@ export default function LaunchCountdown() {
                       placeholder="e.g., 7xKXtg2CW87d97TXJSDpbD5jBkheTqA83TZRuJosgAsU"
                       value={walletAddress}
                       onChange={(e) => setWalletAddress(e.target.value)}
-                      className="bg-muted/20"
+                      className="bg-slate-800/80 border-slate-600 text-white placeholder:text-slate-400 focus:border-cyan-400 focus:ring-cyan-400/20"
                     />
                     <p className="text-xs text-muted-foreground">
                       💰 For FLBY token airdrops (can be added later)
@@ -463,7 +463,7 @@ export default function LaunchCountdown() {
                           placeholder="FLBY-EARLY-XXX"
                           value={accessCode}
                           onChange={(e) => setAccessCode(e.target.value)}
-                          className="bg-muted/20 text-sm"
+                          className="bg-slate-800/80 border-slate-600 text-white placeholder:text-slate-400 focus:border-purple-400 focus:ring-purple-400/20 text-sm"
                         />
                       </div>
 
@@ -477,7 +477,7 @@ export default function LaunchCountdown() {
                           placeholder="your@email.com"
                           value={authorizedEmail}
                           onChange={(e) => setAuthorizedEmail(e.target.value)}
-                          className="bg-muted/20 text-sm"
+                          className="bg-slate-800/80 border-slate-600 text-white placeholder:text-slate-400 focus:border-purple-400 focus:ring-purple-400/20 text-sm"
                         />
                       </div>
 
