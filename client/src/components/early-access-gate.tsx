@@ -36,7 +36,7 @@ export function EarlyAccessGate({ onAccessGranted }: EarlyAccessGateProps) {
         localStorage.setItem("flutterbye_early_access", "granted");
         toast({
           title: "Access Granted!",
-          description: "Welcome to Flutterbye early access."
+          description: `Welcome to Flutterbye early access (${data.accessMethod} verification).`
         });
         onAccessGranted();
       } else {
