@@ -354,6 +354,44 @@ export default function Mint() {
           </TabsList>
 
           <TabsContent value="individual" className="space-y-6">
+                {/* Floating Progress Indicator - Always Visible */}
+                <div className="fixed top-20 right-4 z-50 bg-slate-900/95 backdrop-blur-sm border border-electric-blue/30 rounded-xl p-3 shadow-lg">
+                  <div className="flex items-center gap-3">
+                    {[
+                      { step: 1, label: "Message", icon: Sparkles, completed: message.length > 0 },
+                      { step: 2, label: "Quantity", icon: Calculator, completed: mintAmount && parseInt(mintAmount) > 0 },
+                      { step: 3, label: "Value", icon: DollarSign, completed: !attachValue || (attachedValue && parseFloat(attachedValue) > 0) },
+                      { step: 4, label: "Mint", icon: Zap, completed: false }
+                    ].map(({ step, label, icon: Icon, completed }) => (
+                      <div key={step} className="flex flex-col items-center gap-1">
+                        <div className={`
+                          w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300
+                          ${currentStep === step 
+                            ? 'bg-gradient-to-r from-electric-blue to-circuit-teal animate-pulse shadow-lg shadow-electric-blue/50' 
+                            : completed 
+                              ? 'bg-green-600 text-white' 
+                              : 'bg-gray-700 text-gray-400'
+                          }
+                        `}>
+                          <Icon className="w-5 h-5" />
+                        </div>
+                        <span className={`text-xs font-medium ${
+                          currentStep === step ? 'text-electric-blue' : completed ? 'text-green-400' : 'text-gray-400'
+                        }`}>
+                          {label}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                  {currentStep < 4 && (
+                    <div className="mt-2 text-center">
+                      <span className="text-xs text-electric-blue animate-pulse">
+                        Complete Step {currentStep}
+                      </span>
+                    </div>
+                  )}
+                </div>
+
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Minting Form */}
           <Card id="mint-form" className="premium-card electric-frame lg:col-span-2">
