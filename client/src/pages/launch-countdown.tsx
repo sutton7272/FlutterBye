@@ -231,8 +231,7 @@ export default function LaunchCountdown() {
           <FloatingActionHub />
         </>
       )}
-      {/* Animated Background */}
-      <div className="fixed inset-0 bg-gradient-to-br from-blue-900/20 via-purple-900/20 to-cyan-900/20 pointer-events-none" />
+      {/* Animated Background - removed gradient overlay to show cosmic butterfly */}
       
       {/* Electric Circuit Animation */}
       <div className="fixed inset-0 pointer-events-none">

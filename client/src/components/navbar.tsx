@@ -11,11 +11,11 @@ export default function Navbar() {
 
   // Simplified navigation - Primary items only
   const primaryNavItems = [
-    { href: "/", label: "Home", icon: Home },
+    { href: "/home", label: "Home", icon: Home },
     { href: "/mint", label: "Mint", icon: Coins },
-    { href: "/greeting-cards", label: "Cards", icon: Heart },
-    { href: "/enterprise", label: "Enterprise", icon: Building2 },
+    { href: "/marketplace", label: "Marketplace", icon: Users },
     { href: "/portfolio", label: "Portfolio", icon: Trophy },
+    { href: "/greeting-cards", label: "Cards", icon: Heart },
     { href: "/explore", label: "Explore", icon: Sparkles },
   ];
 
