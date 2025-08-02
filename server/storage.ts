@@ -73,6 +73,12 @@ export interface IStorage {
 
   // Transactions
   createTransaction(transaction: InsertTransaction): Promise<Transaction>;
+
+  // Chat operations
+  getAllChatRooms(): Promise<ChatRoom[]>;
+  getChatMessages(roomId: string, limit: number, offset: number): Promise<ChatMessage[]>;
+  createChatRoom(room: InsertChatRoom): Promise<ChatRoom>;
+  createChatMessage(message: InsertChatMessage): Promise<ChatMessage>;
   getTransactionsByUser(userId: string): Promise<Transaction[]>;
 
   // Airdrop signups

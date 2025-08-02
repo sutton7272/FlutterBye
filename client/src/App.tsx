@@ -53,6 +53,7 @@ import Navbar from "@/components/navbar";
 import { PersonalizedDashboard } from "@/components/PersonalizedDashboard";
 
 import { WalletProvider } from "@/components/wallet-adapter";
+import { AuthProvider } from "@/hooks/useAuth";
 import { TestImage } from "@/components/test-image";
 function Router() {
   return (
@@ -324,10 +325,12 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <WalletProvider>
-        <TooltipProvider>
-          <Toaster />
-          <Router />
-        </TooltipProvider>
+        <AuthProvider>
+          <TooltipProvider>
+            <Toaster />
+            <Router />
+          </TooltipProvider>
+        </AuthProvider>
       </WalletProvider>
     </QueryClientProvider>
   );

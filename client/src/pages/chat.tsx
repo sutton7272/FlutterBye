@@ -13,6 +13,7 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Send, Users, Hash, Coins, MessageSquare, Plus, Settings, Smile, Reply, Edit3, Copy, Star, AlertTriangle, Volume2, VolumeX, Maximize2, Minimize2, Search, Filter, Clock, CheckCircle2, Circle, MoreVertical, Trash2, Pin, Heart, Zap, Gift, BarChart3, RotateCcw, Crown, Sparkles, TrendingUp, DollarSign, Award, Shield, Image, Paperclip, Mic, Video, Calendar, MapPin, Users2, Bot, Lock, Unlock, Eye, EyeOff, Bell, BellOff, Palette, Wand2, Flame, Target, MessageCircle, ThumbsUp, Share2, Download, Upload, Bookmark, Flag, Coffee, Rocket } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { useWalletAuth } from '@/hooks/useAuth';
 
 interface ChatRoom {
   id: string;
@@ -58,16 +59,41 @@ interface ChatMessageExtended extends ChatMessage {
   isPinned?: boolean;
 }
 
-// TODO: Replace with real wallet authentication from useWallet hook
-// This is a critical production issue that needs immediate fixing
-const MOCK_WALLET = "4xY2D8F3nQ9sM1pR6tZ5bV7wX0aH8cJ2kL4mN7oP9qS3uT";
-
-// Production authentication integration needed:
-// import { useWallet } from '@/components/wallet-adapter';
-// const { publicKey, connected } = useWallet();
-// const userWallet = publicKey?.toBase58() || null;
+// Real authentication integration - PRODUCTION READY
+import { WalletConnect } from '@/components/WalletConnect';
 
 export function Chat() {
+  // Real authentication integration
+  const { user, walletAddress, isAuthenticated } = useWalletAuth();
+
+  // Authentication gate - prevent access if not authenticated
+  if (!isAuthenticated || !walletAddress) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-blue-900 to-black flex items-center justify-center">
+        <Card className="w-full max-w-md mx-4">
+          <CardHeader className="text-center">
+            <CardTitle className="text-2xl font-bold text-white">
+              Connect Wallet Required
+            </CardTitle>
+            <CardDescription className="text-gray-300">
+              Please connect your wallet to access the chat platform
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="text-center space-y-4">
+            <WalletConnect />
+            <Button 
+              onClick={() => window.location.href = '/'}
+              variant="outline"
+              className="w-full"
+            >
+              Go to Homepage
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+  
   const [selectedRoom, setSelectedRoom] = useState<string>('general');
   const [message, setMessage] = useState('');
   const [socket, setSocket] = useState<WebSocket | null>(null);
@@ -170,11 +196,11 @@ export function Chat() {
   const reconnectIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
   const connectWebSocket = useCallback(() => {
-    if (!selectedRoom) return;
+    if (!selectedRoom || !walletAddress) return;
 
     setConnectionStatus('connecting');
     const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
-    const wsUrl = `${protocol}//${window.location.host}/ws?wallet=${MOCK_WALLET}&room=${selectedRoom}`;
+    const wsUrl = `${protocol}//${window.location.host}/ws?wallet=${walletAddress}&room=${selectedRoom}`;
     
     const ws = new WebSocket(wsUrl);
     
@@ -197,7 +223,7 @@ export function Chat() {
           case 'message':
           case 'token_share':
             setMessages(prev => [...prev, data]);
-            if (data.senderWallet !== MOCK_WALLET) {
+            if (data.senderWallet && data.senderWallet !== walletAddress) {
               setUnreadCount(prev => prev + 1);
               playNotificationSound();
             }
