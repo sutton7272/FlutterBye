@@ -771,65 +771,6 @@ export default function Mint() {
                 {/* Phase 2: Value Attachment Section */}
                 <Separator />
 
-                {/* Redemption Code Section */}
-                <div className="space-y-4">
-                  <h4 className="text-lg font-semibold flex items-center">
-                    <Ticket className="w-5 h-5 mr-2 text-green-500" />
-                    Free Minting Code (Optional)
-                  </h4>
-                  <p className="text-sm text-muted-foreground">
-                    Have a redemption code? Enter it below to mint your message for free.
-                  </p>
-                  
-                  <div className="flex gap-2">
-                    <Input
-                      placeholder="Enter redemption code (e.g., FLBY-EARLY-001)"
-                      value={redemptionCode}
-                      onChange={(e) => setRedemptionCode(e.target.value.toUpperCase())}
-                      disabled={isValidatingCode || isFreeMode}
-                    />
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={handleRedemptionCodeValidation}
-                      disabled={!redemptionCode.trim() || isValidatingCode || isFreeMode}
-                    >
-                      {isValidatingCode ? <Loader2 className="w-4 h-4 animate-spin" /> : "Validate"}
-                    </Button>
-                  </div>
-                  
-                  {validatedCode && isFreeMode && (
-                    <div className="p-4 bg-green-50 dark:bg-green-950/20 border border-green-200 dark:border-green-800 rounded-lg">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center">
-                          <Ticket className="w-5 h-5 mr-2 text-green-600" />
-                          <div>
-                            <p className="font-semibold text-green-700 dark:text-green-300">
-                              Code "{validatedCode.code}" Validated!
-                            </p>
-                            <p className="text-sm text-green-600 dark:text-green-400">
-                              Type: {validatedCode.type} • {validatedCode.remainingUses !== null ? `${validatedCode.remainingUses} uses left` : 'Unlimited uses'}
-                            </p>
-                          </div>
-                        </div>
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => {
-                            setRedemptionCode("");
-                            setValidatedCode(null);
-                            setIsFreeMode(false);
-                          }}
-                          className="text-green-600 hover:text-green-700"
-                        >
-                          <X className="w-4 h-4" />
-                        </Button>
-                      </div>
-                    </div>
-                  )}
-                </div>
-                
                 <Separator />
                 
                 <div className={`space-y-4 transition-all duration-500 ${
@@ -987,6 +928,67 @@ export default function Mint() {
                       });
                     }}
                   />
+                </div>
+                
+                {/* Free Minting Code Section - Positioned before payment */}
+                <div className="mb-6 p-4 bg-gradient-to-r from-green-900/20 to-emerald-900/20 border border-green-500/30 rounded-xl">
+                  <h4 className="text-lg font-semibold flex items-center text-green-400 mb-3">
+                    <Ticket className="w-5 h-5 mr-2" />
+                    Free Minting Code (Optional)
+                  </h4>
+                  <p className="text-sm text-gray-300 mb-4">
+                    Have a redemption code? Enter it before minting to get your tokens for free!
+                  </p>
+                  
+                  <div className="flex gap-2 mb-4">
+                    <Input
+                      placeholder="Enter redemption code (e.g., FLBY-EARLY-001)"
+                      value={redemptionCode}
+                      onChange={(e) => setRedemptionCode(e.target.value.toUpperCase())}
+                      disabled={isValidatingCode || isFreeMode}
+                      className="bg-black/40 border-green-500/30 focus:border-green-400 text-white placeholder:text-gray-400"
+                    />
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={handleRedemptionCodeValidation}
+                      disabled={!redemptionCode.trim() || isValidatingCode || isFreeMode}
+                      className="border-green-500/50 text-green-400 hover:bg-green-500/10"
+                    >
+                      {isValidatingCode ? <Loader2 className="w-4 h-4 animate-spin" /> : "Validate"}
+                    </Button>
+                  </div>
+                  
+                  {validatedCode && isFreeMode && (
+                    <div className="p-4 bg-green-500/10 border border-green-400/50 rounded-lg">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center">
+                          <CheckCircle className="w-5 h-5 mr-2 text-green-400" />
+                          <div>
+                            <p className="font-semibold text-green-300">
+                              Code "{validatedCode.code}" Validated!
+                            </p>
+                            <p className="text-sm text-green-400">
+                              Type: {validatedCode.type} • {validatedCode.remainingUses !== null ? `${validatedCode.remainingUses} uses left` : 'Unlimited uses'}
+                            </p>
+                          </div>
+                        </div>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => {
+                            setRedemptionCode("");
+                            setValidatedCode(null);
+                            setIsFreeMode(false);
+                          }}
+                          className="text-green-400 hover:text-green-300"
+                        >
+                          <X className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  )}
                 </div>
                 
                 <Button 
