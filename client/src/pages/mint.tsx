@@ -15,7 +15,7 @@ import { apiRequest } from "@/lib/queryClient";
 import ImageUpload from "@/components/image-upload";
 import { LoadingSpinner } from "@/components/loading-spinner";
 import { validateTokenQuantity, validateWholeNumber } from "@/lib/validators";
-import { Coins, Upload, Calculator, DollarSign, Lock, Globe, Gift, AlertCircle, Wand2, Star, Sparkles } from "lucide-react";
+import { Coins, Upload, Calculator, DollarSign, Lock, Globe, Gift, AlertCircle, Wand2, Star, Sparkles, Users, Target } from "lucide-react";
 import AITextOptimizer from "@/components/ai-text-optimizer";
 import { EmotionAnalyzer } from "@/components/EmotionAnalyzer";
 import { ViralMechanics } from "@/components/ViralMechanics";
@@ -177,7 +177,20 @@ export default function Mint() {
           </TabsList>
 
           <TabsContent value="individual" className="space-y-6">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <Tabs defaultValue="create" className="space-y-4">
+              <TabsList className="grid w-full grid-cols-2 bg-slate-700/50">
+                <TabsTrigger value="create" className="flex items-center gap-2">
+                  <Coins className="w-4 h-4" />
+                  Create Token
+                </TabsTrigger>
+                <TabsTrigger value="holders" className="flex items-center gap-2">
+                  <Users className="w-4 h-4" />
+                  Token Holders
+                </TabsTrigger>
+              </TabsList>
+
+              <TabsContent value="create" className="space-y-6">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Minting Form */}
           <Card className="premium-card electric-frame">
             <CardContent className="p-8">
@@ -576,7 +589,55 @@ export default function Mint() {
               />
             </div>
           )}
-            </div>
+                </div>
+              </TabsContent>
+
+              <TabsContent value="holders" className="space-y-6">
+                <Card className="premium-card electric-frame">
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <Users className="w-5 h-5" />
+                      Token Holder Analysis
+                    </CardTitle>
+                    <CardDescription>
+                      Analyze token holders for targeted distribution campaigns
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="p-6">
+                    <div className="text-center py-12">
+                      <Users className="w-16 h-16 mx-auto text-blue-400 mb-4" />
+                      <h3 className="text-xl font-semibold mb-2">Token Holder Map</h3>
+                      <p className="text-muted-foreground mb-6">
+                        Analyze wallet addresses, token holdings, and distribution patterns to optimize your marketing campaigns.
+                        Perfect for targeting specific token communities.
+                      </p>
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-2xl mx-auto mb-6">
+                        <div className="border border-blue-500/20 bg-blue-500/5 rounded-lg p-4">
+                          <h4 className="font-medium text-blue-400 mb-2">Wallet Analysis</h4>
+                          <p className="text-sm text-muted-foreground">Identify high-value holders</p>
+                        </div>
+                        <div className="border border-green-500/20 bg-green-500/5 rounded-lg p-4">
+                          <h4 className="font-medium text-green-400 mb-2">Distribution Patterns</h4>
+                          <p className="text-sm text-muted-foreground">Understand holder behavior</p>
+                        </div>
+                        <div className="border border-purple-500/20 bg-purple-500/5 rounded-lg p-4">
+                          <h4 className="font-medium text-purple-400 mb-2">Targeted Campaigns</h4>
+                          <p className="text-sm text-muted-foreground">Optimize your outreach</p>
+                        </div>
+                      </div>
+                      <Button className="mr-4">
+                        <Users className="w-4 h-4 mr-2" />
+                        View Token Map
+                      </Button>
+                      <Button variant="outline">
+                        <Target className="w-4 h-4 mr-2" />
+                        Analyze Holders
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+            </Tabs>
           </TabsContent>
 
           <TabsContent value="limited" className="space-y-6">

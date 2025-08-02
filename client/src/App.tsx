@@ -23,6 +23,7 @@ import { WalletManagementPage } from "@/pages/wallet-management";
 import { RewardsPage } from "@/pages/rewards";
 import JourneyPage from "@/pages/journey";
 import BadgesPage from "@/pages/badges";
+import InfoPage from "@/pages/info";
 
 import { Chat } from "@/pages/chat";
 import LimitedEdition from "@/pages/limited-edition";
@@ -266,6 +267,13 @@ function Router() {
           <>
             <Navbar />
             <ReferralRewards />
+            <FloatingActionHub />
+          </>
+        )} />
+        <Route path="/info" component={() => (
+          <>
+            <Navbar />
+            <InfoPage />
             <FloatingActionHub />
           </>
         )} />

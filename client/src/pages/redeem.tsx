@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { toast } from '@/hooks/use-toast';
-import { Coins, Clock, CheckCircle, AlertCircle, Flame, TrendingUp, User, Calendar, DollarSign, ArrowUpCircle, ArrowDownCircle, Award, Star, Zap, Target, Trophy } from 'lucide-react';
+import { Coins, Clock, CheckCircle, AlertCircle, Flame, TrendingUp, User, Calendar, DollarSign, ArrowUpCircle, ArrowDownCircle, Award, Star, Zap, Target, Trophy, Activity, Users } from 'lucide-react';
 import { apiRequest } from '@/lib/queryClient';
 import { TransactionSuccessOverlay } from "@/components/confetti-celebration";
 import { format, differenceInDays, isAfter } from 'date-fns';
@@ -289,7 +289,7 @@ export default function RedeemPage() {
 
         {/* Tabbed Interface */}
         <Tabs defaultValue="redeem" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-5 bg-slate-800/50">
+          <TabsList className="grid w-full grid-cols-7 bg-slate-800/50">
             <TabsTrigger value="redeem" className="flex items-center gap-2">
               <ArrowDownCircle className="w-4 h-4" />
               Redeem
@@ -305,6 +305,14 @@ export default function RedeemPage() {
             <TabsTrigger value="badges" className="flex items-center gap-2">
               <Award className="w-4 h-4" />
               Badges
+            </TabsTrigger>
+            <TabsTrigger value="activity" className="flex items-center gap-2">
+              <Activity className="w-4 h-4" />
+              Activity
+            </TabsTrigger>
+            <TabsTrigger value="journey" className="flex items-center gap-2">
+              <Users className="w-4 h-4" />
+              Journey
             </TabsTrigger>
             <TabsTrigger value="stats" className="flex items-center gap-2">
               <TrendingUp className="w-4 h-4" />
@@ -687,6 +695,259 @@ export default function RedeemPage() {
                       </CardContent>
                     </Card>
                   ))}
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Activity Tab */}
+          <TabsContent value="activity" className="space-y-4">
+            <Card className="glassmorphism">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Activity className="w-5 h-5" />
+                  Recent Activity
+                </CardTitle>
+                <CardDescription>
+                  Your recent token transactions and platform interactions
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {[
+                    {
+                      type: 'mint',
+                      message: 'StakeNowForYield',
+                      amount: '1,000 tokens',
+                      value: '2.5 SOL',
+                      time: '2 hours ago',
+                      status: 'completed'
+                    },
+                    {
+                      type: 'redeem',
+                      message: 'HappyBirthday',
+                      amount: '500 tokens',
+                      value: '1.2 SOL',
+                      time: '5 hours ago',
+                      status: 'completed'
+                    },
+                    {
+                      type: 'receive',
+                      message: 'WelcomeGift',
+                      amount: '100 tokens',
+                      value: '0.1 SOL',
+                      time: '1 day ago',
+                      status: 'completed'
+                    },
+                    {
+                      type: 'mint',
+                      message: 'ThankYou',
+                      amount: '2,000 tokens',
+                      value: '5.0 SOL',
+                      time: '2 days ago',
+                      status: 'completed'
+                    },
+                    {
+                      type: 'redeem',
+                      message: 'LoyaltyBonus',
+                      amount: '750 tokens',
+                      value: '1.8 SOL',
+                      time: '3 days ago',
+                      status: 'completed'
+                    }
+                  ].map((activity, index) => (
+                    <div key={index} className={`flex items-center gap-4 p-4 rounded-lg border ${
+                      activity.type === 'mint' ? 'border-blue-500/20 bg-blue-500/5' :
+                      activity.type === 'redeem' ? 'border-green-500/20 bg-green-500/5' :
+                      'border-purple-500/20 bg-purple-500/5'
+                    }`}>
+                      <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                        activity.type === 'mint' ? 'bg-blue-500/20' :
+                        activity.type === 'redeem' ? 'bg-green-500/20' :
+                        'bg-purple-500/20'
+                      }`}>
+                        {activity.type === 'mint' ? 
+                          <ArrowUpCircle className={`w-5 h-5 ${
+                            activity.type === 'mint' ? 'text-blue-400' :
+                            activity.type === 'redeem' ? 'text-green-400' :
+                            'text-purple-400'
+                          }`} /> :
+                        activity.type === 'redeem' ?
+                          <ArrowDownCircle className="w-5 h-5 text-green-400" /> :
+                          <Coins className="w-5 h-5 text-purple-400" />
+                        }
+                      </div>
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className="font-medium capitalize">{activity.type}</span>
+                          <Badge variant="outline" className="text-xs">
+                            {activity.message}
+                          </Badge>
+                        </div>
+                        <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                          <span>{activity.amount}</span>
+                          <span>•</span>
+                          <span>{activity.value}</span>
+                          <span>•</span>
+                          <span>{activity.time}</span>
+                        </div>
+                      </div>
+                      <Badge className="bg-green-600">
+                        <CheckCircle className="w-3 h-3 mr-1" />
+                        {activity.status}
+                      </Badge>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Journey Tab */}
+          <TabsContent value="journey" className="space-y-4">
+            <Card className="glassmorphism">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Users className="w-5 h-5" />
+                  Your Flutterbye Journey
+                </CardTitle>
+                <CardDescription>
+                  Your progress and milestones in the Flutterbye ecosystem
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-6">
+                  {/* Journey Stats */}
+                  <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <Card className="border border-blue-500/20 bg-blue-500/5">
+                      <CardContent className="p-4 text-center">
+                        <Calendar className="w-8 h-8 mx-auto mb-2 text-blue-400" />
+                        <p className="text-sm text-muted-foreground">Member Since</p>
+                        <p className="font-bold">Dec 2024</p>
+                      </CardContent>
+                    </Card>
+                    <Card className="border border-green-500/20 bg-green-500/5">
+                      <CardContent className="p-4 text-center">
+                        <Flame className="w-8 h-8 mx-auto mb-2 text-green-400" />
+                        <p className="text-sm text-muted-foreground">Current Streak</p>
+                        <p className="font-bold">12 days</p>
+                      </CardContent>
+                    </Card>
+                    <Card className="border border-purple-500/20 bg-purple-500/5">
+                      <CardContent className="p-4 text-center">
+                        <Trophy className="w-8 h-8 mx-auto mb-2 text-purple-400" />
+                        <p className="text-sm text-muted-foreground">Level</p>
+                        <p className="font-bold">Level 8</p>
+                      </CardContent>
+                    </Card>
+                    <Card className="border border-yellow-500/20 bg-yellow-500/5">
+                      <CardContent className="p-4 text-center">
+                        <Star className="w-8 h-8 mx-auto mb-2 text-yellow-400" />
+                        <p className="text-sm text-muted-foreground">XP Points</p>
+                        <p className="font-bold">4,250</p>
+                      </CardContent>
+                    </Card>
+                  </div>
+
+                  {/* Journey Timeline */}
+                  <div className="space-y-4">
+                    <h3 className="font-semibold">Journey Milestones</h3>
+                    <div className="space-y-6">
+                      {[
+                        {
+                          title: 'First Token Created',
+                          description: 'Successfully minted your first FLBY-MSG token',
+                          date: 'Dec 15, 2024',
+                          completed: true,
+                          icon: Coins,
+                          color: 'green'
+                        },
+                        {
+                          title: 'Token Collector',
+                          description: 'Acquired 10 different tokens',
+                          date: 'Dec 18, 2024',
+                          completed: true,
+                          icon: Trophy,
+                          color: 'green'
+                        },
+                        {
+                          title: 'Community Member',
+                          description: 'Joined the chat and made your first connection',
+                          date: 'Dec 20, 2024',
+                          completed: true,
+                          icon: Users,
+                          color: 'green'
+                        },
+                        {
+                          title: 'Value Creator',
+                          description: 'Created tokens worth over 5 SOL',
+                          date: 'Dec 25, 2024',
+                          completed: true,
+                          icon: Star,
+                          color: 'green'
+                        },
+                        {
+                          title: 'FLBY Holder',
+                          description: 'Acquire your first FLBY tokens',
+                          date: 'Coming Soon',
+                          completed: false,
+                          icon: Zap,
+                          color: 'blue'
+                        },
+                        {
+                          title: 'Governance Participant',
+                          description: 'Vote on your first platform proposal',
+                          date: 'Coming Soon',
+                          completed: false,
+                          icon: Users,
+                          color: 'blue'
+                        }
+                      ].map((milestone, index) => (
+                        <div key={index} className="flex gap-4">
+                          <div className="flex flex-col items-center">
+                            <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                              milestone.completed 
+                                ? 'bg-green-500/20' 
+                                : 'bg-slate-700'
+                            }`}>
+                              <milestone.icon className={`w-5 h-5 ${
+                                milestone.completed 
+                                  ? 'text-green-400' 
+                                  : 'text-muted-foreground'
+                              }`} />
+                            </div>
+                            {index < 5 && (
+                              <div className={`w-0.5 h-8 mt-2 ${
+                                milestone.completed 
+                                  ? 'bg-green-500/30' 
+                                  : 'bg-slate-700'
+                              }`}></div>
+                            )}
+                          </div>
+                          <div className="flex-1 pb-6">
+                            <div className="flex items-center gap-2 mb-1">
+                              <h4 className={`font-medium ${
+                                milestone.completed 
+                                  ? 'text-white' 
+                                  : 'text-muted-foreground'
+                              }`}>
+                                {milestone.title}
+                              </h4>
+                              {milestone.completed && (
+                                <CheckCircle className="w-4 h-4 text-green-400" />
+                              )}
+                            </div>
+                            <p className="text-sm text-muted-foreground mb-1">
+                              {milestone.description}
+                            </p>
+                            <p className="text-xs text-muted-foreground">
+                              {milestone.date}
+                            </p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
                 </div>
               </CardContent>
             </Card>

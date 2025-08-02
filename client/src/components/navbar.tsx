@@ -14,23 +14,18 @@ export default function Navbar() {
     { href: "/home", label: "Home", icon: Home },
     { href: "/mint", label: "Mint", icon: Coins },
     { href: "/redeem", label: "Dashboard", icon: LayoutDashboard },
+    { href: "/chat", label: "Chat", icon: MessageSquare },
     { href: "/marketplace", label: "Marketplace", icon: Users },
     { href: "/greeting-cards", label: "Cards", icon: Heart },
     { href: "/enterprise", label: "Marketing", icon: Building2 },
-    { href: "/explore", label: "Explore", icon: Sparkles },
+    { href: "/info", label: "Info", icon: HelpCircle },
   ];
 
   // Secondary items for mobile/dropdown
   const secondaryNavItems = [
-    { href: "/activity", label: "Activity", icon: Activity },
     { href: "/portfolio", label: "Portfolio", icon: Trophy },
-    { href: "/chat", label: "Chat", icon: MessageSquare },
-    { href: "/token-map", label: "Token Map", icon: MapPin },
-    { href: "/rewards", label: "Rewards", icon: Trophy },
-    { href: "/journey", label: "Journey", icon: Users },
-    { href: "/flby/staking", label: "FLBY Staking", icon: Zap },
-    { href: "/flby/governance", label: "Governance", icon: Users },
-    { href: "/flby/airdrop", label: "FLBY Airdrop", icon: Coins },
+    { href: "/explore", label: "Explore", icon: Sparkles },
+    { href: "/rewards", label: "Rewards", icon: Gift },
     { href: "/referrals", label: "Referrals", icon: Users },
     { href: "/free-codes", label: "Free Codes", icon: Ticket },
     { href: "/how-it-works", label: "How It Works", icon: HelpCircle },
