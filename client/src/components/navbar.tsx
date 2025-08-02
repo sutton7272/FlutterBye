@@ -3,7 +3,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { WalletConnect } from "@/components/wallet-connect";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { Menu, Home, Coins, Trophy, Users, MessageSquare, Settings, Sparkles } from "lucide-react";
+import { Menu, Home, Coins, Trophy, Users, MessageSquare, Settings, Sparkles, Zap } from "lucide-react";
 
 export default function Navbar() {
   const [location] = useLocation();
@@ -22,14 +22,14 @@ export default function Navbar() {
     { href: "/chat", label: "Chat", icon: MessageSquare },
     { href: "/rewards", label: "Rewards", icon: Trophy },
     { href: "/journey", label: "Journey", icon: Users },
-    { href: "/confetti-demo", label: "Demo", icon: Sparkles },
+    { href: "/electric-demo", label: "Electric Demo", icon: Zap },
     { href: "/admin", label: "Admin", icon: Settings },
   ];
 
   const isActive = (href: string) => location === href;
 
   return (
-    <nav className="glassmorphism border-b border-border sticky top-0 z-50">
+    <nav className="glassmorphism border-b border-border sticky top-0 z-50 electric-frame">
       <div className="container flex h-16 items-center">
         {/* Logo */}
         <div className="mr-8 flex items-center">

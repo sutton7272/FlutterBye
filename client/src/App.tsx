@@ -28,6 +28,7 @@ import LimitedEdition from "@/pages/limited-edition";
 import AdvancedSearch from "@/pages/advanced-search";
 import AdminSystem from "@/pages/admin-system";
 import ConfettiDemo from "@/pages/confetti-demo";
+import ElectricDemo from "@/pages/electric-demo";
 import Navbar from "@/components/navbar";
 import { FloatingActionHub } from "@/components/floating-action-hub";
 import { WalletProvider } from "@/components/wallet-adapter";
@@ -61,6 +62,7 @@ function Router() {
         <Route path="/search" component={AdvancedSearch} />
         <Route path="/admin-system" component={AdminSystem} />
         <Route path="/confetti-demo" component={ConfettiDemo} />
+        <Route path="/electric-demo" component={ElectricDemo} />
         <Route component={NotFound} />
       </Switch>
       <FloatingActionHub />

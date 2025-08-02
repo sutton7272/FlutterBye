@@ -3,38 +3,45 @@
 @tailwind utilities;
 
 :root {
-  /* Modern Web3 Color System - Electric Purple Theme */
-  --background: hsl(240, 5%, 4%);
+  /* Electric Blue & Green Theme with Pulse Effects */
+  --background: hsl(220, 15%, 3%);
   --foreground: hsl(0, 0%, 100%);
-  --muted: hsl(240, 4%, 9%);
-  --muted-foreground: hsl(240, 3%, 63%);
-  --popover: hsl(240, 5%, 4%);
+  --muted: hsl(220, 12%, 8%);
+  --muted-foreground: hsl(220, 8%, 65%);
+  --popover: hsl(220, 15%, 3%);
   --popover-foreground: hsl(0, 0%, 100%);
-  --card: hsl(240, 4%, 9%);
+  --card: hsl(220, 12%, 8%);
   --card-foreground: hsl(0, 0%, 100%);
-  --border: hsl(240, 6%, 15%);
-  --input: hsl(240, 4%, 9%);
-  --primary: hsl(263, 70%, 50%);
-  --primary-foreground: hsl(0, 0%, 100%);
-  --secondary: hsl(270, 60%, 65%);
-  --secondary-foreground: hsl(240, 5%, 4%);
-  --accent: hsl(142, 70%, 45%);
+  --border: hsl(220, 15%, 15%);
+  --input: hsl(220, 12%, 8%);
+  --primary: hsl(200, 100%, 50%);
+  --primary-foreground: hsl(220, 15%, 3%);
+  --secondary: hsl(140, 100%, 40%);
+  --secondary-foreground: hsl(220, 15%, 3%);
+  --accent: hsl(155, 100%, 35%);
   --accent-foreground: hsl(0, 0%, 100%);
   --destructive: hsl(0, 72%, 51%);
   --destructive-foreground: hsl(0, 0%, 100%);
-  --ring: hsl(263, 70%, 50%);
+  --ring: hsl(200, 100%, 50%);
   --radius: 0.75rem;
   
-  /* Electric Purple Theme Palette */
-  --ultra-dark: hsl(240, 5%, 4%);
-  --surface-dark: hsl(240, 4%, 9%);
-  --electric-purple: hsl(263, 70%, 50%);
-  --light-purple: hsl(270, 60%, 65%);
-  --success-green: hsl(142, 70%, 45%);
+  /* Electric Circuit Theme Palette */
+  --ultra-dark: hsl(220, 15%, 3%);
+  --surface-dark: hsl(220, 12%, 8%);
+  --electric-blue: hsl(200, 100%, 50%);
+  --bright-blue: hsl(210, 100%, 60%);
+  --electric-green: hsl(140, 100%, 40%);
+  --neon-green: hsl(155, 100%, 35%);
+  --circuit-teal: hsl(180, 100%, 45%);
   --warning-orange: hsl(35, 100%, 50%);
   --text-primary: hsl(0, 0%, 100%);
-  --text-secondary: hsl(240, 3%, 63%);
-  --glass-overlay: hsla(263, 70%, 50%, 0.05);
+  --text-secondary: hsl(220, 8%, 65%);
+  --glass-overlay: hsla(200, 100%, 50%, 0.05);
+  
+  /* Pulse Animation Colors */
+  --pulse-blue: hsla(200, 100%, 50%, 0.8);
+  --pulse-green: hsla(140, 100%, 40%, 0.8);
+  --pulse-teal: hsla(180, 100%, 45%, 0.8);
 }
 
 .dark {
@@ -97,10 +104,30 @@
   }
   
   .glassmorphism {
-    background: hsla(240, 4%, 9%, 0.8);
+    background: hsla(220, 12%, 8%, 0.8);
     backdrop-filter: blur(20px);
-    border: 1px solid hsla(190, 100%, 50%, 0.1);
+    border: 1px solid hsla(200, 100%, 50%, 0.2);
     box-shadow: 0 8px 32px hsla(0, 0%, 0%, 0.3);
+    position: relative;
+  }
+  
+  .glassmorphism::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border: 1px solid transparent;
+    background: linear-gradient(135deg, 
+      hsla(200, 100%, 50%, 0.3) 0%,
+      transparent 25%, 
+      transparent 75%, 
+      hsla(140, 100%, 40%, 0.3) 100%);
+    background-clip: border-box;
+    border-radius: inherit;
+    pointer-events: none;
+    animation: borderPulse 4s ease-in-out infinite;
   }
   
   .cyber-glow {
@@ -128,18 +155,41 @@
       0 0 24px hsla(190, 100%, 50%, 0.2);
   }
   
-  /* New Modern Components */
+  /* Electric Circuit Components */
   .premium-card {
-    background: hsla(240, 4%, 9%, 0.9);
-    border: 1px solid hsla(190, 100%, 50%, 0.1);
+    background: hsla(220, 12%, 8%, 0.9);
+    border: 1px solid hsla(200, 100%, 50%, 0.2);
     border-radius: 16px;
     backdrop-filter: blur(20px);
     transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .premium-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, 
+      transparent, 
+      hsla(200, 100%, 50%, 0.1), 
+      hsla(140, 100%, 40%, 0.1), 
+      transparent);
+    transition: left 0.5s ease;
   }
   
   .premium-card:hover {
-    border-color: hsla(190, 100%, 50%, 0.3);
-    box-shadow: 0 8px 32px hsla(190, 100%, 50%, 0.1);
+    border-color: hsla(200, 100%, 50%, 0.4);
+    box-shadow: 
+      0 8px 32px hsla(200, 100%, 50%, 0.15),
+      0 0 20px hsla(140, 100%, 40%, 0.1);
+  }
+  
+  .premium-card:hover::before {
+    left: 100%;
   }
   
   .trust-indicator {
@@ -155,38 +205,116 @@
     color: hsl(142, 100%, 55%);
   }
   
+  /* Electric Circuit Animations */
+  @keyframes electricPulse {
+    0%, 100% { 
+      box-shadow: 0 0 5px var(--pulse-blue), 0 0 10px var(--pulse-blue), 0 0 15px var(--pulse-blue);
+      border-color: var(--electric-blue);
+    }
+    50% { 
+      box-shadow: 0 0 10px var(--pulse-green), 0 0 20px var(--pulse-green), 0 0 30px var(--pulse-green);
+      border-color: var(--electric-green);
+    }
+  }
+  
+  @keyframes circuitFlow {
+    0% { 
+      background-position: 0% 50%; 
+      filter: hue-rotate(0deg);
+    }
+    50% { 
+      background-position: 100% 50%; 
+      filter: hue-rotate(90deg);
+    }
+    100% { 
+      background-position: 0% 50%; 
+      filter: hue-rotate(0deg);
+    }
+  }
+  
+  @keyframes borderPulse {
+    0%, 100% { 
+      border-color: var(--electric-blue);
+      box-shadow: inset 0 0 10px var(--pulse-blue);
+    }
+    25% { 
+      border-color: var(--circuit-teal);
+      box-shadow: inset 0 0 10px var(--pulse-teal);
+    }
+    75% { 
+      border-color: var(--electric-green);
+      box-shadow: inset 0 0 10px var(--pulse-green);
+    }
+  }
+
   .modern-gradient {
     background: linear-gradient(135deg, 
-      hsl(263, 70%, 50%) 0%, 
-      hsl(270, 60%, 65%) 100%);
+      hsl(200, 100%, 50%) 0%, 
+      hsl(180, 100%, 45%) 50%,
+      hsl(140, 100%, 40%) 100%);
+    background-size: 200% 200%;
+    animation: circuitFlow 3s ease-in-out infinite;
   }
   
   .text-gradient {
     background: linear-gradient(135deg, 
-      hsl(263, 70%, 50%) 0%, 
-      hsl(270, 60%, 65%) 100%);
+      hsl(200, 100%, 50%) 0%, 
+      hsl(180, 100%, 45%) 50%,
+      hsl(140, 100%, 40%) 100%);
+    background-size: 200% 200%;
     background-clip: text;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
+    animation: circuitFlow 3s ease-in-out infinite;
   }
   
-  /* Alternative Color Themes - Quick Swap Options */
-  .orange-gradient {
-    background: linear-gradient(135deg, 
-      hsl(21, 90%, 52%) 0%, 
-      hsl(35, 85%, 60%) 100%);
+  /* Electric Pulse Components */
+  .electric-frame {
+    position: relative;
+    border: 2px solid var(--electric-blue);
+    border-radius: 12px;
+    animation: electricPulse 2s ease-in-out infinite;
+    overflow: hidden;
   }
   
-  .green-gradient {
-    background: linear-gradient(135deg, 
-      hsl(142, 70%, 45%) 0%, 
-      hsl(155, 65%, 50%) 100%);
+  .electric-frame::before {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    background: linear-gradient(45deg, 
+      var(--electric-blue), 
+      var(--circuit-teal), 
+      var(--electric-green), 
+      var(--circuit-teal), 
+      var(--electric-blue));
+    background-size: 400% 400%;
+    animation: circuitFlow 4s ease-in-out infinite;
+    border-radius: 12px;
+    z-index: -1;
   }
   
-  .blue-gradient {
-    background: linear-gradient(135deg, 
-      hsl(213, 94%, 68%) 0%, 
-      hsl(217, 91%, 60%) 100%);
+  .pulse-border {
+    border: 1px solid var(--electric-blue);
+    animation: borderPulse 3s ease-in-out infinite;
+    transition: all 0.3s ease;
+  }
+  
+  .circuit-glow {
+    box-shadow: 
+      0 0 10px var(--pulse-blue),
+      0 0 20px var(--pulse-blue),
+      inset 0 0 10px var(--pulse-blue);
+    transition: all 0.3s ease;
+  }
+  
+  .circuit-glow:hover {
+    box-shadow: 
+      0 0 15px var(--pulse-green),
+      0 0 30px var(--pulse-green),
+      inset 0 0 15px var(--pulse-green);
   }
   
   .flutter-animate {
