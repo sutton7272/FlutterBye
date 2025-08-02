@@ -319,9 +319,12 @@ export default function LaunchCountdown() {
 
                   <Button 
                     type="button" 
-                    className="w-full"
+                    className="w-full bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 hover:to-blue-700 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-300 hover:scale-105 border border-cyan-400/30"
                     disabled={signupMutation.isPending || !email}
-                    onClick={handleSignup}
+                    onClick={(e) => {
+                      console.log("Raw button click event:", e);
+                      handleSignup();
+                    }}
                   >
                     {signupMutation.isPending ? (
                       <>
@@ -334,6 +337,19 @@ export default function LaunchCountdown() {
                         Join VIP Waitlist
                       </>
                     )}
+                  </Button>
+
+                  {/* Debug button */}
+                  <Button 
+                    type="button" 
+                    variant="outline"
+                    className="w-full mb-2"
+                    onClick={() => {
+                      console.log("TEST BUTTON CLICKED - This proves click events work!");
+                      alert("Test button clicked! Click events are working.");
+                    }}
+                  >
+                    🔧 Test Click (Remove This)
                   </Button>
 
                   <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-3">
