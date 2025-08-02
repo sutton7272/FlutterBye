@@ -91,9 +91,8 @@ export default function LaunchCountdown() {
     }
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    console.log("Form submitted with:", { email, walletAddress });
+  const handleSignup = () => {
+    console.log("Button clicked with:", { email, walletAddress });
     
     if (!email || email.trim() === "") {
       toast({
@@ -275,7 +274,7 @@ export default function LaunchCountdown() {
                   </div>
                 </div>
               ) : (
-                <form onSubmit={handleSubmit} className="space-y-4">
+                <div className="space-y-4">
                   <div className="space-y-2">
                     <Label htmlFor="email">Email Address *</Label>
                     <Input
@@ -310,9 +309,10 @@ export default function LaunchCountdown() {
                   </div>
 
                   <Button 
-                    type="submit" 
+                    type="button" 
                     className="w-full"
                     disabled={signupMutation.isPending || !email}
+                    onClick={handleSignup}
                   >
                     {signupMutation.isPending ? (
                       <>
@@ -336,7 +336,7 @@ export default function LaunchCountdown() {
                       <li>• VIP community access</li>
                     </ul>
                   </div>
-                </form>
+                </div>
               )}
             </CardContent>
           </Card>
