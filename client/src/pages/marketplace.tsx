@@ -4,7 +4,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Search, TrendingUp, Star, Clock, DollarSign, Filter } from "lucide-react";
+import { Search, TrendingUp, Star, Clock, DollarSign, Filter, Share2, Crown, Users, Award, Heart, MessageCircle, Copy, ExternalLink, Verified, Gift } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 interface Message {
   id: string;
@@ -69,6 +70,8 @@ export default function Marketplace() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [sortBy, setSortBy] = useState("trending");
+  const [customMessage, setCustomMessage] = useState("");
+  const { toast } = useToast();
 
   const filteredMessages = mockMessages.filter(message => {
     const matchesSearch = message.content.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -76,6 +79,60 @@ export default function Marketplace() {
     const matchesCategory = selectedCategory === "all" || message.category.toLowerCase() === selectedCategory;
     return matchesSearch && matchesCategory;
   });
+
+  const handleShare = (platform: string) => {
+    const message = customMessage || "Check out this amazing tokenized message on Flutterbye!";
+    const shareUrls = {
+      twitter: `https://twitter.com/intent/tweet?text=${encodeURIComponent(message)}&url=${encodeURIComponent(window.location.origin)}`,
+      facebook: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.origin)}`,
+      linkedin: `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(window.location.origin)}`,
+      reddit: `https://reddit.com/submit?url=${encodeURIComponent(window.location.origin)}&title=${encodeURIComponent(message)}`,
+      telegram: `https://t.me/share/url?url=${encodeURIComponent(window.location.origin)}&text=${encodeURIComponent(message)}`,
+      discord: `Share in Discord: ${message}`
+    };
+
+    if (platform === 'discord') {
+      navigator.clipboard.writeText(`Share in Discord: ${message}`);
+      toast({
+        title: "Copied to Clipboard!",
+        description: "Discord share link copied. Paste it in your Discord server!",
+      });
+    } else if (shareUrls[platform as keyof typeof shareUrls]) {
+      window.open(shareUrls[platform as keyof typeof shareUrls], '_blank');
+      toast({
+        title: "Sharing to " + platform.charAt(0).toUpperCase() + platform.slice(1),
+        description: "You'll earn FLBY rewards for viral shares!",
+      });
+    }
+  };
+
+  // Mock celebrity data
+  const mockCelebrities = [
+    {
+      id: "1",
+      name: "Alex Rodriguez",
+      username: "alexcrypto",
+      avatar: "🌟",
+      verified: true,
+      followers: 2500000,
+      category: "Crypto Influencer",
+      bio: "Blockchain educator & DeFi expert",
+      recentMessage: "GM Web3 builders! 🚀",
+      messagePrice: 0.5
+    },
+    {
+      id: "2",
+      name: "Sarah Chen",
+      username: "sarahnft",
+      avatar: "🎨",
+      verified: true,
+      followers: 890000,
+      category: "NFT Artist",
+      bio: "Digital artist creating the future",
+      recentMessage: "New drop coming soon! ✨",
+      messagePrice: 0.3
+    }
+  ];
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-blue-900 to-purple-900 text-white p-6">
@@ -178,9 +235,17 @@ export default function Marketplace() {
 
         {/* Marketplace Tabs */}
         <Tabs defaultValue="buy" className="mb-8">
-          <TabsList className="grid w-full grid-cols-3 bg-gray-800/50">
+          <TabsList className="grid w-full grid-cols-5 bg-gray-800/50">
             <TabsTrigger value="buy">Buy Messages</TabsTrigger>
             <TabsTrigger value="sell">Sell Messages</TabsTrigger>
+            <TabsTrigger value="viral-sharing" className="text-electric-blue">
+              <Share2 className="h-4 w-4 mr-1" />
+              Viral Sharing
+            </TabsTrigger>
+            <TabsTrigger value="celebrities" className="text-electric-green">
+              <Crown className="h-4 w-4 mr-1" />
+              Celebrities
+            </TabsTrigger>
             <TabsTrigger value="my-collection">My Collection</TabsTrigger>
           </TabsList>
 
@@ -252,6 +317,167 @@ export default function Marketplace() {
                     </Button>
                   </Card>
                 </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="viral-sharing" className="space-y-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+              {/* Share New Message */}
+              <Card className="bg-gray-800/50 border-gray-700">
+                <CardHeader>
+                  <CardTitle className="text-electric-blue flex items-center gap-2">
+                    <Share2 className="h-5 w-5" />
+                    Share & Earn FLBY
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  <div>
+                    <label className="block text-sm font-medium mb-2">Create Viral Message</label>
+                    <Input
+                      placeholder="Write your viral message here..."
+                      className="bg-gray-700/50 border-gray-600 text-white"
+                      value={customMessage}
+                      onChange={(e) => setCustomMessage(e.target.value)}
+                      maxLength={100}
+                    />
+                    <p className="text-xs text-gray-400 mt-1">{customMessage.length}/100 characters</p>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium mb-3">Share to Platforms</label>
+                    <div className="grid grid-cols-2 gap-3">
+                      <Button onClick={() => handleShare('twitter')} className="bg-blue-500 hover:bg-blue-600 flex items-center gap-2">
+                        <ExternalLink className="h-4 w-4" />
+                        Twitter/X
+                      </Button>
+                      <Button onClick={() => handleShare('discord')} className="bg-indigo-600 hover:bg-indigo-700 flex items-center gap-2">
+                        <Copy className="h-4 w-4" />
+                        Discord
+                      </Button>
+                      <Button onClick={() => handleShare('telegram')} className="bg-blue-400 hover:bg-blue-500 flex items-center gap-2">
+                        <ExternalLink className="h-4 w-4" />
+                        Telegram
+                      </Button>
+                      <Button onClick={() => handleShare('reddit')} className="bg-orange-600 hover:bg-orange-700 flex items-center gap-2">
+                        <ExternalLink className="h-4 w-4" />
+                        Reddit
+                      </Button>
+                    </div>
+                  </div>
+
+                  <div className="bg-gradient-to-r from-electric-blue/20 to-electric-green/20 p-4 rounded-lg">
+                    <h4 className="font-semibold mb-2 text-electric-blue">Viral Rewards</h4>
+                    <ul className="text-sm text-gray-300 space-y-1">
+                      <li>• 1 FLBY per 100 views from your shares</li>
+                      <li>• 5 FLBY per 100 likes/reactions</li>
+                      <li>• 10 FLBY per 100 comments/replies</li>
+                    </ul>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Viral Leaderboard */}
+              <Card className="bg-gray-800/50 border-gray-700">
+                <CardHeader>
+                  <CardTitle className="text-electric-green flex items-center gap-2">
+                    <TrendingUp className="h-5 w-5" />
+                    Trending Messages
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="bg-gray-700/50 p-4 rounded-lg">
+                    <div className="flex items-center justify-between mb-2">
+                      <Badge className="bg-yellow-500 text-black">#1 Trending</Badge>
+                      <span className="text-sm text-gray-400">2h ago</span>
+                    </div>
+                    <p className="font-semibold mb-1">Just minted my first FLBY message! 🚀</p>
+                    <div className="flex justify-between text-sm">
+                      <div className="flex items-center gap-4">
+                        <span className="flex items-center gap-1">
+                          <Share2 className="h-4 w-4 text-blue-400" />
+                          1,240
+                        </span>
+                        <span className="flex items-center gap-1">
+                          <Heart className="h-4 w-4 text-red-400" />
+                          3,890
+                        </span>
+                      </div>
+                      <span className="text-electric-green font-semibold">+45.5 FLBY</span>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="celebrities" className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {mockCelebrities.map((celebrity) => (
+                <Card key={celebrity.id} className="bg-gray-800/50 border-gray-700 hover:border-electric-blue/50 transition-colors">
+                  <CardHeader className="pb-3">
+                    <div className="flex items-center gap-3">
+                      <div className="text-3xl">{celebrity.avatar}</div>
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <h3 className="font-semibold">{celebrity.name}</h3>
+                          {celebrity.verified && (
+                            <Verified className="h-4 w-4 text-blue-400" />
+                          )}
+                        </div>
+                        <p className="text-sm text-gray-400">@{celebrity.username}</p>
+                      </div>
+                    </div>
+                  </CardHeader>
+                  
+                  <CardContent className="space-y-4">
+                    <Badge className="bg-purple-600 text-white">
+                      {celebrity.category}
+                    </Badge>
+                    
+                    <p className="text-sm text-gray-300">{celebrity.bio}</p>
+                    
+                    <div className="flex justify-between text-sm">
+                      <div>
+                        <p className="text-gray-400">Followers</p>
+                        <p className="font-semibold">{(celebrity.followers / 1000000).toFixed(1)}M</p>
+                      </div>
+                    </div>
+                    
+                    <div className="bg-gray-700/50 p-3 rounded-lg">
+                      <p className="text-sm text-gray-400 mb-1">Recent Message:</p>
+                      <p className="font-medium text-electric-blue">{celebrity.recentMessage}</p>
+                    </div>
+                    
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-lg font-bold text-electric-green">
+                          {celebrity.messagePrice} SOL
+                        </p>
+                        <p className="text-sm text-gray-400">Per Message</p>
+                      </div>
+                      <Button className="bg-gradient-to-r from-electric-blue to-electric-green hover:opacity-90">
+                        <Gift className="h-4 w-4 mr-2" />
+                        Request Message
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+            
+            <Card className="bg-gradient-to-r from-purple-800/50 to-pink-800/50 border-purple-700">
+              <CardHeader>
+                <CardTitle className="text-purple-300 flex items-center gap-2">
+                  <Crown className="h-5 w-5" />
+                  Join as Celebrity
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-gray-300 mb-4">Are you an influencer? Apply to join our celebrity program!</p>
+                <Button className="w-full bg-gradient-to-r from-electric-blue to-electric-green hover:opacity-90">
+                  Apply Now
+                </Button>
               </CardContent>
             </Card>
           </TabsContent>

@@ -9,16 +9,14 @@ export default function Navbar() {
   const [location] = useLocation();
   const [isOpen, setIsOpen] = useState(false);
 
-  // Primary navigation with viral amplifiers
+  // Streamlined navigation - all viral features consolidated into existing pages
   const primaryNavItems = [
     { href: "/home", label: "Home", icon: Home },
     { href: "/mint", label: "Mint", icon: Coins },
     { href: "/marketplace", label: "Marketplace", icon: TrendingUp, isViral: true },
-    { href: "/viral-sharing", label: "Viral Hub", icon: Share2, isViral: true },
-    { href: "/celebrity-hub", label: "Celebrities", icon: Crown, isViral: true },
     { href: "/chat", label: "Chat", icon: MessageSquare },
     { href: "/greeting-cards", label: "Cards", icon: Heart },
-    { href: "/enterprise", label: "Marketing", icon: Building2 },
+    { href: "/enterprise", label: "Marketing", icon: Building2, isViral: true },
     { href: "/redeem", label: "Dashboard", icon: LayoutDashboard },
   ];
 
@@ -119,11 +117,16 @@ export default function Navbar() {
                 </Link>
               ))}
               
-              {/* Viral Features Section */}
+              {/* Viral Features Info */}
               <div className="pt-4 pb-2">
-                <p className="text-xs font-semibold text-electric-blue uppercase tracking-wider px-3">
-                  🚀 Viral Amplifiers
-                </p>
+                <div className="bg-gradient-to-r from-electric-blue/20 to-electric-green/20 p-3 rounded-lg mx-3">
+                  <p className="text-xs font-semibold text-electric-blue uppercase tracking-wider mb-1">
+                    🚀 Viral Features
+                  </p>
+                  <p className="text-xs text-gray-300">
+                    Find viral sharing in Marketplace • Enterprise Quick Setup in Marketing
+                  </p>
+                </div>
               </div>
             </nav>
           </SheetContent>
