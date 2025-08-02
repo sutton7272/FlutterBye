@@ -620,7 +620,7 @@ export default function AdminDashboard() {
                         </TableRow>
                       </TableHeader>
                       <TableBody>
-                        {platformStats.topTokens.map((token, index) => (
+                        {platformStats?.topTokens?.map((token, index) => (
                           <TableRow key={token.id} className="border-electric-blue/10 hover:bg-electric-blue/5 transition-all">
                             <TableCell className="font-mono text-white">
                               <div className="flex items-center gap-2">

@@ -43,6 +43,7 @@ import AdminEarlyAccess from "@/pages/admin-early-access";
 import AdminFreeCodes from "@/pages/admin-free-codes";
 import AdminPricing from "@/pages/admin-pricing";
 import AdminDefaultImage from "@/pages/admin-default-image";
+import UnifiedAdminDashboard from "@/pages/admin-unified";
 import TokenHolderMapPage from "@/pages/token-holder-map";
 import Navbar from "@/components/navbar";
 import { FloatingActionHub } from "@/components/floating-action-hub";
@@ -120,6 +121,13 @@ function Router() {
           </>
         )} />
         <Route path="/admin" component={() => (
+          <>
+            <Navbar />
+            <UnifiedAdminDashboard />
+            <FloatingActionHub />
+          </>
+        )} />
+        <Route path="/admin-legacy" component={() => (
           <>
             <Navbar />
             <Admin />
