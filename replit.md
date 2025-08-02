@@ -6,11 +6,12 @@ Flutterbye is a revolutionary Solana blockchain-powered platform for tokenized m
 
 **Vision**: Transform from tokenized messaging to become the universal communication protocol for Web3, with AI-powered features, cross-chain capabilities, and industry-disrupting social mechanics that could revolutionize how value and emotion are communicated across the entire blockchain ecosystem.
 
-**Current Phase**: Production infrastructure COMPLETE with enterprise-grade features. Advanced security middleware, intelligent caching, comprehensive backup systems, and professional admin dashboard operational. Advanced search functionality with faceted filtering implemented. 98% production-ready with only API keys needed for AI/SMS features. Platform ready for immediate high-traffic deployment.
+**Current Phase**: Production infrastructure COMPLETE with enterprise-grade features. Advanced security middleware, intelligent caching, comprehensive backup systems, and professional admin dashboard operational. Advanced search functionality with faceted filtering implemented. Electric blue and green theme with animated pulse effects and circuit aesthetics fully implemented across all components. 98% production-ready with only API keys needed for AI/SMS features. Platform ready for immediate high-traffic deployment.
 
 ## User Preferences
 
 Preferred communication style: Simple, everyday language.
+Design preference: Electric blue and green color scheme with animated electrical pulse effects running through frames and borders, creating a high-energy circuit aesthetic.
 
 ## System Architecture
 
@@ -21,7 +22,7 @@ Preferred communication style: Simple, everyday language.
 - **Styling**: Tailwind CSS with custom CSS variables, dark mode support.
 - **State Management**: TanStack React Query for server state management.
 - **Form Handling**: React Hook Form with Zod validation.
-- **UI/UX Decisions**: "boop.fun"-inspired design with black backgrounds, vibrant gradients, meme culture language, scrolling marquee text, live activity feeds, and a purple/pink/cyan color scheme. Emphasis on gamified engagement with points, badges, levels, streaks, and leaderboards. Comprehensive admin interface for dynamic content management (text, images, layout, themes) with live preview, advanced marketing analytics with user acquisition tracking, behavioral insights, revenue analytics, and comprehensive user engagement metrics. Limited Edition Token interface with creation dialogs, progress bars, rarity badges, and minting controls.
+- **UI/UX Decisions**: High-energy electric circuit design with dark navy backgrounds, electric blue and green color scheme with animated pulse effects. Features animated electrical borders, circuit flow gradients, and pulsing glow effects that create a futuristic, high-tech aesthetic. Emphasis on gamified engagement with points, badges, levels, streaks, and leaderboards. Comprehensive admin interface for dynamic content management (text, images, layout, themes) with live preview, advanced marketing analytics with user acquisition tracking, behavioral insights, revenue analytics, and comprehensive user engagement metrics. Limited Edition Token interface with creation dialogs, progress bars, rarity badges, and minting controls.
 
 ### Backend Architecture
 - **Runtime**: Node.js with Express.js.
