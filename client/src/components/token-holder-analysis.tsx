@@ -106,10 +106,10 @@ export default function TokenHolderAnalysis({ onHoldersSelected }: TokenHolderAn
 
   return (
     <div className="mt-4 space-y-4">
-      <Card>
+      <Card className="electric-frame">
         <CardHeader>
-          <CardTitle className="flex items-center">
-            <TrendingUp className="w-5 h-5 mr-2 text-blue-500" />
+          <CardTitle className="flex items-center text-gradient">
+            <TrendingUp className="w-5 h-5 mr-2" />
             Token Holder Analysis
           </CardTitle>
           <CardDescription>
@@ -125,7 +125,7 @@ export default function TokenHolderAnalysis({ onHoldersSelected }: TokenHolderAn
                 value={tokenInput}
                 onChange={(e) => setTokenInput(e.target.value)}
                 placeholder="EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"
-                className="font-mono text-sm"
+                className="font-mono text-sm pulse-border"
               />
             </div>
             <div className="space-y-2">
