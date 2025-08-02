@@ -126,8 +126,7 @@ export function AdminPricingManagement() {
     // Simulate API call
     await new Promise(resolve => setTimeout(resolve, 1000));
     
-    // In real app, would save to backend with all pricing configuration 
-    });
+    // In real app, would save to backend with all pricing configuration
     
     setIsSaving(false);
     setIsEditing(null);

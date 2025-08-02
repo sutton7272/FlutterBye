@@ -8,6 +8,10 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { WalletProvider } from "@/components/wallet-adapter";
 import Navbar from "@/components/navbar";
 import { FloatingActionHub } from "@/components/floating-action-hub";
+import { PerformanceMonitor, usePerformanceTracking } from "@/components/performance-monitor";
+import { DeviceIndicator } from "@/components/mobile-optimizations";
+import { ComponentPreloader } from "@/lib/code-splitting";
+import { usePWA } from "@/lib/pwa-manager";
 
 // Core pages loaded immediately
 import NotFound from "@/pages/not-found";
