@@ -46,24 +46,9 @@ import { WalletProvider } from "@/components/wallet-adapter";
 import { TestImage } from "@/components/test-image";
 function Router() {
   return (
-    <div 
-      className="dark min-h-screen"
-      style={{
-        backgroundImage: 'url(/images/cosmic-butterfly.png)',
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        backgroundRepeat: 'no-repeat',
-        backgroundAttachment: 'fixed'
-      }}
-    >
-      <div 
-        className="min-h-screen"
-        style={{
-          backgroundColor: 'rgba(0, 0, 0, 0.4)'
-        }}
-      >
-        <TestImage />
-        <Switch>
+    <div className="dark min-h-screen">
+      <TestImage />
+      <Switch>
         <Route path="/" component={LaunchCountdown} />
         <Route path="/launch" component={LaunchCountdown} />
         
@@ -286,8 +271,7 @@ function Router() {
           </>
         )} />
         <Route component={NotFound} />
-        </Switch>
-      </div>
+      </Switch>
     </div>
   );
 }
