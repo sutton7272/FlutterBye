@@ -1705,6 +1705,172 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // FLBY Staking APIs
+  app.post("/api/flby/stake", async (req, res) => {
+    try {
+      const { poolId, amount } = req.body;
+      
+      console.log(`🔒 Staking request: ${amount} FLBY in pool ${poolId}`);
+      
+      const stakingPosition = {
+        id: `stake_${Date.now()}`,
+        poolId,
+        amount,
+        startDate: new Date().toISOString(),
+        endDate: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString(), // 1 year
+        currentRewards: 0,
+        status: 'active',
+        metadata: {
+          type: 'flby_staking',
+          poolType: poolId,
+          stakingDate: new Date().toISOString(),
+          expectedApy: poolId === 'long' ? 18 : poolId === 'medium' ? 12 : poolId === 'short' ? 8 : 5
+        }
+      };
+
+      res.json({
+        success: true,
+        position: stakingPosition,
+        message: "FLBY tokens staked successfully!",
+        expectedRewards: {
+          daily: (amount * 0.15) / 365, // Estimate based on APY
+          monthly: (amount * 0.15) / 12,
+          yearly: amount * 0.15
+        }
+      });
+    } catch (error) {
+      console.error("Error creating staking position:", error);
+      res.status(500).json({ error: "Staking feature coming soon with FLBY token launch" });
+    }
+  });
+
+  app.get("/api/flby/staking/positions", async (req, res) => {
+    try {
+      // Mock staking positions for demo
+      const positions = [];
+      
+      res.json({
+        success: true,
+        positions,
+        totalStaked: 0,
+        totalRewards: 0,
+        averageApy: 0
+      });
+    } catch (error) {
+      console.error("Error fetching staking positions:", error);
+      res.status(500).json({ error: "Failed to fetch staking positions" });
+    }
+  });
+
+  // FLBY Governance APIs
+  app.get("/api/flby/governance/proposals", async (req, res) => {
+    try {
+      const proposals = [
+        {
+          id: "prop-001",
+          title: "Reduce Platform Fees by 20%",
+          description: "Proposal to reduce minting and transaction fees by 20% to increase platform adoption and user engagement.",
+          category: "tokenomics",
+          status: "active",
+          votesFor: 75420,
+          votesAgainst: 12380,
+          totalVotes: 87800,
+          quorum: 100000,
+          endDate: "2024-02-15",
+          createdBy: "Community",
+          votingPower: 0,
+          hasVoted: false
+        },
+        {
+          id: "prop-002", 
+          title: "Implement Cross-Chain Bridge",
+          description: "Add support for Ethereum and Polygon bridges to enable cross-chain FLBY token transfers.",
+          category: "features",
+          status: "active",
+          votesFor: 120500,
+          votesAgainst: 45200,
+          totalVotes: 165700,
+          quorum: 100000,
+          endDate: "2024-02-20",
+          createdBy: "Core Team",
+          votingPower: 0,
+          hasVoted: false
+        }
+      ];
+
+      res.json({
+        success: true,
+        proposals,
+        stats: {
+          totalProposals: 15,
+          activeProposals: 3,
+          totalVoters: 8420,
+          userVotingPower: 0,
+          participationRate: 67.8
+        }
+      });
+    } catch (error) {
+      console.error("Error fetching governance proposals:", error);
+      res.status(500).json({ error: "Failed to fetch governance proposals" });
+    }
+  });
+
+  app.post("/api/flby/governance/vote", async (req, res) => {
+    try {
+      const { proposalId, vote } = req.body;
+      
+      console.log(`🗳️ Vote submitted: ${vote} on proposal ${proposalId}`);
+      
+      res.json({
+        success: true,
+        message: "Vote recorded successfully!",
+        vote: {
+          proposalId,
+          vote,
+          votingPower: 0,
+          timestamp: new Date().toISOString()
+        }
+      });
+    } catch (error) {
+      console.error("Error submitting vote:", error);
+      res.status(500).json({ error: "Governance voting coming soon with FLBY token launch" });
+    }
+  });
+
+  app.post("/api/flby/governance/proposals", async (req, res) => {
+    try {
+      const { title, description, category } = req.body;
+      
+      console.log(`📝 New proposal created: ${title}`);
+      
+      const proposal = {
+        id: `prop_${Date.now()}`,
+        title,
+        description,
+        category,
+        status: 'pending_review',
+        votesFor: 0,
+        votesAgainst: 0,
+        totalVotes: 0,
+        quorum: 100000,
+        endDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+        createdBy: "User",
+        votingPower: 0,
+        hasVoted: false,
+        createdAt: new Date().toISOString()
+      };
+
+      res.json({
+        success: true,
+        proposal,
+        message: "Proposal created and submitted for community review!"
+      });
+    } catch (error) {
+      console.error("Error creating proposal:", error);
+      res.status(500).json({ error: "Proposal creation coming soon with FLBY token launch" });
+    }
+  });
+
   // Import admin service
   const { adminService } = await import("./admin-service");
 

@@ -30,6 +30,8 @@ import ConfettiDemo from "@/pages/confetti-demo";
 import ElectricDemo from "@/pages/electric-demo";
 import GreetingCards from "@/pages/greeting-cards";
 import EnterpriseCampaigns from "@/pages/enterprise-campaigns";
+import FlbyStaking from "@/pages/flby-staking";
+import FlbyGovernance from "@/pages/flby-governance";
 import Navbar from "@/components/navbar";
 import { FloatingActionHub } from "@/components/floating-action-hub";
 import { WalletProvider } from "@/components/wallet-adapter";
@@ -64,6 +66,8 @@ function Router() {
         <Route path="/electric-demo" component={ElectricDemo} />
         <Route path="/greeting-cards" component={GreetingCards} />
         <Route path="/enterprise" component={EnterpriseCampaigns} />
+        <Route path="/flby/staking" component={FlbyStaking} />
+        <Route path="/flby/governance" component={FlbyGovernance} />
         <Route component={NotFound} />
       </Switch>
       <FloatingActionHub />

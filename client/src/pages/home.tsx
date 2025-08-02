@@ -281,9 +281,9 @@ export default function Home() {
                 <Target className="ml-2 h-5 w-5" />
               </Button>
             </Link>
-            <Link href="/mint">
+            <Link href="/flby/staking">
               <Button variant="outline" size="lg" className="w-full text-lg px-6 py-6 border-cyan-500 text-cyan-300 hover:bg-cyan-500/10 font-bold">
-                MINT TOKENS
+                FLBY STAKING
                 <Coins className="ml-2 h-5 w-5" />
               </Button>
             </Link>

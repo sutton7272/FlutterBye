@@ -24,7 +24,8 @@ export default function Navbar() {
     { href: "/chat", label: "Chat", icon: MessageSquare },
     { href: "/rewards", label: "Rewards", icon: Trophy },
     { href: "/journey", label: "Journey", icon: Users },
-    { href: "/electric-demo", label: "Electric Demo", icon: Zap },
+    { href: "/flby/staking", label: "FLBY Staking", icon: Zap },
+    { href: "/flby/governance", label: "Governance", icon: Users },
     { href: "/admin", label: "Admin", icon: Settings },
   ];
 

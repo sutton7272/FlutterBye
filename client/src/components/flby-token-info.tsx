@@ -1,7 +1,8 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Zap, Coins, TrendingUp, Gift, Star, Shield } from "lucide-react";
+import { Zap, Coins, TrendingUp, Gift, Star, Shield, Vote, Lock } from "lucide-react";
+import { Link } from "wouter";
 
 interface FlbyTokenInfoProps {
   onGetTokens?: () => void;
@@ -74,13 +75,37 @@ export default function FlbyTokenInfo({ onGetTokens, showGetTokensButton = true 
           </div>
         </div>
 
-        <div className="bg-yellow-500/10 border border-yellow-500/20 rounded-lg p-4">
-          <h4 className="font-semibold text-yellow-600 dark:text-yellow-400 mb-2">
+        <div className="bg-yellow-500/10 border border-yellow-500/20 rounded-lg p-4 space-y-3">
+          <h4 className="font-semibold text-yellow-600 dark:text-yellow-400">
             Early Access Program
           </h4>
-          <p className="text-sm text-muted-foreground mb-3">
+          <p className="text-sm text-muted-foreground">
             Get notified when FLBY tokens become available and receive early access benefits.
           </p>
+          
+          <div className="grid grid-cols-2 gap-2">
+            <Link href="/flby/staking">
+              <Button
+                variant="outline"
+                size="sm"
+                className="w-full border-cyan-500/50 text-cyan-400 hover:bg-cyan-500/10"
+              >
+                <Lock className="w-3 h-3 mr-1" />
+                Staking
+              </Button>
+            </Link>
+            <Link href="/flby/governance">
+              <Button
+                variant="outline"
+                size="sm"
+                className="w-full border-purple-500/50 text-purple-400 hover:bg-purple-500/10"
+              >
+                <Vote className="w-3 h-3 mr-1" />
+                Governance
+              </Button>
+            </Link>
+          </div>
+          
           {showGetTokensButton && (
             <Button
               onClick={onGetTokens}
