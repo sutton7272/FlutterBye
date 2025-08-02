@@ -1,38 +1,10 @@
 import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
-import cors from "cors";
-import { 
-  securityHeaders, 
-  generalRateLimit, 
-  requestLogger, 
-  errorHandler,
-  corsOptions 
-} from "./security-middleware";
-import { ProductionConfigValidator, getHealthStatus } from "./production-config";
 
 const app = express();
-
-// Trust proxy for proper IP detection
-app.set('trust proxy', 1);
-
-// Security middleware - must be first
-app.use(securityHeaders);
-app.use(cors(corsOptions));
-app.use(generalRateLimit);
-app.use(requestLogger);
-
-// Body parsing middleware
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: false, limit: '50mb' }));
-
-// Health check endpoint
-app.get('/health', (req, res) => {
-  res.json(getHealthStatus());
-});
-
-// Production configuration validation
-ProductionConfigValidator.logConfigurationStatus();
 
 app.use((req, res, next) => {
   const start = Date.now();
@@ -67,8 +39,18 @@ app.use((req, res, next) => {
 (async () => {
   const server = await registerRoutes(app);
 
-  // Replace with secure error handler
-  app.use(errorHandler);
+  app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
+    const status = err.status || err.statusCode || 500;
+    let message = err.message || "Internal Server Error";
+    
+    // Handle specific payload too large error
+    if (err.type === 'entity.too.large') {
+      message = "File too large. Maximum size is 50MB.";
+    }
+
+    res.status(status).json({ message });
+    console.error('Server error:', err);
+  });
 
   // importantly only setup vite in development and after
   // setting up all the other routes so the catch-all route

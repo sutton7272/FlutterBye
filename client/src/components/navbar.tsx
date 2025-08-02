@@ -3,22 +3,22 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { WalletConnect } from "@/components/wallet-connect";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { AIFeaturesMenu } from "@/components/ai-features-menu";
-import { Menu, Home, Coins, Trophy, Users, MessageSquare, Settings, Sparkles, Zap, Heart, Building2, MapPin, Activity, Gift, Award, Star, Ticket, HelpCircle, LayoutDashboard, Share2, Crown, TrendingUp } from "lucide-react";
+import { Menu, Home, Coins, Trophy, Users, MessageSquare, Settings, Sparkles, Zap, Heart, Building2, MapPin, Activity, Gift, Award, Star, Ticket, HelpCircle, LayoutDashboard } from "lucide-react";
 
 export default function Navbar() {
   const [location] = useLocation();
   const [isOpen, setIsOpen] = useState(false);
 
-  // Streamlined navigation - all viral features consolidated into existing pages
+  // Simplified navigation - Primary items only
   const primaryNavItems = [
     { href: "/home", label: "Home", icon: Home },
     { href: "/mint", label: "Mint", icon: Coins },
-    { href: "/marketplace", label: "Marketplace", icon: TrendingUp, isViral: true },
-    { href: "/chat", label: "Chat", icon: MessageSquare },
-    { href: "/greeting-cards", label: "Cards", icon: Heart },
-    { href: "/enterprise", label: "Marketing", icon: Building2, isViral: true },
     { href: "/redeem", label: "Dashboard", icon: LayoutDashboard },
+    { href: "/chat", label: "Chat", icon: MessageSquare },
+    { href: "/marketplace", label: "Marketplace", icon: Users },
+    { href: "/greeting-cards", label: "Cards", icon: Heart },
+    { href: "/enterprise", label: "Marketing", icon: Building2 },
+    { href: "/info", label: "Info", icon: HelpCircle },
   ];
 
   // No secondary navigation - everything consolidated into main pages
@@ -50,22 +50,14 @@ export default function Navbar() {
                 className={`flex items-center gap-2 h-9 px-4 ${
                   isActive(item.href) 
                     ? "modern-gradient text-white shadow-lg" 
-                    : item.isViral
-                    ? "text-electric-blue hover:text-electric-green hover:bg-electric-blue/10 border border-electric-blue/20"
                     : "text-text-secondary hover:text-text-primary hover:bg-muted"
                 }`}
               >
                 <item.icon className="h-4 w-4" />
                 {item.label}
-                {item.isViral && (
-                  <div className="w-2 h-2 bg-electric-green rounded-full animate-pulse" />
-                )}
               </Button>
             </Link>
           ))}
-          
-          {/* Revolutionary AI Features Menu */}
-          <AIFeaturesMenu />
         </nav>
 
         {/* Trust Indicator */}
@@ -106,32 +98,17 @@ export default function Navbar() {
                     className={`w-full justify-start h-11 ${
                       isActive(item.href) 
                         ? "modern-gradient text-white" 
-                        : item.isViral
-                        ? "text-electric-blue hover:text-electric-green hover:bg-electric-blue/10 border border-electric-blue/20"
                         : "text-text-secondary hover:text-text-primary hover:bg-muted"
                     }`}
                     onClick={() => setIsOpen(false)}
                   >
                     <item.icon className="h-4 w-4 mr-3" />
                     {item.label}
-                    {item.isViral && (
-                      <div className="w-2 h-2 bg-electric-green rounded-full animate-pulse ml-auto" />
-                    )}
                   </Button>
                 </Link>
               ))}
               
-              {/* Viral Features Info */}
-              <div className="pt-4 pb-2">
-                <div className="bg-gradient-to-r from-electric-blue/20 to-electric-green/20 p-3 rounded-lg mx-3">
-                  <p className="text-xs font-semibold text-electric-blue uppercase tracking-wider mb-1">
-                    🚀 Viral Features
-                  </p>
-                  <p className="text-xs text-gray-300">
-                    Find viral sharing in Marketplace • Enterprise Quick Setup in Marketing
-                  </p>
-                </div>
-              </div>
+              {/* All features now consolidated into main pages */}
             </nav>
           </SheetContent>
         </Sheet>

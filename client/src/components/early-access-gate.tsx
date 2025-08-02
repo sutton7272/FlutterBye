@@ -70,17 +70,7 @@ export function EarlyAccessGate({ onAccessGranted }: EarlyAccessGateProps) {
   };
 
   return (
-    <div 
-      className="min-h-screen bg-black text-white flex items-center justify-center relative overflow-hidden"
-      style={{
-        backgroundImage: `url(${flutterbeyeLogoPath})`,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        backgroundRepeat: 'no-repeat'
-      }}
-    >
-      {/* Dark Overlay */}
-      <div className="fixed inset-0 bg-black/70 pointer-events-none" />
+    <div className="min-h-screen bg-black text-white flex items-center justify-center relative overflow-hidden">
       {/* Electric Background */}
       <div className="fixed inset-0 bg-gradient-to-br from-blue-900/20 via-purple-900/20 to-cyan-900/20 pointer-events-none" />
       
@@ -146,20 +136,11 @@ export function EarlyAccessGate({ onAccessGranted }: EarlyAccessGateProps) {
           </form>
 
           <div className="mt-6 space-y-4">
-            <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-3 space-y-2">
+            <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-3">
               <h4 className="font-medium text-blue-400 mb-2">Need Access?</h4>
               <p className="text-sm text-muted-foreground">
                 Join our waitlist for early access and FLBY token airdrops.
               </p>
-              <Button 
-                variant="outline" 
-                size="sm" 
-                className="w-full mb-2"
-                onClick={() => onAccessGranted()}
-              >
-                <Key className="w-4 h-4 mr-2" />
-                Demo Access (Bypass Gate)
-              </Button>
               <Button 
                 variant="outline" 
                 size="sm" 

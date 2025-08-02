@@ -336,7 +336,19 @@ export class MemStorage implements IStorage {
       });
   }
 
-  // Removed duplicate - using the proper typed version below
+  async createRedemption(redemption: any): Promise<any> {
+    const id = randomUUID();
+    const newRedemption = {
+      id,
+      ...redemption,
+      createdAt: new Date()
+    };
+    if (!this.redemptions) {
+      this.redemptions = new Map();
+    }
+    this.redemptions.set(id, newRedemption);
+    return newRedemption;
+  }
 
   async getRedemptionsByWallet(walletAddress: string): Promise<any[]> {
     if (!this.redemptions) return [];
@@ -487,7 +499,16 @@ export class MemStorage implements IStorage {
       .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
   }
 
-
+  async createRedemption(insertRedemption: InsertRedemption): Promise<Redemption> {
+    const id = randomUUID();
+    const redemption: Redemption = { 
+      ...insertRedemption, 
+      id,
+      createdAt: new Date()
+    };
+    this.redemptions.set(id, redemption);
+    return redemption;
+  }
 
   async getRedemptionsByUser(userId: string): Promise<Redemption[]> {
     return Array.from(this.redemptions.values())

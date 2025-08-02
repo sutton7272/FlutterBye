@@ -97,7 +97,7 @@ export function TransactionHeatmap() {
     const socket = new WebSocket(wsUrl);
 
     socket.onopen = () => {
-      // WebSocket connected
+      console.log('Connected to heatmap WebSocket');
     };
 
     socket.onmessage = (event) => {
@@ -151,7 +151,7 @@ export function TransactionHeatmap() {
     };
 
     socket.onclose = () => {
-      // WebSocket disconnected
+      console.log('Disconnected from heatmap WebSocket');
     };
 
     socket.onerror = (error) => {

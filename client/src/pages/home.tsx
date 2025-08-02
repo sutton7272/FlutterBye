@@ -1,18 +1,14 @@
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Link } from "wouter";
 import { ArrowRight, MessageSquare, Coins, Zap, TrendingUp, Users, Target, Sparkles, Heart, Building2 } from "lucide-react";
 import flutterbeyeLogoPath from "@assets/image_1754068877999.png";
-import backgroundImagePath from "@assets/image_1754020189669.png";
 import { QuickActionPanel } from "@/components/quick-action-panel";
 import { InteractiveStatsDashboard } from "@/components/interactive-stats-dashboard";
 import { EngagementBooster } from "@/components/engagement-booster";
 import { ViralSharingAssistant } from "@/components/viral-sharing-assistant";
 import { TutorialLaunchButton } from "@/components/interactive-tutorial";
-import { WelcomeTour } from "@/components/welcome-tour";
-import { QuickActionsFAB } from "@/components/quick-actions-fab";
 
 interface RecentActivity {
   id: string;
@@ -24,7 +20,6 @@ interface RecentActivity {
 }
 
 export default function Home() {
-  const [showWelcomeTour, setShowWelcomeTour] = useState(true);
   const marqueeText = [
     "TURN MESSAGES INTO MONEY",
     "27 CHARACTERS TO RICHES", 
@@ -68,19 +63,7 @@ export default function Home() {
   };
 
   return (
-    <div 
-      className="min-h-screen text-white pt-20 overflow-hidden relative"
-      style={{
-        backgroundImage: `url(${backgroundImagePath})`,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        backgroundRepeat: 'no-repeat'
-      }}
-    >
-      {/* Dark Overlay */}
-      <div className="absolute inset-0 bg-black/50"></div>
-      {/* Background Pattern */}
-      <div className="absolute inset-0 opacity-10 bg-circuit-pattern"></div>
+    <div className="min-h-screen text-white pt-20 overflow-hidden">
       
       {/* Top Scrolling Marquee */}
       <div className="border-y border-primary/30 modern-gradient py-6 mb-12 overflow-hidden electric-frame">
@@ -325,14 +308,6 @@ export default function Home() {
           ))}
         </div>
       </div>
-
-      {/* Welcome Tour for New Users */}
-      {showWelcomeTour && (
-        <WelcomeTour onComplete={() => setShowWelcomeTour(false)} />
-      )}
-
-      {/* Quick Actions FAB */}
-      <QuickActionsFAB />
     </div>
   );
 }

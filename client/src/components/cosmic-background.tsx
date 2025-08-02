@@ -6,7 +6,7 @@ export function CosmicBackground() {
   useEffect(() => {
     const img = new Image();
     img.onload = () => {
-      // Cosmic butterfly image loaded successfully
+      console.log("Cosmic butterfly image loaded successfully");
       setImageLoaded(true);
     };
     img.onerror = () => {

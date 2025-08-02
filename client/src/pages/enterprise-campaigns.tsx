@@ -30,10 +30,8 @@ import {
   Database,
   Eye,
   PieChart,
-  Activity,
-  CheckCircle
+  Activity
 } from "lucide-react";
-import { Progress } from "@/components/ui/progress";
 
 interface CampaignTemplate {
   id: string;
@@ -188,12 +186,8 @@ export default function EnterpriseCampaigns() {
         </div>
 
         <Tabs defaultValue="create" className="space-y-8">
-          <TabsList className="grid w-full grid-cols-4">
+          <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="create">Create Campaign</TabsTrigger>
-            <TabsTrigger value="quick-setup" className="text-electric-blue">
-              <Zap className="h-4 w-4 mr-1" />
-              Quick Setup
-            </TabsTrigger>
             <TabsTrigger value="insights">Marketing Insights</TabsTrigger>
             <TabsTrigger value="analytics">Data Analytics</TabsTrigger>
           </TabsList>

@@ -6,7 +6,7 @@ export function TestImage() {
         src="/images/cosmic-butterfly.png" 
         alt="Cosmic Butterfly Test" 
         className="w-32 h-24 object-cover rounded"
-        onLoad={() => {/* Test image loaded successfully */}}
+        onLoad={() => console.log("Test image loaded successfully!")}
         onError={() => console.error("Test image failed to load!")}
       />
     </div>
