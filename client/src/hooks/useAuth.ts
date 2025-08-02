@@ -1,4 +1,4 @@
-import { useState, useEffect, createContext, useContext } from 'react';
+import { useState, createContext, useContext } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import type { ReactNode } from 'react';
 
@@ -30,7 +30,6 @@ export function useAuth() {
   return context;
 }
 
-// Hook for wallet-based authentication
 export function useWalletAuth() {
   const [walletAddress, setWalletAddress] = useState<string | null>(
     localStorage.getItem('walletAddress')

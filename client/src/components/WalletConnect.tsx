@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Wallet, LogOut, Copy, Check } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
-import { getWalletBalance, getFLBYBalance } from '@/lib/solana';
+import { getWalletBalance } from '@/lib/solana-real';
 
 interface WalletConnectProps {
   className?: string;
@@ -28,12 +28,9 @@ export function WalletConnect({ className }: WalletConnectProps) {
     if (!walletAddress) return;
     
     try {
-      const [sol, flby] = await Promise.all([
-        getWalletBalance(walletAddress),
-        getFLBYBalance(walletAddress)
-      ]);
+      const sol = await getWalletBalance(walletAddress);
       setSolBalance(sol);
-      setFlbyBalance(flby);
+      setFlbyBalance(0); // FLBY balance will be implemented later
     } catch (error) {
       console.error('Error loading balances:', error);
     }
@@ -218,6 +215,7 @@ declare global {
       isPhantom: boolean;
       connect: () => Promise<{ publicKey: { toString: () => string } }>;
       signMessage: (message: Uint8Array) => Promise<{ signature: string }>;
+      signTransaction: (transaction: any) => Promise<any>;
     };
   }
 }

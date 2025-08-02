@@ -9,7 +9,8 @@ import { Switch } from '@/components/ui/switch';
 import { Badge } from '@/components/ui/badge';
 import { Coins, Send, Timer, Star, AlertCircle } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
-import { createTokenizedMessage, distributeTokens, type TokenMessageData, type CreatedToken } from '@/lib/solana';
+import { createTokenizedMessage, distributeTokens, type TokenMessageData, type CreatedToken } from '@/lib/solana-real';
+import { PublicKey, Transaction } from '@solana/web3.js';
 import { useToast } from '@/hooks/use-toast';
 
 export default function Mint() {
@@ -63,25 +64,53 @@ export default function Mint() {
         maxSupply: formData.isLimitedEdition ? formData.maxSupply : undefined
       };
 
-      // For development, simulate token creation
-      const mockToken: CreatedToken = {
-        mintAddress: 'Flby' + Math.random().toString(36).substring(2, 15),
-        tokenAccount: 'FlbyAcc' + Math.random().toString(36).substring(2, 15),
-        signature: 'FlbySig' + Math.random().toString(36).substring(2, 15),
-        metadata: {
-          name: `FLBY-MSG: ${messageData.title.substring(0, 27)}`,
-          symbol: 'FLBY-MSG',
-          description: messageData.content,
-          image: 'https://flutterbye.io/default-message-token.png'
-        }
-      };
-
-      setCreatedToken(mockToken);
+      // Real blockchain token creation
+      let createdTokenResult: CreatedToken;
       
-      toast({
-        title: "Token Created!",
-        description: `Successfully created tokenized message: ${formData.title}`,
-      });
+      if (window.solana && window.solana.isPhantom) {
+        // Real Phantom wallet integration
+        const walletPublicKey = new PublicKey(walletAddress!);
+        const signTransaction = async (transaction: Transaction) => {
+          return await window.solana.signTransaction(transaction);
+        };
+        
+        toast({
+          title: "Creating Token",
+          description: "Please approve the transaction in your wallet...",
+        });
+        
+        createdTokenResult = await createTokenizedMessage(
+          walletPublicKey,
+          signTransaction,
+          messageData
+        );
+        
+        toast({
+          title: "Token Created on Blockchain!",
+          description: `Successfully minted SPL token: ${formData.title}`,
+        });
+        
+      } else {
+        // Fallback for development
+        createdTokenResult = {
+          mintAddress: 'DevToken' + Math.random().toString(36).substring(2, 15),
+          tokenAccount: 'DevAcc' + Math.random().toString(36).substring(2, 15),
+          signature: 'DevSig' + Math.random().toString(36).substring(2, 15),
+          metadata: {
+            name: `FLBY-MSG: ${messageData.title.substring(0, 27)}`,
+            symbol: 'FLBY-MSG',
+            description: messageData.content,
+            image: 'https://flutterbye.io/default-message-token.png'
+          }
+        };
+        
+        toast({
+          title: "Development Token Created",
+          description: "Real blockchain integration available with Phantom wallet",
+        });
+      }
+
+      setCreatedToken(createdTokenResult);
 
       // Store in backend
       const response = await fetch('/api/tokens/create', {
@@ -92,10 +121,10 @@ export default function Mint() {
         },
         body: JSON.stringify({
           ...messageData,
-          mintAddress: mockToken.mintAddress,
-          tokenAccount: mockToken.tokenAccount,
-          signature: mockToken.signature,
-          metadata: mockToken.metadata
+          mintAddress: createdTokenResult.mintAddress,
+          tokenAccount: createdTokenResult.tokenAccount,
+          signature: createdTokenResult.signature,
+          metadata: createdTokenResult.metadata
         })
       });
 
@@ -107,7 +136,7 @@ export default function Mint() {
       console.error('Token creation failed:', error);
       toast({
         title: "Creation Failed",
-        description: "Failed to create tokenized message. Please try again.",
+        description: `Failed to create tokenized message: ${error.message}`,
         variant: "destructive"
       });
     } finally {
@@ -132,15 +161,43 @@ export default function Mint() {
         .map(addr => addr.trim())
         .filter(addr => addr.length > 0);
 
-      // For development, simulate distribution
-      const signatures = recipients.map(() => 
-        'FlbyDistSig' + Math.random().toString(36).substring(2, 15)
-      );
+      let signatures: string[];
 
-      toast({
-        title: "Tokens Distributed!",
-        description: `Successfully distributed to ${recipients.length} recipients`,
-      });
+      if (window.solana && window.solana.isPhantom) {
+        // Real blockchain distribution
+        const walletPublicKey = new PublicKey(walletAddress!);
+        const signTransaction = async (transaction: Transaction) => {
+          return await window.solana.signTransaction(transaction);
+        };
+        
+        toast({
+          title: "Distributing Tokens",
+          description: "Please approve transactions in your wallet...",
+        });
+        
+        signatures = await distributeTokens(
+          walletPublicKey,
+          signTransaction,
+          createdToken.mintAddress,
+          recipients
+        );
+        
+        toast({
+          title: "Tokens Distributed on Blockchain!",
+          description: `Successfully sent to ${recipients.length} recipients`,
+        });
+        
+      } else {
+        // Development fallback
+        signatures = recipients.map(() => 
+          'DevDistSig' + Math.random().toString(36).substring(2, 15)
+        );
+        
+        toast({
+          title: "Development Distribution",
+          description: "Real blockchain distribution available with Phantom wallet",
+        });
+      }
 
       // Store distribution data
       await fetch('/api/tokens/distribute', {
@@ -160,7 +217,7 @@ export default function Mint() {
       console.error('Distribution failed:', error);
       toast({
         title: "Distribution Failed",
-        description: "Failed to distribute tokens. Please try again.",
+        description: `Failed to distribute tokens: ${error.message}`,
         variant: "destructive"
       });
     } finally {

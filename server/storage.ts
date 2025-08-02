@@ -56,14 +56,15 @@ export interface IStorage {
 
   // Token operations
   getToken(id: string): Promise<Token | undefined>;
-  getTokenByMintAddress(mintAddress: string): Promise<Token | undefined>;
+  getTokenByMint(mintAddress: string): Promise<Token | undefined>;
   createToken(token: InsertToken): Promise<Token>;
   updateTokenSupply(tokenId: string, availableSupply: number): Promise<Token>;
-  getTokensByCreator(creatorId: string): Promise<Token[]>;
+  getUserTokens(walletAddress: string): Promise<Token[]>;
   getAllTokens(limit?: number, offset?: number): Promise<Token[]>;
   searchTokens(query: string): Promise<Token[]>;
   updateToken(tokenId: string, updateData: Partial<Token>): Promise<Token>;
   deleteToken(tokenId: string): Promise<void>;
+  getTokenHolders(mintAddress: string): Promise<Array<{address: string, amount: number}>>;
 
   // Token holdings
   getTokenHolding(userId: string, tokenId: string): Promise<TokenHolding | undefined>;
@@ -399,10 +400,22 @@ export class MemStorage implements IStorage {
     return updatedToken;
   }
 
-  async getTokensByCreator(creatorId: string): Promise<Token[]> {
+  async getUserTokens(walletAddress: string): Promise<Token[]> {
     return Array.from(this.tokens.values())
-      .filter(token => token.creatorId === creatorId)
+      .filter(token => (token as any).creatorWallet === walletAddress)
       .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+  }
+
+  async getTokenByMint(mintAddress: string): Promise<Token | undefined> {
+    return Array.from(this.tokens.values()).find(token => token.mintAddress === mintAddress);
+  }
+
+  async getTokenHolders(mintAddress: string): Promise<Array<{address: string, amount: number}>> {
+    // In production, this would query the Solana blockchain
+    return [
+      { address: 'ExampleHolder1...', amount: 1 },
+      { address: 'ExampleHolder2...', amount: 2 }
+    ];
   }
 
   async getAllTokens(limit = 50, offset = 0): Promise<Token[]> {
