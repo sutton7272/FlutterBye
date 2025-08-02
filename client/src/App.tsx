@@ -45,6 +45,8 @@ import AdminPricing from "@/pages/admin-pricing";
 import AdminDefaultImage from "@/pages/admin-default-image";
 import UnifiedAdminDashboard from "@/pages/admin-unified";
 import TokenHolderMapPage from "@/pages/token-holder-map";
+import CollaborativeCreation from "@/pages/collaborative-creation";
+import ViralDashboard from "@/pages/viral-dashboard";
 import Navbar from "@/components/navbar";
 import { PersonalizedDashboard } from "@/components/PersonalizedDashboard";
 
@@ -278,6 +280,18 @@ function Router() {
           <>
             <Navbar />
             <PersonalizedDashboard />
+          </>
+        )} />
+        <Route path="/collaborative-creation" component={() => (
+          <>
+            <Navbar />
+            <CollaborativeCreation />
+          </>
+        )} />
+        <Route path="/viral-dashboard" component={() => (
+          <>
+            <Navbar />
+            <ViralDashboard />
           </>
         )} />
         <Route component={NotFound} />
