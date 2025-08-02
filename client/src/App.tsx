@@ -48,7 +48,8 @@ function Router() {
     <div className="dark">
       <Navbar />
       <Switch>
-        <Route path="/" component={Home} />
+        <Route path="/" component={LaunchCountdown} />
+        <Route path="/home" component={Home} />
         <Route path="/marketplace" component={Marketplace} />
         <Route path="/portfolio" component={Portfolio} />
         <Route path="/mint" component={Mint} />
@@ -117,7 +118,7 @@ function App() {
     return (
       <QueryClientProvider client={queryClient}>
         <TooltipProvider>
-          <EarlyAccessGate onAccessGranted={() => setHasEarlyAccess(true)} />
+          <Router />
           <Toaster />
         </TooltipProvider>
       </QueryClientProvider>

@@ -35,12 +35,11 @@ export default function LaunchCountdown() {
   const [walletAddress, setWalletAddress] = useState("");
   const [submitted, setSubmitted] = useState(false);
   
-  // Debug: Log state values
-  console.log("Form state:", { submitted, email, walletAddress });
+
   const { toast } = useToast();
 
-  // Set launch date to exactly 30 days from now (fixed target date)
-  const launchDate = new Date('2024-03-05T00:00:00Z'); // Fixed launch date for consistency
+  // Set launch date to September 1, 2025
+  const launchDate = new Date('2025-09-01T00:00:00Z'); // Public launch date
 
   useEffect(() => {
     const updateCountdown = () => {
@@ -268,7 +267,7 @@ export default function LaunchCountdown() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-xs text-muted-foreground mb-4">Debug: submitted={submitted.toString()}, email="{email}"</p>
+
               {submitted ? (
                 <div className="text-center py-8">
                   <CheckCircle className="w-16 h-16 mx-auto mb-4 text-green-400" />
@@ -343,18 +342,7 @@ export default function LaunchCountdown() {
                     )}
                   </Button>
 
-                  {/* Debug button */}
-                  <Button 
-                    type="button" 
-                    variant="outline"
-                    className="w-full mb-2"
-                    onClick={() => {
-                      console.log("TEST BUTTON CLICKED - This proves click events work!");
-                      alert("Test button clicked! Click events are working.");
-                    }}
-                  >
-                    🔧 Test Click (Remove This)
-                  </Button>
+
 
                   <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-3">
                     <h4 className="font-medium text-blue-400 mb-2">VIP Benefits</h4>
