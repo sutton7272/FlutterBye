@@ -717,37 +717,7 @@ export default function Mint() {
                   )}
                 </div>
 
-                {/* Redemption Code Section */}
-                <Separator />
-                
                 <div className="space-y-4">
-                  <h4 className="text-lg font-semibold flex items-center">
-                    <Gift className="w-5 h-5 mr-2 text-purple-500" />
-                    Free Message Redemption
-                  </h4>
-                  
-                  <div className="p-4 border border-green-200 dark:border-green-800 rounded-lg bg-green-50 dark:bg-green-950/20">
-                    <Label htmlFor="redemptionCode" className="text-green-700 dark:text-green-300">
-                      Redemption Code (Optional)
-                    </Label>
-                    <p className="text-sm text-green-600 dark:text-green-400 mt-1 mb-3">
-                      Enter a valid redemption code to mint this message for free
-                    </p>
-                    <Input
-                      id="redemptionCode"
-                      value={redemptionCode}
-                      onChange={(e) => setRedemptionCode(e.target.value.toUpperCase())}
-                      placeholder="Enter redemption code (e.g., FLBY-FREE-2024-001)"
-                      className="bg-white/90 dark:bg-slate-800/90"
-                    />
-                    {redemptionCode && (
-                      <p className="text-xs text-green-600 dark:text-green-400 mt-2">
-                        Code entered: {redemptionCode}
-                      </p>
-                    )}
-                  </div>
-
-                  <div className="space-y-4">
                     <div>
                       <Label htmlFor="memo">Extended Message (Optional)</Label>
                       <Textarea
