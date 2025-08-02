@@ -148,35 +148,45 @@ function Router() {
         <Route path="/admin-legacy" component={() => (
           <>
             <Navbar />
-            <Admin />
+            <Suspense fallback={<PageLoader />}>
+              <Admin />
+            </Suspense>
             <FloatingActionHub />
           </>
         )} />
         <Route path="/sms" component={() => (
           <>
             <Navbar />
-            <SmsIntegrationPage />
+            <Suspense fallback={<PageLoader />}>
+              <SmsIntegrationPage />
+            </Suspense>
             <FloatingActionHub />
           </>
         )} />
         <Route path="/wallets" component={() => (
           <>
             <Navbar />
-            <WalletManagementPage />
+            <Suspense fallback={<PageLoader />}>
+              <WalletManagementPage />
+            </Suspense>
             <FloatingActionHub />
           </>
         )} />
         <Route path="/rewards" component={() => (
           <>
             <Navbar />
-            <RewardsPage />
+            <Suspense fallback={<PageLoader />}>
+              <RewardsPage />
+            </Suspense>
             <FloatingActionHub />
           </>
         )} />
         <Route path="/journey" component={() => (
           <>
             <Navbar />
-            <JourneyPage />
+            <Suspense fallback={<PageLoader />}>
+              <JourneyPage />
+            </Suspense>
             <FloatingActionHub />
           </>
         )} />

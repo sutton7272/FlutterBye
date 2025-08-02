@@ -499,16 +499,7 @@ export class MemStorage implements IStorage {
       .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
   }
 
-  async createRedemption(insertRedemption: InsertRedemption): Promise<Redemption> {
-    const id = randomUUID();
-    const redemption: Redemption = { 
-      ...insertRedemption, 
-      id,
-      createdAt: new Date()
-    };
-    this.redemptions.set(id, redemption);
-    return redemption;
-  }
+
 
   async getRedemptionsByUser(userId: string): Promise<Redemption[]> {
     return Array.from(this.redemptions.values())
