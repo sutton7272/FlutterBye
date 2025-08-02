@@ -39,8 +39,11 @@ import {
   Globe,
   Ticket,
   Target,
-  Sparkles
+  Sparkles,
+  ImageIcon,
+  ExternalLink
 } from "lucide-react";
+import { Link } from "wouter";
 
 interface AdminSettings {
   baseMintingFee: number;
@@ -464,6 +467,51 @@ export default function AdminDashboard() {
                 </div>
               </div>
             </div>
+
+            {/* Quick Access Management */}
+            <Card className="glassmorphism electric-frame">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Settings className="w-5 h-5 text-electric-blue" />
+                  Quick Access Management
+                </CardTitle>
+                <CardDescription>
+                  Direct access to key admin management tools
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                  <Link href="/admin/default-image">
+                    <Button variant="outline" className="w-full h-20 flex flex-col gap-2 border-cyan-500/30 text-cyan-400 hover:bg-cyan-500/10">
+                      <ImageIcon className="h-6 w-6" />
+                      <span className="text-sm">Default Token Image</span>
+                      <ExternalLink className="h-3 w-3 opacity-60" />
+                    </Button>
+                  </Link>
+                  <Link href="/admin/pricing">
+                    <Button variant="outline" className="w-full h-20 flex flex-col gap-2 border-green-500/30 text-green-400 hover:bg-green-500/10">
+                      <DollarSign className="h-6 w-6" />
+                      <span className="text-sm">Pricing Control</span>
+                      <ExternalLink className="h-3 w-3 opacity-60" />
+                    </Button>
+                  </Link>
+                  <Link href="/admin/free-codes">
+                    <Button variant="outline" className="w-full h-20 flex flex-col gap-2 border-purple-500/30 text-purple-400 hover:bg-purple-500/10">
+                      <Ticket className="h-6 w-6" />
+                      <span className="text-sm">Free Codes</span>
+                      <ExternalLink className="h-3 w-3 opacity-60" />
+                    </Button>
+                  </Link>
+                  <Link href="/admin/early-access">
+                    <Button variant="outline" className="w-full h-20 flex flex-col gap-2 border-yellow-500/30 text-yellow-400 hover:bg-yellow-500/10">
+                      <Shield className="h-6 w-6" />
+                      <span className="text-sm">Early Access</span>
+                      <ExternalLink className="h-3 w-3 opacity-60" />
+                    </Button>
+                  </Link>
+                </div>
+              </CardContent>
+            </Card>
 
             {/* Enhanced Stats Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
