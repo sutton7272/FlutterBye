@@ -37,6 +37,11 @@ const UnifiedAdminDashboard = lazy(() => import("@/pages/admin-unified"));
 const Chat = lazy(() => import("@/pages/chat").then(module => ({ default: module.Chat })));
 const LimitedEdition = lazy(() => import("@/pages/limited-edition"));
 const AdvancedSearch = lazy(() => import("@/pages/advanced-search"));
+
+// Revolutionary AI and Analytics Features
+const AIEmotionAnalyzer = lazy(() => import("@/pages/ai-emotion-analyzer"));
+const CrossChainBridge = lazy(() => import("@/pages/cross-chain-bridge"));
+const PredictiveAnalytics = lazy(() => import("@/pages/predictive-analytics"));
 const GreetingCards = lazy(() => import("@/pages/greeting-cards"));
 const EnterpriseCampaigns = lazy(() => import("@/pages/enterprise-campaigns"));
 const FlbyStaking = lazy(() => import("@/pages/flby-staking"));
@@ -374,6 +379,38 @@ function Router() {
             <FloatingActionHub />
           </>
         )} />
+
+        {/* Revolutionary AI and Analytics Features */}
+        <Route path="/ai-emotion-analyzer" component={() => (
+          <>
+            <Navbar />
+            <Suspense fallback={<PageLoader />}>
+              <AIEmotionAnalyzer />
+            </Suspense>
+            <FloatingActionHub />
+          </>
+        )} />
+        
+        <Route path="/cross-chain-bridge" component={() => (
+          <>
+            <Navbar />
+            <Suspense fallback={<PageLoader />}>
+              <CrossChainBridge />
+            </Suspense>
+            <FloatingActionHub />
+          </>
+        )} />
+        
+        <Route path="/predictive-analytics" component={() => (
+          <>
+            <Navbar />
+            <Suspense fallback={<PageLoader />}>
+              <PredictiveAnalytics />
+            </Suspense>
+            <FloatingActionHub />
+          </>
+        )} />
+
         <Route component={NotFound} />
       </Switch>
     </div>

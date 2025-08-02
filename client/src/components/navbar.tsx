@@ -3,6 +3,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { WalletConnect } from "@/components/wallet-connect";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { AIFeaturesMenu } from "@/components/ai-features-menu";
 import { Menu, Home, Coins, Trophy, Users, MessageSquare, Settings, Sparkles, Zap, Heart, Building2, MapPin, Activity, Gift, Award, Star, Ticket, HelpCircle, LayoutDashboard, Share2, Crown, TrendingUp } from "lucide-react";
 
 export default function Navbar() {
@@ -62,6 +63,9 @@ export default function Navbar() {
               </Button>
             </Link>
           ))}
+          
+          {/* Revolutionary AI Features Menu */}
+          <AIFeaturesMenu />
         </nav>
 
         {/* Trust Indicator */}
