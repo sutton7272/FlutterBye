@@ -39,6 +39,7 @@ import FlbyAirdrop from "@/pages/flby-airdrop";
 import AdminStaking from "@/pages/admin-staking";
 import ReferralRewards from "@/pages/referral-rewards";
 import LaunchCountdown from "@/pages/launch-countdown";
+import Subscribe from "@/pages/subscribe";
 import AdminEarlyAccess from "@/pages/admin-early-access";
 import AdminFreeCodes from "@/pages/admin-free-codes";
 import AdminPricing from "@/pages/admin-pricing";
@@ -274,6 +275,12 @@ function Router() {
           <>
             <Navbar />
             <ReferralRewards />
+          </>
+        )} />
+        <Route path="/subscribe" component={() => (
+          <>
+            <Navbar />
+            <Subscribe />
           </>
         )} />
         <Route path="/info" component={() => (

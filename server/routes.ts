@@ -13,6 +13,7 @@ import { registerProductionEndpoints } from "./production-endpoints";
 import { monitoring } from "./monitoring";
 import { collaborativeTokenService } from "./collaborative-token-service";
 import { viralAccelerationService } from "./viral-acceleration-service";
+import { stripeService, subscriptionPlans } from "./stripe-service";
 import { z } from "zod";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -4870,6 +4871,88 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error fetching realtime data:", error);
       res.status(500).json({ error: "Failed to fetch realtime data" });
+    }
+  });
+
+  // ============================================================================
+  // STRIPE PAYMENT ROUTES
+  // ============================================================================
+
+  // Get subscription plans
+  app.get('/api/subscription/plans', (req, res) => {
+    res.json(subscriptionPlans);
+  });
+
+  // Create subscription
+  app.post('/api/create-subscription', async (req, res) => {
+    try {
+      if (!stripeService.isStripeConfigured()) {
+        return res.status(503).json({
+          error: 'Payment system not configured',
+          message: 'Stripe integration is being set up. Please try again later.',
+          mock: true
+        });
+      }
+
+      const { plan, email = 'user@example.com', name = 'Test User' } = req.body;
+      
+      if (!plan || !subscriptionPlans[plan]) {
+        return res.status(400).json({ error: 'Invalid subscription plan' });
+      }
+
+      // Create or get customer
+      const customer = await stripeService.createCustomer(email, name);
+      
+      // Create subscription
+      const { subscription, clientSecret } = await stripeService.createSubscription(
+        customer.id, 
+        plan
+      );
+
+      res.json({
+        subscriptionId: subscription.id,
+        clientSecret,
+        plan: subscriptionPlans[plan]
+      });
+
+    } catch (error: any) {
+      console.error('Subscription creation error:', error);
+      res.status(500).json({ 
+        error: 'Failed to create subscription',
+        message: error.message 
+      });
+    }
+  });
+
+  // Create one-time payment intent
+  app.post('/api/create-payment-intent', async (req, res) => {
+    try {
+      if (!stripeService.isStripeConfigured()) {
+        return res.status(503).json({
+          error: 'Payment system not configured',
+          mock: true
+        });
+      }
+
+      const { amount } = req.body;
+      
+      if (!amount || amount <= 0) {
+        return res.status(400).json({ error: 'Invalid amount' });
+      }
+
+      const paymentIntent = await stripeService.createPaymentIntent(amount);
+      
+      res.json({
+        clientSecret: paymentIntent.client_secret,
+        amount: paymentIntent.amount
+      });
+
+    } catch (error: any) {
+      console.error('Payment intent creation error:', error);
+      res.status(500).json({ 
+        error: 'Failed to create payment intent',
+        message: error.message 
+      });
     }
   });
 
