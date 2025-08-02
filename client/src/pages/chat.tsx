@@ -199,13 +199,13 @@ export function Chat() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-900/20 via-black to-pink-900/20 p-6">
+    <div className="min-h-screen bg-background p-6 pt-20">
       <div className="mx-auto max-w-7xl">
         <div className="mb-6">
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+          <h1 className="text-4xl font-bold text-gradient">
             Flutterbye Chat
           </h1>
-          <p className="text-gray-400 mt-2">Real-time blockchain messaging with token sharing</p>
+          <p className="text-muted-foreground mt-2">Real-time blockchain messaging with token sharing</p>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 h-[600px]">

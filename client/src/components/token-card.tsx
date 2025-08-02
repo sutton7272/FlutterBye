@@ -43,7 +43,7 @@ export default function TokenCard({
   };
 
   return (
-    <Card className="glassmorphism token-card cursor-pointer">
+    <Card className="electric-frame token-card cursor-pointer">
       <CardContent className="p-6">
         <div className="text-center mb-4">
           {token.imageUrl ? (

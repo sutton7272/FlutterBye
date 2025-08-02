@@ -62,11 +62,11 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen gradient-bg text-white pt-20 overflow-hidden">
+    <div className="min-h-screen bg-background text-white pt-20 overflow-hidden">
       
       {/* Top Scrolling Marquee */}
-      <div className="border-y border-electric-cyan/30 electric-gradient py-6 mb-12 overflow-hidden">
-        <div className="flex animate-marquee whitespace-nowrap text-3xl font-bold text-white neon-text">
+      <div className="border-y border-primary/30 modern-gradient py-6 mb-12 overflow-hidden electric-frame">
+        <div className="flex animate-marquee whitespace-nowrap text-3xl font-bold text-white text-gradient">
           {[...marqueeText, ...marqueeText].map((text, i) => (
             <span key={i} className="mx-12 flex-shrink-0 flutter-animate" style={{animationDelay: `${i * 0.2}s`}}>
               {text}
@@ -90,11 +90,11 @@ export default function Home() {
             </div>
           </div>
           
-          <h1 className="text-6xl md:text-8xl font-black mb-8 bg-gradient-to-r from-electric-blue via-electric-cyan to-electric-green bg-clip-text text-transparent neon-text">
+          <h1 className="text-6xl md:text-8xl font-black mb-8 text-gradient">
             FLUTTERBYE
           </h1>
           
-          <p className="text-2xl md:text-3xl text-electric-cyan mb-6 font-bold neon-text">
+          <p className="text-2xl md:text-3xl text-primary mb-6 font-bold">
             Turn Messages Into Money
           </p>
           
@@ -104,21 +104,21 @@ export default function Home() {
           
           <div className="flex flex-col sm:flex-row gap-6 justify-center mb-16">
             <Link href="/mint-solana">
-              <Button size="lg" className="text-xl px-10 py-6 bg-gradient-to-r from-electric-blue to-electric-green hover:from-electric-cyan hover:to-bright-mint text-background font-bold rounded-2xl cyber-glow pulse-electric">
+              <Button size="lg" className="text-xl px-10 py-6 modern-gradient text-white font-bold rounded-2xl circuit-glow">
                 <Coins className="mr-3 h-6 w-6" />
                 MINT FLBY-MSG TOKEN
               </Button>
             </Link>
             
             <Link href="/limited-edition">
-              <Button size="lg" className="text-xl px-10 py-6 bg-gradient-to-r from-cyber-purple to-neon-pink hover:from-purple-500 hover:to-pink-500 text-white font-bold rounded-2xl cyber-glow">
+              <Button size="lg" className="text-xl px-10 py-6 modern-gradient text-white font-bold rounded-2xl circuit-glow">
                 <Sparkles className="mr-3 h-6 w-6" />
                 LIMITED EDITION
               </Button>
             </Link>
             
             <Link href="/sms">
-              <Button variant="outline" size="lg" className="text-xl px-10 py-6 border-2 border-electric-cyan text-electric-cyan hover:bg-electric-cyan/10 hover:border-electric-green font-bold rounded-2xl cyber-glow electric-border">
+              <Button variant="outline" size="lg" className="text-xl px-10 py-6 pulse-border text-primary font-bold rounded-2xl circuit-glow">
                 <MessageSquare className="mr-3 h-6 w-6" />
                 TEXT TO TOKENIZE
               </Button>

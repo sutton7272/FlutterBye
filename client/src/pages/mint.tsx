@@ -156,18 +156,18 @@ export default function Mint() {
   const remainingChars = 27 - message.length;
 
   return (
-    <div className="min-h-screen pt-20 pb-12">
+    <div className="min-h-screen pt-20 pb-12 bg-background">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold mb-4">Mint FLBY-MSG Tokens</h1>
+          <h1 className="text-4xl font-bold mb-4 text-gradient">Mint FLBY-MSG Tokens</h1>
           <p className="text-xl text-muted-foreground">Create tokenized messages and distribute them to your target audience</p>
         </div>
         
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Minting Form */}
-          <Card className="glassmorphism">
+          <Card className="premium-card electric-frame">
             <CardContent className="p-8">
-              <h3 className="text-2xl font-bold mb-6">Create Your Message Token</h3>
+              <h3 className="text-2xl font-bold mb-6 text-gradient">Create Your Message Token</h3>
               
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div>

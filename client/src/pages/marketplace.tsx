@@ -55,15 +55,15 @@ export default function Marketplace() {
   });
 
   return (
-    <div className="min-h-screen pt-20 pb-12">
+    <div className="min-h-screen pt-20 pb-12 bg-background">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold mb-4">FLBY-MSG Token Marketplace</h1>
+          <h1 className="text-4xl font-bold mb-4 text-gradient">FLBY-MSG Token Marketplace</h1>
           <p className="text-xl text-muted-foreground">Discover, trade, and collect unique message tokens</p>
         </div>
         
         {/* Search and Filters */}
-        <Card className="glassmorphism mb-8">
+        <Card className="electric-frame mb-8">
           <CardContent className="p-6">
             <div className="flex flex-col md:flex-row gap-4 items-center">
               <div className="flex-1 relative">
@@ -72,7 +72,7 @@ export default function Marketplace() {
                   placeholder="Search tokens by message or creator..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-10"
+                  className="pl-10 pulse-border"
                 />
               </div>
               <div className="flex gap-2">

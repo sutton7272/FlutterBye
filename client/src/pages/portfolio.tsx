@@ -54,19 +54,19 @@ export default function Portfolio() {
   };
 
   return (
-    <div className="min-h-screen pt-20 pb-12">
+    <div className="min-h-screen pt-20 pb-12 bg-background">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold mb-4">Your FlBY-MSG Portfolio</h1>
+          <h1 className="text-4xl font-bold mb-4 text-gradient">Your FlBY-MSG Portfolio</h1>
           <p className="text-xl text-muted-foreground">Manage your created and owned message tokens</p>
         </div>
         
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Portfolio Stats */}
           <div className="lg:col-span-1 space-y-6">
-            <Card className="glassmorphism">
+            <Card className="premium-card electric-frame">
               <CardContent className="p-6">
-                <h3 className="text-xl font-bold mb-4">Portfolio Overview</h3>
+                <h3 className="text-xl font-bold mb-4 text-gradient">Portfolio Overview</h3>
                 <div className="space-y-4">
                   <div className="flex justify-between items-center">
                     <span className="text-muted-foreground">Total Value</span>

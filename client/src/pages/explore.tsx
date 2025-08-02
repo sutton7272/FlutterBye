@@ -71,11 +71,11 @@ export default function ExplorePage() {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="container mx-auto px-4 py-8 bg-background min-h-screen pt-20">
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold mb-4 bg-gradient-to-r from-green-400 to-blue-400 bg-clip-text text-transparent">
-            Explore Fluttercoins
+          <h1 className="text-4xl font-bold mb-4 text-gradient">
+            Explore FLBY-MSG Tokens
           </h1>
           <p className="text-lg text-muted-foreground">
             Discover public tokens and their messages from the community
@@ -84,7 +84,7 @@ export default function ExplorePage() {
 
         {/* Platform Stats */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-          <Card>
+          <Card className="electric-frame">
             <CardContent className="p-6">
               <div className="flex items-center space-x-2">
                 <Globe className="w-5 h-5 text-blue-500" />
@@ -98,7 +98,7 @@ export default function ExplorePage() {
             </CardContent>
           </Card>
           
-          <Card>
+          <Card className="electric-frame">
             <CardContent className="p-6">
               <div className="flex items-center space-x-2">
                 <TrendingUp className="w-5 h-5 text-green-500" />
@@ -112,7 +112,7 @@ export default function ExplorePage() {
             </CardContent>
           </Card>
           
-          <Card>
+          <Card className="electric-frame">
             <CardContent className="p-6">
               <div className="flex items-center space-x-2">
                 <Clock className="w-5 h-5 text-orange-500" />
@@ -126,7 +126,7 @@ export default function ExplorePage() {
             </CardContent>
           </Card>
           
-          <Card>
+          <Card className="electric-frame">
             <CardContent className="p-6">
               <div className="flex items-center space-x-2">
                 <Eye className="w-5 h-5 text-purple-500" />
@@ -142,9 +142,9 @@ export default function ExplorePage() {
         </div>
 
         {/* Search and Filters */}
-        <Card className="mb-6">
+        <Card className="mb-6 electric-frame">
           <CardHeader>
-            <CardTitle className="text-lg flex items-center">
+            <CardTitle className="text-lg flex items-center text-gradient">
               <Search className="w-4 h-4 mr-2" />
               Search & Filter
             </CardTitle>
@@ -156,7 +156,7 @@ export default function ExplorePage() {
                   placeholder="Search messages..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full"
+                  className="w-full pulse-border"
                 />
               </div>
               <div className="w-full sm:w-48">
