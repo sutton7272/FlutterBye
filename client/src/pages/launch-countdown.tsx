@@ -29,6 +29,8 @@ import {
   Quote
 } from "lucide-react";
 import flutterbeyeLogoPath from "@assets/image_1754068877999.png";
+import Navbar from "@/components/navbar";
+import { FloatingActionHub } from "@/components/floating-action-hub";
 
 interface TimeLeft {
   days: number;
@@ -222,6 +224,13 @@ export default function LaunchCountdown() {
   // Main Launch Countdown & Waitlist (for authorized users)
   return (
     <div className="min-h-screen bg-black text-white relative overflow-hidden">
+      {/* Show navbar if access is granted */}
+      {hasAccess && (
+        <>
+          <Navbar />
+          <FloatingActionHub />
+        </>
+      )}
       {/* Animated Background */}
       <div className="fixed inset-0 bg-gradient-to-br from-blue-900/20 via-purple-900/20 to-cyan-900/20 pointer-events-none" />
       
@@ -238,7 +247,7 @@ export default function LaunchCountdown() {
         <div className="absolute bottom-40 right-24 w-1 h-1 bg-pink-400 rounded-full animate-ping opacity-30 delay-1500"></div>
       </div>
 
-      <div className="container mx-auto px-4 py-8 relative z-10">
+      <div className={`container mx-auto px-4 relative z-10 ${hasAccess ? 'pt-24 pb-8' : 'py-8'}`}>
         {/* Header */}
         <div className="text-center mb-12">
           <img 
