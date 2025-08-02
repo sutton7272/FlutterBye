@@ -156,7 +156,7 @@ export default function Mint() {
   const remainingChars = 27 - message.length;
 
   return (
-    <div className="min-h-screen pt-20 pb-12 bg-background">
+    <div className="min-h-screen pt-20 pb-12">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold mb-4 text-gradient">Mint FLBY-MSG Tokens</h1>

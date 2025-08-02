@@ -199,7 +199,7 @@ export function Chat() {
   };
 
   return (
-    <div className="min-h-screen bg-background p-6 pt-20">
+    <div className="min-h-screen p-6 pt-20">
       <div className="mx-auto max-w-7xl">
         <div className="mb-6">
           <h1 className="text-4xl font-bold text-gradient">

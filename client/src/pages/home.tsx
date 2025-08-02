@@ -62,7 +62,7 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-background text-white pt-20 overflow-hidden">
+    <div className="min-h-screen text-white pt-20 overflow-hidden">
       
       {/* Top Scrolling Marquee */}
       <div className="border-y border-primary/30 modern-gradient py-6 mb-12 overflow-hidden electric-frame">
