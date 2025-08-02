@@ -287,6 +287,9 @@ export default function LaunchCountdown() {
                       required
                       className="bg-muted/20"
                     />
+                    {email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) && (
+                      <p className="text-yellow-400 text-xs">Please enter a valid email address</p>
+                    )}
                   </div>
                   
                   <div className="space-y-2">
@@ -299,8 +302,11 @@ export default function LaunchCountdown() {
                       className="bg-muted/20"
                     />
                     <p className="text-xs text-muted-foreground">
-                      For FLBY token airdrops (can be added later)
+                      💰 For FLBY token airdrops (can be added later)
                     </p>
+                    {walletAddress && walletAddress.length > 0 && walletAddress.length < 32 && (
+                      <p className="text-yellow-400 text-xs">Solana addresses are typically 32-44 characters long</p>
+                    )}
                   </div>
 
                   <Button 
