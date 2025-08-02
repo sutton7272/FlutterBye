@@ -289,14 +289,22 @@ export default function RedeemPage() {
 
         {/* Tabbed Interface */}
         <Tabs defaultValue="redeem" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-2 bg-slate-800/50">
+          <TabsList className="grid w-full grid-cols-4 bg-slate-800/50">
             <TabsTrigger value="redeem" className="flex items-center gap-2">
               <ArrowDownCircle className="w-4 h-4" />
-              Tokens to Redeem
+              Redeem
             </TabsTrigger>
             <TabsTrigger value="created" className="flex items-center gap-2">
               <ArrowUpCircle className="w-4 h-4" />
-              Tokens I Created
+              Created
+            </TabsTrigger>
+            <TabsTrigger value="holdings" className="flex items-center gap-2">
+              <Coins className="w-4 h-4" />
+              Holdings
+            </TabsTrigger>
+            <TabsTrigger value="stats" className="flex items-center gap-2">
+              <TrendingUp className="w-4 h-4" />
+              Stats
             </TabsTrigger>
           </TabsList>
 
@@ -422,6 +430,198 @@ export default function RedeemPage() {
                     ))}
                   </div>
                 )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Holdings Tab - Portfolio Functionality */}
+          <TabsContent value="holdings" className="space-y-4">
+            <Card className="glassmorphism">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Coins className="w-5 h-5" />
+                  All Token Holdings
+                </CardTitle>
+                <CardDescription>
+                  Complete view of all tokens in your wallet
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                  <Card className="border border-blue-500/20 bg-blue-500/5">
+                    <CardContent className="p-4 text-center">
+                      <p className="text-sm text-muted-foreground">Total Holdings</p>
+                      <p className="text-2xl font-bold text-blue-400">47</p>
+                    </CardContent>
+                  </Card>
+                  <Card className="border border-green-500/20 bg-green-500/5">
+                    <CardContent className="p-4 text-center">
+                      <p className="text-sm text-muted-foreground">Portfolio Value</p>
+                      <p className="text-2xl font-bold text-green-400">12.75 SOL</p>
+                    </CardContent>
+                  </Card>
+                  <Card className="border border-purple-500/20 bg-purple-500/5">
+                    <CardContent className="p-4 text-center">
+                      <p className="text-sm text-muted-foreground">Unique Tokens</p>
+                      <p className="text-2xl font-bold text-purple-400">23</p>
+                    </CardContent>
+                  </Card>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {[
+                    { symbol: 'HELLO', message: 'Hello World!', quantity: 5, value: 0.5 },
+                    { symbol: 'LOVE', message: 'Spread Love', quantity: 12, value: 0.25 },
+                    { symbol: 'HAPPY', message: 'Happy Birthday!', quantity: 3, value: 1.0 },
+                    { symbol: 'MAGIC', message: 'Magic Moments', quantity: 8, value: 0.1 },
+                  ].map((holding, index) => (
+                    <Card key={index} className="border border-slate-700 hover:border-blue-500/50 transition-colors">
+                      <CardContent className="p-4">
+                        <div className="flex justify-between items-start mb-2">
+                          <div>
+                            <h3 className="font-medium">{holding.message}</h3>
+                            <Badge variant="outline" className="text-xs mt-1">
+                              {holding.symbol}
+                            </Badge>
+                          </div>
+                          <div className="text-right">
+                            <p className="text-sm text-green-400">
+                              {holding.value} SOL
+                            </p>
+                            <p className="text-xs text-muted-foreground">
+                              × {holding.quantity}
+                            </p>
+                          </div>
+                        </div>
+                        
+                        <div className="flex gap-2 mt-3">
+                          <Button size="sm" variant="outline" className="flex-1">
+                            Trade
+                          </Button>
+                          <Button size="sm" variant="outline" className="flex-1">
+                            Details
+                          </Button>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Stats Tab - Analytics */}
+          <TabsContent value="stats" className="space-y-4">
+            <Card className="glassmorphism">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <TrendingUp className="w-5 h-5" />
+                  Portfolio Analytics
+                </CardTitle>
+                <CardDescription>
+                  Detailed statistics and performance metrics
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                  <Card className="border border-green-500/20 bg-green-500/5">
+                    <CardContent className="p-4">
+                      <div className="flex items-center gap-2 mb-2">
+                        <TrendingUp className="w-4 h-4 text-green-400" />
+                        <p className="text-sm text-muted-foreground">Total Gains</p>
+                      </div>
+                      <p className="text-xl font-bold text-green-400">+2.45 SOL</p>
+                      <p className="text-xs text-green-400">+23.7%</p>
+                    </CardContent>
+                  </Card>
+                  
+                  <Card className="border border-blue-500/20 bg-blue-500/5">
+                    <CardContent className="p-4">
+                      <div className="flex items-center gap-2 mb-2">
+                        <Coins className="w-4 h-4 text-blue-400" />
+                        <p className="text-sm text-muted-foreground">Tokens Created</p>
+                      </div>
+                      <p className="text-xl font-bold text-blue-400">8</p>
+                      <p className="text-xs text-muted-foreground">This month</p>
+                    </CardContent>
+                  </Card>
+                  
+                  <Card className="border border-purple-500/20 bg-purple-500/5">
+                    <CardContent className="p-4">
+                      <div className="flex items-center gap-2 mb-2">
+                        <Calendar className="w-4 h-4 text-purple-400" />
+                        <p className="text-sm text-muted-foreground">Avg Hold Time</p>
+                      </div>
+                      <p className="text-xl font-bold text-purple-400">12d</p>
+                      <p className="text-xs text-muted-foreground">Average</p>
+                    </CardContent>
+                  </Card>
+                  
+                  <Card className="border border-orange-500/20 bg-orange-500/5">
+                    <CardContent className="p-4">
+                      <div className="flex items-center gap-2 mb-2">
+                        <DollarSign className="w-4 h-4 text-orange-400" />
+                        <p className="text-sm text-muted-foreground">Redeemed</p>
+                      </div>
+                      <p className="text-xl font-bold text-orange-400">4.2 SOL</p>
+                      <p className="text-xs text-muted-foreground">All time</p>
+                    </CardContent>
+                  </Card>
+                </div>
+
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  <Card className="border border-slate-700">
+                    <CardHeader>
+                      <CardTitle className="text-lg">Token Activity</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-3">
+                        {[
+                          { action: 'Created', token: 'BIRTHDAY', time: '2h ago', value: '+1.0 SOL' },
+                          { action: 'Redeemed', token: 'THANKS', time: '1d ago', value: '-0.5 SOL' },
+                          { action: 'Received', token: 'LOVE', time: '3d ago', value: '+0.25 SOL' },
+                          { action: 'Created', token: 'CONGRATS', time: '5d ago', value: '+2.0 SOL' },
+                        ].map((activity, index) => (
+                          <div key={index} className="flex items-center justify-between py-2 border-b border-slate-700/50 last:border-0">
+                            <div>
+                              <p className="font-medium">{activity.action} {activity.token}</p>
+                              <p className="text-xs text-muted-foreground">{activity.time}</p>
+                            </div>
+                            <div className={`font-medium ${activity.value.startsWith('+') ? 'text-green-400' : 'text-orange-400'}`}>
+                              {activity.value}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  <Card className="border border-slate-700">
+                    <CardHeader>
+                      <CardTitle className="text-lg">Top Performing Tokens</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-3">
+                        {[
+                          { symbol: 'MAGIC', performance: '+45%', value: '0.8 SOL' },
+                          { symbol: 'LOVE', performance: '+32%', value: '1.2 SOL' },
+                          { symbol: 'HAPPY', performance: '+28%', value: '2.1 SOL' },
+                          { symbol: 'CONGRATS', performance: '+15%', value: '1.5 SOL' },
+                        ].map((token, index) => (
+                          <div key={index} className="flex items-center justify-between py-2 border-b border-slate-700/50 last:border-0">
+                            <div>
+                              <p className="font-medium">{token.symbol}</p>
+                              <p className="text-xs text-green-400">{token.performance}</p>
+                            </div>
+                            <div className="text-right">
+                              <p className="font-medium">{token.value}</p>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
               </CardContent>
             </Card>
           </TabsContent>
