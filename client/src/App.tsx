@@ -39,6 +39,24 @@ const FlbyAirdrop = lazy(() => import("@/pages/flby-airdrop"));
 const ReferralRewards = lazy(() => import("@/pages/referral-rewards"));
 const TokenHolderMapPage = lazy(() => import("@/pages/token-holder-map"));
 
+// Lazy load remaining pages
+const Admin = lazy(() => import("@/pages/admin"));
+const SmsIntegrationPage = lazy(() => import("@/pages/sms-integration").then(module => ({ default: module.SmsIntegrationPage })));
+const WalletManagementPage = lazy(() => import("@/pages/wallet-management").then(module => ({ default: module.WalletManagementPage })));
+const RewardsPage = lazy(() => import("@/pages/rewards").then(module => ({ default: module.RewardsPage })));
+const JourneyPage = lazy(() => import("@/pages/journey"));
+const BadgesPage = lazy(() => import("@/pages/badges"));
+const InfoPage = lazy(() => import("@/pages/info"));
+const TransactionHeatmapPage = lazy(() => import("@/pages/heatmap"));
+const AdminSystem = lazy(() => import("@/pages/admin-system"));
+const ConfettiDemo = lazy(() => import("@/pages/confetti-demo"));
+const ElectricDemo = lazy(() => import("@/pages/electric-demo"));
+const AdminStaking = lazy(() => import("@/pages/admin-staking"));
+const AdminEarlyAccess = lazy(() => import("@/pages/admin-early-access"));
+const AdminFreeCodes = lazy(() => import("@/pages/admin-free-codes"));
+const AdminPricing = lazy(() => import("@/pages/admin-pricing"));
+const AdminDefaultImage = lazy(() => import("@/pages/admin-default-image"));
+
 // Loading component for lazy-loaded pages
 const PageLoader = () => (
   <div className="min-h-screen bg-slate-900 flex items-center justify-center">
@@ -193,42 +211,54 @@ function Router() {
         <Route path="/heatmap" component={() => (
           <>
             <Navbar />
-            <TransactionHeatmapPage />
+            <Suspense fallback={<PageLoader />}>
+              <TransactionHeatmapPage />
+            </Suspense>
             <FloatingActionHub />
           </>
         )} />
         <Route path="/badges" component={() => (
           <>
             <Navbar />
-            <BadgesPage />
+            <Suspense fallback={<PageLoader />}>
+              <BadgesPage />
+            </Suspense>
             <FloatingActionHub />
           </>
         )} />
         <Route path="/chat" component={() => (
           <>
             <Navbar />
-            <Chat />
+            <Suspense fallback={<PageLoader />}>
+              <Chat />
+            </Suspense>
             <FloatingActionHub />
           </>
         )} />
         <Route path="/limited-edition" component={() => (
           <>
             <Navbar />
-            <LimitedEdition />
+            <Suspense fallback={<PageLoader />}>
+              <LimitedEdition />
+            </Suspense>
             <FloatingActionHub />
           </>
         )} />
         <Route path="/search" component={() => (
           <>
             <Navbar />
-            <AdvancedSearch />
+            <Suspense fallback={<PageLoader />}>
+              <AdvancedSearch />
+            </Suspense>
             <FloatingActionHub />
           </>
         )} />
         <Route path="/token-map" component={() => (
           <>
             <Navbar />
-            <TokenHolderMapPage />
+            <Suspense fallback={<PageLoader />}>
+              <TokenHolderMapPage />
+            </Suspense>
             <FloatingActionHub />
           </>
         )} />

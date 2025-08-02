@@ -336,19 +336,7 @@ export class MemStorage implements IStorage {
       });
   }
 
-  async createRedemption(redemption: any): Promise<any> {
-    const id = randomUUID();
-    const newRedemption = {
-      id,
-      ...redemption,
-      createdAt: new Date()
-    };
-    if (!this.redemptions) {
-      this.redemptions = new Map();
-    }
-    this.redemptions.set(id, newRedemption);
-    return newRedemption;
-  }
+  // Removed duplicate - using the proper typed version below
 
   async getRedemptionsByWallet(walletAddress: string): Promise<any[]> {
     if (!this.redemptions) return [];
