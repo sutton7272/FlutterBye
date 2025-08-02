@@ -11,6 +11,8 @@ import { realTimeMonitor } from "./real-time-monitor";
 import { transactionMonitor } from "./transaction-monitor";
 import { registerProductionEndpoints } from "./production-endpoints";
 import { monitoring } from "./monitoring";
+import { collaborativeTokenService } from "./collaborative-token-service";
+import { viralAccelerationService } from "./viral-acceleration-service";
 import { z } from "zod";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -4367,11 +4369,94 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Register production monitoring endpoints
   registerProductionEndpoints(app);
 
+  // Industry-disrupting feature: Real-time collaborative token creation
+  app.get('/api/collaborative/metrics', (req, res) => {
+    res.json(collaborativeTokenService.getSessionMetrics());
+  });
+
+  // Industry-disrupting feature: Viral acceleration protocol
+  app.post('/api/viral/track', async (req, res) => {
+    try {
+      const { tokenId, userId, interactionType } = req.body;
+      await viralAccelerationService.trackInteraction(tokenId, userId, interactionType);
+      res.json({ success: true });
+    } catch (error) {
+      res.status(500).json({ error: 'Failed to track interaction' });
+    }
+  });
+
+  app.get('/api/viral/trending', async (req, res) => {
+    try {
+      const limit = parseInt(req.query.limit as string) || 10;
+      const trending = await viralAccelerationService.getTrendingTokens(limit);
+      res.json(trending);
+    } catch (error) {
+      res.status(500).json({ error: 'Failed to get trending tokens' });
+    }
+  });
+
+  app.get('/api/viral/metrics/:tokenId', async (req, res) => {
+    try {
+      const { tokenId } = req.params;
+      const metrics = await viralAccelerationService.getViralMetrics(tokenId);
+      res.json(metrics);
+    } catch (error) {
+      res.status(500).json({ error: 'Failed to get viral metrics' });
+    }
+  });
+
+  app.get('/api/viral/prediction/:tokenId', async (req, res) => {
+    try {
+      const { tokenId } = req.params;
+      const prediction = await viralAccelerationService.getViralPrediction(tokenId);
+      res.json(prediction);
+    } catch (error) {
+      res.status(500).json({ error: 'Failed to get viral prediction' });
+    }
+  });
+
+  app.get('/api/viral/rewards/:creatorId', async (req, res) => {
+    try {
+      const { creatorId } = req.params;
+      const rewards = await viralAccelerationService.getCreatorRewards(creatorId);
+      res.json(rewards);
+    } catch (error) {
+      res.status(500).json({ error: 'Failed to get creator rewards' });
+    }
+  });
+
+  app.get('/api/viral/network/:userId', async (req, res) => {
+    try {
+      const { userId } = req.params;
+      const analysis = await viralAccelerationService.getNetworkAnalysis(userId);
+      res.json(analysis);
+    } catch (error) {
+      res.status(500).json({ error: 'Failed to get network analysis' });
+    }
+  });
+
   // Initialize chat service heartbeat
   chatService.startHeartbeat();
   
   // Initialize WebSocket server for real-time monitoring on existing httpServer
   realTimeMonitor.initialize(httpServer);
+
+  // Initialize collaborative WebSocket server  
+  const collaborativeWss = new WebSocketServer({
+    server: httpServer,
+    path: '/collaborative-ws',
+    verifyClient: (info) => {
+      return true;
+    }
+  });
+
+  // Handle WebSocket connections for collaborative token creation
+  collaborativeWss.on('connection', (ws, request) => {
+    collaborativeTokenService.handleWebSocketConnection(ws, request);
+  });
+
+  // Start heartbeat for collaborative service
+  collaborativeTokenService.startHeartbeat();
   
   // Monitor real-time events
   realTimeMonitor.on('transaction_update', (data) => {
