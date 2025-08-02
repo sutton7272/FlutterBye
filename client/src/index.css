@@ -288,6 +288,7 @@
     border-radius: 12px;
     animation: electricPulse 2s ease-in-out infinite;
     overflow: hidden;
+    background: rgba(0, 0, 0, 0.8); /* Dark background for better text contrast */
   }
   
   .electric-frame::before {
@@ -307,12 +308,14 @@
     animation: circuitFlow 4s ease-in-out infinite;
     border-radius: 12px;
     z-index: -1;
+    opacity: 0.6; /* Reduce opacity for better text visibility */
   }
   
   .pulse-border {
     border: 1px solid var(--electric-blue);
     animation: borderPulse 3s ease-in-out infinite;
     transition: all 0.3s ease;
+    background: rgba(0, 0, 0, 0.6); /* Darker background for better contrast */
   }
   
   .circuit-glow {
@@ -321,6 +324,7 @@
       0 0 20px var(--pulse-blue),
       inset 0 0 10px var(--pulse-blue);
     transition: all 0.3s ease;
+    background: rgba(0, 0, 0, 0.7); /* Dark background for text readability */
   }
   
   .circuit-glow:hover {
@@ -338,6 +342,30 @@
     animation: pulse-electric 3s ease-in-out infinite;
   }
   
+  /* Better text contrast for electric components */
+  .electric-frame .text-muted-foreground {
+    color: hsl(240, 3.7%, 75%) !important; /* Lighter muted text */
+  }
+  
+  .electric-frame h1, .electric-frame h2, .electric-frame h3, .electric-frame h4 {
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.9); /* Strong text shadow for headings */
+  }
+  
+  .electric-frame p, .electric-frame span, .electric-frame label {
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8); /* Text shadow for body text */
+    color: rgba(255, 255, 255, 0.95) !important; /* Ensure white text is visible */
+  }
+  
+  .circuit-glow p, .circuit-glow span, .circuit-glow label {
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+    color: rgba(255, 255, 255, 0.95) !important;
+  }
+  
+  .pulse-border p, .pulse-border span, .pulse-border label {
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+    color: rgba(255, 255, 255, 0.95) !important;
+  }
+
   .neon-text {
     text-shadow: 
       0 0 5px currentColor,

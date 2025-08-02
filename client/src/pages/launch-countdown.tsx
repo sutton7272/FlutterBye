@@ -30,7 +30,7 @@ import {
 } from "lucide-react";
 import flutterbeyeLogoPath from "@assets/image_1754068877999.png";
 import Navbar from "@/components/navbar";
-import { FloatingActionHub } from "@/components/floating-action-hub";
+
 import { TutorialLaunchButton } from "@/components/interactive-tutorial";
 
 interface TimeLeft {
@@ -229,7 +229,6 @@ export default function LaunchCountdown() {
       {hasAccess && (
         <>
           <Navbar />
-          <FloatingActionHub />
         </>
       )}
       {/* Animated Background - removed gradient overlay to show cosmic butterfly */}
