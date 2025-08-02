@@ -46,44 +46,223 @@ import { WalletProvider } from "@/components/wallet-adapter";
 function Router() {
   return (
     <div className="dark">
-      <Navbar />
       <Switch>
-        <Route path="/" component={Home} />
-        <Route path="/home" component={Home} />
-        <Route path="/marketplace" component={Marketplace} />
-        <Route path="/portfolio" component={Portfolio} />
-        <Route path="/mint" component={Mint} />
-        <Route path="/redeem" component={Redeem} />
-        <Route path="/activity" component={Activity} />
-        <Route path="/explore" component={Explore} />
-        <Route path="/how-it-works" component={HowItWorks} />
-        <Route path="/free-codes" component={FreeCodes} />
-        <Route path="/admin" component={Admin} />
-        <Route path="/sms" component={SmsIntegrationPage} />
-        <Route path="/wallets" component={WalletManagementPage} />
-        <Route path="/rewards" component={RewardsPage} />
-        <Route path="/journey" component={JourneyPage} />
-        <Route path="/heatmap" component={TransactionHeatmapPage} />
-        <Route path="/badges" component={BadgesPage} />
-
-        <Route path="/chat" component={Chat} />
-        <Route path="/limited-edition" component={LimitedEdition} />
-        <Route path="/search" component={AdvancedSearch} />
-        <Route path="/admin-system" component={AdminSystem} />
-        <Route path="/confetti-demo" component={ConfettiDemo} />
-        <Route path="/electric-demo" component={ElectricDemo} />
-        <Route path="/greeting-cards" component={GreetingCards} />
-        <Route path="/enterprise" component={EnterpriseCampaigns} />
-        <Route path="/flby/staking" component={FlbyStaking} />
-        <Route path="/flby/governance" component={FlbyGovernance} />
-        <Route path="/flby/airdrop" component={FlbyAirdrop} />
-        <Route path="/admin/staking" component={AdminStaking} />
-        <Route path="/admin/early-access" component={AdminEarlyAccess} />
-        <Route path="/referrals" component={ReferralRewards} />
+        <Route path="/" component={LaunchCountdown} />
         <Route path="/launch" component={LaunchCountdown} />
+        
+        {/* Routes with navbar - only accessible when authenticated */}
+        <Route path="/home" component={() => (
+          <>
+            <Navbar />
+            <Home />
+            <FloatingActionHub />
+          </>
+        )} />
+        <Route path="/marketplace" component={() => (
+          <>
+            <Navbar />
+            <Marketplace />
+            <FloatingActionHub />
+          </>
+        )} />
+        <Route path="/portfolio" component={() => (
+          <>
+            <Navbar />
+            <Portfolio />
+            <FloatingActionHub />
+          </>
+        )} />
+        <Route path="/mint" component={() => (
+          <>
+            <Navbar />
+            <Mint />
+            <FloatingActionHub />
+          </>
+        )} />
+        <Route path="/redeem" component={() => (
+          <>
+            <Navbar />
+            <Redeem />
+            <FloatingActionHub />
+          </>
+        )} />
+        <Route path="/activity" component={() => (
+          <>
+            <Navbar />
+            <Activity />
+            <FloatingActionHub />
+          </>
+        )} />
+        <Route path="/explore" component={() => (
+          <>
+            <Navbar />
+            <Explore />
+            <FloatingActionHub />
+          </>
+        )} />
+        <Route path="/how-it-works" component={() => (
+          <>
+            <Navbar />
+            <HowItWorks />
+            <FloatingActionHub />
+          </>
+        )} />
+        <Route path="/free-codes" component={() => (
+          <>
+            <Navbar />
+            <FreeCodes />
+            <FloatingActionHub />
+          </>
+        )} />
+        <Route path="/admin" component={() => (
+          <>
+            <Navbar />
+            <Admin />
+            <FloatingActionHub />
+          </>
+        )} />
+        <Route path="/sms" component={() => (
+          <>
+            <Navbar />
+            <SmsIntegrationPage />
+            <FloatingActionHub />
+          </>
+        )} />
+        <Route path="/wallets" component={() => (
+          <>
+            <Navbar />
+            <WalletManagementPage />
+            <FloatingActionHub />
+          </>
+        )} />
+        <Route path="/rewards" component={() => (
+          <>
+            <Navbar />
+            <RewardsPage />
+            <FloatingActionHub />
+          </>
+        )} />
+        <Route path="/journey" component={() => (
+          <>
+            <Navbar />
+            <JourneyPage />
+            <FloatingActionHub />
+          </>
+        )} />
+        <Route path="/heatmap" component={() => (
+          <>
+            <Navbar />
+            <TransactionHeatmapPage />
+            <FloatingActionHub />
+          </>
+        )} />
+        <Route path="/badges" component={() => (
+          <>
+            <Navbar />
+            <BadgesPage />
+            <FloatingActionHub />
+          </>
+        )} />
+        <Route path="/chat" component={() => (
+          <>
+            <Navbar />
+            <Chat />
+            <FloatingActionHub />
+          </>
+        )} />
+        <Route path="/limited-edition" component={() => (
+          <>
+            <Navbar />
+            <LimitedEdition />
+            <FloatingActionHub />
+          </>
+        )} />
+        <Route path="/search" component={() => (
+          <>
+            <Navbar />
+            <AdvancedSearch />
+            <FloatingActionHub />
+          </>
+        )} />
+        <Route path="/admin-system" component={() => (
+          <>
+            <Navbar />
+            <AdminSystem />
+            <FloatingActionHub />
+          </>
+        )} />
+        <Route path="/confetti-demo" component={() => (
+          <>
+            <Navbar />
+            <ConfettiDemo />
+            <FloatingActionHub />
+          </>
+        )} />
+        <Route path="/electric-demo" component={() => (
+          <>
+            <Navbar />
+            <ElectricDemo />
+            <FloatingActionHub />
+          </>
+        )} />
+        <Route path="/greeting-cards" component={() => (
+          <>
+            <Navbar />
+            <GreetingCards />
+            <FloatingActionHub />
+          </>
+        )} />
+        <Route path="/enterprise" component={() => (
+          <>
+            <Navbar />
+            <EnterpriseCampaigns />
+            <FloatingActionHub />
+          </>
+        )} />
+        <Route path="/flby/staking" component={() => (
+          <>
+            <Navbar />
+            <FlbyStaking />
+            <FloatingActionHub />
+          </>
+        )} />
+        <Route path="/flby/governance" component={() => (
+          <>
+            <Navbar />
+            <FlbyGovernance />
+            <FloatingActionHub />
+          </>
+        )} />
+        <Route path="/flby/airdrop" component={() => (
+          <>
+            <Navbar />
+            <FlbyAirdrop />
+            <FloatingActionHub />
+          </>
+        )} />
+        <Route path="/admin/staking" component={() => (
+          <>
+            <Navbar />
+            <AdminStaking />
+            <FloatingActionHub />
+          </>
+        )} />
+        <Route path="/admin/early-access" component={() => (
+          <>
+            <Navbar />
+            <AdminEarlyAccess />
+            <FloatingActionHub />
+          </>
+        )} />
+        <Route path="/referrals" component={() => (
+          <>
+            <Navbar />
+            <ReferralRewards />
+            <FloatingActionHub />
+          </>
+        )} />
         <Route component={NotFound} />
       </Switch>
-      <FloatingActionHub />
     </div>
   );
 }

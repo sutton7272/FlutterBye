@@ -134,10 +134,7 @@ export default function LaunchCountdown() {
           title: "Access Granted!",
           description: `Welcome to Flutterbye (${data.accessMethod} verification).`
         });
-        // Redirect to home after a brief delay
-        setTimeout(() => {
-          setLocation("/home");
-        }, 1000);
+        // No redirect - stay on launch page
       } else {
         toast({
           title: "Access Denied",
@@ -203,96 +200,7 @@ export default function LaunchCountdown() {
     );
   }
 
-  // Access Gate
-  if (!hasAccess) {
-    return (
-      <div className="min-h-screen bg-black text-white relative overflow-hidden">
-        {/* Electric Background */}
-        <div className="fixed inset-0 bg-gradient-to-br from-blue-900/20 via-purple-900/20 to-cyan-900/20 pointer-events-none" />
-        
-        <div className="container mx-auto px-4 py-8 relative z-10 flex items-center justify-center min-h-screen">
-          <Card className="electric-frame w-full max-w-md">
-            <CardHeader className="text-center">
-              <img 
-                src={flutterbeyeLogoPath} 
-                alt="Flutterbye Logo" 
-                className="w-20 h-20 mx-auto mb-4 rounded-full electric-frame"
-              />
-              <CardTitle className="text-2xl text-gradient flex items-center justify-center gap-2">
-                <Lock className="w-6 h-6" />
-                Early Access Required
-              </CardTitle>
-              <p className="text-muted-foreground">
-                Flutterbye is currently in early access mode. Enter your credentials to continue.
-              </p>
-            </CardHeader>
-            
-            <CardContent>
-              <form onSubmit={handleAccessRequest} className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="access-code">Access Code</Label>
-                  <Input
-                    id="access-code"
-                    placeholder="FLBY-EARLY-XXX"
-                    value={accessCode}
-                    onChange={(e) => setAccessCode(e.target.value)}
-                    className="bg-muted/20"
-                  />
-                </div>
-                
-                <div className="text-center text-sm text-muted-foreground">
-                  OR
-                </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="authorized-email">Authorized Email</Label>
-                  <Input
-                    id="authorized-email"
-                    type="email"
-                    placeholder="your@email.com"
-                    value={authorizedEmail}
-                    onChange={(e) => setAuthorizedEmail(e.target.value)}
-                    className="bg-muted/20"
-                  />
-                </div>
 
-                <Button 
-                  type="submit" 
-                  className="w-full"
-                  disabled={checkAccessMutation.isPending}
-                >
-                  {checkAccessMutation.isPending ? (
-                    "Verifying..."
-                  ) : (
-                    <>
-                      <Unlock className="w-4 h-4 mr-2" />
-                      Request Access
-                    </>
-                  )}
-                </Button>
-              </form>
-
-              <div className="mt-6 space-y-4">
-                <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-3">
-                  <h4 className="font-medium text-blue-400 mb-2">Need Access?</h4>
-                  <p className="text-sm text-muted-foreground">
-                    Early access users get exclusive benefits and FLBY token rewards.
-                  </p>
-                </div>
-
-                <div className="bg-muted/10 border border-muted/20 rounded-lg p-3">
-                  <h4 className="font-medium mb-2">Public Launch</h4>
-                  <p className="text-sm text-muted-foreground">
-                    Flutterbye will be publicly available on September 1, 2025.
-                  </p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      </div>
-    );
-  }
 
   // Main Launch Countdown & Waitlist (for authorized users)
   return (
@@ -424,17 +332,86 @@ export default function LaunchCountdown() {
         </Card>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-6xl mx-auto">
-          {/* Waitlist Signup */}
+          {/* Access Gate or Waitlist Signup */}
           <Card className="electric-frame">
             <CardHeader>
               <CardTitle className="text-gradient flex items-center gap-2">
-                <Sparkles className="w-6 h-6" />
-                Join the VIP Waitlist
+                {!hasAccess ? (
+                  <>
+                    <Lock className="w-6 h-6" />
+                    Early Access Required
+                  </>
+                ) : (
+                  <>
+                    <Sparkles className="w-6 h-6" />
+                    Join the VIP Waitlist
+                  </>
+                )}
               </CardTitle>
             </CardHeader>
             <CardContent>
+              {!hasAccess ? (
+                <div className="space-y-4">
+                  <p className="text-muted-foreground mb-4">
+                    Enter your credentials to access the platform and join the VIP waitlist.
+                  </p>
+                  
+                  <form onSubmit={handleAccessRequest} className="space-y-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="access-code">Access Code</Label>
+                      <Input
+                        id="access-code"
+                        placeholder="FLBY-EARLY-XXX"
+                        value={accessCode}
+                        onChange={(e) => setAccessCode(e.target.value)}
+                        className="bg-muted/20"
+                      />
+                    </div>
+                    
+                    <div className="text-center text-sm text-muted-foreground">
+                      OR
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <Label htmlFor="authorized-email">Authorized Email</Label>
+                      <Input
+                        id="authorized-email"
+                        type="email"
+                        placeholder="your@email.com"
+                        value={authorizedEmail}
+                        onChange={(e) => setAuthorizedEmail(e.target.value)}
+                        className="bg-muted/20"
+                      />
+                    </div>
 
-              {submitted ? (
+                    <Button 
+                      type="submit" 
+                      className="w-full"
+                      disabled={checkAccessMutation.isPending}
+                    >
+                      {checkAccessMutation.isPending ? (
+                        "Verifying..."
+                      ) : (
+                        <>
+                          <Unlock className="w-4 h-4 mr-2" />
+                          Request Access
+                        </>
+                      )}
+                    </Button>
+                  </form>
+
+                  <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-3">
+                    <h4 className="font-medium text-blue-400 mb-2">Early Access Benefits</h4>
+                    <ul className="text-sm text-muted-foreground space-y-1">
+                      <li>• Exclusive FLBY token airdrops</li>
+                      <li>• Beta testing privileges</li>
+                      <li>• VIP community access</li>
+                      <li>• Priority support</li>
+                    </ul>
+                  </div>
+                </div>
+              ) : (
+                submitted ? (
                 <div className="text-center py-8">
                   <CheckCircle className="w-16 h-16 mx-auto mb-4 text-green-400" />
                   <h3 className="text-xl font-bold mb-2 text-green-400">You're In!</h3>
@@ -520,6 +497,7 @@ export default function LaunchCountdown() {
                     </ul>
                   </div>
                 </div>
+              ) 
               )}
             </CardContent>
           </Card>
