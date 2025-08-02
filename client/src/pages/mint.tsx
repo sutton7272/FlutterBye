@@ -399,7 +399,7 @@ export default function Mint() {
                       placeholder="StakeNowForYield"
                       className={`${remainingChars < 0 ? "border-destructive" : "border-electric-blue/50"} bg-black/40 text-white placeholder:text-gray-400 focus:border-electric-green focus:ring-electric-green/20`}
                     />
-                    <div className="absolute inset-0 rounded-md border border-electric-blue/30 pointer-events-none animate-pulse"></div>
+                    <div className="absolute inset-0 rounded-md border border-electric-blue/30 pointer-events-none"></div>
                   </div>
                   <p className="text-xs text-electric-blue/80 mt-2 flex items-center gap-1">
                     <Zap className="w-3 h-3" />
