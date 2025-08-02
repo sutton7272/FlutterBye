@@ -32,15 +32,25 @@ export default function TokenHolderAnalysis({ onHoldersSelected }: TokenHolderAn
   const analyzeToken = useMutation({
     mutationFn: async ({ token, count }: { token: string; count: number }): Promise<TokenHolder[]> => {
       const response = await apiRequest("POST", "/api/tokens/analyze-holders", { token, count });
-      return response as unknown as TokenHolder[];
+      const data = response.json ? await response.json() : response;
+      // Ensure we have an array
+      return Array.isArray(data) ? data : [];
     },
     onSuccess: (data: TokenHolder[]) => {
-      setHolders(data);
-      setSelectedHolders(new Set(data.map((_, i) => i))); // Select all by default
-      toast({
-        title: "Analysis Complete",
-        description: `Found ${data.length} top token holders`,
-      });
+      if (Array.isArray(data) && data.length > 0) {
+        setHolders(data);
+        setSelectedHolders(new Set(data.map((_, i) => i))); // Select all by default
+        toast({
+          title: "Analysis Complete",
+          description: `Found ${data.length} top token holders`,
+        });
+      } else {
+        toast({
+          title: "No Data Found",
+          description: "No token holders found for this token",
+          variant: "destructive",
+        });
+      }
     },
     onError: (error) => {
       toast({
