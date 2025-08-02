@@ -36,24 +36,32 @@ export default function LaunchCountdown() {
   const [submitted, setSubmitted] = useState(false);
   const { toast } = useToast();
 
-  // Set launch date to 30 days from now
-  const launchDate = new Date();
-  launchDate.setDate(launchDate.getDate() + 30);
+  // Set launch date to exactly 30 days from now (fixed target date)
+  const launchDate = new Date('2024-03-05T00:00:00Z'); // Fixed launch date for consistency
 
   useEffect(() => {
-    const timer = setInterval(() => {
+    const updateCountdown = () => {
       const now = new Date().getTime();
       const distance = launchDate.getTime() - now;
 
       if (distance > 0) {
-        setTimeLeft({
-          days: Math.floor(distance / (1000 * 60 * 60 * 24)),
-          hours: Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)),
-          minutes: Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60)),
-          seconds: Math.floor((distance % (1000 * 60)) / 1000)
-        });
+        const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+        setTimeLeft({ days, hours, minutes, seconds });
+      } else {
+        // Launch day has arrived!
+        setTimeLeft({ days: 0, hours: 0, minutes: 0, seconds: 0 });
       }
-    }, 1000);
+    };
+
+    // Update immediately
+    updateCountdown();
+
+    // Update every second
+    const timer = setInterval(updateCountdown, 1000);
 
     return () => clearInterval(timer);
   }, [launchDate]);
@@ -101,6 +109,12 @@ export default function LaunchCountdown() {
         <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-r from-transparent via-cyan-500/5 to-transparent animate-pulse" />
         <div className="absolute top-1/4 left-0 w-full h-px bg-gradient-to-r from-transparent via-blue-400/50 to-transparent animate-pulse delay-1000" />
         <div className="absolute top-3/4 left-0 w-full h-px bg-gradient-to-r from-transparent via-green-400/50 to-transparent animate-pulse delay-2000" />
+        
+        {/* Floating countdown elements */}
+        <div className="absolute top-20 right-10 w-2 h-2 bg-cyan-400 rounded-full animate-ping opacity-30"></div>
+        <div className="absolute bottom-32 left-16 w-1 h-1 bg-blue-400 rounded-full animate-ping opacity-40 delay-500"></div>
+        <div className="absolute top-1/3 left-20 w-1.5 h-1.5 bg-purple-400 rounded-full animate-ping opacity-35 delay-1000"></div>
+        <div className="absolute bottom-40 right-24 w-1 h-1 bg-pink-400 rounded-full animate-ping opacity-30 delay-1500"></div>
       </div>
 
       <div className="container mx-auto px-4 py-8 relative z-10">
@@ -145,22 +159,70 @@ export default function LaunchCountdown() {
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
-              <div className="bg-gradient-to-br from-cyan-500/20 to-blue-500/20 rounded-lg p-6 electric-frame">
-                <div className="text-4xl font-bold text-cyan-400 mb-2">{timeLeft.days}</div>
-                <div className="text-sm text-muted-foreground">DAYS</div>
+              <div className="bg-gradient-to-br from-cyan-500/20 to-blue-500/20 rounded-lg p-6 electric-frame relative overflow-hidden">
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-cyan-400/10 to-transparent animate-pulse"></div>
+                <div className="relative z-10">
+                  <div className="text-5xl font-bold text-cyan-400 mb-2 font-mono tabular-nums">
+                    {timeLeft.days.toString().padStart(2, '0')}
+                  </div>
+                  <div className="text-sm text-muted-foreground font-semibold tracking-wider">DAYS</div>
+                </div>
               </div>
-              <div className="bg-gradient-to-br from-blue-500/20 to-purple-500/20 rounded-lg p-6 electric-frame">
-                <div className="text-4xl font-bold text-blue-400 mb-2">{timeLeft.hours}</div>
-                <div className="text-sm text-muted-foreground">HOURS</div>
+              
+              <div className="bg-gradient-to-br from-blue-500/20 to-purple-500/20 rounded-lg p-6 electric-frame relative overflow-hidden">
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-blue-400/10 to-transparent animate-pulse delay-300"></div>
+                <div className="relative z-10">
+                  <div className="text-5xl font-bold text-blue-400 mb-2 font-mono tabular-nums">
+                    {timeLeft.hours.toString().padStart(2, '0')}
+                  </div>
+                  <div className="text-sm text-muted-foreground font-semibold tracking-wider">HOURS</div>
+                </div>
               </div>
-              <div className="bg-gradient-to-br from-purple-500/20 to-pink-500/20 rounded-lg p-6 electric-frame">
-                <div className="text-4xl font-bold text-purple-400 mb-2">{timeLeft.minutes}</div>
-                <div className="text-sm text-muted-foreground">MINUTES</div>
+              
+              <div className="bg-gradient-to-br from-purple-500/20 to-pink-500/20 rounded-lg p-6 electric-frame relative overflow-hidden">
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-purple-400/10 to-transparent animate-pulse delay-700"></div>
+                <div className="relative z-10">
+                  <div className="text-5xl font-bold text-purple-400 mb-2 font-mono tabular-nums">
+                    {timeLeft.minutes.toString().padStart(2, '0')}
+                  </div>
+                  <div className="text-sm text-muted-foreground font-semibold tracking-wider">MINUTES</div>
+                </div>
               </div>
-              <div className="bg-gradient-to-br from-pink-500/20 to-cyan-500/20 rounded-lg p-6 electric-frame">
-                <div className="text-4xl font-bold text-pink-400 mb-2">{timeLeft.seconds}</div>
-                <div className="text-sm text-muted-foreground">SECONDS</div>
+              
+              <div className="bg-gradient-to-br from-pink-500/20 to-cyan-500/20 rounded-lg p-6 electric-frame relative overflow-hidden">
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-pink-400/10 to-transparent animate-pulse delay-1000"></div>
+                <div className="relative z-10">
+                  <div className={`text-5xl font-bold mb-2 font-mono tabular-nums transition-colors duration-300 ${
+                    timeLeft.seconds % 2 === 0 ? 'text-pink-400' : 'text-pink-300'
+                  }`}>
+                    {timeLeft.seconds.toString().padStart(2, '0')}
+                  </div>
+                  <div className="text-sm text-muted-foreground font-semibold tracking-wider">SECONDS</div>
+                </div>
               </div>
+            </div>
+
+            {/* Launch Date Display */}
+            <div className="mt-6 text-center">
+              <p className="text-muted-foreground">
+                Public Launch: <span className="text-cyan-400 font-semibold">
+                  {launchDate.toLocaleDateString('en-US', { 
+                    weekday: 'long', 
+                    year: 'numeric', 
+                    month: 'long', 
+                    day: 'numeric',
+                    timeZone: 'UTC'
+                  })}
+                </span>
+              </p>
+              <p className="text-xs text-muted-foreground mt-1">
+                {launchDate.toLocaleTimeString('en-US', { 
+                  hour: '2-digit', 
+                  minute: '2-digit',
+                  timeZoneName: 'short',
+                  timeZone: 'UTC'
+                })}
+              </p>
             </div>
           </CardContent>
         </Card>
@@ -313,6 +375,24 @@ export default function LaunchCountdown() {
           </Card>
         </div>
 
+        {/* Progress Bar */}
+        <div className="max-w-4xl mx-auto mt-12">
+          <div className="bg-muted/20 rounded-full h-2 overflow-hidden electric-frame">
+            <div 
+              className="h-full bg-gradient-to-r from-cyan-500 via-blue-500 to-purple-500 transition-all duration-1000 ease-out"
+              style={{
+                width: `${Math.max(0, Math.min(100, 
+                  100 - ((launchDate.getTime() - new Date().getTime()) / (30 * 24 * 60 * 60 * 1000)) * 100
+                ))}%`
+              }}
+            />
+          </div>
+          <div className="flex justify-between text-xs text-muted-foreground mt-2">
+            <span>Pre-Launch Started</span>
+            <span>Launch Day</span>
+          </div>
+        </div>
+
         {/* Footer */}
         <div className="text-center mt-16 text-muted-foreground">
           <p className="mb-2">
@@ -321,6 +401,9 @@ export default function LaunchCountdown() {
           <p className="text-sm">
             The future of communication starts here. Be part of the revolution.
           </p>
+          <div className="mt-4 text-xs opacity-60">
+            Countdown updates every second • Launch time: UTC
+          </div>
         </div>
       </div>
     </div>

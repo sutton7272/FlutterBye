@@ -2296,12 +2296,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get("/api/launch/stats", async (req, res) => {
     try {
+      const launchDate = new Date('2024-03-05T00:00:00Z');
+      const now = new Date();
+      const timeRemaining = launchDate.getTime() - now.getTime();
+      const daysRemaining = Math.max(0, Math.ceil(timeRemaining / (1000 * 60 * 60 * 24)));
+
       const stats = {
         totalSignups: 247,
         earlyAccessUsers: 15,
         airdropEligible: 189,
-        launchDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
-        daysRemaining: 30
+        launchDate: launchDate.toISOString(),
+        daysRemaining,
+        timeRemaining: {
+          days: Math.floor(timeRemaining / (1000 * 60 * 60 * 24)),
+          hours: Math.floor((timeRemaining % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)),
+          minutes: Math.floor((timeRemaining % (1000 * 60 * 60)) / (1000 * 60)),
+          seconds: Math.floor((timeRemaining % (1000 * 60)) / 1000)
+        },
+        isLaunched: timeRemaining <= 0
       };
 
       res.json({
