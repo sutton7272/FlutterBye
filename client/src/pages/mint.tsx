@@ -10,7 +10,7 @@ import { Switch } from "@/components/ui/switch";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import ImageUpload from "@/components/image-upload";
 import { LoadingSpinner } from "@/components/loading-spinner";
@@ -37,9 +37,42 @@ export default function Mint() {
     window.addEventListener('openShareModal', handleOpenShareModal);
     return () => window.removeEventListener('openShareModal', handleOpenShareModal);
   }, []);
+
+  // Calculate price when mint amount changes
+  useEffect(() => {
+    const calculatePrice = async () => {
+      const quantity = parseInt(mintAmount);
+      if (quantity && quantity > 0) {
+        try {
+          const response = await apiRequest("/api/calculate-token-price", {
+            method: "POST",
+            body: JSON.stringify({ quantity }),
+            headers: { "Content-Type": "application/json" }
+          });
+          setPriceCalculation(response);
+        } catch (error) {
+          console.error("Failed to calculate price:", error);
+          setPriceCalculation(null);
+        }
+      } else {
+        setPriceCalculation(null);
+      }
+    };
+
+    const timeoutId = setTimeout(calculatePrice, 300); // Debounce
+    return () => clearTimeout(timeoutId);
+  }, [mintAmount]);
   const [message, setMessage] = useState("");
   const [mintAmount, setMintAmount] = useState("");
   const [mintAmountError, setMintAmountError] = useState("");
+  
+  // Price calculation state
+  const [priceCalculation, setPriceCalculation] = useState<{
+    pricePerToken: number;
+    totalPrice: number;
+    tier: any;
+    currency: string;
+  } | null>(null);
   const [valuePerToken, setValuePerToken] = useState("");
   const [targetType, setTargetType] = useState("manual");
   const [manualWallets, setManualWallets] = useState("");
@@ -389,6 +422,42 @@ export default function Mint() {
                     <p className="text-xs text-muted-foreground mt-1">
                       Only whole numbers allowed - no fractional tokens
                     </p>
+
+                    {/* Dynamic Pricing Display */}
+                    {priceCalculation && (
+                      <div className="mt-3 p-4 bg-gradient-to-r from-blue-900/30 to-green-900/30 border border-electric-blue/30 rounded-lg">
+                        <div className="flex items-center justify-between">
+                          <div className="space-y-1">
+                            <p className="text-electric-blue font-medium text-sm">Price per Token</p>
+                            <p className="text-xl font-bold text-white">
+                              ${priceCalculation.pricePerToken.toFixed(2)}
+                            </p>
+                            {priceCalculation.tier?.discountPercentage !== "0" && (
+                              <Badge className="bg-green-600/20 text-green-400 border-green-400 text-xs">
+                                {priceCalculation.tier.discountPercentage}% OFF
+                              </Badge>
+                            )}
+                          </div>
+                          <div className="text-right space-y-1">
+                            <p className="text-circuit-teal font-medium text-sm">Total Cost</p>
+                            <p className="text-xl font-bold text-electric-green">
+                              ${priceCalculation.totalPrice.toFixed(2)}
+                            </p>
+                            <p className="text-xs text-gray-400">
+                              {parseInt(mintAmount)} × ${priceCalculation.pricePerToken.toFixed(2)}
+                            </p>
+                          </div>
+                        </div>
+                        {priceCalculation.tier && (
+                          <div className="mt-2 pt-2 border-t border-electric-blue/20">
+                            <p className="text-xs text-gray-400">
+                              <Sparkles className="w-3 h-3 inline mr-1" />
+                              Using <span className="text-electric-blue font-medium">{priceCalculation.tier.tierName}</span> pricing tier
+                            </p>
+                          </div>
+                        )}
+                      </div>
+                    )}
                   </div>
                 </div>
                 
