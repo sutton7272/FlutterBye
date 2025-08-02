@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { toast } from '@/hooks/use-toast';
-import { Coins, Clock, CheckCircle, AlertCircle, Flame, TrendingUp, User, Calendar, DollarSign, ArrowUpCircle, ArrowDownCircle, Award, Star, Zap, Target, Trophy, Activity, Users } from 'lucide-react';
+import { Coins, Clock, CheckCircle, AlertCircle, Flame, TrendingUp, User, Calendar, DollarSign, ArrowUpCircle, ArrowDownCircle, Award, Star, Zap, Target, Trophy, Activity, Users, Gift } from 'lucide-react';
 import { apiRequest } from '@/lib/queryClient';
 import { TransactionSuccessOverlay } from "@/components/confetti-celebration";
 import { format, differenceInDays, isAfter } from 'date-fns';
@@ -289,7 +289,7 @@ export default function RedeemPage() {
 
         {/* Tabbed Interface */}
         <Tabs defaultValue="redeem" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-7 bg-slate-800/50">
+          <TabsList className="grid w-full grid-cols-8 bg-slate-800/50">
             <TabsTrigger value="redeem" className="flex items-center gap-2">
               <ArrowDownCircle className="w-4 h-4" />
               Redeem
@@ -313,6 +313,10 @@ export default function RedeemPage() {
             <TabsTrigger value="journey" className="flex items-center gap-2">
               <Users className="w-4 h-4" />
               Journey
+            </TabsTrigger>
+            <TabsTrigger value="rewards" className="flex items-center gap-2">
+              <Gift className="w-4 h-4" />
+              Rewards
             </TabsTrigger>
             <TabsTrigger value="stats" className="flex items-center gap-2">
               <TrendingUp className="w-4 h-4" />
@@ -946,6 +950,173 @@ export default function RedeemPage() {
                           </div>
                         </div>
                       ))}
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Rewards Tab */}
+          <TabsContent value="rewards" className="space-y-4">
+            <Card className="glassmorphism">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Gift className="w-5 h-5" />
+                  Your Rewards
+                </CardTitle>
+                <CardDescription>
+                  Track your earned rewards and upcoming benefits
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-6">
+                  {/* Rewards Summary */}
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <Card className="border border-blue-500/20 bg-blue-500/5">
+                      <CardContent className="p-4">
+                        <div className="flex items-center gap-3">
+                          <Coins className="w-8 h-8 text-blue-400" />
+                          <div>
+                            <p className="text-sm text-muted-foreground">FLBY Earned</p>
+                            <p className="text-xl font-bold">1,250</p>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                    <Card className="border border-green-500/20 bg-green-500/5">
+                      <CardContent className="p-4">
+                        <div className="flex items-center gap-3">
+                          <Trophy className="w-8 h-8 text-green-400" />
+                          <div>
+                            <p className="text-sm text-muted-foreground">Achievements</p>
+                            <p className="text-xl font-bold">8</p>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                    <Card className="border border-purple-500/20 bg-purple-500/5">
+                      <CardContent className="p-4">
+                        <div className="flex items-center gap-3">
+                          <Star className="w-8 h-8 text-purple-400" />
+                          <div>
+                            <p className="text-sm text-muted-foreground">Reward Points</p>
+                            <p className="text-xl font-bold">4,250</p>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </div>
+
+                  {/* Recent Rewards */}
+                  <div>
+                    <h3 className="font-semibold mb-4">Recent Rewards</h3>
+                    <div className="space-y-3">
+                      {[
+                        {
+                          type: 'daily',
+                          title: 'Daily Login Bonus',
+                          amount: '10 FLBY',
+                          time: '2 hours ago',
+                          icon: Calendar,
+                          color: 'blue'
+                        },
+                        {
+                          type: 'achievement',
+                          title: 'First Token Created',
+                          amount: '100 FLBY',
+                          time: '1 day ago',
+                          icon: Trophy,
+                          color: 'green'
+                        },
+                        {
+                          type: 'referral',
+                          title: 'Friend Referral Bonus',
+                          amount: '50 FLBY',
+                          time: '2 days ago',
+                          icon: Users,
+                          color: 'purple'
+                        },
+                        {
+                          type: 'community',
+                          title: 'Community Participation',
+                          amount: '25 FLBY',
+                          time: '3 days ago',
+                          icon: Star,
+                          color: 'yellow'
+                        }
+                      ].map((reward, index) => (
+                        <div key={index} className={`flex items-center gap-4 p-4 rounded-lg border ${
+                          reward.color === 'blue' ? 'border-blue-500/20 bg-blue-500/5' :
+                          reward.color === 'green' ? 'border-green-500/20 bg-green-500/5' :
+                          reward.color === 'purple' ? 'border-purple-500/20 bg-purple-500/5' :
+                          'border-yellow-500/20 bg-yellow-500/5'
+                        }`}>
+                          <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                            reward.color === 'blue' ? 'bg-blue-500/20' :
+                            reward.color === 'green' ? 'bg-green-500/20' :
+                            reward.color === 'purple' ? 'bg-purple-500/20' :
+                            'bg-yellow-500/20'
+                          }`}>
+                            <reward.icon className={`w-5 h-5 ${
+                              reward.color === 'blue' ? 'text-blue-400' :
+                              reward.color === 'green' ? 'text-green-400' :
+                              reward.color === 'purple' ? 'text-purple-400' :
+                              'text-yellow-400'
+                            }`} />
+                          </div>
+                          <div className="flex-1">
+                            <h4 className="font-medium">{reward.title}</h4>
+                            <p className="text-sm text-muted-foreground">{reward.time}</p>
+                          </div>
+                          <div className="text-right">
+                            <p className="font-semibold text-green-400">+{reward.amount}</p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Available Rewards */}
+                  <div>
+                    <h3 className="font-semibold mb-4">Available Rewards</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <Card className="border border-green-500/20">
+                        <CardContent className="p-4">
+                          <div className="flex items-center gap-3 mb-3">
+                            <Flame className="w-6 h-6 text-green-400" />
+                            <h4 className="font-medium">7-Day Streak Bonus</h4>
+                          </div>
+                          <p className="text-sm text-muted-foreground mb-3">
+                            Complete 7 consecutive days of activity
+                          </p>
+                          <div className="flex items-center gap-2">
+                            <div className="flex-1 bg-slate-700 rounded-full h-2">
+                              <div className="bg-green-500 h-2 rounded-full" style={{width: '71%'}}></div>
+                            </div>
+                            <span className="text-sm">5/7 days</span>
+                          </div>
+                          <p className="text-sm font-semibold text-green-400 mt-2">Reward: 200 FLBY</p>
+                        </CardContent>
+                      </Card>
+                      <Card className="border border-blue-500/20">
+                        <CardContent className="p-4">
+                          <div className="flex items-center gap-3 mb-3">
+                            <Target className="w-6 h-6 text-blue-400" />
+                            <h4 className="font-medium">Token Creator</h4>
+                          </div>
+                          <p className="text-sm text-muted-foreground mb-3">
+                            Create 10 unique tokens
+                          </p>
+                          <div className="flex items-center gap-2">
+                            <div className="flex-1 bg-slate-700 rounded-full h-2">
+                              <div className="bg-blue-500 h-2 rounded-full" style={{width: '60%'}}></div>
+                            </div>
+                            <span className="text-sm">6/10 tokens</span>
+                          </div>
+                          <p className="text-sm font-semibold text-blue-400 mt-2">Reward: 300 FLBY</p>
+                        </CardContent>
+                      </Card>
                     </div>
                   </div>
                 </div>

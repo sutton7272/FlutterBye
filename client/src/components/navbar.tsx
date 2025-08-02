@@ -21,13 +21,7 @@ export default function Navbar() {
     { href: "/info", label: "Info", icon: HelpCircle },
   ];
 
-  // Secondary items for mobile/dropdown - Production ready only
-  const secondaryNavItems = [
-    { href: "/explore", label: "Explore", icon: Sparkles },
-    { href: "/rewards", label: "Rewards", icon: Gift },
-    { href: "/referrals", label: "Referrals", icon: Users },
-    { href: "/free-codes", label: "Free Codes", icon: Ticket },
-  ];
+  // No secondary navigation - everything consolidated into main pages
 
   const isActive = (href: string) => location === href;
 
@@ -114,21 +108,7 @@ export default function Navbar() {
                 </Link>
               ))}
               
-              <div className="border-t border-border my-4"></div>
-              
-              {/* Secondary Items */}
-              {secondaryNavItems.map((item) => (
-                <Link key={item.href} href={item.href}>
-                  <Button
-                    variant="ghost"
-                    className="w-full justify-start h-10 text-text-secondary hover:text-text-primary hover:bg-muted"
-                    onClick={() => setIsOpen(false)}
-                  >
-                    <item.icon className="h-4 w-4 mr-3" />
-                    {item.label}
-                  </Button>
-                </Link>
-              ))}
+              {/* All features now consolidated into main pages */}
             </nav>
           </SheetContent>
         </Sheet>

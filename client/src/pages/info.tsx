@@ -3,7 +3,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { BookOpen, Map, Zap, Users, Coins, Trophy, Star, CheckCircle, Clock, AlertCircle, Target, Rocket, FileText, TrendingUp, Shield, Globe, Heart, MessageSquare, DollarSign, Building2 } from "lucide-react";
+import { BookOpen, Map, Zap, Users, Coins, Trophy, Star, CheckCircle, Clock, AlertCircle, Target, Rocket, FileText, TrendingUp, Shield, Globe, Heart, MessageSquare, DollarSign, Building2, Gift, Sparkles, Ticket, UserPlus, Search } from "lucide-react";
 
 export default function InfoPage() {
   return (
@@ -17,7 +17,7 @@ export default function InfoPage() {
         </div>
 
         <Tabs defaultValue="roadmap" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4 bg-slate-800/50">
+          <TabsList className="grid w-full grid-cols-6 bg-slate-800/50">
             <TabsTrigger value="roadmap" className="flex items-center gap-2">
               <Map className="w-4 h-4" />
               Roadmap
@@ -33,6 +33,14 @@ export default function InfoPage() {
             <TabsTrigger value="features" className="flex items-center gap-2">
               <Star className="w-4 h-4" />
               Features
+            </TabsTrigger>
+            <TabsTrigger value="programs" className="flex items-center gap-2">
+              <Gift className="w-4 h-4" />
+              Programs
+            </TabsTrigger>
+            <TabsTrigger value="explore" className="flex items-center gap-2">
+              <Sparkles className="w-4 h-4" />
+              Explore
             </TabsTrigger>
           </TabsList>
 
@@ -491,6 +499,162 @@ export default function InfoPage() {
                 </Card>
               ))}
             </div>
+          </TabsContent>
+
+          {/* Programs Tab - Referrals & Free Codes */}
+          <TabsContent value="programs" className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Referral Program */}
+              <Card className="glassmorphism">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <UserPlus className="w-5 h-5" />
+                    Referral Program
+                  </CardTitle>
+                  <CardDescription>
+                    Earn FLBY tokens by inviting friends to the platform
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-3 p-3 border border-blue-500/20 bg-blue-500/5 rounded-lg">
+                      <Trophy className="w-5 h-5 text-blue-400" />
+                      <div>
+                        <h4 className="font-medium">Bronze Tier</h4>
+                        <p className="text-sm text-muted-foreground">50 FLBY per referral</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3 p-3 border border-green-500/20 bg-green-500/5 rounded-lg">
+                      <Trophy className="w-5 h-5 text-green-400" />
+                      <div>
+                        <h4 className="font-medium">Silver Tier</h4>
+                        <p className="text-sm text-muted-foreground">100 FLBY per referral</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3 p-3 border border-yellow-500/20 bg-yellow-500/5 rounded-lg">
+                      <Trophy className="w-5 h-5 text-yellow-400" />
+                      <div>
+                        <h4 className="font-medium">Gold Tier</h4>
+                        <p className="text-sm text-muted-foreground">150 FLBY per referral</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3 p-3 border border-purple-500/20 bg-purple-500/5 rounded-lg">
+                      <Trophy className="w-5 h-5 text-purple-400" />
+                      <div>
+                        <h4 className="font-medium">Platinum Tier</h4>
+                        <p className="text-sm text-muted-foreground">250 FLBY per referral</p>
+                      </div>
+                    </div>
+                  </div>
+                  <Button className="w-full">
+                    <UserPlus className="w-4 h-4 mr-2" />
+                    Get Referral Link
+                  </Button>
+                </CardContent>
+              </Card>
+
+              {/* Free Codes */}
+              <Card className="glassmorphism">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Ticket className="w-5 h-5" />
+                    Free Token Codes
+                  </CardTitle>
+                  <CardDescription>
+                    Redeem promotional codes for free tokens and rewards
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="space-y-3">
+                    <div className="p-4 border border-green-500/20 bg-green-500/5 rounded-lg">
+                      <h4 className="font-medium text-green-400 mb-2">Welcome Bonus</h4>
+                      <p className="text-sm text-muted-foreground mb-3">
+                        Get 100 free tokens when you create your first token
+                      </p>
+                      <Badge className="bg-green-600">Auto-Applied</Badge>
+                    </div>
+                    <div className="p-4 border border-blue-500/20 bg-blue-500/5 rounded-lg">
+                      <h4 className="font-medium text-blue-400 mb-2">Community Rewards</h4>
+                      <p className="text-sm text-muted-foreground mb-3">
+                        Special event codes shared in our community channels
+                      </p>
+                      <Badge variant="outline" className="border-blue-500 text-blue-400">
+                        Event-Based
+                      </Badge>
+                    </div>
+                    <div className="p-4 border border-purple-500/20 bg-purple-500/5 rounded-lg">
+                      <h4 className="font-medium text-purple-400 mb-2">Partnership Codes</h4>
+                      <p className="text-sm text-muted-foreground mb-3">
+                        Exclusive codes from our ecosystem partners
+                      </p>
+                      <Badge variant="outline" className="border-purple-500 text-purple-400">
+                        Partner-Only
+                      </Badge>
+                    </div>
+                  </div>
+                  <div className="flex gap-2">
+                    <input 
+                      type="text" 
+                      placeholder="Enter code..." 
+                      className="flex-1 px-3 py-2 bg-slate-800 border border-slate-700 rounded-md"
+                    />
+                    <Button>Redeem</Button>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </TabsContent>
+
+          {/* Explore Tab */}
+          <TabsContent value="explore" className="space-y-6">
+            <Card className="glassmorphism">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Search className="w-5 h-5" />
+                  Explore Tokens
+                </CardTitle>
+                <CardDescription>
+                  Discover and browse tokens created by the community
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="text-center py-12">
+                  <Sparkles className="w-16 h-16 mx-auto text-blue-400 mb-4" />
+                  <h3 className="text-xl font-semibold mb-2">Token Discovery</h3>
+                  <p className="text-muted-foreground mb-6">
+                    Browse through thousands of unique tokens created by the Flutterbye community.
+                    Find tokens by category, value, or message content.
+                  </p>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-2xl mx-auto mb-6">
+                    <div className="border border-blue-500/20 bg-blue-500/5 rounded-lg p-4">
+                      <Heart className="w-8 h-8 mx-auto mb-2 text-blue-400" />
+                      <h4 className="font-medium text-blue-400 mb-2">Greeting Cards</h4>
+                      <p className="text-sm text-muted-foreground">Birthday wishes, thank you notes</p>
+                    </div>
+                    <div className="border border-green-500/20 bg-green-500/5 rounded-lg p-4">
+                      <Building2 className="w-8 h-8 mx-auto mb-2 text-green-400" />
+                      <h4 className="font-medium text-green-400 mb-2">Marketing</h4>
+                      <p className="text-sm text-muted-foreground">Promotional campaigns, rewards</p>
+                    </div>
+                    <div className="border border-purple-500/20 bg-purple-500/5 rounded-lg p-4">
+                      <Users className="w-8 h-8 mx-auto mb-2 text-purple-400" />
+                      <h4 className="font-medium text-purple-400 mb-2">Community</h4>
+                      <p className="text-sm text-muted-foreground">Memes, social messages</p>
+                    </div>
+                  </div>
+                  <div className="flex gap-4 justify-center">
+                    <Button>
+                      <Search className="w-4 h-4 mr-2" />
+                      Browse All Tokens
+                    </Button>
+                    <Button variant="outline">
+                      <Star className="w-4 h-4 mr-2" />
+                      Popular This Week
+                    </Button>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
           </TabsContent>
         </Tabs>
       </div>
