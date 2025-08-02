@@ -773,33 +773,91 @@ export default function Mint() {
 
                 <Separator />
                 
-                <div className={`space-y-4 transition-all duration-500 ${
+                <div className={`space-y-6 transition-all duration-500 ${
                   currentStep === 3 
-                    ? 'ring-2 ring-electric-blue/50 shadow-lg shadow-electric-blue/25 bg-gradient-to-r from-blue-900/20 to-green-900/20 p-4 rounded-xl' 
-                    : ''
+                    ? 'ring-2 ring-electric-blue/50 shadow-lg shadow-electric-blue/25 bg-gradient-to-r from-blue-900/20 to-green-900/20 p-6 rounded-xl' 
+                    : 'p-6 bg-gradient-to-r from-purple-900/10 to-blue-900/10 border-2 border-purple-500/30 rounded-xl'
                 }`}>
-                  <h4 className={`text-lg font-semibold flex items-center ${
-                    currentStep === 3 ? 'text-electric-blue animate-pulse' : ''
-                  }`}>
-                    <DollarSign className={`w-5 h-5 mr-2 ${currentStep === 3 ? 'text-electric-blue animate-spin' : 'text-blue-500'}`} />
-                    Value & Distribution Settings
-                    {currentStep === 3 && <Badge className="bg-electric-blue/20 text-electric-blue border-electric-blue animate-pulse ml-2">Step 3</Badge>}
-                  </h4>
+                  <div className="text-center mb-4">
+                    <h4 className={`text-2xl font-bold flex items-center justify-center ${
+                      currentStep === 3 ? 'text-electric-blue animate-pulse' : 'text-purple-400'
+                    }`}>
+                      <DollarSign className={`w-6 h-6 mr-3 ${currentStep === 3 ? 'text-electric-blue animate-spin' : 'text-purple-400'}`} />
+                      Value & Distribution Engine
+                      {currentStep === 3 && <Badge className="bg-electric-blue/20 text-electric-blue border-electric-blue animate-pulse ml-3">Step 3</Badge>}
+                    </h4>
+                    <p className="text-sm text-purple-300 mt-2 max-w-md mx-auto">
+                      🚀 Transform your message into a valuable asset by attaching real SOL tokens that recipients can claim
+                    </p>
+                  </div>
                   
-                  <div className="flex items-center space-x-2">
-                    <Switch
-                      id="attach-value"
-                      checked={attachValue}
-                      onCheckedChange={setAttachValue}
-                    />
-                    <Label htmlFor="attach-value">Attach value to this token</Label>
+                  {/* Value Proposition Cards */}
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-6">
+                    <div className="bg-gradient-to-br from-green-900/30 to-emerald-900/30 border border-green-500/40 rounded-lg p-3 text-center">
+                      <Gift className="w-6 h-6 mx-auto text-green-400 mb-2" />
+                      <h5 className="text-sm font-semibold text-green-300">Instant Rewards</h5>
+                      <p className="text-xs text-green-400/80">Recipients get immediate value</p>
+                    </div>
+                    <div className="bg-gradient-to-br from-blue-900/30 to-cyan-900/30 border border-blue-500/40 rounded-lg p-3 text-center">
+                      <Target className="w-6 h-6 mx-auto text-blue-400 mb-2" />
+                      <h5 className="text-sm font-semibold text-blue-300">Viral Incentive</h5>
+                      <p className="text-xs text-blue-400/80">Value drives engagement</p>
+                    </div>
+                    <div className="bg-gradient-to-br from-purple-900/30 to-pink-900/30 border border-purple-500/40 rounded-lg p-3 text-center">
+                      <Star className="w-6 h-6 mx-auto text-purple-400 mb-2" />
+                      <h5 className="text-sm font-semibold text-purple-300">Premium Appeal</h5>
+                      <p className="text-xs text-purple-400/80">Value = perceived importance</p>
+                    </div>
+                  </div>
+                  
+                  {/* Main Value Toggle */}
+                  <div className="p-4 bg-gradient-to-r from-indigo-900/30 to-purple-900/30 border-2 border-purple-400/50 rounded-lg">
+                    <div className="flex items-center justify-between">
+                      <div className="flex-1">
+                        <div className="flex items-center space-x-3 mb-2">
+                          <Switch
+                            id="attach-value"
+                            checked={attachValue}
+                            onCheckedChange={setAttachValue}
+                            className="data-[state=checked]:bg-purple-500"
+                          />
+                          <Label htmlFor="attach-value" className="text-lg font-semibold text-purple-300 cursor-pointer">
+                            💰 Attach Real Value to Your Token
+                          </Label>
+                        </div>
+                        <p className="text-sm text-purple-400/90 ml-11">
+                          Turn your message into a valuable asset that recipients can actually claim and use. This is what makes Flutterbye revolutionary!
+                        </p>
+                      </div>
+                      {!attachValue && (
+                        <div className="text-right">
+                          <Badge variant="outline" className="border-purple-400/50 text-purple-300">
+                            Optional but Powerful
+                          </Badge>
+                        </div>
+                      )}
+                    </div>
+                    
+                    {!attachValue && (
+                      <div className="mt-3 p-3 bg-purple-500/10 border border-purple-400/30 rounded-lg">
+                        <p className="text-xs text-purple-300 flex items-center">
+                          <AlertCircle className="w-4 h-4 mr-2" />
+                          <strong>Why attach value?</strong> Recipients are 10x more likely to engage with tokens that have real worth. Transform your message from notification to valuable gift!
+                        </p>
+                      </div>
+                    )}
                   </div>
 
                   {attachValue && (
-                    <div className="space-y-4 ml-6 border-l-2 border-blue-200 pl-4">
-                      <div className="grid grid-cols-2 gap-4">
-                        <div className="space-y-2">
-                          <Label htmlFor="attached-value">Total Value Pool</Label>
+                    <div className="space-y-6 p-6 bg-gradient-to-r from-green-900/20 to-blue-900/20 border-2 border-green-400/40 rounded-xl">
+                      <div className="text-center mb-4">
+                        <h5 className="text-lg font-semibold text-green-300 mb-2">🎯 Value Configuration</h5>
+                        <p className="text-sm text-green-400/80">Set up how much value each recipient will receive</p>
+                      </div>
+                      
+                      <div className="grid grid-cols-2 gap-6">
+                        <div className="space-y-3">
+                          <Label htmlFor="attached-value" className="text-base font-semibold text-green-300">Total Value Pool</Label>
                           <Input
                             id="attached-value"
                             type="number"
@@ -808,29 +866,40 @@ export default function Mint() {
                             value={attachedValue}
                             onChange={(e) => setAttachedValue(e.target.value)}
                             placeholder="10.0"
+                            className="text-lg py-3 bg-black/40 border-green-400/50 focus:border-green-300 text-center"
                           />
-                          <p className="text-xs text-muted-foreground">
-                            Total value to distribute among all tokens
+                          <p className="text-xs text-green-400/80">
+                            💎 This amount gets distributed among all tokens
                           </p>
                         </div>
-                        <div className="space-y-2">
-                          <Label htmlFor="currency">Currency</Label>
+                        <div className="space-y-3">
+                          <Label htmlFor="currency" className="text-base font-semibold text-blue-300">Currency</Label>
                           <select
                             id="currency"
                             value={currency}
                             onChange={(e) => setCurrency(e.target.value)}
-                            className="w-full px-3 py-2 border rounded-md dark:bg-slate-800 dark:border-slate-600"
+                            className="w-full px-4 py-3 text-lg border rounded-md bg-black/40 border-blue-400/50 focus:border-blue-300 text-center text-white"
                           >
-                            <option value="SOL">SOL</option>
-                            <option value="USDC">USDC</option>
+                            <option value="SOL">SOL (Solana)</option>
+                            <option value="USDC">USDC (USD Coin)</option>
                           </select>
+                          <p className="text-xs text-blue-400/80">
+                            🌟 Choose your distribution currency
+                          </p>
                         </div>
                       </div>
 
-                      <div className="space-y-2">
-                        <Label>Value Per Token: {attachedValue && mintAmount ? (parseFloat(attachedValue) / parseInt(mintAmount)).toFixed(6) : '0'} {currency}</Label>
-                        <p className="text-xs text-muted-foreground">
-                          Automatically calculated based on total pool and mint amount
+                      {/* Value Per Token Calculation - Make this super prominent */}
+                      <div className="p-4 bg-gradient-to-r from-yellow-900/30 to-orange-900/30 border-2 border-yellow-400/50 rounded-lg text-center">
+                        <h6 className="text-lg font-bold text-yellow-300 mb-2">💰 Value Per Token</h6>
+                        <div className="text-3xl font-bold text-yellow-200 mb-2">
+                          {attachedValue && mintAmount ? (parseFloat(attachedValue) / parseInt(mintAmount)).toFixed(6) : '0'} {currency}
+                        </div>
+                        <p className="text-sm text-yellow-400/90">
+                          Each recipient gets this amount when they claim their token
+                        </p>
+                        <p className="text-xs text-yellow-500/70 mt-1">
+                          Automatically calculated: {attachedValue || '0'} {currency} ÷ {mintAmount || '0'} tokens
                         </p>
                       </div>
 
