@@ -45,7 +45,9 @@ import {
   CheckCircle,
   AlertCircle,
   Info,
-  RotateCcw
+  RotateCcw,
+  Mail,
+  Clock
 } from "lucide-react";
 
 // Consolidated Admin Dashboard - All admin functions in one place

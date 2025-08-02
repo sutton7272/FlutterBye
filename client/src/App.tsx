@@ -124,7 +124,6 @@ function Router() {
           <>
             <Navbar />
             <UnifiedAdminDashboard />
-            <FloatingActionHub />
           </>
         )} />
         <Route path="/admin-legacy" component={() => (
