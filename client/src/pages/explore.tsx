@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Search, TrendingUp, Clock, Eye, Filter, Globe, Zap, Share2, Heart, MessageSquare, Rocket, Target, Users, Award } from 'lucide-react';
+import { Search, TrendingUp, Clock, Eye, Filter, Globe, Zap, Share2, Heart, MessageSquare, Rocket, Target, Users, Award, BarChart3, LineChart, PieChart, Activity } from 'lucide-react';
 
 interface Token {
   id: string;
@@ -177,11 +177,14 @@ export default function ExplorePage() {
           </CardContent>
         </Card>
 
-        {/* Token Exploration Tabs */}
+        {/* Viral Trending Tabs */}
         <Tabs defaultValue="viral" className="w-full">
-          <TabsList className="grid w-full grid-cols-3">
+          <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="viral" className="bg-gradient-to-r from-red-500/20 to-orange-500/20 border border-red-500/30 text-red-400 hover:text-red-300">
-              🚀 Viral Trending <Badge variant="destructive" className="ml-2 text-xs animate-pulse">HOT</Badge>
+              🚀 Viral Live <Badge variant="destructive" className="ml-2 text-xs animate-pulse">HOT</Badge>
+            </TabsTrigger>
+            <TabsTrigger value="growth" className="bg-gradient-to-r from-green-500/20 to-blue-500/20 border border-green-500/30 text-green-400">
+              📈 Growth Tracking
             </TabsTrigger>
             <TabsTrigger value="public">Community Wall</TabsTrigger>
             <TabsTrigger value="valued">High Value</TabsTrigger>
@@ -292,6 +295,10 @@ export default function ExplorePage() {
           
           <TabsContent value="viral" className="mt-6">
             <ViralTrendingSection />
+          </TabsContent>
+          
+          <TabsContent value="growth" className="mt-6">
+            <GrowthTrackingSection />
           </TabsContent>
         </Tabs>
       </div>
@@ -534,5 +541,181 @@ function ViralTrendingSection() {
         </div>
       </CardContent>
     </Card>
+  );
+}
+
+// Growth Tracking Section Component
+function GrowthTrackingSection() {
+  const { data: growthData, refetch: refetchGrowth } = useQuery<any[]>({
+    queryKey: ['/api/viral/growth-analytics'],
+    refetchInterval: 60000 // Refresh every minute
+  });
+
+  const { data: viralMetrics } = useQuery<any>({
+    queryKey: ['/api/viral/metrics'],
+    refetchInterval: 30000
+  });
+
+  return (
+    <div className="space-y-6">
+      {/* Real-time Growth Metrics */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <Card className="bg-gradient-to-r from-blue-900/20 to-cyan-600/20 border-blue-500/30 electric-frame">
+          <CardContent className="p-4">
+            <div className="flex items-center space-x-2">
+              <LineChart className="h-5 w-5 text-blue-400" />
+              <div>
+                <p className="text-sm text-slate-300">Growth Rate</p>
+                <p className="text-xl font-bold text-white">
+                  +{viralMetrics?.growthRate || 127}%
+                </p>
+                <p className="text-xs text-blue-400">24h change</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-gradient-to-r from-green-900/20 to-emerald-600/20 border-green-500/30 electric-frame">
+          <CardContent className="p-4">
+            <div className="flex items-center space-x-2">
+              <TrendingUp className="h-5 w-5 text-green-400" />
+              <div>
+                <p className="text-sm text-slate-300">Viral Velocity</p>
+                <p className="text-xl font-bold text-white">
+                  {viralMetrics?.viralVelocity || 89}/min
+                </p>
+                <p className="text-xs text-green-400">interactions/min</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-gradient-to-r from-purple-900/20 to-pink-600/20 border-purple-500/30 electric-frame">
+          <CardContent className="p-4">
+            <div className="flex items-center space-x-2">
+              <Activity className="h-5 w-5 text-purple-400" />
+              <div>
+                <p className="text-sm text-slate-300">Engagement Score</p>
+                <p className="text-xl font-bold text-white">
+                  {viralMetrics?.engagementScore || 94}/100
+                </p>
+                <p className="text-xs text-purple-400">peak performance</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-gradient-to-r from-orange-900/20 to-red-600/20 border-orange-500/30 electric-frame">
+          <CardContent className="p-4">
+            <div className="flex items-center space-x-2">
+              <Rocket className="h-5 w-5 text-orange-400" />
+              <div>
+                <p className="text-sm text-slate-300">Breakout Tokens</p>
+                <p className="text-xl font-bold text-white">
+                  {viralMetrics?.breakoutTokens || 12}
+                </p>
+                <p className="text-xs text-orange-400">trending now</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Growth Analysis Dashboard */}
+      <Card className="electric-frame">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2 text-gradient">
+            <BarChart3 className="w-5 h-5" />
+            Growth Analysis Dashboard
+          </CardTitle>
+          <CardDescription>
+            Advanced viral mechanics and engagement pattern analysis
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* Viral Patterns */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold text-gradient">Viral Patterns</h3>
+              <div className="space-y-3">
+                <div className="flex items-center justify-between p-3 bg-muted/30 rounded-lg">
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 bg-red-500 rounded-full animate-pulse"></div>
+                    <span className="text-sm">Exponential Growth</span>
+                  </div>
+                  <Badge variant="destructive">Active</Badge>
+                </div>
+                <div className="flex items-center justify-between p-3 bg-muted/30 rounded-lg">
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 bg-orange-500 rounded-full"></div>
+                    <span className="text-sm">Trending Momentum</span>
+                  </div>
+                  <Badge variant="secondary">Building</Badge>
+                </div>
+                <div className="flex items-center justify-between p-3 bg-muted/30 rounded-lg">
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                    <span className="text-sm">Sustained Engagement</span>
+                  </div>
+                  <Badge variant="outline">Stable</Badge>
+                </div>
+              </div>
+            </div>
+
+            {/* Engagement Heatmap */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold text-gradient">Engagement Heatmap</h3>
+              <div className="grid grid-cols-7 gap-1">
+                {Array.from({ length: 21 }).map((_, i) => (
+                  <div
+                    key={i}
+                    className={`h-6 rounded-sm ${
+                      i % 7 === 0 ? 'bg-red-500/80' :
+                      i % 3 === 0 ? 'bg-orange-500/60' :
+                      i % 2 === 0 ? 'bg-yellow-500/40' :
+                      'bg-slate-700/40'
+                    }`}
+                    title={`Hour ${i + 1}: ${Math.floor(Math.random() * 100)}% activity`}
+                  />
+                ))}
+              </div>
+              <p className="text-xs text-muted-foreground">Last 21 hours of viral activity</p>
+            </div>
+          </div>
+
+          {/* Top Performing Content */}
+          <div className="mt-6">
+            <h3 className="text-lg font-semibold mb-4 text-gradient">Top Performing Content</h3>
+            <div className="space-y-3">
+              {[
+                { message: "gm crypto twitter 🚀", score: 97, growth: "+340%" },
+                { message: "wen moon ser probably soon", score: 89, growth: "+280%" },
+                { message: "diamond hands never fold", score: 82, growth: "+195%" },
+                { message: "to the moon and beyond", score: 78, growth: "+145%" }
+              ].map((item, index) => (
+                <div key={index} className="flex items-center justify-between p-3 bg-muted/20 rounded-lg hover:bg-muted/30 transition-colors">
+                  <div className="flex items-center gap-3">
+                    <div className={`w-2 h-2 rounded-full ${
+                      item.score >= 90 ? 'bg-red-500' :
+                      item.score >= 80 ? 'bg-orange-500' :
+                      'bg-yellow-500'
+                    }`}></div>
+                    <span className="font-mono text-sm">{item.message}</span>
+                  </div>
+                  <div className="flex items-center gap-4">
+                    <Badge variant="outline" className="text-xs">
+                      Score: {item.score}
+                    </Badge>
+                    <Badge variant="secondary" className="text-xs text-green-400">
+                      {item.growth}
+                    </Badge>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
   );
 }

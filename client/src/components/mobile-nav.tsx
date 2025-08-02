@@ -15,7 +15,8 @@ import {
   MessageSquare,
   Award,
   Compass,
-  Wrench
+  Wrench,
+  TrendingUp
 } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
 
@@ -23,7 +24,8 @@ import { useIsMobile } from '@/hooks/use-mobile';
 const navigation = [
   { name: 'Home', href: '/', icon: Home },
   { name: 'Create', href: '/mint', icon: Coins },
-  { name: 'Explore', href: '/explore', icon: Compass, submenu: [
+  { name: '🚀 Trending', href: '/trending', icon: TrendingUp, submenu: [
+    { name: 'Viral Dashboard', href: '/viral-dashboard' },
     { name: 'Marketplace', href: '/marketplace' },
     { name: 'Activity', href: '/activity' },
     { name: 'Heat Map', href: '/heatmap' }
@@ -131,15 +133,6 @@ export function MobileNav() {
                 );
               })}
             </div>
-          </div>
-        </div>
-      )}
-    </div>
-  );
-}
-                </MobileLink>
-              );
-            })}
           </div>
         </div>
       )}

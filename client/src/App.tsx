@@ -102,6 +102,12 @@ function Router() {
             <Explore />
           </>
         )} />
+        <Route path="/trending" component={() => (
+          <>
+            <Navbar />
+            <Explore />
+          </>
+        )} />
         <Route path="/how-it-works" component={() => (
           <>
             <Navbar />
