@@ -16,10 +16,10 @@ import ImageUpload from "@/components/image-upload";
 import { LoadingSpinner } from "@/components/loading-spinner";
 import { validateTokenQuantity, validateWholeNumber } from "@/lib/validators";
 import { Coins, Upload, Calculator, DollarSign, Lock, Globe, Gift, AlertCircle, Wand2, Star, Sparkles, Users, Target, ImageIcon, FileImage, QrCode, Plus, X, Ticket, Loader2, Zap } from "lucide-react";
-import AITextOptimizer from "@/components/ai-text-optimizer";
-import { EmotionAnalyzer } from "@/components/EmotionAnalyzer";
-import { ViralMechanics } from "@/components/ViralMechanics";
-import { NetworkEffects } from "@/components/NetworkEffects";
+// import AITextOptimizer from "@/components/ai-text-optimizer";
+// import { EmotionAnalyzer } from "@/components/EmotionAnalyzer";
+// import { ViralMechanics } from "@/components/ViralMechanics";
+// import { NetworkEffects } from "@/components/NetworkEffects";
 import { type InsertToken } from "@shared/schema";
 import TokenHolderAnalysis from "@/components/token-holder-analysis";
 import { TransactionSuccessOverlay } from "@/components/confetti-celebration";
@@ -32,6 +32,15 @@ export default function Mint() {
   const [message, setMessage] = useState("");
   const [mintAmount, setMintAmount] = useState("");
   const [mintAmountError, setMintAmountError] = useState("");
+  
+  // State variables needed early for useEffect hooks
+  const [showShareModal, setShowShareModal] = useState(false);
+  const [priceCalculation, setPriceCalculation] = useState<{
+    pricePerToken: number;
+    totalPrice: number;
+    tier: any;
+    currency: string;
+  } | null>(null);
 
   // Listen for share modal trigger
   useEffect(() => {
@@ -49,7 +58,7 @@ export default function Mint() {
       const quantity = parseInt(mintAmount);
       if (quantity && quantity > 0) {
         try {
-          const response = await apiRequest("/api/calculate-token-price", "POST", { quantity });
+          const response = await apiRequest("POST", "/api/calculate-token-price", { quantity });
           setPriceCalculation(response as any);
         } catch (error) {
           console.error("Failed to calculate price:", error);
@@ -63,14 +72,6 @@ export default function Mint() {
     const timeoutId = setTimeout(calculatePrice, 300); // Debounce
     return () => clearTimeout(timeoutId);
   }, [mintAmount]);
-  
-  // Price calculation state
-  const [priceCalculation, setPriceCalculation] = useState<{
-    pricePerToken: number;
-    totalPrice: number;
-    tier: any;
-    currency: string;
-  } | null>(null);
   const [valuePerToken, setValuePerToken] = useState("");
   const [targetType, setTargetType] = useState("manual");
   const [manualWallets, setManualWallets] = useState("");
@@ -97,7 +98,6 @@ export default function Mint() {
   
   // Confetti celebration state
   const [showSuccessOverlay, setShowSuccessOverlay] = useState(false);
-  const [showShareModal, setShowShareModal] = useState(false);
   const [successData, setSuccessData] = useState<{
     message: string;
     amount: string;
@@ -109,8 +109,7 @@ export default function Mint() {
 
   const mintToken = useMutation({
     mutationFn: async (data: InsertToken) => {
-      const response = await apiRequest("POST", "/api/tokens", data);
-      return response.json();
+      return await apiRequest("POST", "/api/tokens", data);
     },
     onSuccess: (data) => {
       // Show confetti celebration
