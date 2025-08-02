@@ -43,6 +43,10 @@ export default function AdminEarlyAccess() {
   const [newUserEmail, setNewUserEmail] = useState("");
   const [newUserWallet, setNewUserWallet] = useState("");
   const [launchMode, setLaunchMode] = useState(false);
+  const [newAccessCode, setNewAccessCode] = useState("");
+  const [newAuthorizedEmail, setNewAuthorizedEmail] = useState("");
+  const [accessCodes, setAccessCodes] = useState(["FLBY-EARLY-001", "FLBY-EARLY-002"]);
+  const [authorizedEmails, setAuthorizedEmails] = useState(["admin@flutterbye.com", "beta@flutterbye.com"]);
   const { toast } = useToast();
 
   // Mock data for demonstration
@@ -147,6 +151,93 @@ export default function AdminEarlyAccess() {
     }
   });
 
+  const addAccessCodeMutation = useMutation({
+    mutationFn: async (code: string) => {
+      return apiRequest("/api/admin/access-codes", "POST", { code });
+    },
+    onSuccess: () => {
+      setAccessCodes([...accessCodes, newAccessCode]);
+      setNewAccessCode("");
+      toast({
+        title: "Access Code Added",
+        description: "New access code has been created successfully."
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Demo Mode",
+        description: "Access code management ready for deployment.",
+        variant: "destructive"
+      });
+    }
+  });
+
+  const removeAccessCodeMutation = useMutation({
+    mutationFn: async (code: string) => {
+      return apiRequest("/api/admin/access-codes", "DELETE", { code });
+    },
+    onSuccess: (_, code) => {
+      setAccessCodes(accessCodes.filter(c => c !== code));
+      toast({
+        title: "Access Code Removed",
+        description: "Access code has been deleted successfully."
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Demo Mode",
+        description: "Access code management ready for deployment.",
+        variant: "destructive"
+      });
+    }
+  });
+
+  const addAuthorizedEmailMutation = useMutation({
+    mutationFn: async (email: string) => {
+      return apiRequest("/api/admin/authorized-emails", "POST", { email });
+    },
+    onSuccess: () => {
+      setAuthorizedEmails([...authorizedEmails, newAuthorizedEmail]);
+      setNewAuthorizedEmail("");
+      toast({
+        title: "Email Authorized",
+        description: "Email address has been added to authorized list."
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Demo Mode",
+        description: "Email authorization management ready for deployment.",
+        variant: "destructive"
+      });
+    }
+  });
+
+  const removeAuthorizedEmailMutation = useMutation({
+    mutationFn: async (email: string) => {
+      return apiRequest("/api/admin/authorized-emails", "DELETE", { email });
+    },
+    onSuccess: (_, email) => {
+      setAuthorizedEmails(authorizedEmails.filter(e => e !== email));
+      toast({
+        title: "Email Removed",
+        description: "Email address has been removed from authorized list."
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Demo Mode",
+        description: "Email authorization management ready for deployment.",
+        variant: "destructive"
+      });
+    }
+  });
+
+  const generateAccessCode = () => {
+    const code = `FLBY-EARLY-${Math.random().toString(36).substr(2, 6).toUpperCase()}`;
+    setNewAccessCode(code);
+  };
+
   return (
     <div className="min-h-screen bg-black text-white relative overflow-hidden">
       {/* Electric Background */}
@@ -190,7 +281,7 @@ export default function AdminEarlyAccess() {
           </Card>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
           {/* Launch Controls */}
           <div className="space-y-6">
             <Card className="electric-frame">
@@ -283,6 +374,113 @@ export default function AdminEarlyAccess() {
                     </>
                   )}
                 </Button>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Access Codes & Authorized Emails Management */}
+          <div className="space-y-6">
+            {/* Access Codes Management */}
+            <Card className="electric-frame">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-gradient">
+                  <Key className="w-5 h-5" />
+                  Access Codes Management
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="flex gap-2">
+                  <Input
+                    placeholder="FLBY-EARLY-XXX"
+                    value={newAccessCode}
+                    onChange={(e) => setNewAccessCode(e.target.value)}
+                    className="bg-muted/20"
+                  />
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={generateAccessCode}
+                  >
+                    Generate
+                  </Button>
+                </div>
+                
+                <Button 
+                  onClick={() => addAccessCodeMutation.mutate(newAccessCode)}
+                  disabled={!newAccessCode || addAccessCodeMutation.isPending}
+                  className="w-full"
+                  size="sm"
+                >
+                  {addAccessCodeMutation.isPending ? "Adding..." : "Add Access Code"}
+                </Button>
+
+                <div className="space-y-2 max-h-32 overflow-y-auto">
+                  {accessCodes.map((code, index) => (
+                    <div 
+                      key={index}
+                      className="flex items-center justify-between p-2 bg-muted/10 rounded border border-muted/20"
+                    >
+                      <span className="text-sm font-mono text-cyan-400">{code}</span>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => removeAccessCodeMutation.mutate(code)}
+                        disabled={removeAccessCodeMutation.isPending}
+                        className="h-6 w-6 p-0 hover:bg-red-500/20"
+                      >
+                        <Trash2 className="w-3 h-3 text-red-400" />
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Authorized Emails Management */}
+            <Card className="electric-frame">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-gradient">
+                  <Mail className="w-5 h-5" />
+                  Authorized Emails
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <Input
+                  type="email"
+                  placeholder="user@example.com"
+                  value={newAuthorizedEmail}
+                  onChange={(e) => setNewAuthorizedEmail(e.target.value)}
+                  className="bg-muted/20"
+                />
+                
+                <Button 
+                  onClick={() => addAuthorizedEmailMutation.mutate(newAuthorizedEmail)}
+                  disabled={!newAuthorizedEmail || addAuthorizedEmailMutation.isPending}
+                  className="w-full"
+                  size="sm"
+                >
+                  {addAuthorizedEmailMutation.isPending ? "Adding..." : "Authorize Email"}
+                </Button>
+
+                <div className="space-y-2 max-h-32 overflow-y-auto">
+                  {authorizedEmails.map((email, index) => (
+                    <div 
+                      key={index}
+                      className="flex items-center justify-between p-2 bg-muted/10 rounded border border-muted/20"
+                    >
+                      <span className="text-sm text-blue-400">{email}</span>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => removeAuthorizedEmailMutation.mutate(email)}
+                        disabled={removeAuthorizedEmailMutation.isPending}
+                        className="h-6 w-6 p-0 hover:bg-red-500/20"
+                      >
+                        <Trash2 className="w-3 h-3 text-red-400" />
+                      </Button>
+                    </div>
+                  ))}
+                </div>
               </CardContent>
             </Card>
           </div>

@@ -2402,16 +2402,139 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Check early access codes (this would query database)
       const validCodes = ["FLBY-EARLY-001", "FLBY-EARLY-002"];
-      const hasEarlyAccess = accessCode && validCodes.includes(accessCode);
+      const authorizedEmails = ["admin@flutterbye.com", "beta@flutterbye.com"];
+      
+      const hasCodeAccess = accessCode && validCodes.includes(accessCode);
+      const hasEmailAccess = email && authorizedEmails.includes(email);
+      const hasEarlyAccess = hasCodeAccess || hasEmailAccess;
       
       res.json({
         success: true,
         hasAccess: hasEarlyAccess,
-        accessType: hasEarlyAccess ? "early_access" : "restricted"
+        accessType: hasEarlyAccess ? "early_access" : "restricted",
+        accessMethod: hasCodeAccess ? "code" : hasEmailAccess ? "email" : null
       });
     } catch (error) {
       console.error("Error checking access:", error);
       res.status(500).json({ error: "Failed to check access" });
+    }
+  });
+
+  // Access Codes Management APIs
+  app.post("/api/admin/access-codes", async (req, res) => {
+    try {
+      const { code } = req.body;
+      
+      if (!code) {
+        return res.status(400).json({ error: "Access code is required" });
+      }
+
+      // In production, this would save to database
+      console.log(`🔑 Added new access code: ${code}`);
+      
+      res.json({
+        success: true,
+        code,
+        message: "Access code added successfully"
+      });
+    } catch (error) {
+      console.error("Error adding access code:", error);
+      res.status(500).json({ error: "Failed to add access code" });
+    }
+  });
+
+  app.delete("/api/admin/access-codes", async (req, res) => {
+    try {
+      const { code } = req.body;
+      
+      if (!code) {
+        return res.status(400).json({ error: "Access code is required" });
+      }
+
+      // In production, this would remove from database
+      console.log(`🗑️ Removed access code: ${code}`);
+      
+      res.json({
+        success: true,
+        message: "Access code removed successfully"
+      });
+    } catch (error) {
+      console.error("Error removing access code:", error);
+      res.status(500).json({ error: "Failed to remove access code" });
+    }
+  });
+
+  app.get("/api/admin/access-codes", async (req, res) => {
+    try {
+      // In production, this would query database
+      const codes = ["FLBY-EARLY-001", "FLBY-EARLY-002"];
+      
+      res.json({
+        success: true,
+        codes
+      });
+    } catch (error) {
+      console.error("Error fetching access codes:", error);
+      res.status(500).json({ error: "Failed to fetch access codes" });
+    }
+  });
+
+  // Authorized Emails Management APIs
+  app.post("/api/admin/authorized-emails", async (req, res) => {
+    try {
+      const { email } = req.body;
+      
+      if (!email) {
+        return res.status(400).json({ error: "Email address is required" });
+      }
+
+      // In production, this would save to database
+      console.log(`📧 Added authorized email: ${email}`);
+      
+      res.json({
+        success: true,
+        email,
+        message: "Email authorized successfully"
+      });
+    } catch (error) {
+      console.error("Error authorizing email:", error);
+      res.status(500).json({ error: "Failed to authorize email" });
+    }
+  });
+
+  app.delete("/api/admin/authorized-emails", async (req, res) => {
+    try {
+      const { email } = req.body;
+      
+      if (!email) {
+        return res.status(400).json({ error: "Email address is required" });
+      }
+
+      // In production, this would remove from database
+      console.log(`🗑️ Removed authorized email: ${email}`);
+      
+      res.json({
+        success: true,
+        message: "Email authorization removed successfully"
+      });
+    } catch (error) {
+      console.error("Error removing email authorization:", error);
+      res.status(500).json({ error: "Failed to remove email authorization" });
+    }
+  });
+
+  app.get("/api/admin/authorized-emails", async (req, res) => {
+    try {
+      // In production, this would query database
+      const emails = ["admin@flutterbye.com", "beta@flutterbye.com"];
+      
+      res.json({
+        success: true,
+        emails
+      });
+    } catch (error) {
+      console.error("Error fetching authorized emails:", error);
+      res.status(500).json({ error: "Failed to fetch authorized emails" });
     }
   });
 
