@@ -9,6 +9,8 @@ import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
+import CurrencySelector, { supportedCurrencies, type Currency } from "@/components/currency-selector";
+import FlbyTokenInfo from "@/components/flby-token-info";
 import { 
   Heart, 
   Gift, 
@@ -93,6 +95,7 @@ export default function GreetingCards() {
   const [selectedTemplate, setSelectedTemplate] = useState<GreetingTemplate | null>(null);
   const [customMessage, setCustomMessage] = useState("");
   const [attachedValue, setAttachedValue] = useState("");
+  const [selectedCurrency, setSelectedCurrency] = useState<Currency>(supportedCurrencies[0]);
   const [recipientAddress, setRecipientAddress] = useState("");
   const [personalNote, setPersonalNote] = useState("");
   const [scheduledDate, setScheduledDate] = useState("");
@@ -139,6 +142,8 @@ export default function GreetingCards() {
     createGreetingCard.mutate({
       message: message.substring(0, 27), // Ensure 27 char limit
       attachedValue: attachedValue || "0",
+      currency: selectedCurrency.symbol,
+      currencyAddress: selectedCurrency.address,
       recipientAddress,
       personalNote,
       scheduledDate: scheduledDate || null,
@@ -230,23 +235,40 @@ export default function GreetingCards() {
                 />
               </div>
 
-              <div className="space-y-2">
-                <Label>Attached Value (SOL)</Label>
-                <div className="relative">
-                  <DollarSign className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    type="number"
-                    step="0.001"
-                    min="0"
-                    value={attachedValue}
-                    onChange={(e) => setAttachedValue(e.target.value)}
-                    placeholder={selectedTemplate?.suggestedValue || "0.05"}
-                    className="pl-10 pulse-border"
-                  />
+              <div className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label>Payment Currency</Label>
+                    <CurrencySelector
+                      value={selectedCurrency.symbol}
+                      onValueChange={setSelectedCurrency}
+                      showExchangeRates
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Attached Value</Label>
+                    <div className="relative">
+                      <selectedCurrency.icon className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                      <Input
+                        type="number"
+                        step="0.001"
+                        min="0"
+                        value={attachedValue}
+                        onChange={(e) => setAttachedValue(e.target.value)}
+                        placeholder={selectedTemplate?.suggestedValue || "0.05"}
+                        className="pl-10 pulse-border"
+                      />
+                    </div>
+                  </div>
                 </div>
-                <p className="text-xs text-muted-foreground">
-                  Suggested: {selectedTemplate?.suggestedValue || "0.05"} SOL
-                </p>
+                <div className="flex justify-between text-xs text-muted-foreground">
+                  <span>Suggested: {selectedTemplate?.suggestedValue || "0.05"} {selectedCurrency.symbol}</span>
+                  {selectedCurrency.symbol === "FLBY" && (
+                    <Badge variant="secondary" className="text-xs">
+                      Native token discount: 10% off fees
+                    </Badge>
+                  )}
+                </div>
               </div>
 
               <div className="space-y-2">
@@ -284,7 +306,7 @@ export default function GreetingCards() {
                     <p className="text-lg font-medium">{getMessage()}</p>
                     {attachedValue && (
                       <Badge variant="secondary" className="mt-2">
-                        +{attachedValue} SOL
+                        +{attachedValue} {selectedCurrency.symbol}
                       </Badge>
                     )}
                   </div>
@@ -345,6 +367,18 @@ export default function GreetingCards() {
               </CardContent>
             </Card>
           </div>
+        </div>
+
+        {/* FLBY Token Information Sidebar */}
+        <div className="mt-16">
+          <FlbyTokenInfo 
+            onGetTokens={() => {
+              toast({
+                title: "Early Access Signup",
+                description: "You've been added to the FLBY token early access list!",
+              });
+            }}
+          />
         </div>
       </div>
     </div>

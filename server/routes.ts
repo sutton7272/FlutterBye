@@ -1472,6 +1472,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const {
         message,
         attachedValue,
+        currency,
+        currencyAddress,
         recipientAddress,
         personalNote,
         scheduledDate,
@@ -1491,7 +1493,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         availableSupply: 1,
         attachedValue: attachedValue || "0",
         valuePerToken: attachedValue || "0",
-        currency: "SOL",
+        currency: currency || "SOL",
         isPublic: false,
         recipientAddress,
         personalNote,
@@ -1501,7 +1503,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         metadata: {
           type: "greeting_card",
           category: cardType,
-          template: templateId
+          template: templateId,
+          currency: currency || "SOL",
+          currencyAddress: currencyAddress,
+          paymentMethod: currency || "SOL",
+          feeDiscount: currency === "FLBY" ? 0.1 : 0
         },
         createdAt: new Date()
       };
@@ -1529,6 +1535,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         templateId,
         totalBudget,
         valuePerToken,
+        currency,
+        currencyAddress,
         targetingMethod,
         demographicFilters,
         advancedFeatures,
@@ -1549,6 +1557,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         totalSupply: estimatedReach,
         availableSupply: estimatedReach,
         valuePerToken: valuePerToken.toString(),
+        currency: currency || "SOL",
         totalBudget,
         targetingMethod,
         demographicFilters,
@@ -1559,7 +1568,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
           template: templateId,
           targeting: targetingMethod,
           features: advancedFeatures,
-          metrics: expectedMetrics
+          metrics: expectedMetrics,
+          currency: currency || "SOL",
+          currencyAddress: currencyAddress,
+          paymentMethod: currency || "SOL",
+          feeDiscount: currency === "FLBY" ? 0.1 : 0
         },
         createdAt: new Date(),
         status: "active"
@@ -1575,7 +1588,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         metrics: {
           expectedEngagement: "5-15%",
           expectedConversion: "2-8%",
-          costPerEngagement: (totalBudget / (estimatedReach * 0.1)).toFixed(4)
+          costPerEngagement: (totalBudget / (estimatedReach * 0.1)).toFixed(4),
+          currency: currency || "SOL",
+          totalBudget: totalBudget,
+          feeDiscount: currency === "FLBY" ? "10% native token discount" : "Standard fees"
         }
       });
     } catch (error) {
@@ -1632,6 +1648,60 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error fetching marketing insights:", error);
       res.status(500).json({ error: "Failed to fetch marketing insights" });
+    }
+  });
+
+  // Currency Exchange Rates API
+  app.get("/api/currencies/rates", async (req, res) => {
+    try {
+      // In production, this would fetch real-time rates from an oracle or exchange API
+      const exchangeRates = {
+        SOL: { rate: 1, symbol: "SOL", name: "Solana", decimals: 9 },
+        USDC: { rate: 0.01, symbol: "USDC", name: "USD Coin", decimals: 6 }, // 1 USDC = 0.01 SOL
+        FLBY: { rate: 0.001, symbol: "FLBY", name: "Flutterbye Token", decimals: 6 } // 1 FLBY = 0.001 SOL
+      };
+
+      res.json({
+        success: true,
+        rates: exchangeRates,
+        timestamp: new Date().toISOString(),
+        baseCurrency: "SOL"
+      });
+    } catch (error) {
+      console.error("Error fetching exchange rates:", error);
+      res.status(500).json({ error: "Failed to fetch exchange rates" });
+    }
+  });
+
+  // FLBY Token Information API
+  app.get("/api/flby/info", async (req, res) => {
+    try {
+      const tokenInfo = {
+        symbol: "FLBY",
+        name: "Flutterbye Token",
+        totalSupply: "1000000000", // 1 billion tokens
+        circulatingSupply: "0", // Not yet launched
+        decimals: 6,
+        address: "FLBY1234567890123456789012345678901234567890", // Placeholder
+        launchDate: "Q2 2024",
+        benefits: [
+          { type: "fee_discount", value: 10, description: "10% discount on all platform fees" },
+          { type: "governance", description: "Voting rights on platform improvements" },
+          { type: "staking_rewards", apy: "8-12%", description: "Earn rewards by staking FLBY" },
+          { type: "exclusive_access", description: "Early access to new features and templates" },
+          { type: "priority_support", description: "Premium customer support" }
+        ],
+        price: {
+          current: "0.001", // 0.001 SOL
+          currency: "SOL"
+        },
+        status: "pre_launch"
+      };
+
+      res.json(tokenInfo);
+    } catch (error) {
+      console.error("Error fetching FLBY info:", error);
+      res.status(500).json({ error: "Failed to fetch FLBY token information" });
     }
   });
 

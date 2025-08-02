@@ -12,6 +12,8 @@ import { useToast } from "@/hooks/use-toast";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import TokenHolderAnalysis from "@/components/token-holder-analysis";
+import CurrencySelector, { supportedCurrencies, type Currency } from "@/components/currency-selector";
+import FlbyTokenInfo from "@/components/flby-token-info";
 import { 
   Building2, 
   Target, 
@@ -101,6 +103,7 @@ export default function EnterpriseCampaigns() {
   const [campaignMessage, setCampaignMessage] = useState("");
   const [totalBudget, setTotalBudget] = useState("");
   const [valuePerToken, setValuePerToken] = useState("");
+  const [selectedCurrency, setSelectedCurrency] = useState<Currency>(supportedCurrencies[0]);
   const [targetingMethod, setTargetingMethod] = useState("demographics");
   const [demographicFilters, setDemographicFilters] = useState({
     ageRange: "",
@@ -158,6 +161,8 @@ export default function EnterpriseCampaigns() {
       templateId: selectedTemplate?.id,
       totalBudget: parseFloat(totalBudget),
       valuePerToken: parseFloat(valuePerToken || "0.01"),
+      currency: selectedCurrency.symbol,
+      currencyAddress: selectedCurrency.address,
       targetingMethod,
       demographicFilters,
       advancedFeatures,
@@ -240,16 +245,45 @@ export default function EnterpriseCampaigns() {
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label>Total Budget (SOL)</Label>
-                      <Input
-                        type="number"
-                        step="0.1"
-                        min="0"
-                        value={totalBudget}
-                        onChange={(e) => setTotalBudget(e.target.value)}
-                        placeholder="10.0"
-                        className="pulse-border"
+                      <Label>Payment Currency</Label>
+                      <CurrencySelector
+                        value={selectedCurrency.symbol}
+                        onValueChange={setSelectedCurrency}
+                        showExchangeRates
                       />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label>Total Budget ({selectedCurrency.symbol})</Label>
+                      <div className="relative">
+                        <selectedCurrency.icon className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                        <Input
+                          type="number"
+                          step="0.1"
+                          min="0"
+                          value={totalBudget}
+                          onChange={(e) => setTotalBudget(e.target.value)}
+                          placeholder="10.0"
+                          className="pl-10 pulse-border"
+                        />
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Value Per Token ({selectedCurrency.symbol})</Label>
+                      <div className="relative">
+                        <selectedCurrency.icon className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                        <Input
+                          type="number"
+                          step="0.001"
+                          min="0.001"
+                          value={valuePerToken}
+                          onChange={(e) => setValuePerToken(e.target.value)}
+                          placeholder="0.01"
+                          className="pl-10 pulse-border"
+                        />
+                      </div>
                     </div>
                   </div>
 
@@ -272,22 +306,28 @@ export default function EnterpriseCampaigns() {
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <Label>Value Per Token (SOL)</Label>
-                      <Input
-                        type="number"
-                        step="0.001"
-                        min="0.001"
-                        value={valuePerToken}
-                        onChange={(e) => setValuePerToken(e.target.value)}
-                        placeholder="0.01"
-                        className="pulse-border"
-                      />
-                    </div>
-                    <div className="space-y-2">
                       <Label>Estimated Reach</Label>
-                      <div className="flex items-center space-x-2 h-10 px-3 py-2 bg-muted rounded-md">
+                      <div className="flex items-center space-x-2 h-10 px-3 py-2 bg-muted rounded-md pulse-border">
                         <Users className="w-4 h-4" />
                         <span>{estimatedReach.toLocaleString()} users</span>
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Campaign Benefits</Label>
+                      <div className="flex flex-wrap gap-2">
+                        {selectedCurrency.symbol === "FLBY" && (
+                          <Badge variant="default" className="text-xs">
+                            10% fee discount
+                          </Badge>
+                        )}
+                        {selectedCurrency.symbol === "USDC" && (
+                          <Badge variant="secondary" className="text-xs">
+                            Stable value
+                          </Badge>
+                        )}
+                        <Badge variant="outline" className="text-xs">
+                          Blockchain verified
+                        </Badge>
                       </div>
                     </div>
                   </div>

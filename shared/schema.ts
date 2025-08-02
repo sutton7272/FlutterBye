@@ -40,7 +40,7 @@ export const tokens = pgTable("tokens", {
   // Phase 2: Value attachment
   hasAttachedValue: boolean("has_attached_value").default(false),
   attachedValue: decimal("attached_value", { precision: 18, scale: 9 }).default("0"),
-  currency: text("currency").default("SOL"), // SOL or USDC
+  currency: text("currency").default("SOL"), // SOL, USDC, or FLBY
   escrowStatus: text("escrow_status").default("none"), // none, escrowed, redeemed, refunded
   escrowWallet: text("escrow_wallet"),
   expiresAt: timestamp("expires_at"),
