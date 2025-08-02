@@ -236,8 +236,8 @@
       filter: hue-rotate(0deg);
     }
     50% { 
-      background-position: 100% 50%; 
-      filter: hue-rotate(90deg);
+      background-position: 0% 50%; 
+      filter: hue-rotate(0deg);
     }
     100% { 
       background-position: 0% 50%; 
@@ -265,8 +265,8 @@
       hsl(200, 100%, 50%) 0%, 
       hsl(180, 100%, 45%) 50%,
       hsl(140, 100%, 40%) 100%);
-    background-size: 200% 200%;
-    animation: circuitFlow 3s ease-in-out infinite;
+    background-size: 100% 100%;
+    /* animation disabled */
   }
   
   .text-gradient {
@@ -274,11 +274,11 @@
       hsl(200, 100%, 50%) 0%, 
       hsl(180, 100%, 45%) 50%,
       hsl(140, 100%, 40%) 100%);
-    background-size: 200% 200%;
+    background-size: 100% 100%;
     background-clip: text;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
-    animation: circuitFlow 3s ease-in-out infinite;
+    /* animation disabled */
   }
   
   /* Electric Pulse Components */
@@ -286,7 +286,7 @@
     position: relative;
     border: 2px solid var(--electric-blue);
     border-radius: 12px;
-    animation: electricPulse 2s ease-in-out infinite;
+    /* animation disabled */
     overflow: hidden;
     background: rgba(0, 0, 0, 0.8); /* Dark background for better text contrast */
   }
@@ -311,7 +311,7 @@
   
   .pulse-border {
     border: 1px solid var(--electric-blue);
-    animation: borderPulse 3s ease-in-out infinite;
+    /* animation disabled */
     transition: all 0.3s ease;
     background: rgba(0, 0, 0, 0.6); /* Darker background for better contrast */
   }
@@ -412,7 +412,7 @@
     background-position: 0% 50%;
   }
   50% {
-    background-position: 100% 50%;
+    background-position: 0% 50%;
   }
   100% {
     background-position: 0% 50%;
