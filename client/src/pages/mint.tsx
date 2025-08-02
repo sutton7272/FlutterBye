@@ -718,111 +718,110 @@ export default function Mint() {
                 </div>
 
                 <div className="space-y-4">
-                    <div>
-                      <Label htmlFor="memo">Extended Message (Optional)</Label>
-                      <Textarea
-                        id="memo"
-                        value={memo}
-                        onChange={(e) => setMemo(e.target.value)}
-                        placeholder="Add a longer message, detailed description, or special instructions for this token. This text will be stored with your token and can be much longer than the 27-character token name..."
-                        rows={4}
-                        maxLength={500}
-                      />
-                      <p className="text-xs text-muted-foreground">
-                        Use this for longer messages, detailed descriptions, or context that doesn't fit in the 27-character token name. {memo.length}/500 characters
-                      </p>
+                  <div>
+                    <Label htmlFor="memo">Extended Message (Optional)</Label>
+                    <Textarea
+                      id="memo"
+                      value={memo}
+                      onChange={(e) => setMemo(e.target.value)}
+                      placeholder="Add a longer message, detailed description, or special instructions for this token. This text will be stored with your token and can be much longer than the 27-character token name..."
+                      rows={4}
+                      maxLength={500}
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      Use this for longer messages, detailed descriptions, or context that doesn't fit in the 27-character token name. {memo.length}/500 characters
+                    </p>
+                  </div>
+
+                  {/* Message Media Upload Section */}
+                  <div className="space-y-3">
+                    <Label>Add Media to Message</Label>
+                    <p className="text-sm text-muted-foreground">
+                      Attach images, GIFs, or QR codes to enhance your extended message
+                    </p>
+                    
+                    <div className="flex gap-2">
+                      <div className="relative">
+                        <input
+                          type="file"
+                          accept="image/jpeg,image/png,image/webp"
+                          onChange={(e) => handleMessageMediaUpload(e, 'image')}
+                          className="hidden"
+                          id="message-image-upload"
+                        />
+                        <Label htmlFor="message-image-upload" className="cursor-pointer">
+                          <Button type="button" variant="outline" size="sm">
+                            <ImageIcon className="w-4 h-4 mr-2" />
+                            Add Image
+                          </Button>
+                        </Label>
+                      </div>
+                      
+                      <div className="relative">
+                        <input
+                          type="file"
+                          accept="image/gif"
+                          onChange={(e) => handleMessageMediaUpload(e, 'gif')}
+                          className="hidden"
+                          id="message-gif-upload"
+                        />
+                        <Label htmlFor="message-gif-upload" className="cursor-pointer">
+                          <Button type="button" variant="outline" size="sm">
+                            <FileImage className="w-4 h-4 mr-2" />
+                            Add GIF
+                          </Button>
+                        </Label>
+                      </div>
+                      
+                      <div className="relative">
+                        <input
+                          type="file"
+                          accept="image/jpeg,image/png,image/webp"
+                          onChange={(e) => handleMessageMediaUpload(e, 'qr')}
+                          className="hidden"
+                          id="message-qr-upload"
+                        />
+                        <Label htmlFor="message-qr-upload" className="cursor-pointer">
+                          <Button type="button" variant="outline" size="sm">
+                            <QrCode className="w-4 h-4 mr-2" />
+                            Add QR Code
+                          </Button>
+                        </Label>
+                      </div>
                     </div>
 
-                    {/* Message Media Upload Section */}
-                    <div className="space-y-3">
-                      <Label>Add Media to Message</Label>
-                      <p className="text-sm text-muted-foreground">
-                        Attach images, GIFs, or QR codes to enhance your extended message
-                      </p>
-                      
-                      <div className="flex gap-2">
-                        <div className="relative">
-                          <input
-                            type="file"
-                            accept="image/jpeg,image/png,image/webp"
-                            onChange={(e) => handleMessageMediaUpload(e, 'image')}
-                            className="hidden"
-                            id="message-image-upload"
-                          />
-                          <Label htmlFor="message-image-upload" className="cursor-pointer">
-                            <Button type="button" variant="outline" size="sm">
-                              <ImageIcon className="w-4 h-4 mr-2" />
-                              Add Image
-                            </Button>
-                          </Label>
-                        </div>
-                        
-                        <div className="relative">
-                          <input
-                            type="file"
-                            accept="image/gif"
-                            onChange={(e) => handleMessageMediaUpload(e, 'gif')}
-                            className="hidden"
-                            id="message-gif-upload"
-                          />
-                          <Label htmlFor="message-gif-upload" className="cursor-pointer">
-                            <Button type="button" variant="outline" size="sm">
-                              <FileImage className="w-4 h-4 mr-2" />
-                              Add GIF
-                            </Button>
-                          </Label>
-                        </div>
-                        
-                        <div className="relative">
-                          <input
-                            type="file"
-                            accept="image/jpeg,image/png,image/webp"
-                            onChange={(e) => handleMessageMediaUpload(e, 'qr')}
-                            className="hidden"
-                            id="message-qr-upload"
-                          />
-                          <Label htmlFor="message-qr-upload" className="cursor-pointer">
-                            <Button type="button" variant="outline" size="sm">
-                              <QrCode className="w-4 h-4 mr-2" />
-                              Add QR Code
-                            </Button>
-                          </Label>
+                    {/* Display uploaded media */}
+                    {messageMedia.length > 0 && (
+                      <div className="space-y-2">
+                        <Label>Attached Media ({messageMedia.length})</Label>
+                        <div className="grid grid-cols-2 gap-3">
+                          {messageMedia.map((media) => (
+                            <div key={media.id} className="relative border border-slate-200 dark:border-slate-700 rounded-lg p-2">
+                              <div className="flex items-center gap-2">
+                                <div className="w-12 h-12 bg-slate-100 dark:bg-slate-800 rounded flex items-center justify-center overflow-hidden">
+                                  {media.type === 'image' && <ImageIcon className="w-6 h-6 text-blue-500" />}
+                                  {media.type === 'gif' && <FileImage className="w-6 h-6 text-green-500" />}
+                                  {media.type === 'qr' && <QrCode className="w-6 h-6 text-purple-500" />}
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                  <p className="text-sm font-medium truncate">{media.name}</p>
+                                  <p className="text-xs text-muted-foreground capitalize">{media.type}</p>
+                                </div>
+                                <Button
+                                  type="button"
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => removeMessageMedia(media.id)}
+                                  className="w-6 h-6 p-0 text-red-500 hover:text-red-700"
+                                >
+                                  <X className="w-4 h-4" />
+                                </Button>
+                              </div>
+                            </div>
+                          ))}
                         </div>
                       </div>
-
-                      {/* Display uploaded media */}
-                      {messageMedia.length > 0 && (
-                        <div className="space-y-2">
-                          <Label>Attached Media ({messageMedia.length})</Label>
-                          <div className="grid grid-cols-2 gap-3">
-                            {messageMedia.map((media) => (
-                              <div key={media.id} className="relative border border-slate-200 dark:border-slate-700 rounded-lg p-2">
-                                <div className="flex items-center gap-2">
-                                  <div className="w-12 h-12 bg-slate-100 dark:bg-slate-800 rounded flex items-center justify-center overflow-hidden">
-                                    {media.type === 'image' && <ImageIcon className="w-6 h-6 text-blue-500" />}
-                                    {media.type === 'gif' && <FileImage className="w-6 h-6 text-green-500" />}
-                                    {media.type === 'qr' && <QrCode className="w-6 h-6 text-purple-500" />}
-                                  </div>
-                                  <div className="flex-1 min-w-0">
-                                    <p className="text-sm font-medium truncate">{media.name}</p>
-                                    <p className="text-xs text-muted-foreground capitalize">{media.type}</p>
-                                  </div>
-                                  <Button
-                                    type="button"
-                                    variant="ghost"
-                                    size="sm"
-                                    onClick={() => removeMessageMedia(media.id)}
-                                    className="w-6 h-6 p-0 text-red-500 hover:text-red-700"
-                                  >
-                                    <X className="w-4 h-4" />
-                                  </Button>
-                                </div>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      )}
-                    </div>
+                    )}
                   </div>
                 </div>
                 
