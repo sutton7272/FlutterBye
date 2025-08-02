@@ -1,47 +1,17 @@
-import { useState, useEffect } from "react";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { useState } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Badge } from "@/components/ui/badge";
-import { Switch } from "@/components/ui/switch";
-import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { useMutation, useQuery } from "@tanstack/react-query";
-import { apiRequest } from "@/lib/queryClient";
-import ImageUpload from "@/components/image-upload";
-import { LoadingSpinner } from "@/components/loading-spinner";
-import { validateTokenQuantity, validateWholeNumber } from "@/lib/validators";
-import { Coins, Upload, Calculator, DollarSign, Lock, Globe, Gift, AlertCircle, Wand2, Star, Sparkles, Users, Target, ImageIcon, FileImage, QrCode, Plus, X, Ticket, Loader2, Zap, CheckCircle, Eye, FileText } from "lucide-react";
-import AITextOptimizer from "@/components/ai-text-optimizer";
-import { EmotionAnalyzer } from "@/components/EmotionAnalyzer";
-import { ViralMechanics } from "@/components/ViralMechanics";
-import { NetworkEffects } from "@/components/NetworkEffects";
-import { type InsertToken } from "@shared/schema";
-import TokenHolderAnalysis from "@/components/token-holder-analysis";
-import { TransactionSuccessOverlay } from "@/components/confetti-celebration";
-import { ShareSuccessModal } from "@/components/ShareSuccessModal";
-import { TokenPriceComparison } from "@/components/token-price-comparison";
+import { Coins, Sparkles, Zap, Star, Users } from "lucide-react";
 
 export default function Mint() {
   const { toast } = useToast();
-
   const [message, setMessage] = useState("");
   const [mintAmount, setMintAmount] = useState("");
-  const [mintAmountError, setMintAmountError] = useState("");
-  
-  // State variables needed early for useEffect hooks
-  const [showShareModal, setShowShareModal] = useState(false);
-  const [priceCalculation, setPriceCalculation] = useState<{
-    pricePerToken: number;
-    totalPrice: number;
-    tier: any;
-    currency: string;
-  } | null>(null);
 
   // Listen for share modal trigger
   useEffect(() => {
