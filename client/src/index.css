@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 :root {
-  /* Modern Web3 Color System - Inspired by top DeFi platforms */
+  /* Modern Web3 Color System - Electric Purple Theme */
   --background: hsl(240, 5%, 4%);
   --foreground: hsl(0, 0%, 100%);
   --muted: hsl(240, 4%, 9%);
@@ -14,27 +14,27 @@
   --card-foreground: hsl(0, 0%, 100%);
   --border: hsl(240, 6%, 15%);
   --input: hsl(240, 4%, 9%);
-  --primary: hsl(190, 100%, 50%);
-  --primary-foreground: hsl(240, 5%, 4%);
-  --secondary: hsl(248, 73%, 70%);
+  --primary: hsl(263, 70%, 50%);
+  --primary-foreground: hsl(0, 0%, 100%);
+  --secondary: hsl(270, 60%, 65%);
   --secondary-foreground: hsl(240, 5%, 4%);
-  --accent: hsl(142, 100%, 55%);
-  --accent-foreground: hsl(240, 5%, 4%);
+  --accent: hsl(142, 70%, 45%);
+  --accent-foreground: hsl(0, 0%, 100%);
   --destructive: hsl(0, 72%, 51%);
   --destructive-foreground: hsl(0, 0%, 100%);
-  --ring: hsl(190, 100%, 50%);
+  --ring: hsl(263, 70%, 50%);
   --radius: 0.75rem;
   
-  /* Simplified Modern Palette */
+  /* Electric Purple Theme Palette */
   --ultra-dark: hsl(240, 5%, 4%);
   --surface-dark: hsl(240, 4%, 9%);
-  --electric-cyan: hsl(190, 100%, 50%);
-  --premium-purple: hsl(248, 73%, 70%);
-  --success-green: hsl(142, 100%, 55%);
+  --electric-purple: hsl(263, 70%, 50%);
+  --light-purple: hsl(270, 60%, 65%);
+  --success-green: hsl(142, 70%, 45%);
   --warning-orange: hsl(35, 100%, 50%);
   --text-primary: hsl(0, 0%, 100%);
   --text-secondary: hsl(240, 3%, 63%);
-  --glass-overlay: hsla(190, 100%, 50%, 0.05);
+  --glass-overlay: hsla(263, 70%, 50%, 0.05);
 }
 
 .dark {
@@ -157,17 +157,36 @@
   
   .modern-gradient {
     background: linear-gradient(135deg, 
-      hsl(190, 100%, 50%) 0%, 
-      hsl(248, 73%, 70%) 100%);
+      hsl(263, 70%, 50%) 0%, 
+      hsl(270, 60%, 65%) 100%);
   }
   
   .text-gradient {
     background: linear-gradient(135deg, 
-      hsl(190, 100%, 50%) 0%, 
-      hsl(248, 73%, 70%) 100%);
+      hsl(263, 70%, 50%) 0%, 
+      hsl(270, 60%, 65%) 100%);
     background-clip: text;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
+  }
+  
+  /* Alternative Color Themes - Quick Swap Options */
+  .orange-gradient {
+    background: linear-gradient(135deg, 
+      hsl(21, 90%, 52%) 0%, 
+      hsl(35, 85%, 60%) 100%);
+  }
+  
+  .green-gradient {
+    background: linear-gradient(135deg, 
+      hsl(142, 70%, 45%) 0%, 
+      hsl(155, 65%, 50%) 100%);
+  }
+  
+  .blue-gradient {
+    background: linear-gradient(135deg, 
+      hsl(213, 94%, 68%) 0%, 
+      hsl(217, 91%, 60%) 100%);
   }
   
   .flutter-animate {
