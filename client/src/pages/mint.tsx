@@ -350,9 +350,9 @@ export default function Mint() {
                   />
                 </div>
                 
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Minting Form */}
-          <Card id="mint-form" className="premium-card electric-frame">
+          <Card id="mint-form" className="premium-card electric-frame lg:col-span-2">
             <CardContent className="p-8">
               <h3 className="text-2xl font-bold mb-6 text-gradient">Create Your Message Token</h3>
               <div className="mb-6 p-4 bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-800 rounded-lg">
@@ -877,72 +877,7 @@ export default function Mint() {
             </CardContent>
           </Card>
           
-          {/* Preview */}
-          <Card className="glassmorphism">
-            <CardContent className="p-8">
-              <h3 className="text-2xl font-bold mb-6">Token Preview</h3>
-              
-              <div className="bg-slate-700/50 p-6 rounded-xl border-2 border-dashed border-slate-600">
-                <div className="text-center">
-                  {tokenImage ? (
-                    <div className="w-16 h-16 mx-auto mb-4 rounded-full overflow-hidden">
-                      <img 
-                        src={`data:image/png;base64,${tokenImage}`}
-                        alt="Token preview"
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                  ) : (
-                    <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-r from-primary to-blue-500 rounded-full flex items-center justify-center">
-                      <Coins className="text-2xl text-white" />
-                    </div>
-                  )}
-                  <h4 className="text-lg font-bold mb-2">
-                    {message || "Your Message Token"}
-                  </h4>
-                  <Badge variant="secondary" className="mb-4">
-                    FLBY-MSG
-                  </Badge>
-                  <div className="space-y-2 text-sm">
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">Total Supply:</span>
-                      <span>{mintAmount || "0"}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">Value per Token:</span>
-                      <span>{valuePerToken ? `${valuePerToken} SOL` : "Free"}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">Creator:</span>
-                      <span className="text-primary">Connected Wallet</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              
-              <div className="mt-6">
-                <h4 className="font-semibold mb-3">Recent Mints</h4>
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between bg-slate-700/50 p-3 rounded-lg">
-                    <div>
-                      <p className="font-semibold">HodlForDiamondHands</p>
-                      <p className="text-xs text-muted-foreground">FlBY-MSG • 500 tokens</p>
-                    </div>
-                    <span className="text-primary font-semibold">0.1 SOL</span>
-                  </div>
-                  <div className="flex items-center justify-between bg-slate-700/50 p-3 rounded-lg">
-                    <div>
-                      <p className="font-semibold">JoinTheHiveNow</p>
-                      <p className="text-xs text-muted-foreground">FlBY-MSG • 1000 tokens</p>
-                    </div>
-                    <span className="text-primary font-semibold">0.05 SOL</span>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-          
-          {/* Token Holder Analysis - Permanently Displayed */}
+          {/* Token Holder Analysis - Permanently Displayed in Right Column */}
           <Card className="premium-card electric-frame">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
@@ -954,7 +889,7 @@ export default function Mint() {
               </CardDescription>
             </CardHeader>
             <CardContent className="p-6">
-              <div className="text-center py-8">
+              <div className="text-center">
                 <Users className="w-12 h-12 mx-auto text-blue-400 mb-4" />
                 <h3 className="text-lg font-semibold mb-2">Token Holder Map</h3>
                 <p className="text-muted-foreground mb-4 text-sm">
