@@ -16,7 +16,7 @@ import { apiRequest } from "@/lib/queryClient";
 import ImageUpload from "@/components/image-upload";
 import { LoadingSpinner } from "@/components/loading-spinner";
 import { validateTokenQuantity, validateWholeNumber } from "@/lib/validators";
-import { Coins, Upload, Calculator, DollarSign, Lock, Globe, Gift, AlertCircle, Wand2, Star, Sparkles, Users, Target, ImageIcon, FileImage, QrCode, Plus, X, Ticket, Loader2, Zap } from "lucide-react";
+import { Coins, Upload, Calculator, DollarSign, Lock, Globe, Gift, AlertCircle, Wand2, Star, Sparkles, Users, Target, ImageIcon, FileImage, QrCode, Plus, X, Ticket, Loader2, Zap, CheckCircle } from "lucide-react";
 import AITextOptimizer from "@/components/ai-text-optimizer";
 import { EmotionAnalyzer } from "@/components/EmotionAnalyzer";
 import { ViralMechanics } from "@/components/ViralMechanics";
