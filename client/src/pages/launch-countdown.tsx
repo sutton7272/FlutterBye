@@ -34,6 +34,9 @@ export default function LaunchCountdown() {
   const [email, setEmail] = useState("");
   const [walletAddress, setWalletAddress] = useState("");
   const [submitted, setSubmitted] = useState(false);
+  
+  // Debug: Log state values
+  console.log("Form state:", { submitted, email, walletAddress });
   const { toast } = useToast();
 
   // Set launch date to exactly 30 days from now (fixed target date)
@@ -265,6 +268,7 @@ export default function LaunchCountdown() {
               </CardTitle>
             </CardHeader>
             <CardContent>
+              <p className="text-xs text-muted-foreground mb-4">Debug: submitted={submitted.toString()}, email="{email}"</p>
               {submitted ? (
                 <div className="text-center py-8">
                   <CheckCircle className="w-16 h-16 mx-auto mb-4 text-green-400" />
