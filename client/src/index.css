@@ -73,7 +73,7 @@
 
   body {
     @apply font-sans antialiased text-foreground;
-    background-image: url('@assets/image_1754105283070.png');
+    background-image: url('/images/cosmic-butterfly.png');
     background-size: cover;
     background-position: center;
     background-attachment: fixed;
