@@ -150,44 +150,74 @@ export default function UnifiedAdminDashboard() {
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-10 glassmorphism electric-frame border-0 p-2">
-            <TabsTrigger value="overview" className="flex items-center gap-2 pulse-border hover:text-electric-blue transition-all">
+          <TabsList className="grid w-full grid-cols-10 bg-slate-900/90 border border-slate-600 p-2 rounded-lg">
+            <TabsTrigger 
+              value="overview" 
+              className="flex items-center gap-2 text-slate-300 font-medium data-[state=active]:text-white data-[state=active]:bg-blue-600/60 data-[state=active]:shadow-lg hover:text-white hover:bg-slate-700/50 transition-all duration-200"
+            >
               <BarChart3 className="w-4 h-4" />
               <span className="hidden sm:inline">Overview</span>
             </TabsTrigger>
-            <TabsTrigger value="settings" className="flex items-center gap-2 pulse-border hover:text-electric-blue transition-all">
+            <TabsTrigger 
+              value="settings" 
+              className="flex items-center gap-2 text-slate-300 font-medium data-[state=active]:text-white data-[state=active]:bg-green-600/60 data-[state=active]:shadow-lg hover:text-white hover:bg-slate-700/50 transition-all duration-200"
+            >
               <Settings className="w-4 h-4" />
               <span className="hidden sm:inline">Settings</span>
             </TabsTrigger>
-            <TabsTrigger value="users" className="flex items-center gap-2 pulse-border hover:text-electric-green transition-all">
+            <TabsTrigger 
+              value="users" 
+              className="flex items-center gap-2 text-slate-300 font-medium data-[state=active]:text-white data-[state=active]:bg-purple-600/60 data-[state=active]:shadow-lg hover:text-white hover:bg-slate-700/50 transition-all duration-200"
+            >
               <Users className="w-4 h-4" />
               <span className="hidden sm:inline">Users</span>
             </TabsTrigger>
-            <TabsTrigger value="tokens" className="flex items-center gap-2 pulse-border hover:text-circuit-teal transition-all">
+            <TabsTrigger 
+              value="tokens" 
+              className="flex items-center gap-2 text-slate-300 font-medium data-[state=active]:text-white data-[state=active]:bg-cyan-600/60 data-[state=active]:shadow-lg hover:text-white hover:bg-slate-700/50 transition-all duration-200"
+            >
               <ImageIcon className="w-4 h-4" />
               <span className="hidden sm:inline">Tokens</span>
             </TabsTrigger>
-            <TabsTrigger value="pricing" className="flex items-center gap-2 pulse-border hover:text-electric-green transition-all">
+            <TabsTrigger 
+              value="pricing" 
+              className="flex items-center gap-2 text-slate-300 font-medium data-[state=active]:text-white data-[state=active]:bg-yellow-600/60 data-[state=active]:shadow-lg hover:text-white hover:bg-slate-700/50 transition-all duration-200"
+            >
               <DollarSign className="w-4 h-4" />
               <span className="hidden sm:inline">Pricing</span>
             </TabsTrigger>
-            <TabsTrigger value="codes" className="flex items-center gap-2 pulse-border hover:text-electric-blue transition-all">
+            <TabsTrigger 
+              value="codes" 
+              className="flex items-center gap-2 text-slate-300 font-medium data-[state=active]:text-white data-[state=active]:bg-pink-600/60 data-[state=active]:shadow-lg hover:text-white hover:bg-slate-700/50 transition-all duration-200"
+            >
               <Ticket className="w-4 h-4" />
               <span className="hidden sm:inline">Codes</span>
             </TabsTrigger>
-            <TabsTrigger value="access" className="flex items-center gap-2 pulse-border hover:text-electric-green transition-all">
+            <TabsTrigger 
+              value="access" 
+              className="flex items-center gap-2 text-slate-300 font-medium data-[state=active]:text-white data-[state=active]:bg-emerald-600/60 data-[state=active]:shadow-lg hover:text-white hover:bg-slate-700/50 transition-all duration-200"
+            >
               <Shield className="w-4 h-4" />
               <span className="hidden sm:inline">Access</span>
             </TabsTrigger>
-            <TabsTrigger value="analytics" className="flex items-center gap-2 pulse-border hover:text-circuit-teal transition-all">
+            <TabsTrigger 
+              value="analytics" 
+              className="flex items-center gap-2 text-slate-300 font-medium data-[state=active]:text-white data-[state=active]:bg-indigo-600/60 data-[state=active]:shadow-lg hover:text-white hover:bg-slate-700/50 transition-all duration-200"
+            >
               <Target className="w-4 h-4" />
               <span className="hidden sm:inline">Analytics</span>
             </TabsTrigger>
-            <TabsTrigger value="staking" className="flex items-center gap-2 pulse-border hover:text-electric-blue transition-all">
+            <TabsTrigger 
+              value="staking" 
+              className="flex items-center gap-2 text-slate-300 font-medium data-[state=active]:text-white data-[state=active]:bg-orange-600/60 data-[state=active]:shadow-lg hover:text-white hover:bg-slate-700/50 transition-all duration-200"
+            >
               <Coins className="w-4 h-4" />
               <span className="hidden sm:inline">Staking</span>
             </TabsTrigger>
-            <TabsTrigger value="system" className="flex items-center gap-2 pulse-border hover:text-electric-green transition-all">
+            <TabsTrigger 
+              value="system" 
+              className="flex items-center gap-2 text-slate-300 font-medium data-[state=active]:text-white data-[state=active]:bg-red-600/60 data-[state=active]:shadow-lg hover:text-white hover:bg-slate-700/50 transition-all duration-200"
+            >
               <Database className="w-4 h-4" />
               <span className="hidden sm:inline">System</span>
             </TabsTrigger>
