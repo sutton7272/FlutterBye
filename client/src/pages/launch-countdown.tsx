@@ -31,6 +31,7 @@ import {
 import flutterbeyeLogoPath from "@assets/image_1754068877999.png";
 import Navbar from "@/components/navbar";
 import { FloatingActionHub } from "@/components/floating-action-hub";
+import { TutorialLaunchButton } from "@/components/interactive-tutorial";
 
 interface TimeLeft {
   days: number;
@@ -275,6 +276,14 @@ export default function LaunchCountdown() {
               <Star className="w-3 h-3 mr-1" />
               Exclusive Airdrops
             </Badge>
+          </div>
+
+          {/* Tutorial Preview Button for All Users */}
+          <div className="flex justify-center mb-8">
+            <TutorialLaunchButton 
+              className="bg-gradient-to-r from-electric-blue to-circuit-teal hover:from-electric-blue/80 hover:to-circuit-teal/80 text-white px-8 py-3 text-lg" 
+              variant="default"
+            />
           </div>
         </div>
 

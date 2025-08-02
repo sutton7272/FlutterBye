@@ -8,6 +8,7 @@ import { QuickActionPanel } from "@/components/quick-action-panel";
 import { InteractiveStatsDashboard } from "@/components/interactive-stats-dashboard";
 import { EngagementBooster } from "@/components/engagement-booster";
 import { ViralSharingAssistant } from "@/components/viral-sharing-assistant";
+import { TutorialLaunchButton } from "@/components/interactive-tutorial";
 
 interface RecentActivity {
   id: string;
@@ -102,7 +103,7 @@ export default function Home() {
             Transform 27-character messages into SPL tokens. Build cults, distribute value, get rewarded even if you get rugged.
           </p>
           
-          <div className="flex flex-col sm:flex-row gap-6 justify-center mb-16">
+          <div className="flex flex-col sm:flex-row gap-6 justify-center mb-8">
             <Link href="/mint-solana">
               <Button size="lg" className="text-xl px-10 py-6 modern-gradient text-white font-bold rounded-2xl circuit-glow">
                 <Coins className="mr-3 h-6 w-6" />
@@ -123,6 +124,14 @@ export default function Home() {
                 TEXT TO TOKENIZE
               </Button>
             </Link>
+          </div>
+
+          {/* Tutorial Access for All Users */}
+          <div className="flex justify-center mb-16">
+            <TutorialLaunchButton 
+              className="text-lg px-8 py-4 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-bold rounded-xl border-2 border-purple-400/30 shadow-lg shadow-purple-500/25" 
+              variant="default"
+            />
           </div>
         </div>
 
