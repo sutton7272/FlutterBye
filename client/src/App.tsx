@@ -3,52 +3,50 @@ import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { EarlyAccessGate } from "@/components/early-access-gate";
-import { useState, useEffect } from "react";
+import { useState, useEffect, lazy, Suspense } from "react";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import NotFound from "@/pages/not-found";
-import Home from "@/pages/home";
-import Marketplace from "@/pages/marketplace";
-import Portfolio from "@/pages/portfolio";
-import Mint from "@/pages/mint";
-
-import Redeem from "@/pages/redeem";
-import Activity from "@/pages/activity";
-import Explore from "@/pages/explore";
-import HowItWorks from "@/pages/how-it-works";
-import FreeCodes from "@/pages/free-codes";
-import Admin from "@/pages/admin";
-import TransactionHeatmapPage from "@/pages/heatmap";
-import { SmsIntegrationPage } from "@/pages/sms-integration";
-import { WalletManagementPage } from "@/pages/wallet-management";
-import { RewardsPage } from "@/pages/rewards";
-import JourneyPage from "@/pages/journey";
-import BadgesPage from "@/pages/badges";
-import InfoPage from "@/pages/info";
-
-import { Chat } from "@/pages/chat";
-import LimitedEdition from "@/pages/limited-edition";
-import AdvancedSearch from "@/pages/advanced-search";
-import AdminSystem from "@/pages/admin-system";
-import ConfettiDemo from "@/pages/confetti-demo";
-import ElectricDemo from "@/pages/electric-demo";
-import GreetingCards from "@/pages/greeting-cards";
-import EnterpriseCampaigns from "@/pages/enterprise-campaigns";
-import FlbyStaking from "@/pages/flby-staking";
-import FlbyGovernance from "@/pages/flby-governance";
-import FlbyAirdrop from "@/pages/flby-airdrop";
-import AdminStaking from "@/pages/admin-staking";
-import ReferralRewards from "@/pages/referral-rewards";
-import LaunchCountdown from "@/pages/launch-countdown";
-import AdminEarlyAccess from "@/pages/admin-early-access";
-import AdminFreeCodes from "@/pages/admin-free-codes";
-import AdminPricing from "@/pages/admin-pricing";
-import AdminDefaultImage from "@/pages/admin-default-image";
-import UnifiedAdminDashboard from "@/pages/admin-unified";
-import TokenHolderMapPage from "@/pages/token-holder-map";
+import { WalletProvider } from "@/components/wallet-adapter";
 import Navbar from "@/components/navbar";
 import { FloatingActionHub } from "@/components/floating-action-hub";
-import { WalletProvider } from "@/components/wallet-adapter";
-import { TestImage } from "@/components/test-image";
+
+// Core pages loaded immediately
+import NotFound from "@/pages/not-found";
+import LaunchCountdown from "@/pages/launch-countdown";
+
+// Lazy load main application pages
+const Home = lazy(() => import("@/pages/home"));
+const Marketplace = lazy(() => import("@/pages/marketplace"));
+const Portfolio = lazy(() => import("@/pages/portfolio"));
+const Mint = lazy(() => import("@/pages/mint"));
+const Redeem = lazy(() => import("@/pages/redeem"));
+const Activity = lazy(() => import("@/pages/activity"));
+const Explore = lazy(() => import("@/pages/explore"));
+const HowItWorks = lazy(() => import("@/pages/how-it-works"));
+const FreeCodes = lazy(() => import("@/pages/free-codes"));
+
+// Lazy load admin pages - consolidated into unified dashboard
+const UnifiedAdminDashboard = lazy(() => import("@/pages/admin-unified"));
+
+// Lazy load additional features
+const Chat = lazy(() => import("@/pages/chat").then(module => ({ default: module.Chat })));
+const LimitedEdition = lazy(() => import("@/pages/limited-edition"));
+const AdvancedSearch = lazy(() => import("@/pages/advanced-search"));
+const GreetingCards = lazy(() => import("@/pages/greeting-cards"));
+const EnterpriseCampaigns = lazy(() => import("@/pages/enterprise-campaigns"));
+const FlbyStaking = lazy(() => import("@/pages/flby-staking"));
+const FlbyGovernance = lazy(() => import("@/pages/flby-governance"));
+const FlbyAirdrop = lazy(() => import("@/pages/flby-airdrop"));
+const ReferralRewards = lazy(() => import("@/pages/referral-rewards"));
+const TokenHolderMapPage = lazy(() => import("@/pages/token-holder-map"));
+
+// Loading component for lazy-loaded pages
+const PageLoader = () => (
+  <div className="min-h-screen bg-slate-900 flex items-center justify-center">
+    <div className="animate-pulse">
+      <div className="w-8 h-8 bg-blue-500 rounded-full animate-bounce"></div>
+    </div>
+  </div>
+);
 function Router() {
   return (
     <div className="dark min-h-screen" style={{ background: 'transparent' }}>
@@ -60,70 +58,90 @@ function Router() {
         <Route path="/home" component={() => (
           <>
             <Navbar />
-            <Home />
+            <Suspense fallback={<PageLoader />}>
+              <Home />
+            </Suspense>
             <FloatingActionHub />
           </>
         )} />
         <Route path="/marketplace" component={() => (
           <>
             <Navbar />
-            <Marketplace />
+            <Suspense fallback={<PageLoader />}>
+              <Marketplace />
+            </Suspense>
             <FloatingActionHub />
           </>
         )} />
         <Route path="/portfolio" component={() => (
           <>
             <Navbar />
-            <Portfolio />
+            <Suspense fallback={<PageLoader />}>
+              <Portfolio />
+            </Suspense>
             <FloatingActionHub />
           </>
         )} />
         <Route path="/mint" component={() => (
           <>
             <Navbar />
-            <Mint />
+            <Suspense fallback={<PageLoader />}>
+              <Mint />
+            </Suspense>
             <FloatingActionHub />
           </>
         )} />
         <Route path="/redeem" component={() => (
           <>
             <Navbar />
-            <Redeem />
+            <Suspense fallback={<PageLoader />}>
+              <Redeem />
+            </Suspense>
             <FloatingActionHub />
           </>
         )} />
         <Route path="/activity" component={() => (
           <>
             <Navbar />
-            <Activity />
+            <Suspense fallback={<PageLoader />}>
+              <Activity />
+            </Suspense>
             <FloatingActionHub />
           </>
         )} />
         <Route path="/explore" component={() => (
           <>
             <Navbar />
-            <Explore />
+            <Suspense fallback={<PageLoader />}>
+              <Explore />
+            </Suspense>
             <FloatingActionHub />
           </>
         )} />
         <Route path="/how-it-works" component={() => (
           <>
             <Navbar />
-            <HowItWorks />
+            <Suspense fallback={<PageLoader />}>
+              <HowItWorks />
+            </Suspense>
             <FloatingActionHub />
           </>
         )} />
         <Route path="/free-codes" component={() => (
           <>
             <Navbar />
-            <FreeCodes />
+            <Suspense fallback={<PageLoader />}>
+              <FreeCodes />
+            </Suspense>
             <FloatingActionHub />
           </>
         )} />
         <Route path="/admin" component={() => (
           <>
             <Navbar />
-            <UnifiedAdminDashboard />
+            <Suspense fallback={<PageLoader />}>
+              <UnifiedAdminDashboard />
+            </Suspense>
             <FloatingActionHub />
           </>
         )} />
