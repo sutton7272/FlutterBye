@@ -195,6 +195,14 @@ export default function Mint() {
           <Card className="premium-card electric-frame">
             <CardContent className="p-8">
               <h3 className="text-2xl font-bold mb-6 text-gradient">Create Your Message Token</h3>
+              <div className="mb-6 p-4 bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+                <h4 className="font-semibold text-blue-700 dark:text-blue-300 mb-2">Message Structure</h4>
+                <div className="text-sm text-blue-600 dark:text-blue-400 space-y-1">
+                  <p><strong>Token Name:</strong> 27 characters max - becomes the official token identifier</p>
+                  <p><strong>Extended Message:</strong> Up to 500 characters - for longer descriptions and context</p>
+                  <p><strong>Custom Image:</strong> Visual attachment to make your token memorable</p>
+                </div>
+              </div>
               
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div>
@@ -323,12 +331,30 @@ export default function Mint() {
                   )}
                 </div>
                 
-                <ImageUpload
-                  onImageSelect={setTokenImage}
-                  onImageRemove={() => setTokenImage("")}
-                  selectedImage={tokenImage}
-                  disabled={mintToken.isPending}
-                />
+                {/* Token Image Upload Section */}
+                <div className="space-y-4">
+                  <h4 className="text-lg font-semibold flex items-center">
+                    <Upload className="w-5 h-5 mr-2 text-green-500" />
+                    Token Image (Optional)
+                  </h4>
+                  <p className="text-sm text-muted-foreground">
+                    Add a custom image to make your token more engaging and memorable
+                  </p>
+                  <ImageUpload
+                    onImageSelect={setTokenImage}
+                    onImageRemove={() => setTokenImage("")}
+                    selectedImage={tokenImage}
+                    disabled={mintToken.isPending}
+                  />
+                  {tokenImage && (
+                    <div className="p-3 bg-green-50 dark:bg-green-950/20 border border-green-200 dark:border-green-800 rounded-lg">
+                      <p className="text-sm text-green-700 dark:text-green-300 flex items-center">
+                        <Sparkles className="w-4 h-4 mr-2" />
+                        Image attached! Your token will stand out with this custom visual.
+                      </p>
+                    </div>
+                  )}
+                </div>
 
                 {/* Phase 2: Value Attachment Section */}
                 <Separator />
@@ -440,14 +466,18 @@ export default function Mint() {
                   )}
 
                   <div className="space-y-2">
-                    <Label htmlFor="memo">Memo (Optional)</Label>
+                    <Label htmlFor="memo">Extended Message (Optional)</Label>
                     <Textarea
                       id="memo"
                       value={memo}
                       onChange={(e) => setMemo(e.target.value)}
-                      placeholder="Add any notes or special instructions for this token..."
-                      rows={3}
+                      placeholder="Add a longer message, detailed description, or special instructions for this token. This text will be stored with your token and can be much longer than the 27-character token name..."
+                      rows={4}
+                      maxLength={500}
                     />
+                    <p className="text-xs text-muted-foreground">
+                      Use this for longer messages, detailed descriptions, or context that doesn't fit in the 27-character token name. {memo.length}/500 characters
+                    </p>
                   </div>
                 </div>
                 
