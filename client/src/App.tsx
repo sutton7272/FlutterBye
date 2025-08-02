@@ -81,6 +81,12 @@ function Router() {
             <Portfolio />
           </>
         )} />
+        <Route path="/redeem" component={() => (
+          <>
+            <Navbar />
+            <Redeem />
+          </>
+        )} />
         <Route path="/mint" component={() => (
           <>
             <Navbar />

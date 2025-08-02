@@ -5078,6 +5078,129 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get redeemable tokens for user
+  app.get('/api/tokens/redeemable', async (req, res) => {
+    try {
+      const walletAddress = req.headers['x-wallet-address'] as string;
+      if (!walletAddress) {
+        return res.status(401).json({ error: 'Wallet authentication required' });
+      }
+
+      const userTokens = await storage.getUserTokens(walletAddress);
+      
+      // Calculate redemption values and check expiration
+      const redeemableTokens = userTokens.map(token => {
+        const now = new Date();
+        const expiry = token.expirationDate ? new Date(token.expirationDate) : null;
+        const isExpired = expiry ? now > expiry : false;
+        
+        // Calculate age-based depreciation
+        const ageInDays = Math.floor((now.getTime() - new Date(token.createdAt).getTime()) / (1000 * 60 * 60 * 24));
+        const ageMultiplier = Math.max(0.5, 1 - (ageInDays * 0.01)); // 1% depreciation per day, minimum 50%
+        
+        // Base redemption rate (can be configured)
+        const baseRedemptionRate = 0.95; // 95% of original value
+        const currentValue = token.value * ageMultiplier * baseRedemptionRate;
+
+        return {
+          ...token,
+          isExpired,
+          redemptionRate: baseRedemptionRate,
+          currentValue: isExpired ? 0 : currentValue
+        };
+      }).filter(token => !token.isExpired && token.currentValue > 0);
+
+      res.json(redeemableTokens);
+    } catch (error) {
+      console.error('Error fetching redeemable tokens:', error);
+      res.status(500).json({ error: 'Failed to fetch redeemable tokens' });
+    }
+  });
+
+  // Get current redemption rates
+  app.get('/api/redemption/rates', async (req, res) => {
+    try {
+      // In production, these would be dynamic based on market conditions
+      const rates = [
+        {
+          currency: 'SOL',
+          rate: 0.95,
+          multiplier: 1.0,
+          description: 'Standard redemption rate'
+        },
+        {
+          currency: 'USDC',
+          rate: 0.98,
+          multiplier: 1.0,
+          description: 'Stable coin premium'
+        },
+        {
+          currency: 'FLBY',
+          rate: 1.05,
+          multiplier: 1.1,
+          description: 'Native token bonus'
+        }
+      ];
+
+      res.json(rates);
+    } catch (error) {
+      console.error('Error fetching redemption rates:', error);
+      res.status(500).json({ error: 'Failed to fetch redemption rates' });
+    }
+  });
+
+  // Process token redemption
+  app.post('/api/tokens/redeem', async (req, res) => {
+    try {
+      const walletAddress = req.headers['x-wallet-address'] as string;
+      if (!walletAddress) {
+        return res.status(401).json({ error: 'Wallet authentication required' });
+      }
+
+      const { tokenId, mintAddress, amount, expectedValue, currency } = req.body;
+
+      // Validate token ownership
+      const token = await storage.getToken(tokenId);
+      if (!token || (token as any).creatorWallet !== walletAddress) {
+        return res.status(403).json({ error: 'Token not found or not owned' });
+      }
+
+      // Check if token is expired
+      const now = new Date();
+      const expiry = token.expirationDate ? new Date(token.expirationDate) : null;
+      if (expiry && now > expiry) {
+        return res.status(400).json({ error: 'Token has expired and cannot be redeemed' });
+      }
+
+      // Create redemption record
+      const redemption = await storage.createRedemption({
+        tokenId,
+        mintAddress,
+        walletAddress,
+        amount: parseFloat(amount),
+        originalValue: token.value,
+        redemptionValue: parseFloat(expectedValue),
+        currency,
+        status: 'completed',
+        transactionSignature: `redemption-${Date.now()}-${Math.random().toString(36).substring(2)}`,
+        processedAt: new Date().toISOString()
+      });
+
+      // In production, this would trigger actual blockchain transactions
+      // For now, we simulate the redemption process
+
+      res.json({
+        success: true,
+        redemption,
+        message: `Successfully redeemed ${amount} tokens for ${expectedValue} ${currency}`
+      });
+
+    } catch (error) {
+      console.error('Error processing redemption:', error);
+      res.status(500).json({ error: 'Failed to process redemption' });
+    }
+  });
+
   // ============================================================================
   // STRIPE PAYMENT ROUTES
   // ============================================================================

@@ -1,1255 +1,420 @@
 import { useState, useEffect } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { toast } from '@/hooks/use-toast';
-import { Coins, Clock, CheckCircle, AlertCircle, Flame, TrendingUp, User, Calendar, DollarSign, ArrowUpCircle, ArrowDownCircle, Award, Star, Zap, Target, Trophy, Activity, Users, Gift } from 'lucide-react';
-import { apiRequest } from '@/lib/queryClient';
-import { TransactionSuccessOverlay } from "@/components/confetti-celebration";
-import { format, differenceInDays, isAfter } from 'date-fns';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Coins, ArrowRightLeft, Clock, TrendingUp, AlertCircle, Check, X } from 'lucide-react';
+import { useAuth } from '@/hooks/useAuth';
+import { useToast } from '@/hooks/use-toast';
+import { PublicKey, Transaction } from '@solana/web3.js';
 
-interface Token {
+interface RedeemableToken {
   id: string;
-  message: string;
-  symbol: string;
   mintAddress: string;
-  hasAttachedValue: boolean;
-  attachedValue: string;
+  title: string;
+  content: string;
+  value: number;
   currency: string;
-  escrowStatus: string;
-  imageUrl?: string;
+  expirationDate?: string;
+  metadata: {
+    name: string;
+    symbol: string;
+    description: string;
+  };
   createdAt: string;
-  expiresAt?: string;
-  creatorId?: string;
-  totalSupply?: number;
-  circulatingSupply?: number;
+  redemptionRate: number;
+  isExpired: boolean;
+  currentValue: number;
 }
 
-interface UserHolding {
-  id: string;
-  tokenId: string;
-  quantity: number;
-  token?: Token;
+interface RedemptionRate {
+  currency: 'SOL' | 'USDC' | 'FLBY';
+  rate: number;
+  multiplier: number;
+  description: string;
 }
 
-export default function RedeemPage() {
-  const [selectedWallet, setSelectedWallet] = useState<string>('user-1'); // Mock user
-  const queryClient = useQueryClient();
-  
-  // Confetti celebration state
-  const [showSuccessOverlay, setShowSuccessOverlay] = useState(false);
-  const [successData, setSuccessData] = useState<{
-    message: string;
-    amount: string;
-    type: string;
-  } | null>(null);
+export default function Redeem() {
+  const { isAuthenticated, walletAddress } = useAuth();
+  const { toast } = useToast();
+  const [tokens, setTokens] = useState<RedeemableToken[]>([]);
+  const [selectedToken, setSelectedToken] = useState<RedeemableToken | null>(null);
+  const [redemptionRates, setRedemptionRates] = useState<RedemptionRate[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isRedeeming, setIsRedeeming] = useState(false);
+  const [redemptionAmount, setRedemptionAmount] = useState('');
 
-  // User's holdings with attached value
-  const { data: userHoldings = [], isLoading: holdingsLoading } = useQuery({
-    queryKey: ['/api/users', selectedWallet, 'holdings'],
-    enabled: !!selectedWallet,
-  });
+  useEffect(() => {
+    if (isAuthenticated && walletAddress) {
+      loadRedeemableTokens();
+      loadRedemptionRates();
+    }
+  }, [isAuthenticated, walletAddress]);
 
-  // Tokens created by user with attached value
-  const { data: userCreatedTokens = [], isLoading: createdLoading } = useQuery({
-    queryKey: ['/api/users', selectedWallet, 'created-tokens'],
-    enabled: !!selectedWallet,
-  });
+  const loadRedeemableTokens = async () => {
+    try {
+      const response = await fetch('/api/tokens/redeemable', {
+        headers: {
+          'X-Wallet-Address': walletAddress!
+        }
+      });
 
-  // All tokens with value for discovery
-  const { data: tokensWithValue = [], isLoading: tokensLoading } = useQuery({
-    queryKey: ['/api/tokens/with-value'],
-  });
-
-  // Helper functions for date/expiration handling
-  const getExpirationStatus = (expiresAt?: string) => {
-    if (!expiresAt) return { status: 'no-expiry', daysLeft: null, expired: false };
-    
-    const expiration = new Date(expiresAt);
-    const now = new Date();
-    const daysLeft = differenceInDays(expiration, now);
-    const expired = isAfter(now, expiration);
-    
-    if (expired) return { status: 'expired', daysLeft: 0, expired: true };
-    if (daysLeft <= 7) return { status: 'expiring-soon', daysLeft, expired: false };
-    return { status: 'active', daysLeft, expired: false };
+      if (response.ok) {
+        const redeemableTokens = await response.json();
+        setTokens(redeemableTokens);
+      }
+    } catch (error) {
+      console.error('Error loading redeemable tokens:', error);
+      toast({
+        title: "Loading Failed",
+        description: "Failed to load your redeemable tokens",
+        variant: "destructive"
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const getExpirationBadge = (expiresAt?: string) => {
-    const { status, daysLeft, expired } = getExpirationStatus(expiresAt);
-    
-    if (status === 'no-expiry') return <Badge variant="secondary">No Expiry</Badge>;
-    if (expired) return <Badge variant="destructive">Expired</Badge>;
-    if (status === 'expiring-soon') return <Badge variant="destructive">{daysLeft} days left</Badge>;
-    return <Badge variant="outline">{daysLeft} days left</Badge>;
+  const loadRedemptionRates = async () => {
+    try {
+      const response = await fetch('/api/redemption/rates');
+      if (response.ok) {
+        const rates = await response.json();
+        setRedemptionRates(rates);
+      }
+    } catch (error) {
+      console.error('Error loading redemption rates:', error);
+    }
   };
 
-  const burnTokenMutation = useMutation({
-    mutationFn: async ({ tokenId, userId }: { tokenId: string; userId: string }) => {
-      return await apiRequest(`/api/redemptions`, 'POST', {
-        tokenId,
-        userId,
-        burnTransactionSignature: `burn_${Date.now()}`,
-        redeemedAmount: '0.25',
-        currency: 'SOL',
-        status: 'pending'
-      });
-    },
-    onSuccess: (data, variables) => {
-      const token = userHoldings.find((h: UserHolding) => h.tokenId === variables.tokenId)?.token;
-      
-      setSuccessData({
-        message: `Successfully redeemed: ${token?.message || 'Token'}`,
-        amount: `${token?.attachedValue || '0.25'} ${token?.currency || 'SOL'}`,
-        type: 'redemption'
-      });
-      setShowSuccessOverlay(true);
-      
+  const calculateRedemptionValue = (token: RedeemableToken, amount: number) => {
+    const ageInDays = Math.floor((Date.now() - new Date(token.createdAt).getTime()) / (1000 * 60 * 60 * 24));
+    const ageMultiplier = Math.max(0.5, 1 - (ageInDays * 0.01)); // Decreases by 1% per day
+    const baseValue = token.value * amount;
+    return baseValue * ageMultiplier * token.redemptionRate;
+  };
+
+  const handleRedeemToken = async () => {
+    if (!selectedToken || !redemptionAmount) {
       toast({
-        title: "Redemption Successful",
-        description: `Redeemed ${token?.attachedValue || '0.25'} ${token?.currency || 'SOL'}`,
-      });
-      
-      queryClient.invalidateQueries({ queryKey: ['/api/users', selectedWallet, 'holdings'] });
-      queryClient.invalidateQueries({ queryKey: ['/api/tokens/with-value'] });
-    },
-    onError: () => {
-      toast({
-        title: "Redemption Failed",
-        description: "Failed to process token redemption. Please try again.",
-        variant: "destructive",
-      });
-    },
-  });
-
-  // Mock data for demonstration
-  const mockUserHoldings: UserHolding[] = [
-    {
-      id: '1',
-      tokenId: 'token-1',
-      quantity: 2,
-      token: {
-        id: 'token-1',
-        message: 'Happy Birthday Sarah!',
-        symbol: 'HBDSA',
-        mintAddress: 'mint123',
-        hasAttachedValue: true,
-        attachedValue: '0.5',
-        currency: 'SOL',
-        escrowStatus: 'active',
-        createdAt: '2024-01-15T10:00:00Z',
-        expiresAt: '2024-12-31T23:59:59Z',
-        totalSupply: 100,
-        circulatingSupply: 85
-      }
-    },
-    {
-      id: '2',
-      tokenId: 'token-2',
-      quantity: 1,
-      token: {
-        id: 'token-2',
-        message: 'Congratulations on graduation',
-        symbol: 'CONGR',
-        mintAddress: 'mint456',
-        hasAttachedValue: true,
-        attachedValue: '0.25',
-        currency: 'USDC',
-        escrowStatus: 'active',
-        createdAt: '2024-02-10T14:30:00Z',
-        expiresAt: '2024-08-15T23:59:59Z',
-        totalSupply: 50,
-        circulatingSupply: 45
-      }
-    }
-  ];
-
-  const mockCreatedTokens: Token[] = [
-    {
-      id: 'created-1',
-      message: 'Welcome new team member!',
-      symbol: 'WLCM',
-      mintAddress: 'mint789',
-      hasAttachedValue: true,
-      attachedValue: '1.0',
-      currency: 'SOL',
-      escrowStatus: 'active',
-      createdAt: '2024-01-20T09:00:00Z',
-      expiresAt: '2024-06-30T23:59:59Z',
-      creatorId: 'user-1',
-      totalSupply: 200,
-      circulatingSupply: 150
-    }
-  ];
-
-  // Use mock data for now (in production this would come from API)
-  const actualHoldings = userHoldings.length > 0 ? userHoldings : mockUserHoldings;
-  const actualCreatedTokens = userCreatedTokens.length > 0 ? userCreatedTokens : mockCreatedTokens;
-
-  const handleRedeem = async (tokenId: string) => {
-    if (!selectedWallet) {
-      toast({
-        title: "Wallet Required",
-        description: "Please connect your wallet first.",
-        variant: "destructive",
+        title: "Missing Information",
+        description: "Please select a token and enter redemption amount",
+        variant: "destructive"
       });
       return;
     }
 
-    burnTokenMutation.mutate({ tokenId, userId: selectedWallet });
-  };
+    const amount = parseFloat(redemptionAmount);
+    if (amount <= 0) {
+      toast({
+        title: "Invalid Amount",
+        description: "Please enter a valid redemption amount",
+        variant: "destructive"
+      });
+      return;
+    }
 
-  const getStatusBadge = (status: string) => {
-    switch (status) {
-      case 'escrowed':
-        return <Badge variant="secondary"><Clock className="w-3 h-3 mr-1" />Escrowed</Badge>;
-      case 'redeemed':
-        return <Badge variant="outline"><CheckCircle className="w-3 h-3 mr-1" />Redeemed</Badge>;
-      case 'none':
-        return <Badge variant="destructive"><AlertCircle className="w-3 h-3 mr-1" />No Value</Badge>;
-      default:
-        return <Badge>{status}</Badge>;
+    setIsRedeeming(true);
+    try {
+      const redemptionValue = calculateRedemptionValue(selectedToken, amount);
+      
+      // Real blockchain redemption process
+      if (window.solana && window.solana.isPhantom) {
+        toast({
+          title: "Processing Redemption",
+          description: "Please approve the redemption transaction in your wallet...",
+        });
+
+        const response = await fetch('/api/tokens/redeem', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Wallet-Address': walletAddress!
+          },
+          body: JSON.stringify({
+            tokenId: selectedToken.id,
+            mintAddress: selectedToken.mintAddress,
+            amount: amount,
+            expectedValue: redemptionValue,
+            currency: selectedToken.currency
+          })
+        });
+
+        if (response.ok) {
+          const result = await response.json();
+          
+          toast({
+            title: "Redemption Successful!",
+            description: `Redeemed ${amount} tokens for ${redemptionValue.toFixed(4)} ${selectedToken.currency}`,
+          });
+
+          // Refresh token list
+          await loadRedeemableTokens();
+          setSelectedToken(null);
+          setRedemptionAmount('');
+        } else {
+          const error = await response.json();
+          throw new Error(error.message || 'Redemption failed');
+        }
+      } else {
+        // Development fallback
+        toast({
+          title: "Development Mode",
+          description: `Would redeem ${amount} tokens for ${redemptionValue.toFixed(4)} ${selectedToken.currency}`,
+        });
+      }
+
+    } catch (error) {
+      console.error('Redemption failed:', error);
+      toast({
+        title: "Redemption Failed",
+        description: `Failed to redeem tokens: ${error.message}`,
+        variant: "destructive"
+      });
+    } finally {
+      setIsRedeeming(false);
     }
   };
 
-  // Filter tokens and calculate statistics
-  const redeemableTokens = actualHoldings.filter((holding: UserHolding) => 
-    holding.token?.hasAttachedValue && holding.token?.escrowStatus === 'active'
-  );
+  const formatTimeRemaining = (expirationDate: string) => {
+    const now = new Date();
+    const expiry = new Date(expirationDate);
+    const diff = expiry.getTime() - now.getTime();
+    
+    if (diff <= 0) return 'Expired';
+    
+    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    
+    if (days > 0) return `${days}d ${hours}h`;
+    return `${hours}h`;
+  };
 
-  const totalRedeemableValue = redeemableTokens.reduce((sum, holding) => {
-    const value = parseFloat(holding.token?.attachedValue || '0');
-    return sum + (value * holding.quantity);
-  }, 0);
+  if (!isAuthenticated) {
+    return (
+      <div className="max-w-2xl mx-auto p-6">
+        <Card>
+          <CardHeader className="text-center">
+            <CardTitle>Connect Wallet</CardTitle>
+            <CardDescription>
+              Please connect your wallet to redeem your tokens
+            </CardDescription>
+          </CardHeader>
+        </Card>
+      </div>
+    );
+  }
 
-  const totalCreatedValue = actualCreatedTokens.reduce((sum, token) => {
-    const value = parseFloat(token.attachedValue || '0');
-    const remaining = (token.totalSupply || 0) - (token.circulatingSupply || 0);
-    return sum + (value * remaining);
-  }, 0);
+  if (isLoading) {
+    return (
+      <div className="max-w-6xl mx-auto p-6">
+        <div className="space-y-6">
+          <div className="text-center">
+            <h1 className="text-3xl font-bold bg-gradient-to-r from-green-400 to-blue-400 bg-clip-text text-transparent">
+              Token Redemption
+            </h1>
+            <p className="text-slate-400 mt-2">Loading your redeemable tokens...</p>
+          </div>
+          
+          <div className="grid gap-6">
+            {[1, 2, 3].map((i) => (
+              <Card key={i} className="animate-pulse">
+                <CardContent className="p-6">
+                  <div className="h-6 bg-slate-700 rounded w-1/3 mb-4"></div>
+                  <div className="h-4 bg-slate-700 rounded w-full mb-2"></div>
+                  <div className="h-4 bg-slate-700 rounded w-2/3"></div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="min-h-screen py-8">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent mb-4">
-            Token Value Dashboard
-          </h1>
-          <p className="text-xl text-muted-foreground">
-            Manage your tokens with attached value and track expirations
-          </p>
-        </div>
+    <div className="max-w-6xl mx-auto p-6 space-y-6">
+      <div className="text-center">
+        <h1 className="text-3xl font-bold bg-gradient-to-r from-green-400 to-blue-400 bg-clip-text text-transparent">
+          Token Redemption
+        </h1>
+        <p className="text-slate-400 mt-2">
+          Convert your tokenized messages back to real value
+        </p>
+      </div>
 
-        {/* Summary Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <Card className="glassmorphism">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-muted-foreground">Available to Redeem</p>
-                  <p className="text-3xl font-bold text-green-400">
-                    {totalRedeemableValue.toFixed(3)} SOL
-                  </p>
+      {/* Current Redemption Rates */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <TrendingUp className="h-5 w-5 text-green-400" />
+            Current Redemption Rates
+          </CardTitle>
+          <CardDescription>
+            Rates are dynamic and may change based on market conditions
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {redemptionRates.map((rate) => (
+              <div key={rate.currency} className="p-4 border border-slate-700 rounded-lg">
+                <div className="text-center">
+                  <div className="text-lg font-bold text-white">{rate.currency}</div>
+                  <div className="text-2xl font-bold text-green-400">
+                    {(rate.rate * 100).toFixed(1)}%
+                  </div>
+                  <div className="text-xs text-slate-400 mt-1">
+                    {rate.description}
+                  </div>
                 </div>
-                <ArrowDownCircle className="w-8 h-8 text-green-400" />
               </div>
-            </CardContent>
-          </Card>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
 
-          <Card className="glassmorphism">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-muted-foreground">Created Token Value</p>
-                  <p className="text-3xl font-bold text-blue-400">
-                    {totalCreatedValue.toFixed(3)} SOL
-                  </p>
-                </div>
-                <ArrowUpCircle className="w-8 h-8 text-blue-400" />
+      {/* Token Selection */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <Card>
+          <CardHeader>
+            <CardTitle>Your Redeemable Tokens</CardTitle>
+            <CardDescription>
+              Select a token to redeem for its current value
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {tokens.length === 0 ? (
+              <div className="text-center py-8">
+                <Coins className="h-12 w-12 mx-auto text-slate-600 mb-4" />
+                <p className="text-slate-400">No redeemable tokens found</p>
+                <Button 
+                  onClick={() => window.location.href = '/mint'}
+                  className="mt-4"
+                  variant="outline"
+                >
+                  Create Tokens
+                </Button>
               </div>
-            </CardContent>
-          </Card>
-
-          <Card className="glassmorphism">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-muted-foreground">Total Tokens</p>
-                  <p className="text-3xl font-bold text-purple-400">
-                    {redeemableTokens.length + actualCreatedTokens.length}
-                  </p>
-                </div>
-                <Coins className="w-8 h-8 text-purple-400" />
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Tabbed Interface */}
-        <Tabs defaultValue="redeem" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-8 bg-slate-800/50">
-            <TabsTrigger value="redeem" className="flex items-center gap-2">
-              <ArrowDownCircle className="w-4 h-4" />
-              Redeem
-            </TabsTrigger>
-            <TabsTrigger value="created" className="flex items-center gap-2">
-              <ArrowUpCircle className="w-4 h-4" />
-              Created
-            </TabsTrigger>
-            <TabsTrigger value="holdings" className="flex items-center gap-2">
-              <Coins className="w-4 h-4" />
-              Holdings
-            </TabsTrigger>
-            <TabsTrigger value="badges" className="flex items-center gap-2">
-              <Award className="w-4 h-4" />
-              Badges
-            </TabsTrigger>
-            <TabsTrigger value="activity" className="flex items-center gap-2">
-              <Activity className="w-4 h-4" />
-              Activity
-            </TabsTrigger>
-            <TabsTrigger value="journey" className="flex items-center gap-2">
-              <Users className="w-4 h-4" />
-              Journey
-            </TabsTrigger>
-            <TabsTrigger value="rewards" className="flex items-center gap-2">
-              <Gift className="w-4 h-4" />
-              Rewards
-            </TabsTrigger>
-            <TabsTrigger value="stats" className="flex items-center gap-2">
-              <TrendingUp className="w-4 h-4" />
-              Stats
-            </TabsTrigger>
-          </TabsList>
-
-          {/* Redeemable Tokens Tab */}
-          <TabsContent value="redeem" className="space-y-4">
-            <Card className="glassmorphism">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <ArrowDownCircle className="w-5 h-5" />
-                  Your Redeemable Tokens
-                </CardTitle>
-                <CardDescription>
-                  Tokens you own that have attached value you can redeem
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                {redeemableTokens.length === 0 ? (
-                  <div className="text-center py-8 text-muted-foreground">
-                    <Coins className="w-12 h-12 mx-auto mb-4 opacity-50" />
-                    <p>No redeemable tokens found</p>
-                  </div>
-                ) : (
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {redeemableTokens.map((holding) => (
-                      <Card key={holding.id} className="border border-blue-500/20 bg-blue-500/5">
-                        <CardContent className="p-4">
-                          <div className="flex items-start justify-between mb-3">
-                            <div className="flex-1">
-                              <h3 className="font-medium text-lg mb-1">{holding.token?.message}</h3>
-                              <Badge variant="outline" className="text-xs mb-2">
-                                {holding.token?.symbol}
-                              </Badge>
-                            </div>
-                            <div className="text-right">
-                              <p className="text-lg font-bold text-green-400">
-                                {holding.token?.attachedValue} {holding.token?.currency}
-                              </p>
-                              <p className="text-xs text-muted-foreground">
-                                × {holding.quantity} tokens
-                              </p>
-                            </div>
-                          </div>
-                          
-                          <div className="flex items-center justify-between mb-4">
-                            {getExpirationBadge(holding.token?.expiresAt)}
-                            {getStatusBadge(holding.token?.escrowStatus || 'none')}
-                          </div>
-                          
-                          <Button
-                            onClick={() => handleRedeem(holding.tokenId)}
-                            disabled={burnTokenMutation.isPending}
-                            size="sm"
-                            className="w-full bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600"
-                          >
-                            {burnTokenMutation.isPending ? "Processing..." : "Redeem Value"}
-                          </Button>
-                        </CardContent>
-                      </Card>
-                    ))}
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          {/* Created Tokens Tab */}
-          <TabsContent value="created" className="space-y-4">
-            <Card className="glassmorphism">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <ArrowUpCircle className="w-5 h-5" />
-                  Tokens You Created
-                </CardTitle>
-                <CardDescription>
-                  Track value distribution and expiration dates for tokens you've created
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                {actualCreatedTokens.length === 0 ? (
-                  <div className="text-center py-8 text-muted-foreground">
-                    <User className="w-12 h-12 mx-auto mb-4 opacity-50" />
-                    <p>No created tokens found</p>
-                  </div>
-                ) : (
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {actualCreatedTokens.map((token) => (
-                      <Card key={token.id} className="border border-purple-500/20 bg-purple-500/5">
-                        <CardContent className="p-4">
-                          <div className="flex items-start justify-between mb-3">
-                            <div className="flex-1">
-                              <h3 className="font-medium text-lg mb-1">{token.message}</h3>
-                              <Badge variant="outline" className="text-xs mb-2">
-                                {token.symbol}
-                              </Badge>
-                            </div>
-                            <div className="text-right">
-                              <p className="text-lg font-bold text-blue-400">
-                                {token.attachedValue} {token.currency}
-                              </p>
-                              <p className="text-xs text-muted-foreground">per token</p>
-                            </div>
-                          </div>
-                          
-                          <div className="space-y-2 mb-4">
-                            <div className="flex justify-between text-sm">
-                              <span className="text-muted-foreground">Supply:</span>
-                              <span>{token.circulatingSupply}/{token.totalSupply}</span>
-                            </div>
-                            <div className="flex justify-between text-sm">
-                              <span className="text-muted-foreground">Remaining Value:</span>
-                              <span className="font-medium">
-                                {((token.totalSupply || 0) - (token.circulatingSupply || 0)) * parseFloat(token.attachedValue || '0')} {token.currency}
-                              </span>
-                            </div>
-                          </div>
-                          
-                          <div className="flex items-center justify-between">
-                            {getExpirationBadge(token.expiresAt)}
-                            {getStatusBadge(token.escrowStatus || 'none')}
-                          </div>
-                        </CardContent>
-                      </Card>
-                    ))}
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          {/* Holdings Tab - Portfolio Functionality */}
-          <TabsContent value="holdings" className="space-y-4">
-            <Card className="glassmorphism">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Coins className="w-5 h-5" />
-                  All Token Holdings
-                </CardTitle>
-                <CardDescription>
-                  Complete view of all tokens in your wallet
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-                  <Card className="border border-blue-500/20 bg-blue-500/5">
-                    <CardContent className="p-4 text-center">
-                      <p className="text-sm text-muted-foreground">Total Holdings</p>
-                      <p className="text-2xl font-bold text-blue-400">47</p>
-                    </CardContent>
-                  </Card>
-                  <Card className="border border-green-500/20 bg-green-500/5">
-                    <CardContent className="p-4 text-center">
-                      <p className="text-sm text-muted-foreground">Portfolio Value</p>
-                      <p className="text-2xl font-bold text-green-400">12.75 SOL</p>
-                    </CardContent>
-                  </Card>
-                  <Card className="border border-purple-500/20 bg-purple-500/5">
-                    <CardContent className="p-4 text-center">
-                      <p className="text-sm text-muted-foreground">Unique Tokens</p>
-                      <p className="text-2xl font-bold text-purple-400">23</p>
-                    </CardContent>
-                  </Card>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {[
-                    { symbol: 'HELLO', message: 'Hello World!', quantity: 5, value: 0.5 },
-                    { symbol: 'LOVE', message: 'Spread Love', quantity: 12, value: 0.25 },
-                    { symbol: 'HAPPY', message: 'Happy Birthday!', quantity: 3, value: 1.0 },
-                    { symbol: 'MAGIC', message: 'Magic Moments', quantity: 8, value: 0.1 },
-                  ].map((holding, index) => (
-                    <Card key={index} className="border border-slate-700 hover:border-blue-500/50 transition-colors">
-                      <CardContent className="p-4">
-                        <div className="flex justify-between items-start mb-2">
-                          <div>
-                            <h3 className="font-medium">{holding.message}</h3>
-                            <Badge variant="outline" className="text-xs mt-1">
-                              {holding.symbol}
-                            </Badge>
-                          </div>
-                          <div className="text-right">
-                            <p className="text-sm text-green-400">
-                              {holding.value} SOL
-                            </p>
-                            <p className="text-xs text-muted-foreground">
-                              × {holding.quantity}
-                            </p>
-                          </div>
-                        </div>
-                        
-                        <div className="flex gap-2 mt-3">
-                          <Button size="sm" variant="outline" className="flex-1">
-                            Trade
-                          </Button>
-                          <Button size="sm" variant="outline" className="flex-1">
-                            Details
-                          </Button>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          {/* Badges Tab */}
-          <TabsContent value="badges" className="space-y-4">
-            <Card className="glassmorphism">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Award className="w-5 h-5" />
-                  Achievement Badges
-                </CardTitle>
-                <CardDescription>
-                  Your earned badges and achievements in the Flutterbye ecosystem
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-                  <Card className="border border-yellow-500/20 bg-yellow-500/5">
-                    <CardContent className="p-4 text-center">
-                      <div className="w-12 h-12 bg-yellow-500/20 rounded-full flex items-center justify-center mx-auto mb-2">
-                        <Star className="w-6 h-6 text-yellow-400" />
-                      </div>
-                      <p className="text-sm text-muted-foreground">Total Badges</p>
-                      <p className="text-2xl font-bold text-yellow-400">12</p>
-                    </CardContent>
-                  </Card>
-                  
-                  <Card className="border border-blue-500/20 bg-blue-500/5">
-                    <CardContent className="p-4 text-center">
-                      <div className="w-12 h-12 bg-blue-500/20 rounded-full flex items-center justify-center mx-auto mb-2">
-                        <Zap className="w-6 h-6 text-blue-400" />
-                      </div>
-                      <p className="text-sm text-muted-foreground">Rare Badges</p>
-                      <p className="text-2xl font-bold text-blue-400">3</p>
-                    </CardContent>
-                  </Card>
-                  
-                  <Card className="border border-purple-500/20 bg-purple-500/5">
-                    <CardContent className="p-4 text-center">
-                      <div className="w-12 h-12 bg-purple-500/20 rounded-full flex items-center justify-center mx-auto mb-2">
-                        <Target className="w-6 h-6 text-purple-400" />
-                      </div>
-                      <p className="text-sm text-muted-foreground">Points Earned</p>
-                      <p className="text-2xl font-bold text-purple-400">2,450</p>
-                    </CardContent>
-                  </Card>
-                  
-                  <Card className="border border-green-500/20 bg-green-500/5">
-                    <CardContent className="p-4 text-center">
-                      <div className="w-12 h-12 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-2">
-                        <Trophy className="w-6 h-6 text-green-400" />
-                      </div>
-                      <p className="text-sm text-muted-foreground">Achievements</p>
-                      <p className="text-2xl font-bold text-green-400">8</p>
-                    </CardContent>
-                  </Card>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {[
-                    {
-                      name: 'First Token Creator',
-                      description: 'Created your first FLBY-MSG token',
-                      icon: '🎯',
-                      rarity: 'Common',
-                      earned: true,
-                      progress: 100,
-                      points: 100
-                    },
-                    {
-                      name: 'Token Collector',
-                      description: 'Own 10+ different tokens',
-                      icon: '💎',
-                      rarity: 'Uncommon',
-                      earned: true,
-                      progress: 100,
-                      points: 250
-                    },
-                    {
-                      name: 'Value Creator',
-                      description: 'Created tokens worth 5+ SOL',
-                      icon: '⚡',
-                      rarity: 'Rare',
-                      earned: true,
-                      progress: 100,
-                      points: 500
-                    },
-                    {
-                      name: 'Early Adopter',
-                      description: 'Joined Flutterbye in beta',
-                      icon: '🚀',
-                      rarity: 'Epic',
-                      earned: true,
-                      progress: 100,
-                      points: 1000
-                    },
-                    {
-                      name: 'Community Builder',
-                      description: 'Invite 5 friends to the platform',
-                      icon: '🌟',
-                      rarity: 'Rare',
-                      earned: false,
-                      progress: 60,
-                      points: 750
-                    },
-                    {
-                      name: 'Token Master',
-                      description: 'Create 100 tokens',
-                      icon: '👑',
-                      rarity: 'Legendary',
-                      earned: false,
-                      progress: 8,
-                      points: 2500
-                    }
-                  ].map((badge, index) => (
-                    <Card key={index} className={`border transition-all duration-300 ${
-                      badge.earned 
-                        ? 'border-green-500/30 bg-green-500/5' 
-                        : 'border-slate-700 bg-slate-800/20'
-                    }`}>
-                      <CardContent className="p-4">
-                        <div className="flex items-start gap-3 mb-3">
-                          <div className={`text-2xl ${badge.earned ? 'grayscale-0' : 'grayscale opacity-50'}`}>
-                            {badge.icon}
-                          </div>
-                          <div className="flex-1">
-                            <h3 className={`font-medium ${badge.earned ? 'text-white' : 'text-muted-foreground'}`}>
-                              {badge.name}
-                            </h3>
-                            <p className="text-xs text-muted-foreground mb-2">
-                              {badge.description}
-                            </p>
-                            <div className="flex items-center gap-2">
-                              <Badge 
-                                variant="outline" 
-                                className={`text-xs ${
-                                  badge.rarity === 'Legendary' ? 'border-orange-500 text-orange-400' :
-                                  badge.rarity === 'Epic' ? 'border-purple-500 text-purple-400' :
-                                  badge.rarity === 'Rare' ? 'border-blue-500 text-blue-400' :
-                                  badge.rarity === 'Uncommon' ? 'border-green-500 text-green-400' :
-                                  'border-gray-500 text-gray-400'
-                                }`}
-                              >
-                                {badge.rarity}
-                              </Badge>
-                              <span className="text-xs text-yellow-400">
-                                {badge.points} pts
-                              </span>
-                            </div>
-                          </div>
-                        </div>
-                        
-                        {!badge.earned && (
-                          <div className="space-y-1">
-                            <div className="flex justify-between text-xs">
-                              <span>Progress</span>
-                              <span>{badge.progress}%</span>
-                            </div>
-                            <div className="w-full bg-slate-700 rounded-full h-1.5">
-                              <div 
-                                className="bg-blue-500 h-1.5 rounded-full transition-all duration-300"
-                                style={{ width: `${badge.progress}%` }}
-                              ></div>
-                            </div>
-                          </div>
-                        )}
-                        
-                        {badge.earned && (
-                          <Badge className="w-full justify-center bg-green-600 hover:bg-green-700">
-                            <CheckCircle className="w-3 h-3 mr-1" />
-                            Earned
-                          </Badge>
-                        )}
-                      </CardContent>
-                    </Card>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          {/* Activity Tab */}
-          <TabsContent value="activity" className="space-y-4">
-            <Card className="glassmorphism">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Activity className="w-5 h-5" />
-                  Recent Activity
-                </CardTitle>
-                <CardDescription>
-                  Your recent token transactions and platform interactions
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {[
-                    {
-                      type: 'mint',
-                      message: 'StakeNowForYield',
-                      amount: '1,000 tokens',
-                      value: '2.5 SOL',
-                      time: '2 hours ago',
-                      status: 'completed'
-                    },
-                    {
-                      type: 'redeem',
-                      message: 'HappyBirthday',
-                      amount: '500 tokens',
-                      value: '1.2 SOL',
-                      time: '5 hours ago',
-                      status: 'completed'
-                    },
-                    {
-                      type: 'receive',
-                      message: 'WelcomeGift',
-                      amount: '100 tokens',
-                      value: '0.1 SOL',
-                      time: '1 day ago',
-                      status: 'completed'
-                    },
-                    {
-                      type: 'mint',
-                      message: 'ThankYou',
-                      amount: '2,000 tokens',
-                      value: '5.0 SOL',
-                      time: '2 days ago',
-                      status: 'completed'
-                    },
-                    {
-                      type: 'redeem',
-                      message: 'LoyaltyBonus',
-                      amount: '750 tokens',
-                      value: '1.8 SOL',
-                      time: '3 days ago',
-                      status: 'completed'
-                    }
-                  ].map((activity, index) => (
-                    <div key={index} className={`flex items-center gap-4 p-4 rounded-lg border ${
-                      activity.type === 'mint' ? 'border-blue-500/20 bg-blue-500/5' :
-                      activity.type === 'redeem' ? 'border-green-500/20 bg-green-500/5' :
-                      'border-purple-500/20 bg-purple-500/5'
-                    }`}>
-                      <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                        activity.type === 'mint' ? 'bg-blue-500/20' :
-                        activity.type === 'redeem' ? 'bg-green-500/20' :
-                        'bg-purple-500/20'
-                      }`}>
-                        {activity.type === 'mint' ? 
-                          <ArrowUpCircle className={`w-5 h-5 ${
-                            activity.type === 'mint' ? 'text-blue-400' :
-                            activity.type === 'redeem' ? 'text-green-400' :
-                            'text-purple-400'
-                          }`} /> :
-                        activity.type === 'redeem' ?
-                          <ArrowDownCircle className="w-5 h-5 text-green-400" /> :
-                          <Coins className="w-5 h-5 text-purple-400" />
-                        }
-                      </div>
+            ) : (
+              tokens.map((token) => (
+                <Card 
+                  key={token.id} 
+                  className={`cursor-pointer transition-all ${
+                    selectedToken?.id === token.id 
+                      ? 'border-green-500 bg-green-500/10' 
+                      : 'border-slate-700 hover:border-green-400'
+                  }`}
+                  onClick={() => setSelectedToken(token)}
+                >
+                  <CardContent className="p-4">
+                    <div className="flex items-start justify-between">
                       <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-1">
-                          <span className="font-medium capitalize">{activity.type}</span>
-                          <Badge variant="outline" className="text-xs">
-                            {activity.message}
+                        <h3 className="font-semibold text-white">{token.title}</h3>
+                        <p className="text-sm text-slate-400 mt-1">{token.content}</p>
+                        <div className="flex items-center gap-4 mt-2 text-xs">
+                          <span className="text-green-400">
+                            Original: {token.value} {token.currency}
+                          </span>
+                          <span className="text-blue-400">
+                            Current: {token.currentValue.toFixed(4)} {token.currency}
+                          </span>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        {token.isExpired ? (
+                          <Badge variant="destructive">
+                            <X className="h-3 w-3 mr-1" />
+                            Expired
                           </Badge>
-                        </div>
-                        <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                          <span>{activity.amount}</span>
-                          <span>•</span>
-                          <span>{activity.value}</span>
-                          <span>•</span>
-                          <span>{activity.time}</span>
-                        </div>
+                        ) : token.expirationDate ? (
+                          <Badge variant="outline" className="text-yellow-400 border-yellow-400">
+                            <Clock className="h-3 w-3 mr-1" />
+                            {formatTimeRemaining(token.expirationDate)}
+                          </Badge>
+                        ) : (
+                          <Badge variant="outline" className="text-green-400 border-green-400">
+                            <Check className="h-3 w-3 mr-1" />
+                            Active
+                          </Badge>
+                        )}
                       </div>
-                      <Badge className="bg-green-600">
-                        <CheckCircle className="w-3 h-3 mr-1" />
-                        {activity.status}
-                      </Badge>
                     </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
+                  </CardContent>
+                </Card>
+              ))
+            )}
+          </CardContent>
+        </Card>
 
-          {/* Journey Tab */}
-          <TabsContent value="journey" className="space-y-4">
-            <Card className="glassmorphism">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Users className="w-5 h-5" />
-                  Your Flutterbye Journey
-                </CardTitle>
-                <CardDescription>
-                  Your progress and milestones in the Flutterbye ecosystem
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-6">
-                  {/* Journey Stats */}
-                  <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                    <Card className="border border-blue-500/20 bg-blue-500/5">
-                      <CardContent className="p-4 text-center">
-                        <Calendar className="w-8 h-8 mx-auto mb-2 text-blue-400" />
-                        <p className="text-sm text-muted-foreground">Member Since</p>
-                        <p className="font-bold">Dec 2024</p>
-                      </CardContent>
-                    </Card>
-                    <Card className="border border-green-500/20 bg-green-500/5">
-                      <CardContent className="p-4 text-center">
-                        <Flame className="w-8 h-8 mx-auto mb-2 text-green-400" />
-                        <p className="text-sm text-muted-foreground">Current Streak</p>
-                        <p className="font-bold">12 days</p>
-                      </CardContent>
-                    </Card>
-                    <Card className="border border-purple-500/20 bg-purple-500/5">
-                      <CardContent className="p-4 text-center">
-                        <Trophy className="w-8 h-8 mx-auto mb-2 text-purple-400" />
-                        <p className="text-sm text-muted-foreground">Level</p>
-                        <p className="font-bold">Level 8</p>
-                      </CardContent>
-                    </Card>
-                    <Card className="border border-yellow-500/20 bg-yellow-500/5">
-                      <CardContent className="p-4 text-center">
-                        <Star className="w-8 h-8 mx-auto mb-2 text-yellow-400" />
-                        <p className="text-sm text-muted-foreground">XP Points</p>
-                        <p className="font-bold">4,250</p>
-                      </CardContent>
-                    </Card>
-                  </div>
+        {/* Redemption Interface */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Redeem Selected Token</CardTitle>
+            <CardDescription>
+              Enter the amount you want to redeem
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {selectedToken ? (
+              <>
+                <Alert>
+                  <AlertCircle className="h-4 w-4" />
+                  <AlertDescription>
+                    Selected: {selectedToken.title} - Original value: {selectedToken.value} {selectedToken.currency}
+                  </AlertDescription>
+                </Alert>
 
-                  {/* Journey Timeline */}
-                  <div className="space-y-4">
-                    <h3 className="font-semibold">Journey Milestones</h3>
-                    <div className="space-y-6">
-                      {[
-                        {
-                          title: 'First Token Created',
-                          description: 'Successfully minted your first FLBY-MSG token',
-                          date: 'Dec 15, 2024',
-                          completed: true,
-                          icon: Coins,
-                          color: 'green'
-                        },
-                        {
-                          title: 'Token Collector',
-                          description: 'Acquired 10 different tokens',
-                          date: 'Dec 18, 2024',
-                          completed: true,
-                          icon: Trophy,
-                          color: 'green'
-                        },
-                        {
-                          title: 'Community Member',
-                          description: 'Joined the chat and made your first connection',
-                          date: 'Dec 20, 2024',
-                          completed: true,
-                          icon: Users,
-                          color: 'green'
-                        },
-                        {
-                          title: 'Value Creator',
-                          description: 'Created tokens worth over 5 SOL',
-                          date: 'Dec 25, 2024',
-                          completed: true,
-                          icon: Star,
-                          color: 'green'
-                        },
-                        {
-                          title: 'FLBY Holder',
-                          description: 'Acquire your first FLBY tokens',
-                          date: 'Coming Soon',
-                          completed: false,
-                          icon: Zap,
-                          color: 'blue'
-                        },
-                        {
-                          title: 'Governance Participant',
-                          description: 'Vote on your first platform proposal',
-                          date: 'Coming Soon',
-                          completed: false,
-                          icon: Users,
-                          color: 'blue'
-                        }
-                      ].map((milestone, index) => (
-                        <div key={index} className="flex gap-4">
-                          <div className="flex flex-col items-center">
-                            <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                              milestone.completed 
-                                ? 'bg-green-500/20' 
-                                : 'bg-slate-700'
-                            }`}>
-                              <milestone.icon className={`w-5 h-5 ${
-                                milestone.completed 
-                                  ? 'text-green-400' 
-                                  : 'text-muted-foreground'
-                              }`} />
-                            </div>
-                            {index < 5 && (
-                              <div className={`w-0.5 h-8 mt-2 ${
-                                milestone.completed 
-                                  ? 'bg-green-500/30' 
-                                  : 'bg-slate-700'
-                              }`}></div>
-                            )}
-                          </div>
-                          <div className="flex-1 pb-6">
-                            <div className="flex items-center gap-2 mb-1">
-                              <h4 className={`font-medium ${
-                                milestone.completed 
-                                  ? 'text-white' 
-                                  : 'text-muted-foreground'
-                              }`}>
-                                {milestone.title}
-                              </h4>
-                              {milestone.completed && (
-                                <CheckCircle className="w-4 h-4 text-green-400" />
-                              )}
-                            </div>
-                            <p className="text-sm text-muted-foreground mb-1">
-                              {milestone.description}
-                            </p>
-                            <p className="text-xs text-muted-foreground">
-                              {milestone.date}
-                            </p>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          {/* Rewards Tab */}
-          <TabsContent value="rewards" className="space-y-4">
-            <Card className="glassmorphism">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Gift className="w-5 h-5" />
-                  Your Rewards
-                </CardTitle>
-                <CardDescription>
-                  Track your earned rewards and upcoming benefits
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-6">
-                  {/* Rewards Summary */}
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <Card className="border border-blue-500/20 bg-blue-500/5">
-                      <CardContent className="p-4">
-                        <div className="flex items-center gap-3">
-                          <Coins className="w-8 h-8 text-blue-400" />
-                          <div>
-                            <p className="text-sm text-muted-foreground">FLBY Earned</p>
-                            <p className="text-xl font-bold">1,250</p>
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                    <Card className="border border-green-500/20 bg-green-500/5">
-                      <CardContent className="p-4">
-                        <div className="flex items-center gap-3">
-                          <Trophy className="w-8 h-8 text-green-400" />
-                          <div>
-                            <p className="text-sm text-muted-foreground">Achievements</p>
-                            <p className="text-xl font-bold">8</p>
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                    <Card className="border border-purple-500/20 bg-purple-500/5">
-                      <CardContent className="p-4">
-                        <div className="flex items-center gap-3">
-                          <Star className="w-8 h-8 text-purple-400" />
-                          <div>
-                            <p className="text-sm text-muted-foreground">Reward Points</p>
-                            <p className="text-xl font-bold">4,250</p>
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  </div>
-
-                  {/* Recent Rewards */}
-                  <div>
-                    <h3 className="font-semibold mb-4">Recent Rewards</h3>
-                    <div className="space-y-3">
-                      {[
-                        {
-                          type: 'daily',
-                          title: 'Daily Login Bonus',
-                          amount: '10 FLBY',
-                          time: '2 hours ago',
-                          icon: Calendar,
-                          color: 'blue'
-                        },
-                        {
-                          type: 'achievement',
-                          title: 'First Token Created',
-                          amount: '100 FLBY',
-                          time: '1 day ago',
-                          icon: Trophy,
-                          color: 'green'
-                        },
-                        {
-                          type: 'referral',
-                          title: 'Friend Referral Bonus',
-                          amount: '50 FLBY',
-                          time: '2 days ago',
-                          icon: Users,
-                          color: 'purple'
-                        },
-                        {
-                          type: 'community',
-                          title: 'Community Participation',
-                          amount: '25 FLBY',
-                          time: '3 days ago',
-                          icon: Star,
-                          color: 'yellow'
-                        }
-                      ].map((reward, index) => (
-                        <div key={index} className={`flex items-center gap-4 p-4 rounded-lg border ${
-                          reward.color === 'blue' ? 'border-blue-500/20 bg-blue-500/5' :
-                          reward.color === 'green' ? 'border-green-500/20 bg-green-500/5' :
-                          reward.color === 'purple' ? 'border-purple-500/20 bg-purple-500/5' :
-                          'border-yellow-500/20 bg-yellow-500/5'
-                        }`}>
-                          <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                            reward.color === 'blue' ? 'bg-blue-500/20' :
-                            reward.color === 'green' ? 'bg-green-500/20' :
-                            reward.color === 'purple' ? 'bg-purple-500/20' :
-                            'bg-yellow-500/20'
-                          }`}>
-                            <reward.icon className={`w-5 h-5 ${
-                              reward.color === 'blue' ? 'text-blue-400' :
-                              reward.color === 'green' ? 'text-green-400' :
-                              reward.color === 'purple' ? 'text-purple-400' :
-                              'text-yellow-400'
-                            }`} />
-                          </div>
-                          <div className="flex-1">
-                            <h4 className="font-medium">{reward.title}</h4>
-                            <p className="text-sm text-muted-foreground">{reward.time}</p>
-                          </div>
-                          <div className="text-right">
-                            <p className="font-semibold text-green-400">+{reward.amount}</p>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Available Rewards */}
-                  <div>
-                    <h3 className="font-semibold mb-4">Available Rewards</h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <Card className="border border-green-500/20">
-                        <CardContent className="p-4">
-                          <div className="flex items-center gap-3 mb-3">
-                            <Flame className="w-6 h-6 text-green-400" />
-                            <h4 className="font-medium">7-Day Streak Bonus</h4>
-                          </div>
-                          <p className="text-sm text-muted-foreground mb-3">
-                            Complete 7 consecutive days of activity
-                          </p>
-                          <div className="flex items-center gap-2">
-                            <div className="flex-1 bg-slate-700 rounded-full h-2">
-                              <div className="bg-green-500 h-2 rounded-full" style={{width: '71%'}}></div>
-                            </div>
-                            <span className="text-sm">5/7 days</span>
-                          </div>
-                          <p className="text-sm font-semibold text-green-400 mt-2">Reward: 200 FLBY</p>
-                        </CardContent>
-                      </Card>
-                      <Card className="border border-blue-500/20">
-                        <CardContent className="p-4">
-                          <div className="flex items-center gap-3 mb-3">
-                            <Target className="w-6 h-6 text-blue-400" />
-                            <h4 className="font-medium">Token Creator</h4>
-                          </div>
-                          <p className="text-sm text-muted-foreground mb-3">
-                            Create 10 unique tokens
-                          </p>
-                          <div className="flex items-center gap-2">
-                            <div className="flex-1 bg-slate-700 rounded-full h-2">
-                              <div className="bg-blue-500 h-2 rounded-full" style={{width: '60%'}}></div>
-                            </div>
-                            <span className="text-sm">6/10 tokens</span>
-                          </div>
-                          <p className="text-sm font-semibold text-blue-400 mt-2">Reward: 300 FLBY</p>
-                        </CardContent>
-                      </Card>
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          {/* Stats Tab - Analytics */}
-          <TabsContent value="stats" className="space-y-4">
-            <Card className="glassmorphism">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <TrendingUp className="w-5 h-5" />
-                  Portfolio Analytics
-                </CardTitle>
-                <CardDescription>
-                  Detailed statistics and performance metrics
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-                  <Card className="border border-green-500/20 bg-green-500/5">
-                    <CardContent className="p-4">
-                      <div className="flex items-center gap-2 mb-2">
-                        <TrendingUp className="w-4 h-4 text-green-400" />
-                        <p className="text-sm text-muted-foreground">Total Gains</p>
-                      </div>
-                      <p className="text-xl font-bold text-green-400">+2.45 SOL</p>
-                      <p className="text-xs text-green-400">+23.7%</p>
-                    </CardContent>
-                  </Card>
-                  
-                  <Card className="border border-blue-500/20 bg-blue-500/5">
-                    <CardContent className="p-4">
-                      <div className="flex items-center gap-2 mb-2">
-                        <Coins className="w-4 h-4 text-blue-400" />
-                        <p className="text-sm text-muted-foreground">Tokens Created</p>
-                      </div>
-                      <p className="text-xl font-bold text-blue-400">8</p>
-                      <p className="text-xs text-muted-foreground">This month</p>
-                    </CardContent>
-                  </Card>
-                  
-                  <Card className="border border-purple-500/20 bg-purple-500/5">
-                    <CardContent className="p-4">
-                      <div className="flex items-center gap-2 mb-2">
-                        <Calendar className="w-4 h-4 text-purple-400" />
-                        <p className="text-sm text-muted-foreground">Avg Hold Time</p>
-                      </div>
-                      <p className="text-xl font-bold text-purple-400">12d</p>
-                      <p className="text-xs text-muted-foreground">Average</p>
-                    </CardContent>
-                  </Card>
-                  
-                  <Card className="border border-orange-500/20 bg-orange-500/5">
-                    <CardContent className="p-4">
-                      <div className="flex items-center gap-2 mb-2">
-                        <DollarSign className="w-4 h-4 text-orange-400" />
-                        <p className="text-sm text-muted-foreground">Redeemed</p>
-                      </div>
-                      <p className="text-xl font-bold text-orange-400">4.2 SOL</p>
-                      <p className="text-xs text-muted-foreground">All time</p>
-                    </CardContent>
-                  </Card>
+                <div className="space-y-2">
+                  <Label htmlFor="amount">Redemption Amount</Label>
+                  <Input
+                    id="amount"
+                    type="number"
+                    placeholder="Enter amount to redeem"
+                    value={redemptionAmount}
+                    onChange={(e) => setRedemptionAmount(e.target.value)}
+                    min="0.001"
+                    step="0.001"
+                  />
                 </div>
 
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                  <Card className="border border-slate-700">
-                    <CardHeader>
-                      <CardTitle className="text-lg">Token Activity</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="space-y-3">
-                        {[
-                          { action: 'Created', token: 'BIRTHDAY', time: '2h ago', value: '+1.0 SOL' },
-                          { action: 'Redeemed', token: 'THANKS', time: '1d ago', value: '-0.5 SOL' },
-                          { action: 'Received', token: 'LOVE', time: '3d ago', value: '+0.25 SOL' },
-                          { action: 'Created', token: 'CONGRATS', time: '5d ago', value: '+2.0 SOL' },
-                        ].map((activity, index) => (
-                          <div key={index} className="flex items-center justify-between py-2 border-b border-slate-700/50 last:border-0">
-                            <div>
-                              <p className="font-medium">{activity.action} {activity.token}</p>
-                              <p className="text-xs text-muted-foreground">{activity.time}</p>
-                            </div>
-                            <div className={`font-medium ${activity.value.startsWith('+') ? 'text-green-400' : 'text-orange-400'}`}>
-                              {activity.value}
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </CardContent>
-                  </Card>
+                {redemptionAmount && parseFloat(redemptionAmount) > 0 && (
+                  <Alert>
+                    <TrendingUp className="h-4 w-4" />
+                    <AlertDescription>
+                      You will receive: {calculateRedemptionValue(selectedToken, parseFloat(redemptionAmount)).toFixed(6)} {selectedToken.currency}
+                    </AlertDescription>
+                  </Alert>
+                )}
 
-                  <Card className="border border-slate-700">
-                    <CardHeader>
-                      <CardTitle className="text-lg">Top Performing Tokens</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="space-y-3">
-                        {[
-                          { symbol: 'MAGIC', performance: '+45%', value: '0.8 SOL' },
-                          { symbol: 'LOVE', performance: '+32%', value: '1.2 SOL' },
-                          { symbol: 'HAPPY', performance: '+28%', value: '2.1 SOL' },
-                          { symbol: 'CONGRATS', performance: '+15%', value: '1.5 SOL' },
-                        ].map((token, index) => (
-                          <div key={index} className="flex items-center justify-between py-2 border-b border-slate-700/50 last:border-0">
-                            <div>
-                              <p className="font-medium">{token.symbol}</p>
-                              <p className="text-xs text-green-400">{token.performance}</p>
-                            </div>
-                            <div className="text-right">
-                              <p className="font-medium">{token.value}</p>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </CardContent>
-                  </Card>
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-        </Tabs>
-
-        {/* Success Overlay */}
-        {showSuccessOverlay && successData && (
-          <TransactionSuccessOverlay
-            message={successData.message}
-            amount={successData.amount}
-            type={successData.type}
-            onClose={() => setShowSuccessOverlay(false)}
-          />
-        )}
+                <Button 
+                  onClick={handleRedeemToken}
+                  disabled={!redemptionAmount || parseFloat(redemptionAmount) <= 0 || isRedeeming}
+                  className="w-full bg-gradient-to-r from-green-500 to-blue-500 hover:from-green-600 hover:to-blue-600"
+                >
+                  {isRedeeming ? (
+                    <>
+                      <ArrowRightLeft className="h-4 w-4 mr-2 animate-spin" />
+                      Processing Redemption...
+                    </>
+                  ) : (
+                    <>
+                      <ArrowRightLeft className="h-4 w-4 mr-2" />
+                      Redeem Token
+                    </>
+                  )}
+                </Button>
+              </>
+            ) : (
+              <div className="text-center py-8">
+                <ArrowRightLeft className="h-12 w-12 mx-auto text-slate-600 mb-4" />
+                <p className="text-slate-400">Select a token to redeem</p>
+              </div>
+            )}
+          </CardContent>
+        </Card>
       </div>
     </div>
   );

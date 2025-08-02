@@ -13,7 +13,7 @@ export default function Navbar() {
   const primaryNavItems = [
     { href: "/home", label: "Home", icon: Home },
     { href: "/mint", label: "Mint", icon: Coins },
-    { href: "/redeem", label: "Dashboard", icon: LayoutDashboard },
+    { href: "/redeem", label: "Redeem", icon: Coins },
     { href: "/chat", label: "Chat", icon: MessageSquare },
     { href: "/marketplace", label: "Marketplace", icon: Users },
     { href: "/greeting-cards", label: "Cards", icon: Heart },

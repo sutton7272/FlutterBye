@@ -66,6 +66,11 @@ export interface IStorage {
   deleteToken(tokenId: string): Promise<void>;
   getTokenHolders(mintAddress: string): Promise<Array<{address: string, amount: number}>>;
 
+  // Redemption operations
+  createRedemption(redemption: any): Promise<any>;
+  getRedemptionsByWallet(walletAddress: string): Promise<any[]>;
+  getRedemptionHistory(limit?: number): Promise<any[]>;
+
   // Token holdings
   getTokenHolding(userId: string, tokenId: string): Promise<TokenHolding | undefined>;
   createTokenHolding(holding: InsertTokenHolding): Promise<TokenHolding>;
@@ -204,6 +209,7 @@ export class MemStorage implements IStorage {
   private redemptionCodes: Map<string, RedemptionCode> = new Map();
   private pricingTiers: Map<string, PricingTier> = new Map();
   private systemSettings: Map<string, SystemSetting> = new Map();
+  private tokenRedemptions: Map<string, any> = new Map();
 
   constructor() {
     this.initializeTestData();
@@ -416,6 +422,30 @@ export class MemStorage implements IStorage {
       { address: 'ExampleHolder1...', amount: 1 },
       { address: 'ExampleHolder2...', amount: 2 }
     ];
+  }
+
+  // Token Redemption methods
+  async createRedemption(redemption: any): Promise<any> {
+    const id = randomUUID();
+    const newRedemption = {
+      id,
+      ...redemption,
+      createdAt: new Date().toISOString()
+    };
+    this.tokenRedemptions.set(id, newRedemption);
+    return newRedemption;
+  }
+
+  async getRedemptionsByWallet(walletAddress: string): Promise<any[]> {
+    const redemptions = Array.from(this.tokenRedemptions.values())
+      .filter(r => r.walletAddress === walletAddress);
+    return redemptions;
+  }
+
+  async getRedemptionHistory(limit = 50): Promise<any[]> {
+    return Array.from(this.tokenRedemptions.values())
+      .sort((a, b) => new Date(b.processedAt).getTime() - new Date(a.processedAt).getTime())
+      .slice(0, limit);
   }
 
   async getAllTokens(limit = 50, offset = 0): Promise<Token[]> {
