@@ -32,6 +32,8 @@ import GreetingCards from "@/pages/greeting-cards";
 import EnterpriseCampaigns from "@/pages/enterprise-campaigns";
 import FlbyStaking from "@/pages/flby-staking";
 import FlbyGovernance from "@/pages/flby-governance";
+import FlbyAirdrop from "@/pages/flby-airdrop";
+import AdminStaking from "@/pages/admin-staking";
 import Navbar from "@/components/navbar";
 import { FloatingActionHub } from "@/components/floating-action-hub";
 import { WalletProvider } from "@/components/wallet-adapter";
@@ -68,6 +70,8 @@ function Router() {
         <Route path="/enterprise" component={EnterpriseCampaigns} />
         <Route path="/flby/staking" component={FlbyStaking} />
         <Route path="/flby/governance" component={FlbyGovernance} />
+        <Route path="/flby/airdrop" component={FlbyAirdrop} />
+        <Route path="/admin/staking" component={AdminStaking} />
         <Route component={NotFound} />
       </Switch>
       <FloatingActionHub />

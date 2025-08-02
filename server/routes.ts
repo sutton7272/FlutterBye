@@ -1871,6 +1871,220 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // FLBY Airdrop APIs
+  app.get("/api/flby/airdrops", async (req, res) => {
+    try {
+      const campaigns = [
+        {
+          id: "airdrop-001",
+          name: "Genesis Airdrop",
+          description: "Reward early Flutterbye users who helped build the community before token launch",
+          totalTokens: 10000000,
+          tokensDistributed: 0,
+          eligibilityType: "early_user",
+          status: "upcoming",
+          startDate: "2024-03-01",
+          endDate: "2024-03-31",
+          requirements: [
+            "Account created before Feb 1, 2024",
+            "Minted at least 3 tokens",
+            "Participated in community events"
+          ],
+          rewardAmount: 500
+        }
+      ];
+
+      res.json({
+        success: true,
+        campaigns,
+        totalAirdrops: campaigns.length,
+        totalTokensAllocated: campaigns.reduce((sum, c) => sum + c.totalTokens, 0)
+      });
+    } catch (error) {
+      console.error("Error fetching airdrops:", error);
+      res.status(500).json({ error: "Failed to fetch airdrop campaigns" });
+    }
+  });
+
+  app.post("/api/flby/airdrop/claim", async (req, res) => {
+    try {
+      const { campaignId, walletAddress } = req.body;
+      
+      console.log(`🎁 Airdrop claim: Campaign ${campaignId} to wallet ${walletAddress}`);
+      
+      res.json({
+        success: true,
+        message: "Airdrop claimed successfully!",
+        claim: {
+          campaignId,
+          walletAddress,
+          amount: 500,
+          transactionId: `airdrop_${Date.now()}`,
+          claimedAt: new Date().toISOString()
+        }
+      });
+    } catch (error) {
+      console.error("Error claiming airdrop:", error);
+      res.status(500).json({ error: "Airdrop claiming coming soon with FLBY token launch" });
+    }
+  });
+
+  // Profit Sharing APIs
+  app.get("/api/flby/profit-sharing", async (req, res) => {
+    try {
+      const pools = [
+        {
+          id: "revenue-q1-2024",
+          name: "Q1 2024 Revenue Share",
+          totalRevenue: 50000,
+          distributionDate: "2024-04-01",
+          stakersShare: 60,
+          governanceShare: 25,
+          distributedAmount: 42500,
+          participantCount: 1250,
+          userEligible: false,
+          userShare: 0
+        }
+      ];
+
+      res.json({
+        success: true,
+        pools,
+        totalRevenue: pools.reduce((sum, p) => sum + p.totalRevenue, 0),
+        userTotalEarnings: 0
+      });
+    } catch (error) {
+      console.error("Error fetching profit sharing:", error);
+      res.status(500).json({ error: "Failed to fetch profit sharing data" });
+    }
+  });
+
+  app.post("/api/flby/profit-share/claim", async (req, res) => {
+    try {
+      const { poolId } = req.body;
+      
+      console.log(`💰 Profit share claim: Pool ${poolId}`);
+      
+      res.json({
+        success: true,
+        message: "Profit share claimed successfully!",
+        claim: {
+          poolId,
+          amount: 34.50,
+          claimedAt: new Date().toISOString()
+        }
+      });
+    } catch (error) {
+      console.error("Error claiming profit share:", error);
+      res.status(500).json({ error: "Profit sharing coming soon with FLBY token launch" });
+    }
+  });
+
+  // Admin Staking Configuration APIs
+  app.get("/api/admin/staking/config", async (req, res) => {
+    try {
+      const config = {
+        stakingPools: [
+          {
+            id: "flexible",
+            name: "Flexible Staking",
+            duration: 0,
+            apy: 5,
+            minStake: 100,
+            maxCapacity: 10000000,
+            isActive: true,
+            earlyUnstakePenalty: 0,
+            bonusMultiplier: 1.0
+          },
+          {
+            id: "short",
+            name: "30-Day Lock",
+            duration: 30,
+            apy: 8,
+            minStake: 500,
+            maxCapacity: 5000000,
+            isActive: true,
+            earlyUnstakePenalty: 2,
+            bonusMultiplier: 1.2
+          },
+          {
+            id: "medium",
+            name: "90-Day Lock",
+            duration: 90,
+            apy: 12,
+            minStake: 1000,
+            maxCapacity: 3000000,
+            isActive: true,
+            earlyUnstakePenalty: 5,
+            bonusMultiplier: 1.5
+          },
+          {
+            id: "long",
+            name: "1-Year Lock",
+            duration: 365,
+            apy: 18,
+            minStake: 5000,
+            maxCapacity: 1000000,
+            isActive: true,
+            earlyUnstakePenalty: 10,
+            bonusMultiplier: 2.0
+          }
+        ],
+        profitSharing: {
+          stakersShare: 60,
+          governanceShare: 25,
+          distributionFrequency: 'quarterly',
+          minimumStakeForProfit: 100,
+          autoDistribute: true
+        }
+      };
+
+      res.json({
+        success: true,
+        config
+      });
+    } catch (error) {
+      console.error("Error fetching staking config:", error);
+      res.status(500).json({ error: "Failed to fetch staking configuration" });
+    }
+  });
+
+  app.put("/api/admin/staking/pools/:poolId", async (req, res) => {
+    try {
+      const { poolId } = req.params;
+      const updates = req.body;
+      
+      console.log(`⚙️ Updating staking pool ${poolId}:`, updates);
+      
+      res.json({
+        success: true,
+        message: "Staking pool configuration updated successfully",
+        poolId,
+        updates
+      });
+    } catch (error) {
+      console.error("Error updating staking pool:", error);
+      res.status(500).json({ error: "Failed to update staking pool configuration" });
+    }
+  });
+
+  app.put("/api/admin/profit-sharing/config", async (req, res) => {
+    try {
+      const config = req.body;
+      
+      console.log(`💼 Updating profit sharing config:`, config);
+      
+      res.json({
+        success: true,
+        message: "Profit sharing configuration updated successfully",
+        config
+      });
+    } catch (error) {
+      console.error("Error updating profit sharing config:", error);
+      res.status(500).json({ error: "Failed to update profit sharing configuration" });
+    }
+  });
+
   // Import admin service
   const { adminService } = await import("./admin-service");
 

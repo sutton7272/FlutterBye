@@ -27,6 +27,7 @@ export default function Navbar() {
     { href: "/flby/staking", label: "FLBY Staking", icon: Zap },
     { href: "/flby/governance", label: "Governance", icon: Users },
     { href: "/admin", label: "Admin", icon: Settings },
+    { href: "/admin/staking", label: "Admin Staking", icon: Settings },
   ];
 
   const isActive = (href: string) => location === href;

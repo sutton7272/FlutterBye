@@ -83,25 +83,35 @@ export default function FlbyTokenInfo({ onGetTokens, showGetTokensButton = true 
             Get notified when FLBY tokens become available and receive early access benefits.
           </p>
           
-          <div className="grid grid-cols-2 gap-2">
+          <div className="grid grid-cols-3 gap-1">
             <Link href="/flby/staking">
               <Button
                 variant="outline"
                 size="sm"
-                className="w-full border-cyan-500/50 text-cyan-400 hover:bg-cyan-500/10"
+                className="w-full border-cyan-500/50 text-cyan-400 hover:bg-cyan-500/10 text-xs"
               >
                 <Lock className="w-3 h-3 mr-1" />
-                Staking
+                Stake
               </Button>
             </Link>
             <Link href="/flby/governance">
               <Button
                 variant="outline"
                 size="sm"
-                className="w-full border-purple-500/50 text-purple-400 hover:bg-purple-500/10"
+                className="w-full border-purple-500/50 text-purple-400 hover:bg-purple-500/10 text-xs"
               >
                 <Vote className="w-3 h-3 mr-1" />
-                Governance
+                Vote
+              </Button>
+            </Link>
+            <Link href="/flby/airdrop">
+              <Button
+                variant="outline"
+                size="sm"
+                className="w-full border-yellow-500/50 text-yellow-400 hover:bg-yellow-500/10 text-xs"
+              >
+                <Gift className="w-3 h-3 mr-1" />
+                Airdrop
               </Button>
             </Link>
           </div>
