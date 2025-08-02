@@ -9,17 +9,18 @@ import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import ImageUpload from "@/components/image-upload";
 import { LoadingSpinner } from "@/components/loading-spinner";
 import { validateTokenQuantity, validateWholeNumber } from "@/lib/validators";
-import { Coins, Upload, Calculator, DollarSign, Lock, Globe, Gift, AlertCircle, Wand2, Star, Sparkles, Users, Target, ImageIcon, FileImage, QrCode, Plus, X, Ticket, Loader2, Zap } from "lucide-react";
-// import AITextOptimizer from "@/components/ai-text-optimizer";
-// import { EmotionAnalyzer } from "@/components/EmotionAnalyzer";
-// import { ViralMechanics } from "@/components/ViralMechanics";
-// import { NetworkEffects } from "@/components/NetworkEffects";
+import { Coins, Upload, Calculator, DollarSign, Lock, Globe, Gift, AlertCircle, Wand2, Star, Sparkles, Users, Target, ImageIcon, FileImage, QrCode, Plus, X, Ticket, Loader2, Zap, CheckCircle, Eye, FileText } from "lucide-react";
+import AITextOptimizer from "@/components/ai-text-optimizer";
+import { EmotionAnalyzer } from "@/components/EmotionAnalyzer";
+import { ViralMechanics } from "@/components/ViralMechanics";
+import { NetworkEffects } from "@/components/NetworkEffects";
 import { type InsertToken } from "@shared/schema";
 import TokenHolderAnalysis from "@/components/token-holder-analysis";
 import { TransactionSuccessOverlay } from "@/components/confetti-celebration";
@@ -59,7 +60,8 @@ export default function Mint() {
       if (quantity && quantity > 0) {
         try {
           const response = await apiRequest("POST", "/api/calculate-token-price", { quantity });
-          setPriceCalculation(response as any);
+          const data = await response.json();
+          setPriceCalculation(data);
         } catch (error) {
           console.error("Failed to calculate price:", error);
           setPriceCalculation(null);
@@ -96,6 +98,9 @@ export default function Mint() {
   const [validatedCode, setValidatedCode] = useState<any>(null);
   const [isFreeMode, setIsFreeMode] = useState(false);
   
+  // Additional state variables
+  const [walletAddresses, setWalletAddresses] = useState("");
+  
   // Confetti celebration state
   const [showSuccessOverlay, setShowSuccessOverlay] = useState(false);
   const [successData, setSuccessData] = useState<{
@@ -109,7 +114,8 @@ export default function Mint() {
 
   const mintToken = useMutation({
     mutationFn: async (data: InsertToken) => {
-      return await apiRequest("POST", "/api/tokens", data);
+      const response = await apiRequest("POST", "/api/tokens", data);
+      return await response.json();
     },
     onSuccess: (data) => {
       // Show confetti celebration
@@ -170,7 +176,8 @@ export default function Mint() {
         }
       };
       
-      return await apiRequest("POST", "/api/validate-redemption-code", userData);
+      const response = await apiRequest("POST", "/api/validate-redemption-code", userData);
+      return await response.json();
     },
     onSuccess: (data: any) => {
       setValidatedCode(data);
@@ -314,6 +321,22 @@ export default function Mint() {
 
   const remainingChars = 27 - message.length;
 
+  // Handler functions
+  const handleTokenImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      setTokenImage(event.target?.result as string);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  // Validation states for redemption code
+  const validateCode = validatedCode;
+  const codeValidation = validatedCode;
+
   return (
     <div className="min-h-screen pt-20 pb-12">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -395,12 +418,12 @@ export default function Mint() {
                             </p>
                           </div>
                           
-                          {/* AI Text Optimizer - Simple Version */}
-                          <div className="bg-slate-700/20 rounded-lg p-3 text-center">
-                            <p className="text-sm text-muted-foreground">
-                              <Wand2 className="w-4 h-4 inline mr-2" />
-                              AI Text Optimizer available - Phase 1 uses rule-based optimization
-                            </p>
+                          {/* AI Text Optimizer */}
+                          <div className="bg-slate-700/20 rounded-lg p-1">
+                            <AITextOptimizer 
+                              onOptimizedTextSelect={(optimizedText) => setMessage(optimizedText)}
+                              className="border-0 bg-transparent"
+                            />
                           </div>
                           
                           {/* Amount and Image */}
@@ -463,7 +486,7 @@ export default function Mint() {
                               />
                               <Button
                                 type="button"
-                                onClick={validateRedemptionCode}
+                                onClick={handleRedemptionCodeValidation}
                                 disabled={validateCode.isPending}
                                 variant="outline"
                                 size="sm"

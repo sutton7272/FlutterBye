@@ -9,7 +9,7 @@ import NotFound from "@/pages/not-found";
 import Home from "@/pages/home";
 import Marketplace from "@/pages/marketplace";
 import Portfolio from "@/pages/portfolio";
-import MintMinimal from "@/pages/mint-minimal";
+import Mint from "@/pages/mint";
 
 import Redeem from "@/pages/redeem";
 import Activity from "@/pages/activity";
@@ -78,7 +78,7 @@ function Router() {
         <Route path="/mint" component={() => (
           <>
             <Navbar />
-            <MintMinimal />
+            <Mint />
           </>
         )} />
         <Route path="/redeem" component={() => (
