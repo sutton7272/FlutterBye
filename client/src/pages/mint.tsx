@@ -284,7 +284,7 @@ export default function Mint() {
       // Basic wallet validation would go here
     }
 
-    const tokenData: InsertToken & { imageFile?: string; redemptionCode?: string; isFreeMode?: boolean } = {
+    const tokenData: InsertToken = {
       message,
       symbol: "FlBY-MSG", // Always FlBY-MSG
       creatorId: "user-1", // Mock user ID
