@@ -399,12 +399,34 @@ export const redeemableCodes = pgTable("redeemable_codes", {
   createdBy: varchar("created_by").references(() => adminUsers.id),
 });
 
-// Updated code redemptions tracking
+// Enhanced code redemptions tracking with comprehensive user data
 export const codeRedemptions = pgTable("code_redemptions", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   codeId: varchar("code_id").references(() => redeemableCodes.id).notNull(),
   userId: varchar("user_id").references(() => users.id).notNull(),
+  walletAddress: text("wallet_address").notNull(),
+  tokenId: varchar("token_id").references(() => tokens.id), // Token created with this redemption
+  ipAddress: text("ip_address"), // For analytics and fraud prevention
+  userAgent: text("user_agent"), // Browser/device information
+  savingsAmount: decimal("savings_amount", { precision: 18, scale: 9 }).default("0"), // How much they saved
+  originalCost: decimal("original_cost", { precision: 18, scale: 9 }).default("0"), // What they would have paid
+  referralSource: text("referral_source"), // How they found the code
+  geolocation: json("geolocation").$type<{country?: string, region?: string, city?: string}>(),
+  metadata: json("metadata").$type<Record<string, any>>(),
   redeemedAt: timestamp("redeemed_at").defaultNow(),
+});
+
+// Platform pricing configuration for centralized pricing management
+export const pricingConfig = pgTable("pricing_config", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  configKey: text("config_key").notNull().unique(), // 'base_minting_fee', 'image_upload_fee', etc.
+  configValue: decimal("config_value", { precision: 18, scale: 9 }).notNull(),
+  currency: text("currency").default("SOL"), // SOL, USDC, FLBY
+  description: text("description"),
+  category: text("category").notNull(), // 'minting', 'features', 'value_attachment', 'discounts'
+  isActive: boolean("is_active").default(true),
+  updatedAt: timestamp("updated_at").defaultNow(),
+  updatedBy: varchar("updated_by").references(() => users.id),
 });
 
 // SMS Integration Tables
@@ -663,6 +685,9 @@ export type RedeemableCode = typeof redeemableCodes.$inferSelect;
 export type InsertRedeemableCode = z.infer<typeof insertRedeemableCodeSchema>;
 
 export type CodeRedemption = typeof codeRedemptions.$inferSelect;
+export type InsertCodeRedemption = typeof codeRedemptions.$inferInsert;
+export type PricingConfig = typeof pricingConfig.$inferSelect;
+export type InsertPricingConfig = typeof pricingConfig.$inferInsert;
 
 // Gamified Rewards System Types
 export const insertUserRewardSchema = createInsertSchema(userRewards).omit({ id: true, createdAt: true, updatedAt: true });

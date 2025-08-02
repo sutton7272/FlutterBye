@@ -36,6 +36,8 @@ import {
   type InsertLimitedEditionSet,
   type RedemptionCode,
   type InsertRedemptionCodeForm,
+  type PricingConfig,
+  type InsertPricingConfig,
 } from "@shared/schema";
 
 // Storage interface for both in-memory and database implementations
@@ -142,6 +144,15 @@ export interface IStorage {
   updateRedemptionCode(id: string, updates: Partial<RedemptionCode>): Promise<RedemptionCode>;
   deleteRedemptionCode(id: string): Promise<void>;
   validateAndUseRedemptionCode(code: string): Promise<RedemptionCode | null>;
+  
+  // Enhanced redemption tracking for admin analytics
+  trackRedemptionUsage(data: any): Promise<void>;
+  getRedemptionUsageAnalytics(): Promise<any[]>;
+  
+  // Pricing configuration management
+  getPricingConfig(): Promise<any[]>;
+  updatePricingConfig(key: string, value: string, currency?: string): Promise<void>;
+  getPricingByCategory(category: string): Promise<any[]>;
 }
 
 // In-memory storage implementation
@@ -854,6 +865,125 @@ export class MemStorage implements IStorage {
     this.redemptionCodes.set(redemptionCode.id, redemptionCode);
     
     return redemptionCode;
+  }
+
+  // Enhanced redemption tracking for admin analytics
+  private redemptionUsageData = new Map<string, any>();
+  private pricingConfigData = new Map<string, any>();
+
+  async trackRedemptionUsage(data: any): Promise<void> {
+    const id = randomUUID();
+    const trackingData = {
+      id,
+      ...data,
+      timestamp: new Date().toISOString()
+    };
+    this.redemptionUsageData.set(id, trackingData);
+    
+    // Also track in code redemptions for compatibility
+    if (data.codeId && data.userId) {
+      const redemption: CodeRedemption = {
+        id,
+        codeId: data.codeId,
+        userId: data.userId,
+        walletAddress: data.walletAddress,
+        tokenId: data.tokenId,
+        ipAddress: data.ipAddress,
+        userAgent: data.userAgent,
+        savingsAmount: data.savingsAmount,
+        originalCost: data.originalCost,
+        referralSource: data.referralSource,
+        geolocation: data.geolocation,
+        metadata: data.metadata,
+        redeemedAt: new Date()
+      };
+      this.codeRedemptions.set(id, redemption);
+    }
+  }
+
+  async getRedemptionUsageAnalytics(): Promise<any[]> {
+    return Array.from(this.redemptionUsageData.values())
+      .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+  }
+
+  // Pricing configuration management
+  async getPricingConfig(): Promise<any[]> {
+    // Initialize default pricing if empty
+    if (this.pricingConfigData.size === 0) {
+      await this.initializeDefaultPricing();
+    }
+    return Array.from(this.pricingConfigData.values());
+  }
+
+  async updatePricingConfig(key: string, value: string, currency: string = "SOL"): Promise<void> {
+    const existing = Array.from(this.pricingConfigData.values()).find(p => p.configKey === key);
+    if (existing) {
+      existing.configValue = value;
+      existing.currency = currency;
+      existing.updatedAt = new Date();
+      this.pricingConfigData.set(existing.id, existing);
+    } else {
+      const id = randomUUID();
+      const config = {
+        id,
+        configKey: key,
+        configValue: value,
+        currency,
+        description: this.getPricingDescription(key),
+        category: this.getPricingCategory(key),
+        isActive: true,
+        updatedAt: new Date(),
+        updatedBy: "admin"
+      };
+      this.pricingConfigData.set(id, config);
+    }
+  }
+
+  async getPricingByCategory(category: string): Promise<any[]> {
+    const allConfig = await this.getPricingConfig();
+    return allConfig.filter(config => config.category === category);
+  }
+
+  private async initializeDefaultPricing(): Promise<void> {
+    const defaultPricing = [
+      { key: "base_minting_fee", value: "0.01", category: "minting", description: "Base fee for minting tokens" },
+      { key: "image_upload_fee", value: "0.005", category: "features", description: "Fee for uploading custom images" },
+      { key: "min_value_attachment", value: "0.001", category: "value_attachment", description: "Minimum value that can be attached" },
+      { key: "max_value_attachment", value: "10", category: "value_attachment", description: "Maximum value that can be attached" },
+      { key: "bulk_discount_tier1", value: "5", category: "discounts", description: "Discount for 10+ tokens (%)" },
+      { key: "bulk_discount_tier2", value: "10", category: "discounts", description: "Discount for 50+ tokens (%)" },
+      { key: "bulk_discount_tier3", value: "15", category: "discounts", description: "Discount for 100+ tokens (%)" },
+      { key: "flby_token_discount", value: "10", category: "discounts", description: "Discount when paying with FLBY tokens (%)" },
+      { key: "premium_feature_fee", value: "0.002", category: "features", description: "Fee for premium features" },
+      { key: "marketplace_fee", value: "2.5", category: "features", description: "Marketplace transaction fee (%)" }
+    ];
+
+    for (const pricing of defaultPricing) {
+      await this.updatePricingConfig(pricing.key, pricing.value);
+    }
+  }
+
+  private getPricingDescription(key: string): string {
+    const descriptions: Record<string, string> = {
+      "base_minting_fee": "Base fee for minting tokens",
+      "image_upload_fee": "Fee for uploading custom images",
+      "min_value_attachment": "Minimum value that can be attached",
+      "max_value_attachment": "Maximum value that can be attached",
+      "bulk_discount_tier1": "Discount for 10+ tokens (%)",
+      "bulk_discount_tier2": "Discount for 50+ tokens (%)",
+      "bulk_discount_tier3": "Discount for 100+ tokens (%)",
+      "flby_token_discount": "Discount when paying with FLBY tokens (%)",
+      "premium_feature_fee": "Fee for premium features",
+      "marketplace_fee": "Marketplace transaction fee (%)"
+    };
+    return descriptions[key] || "Custom pricing configuration";
+  }
+
+  private getPricingCategory(key: string): string {
+    if (key.includes("discount")) return "discounts";
+    if (key.includes("value") || key.includes("attachment")) return "value_attachment";
+    if (key.includes("mint")) return "minting";
+    return "features";
   }
 }
 

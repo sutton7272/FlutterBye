@@ -173,6 +173,34 @@ interface RevenueAnalytics {
   }>;
 }
 
+interface RedemptionAnalytics {
+  id: string;
+  codeId: string;
+  userId: string;
+  walletAddress: string;
+  tokenId?: string;
+  ipAddress?: string;
+  userAgent?: string;
+  savingsAmount: string;
+  originalCost: string;
+  referralSource?: string;
+  geolocation?: any;
+  metadata?: any;
+  timestamp: string;
+}
+
+interface PricingConfig {
+  id: string;
+  configKey: string;
+  configValue: string;
+  currency: string;
+  description?: string;
+  category: string;
+  isActive: boolean;
+  updatedAt: Date;
+  updatedBy?: string;
+}
+
 interface AdminLog {
   id: string;
   adminId: string;
@@ -230,6 +258,17 @@ export default function AdminDashboard() {
 
   const { data: currentSettings, isLoading: settingsLoading } = useQuery<AdminSettings>({
     queryKey: ["/api/admin/settings"],
+  });
+
+  // New comprehensive data queries
+  const { data: redemptionAnalytics = [], isLoading: redemptionLoading } = useQuery<RedemptionAnalytics[]>({
+    queryKey: ["/api/admin/redemption-analytics"],
+    select: (data: any) => data?.analytics || []
+  });
+
+  const { data: pricingConfig = [], isLoading: pricingLoading } = useQuery<PricingConfig[]>({
+    queryKey: ["/api/admin/pricing-config"],
+    select: (data: any) => data?.pricingConfig || []
   });
 
   // Update settings when currentSettings changes
@@ -296,6 +335,20 @@ export default function AdminDashboard() {
         title: "Data Exported",
         description: "Data has been exported and downloaded.",
       });
+    },
+  });
+
+  // Pricing configuration mutation
+  const updatePricingMutation = useMutation({
+    mutationFn: async ({ key, value, currency }: { key: string; value: string; currency?: string }) => {
+      return await apiRequest("POST", "/api/admin/pricing-config", { key, value, currency });
+    },
+    onSuccess: () => {
+      toast({
+        title: "Pricing Updated",
+        description: "Pricing configuration has been updated successfully.",
+      });
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/pricing-config"] });
     },
   });
 
@@ -623,18 +676,247 @@ export default function AdminDashboard() {
 
           {/* Pricing Management Tab */}
           <TabsContent value="pricing" className="space-y-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              
+              {/* Redemption Code Analytics */}
+              <Card className="glassmorphism">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Ticket className="w-5 h-5" />
+                    Redemption Code Analytics
+                  </CardTitle>
+                  <CardDescription>Track free token redemption usage and user data</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  {redemptionLoading ? (
+                    <div className="text-center py-4">Loading redemption analytics...</div>
+                  ) : redemptionAnalytics.length > 0 ? (
+                    <>
+                      {/* Summary Stats */}
+                      <div className="grid grid-cols-3 gap-4">
+                        <div className="text-center">
+                          <div className="text-2xl font-bold text-green-400">
+                            {redemptionAnalytics.length}
+                          </div>
+                          <div className="text-sm text-gray-400">Total Redemptions</div>
+                        </div>
+                        <div className="text-center">
+                          <div className="text-2xl font-bold text-blue-400">
+                            {redemptionAnalytics.reduce((sum, r) => sum + parseFloat(r.savingsAmount || "0"), 0).toFixed(4)}
+                          </div>
+                          <div className="text-sm text-gray-400">Total Savings (SOL)</div>
+                        </div>
+                        <div className="text-center">
+                          <div className="text-2xl font-bold text-purple-400">
+                            {new Set(redemptionAnalytics.map(r => r.walletAddress)).size}
+                          </div>
+                          <div className="text-sm text-gray-400">Unique Wallets</div>
+                        </div>
+                      </div>
+
+                      {/* Recent Redemptions Table */}
+                      <div className="space-y-2">
+                        <h4 className="font-semibold">Recent Redemptions</h4>
+                        <div className="max-h-64 overflow-y-auto">
+                          <Table>
+                            <TableHeader>
+                              <TableRow>
+                                <TableHead>Wallet</TableHead>
+                                <TableHead>Savings</TableHead>
+                                <TableHead>Source</TableHead>
+                                <TableHead>Date</TableHead>
+                              </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                              {redemptionAnalytics.slice(0, 10).map((redemption) => (
+                                <TableRow key={redemption.id}>
+                                  <TableCell className="font-mono text-xs">
+                                    {redemption.walletAddress.slice(0, 8)}...{redemption.walletAddress.slice(-4)}
+                                  </TableCell>
+                                  <TableCell className="text-green-400">
+                                    {parseFloat(redemption.savingsAmount || "0").toFixed(4)} SOL
+                                  </TableCell>
+                                  <TableCell>
+                                    <Badge variant="secondary">
+                                      {redemption.referralSource || 'Direct'}
+                                    </Badge>
+                                  </TableCell>
+                                  <TableCell className="text-xs">
+                                    {new Date(redemption.timestamp).toLocaleString()}
+                                  </TableCell>
+                                </TableRow>
+                              ))}
+                            </TableBody>
+                          </Table>
+                        </div>
+                      </div>
+                    </>
+                  ) : (
+                    <div className="text-center py-8 text-gray-400">
+                      No redemption data available
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+
+              {/* Comprehensive Pricing Configuration */}
+              <Card className="glassmorphism">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <DollarSign className="w-5 h-5" />
+                    Pricing Configuration
+                  </CardTitle>
+                  <CardDescription>Centralized pricing management for all platform features</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  {pricingLoading ? (
+                    <div className="text-center py-4">Loading pricing config...</div>
+                  ) : (
+                    <>
+                      {/* Pricing Categories */}
+                      {['minting', 'features', 'value_attachment', 'discounts'].map((category) => {
+                        const categoryConfig = pricingConfig.filter(p => p.category === category);
+                        return (
+                          <div key={category} className="space-y-2">
+                            <h4 className="font-semibold capitalize text-blue-400">
+                              {category.replace('_', ' ')} ({categoryConfig.length} items)
+                            </h4>
+                            <div className="space-y-2 pl-4">
+                              {categoryConfig.map((config) => (
+                                <div key={config.id} className="flex items-center justify-between p-2 bg-slate-800/30 rounded">
+                                  <div className="flex-1">
+                                    <div className="text-sm font-medium">{config.description}</div>
+                                    <div className="text-xs text-gray-400">{config.configKey}</div>
+                                  </div>
+                                  <div className="flex items-center gap-2">
+                                    <Input
+                                      type="number"
+                                      step="0.0001"
+                                      defaultValue={config.configValue}
+                                      className="w-24 h-8"
+                                      onBlur={(e) => {
+                                        if (e.target.value !== config.configValue) {
+                                          updatePricingMutation.mutate({
+                                            key: config.configKey,
+                                            value: e.target.value,
+                                            currency: config.currency
+                                          });
+                                        }
+                                      }}
+                                    />
+                                    <Badge variant="outline">{config.currency}</Badge>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        );
+                      })}
+
+                      {/* Quick Actions */}
+                      <div className="pt-4 border-t border-gray-700">
+                        <h4 className="font-semibold mb-2">Quick Actions</h4>
+                        <div className="grid grid-cols-2 gap-2">
+                          <Button size="sm" variant="outline">
+                            <Download className="w-4 h-4 mr-2" />
+                            Export Config
+                          </Button>
+                          <Button size="sm" variant="outline">
+                            <Upload className="w-4 h-4 mr-2" />
+                            Import Config
+                          </Button>
+                        </div>
+                      </div>
+                    </>
+                  )}
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Advanced Analytics Section */}
             <Card className="glassmorphism">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  <TrendingUp className="w-5 h-5" />
-                  Pricing & Fee Management
+                  <BarChart3 className="w-5 h-5" />
+                  User Behavior Insights from Redemptions
                 </CardTitle>
-                <CardDescription>
-                  Configure flexible pricing tiers, bulk discounts, and platform fees
-                </CardDescription>
+                <CardDescription>Detailed analytics from free token redemption data</CardDescription>
               </CardHeader>
-              <CardContent>
-                <AdminPricingManagement />
+              <CardContent className="space-y-6">
+                {redemptionAnalytics.length > 0 ? (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    
+                    {/* Geographic Distribution */}
+                    <div className="space-y-2">
+                      <h4 className="font-semibold flex items-center gap-2">
+                        <Globe className="w-4 h-4" />
+                        Geographic Distribution
+                      </h4>
+                      <div className="space-y-1">
+                        {Object.entries(
+                          redemptionAnalytics.reduce((acc, r) => {
+                            const country = r.geolocation?.country || 'Unknown';
+                            acc[country] = (acc[country] || 0) + 1;
+                            return acc;
+                          }, {} as Record<string, number>)
+                        ).slice(0, 5).map(([country, count]) => (
+                          <div key={country} className="flex justify-between items-center text-sm">
+                            <span>{country}</span>
+                            <Badge variant="secondary">{count}</Badge>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Referral Sources */}
+                    <div className="space-y-2">
+                      <h4 className="font-semibold flex items-center gap-2">
+                        <TrendingUp className="w-4 h-4" />
+                        Referral Sources
+                      </h4>
+                      <div className="space-y-1">
+                        {Object.entries(
+                          redemptionAnalytics.reduce((acc, r) => {
+                            const source = r.referralSource || 'Direct';
+                            acc[source] = (acc[source] || 0) + 1;
+                            return acc;
+                          }, {} as Record<string, number>)
+                        ).slice(0, 5).map(([source, count]) => (
+                          <div key={source} className="flex justify-between items-center text-sm">
+                            <span className="capitalize">{source}</span>
+                            <Badge variant="secondary">{count}</Badge>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Device Information */}
+                    <div className="space-y-2">
+                      <h4 className="font-semibold flex items-center gap-2">
+                        <Activity className="w-4 h-4" />
+                        Device Types
+                      </h4>
+                      <div className="space-y-1">
+                        {Object.entries(
+                          redemptionAnalytics.reduce((acc, r) => {
+                            const isMobile = r.userAgent?.toLowerCase().includes('mobile') ? 'Mobile' : 'Desktop';
+                            acc[isMobile] = (acc[isMobile] || 0) + 1;
+                            return acc;
+                          }, {} as Record<string, number>)
+                        ).map(([device, count]) => (
+                          <div key={device} className="flex justify-between items-center text-sm">
+                            <span>{device}</span>
+                            <Badge variant="secondary">{count}</Badge>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="text-center py-8 text-gray-400">
+                    No redemption data available for analysis
+                  </div>
+                )}
               </CardContent>
             </Card>
           </TabsContent>

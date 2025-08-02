@@ -120,18 +120,34 @@ export default function Mint() {
     },
   });
 
-  // Validate redemption code
+  // Validate redemption code with comprehensive data collection
   const validateRedemptionCode = useMutation({
     mutationFn: async (code: string) => {
-      const response = await apiRequest("POST", "/api/validate-redemption-code", { code });
-      return response.json();
+      // Collect comprehensive user data for analytics
+      const userData = {
+        code,
+        walletAddress: "user-wallet-placeholder", // This would come from wallet connection
+        ipAddress: undefined, // Server-side collection
+        userAgent: navigator.userAgent,
+        referralSource: new URLSearchParams(window.location.search).get('ref') || 'direct',
+        timestamp: new Date().toISOString(),
+        geolocation: undefined, // Server-side IP geolocation
+        metadata: {
+          screenResolution: `${window.screen.width}x${window.screen.height}`,
+          timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+          language: navigator.language,
+          platform: navigator.platform
+        }
+      };
+      
+      return await apiRequest("POST", "/api/validate-redemption-code", userData);
     },
-    onSuccess: (data) => {
+    onSuccess: (data: any) => {
       setValidatedCode(data);
       setIsFreeMode(true);
       toast({
         title: "Code Validated",
-        description: "Your redemption code is valid! You can now mint for free.",
+        description: `Your redemption code is valid! You'll save ${data.savingsAmount || '0.01'} SOL on this transaction.`,
       });
     },
     onError: (error) => {

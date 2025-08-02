@@ -204,6 +204,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { redemptionCode, isFreeMode, ...rawTokenData } = req.body;
       
+      let redemptionData = null;
+      
       // If using free mode with a redemption code, validate and use it
       if (isFreeMode && redemptionCode) {
         const validCode = await storage.validateAndUseRedemptionCode(redemptionCode);
@@ -211,8 +213,35 @@ export async function registerRoutes(app: Express): Promise<Server> {
           return res.status(400).json({ message: "Invalid or expired redemption code" });
         }
         
-        // Log successful free minting
-        console.log(`Free minting using code: ${redemptionCode} (${validCode.type})`);
+        // Calculate savings data
+        const originalCost = parseFloat(tokenData.valuePerToken || "0.01"); // Base minting cost
+        const savingsAmount = originalCost;
+        
+        // Collect comprehensive user data for admin analytics
+        redemptionData = {
+          codeId: validCode.id,
+          walletAddress: (req.body as any).creatorWallet || tokenData.creatorId,
+          ipAddress: req.ip || req.connection.remoteAddress,
+          userAgent: req.get('User-Agent'),
+          savingsAmount: savingsAmount.toString(),
+          originalCost: originalCost.toString(),
+          referralSource: req.get('Referer') || 'direct',
+          geolocation: {
+            // Could be enhanced with IP geolocation service
+            userAgent: req.get('User-Agent')
+          },
+          metadata: {
+            redemptionCode: redemptionCode,
+            codeType: validCode.type,
+            timestamp: new Date().toISOString(),
+            sessionData: {
+              acceptLanguage: req.get('Accept-Language'),
+              acceptEncoding: req.get('Accept-Encoding')
+            }
+          }
+        };
+        
+        console.log(`Free minting using code: ${redemptionCode} (${validCode.type}) - Data collected for admin analytics`);
       }
       
       const tokenData = insertTokenSchema.parse(rawTokenData);
@@ -271,6 +300,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
       };
       
       const token = await storage.createToken(finalTokenData);
+      
+      // Track redemption code usage if applicable
+      if (redemptionData) {
+        try {
+          await storage.trackRedemptionUsage({
+            ...redemptionData,
+            tokenId: token.id,
+            userId: token.creatorId
+          });
+        } catch (error) {
+          console.error('Failed to track redemption usage:', error);
+          // Continue with token creation even if tracking fails
+        }
+      }
       
       // Return successful response with blockchain info
       res.json({
@@ -597,6 +640,62 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(listings);
     } catch (error) {
       res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Redemption analytics for admin panel
+  app.get("/api/admin/redemption-analytics", async (req, res) => {
+    try {
+      const analytics = await storage.getRedemptionUsageAnalytics();
+      res.json({ success: true, analytics });
+    } catch (error) {
+      res.status(500).json({ 
+        success: false, 
+        error: error instanceof Error ? error.message : "Failed to fetch redemption analytics" 
+      });
+    }
+  });
+
+  // Comprehensive pricing configuration endpoints
+  app.get("/api/admin/pricing-config", async (req, res) => {
+    try {
+      const pricingConfig = await storage.getPricingConfig();
+      res.json({ success: true, pricingConfig });
+    } catch (error) {
+      res.status(500).json({ 
+        success: false, 
+        error: error instanceof Error ? error.message : "Failed to fetch pricing config" 
+      });
+    }
+  });
+  
+  app.post("/api/admin/pricing-config", async (req, res) => {
+    try {
+      const { key, value, currency } = req.body;
+      if (!key || !value) {
+        return res.status(400).json({ success: false, error: "Key and value are required" });
+      }
+      
+      await storage.updatePricingConfig(key, value, currency);
+      res.json({ success: true, message: "Pricing configuration updated" });
+    } catch (error) {
+      res.status(500).json({ 
+        success: false, 
+        error: error instanceof Error ? error.message : "Failed to update pricing config" 
+      });
+    }
+  });
+
+  app.get("/api/admin/pricing-config/:category", async (req, res) => {
+    try {
+      const { category } = req.params;
+      const pricingConfig = await storage.getPricingByCategory(category);
+      res.json({ success: true, pricingConfig });
+    } catch (error) {
+      res.status(500).json({ 
+        success: false, 
+        error: error instanceof Error ? error.message : "Failed to fetch pricing config by category" 
+      });
     }
   });
 
