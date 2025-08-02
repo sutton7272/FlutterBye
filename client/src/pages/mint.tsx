@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -15,7 +15,7 @@ import { apiRequest } from "@/lib/queryClient";
 import ImageUpload from "@/components/image-upload";
 import { LoadingSpinner } from "@/components/loading-spinner";
 import { validateTokenQuantity, validateWholeNumber } from "@/lib/validators";
-import { Coins, Upload, Calculator, DollarSign, Lock, Globe, Gift, AlertCircle, Wand2, Star, Sparkles, Users, Target, ImageIcon, FileImage, QrCode, Plus, X, Ticket } from "lucide-react";
+import { Coins, Upload, Calculator, DollarSign, Lock, Globe, Gift, AlertCircle, Wand2, Star, Sparkles, Users, Target, ImageIcon, FileImage, QrCode, Plus, X, Ticket, Loader2 } from "lucide-react";
 import AITextOptimizer from "@/components/ai-text-optimizer";
 import { EmotionAnalyzer } from "@/components/EmotionAnalyzer";
 import { ViralMechanics } from "@/components/ViralMechanics";
@@ -23,9 +23,20 @@ import { NetworkEffects } from "@/components/NetworkEffects";
 import { type InsertToken } from "@shared/schema";
 import TokenHolderAnalysis from "@/components/token-holder-analysis";
 import { TransactionSuccessOverlay } from "@/components/confetti-celebration";
+import { ShareSuccessModal } from "@/components/ShareSuccessModal";
 
 export default function Mint() {
   const { toast } = useToast();
+
+  // Listen for share modal trigger
+  useEffect(() => {
+    const handleOpenShareModal = () => {
+      setShowShareModal(true);
+    };
+
+    window.addEventListener('openShareModal', handleOpenShareModal);
+    return () => window.removeEventListener('openShareModal', handleOpenShareModal);
+  }, []);
   const [message, setMessage] = useState("");
   const [mintAmount, setMintAmount] = useState("");
   const [mintAmountError, setMintAmountError] = useState("");
@@ -55,10 +66,14 @@ export default function Mint() {
   
   // Confetti celebration state
   const [showSuccessOverlay, setShowSuccessOverlay] = useState(false);
+  const [showShareModal, setShowShareModal] = useState(false);
   const [successData, setSuccessData] = useState<{
     message: string;
     amount: string;
     type: string;
+    wasFreeMint?: boolean;
+    redemptionCode?: string;
+    transactionUrl?: string;
   } | null>(null);
 
   const mintToken = useMutation({
@@ -71,7 +86,10 @@ export default function Mint() {
       setSuccessData({
         message: message,
         amount: `${mintAmount} tokens${attachValue ? ` • ${attachedValue} ${currency} value` : ''}`,
-        type: 'Token Mint'
+        type: 'Token Mint',
+        wasFreeMint: isFreeMode,
+        redemptionCode: validatedCode?.code,
+        transactionUrl: data.blockchainUrl
       });
       setShowSuccessOverlay(true);
       
@@ -1001,6 +1019,15 @@ export default function Mint() {
         amount={successData?.amount}
         message={successData?.message}
       />
+
+      {/* Share Success Modal */}
+      {successData && (
+        <ShareSuccessModal
+          isOpen={showShareModal}
+          onClose={() => setShowShareModal(false)}
+          mintData={successData}
+        />
+      )}
     </div>
   );
 }
