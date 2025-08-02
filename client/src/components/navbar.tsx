@@ -21,16 +21,12 @@ export default function Navbar() {
     { href: "/info", label: "Info", icon: HelpCircle },
   ];
 
-  // Secondary items for mobile/dropdown
+  // Secondary items for mobile/dropdown - Production ready only
   const secondaryNavItems = [
-    { href: "/portfolio", label: "Portfolio", icon: Trophy },
     { href: "/explore", label: "Explore", icon: Sparkles },
     { href: "/rewards", label: "Rewards", icon: Gift },
     { href: "/referrals", label: "Referrals", icon: Users },
     { href: "/free-codes", label: "Free Codes", icon: Ticket },
-    { href: "/how-it-works", label: "How It Works", icon: HelpCircle },
-    { href: "/admin", label: "Admin", icon: Settings },
-    { href: "/admin/staking", label: "Admin Staking", icon: Settings },
   ];
 
   const isActive = (href: string) => location === href;
