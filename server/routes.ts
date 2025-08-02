@@ -295,12 +295,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: "Code is required" });
       }
 
-      // Check if code exists and is valid - first check redeemable codes, then redemption codes
-      let redemptionCode = await storage.getRedeemableCode(code);
-      if (!redemptionCode) {
-        const allRedemptionCodes = await storage.getAllRedemptionCodes();
-        redemptionCode = allRedemptionCodes.find(rc => rc.code === code) || null;
-      }
+      // Check if code exists and is valid in redemption codes
+      const allRedemptionCodes = await storage.getAllRedemptionCodes();
+      const redemptionCode = allRedemptionCodes.find(rc => rc.code === code) || null;
       
       if (!redemptionCode) {
         return res.status(400).json({ error: "Invalid redemption code" });
@@ -311,8 +308,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: "Redemption code has expired" });
       }
 
-      // Check if code has remaining uses
-      if (redemptionCode.maxUses && redemptionCode.usedCount >= redemptionCode.maxUses) {
+      // Check if code has remaining uses (maxUses = -1 means unlimited)
+      if (redemptionCode.maxUses > 0 && redemptionCode.currentUses >= redemptionCode.maxUses) {
         return res.status(400).json({ error: "Redemption code has been fully used" });
       }
 
@@ -322,7 +319,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         code: redemptionCode.code,
         type: redemptionCode.type,
         value: redemptionCode.value,
-        remainingUses: redemptionCode.maxUses ? redemptionCode.maxUses - redemptionCode.usedCount : null,
+        remainingUses: redemptionCode.maxUses > 0 ? redemptionCode.maxUses - redemptionCode.currentUses : null,
         expiresAt: redemptionCode.expiresAt
       });
     } catch (error) {

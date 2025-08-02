@@ -466,7 +466,7 @@ export default function Mint() {
                   
                   <div className="flex gap-2">
                     <Input
-                      placeholder="Enter redemption code (e.g., FLBY-FREE-2024)"
+                      placeholder="Enter redemption code (e.g., FLBY-EARLY-001)"
                       value={redemptionCode}
                       onChange={(e) => setRedemptionCode(e.target.value.toUpperCase())}
                       disabled={isValidatingCode || isFreeMode}
@@ -483,16 +483,31 @@ export default function Mint() {
                   
                   {validatedCode && isFreeMode && (
                     <div className="p-4 bg-green-50 dark:bg-green-950/20 border border-green-200 dark:border-green-800 rounded-lg">
-                      <div className="flex items-center">
-                        <Ticket className="w-5 h-5 mr-2 text-green-600" />
-                        <div>
-                          <p className="font-semibold text-green-700 dark:text-green-300">
-                            Code Validated Successfully!
-                          </p>
-                          <p className="text-sm text-green-600 dark:text-green-400">
-                            You can now mint your message completely free. No fees will be charged.
-                          </p>
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center">
+                          <Ticket className="w-5 h-5 mr-2 text-green-600" />
+                          <div>
+                            <p className="font-semibold text-green-700 dark:text-green-300">
+                              Code "{validatedCode.code}" Validated!
+                            </p>
+                            <p className="text-sm text-green-600 dark:text-green-400">
+                              Type: {validatedCode.type} • {validatedCode.remainingUses !== null ? `${validatedCode.remainingUses} uses left` : 'Unlimited uses'}
+                            </p>
+                          </div>
                         </div>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => {
+                            setRedemptionCode("");
+                            setValidatedCode(null);
+                            setIsFreeMode(false);
+                          }}
+                          className="text-green-600 hover:text-green-700"
+                        >
+                          <X className="w-4 h-4" />
+                        </Button>
                       </div>
                     </div>
                   )}

@@ -165,6 +165,56 @@ export class MemStorage implements IStorage {
   private limitedEditionSets: Map<string, LimitedEditionSet> = new Map();
   private redemptionCodes: Map<string, RedemptionCode> = new Map();
 
+  constructor() {
+    this.initializeTestData();
+  }
+
+  private initializeTestData() {
+    // Create test redemption codes for development
+    const testCodes = [
+      {
+        id: "test-1",
+        code: "FLBY-EARLY-001",
+        type: "early_access",
+        value: "free_mint",
+        description: "Early access free minting code",
+        isActive: true,
+        maxUses: 10,
+        currentUses: 0,
+        expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days from now
+        createdAt: new Date(),
+      },
+      {
+        id: "test-2", 
+        code: "FLBY-EARLY-002",
+        type: "beta_tester",
+        value: "free_mint",
+        description: "Beta tester free minting code",
+        isActive: true,
+        maxUses: 5,
+        currentUses: 0,
+        expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+        createdAt: new Date(),
+      },
+      {
+        id: "test-3",
+        code: "FLBY-FREE-2024",
+        type: "promotional",
+        value: "free_mint",
+        description: "2024 promotional free minting code",
+        isActive: true,
+        maxUses: -1, // Unlimited uses
+        currentUses: 0,
+        expiresAt: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000), // 90 days
+        createdAt: new Date(),
+      }
+    ];
+
+    testCodes.forEach(code => {
+      this.redemptionCodes.set(code.id, code as RedemptionCode);
+    });
+  }
+
   // User operations
   async getUser(id: string): Promise<User | undefined> {
     return this.users.get(id);
@@ -809,3 +859,8 @@ export class MemStorage implements IStorage {
 
 // Export storage instance
 export const storage = new MemStorage();
+
+// Debug: Log initialization (remove in production)
+storage.getAllRedemptionCodes().then(codes => 
+  console.log('Storage initialized with redemption codes:', codes.map(c => `${c.code} (${c.type})`))
+);
