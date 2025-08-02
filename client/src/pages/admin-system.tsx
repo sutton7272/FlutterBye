@@ -87,7 +87,7 @@ export default function AdminSystem() {
 
   if (healthLoading) {
     return (
-      <div className="min-h-screen bg-black text-white p-6">
+      <div className="min-h-screen text-white p-6">
         <div className="max-w-7xl mx-auto">
           <div className="animate-pulse space-y-6">
             <div className="h-8 bg-gray-800 rounded w-1/4"></div>
@@ -121,7 +121,7 @@ export default function AdminSystem() {
   };
 
   return (
-    <div className="min-h-screen bg-black text-white p-6">
+    <div className="min-h-screen text-white p-6">
       <div className="max-w-7xl mx-auto space-y-8">
         {/* Header */}
         <div className="flex justify-between items-center">
