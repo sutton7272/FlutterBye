@@ -41,6 +41,7 @@ import ReferralRewards from "@/pages/referral-rewards";
 import LaunchCountdown from "@/pages/launch-countdown";
 import AdminEarlyAccess from "@/pages/admin-early-access";
 import AdminFreeCodes from "@/pages/admin-free-codes";
+import AdminPricing from "@/pages/admin-pricing";
 import TokenHolderMapPage from "@/pages/token-holder-map";
 import Navbar from "@/components/navbar";
 import { FloatingActionHub } from "@/components/floating-action-hub";
@@ -268,6 +269,13 @@ function Router() {
           <>
             <Navbar />
             <AdminFreeCodes />
+            <FloatingActionHub />
+          </>
+        )} />
+        <Route path="/admin/pricing" component={() => (
+          <>
+            <Navbar />
+            <AdminPricing />
             <FloatingActionHub />
           </>
         )} />

@@ -2787,6 +2787,113 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Dynamic Pricing Tier Management APIs
+  app.get("/api/admin/pricing-tiers", async (req, res) => {
+    try {
+      const tiers = await storage.getPricingTiers();
+      res.json({
+        success: true,
+        tiers
+      });
+    } catch (error) {
+      console.error("Error fetching pricing tiers:", error);
+      res.status(500).json({ error: "Failed to fetch pricing tiers" });
+    }
+  });
+
+  app.post("/api/admin/pricing-tiers", async (req, res) => {
+    try {
+      const { tierName, minQuantity, maxQuantity, basePricePerToken, discountPercentage, currency, gasFeeIncluded, sortOrder } = req.body;
+      
+      if (!tierName || !basePricePerToken) {
+        return res.status(400).json({ error: "Tier name and base price are required" });
+      }
+
+      const finalPrice = parseFloat(basePricePerToken) * (1 - (parseFloat(discountPercentage) || 0) / 100);
+      
+      const newTier = await storage.createPricingTier({
+        tierName,
+        minQuantity: parseInt(minQuantity) || 1,
+        maxQuantity: maxQuantity ? parseInt(maxQuantity) : null,
+        basePricePerToken: basePricePerToken.toString(),
+        discountPercentage: (discountPercentage || 0).toString(),
+        finalPricePerToken: finalPrice.toString(),
+        currency: currency || "USD",
+        gasFeeIncluded: gasFeeIncluded !== false,
+        sortOrder: parseInt(sortOrder) || 0,
+        isActive: true
+      });
+      
+      res.json({
+        success: true,
+        tier: newTier,
+        message: "Pricing tier created successfully"
+      });
+    } catch (error) {
+      console.error("Error creating pricing tier:", error);
+      res.status(500).json({ error: "Failed to create pricing tier" });
+    }
+  });
+
+  app.put("/api/admin/pricing-tiers/:tierId", async (req, res) => {
+    try {
+      const { tierId } = req.params;
+      const updateData = req.body;
+      
+      if (updateData.basePricePerToken && updateData.discountPercentage !== undefined) {
+        const finalPrice = parseFloat(updateData.basePricePerToken) * (1 - (parseFloat(updateData.discountPercentage) || 0) / 100);
+        updateData.finalPricePerToken = finalPrice.toString();
+      }
+      
+      const updatedTier = await storage.updatePricingTier(tierId, updateData);
+      
+      res.json({
+        success: true,
+        tier: updatedTier,
+        message: "Pricing tier updated successfully"
+      });
+    } catch (error) {
+      console.error("Error updating pricing tier:", error);
+      res.status(500).json({ error: "Failed to update pricing tier" });
+    }
+  });
+
+  app.delete("/api/admin/pricing-tiers/:tierId", async (req, res) => {
+    try {
+      const { tierId } = req.params;
+      await storage.deletePricingTier(tierId);
+      
+      res.json({
+        success: true,
+        message: "Pricing tier deactivated successfully"
+      });
+    } catch (error) {
+      console.error("Error deleting pricing tier:", error);
+      res.status(500).json({ error: "Failed to delete pricing tier" });
+    }
+  });
+
+  // Token pricing calculation endpoint
+  app.post("/api/calculate-token-price", async (req, res) => {
+    try {
+      const { quantity } = req.body;
+      
+      if (!quantity || quantity < 1) {
+        return res.status(400).json({ error: "Valid quantity is required" });
+      }
+      
+      const pricingResult = await storage.calculateTokenPrice(parseInt(quantity));
+      
+      res.json({
+        success: true,
+        ...pricingResult
+      });
+    } catch (error) {
+      console.error("Error calculating token price:", error);
+      res.status(500).json({ error: "Failed to calculate token price" });
+    }
+  });
+
   // Access Codes Management APIs
   app.post("/api/admin/access-codes", async (req, res) => {
     try {

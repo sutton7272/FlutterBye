@@ -1,4 +1,5 @@
 import { randomUUID } from "crypto";
+import { eq } from "drizzle-orm";
 import {
   type User,
   type InsertUser,
@@ -38,6 +39,9 @@ import {
   type InsertRedemptionCodeForm,
   type PricingConfig,
   type InsertPricingConfig,
+  type PricingTier,
+  type InsertPricingTier,
+  pricingTiers,
 } from "@shared/schema";
 
 // Storage interface for both in-memory and database implementations
@@ -149,6 +153,13 @@ export interface IStorage {
   trackRedemptionUsage(data: any): Promise<void>;
   getRedemptionUsageAnalytics(): Promise<any[]>;
   
+  // Pricing tier management
+  getPricingTiers(): Promise<PricingTier[]>;
+  createPricingTier(tier: InsertPricingTier): Promise<PricingTier>;
+  updatePricingTier(tierId: string, updateData: Partial<PricingTier>): Promise<PricingTier>;
+  deletePricingTier(tierId: string): Promise<void>;
+  calculateTokenPrice(quantity: number): Promise<{ pricePerToken: number; totalPrice: number; tier: PricingTier | null; currency: string }>;
+
   // Pricing configuration management
   getPricingConfig(): Promise<any[]>;
   updatePricingConfig(key: string, value: string, currency?: string): Promise<void>;
@@ -906,6 +917,190 @@ export class MemStorage implements IStorage {
       .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
   }
 
+  // Dynamic pricing tier management for MemStorage
+  async getPricingTiers(): Promise<PricingTier[]> {
+    // Initialize default pricing tiers if none exist
+    if (this.pricingConfigData.size === 0) {
+      await this.initializeDefaultPricingTiers();
+    }
+    
+    // Convert existing pricing config to pricing tiers format
+    const tiers: PricingTier[] = [];
+    const configArray = Array.from(this.pricingConfigData.values());
+    
+    // Create tiers based on existing structure
+    tiers.push({
+      id: "tier-1",
+      tierName: "starter",
+      minQuantity: 1,
+      maxQuantity: 9,
+      basePricePerToken: "2.00",
+      discountPercentage: "0",
+      finalPricePerToken: "2.00",
+      currency: "USD",
+      gasFeeIncluded: true,
+      isActive: true,
+      sortOrder: 1,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    });
+    
+    tiers.push({
+      id: "tier-2", 
+      tierName: "bulk_10",
+      minQuantity: 10,
+      maxQuantity: 49,
+      basePricePerToken: "2.00",
+      discountPercentage: "10",
+      finalPricePerToken: "1.80",
+      currency: "USD",
+      gasFeeIncluded: true,
+      isActive: true,
+      sortOrder: 2,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    });
+    
+    tiers.push({
+      id: "tier-3",
+      tierName: "bulk_50", 
+      minQuantity: 50,
+      maxQuantity: 99,
+      basePricePerToken: "2.00",
+      discountPercentage: "20",
+      finalPricePerToken: "1.60",
+      currency: "USD",
+      gasFeeIncluded: true,
+      isActive: true,
+      sortOrder: 3,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    });
+    
+    tiers.push({
+      id: "tier-4",
+      tierName: "bulk_100",
+      minQuantity: 100,
+      maxQuantity: null,
+      basePricePerToken: "2.00", 
+      discountPercentage: "30",
+      finalPricePerToken: "1.40",
+      currency: "USD",
+      gasFeeIncluded: true,
+      isActive: true,
+      sortOrder: 4,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    });
+    
+    return tiers;
+  }
+
+  async createPricingTier(tier: InsertPricingTier): Promise<PricingTier> {
+    const id = randomUUID();
+    const newTier: PricingTier = {
+      id,
+      tierName: tier.tierName,
+      minQuantity: tier.minQuantity || 1,
+      maxQuantity: tier.maxQuantity || null,
+      basePricePerToken: tier.basePricePerToken,
+      discountPercentage: tier.discountPercentage || "0",
+      finalPricePerToken: tier.finalPricePerToken,
+      currency: tier.currency || "USD",
+      gasFeeIncluded: tier.gasFeeIncluded !== false,
+      isActive: tier.isActive !== false,
+      sortOrder: tier.sortOrder || 0,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
+    
+    // Store in pricing config for compatibility
+    this.pricingConfigData.set(id, {
+      id,
+      configKey: `tier_${tier.tierName}`,
+      configValue: tier.finalPricePerToken,
+      currency: tier.currency || "USD",
+      description: `${tier.tierName} pricing tier`,
+      category: "pricing_tiers",
+      isActive: true,
+      updatedAt: new Date(),
+      updatedBy: "admin"
+    });
+    
+    return newTier;
+  }
+
+  async updatePricingTier(tierId: string, updateData: Partial<PricingTier>): Promise<PricingTier> {
+    const tiers = await this.getPricingTiers();
+    const existingTier = tiers.find(t => t.id === tierId);
+    
+    if (!existingTier) {
+      throw new Error("Pricing tier not found");
+    }
+    
+    const updatedTier = {
+      ...existingTier,
+      ...updateData,
+      updatedAt: new Date()
+    };
+    
+    // Update in pricing config
+    this.pricingConfigData.set(tierId, {
+      id: tierId,
+      configKey: `tier_${updatedTier.tierName}`,
+      configValue: updatedTier.finalPricePerToken,
+      currency: updatedTier.currency,
+      description: `${updatedTier.tierName} pricing tier`,
+      category: "pricing_tiers",
+      isActive: updatedTier.isActive,
+      updatedAt: new Date(),
+      updatedBy: "admin"
+    });
+    
+    return updatedTier;
+  }
+
+  async deletePricingTier(tierId: string): Promise<void> {
+    // Mark as inactive
+    const tiers = await this.getPricingTiers();
+    const tier = tiers.find(t => t.id === tierId);
+    if (tier) {
+      await this.updatePricingTier(tierId, { isActive: false });
+    }
+  }
+
+  async calculateTokenPrice(quantity: number): Promise<{ pricePerToken: number; totalPrice: number; tier: PricingTier | null; currency: string }> {
+    const tiers = await this.getPricingTiers();
+    
+    // Find the appropriate tier based on quantity
+    let selectedTier = null;
+    for (const tier of tiers) {
+      if (quantity >= tier.minQuantity && (tier.maxQuantity === null || quantity <= tier.maxQuantity)) {
+        selectedTier = tier;
+        break;
+      }
+    }
+
+    if (!selectedTier) {
+      // Default to highest tier if no match found
+      selectedTier = tiers[tiers.length - 1] || {
+        finalPricePerToken: "2.00",
+        currency: "USD",
+        tierName: "default"
+      };
+    }
+
+    const pricePerToken = parseFloat(selectedTier.finalPricePerToken);
+    const totalPrice = pricePerToken * quantity;
+
+    return {
+      pricePerToken,
+      totalPrice,
+      tier: selectedTier,
+      currency: selectedTier.currency
+    };
+  }
+
   // Pricing configuration management
   async getPricingConfig(): Promise<any[]> {
     // Initialize default pricing if empty
@@ -942,6 +1137,20 @@ export class MemStorage implements IStorage {
   async getPricingByCategory(category: string): Promise<any[]> {
     const allConfig = await this.getPricingConfig();
     return allConfig.filter(config => config.category === category);
+  }
+
+  private async initializeDefaultPricingTiers(): Promise<void> {
+    // This creates the default pricing configuration that supports the tier system
+    const defaultTiers = [
+      { key: "tier_starter", value: "2.00", category: "pricing_tiers", description: "Starter tier: 1-9 tokens at $2.00 each" },
+      { key: "tier_bulk_10", value: "1.80", category: "pricing_tiers", description: "Bulk tier: 10-49 tokens at $1.80 each (10% discount)" }, 
+      { key: "tier_bulk_50", value: "1.60", category: "pricing_tiers", description: "Bulk tier: 50-99 tokens at $1.60 each (20% discount)" },
+      { key: "tier_bulk_100", value: "1.40", category: "pricing_tiers", description: "Enterprise tier: 100+ tokens at $1.40 each (30% discount)" }
+    ];
+
+    for (const tier of defaultTiers) {
+      await this.updatePricingConfig(tier.key, tier.value);
+    }
   }
 
   private async initializeDefaultPricing(): Promise<void> {

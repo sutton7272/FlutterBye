@@ -267,16 +267,19 @@ export const adminSettings = pgTable("admin_settings", {
   updatedBy: varchar("updated_by").references(() => adminUsers.id),
 });
 
-// Pricing configuration table for flexible pricing management
+// Dynamic pricing tiers based on quantity minted
 export const pricingTiers = pgTable("pricing_tiers", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  tierName: text("tier_name").notNull().unique(), // 'base', 'bulk_100', 'bulk_500', etc.
+  tierName: text("tier_name").notNull().unique(), // 'starter', 'bulk_100', 'bulk_500', 'bulk_1000', etc.
   minQuantity: integer("min_quantity").notNull().default(1),
   maxQuantity: integer("max_quantity"), // null for unlimited
   basePricePerToken: decimal("base_price_per_token", { precision: 18, scale: 9 }).notNull(),
   discountPercentage: decimal("discount_percentage", { precision: 5, scale: 2 }).default("0"), // 0-100%
+  finalPricePerToken: decimal("final_price_per_token", { precision: 18, scale: 9 }).notNull(), // After discount
+  currency: text("currency").notNull().default("USD"), // USD, SOL, USDC, FLBY
   gasFeeIncluded: boolean("gas_fee_included").default(true),
   isActive: boolean("is_active").default(true),
+  sortOrder: integer("sort_order").default(0), // For admin panel ordering
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
@@ -693,6 +696,11 @@ export type InsertPricingConfig = typeof pricingConfig.$inferInsert;
 export const insertUserRewardSchema = createInsertSchema(userRewards).omit({ id: true, createdAt: true, updatedAt: true });
 export type InsertUserReward = z.infer<typeof insertUserRewardSchema>;
 export type UserReward = typeof userRewards.$inferSelect;
+
+// Pricing Tier Types
+export const insertPricingTierSchema = createInsertSchema(pricingTiers).omit({ id: true, createdAt: true, updatedAt: true });
+export type InsertPricingTier = z.infer<typeof insertPricingTierSchema>;
+export type PricingTier = typeof pricingTiers.$inferSelect;
 
 export const insertBadgeSchema = createInsertSchema(badges).omit({ id: true, createdAt: true });
 export type InsertBadge = z.infer<typeof insertBadgeSchema>;
