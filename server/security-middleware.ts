@@ -1,210 +1,268 @@
-// Production security middleware
 import type { Request, Response, NextFunction } from 'express';
-import { z } from 'zod';
+import rateLimit from 'express-rate-limit';
 
-// Security headers middleware
-export const securityHeaders = (req: Request, res: Response, next: NextFunction) => {
-  // Basic security headers
-  res.setHeader('X-Content-Type-Options', 'nosniff');
-  res.setHeader('X-Frame-Options', 'DENY');
-  res.setHeader('X-XSS-Protection', '1; mode=block');
-  res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
-  res.setHeader('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
+// Enhanced security middleware for production
+export class SecurityMiddleware {
   
-  // Content Security Policy
-  const csp = [
-    "default-src 'self'",
-    "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net",
-    "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
-    "font-src 'self' https://fonts.gstatic.com",
-    "img-src 'self' data: blob: https:",
-    "connect-src 'self' https: wss:",
-    "frame-ancestors 'none'",
-    "base-uri 'self'",
-    "form-action 'self'"
-  ].join('; ');
-  
-  res.setHeader('Content-Security-Policy', csp);
-  
-  // HSTS for HTTPS
-  if (req.secure) {
-    res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains; preload');
-  }
-  
-  next();
-};
+  // CORS configuration
+  static corsMiddleware() {
+    return (req: Request, res: Response, next: NextFunction) => {
+      const allowedOrigins = [
+        'http://localhost:3000',
+        'http://localhost:5173',
+        'https://*.replit.app',
+        'https://*.replit.co',
+        'https://*.replit.dev'
+      ];
 
-// Input sanitization middleware
-export const sanitizeInput = (req: Request, res: Response, next: NextFunction) => {
-  // Sanitize query parameters
-  if (req.query) {
-    for (const [key, value] of Object.entries(req.query)) {
-      if (typeof value === 'string') {
-        req.query[key] = sanitizeString(value);
+      const origin = req.headers.origin;
+      
+      if (origin && allowedOrigins.some(allowed => 
+        allowed.includes('*') ? origin.includes(allowed.replace('*', '')) : allowed === origin
+      )) {
+        res.header('Access-Control-Allow-Origin', origin);
       }
-    }
-  }
-  
-  // Sanitize body parameters
-  if (req.body && typeof req.body === 'object') {
-    sanitizeObject(req.body);
-  }
-  
-  next();
-};
 
-// String sanitization
-function sanitizeString(input: string): string {
-  return input
-    .replace(/[<>]/g, '') // Remove < and >
-    .replace(/javascript:/gi, '') // Remove javascript: protocol
-    .replace(/on\w+=/gi, '') // Remove event handlers
-    .trim()
-    .slice(0, 1000); // Limit length
-}
+      res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
+      res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization, X-User-ID');
+      res.header('Access-Control-Allow-Credentials', 'true');
+      res.header('Access-Control-Max-Age', '86400');
 
-// Object sanitization
-function sanitizeObject(obj: any): void {
-  for (const [key, value] of Object.entries(obj)) {
-    if (typeof value === 'string') {
-      obj[key] = sanitizeString(value);
-    } else if (typeof value === 'object' && value !== null) {
-      sanitizeObject(value);
-    }
+      if (req.method === 'OPTIONS') {
+        res.sendStatus(200);
+      } else {
+        next();
+      }
+    };
   }
-}
 
-// Request validation middleware factory
-export const validateRequest = (validation: {
-  body?: (body: any) => { isValid: boolean; errors?: string[] };
-  query?: (query: any) => { isValid: boolean; errors?: string[] };
-  params?: (params: any) => { isValid: boolean; errors?: string[] };
-}) => {
-  return (req: Request, res: Response, next: NextFunction) => {
-    const errors: string[] = [];
-    
-    // Validate body
-    if (validation.body && req.body) {
-      const bodyValidation = validation.body(req.body);
-      if (!bodyValidation.isValid) {
-        errors.push(...(bodyValidation.errors || ['Invalid body']));
+  // Comprehensive security headers
+  static securityHeaders() {
+    return (req: Request, res: Response, next: NextFunction) => {
+      // Content Security Policy
+      res.setHeader('Content-Security-Policy', [
+        "default-src 'self'",
+        "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://vercel.live",
+        "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+        "font-src 'self' https://fonts.gstatic.com",
+        "img-src 'self' data: https: blob:",
+        "connect-src 'self' wss: ws: https:",
+        "frame-src 'self' https://vercel.live",
+        "object-src 'none'",
+        "base-uri 'self'"
+      ].join('; '));
+
+      // Security headers
+      res.setHeader('X-Content-Type-Options', 'nosniff');
+      res.setHeader('X-Frame-Options', 'DENY');
+      res.setHeader('X-XSS-Protection', '1; mode=block');
+      res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+      res.setHeader('Permissions-Policy', [
+        'camera=()',
+        'microphone=()',
+        'geolocation=()',
+        'payment=(self)',
+        'usb=()',
+        'magnetometer=()',
+        'gyroscope=()',
+        'accelerometer=()'
+      ].join(', '));
+
+      // HSTS (HTTP Strict Transport Security)
+      if (req.secure || req.headers['x-forwarded-proto'] === 'https') {
+        res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains; preload');
       }
-    }
-    
-    // Validate query
-    if (validation.query && req.query) {
-      const queryValidation = validation.query(req.query);
-      if (!queryValidation.isValid) {
-        errors.push(...(queryValidation.errors || ['Invalid query parameters']));
+
+      next();
+    };
+  }
+
+  // Rate limiting with different tiers
+  static createRateLimiter(maxRequests: number, windowMs: number, message?: string) {
+    return rateLimit({
+      windowMs,
+      max: maxRequests,
+      message: {
+        error: 'Rate limit exceeded',
+        message: message || `Too many requests. Try again in ${Math.ceil(windowMs / 60000)} minutes.`,
+        retryAfter: Math.ceil(windowMs / 1000)
+      },
+      standardHeaders: true,
+      legacyHeaders: false,
+      keyGenerator: (req) => {
+        // Use combination of IP and user ID for authenticated users
+        const userKey = (req as any).user?.userId || 'anonymous';
+        return `${req.ip}_${userKey}`;
+      },
+      skip: (req) => {
+        // Skip rate limiting for health checks
+        return req.path === '/api/health';
       }
-    }
-    
-    // Validate params
-    if (validation.params && req.params) {
-      const paramsValidation = validation.params(req.params);
-      if (!paramsValidation.isValid) {
-        errors.push(...(paramsValidation.errors || ['Invalid URL parameters']));
+    });
+  }
+
+  // Input sanitization middleware
+  static sanitizeInput() {
+    return (req: Request, res: Response, next: NextFunction) => {
+      if (req.body) {
+        req.body = this.sanitizeObject(req.body);
       }
+      
+      if (req.query) {
+        req.query = this.sanitizeObject(req.query);
+      }
+      
+      if (req.params) {
+        req.params = this.sanitizeObject(req.params);
+      }
+      
+      next();
+    };
+  }
+
+  // Sanitize object recursively
+  private static sanitizeObject(obj: any): any {
+    if (typeof obj === 'string') {
+      return this.sanitizeString(obj);
+    } else if (Array.isArray(obj)) {
+      return obj.map(item => this.sanitizeObject(item));
+    } else if (obj && typeof obj === 'object') {
+      const sanitized: any = {};
+      for (const [key, value] of Object.entries(obj)) {
+        sanitized[this.sanitizeString(key)] = this.sanitizeObject(value);
+      }
+      return sanitized;
     }
+    return obj;
+  }
+
+  // Sanitize string input
+  private static sanitizeString(str: string): string {
+    if (typeof str !== 'string') return str;
     
-    if (errors.length > 0) {
-      return res.status(400).json({
-        error: 'Validation failed',
-        details: errors
+    return str
+      .replace(/[<>]/g, '') // Remove basic XSS vectors
+      .replace(/javascript:/gi, '') // Remove javascript: URLs
+      .replace(/on\w+=/gi, '') // Remove event handlers
+      .trim()
+      .slice(0, 10000); // Limit length
+  }
+
+  // Request logging middleware
+  static requestLogger() {
+    return (req: Request, res: Response, next: NextFunction) => {
+      const start = Date.now();
+      const userAgent = req.headers['user-agent'] || 'unknown';
+      const userKey = (req as any).user?.userId || 'anonymous';
+      
+      // Log request
+      console.log(`🌐 ${req.method} ${req.path} - ${req.ip} - ${userKey}`);
+      
+      // Log response when finished
+      res.on('finish', () => {
+        const duration = Date.now() - start;
+        const level = res.statusCode >= 400 ? '❌' : '✅';
+        console.log(`${level} ${req.method} ${req.path} ${res.statusCode} - ${duration}ms`);
       });
-    }
-    
-    next();
-  };
-};
+      
+      next();
+    };
+  }
 
-// Message validation
-export const validateMessage = (message: string): { isValid: boolean; error?: string } => {
-  if (!message || typeof message !== 'string') {
-    return { isValid: false, error: 'Message is required and must be a string' };
+  // Error handling middleware
+  static errorHandler() {
+    return (err: any, req: Request, res: Response, next: NextFunction) => {
+      console.error('🚨 Server error:', err);
+      
+      // Don't leak error details in production
+      const isDevelopment = process.env.NODE_ENV === 'development';
+      
+      const errorResponse = {
+        error: 'Internal server error',
+        message: isDevelopment ? err.message : 'Something went wrong',
+        ...(isDevelopment && { stack: err.stack }),
+        timestamp: new Date().toISOString(),
+        requestId: req.headers['x-request-id'] || 'unknown'
+      };
+      
+      res.status(err.status || 500).json(errorResponse);
+    };
   }
-  
-  if (message.length === 0) {
-    return { isValid: false, error: 'Message cannot be empty' };
-  }
-  
-  if (message.length > 27) {
-    return { isValid: false, error: 'Message must be 27 characters or less' };
-  }
-  
-  // Check for prohibited content
-  const prohibited = ['script', 'javascript:', 'data:', 'vbscript:', 'onload', 'onerror'];
-  const lowerMessage = message.toLowerCase();
-  
-  for (const term of prohibited) {
-    if (lowerMessage.includes(term)) {
-      return { isValid: false, error: 'Message contains prohibited content' };
-    }
-  }
-  
-  return { isValid: true };
-};
 
-// Wallet address validation
-export const validateWalletAddress = (address: string): boolean => {
-  if (!address || typeof address !== 'string') {
-    return false;
+  // Request timeout middleware
+  static requestTimeout(timeoutMs: number = 30000) {
+    return (req: Request, res: Response, next: NextFunction) => {
+      const timeout = setTimeout(() => {
+        if (!res.headersSent) {
+          res.status(408).json({
+            error: 'Request timeout',
+            message: `Request took longer than ${timeoutMs}ms to complete`
+          });
+        }
+      }, timeoutMs);
+      
+      res.on('finish', () => clearTimeout(timeout));
+      res.on('close', () => clearTimeout(timeout));
+      
+      next();
+    };
   }
-  
-  // Solana wallet addresses are base58 encoded and typically 44 characters
-  const base58Regex = /^[1-9A-HJ-NP-Za-km-z]{32,44}$/;
-  return base58Regex.test(address);
-};
 
-// Numeric validation
-export const validateNumeric = (value: any, options: {
-  min?: number;
-  max?: number;
-  integer?: boolean;
-} = {}): { isValid: boolean; error?: string } => {
-  const num = parseFloat(value);
-  
-  if (isNaN(num)) {
-    return { isValid: false, error: 'Must be a valid number' };
+  // Content validation middleware
+  static validateContentType(allowedTypes: string[] = ['application/json']) {
+    return (req: Request, res: Response, next: NextFunction) => {
+      if (['POST', 'PUT', 'PATCH'].includes(req.method)) {
+        const contentType = req.headers['content-type'];
+        
+        if (!contentType || !allowedTypes.some(type => contentType.includes(type))) {
+          return res.status(415).json({
+            error: 'Unsupported Media Type',
+            message: `Content-Type must be one of: ${allowedTypes.join(', ')}`
+          });
+        }
+      }
+      
+      next();
+    };
   }
-  
-  if (options.integer && !Number.isInteger(num)) {
-    return { isValid: false, error: 'Must be an integer' };
-  }
-  
-  if (options.min !== undefined && num < options.min) {
-    return { isValid: false, error: `Must be at least ${options.min}` };
-  }
-  
-  if (options.max !== undefined && num > options.max) {
-    return { isValid: false, error: `Must be at most ${options.max}` };
-  }
-  
-  return { isValid: true };
-};
 
-// CORS middleware for production
-export const corsMiddleware = (req: Request, res: Response, next: NextFunction) => {
-  const allowedOrigins = [
-    'https://flutterbye.replit.app',
-    'https://flutterbye-production.replit.app',
-    process.env.NODE_ENV === 'development' ? 'http://localhost:5000' : null
-  ].filter(Boolean);
-  
-  const origin = req.headers.origin;
-  
-  if (origin && allowedOrigins.includes(origin)) {
-    res.setHeader('Access-Control-Allow-Origin', origin);
+  // Request size limit middleware
+  static requestSizeLimit(maxSizeBytes: number = 10 * 1024 * 1024) { // 10MB default
+    return (req: Request, res: Response, next: NextFunction) => {
+      const contentLength = parseInt(req.headers['content-length'] || '0');
+      
+      if (contentLength > maxSizeBytes) {
+        return res.status(413).json({
+          error: 'Request too large',
+          message: `Request size ${contentLength} bytes exceeds limit of ${maxSizeBytes} bytes`
+        });
+      }
+      
+      next();
+    };
   }
-  
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With');
-  res.setHeader('Access-Control-Allow-Credentials', 'true');
-  res.setHeader('Access-Control-Max-Age', '86400'); // 24 hours
-  
-  if (req.method === 'OPTIONS') {
-    return res.sendStatus(200);
-  }
-  
-  next();
-};
+}
+
+// Pre-configured middleware bundles
+export const productionMiddleware = [
+  SecurityMiddleware.corsMiddleware(),
+  SecurityMiddleware.securityHeaders(),
+  SecurityMiddleware.createRateLimiter(1000, 15 * 60 * 1000), // 1000 req/15min general
+  SecurityMiddleware.sanitizeInput(),
+  SecurityMiddleware.requestLogger(),
+  SecurityMiddleware.requestTimeout(30000),
+  SecurityMiddleware.validateContentType(),
+  SecurityMiddleware.requestSizeLimit()
+];
+
+export const authenticationRateLimit = SecurityMiddleware.createRateLimiter(
+  5, 15 * 60 * 1000, 'Too many authentication attempts'
+);
+
+export const adminRateLimit = SecurityMiddleware.createRateLimiter(
+  50, 15 * 60 * 1000, 'Too many admin requests'
+);
+
+export const tokenCreationRateLimit = SecurityMiddleware.createRateLimiter(
+  20, 60 * 1000, 'Too many token creation attempts'
+);

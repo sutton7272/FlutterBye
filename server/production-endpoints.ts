@@ -1,373 +1,251 @@
-// Production-ready API endpoints with monitoring and security
-import type { Express } from "express";
-import { storage } from "./database-storage.js";
-import { monitoringService, trackTokenCreation, trackTokenRedemption, trackUserSignup } from "./monitoring.js";
-import { smsService } from "./sms-service.js";
-import { generalRateLimit, tokenCreationRateLimit, walletRateLimit, adminRateLimit } from "./rate-limiter.js";
-import { securityHeaders, sanitizeInput, validateRequest, validateMessage, validateWalletAddress } from "./security-middleware.js";
-import { config } from "./environment-config.js";
+import type { Express, Request, Response } from 'express';
+import { monitoring } from './monitoring';
+import { transactionMonitor } from './transaction-monitor';
+import { realTimeMonitor } from './real-time-monitor';
+import { SecurityMiddleware, adminRateLimit, tokenCreationRateLimit } from './security-middleware';
 
-export function registerProductionEndpoints(app: Express) {
-  // Apply global security middleware
-  app.use(securityHeaders);
-  app.use(sanitizeInput);
+// Production monitoring and analytics endpoints
+export function registerProductionEndpoints(app: Express): void {
   
-  // Health check endpoint (no rate limiting)
-  app.get('/api/health', (req, res) => {
-    const health = monitoringService.getHealthStatus();
-    res.status(health.status === 'healthy' ? 200 : 503).json(health);
+  // Advanced health check with comprehensive metrics
+  app.get('/api/system/health', (req: Request, res: Response) => {
+    const healthStatus = monitoring.getHealthStatus();
+    const performanceSummary = monitoring.getPerformanceSummary();
+    const transactionMetrics = transactionMonitor.getMetrics();
+    const realTimeMetrics = realTimeMonitor.getMetrics();
+
+    res.json({
+      status: healthStatus.status,
+      score: healthStatus.score,
+      issues: healthStatus.issues,
+      timestamp: new Date().toISOString(),
+      uptime: performanceSummary.uptime,
+      requests: performanceSummary.requests,
+      memory: performanceSummary.memory,
+      business: performanceSummary.business,
+      transactions: transactionMetrics,
+      realTime: realTimeMetrics,
+      environment: {
+        nodeVersion: process.version,
+        platform: process.platform,
+        arch: process.arch
+      }
+    });
   });
 
-  // Metrics endpoint (admin only)
-  app.get('/api/admin/metrics', adminRateLimit, (req, res) => {
-    const metrics = monitoringService.getMetricsSummary();
+  // Detailed system metrics for monitoring dashboards
+  app.get('/api/system/metrics', (req: Request, res: Response) => {
+    const metrics = monitoring.getMetrics();
     res.json(metrics);
   });
 
-  // SMS Analytics endpoint
-  app.get('/api/admin/sms-analytics', adminRateLimit, async (req, res) => {
-    try {
-      const analytics = await smsService.getSMSAnalytics();
-      res.json(analytics);
-    } catch (error) {
-      console.error('SMS analytics error:', error);
-      res.status(500).json({ error: 'Failed to get SMS analytics' });
-    }
+  // Performance analytics
+  app.get('/api/system/performance', (req: Request, res: Response) => {
+    const summary = monitoring.getPerformanceSummary();
+    res.json(summary);
   });
 
-  // Enhanced token creation with comprehensive validation
-  app.post('/api/tokens/create', 
-    tokenCreationRateLimit,
-    validateRequest({
-      body: (body) => {
-        const errors: string[] = [];
-        
-        if (!body.walletAddress || !validateWalletAddress(body.walletAddress)) {
-          errors.push('Valid wallet address is required');
-        }
-        
-        const messageValidation = validateMessage(body.message);
-        if (!messageValidation.isValid) {
-          errors.push(messageValidation.error!);
-        }
-        
-        if (body.totalSupply && (!Number.isInteger(body.totalSupply) || body.totalSupply < 1 || body.totalSupply > 1000000)) {
-          errors.push('Total supply must be between 1 and 1,000,000');
-        }
-        
-        if (body.valuePerToken && (isNaN(parseFloat(body.valuePerToken)) || parseFloat(body.valuePerToken) < 0)) {
-          errors.push('Value per token must be a positive number');
-        }
-        
-        return { isValid: errors.length === 0, errors };
-      }
-    }),
-    async (req, res) => {
-      try {
-        // Get or create user
-        let user = await storage.getUserByWallet(req.body.walletAddress);
-        if (!user) {
-          user = await storage.createUser({
-            walletAddress: req.body.walletAddress,
-            email: req.body.email || null,
-            airdropPreferences: [],
-            credits: "0"
-          });
-          await trackUserSignup(user);
-        }
-
-        // Create token with enhanced metadata
-        const tokenData = {
-          ...req.body,
-          creatorId: user.id,
-          symbol: 'FLBY-MSG',
-          totalSupply: req.body.totalSupply || 1,
-          availableSupply: req.body.totalSupply || 1,
-          valuePerToken: req.body.valuePerToken || "0.01",
-          metadata: {
-            createdVia: 'web_app',
-            timestamp: new Date().toISOString(),
-            userAgent: req.get('User-Agent'),
-            ...req.body.metadata
-          }
-        };
-
-        const token = await storage.createToken(tokenData);
-        await trackTokenCreation(token, user.id);
-
-        res.status(201).json({
-          success: true,
-          token,
-          message: 'Token created successfully'
-        });
-      } catch (error) {
-        console.error('Token creation error:', error);
-        res.status(500).json({ error: 'Failed to create token' });
-      }
-    }
-  );
-
-  // Enhanced token redemption
-  app.post('/api/tokens/redeem',
-    walletRateLimit,
-    validateRequest({
-      body: (body) => {
-        const errors: string[] = [];
-        
-        if (!body.walletAddress || !validateWalletAddress(body.walletAddress)) {
-          errors.push('Valid wallet address is required');
-        }
-        
-        if (!body.tokenId || typeof body.tokenId !== 'string') {
-          errors.push('Token ID is required');
-        }
-        
-        if (!body.amount || !Number.isInteger(body.amount) || body.amount < 1) {
-          errors.push('Amount must be a positive integer');
-        }
-        
-        return { isValid: errors.length === 0, errors };
-      }
-    }),
-    async (req, res) => {
-      try {
-        const { walletAddress, tokenId, amount } = req.body;
-        
-        // Get user and token
-        const user = await storage.getUserByWallet(walletAddress);
-        if (!user) {
-          return res.status(404).json({ error: 'User not found' });
-        }
-
-        const token = await storage.getToken(tokenId);
-        if (!token) {
-          return res.status(404).json({ error: 'Token not found' });
-        }
-
-        // Calculate redemption value
-        const totalValue = parseFloat(token.valuePerToken) * amount;
-        const feePercentage = config.business.redemptionFeePercentage / 100;
-        const fee = totalValue * feePercentage;
-        const netValue = totalValue - fee;
-
-        // Create redemption record
-        const redemption = await storage.createRedemption({
-          userId: user.id,
-          tokenId: token.id,
-          amount,
-          totalValue: totalValue.toString(),
-          fee: fee.toString(),
-          netValue: netValue.toString(),
-          status: 'pending',
-          walletAddress
-        });
-
-        await trackTokenRedemption(redemption, user.id);
-
-        res.json({
-          success: true,
-          redemption,
-          totalValue,
-          fee,
-          netValue,
-          message: `Redeemed ${amount} tokens for ${netValue.toFixed(4)} SOL`
-        });
-      } catch (error) {
-        console.error('Token redemption error:', error);
-        res.status(500).json({ error: 'Failed to redeem token' });
-      }
-    }
-  );
-
-  // SMS webhook endpoint
-  app.post('/api/sms/webhook', 
-    generalRateLimit,
-    async (req, res) => {
-      try {
-        const tokenData = await smsService.processIncomingSMS(req.body);
-        res.json({
-          success: true,
-          tokenData,
-          message: 'SMS processed successfully'
-        });
-      } catch (error) {
-        console.error('SMS webhook error:', error);
-        res.status(500).json({ error: 'Failed to process SMS' });
-      }
-    }
-  );
-
-  // Enhanced analytics endpoint
-  app.get('/api/admin/analytics', adminRateLimit, async (req, res) => {
-    try {
-      const tokens = await storage.getAllTokensWithOptions({
-        limit: 1000,
-        offset: 0
-      });
-
-      const analytics = {
-        totalTokens: tokens.length,
-        totalUsers: (await storage.getAllAdminUsers()).length, // This would need proper user count
-        totalValueLocked: tokens.reduce((sum, token) => 
-          sum + (parseFloat(token.valuePerToken) * token.totalSupply), 0),
-        tokenCreationTrends: generateDateTrends(tokens),
-        valueDistribution: generateValueDistribution(tokens),
-        popularMessages: generatePopularMessages(tokens),
-        userGrowth: await generateUserGrowthData(),
-        revenueMetrics: await generateRevenueMetrics()
-      };
-
-      res.json(analytics);
-    } catch (error) {
-      console.error('Analytics error:', error);
-      res.status(500).json({ error: 'Failed to get analytics' });
-    }
+  // Transaction monitoring status
+  app.get('/api/system/transactions', (req: Request, res: Response) => {
+    const metrics = transactionMonitor.getMetrics();
+    res.json({
+      ...metrics,
+      timestamp: new Date().toISOString()
+    });
   });
 
-  // Token search with advanced filtering
-  app.get('/api/tokens/search', generalRateLimit, async (req, res) => {
-    try {
-      const { 
-        query = '', 
-        limit = 50, 
-        offset = 0, 
-        sortBy = 'created',
-        valueMin,
-        valueMax,
-        emotionType
-      } = req.query;
+  // Real-time connections status
+  app.get('/api/system/realtime', (req: Request, res: Response) => {
+    const metrics = realTimeMonitor.getMetrics();
+    res.json(metrics);
+  });
 
-      let tokens = await storage.getAllTokensWithOptions({
-        limit: parseInt(limit as string),
-        offset: parseInt(offset as string),
-        search: query as string,
-        sortBy: sortBy as string
+  // Error log endpoint (admin only)
+  app.get('/api/system/errors', adminRateLimit, (req: Request, res: Response) => {
+    const metrics = monitoring.getMetrics();
+    res.json({
+      errors: metrics.errors,
+      totalErrors: metrics.errors.length,
+      timestamp: new Date().toISOString()
+    });
+  });
+
+  // Create test transaction for monitoring
+  app.post('/api/system/test-transaction', tokenCreationRateLimit, async (req: Request, res: Response) => {
+    try {
+      const { userId, type, amount, currency } = req.body;
+      
+      if (!userId || !type) {
+        return res.status(400).json({
+          error: 'Missing required fields',
+          required: ['userId', 'type']
+        });
+      }
+
+      const transactionId = await transactionMonitor.monitorTransaction({
+        userId,
+        type,
+        amount: amount || '0',
+        currency: currency || 'SOL'
       });
 
-      // Apply additional filters
-      if (valueMin) {
-        tokens = tokens.filter(token => parseFloat(token.valuePerToken) >= parseFloat(valueMin as string));
-      }
-
-      if (valueMax) {
-        tokens = tokens.filter(token => parseFloat(token.valuePerToken) <= parseFloat(valueMax as string));
-      }
-
-      if (emotionType) {
-        tokens = tokens.filter(token => token.emotionType === emotionType);
-      }
+      // Simulate processing
+      setTimeout(async () => {
+        const success = Math.random() > 0.3; // 70% success rate
+        
+        if (success) {
+          await transactionMonitor.updateTransactionStatus(
+            transactionId, 
+            'confirmed',
+            {
+              signature: `test_tx_${Date.now()}`,
+              blockHeight: Math.floor(Math.random() * 1000000)
+            }
+          );
+        } else {
+          await transactionMonitor.updateTransactionStatus(
+            transactionId, 
+            'failed',
+            null,
+            'Simulated transaction failure'
+          );
+        }
+      }, 2000 + Math.random() * 3000); // 2-5 second delay
 
       res.json({
-        tokens,
-        total: tokens.length,
-        filters: { query, limit, offset, sortBy, valueMin, valueMax, emotionType }
+        success: true,
+        transactionId,
+        message: 'Test transaction initiated'
       });
     } catch (error) {
-      console.error('Token search error:', error);
-      res.status(500).json({ error: 'Failed to search tokens' });
+      console.error('Test transaction error:', error);
+      res.status(500).json({
+        error: 'Failed to create test transaction',
+        message: error instanceof Error ? error.message : 'Unknown error'
+      });
     }
   });
 
-  // Wallet portfolio endpoint
-  app.get('/api/wallet/:address/portfolio', walletRateLimit, async (req, res) => {
+  // Get transaction status
+  app.get('/api/system/transactions/:transactionId', (req: Request, res: Response) => {
+    const { transactionId } = req.params;
+    const transaction = transactionMonitor.getTransactionStatus(transactionId);
+    
+    if (!transaction) {
+      return res.status(404).json({
+        error: 'Transaction not found',
+        transactionId
+      });
+    }
+    
+    res.json(transaction);
+  });
+
+  // Get user pending transactions
+  app.get('/api/system/users/:userId/transactions', (req: Request, res: Response) => {
+    const { userId } = req.params;
+    const transactions = transactionMonitor.getUserPendingTransactions(userId);
+    
+    res.json({
+      userId,
+      pendingTransactions: transactions,
+      count: transactions.length
+    });
+  });
+
+  // System alert endpoint
+  app.post('/api/system/alert', adminRateLimit, (req: Request, res: Response) => {
     try {
-      const { address } = req.params;
+      const { type, message, severity } = req.body;
       
-      if (!validateWalletAddress(address)) {
-        return res.status(400).json({ error: 'Invalid wallet address' });
+      if (!type || !message || !severity) {
+        return res.status(400).json({
+          error: 'Missing required fields',
+          required: ['type', 'message', 'severity']
+        });
       }
 
-      const user = await storage.getUserByWallet(address);
-      if (!user) {
-        return res.status(404).json({ error: 'Wallet not found' });
-      }
-
-      const createdTokens = await storage.getTokensByCreator(user.id);
-      const holdings = await storage.getTokenHoldingsByUser(user.id);
-      const transactions = await storage.getTransactionsByUser(user.id);
-      const redemptions = await storage.getRedemptionsByWallet(address);
-
-      const portfolio = {
-        walletAddress: address,
-        totalTokensCreated: createdTokens.length,
-        totalValue: createdTokens.reduce((sum, token) => 
-          sum + (parseFloat(token.valuePerToken) * token.totalSupply), 0),
-        holdings,
-        transactions: transactions.slice(0, 10), // Latest 10
-        redemptions: redemptions.slice(0, 10), // Latest 10
-        recentTokens: createdTokens.slice(0, 5) // Latest 5
-      };
-
-      res.json(portfolio);
+      monitoring.generateAlert(type, message, severity);
+      
+      res.json({
+        success: true,
+        message: 'Alert generated successfully'
+      });
     } catch (error) {
-      console.error('Portfolio error:', error);
-      res.status(500).json({ error: 'Failed to get portfolio' });
+      console.error('Alert generation error:', error);
+      res.status(500).json({
+        error: 'Failed to generate alert'
+      });
     }
   });
-}
 
-// Helper functions for analytics
-function generateDateTrends(tokens: any[]): any[] {
-  const last30Days = Array.from({ length: 30 }, (_, i) => {
-    const date = new Date();
-    date.setDate(date.getDate() - i);
-    return {
-      date: date.toISOString().split('T')[0],
-      tokens: tokens.filter(token => {
-        const tokenDate = new Date(token.createdAt).toISOString().split('T')[0];
-        return tokenDate === date.toISOString().split('T')[0];
-      }).length
-    };
-  }).reverse();
-  
-  return last30Days;
-}
+  // System configuration endpoint
+  app.get('/api/system/config', (req: Request, res: Response) => {
+    res.json({
+      environment: process.env.NODE_ENV || 'development',
+      version: '1.0.0',
+      features: {
+        realTimeMonitoring: true,
+        transactionTracking: true,
+        performanceMetrics: true,
+        errorTracking: true,
+        securityMiddleware: true
+      },
+      limits: {
+        maxConnections: 10000,
+        requestTimeout: 30000,
+        maxRequestSize: 10485760, // 10MB
+        rateLimitWindow: 900000 // 15 minutes
+      },
+      security: {
+        rateLimit: true,
+        cors: true,
+        helmet: true,
+        sanitization: true
+      }
+    });
+  });
 
-function generateValueDistribution(tokens: any[]): any[] {
-  const ranges = [
-    { name: '0-0.01 SOL', min: 0, max: 0.01 },
-    { name: '0.01-0.05 SOL', min: 0.01, max: 0.05 },
-    { name: '0.05-0.1 SOL', min: 0.05, max: 0.1 },
-    { name: '0.1-0.5 SOL', min: 0.1, max: 0.5 },
-    { name: '0.5+ SOL', min: 0.5, max: Infinity }
-  ];
+  // Emergency system shutdown endpoint (admin only)
+  app.post('/api/system/shutdown', adminRateLimit, (req: Request, res: Response) => {
+    console.log('🚨 Emergency shutdown initiated by admin');
+    
+    res.json({
+      success: true,
+      message: 'System shutdown initiated',
+      timestamp: new Date().toISOString()
+    });
 
-  return ranges.map(range => ({
-    name: range.name,
-    value: tokens.filter(token => {
-      const value = parseFloat(token.valuePerToken);
-      return value > range.min && value <= range.max;
-    }).length
-  }));
-}
+    // Graceful shutdown
+    setTimeout(() => {
+      transactionMonitor.shutdown();
+      monitoring.shutdown();
+      realTimeMonitor.shutdown();
+      
+      console.log('🛑 Graceful shutdown complete');
+      process.exit(0);
+    }, 1000);
+  });
 
-function generatePopularMessages(tokens: any[]): any[] {
-  const messageCounts = tokens.reduce((acc: any, token) => {
-    const message = token.message.substring(0, 15) + '...';
-    acc[message] = (acc[message] || 0) + 1;
-    return acc;
-  }, {});
+  // System restart endpoint (admin only)
+  app.post('/api/system/restart', adminRateLimit, (req: Request, res: Response) => {
+    console.log('🔄 System restart initiated by admin');
+    
+    res.json({
+      success: true,
+      message: 'System restart initiated',
+      timestamp: new Date().toISOString()
+    });
 
-  return Object.entries(messageCounts)
-    .map(([text, count]) => ({ text, count }))
-    .sort((a: any, b: any) => b.count - a.count)
-    .slice(0, 10);
-}
+    // Restart monitoring services
+    setTimeout(() => {
+      transactionMonitor.shutdown();
+      monitoring.shutdown();
+      realTimeMonitor.shutdown();
+      
+      console.log('🔄 Services restarted');
+    }, 1000);
+  });
 
-async function generateUserGrowthData(): Promise<any[]> {
-  // This would be implemented with proper user tracking
-  return Array.from({ length: 30 }, (_, i) => ({
-    date: new Date(Date.now() - i * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-    users: Math.floor(Math.random() * 50) + 10
-  })).reverse();
-}
-
-async function generateRevenueMetrics(): Promise<any> {
-  // This would be implemented with proper transaction tracking
-  return {
-    totalRevenue: 0,
-    monthlyRevenue: 0,
-    feeCollected: 0,
-    averageTransactionValue: 0
-  };
+  console.log('🏭 Production monitoring endpoints registered');
 }

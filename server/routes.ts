@@ -6,20 +6,33 @@ import { DefaultTokenImageService } from "./default-token-image";
 import { authenticateWallet, requireAdmin, requirePermission, requireSuperAdmin } from "./admin-middleware";
 import { chatService } from "./chat-service";
 import { registerSolanaRoutes } from "./routes-solana";
-import { DefaultTokenImageService } from "./default-token-image";
+import { productionAuth } from "./production-auth";
+import { realTimeMonitor } from "./real-time-monitor";
+import { transactionMonitor } from "./transaction-monitor";
+import { registerProductionEndpoints } from "./production-endpoints";
+import { monitoring } from "./monitoring";
 import { z } from "zod";
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  // Basic security headers
+  // Apply production-grade security middleware
+  app.use(productionAuth.securityHeaders);
+  app.use(productionAuth.rateLimiter(100, 15 * 60 * 1000)); // 100 requests per 15 minutes
+  
+  // Request monitoring middleware
   app.use((req, res, next) => {
-    res.setHeader('X-Content-Type-Options', 'nosniff');
-    res.setHeader('X-Frame-Options', 'DENY');
-    res.setHeader('X-XSS-Protection', '1; mode=block');
+    const start = Date.now();
+    
+    res.on('finish', () => {
+      const responseTime = Date.now() - start;
+      monitoring.recordRequest(responseTime, res.statusCode);
+    });
+    
     next();
   });
   
-  // Health check endpoint
+  // Enhanced health check endpoint with real-time metrics
   app.get('/api/health', (req, res) => {
+    const metrics = realTimeMonitor.getMetrics();
     res.json({
       status: 'healthy',
       timestamp: new Date().toISOString(),
@@ -27,8 +40,137 @@ export async function registerRoutes(app: Express): Promise<Server> {
       services: 'operational',
       uptime: process.uptime(),
       memory: process.memoryUsage(),
-      version: '1.0.0'
+      version: '1.0.0',
+      realTimeMetrics: metrics
     });
+  });
+
+  // Production-grade authentication routes
+  app.post('/api/auth/login', productionAuth.rateLimiter(5, 15 * 60 * 1000), async (req, res) => {
+    try {
+      const { walletAddress, signature, message, deviceInfo } = req.body;
+      const ipAddress = req.ip || req.connection.remoteAddress;
+
+      if (!walletAddress || !signature || !message) {
+        return res.status(400).json({
+          error: 'Missing required fields',
+          required: ['walletAddress', 'signature', 'message']
+        });
+      }
+
+      const authResult = await productionAuth.authenticateUser(
+        walletAddress,
+        signature,
+        message,
+        deviceInfo,
+        ipAddress
+      );
+
+      if (!authResult) {
+        return res.status(401).json({
+          error: 'Authentication failed',
+          message: 'Invalid wallet signature or expired message'
+        });
+      }
+
+      res.json({
+        success: true,
+        user: authResult.user,
+        accessToken: authResult.accessToken,
+        refreshToken: authResult.refreshToken,
+        expiresIn: '24h'
+      });
+
+      console.log(`✅ User authenticated: ${walletAddress}`);
+    } catch (error) {
+      console.error('Login error:', error);
+      res.status(500).json({
+        error: 'Authentication service unavailable',
+        message: 'Please try again later'
+      });
+    }
+  });
+
+  app.post('/api/auth/refresh', async (req, res) => {
+    try {
+      const { refreshToken } = req.body;
+
+      if (!refreshToken) {
+        return res.status(400).json({
+          error: 'Refresh token required'
+        });
+      }
+
+      const result = await productionAuth.refreshAccessToken(refreshToken);
+
+      if (!result) {
+        return res.status(401).json({
+          error: 'Invalid or expired refresh token'
+        });
+      }
+
+      res.json({
+        success: true,
+        accessToken: result.accessToken,
+        user: result.user,
+        expiresIn: '24h'
+      });
+    } catch (error) {
+      console.error('Token refresh error:', error);
+      res.status(500).json({
+        error: 'Token refresh failed',
+        message: 'Please log in again'
+      });
+    }
+  });
+
+  app.post('/api/auth/logout', productionAuth.authenticateToken, async (req, res) => {
+    try {
+      const { refreshToken } = req.body;
+      
+      if (refreshToken) {
+        await productionAuth.logout(refreshToken);
+      }
+
+      res.json({
+        success: true,
+        message: 'Logged out successfully'
+      });
+    } catch (error) {
+      console.error('Logout error:', error);
+      res.status(500).json({
+        error: 'Logout failed'
+      });
+    }
+  });
+
+  app.get('/api/auth/me', productionAuth.authenticateToken, async (req, res) => {
+    try {
+      const user = (req as any).user;
+      const dbUser = await storage.getUser(user.userId);
+      
+      if (!dbUser) {
+        return res.status(404).json({
+          error: 'User not found'
+        });
+      }
+
+      res.json({
+        user: {
+          id: dbUser.id,
+          walletAddress: dbUser.walletAddress,
+          role: dbUser.role,
+          isAdmin: dbUser.isAdmin,
+          adminPermissions: dbUser.adminPermissions,
+          credits: dbUser.credits
+        }
+      });
+    } catch (error) {
+      console.error('Get user error:', error);
+      res.status(500).json({
+        error: 'Failed to get user information'
+      });
+    }
   });
 
   // Admin cache management
@@ -4223,8 +4365,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Register Solana blockchain integration routes
   registerSolanaRoutes(app);
 
+  // Register production monitoring endpoints
+  registerProductionEndpoints(app);
+
   // Initialize chat service heartbeat
   chatService.startHeartbeat();
+  
+  // Initialize WebSocket server for real-time monitoring on existing httpServer
+  realTimeMonitor.initialize(httpServer);
+  
+  // Monitor real-time events
+  realTimeMonitor.on('transaction_update', (data) => {
+    console.log(`📊 Transaction update for user ${data.userId}`);
+  });
+  
+  realTimeMonitor.on('portfolio_update', (data) => {
+    console.log(`💼 Portfolio update for user ${data.userId}`);
+  });
+  
+  console.log('🚀 Production-grade server with real-time monitoring initialized');
   
   return httpServer;
 }
