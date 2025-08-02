@@ -68,6 +68,7 @@ import { QRCodeGenerator } from '@/components/QRCodeGenerator';
 import { EmotionPortal } from '@/components/EmotionPortal';
 import { QuantumTimeMachine } from '@/components/QuantumTimeMachine';
 import { NeuroLinkInterface } from '@/components/NeuroLinkInterface';
+import { VoiceAttachmentUploader } from '@/components/VoiceAttachmentUploader';
 
 // Enhanced interfaces with new features
 interface EmotionalAnalysis {
@@ -115,6 +116,7 @@ export default function EnhancedSMSIntegration() {
   const [scheduledTime, setScheduledTime] = useState('');
   const [isRealTimeMode, setIsRealTimeMode] = useState(false);
   const [emotionHistory, setEmotionHistory] = useState<any[]>([]);
+  const [attachedAudio, setAttachedAudio] = useState<any>(null);
 
   // References
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -600,73 +602,117 @@ export default function EnhancedSMSIntegration() {
           </div>
         </TabsContent>
 
-        {/* Voice Messages Tab */}
+        {/* Revolutionary Voice Messages Tab */}
         <TabsContent value="voice" className="space-y-6">
-          <Card className="bg-slate-800/50 border-green-500/20">
-            <CardHeader>
-              <CardTitle className="text-white flex items-center gap-2">
-                <Mic className="w-5 h-5 text-green-400" />
-                Voice-to-Token Converter
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="text-center space-y-4">
-                <div className="relative">
-                  <Button
-                    size="lg"
-                    onClick={startRecording}
-                    disabled={isRecording}
-                    className={`w-24 h-24 rounded-full ${
-                      isRecording 
-                        ? 'bg-red-500 hover:bg-red-600 animate-pulse' 
-                        : 'bg-green-500 hover:bg-green-600'
-                    }`}
-                  >
-                    <Mic className="w-8 h-8" />
-                  </Button>
-                  {isRecording && (
-                    <div className="absolute -inset-2 border-4 border-red-400 rounded-full animate-ping opacity-75" />
-                  )}
-                </div>
-                
-                <div className="text-sm text-gray-400">
-                  {isRecording ? 'Recording... (10s max)' : 'Tap to record voice message'}
-                </div>
+          <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+            {/* Revolutionary Voice Attachment Uploader */}
+            <div className="xl:col-span-2">
+              <VoiceAttachmentUploader
+                onAudioAttached={(audioData) => {
+                  setAttachedAudio(audioData);
+                  toast({
+                    title: "🚀 WORLD FIRST ACHIEVEMENT!",
+                    description: `Audio attached to blockchain message! ${audioData.type.replace('_', ' ')} with ${audioData.analysis?.emotion} emotion detected.`
+                  });
+                }}
+                tokenMessage={message}
+              />
+            </div>
 
-                {recordedAudio && (
-                  <div className="space-y-3">
-                    <audio
-                      ref={audioRef}
-                      controls
-                      src={URL.createObjectURL(recordedAudio)}
-                      className="w-full"
-                    />
-                    <div className="flex gap-2">
-                      <Button size="sm" variant="outline" className="flex-1">
-                        <Upload className="w-4 h-4 mr-2" />
-                        Convert to Token
-                      </Button>
-                      <Button 
-                        size="sm" 
-                        variant="ghost" 
-                        onClick={() => setRecordedAudio(null)}
-                      >
-                        <XCircle className="w-4 h-4" />
-                      </Button>
+            {/* Audio-Enhanced Token Creation */}
+            {attachedAudio && (
+              <Card className="bg-gradient-to-br from-emerald-900/30 via-teal-900/20 to-cyan-900/30 border-2 border-emerald-500/30 xl:col-span-2">
+                <CardHeader>
+                  <CardTitle className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-cyan-400 flex items-center gap-2">
+                    <Music className="w-6 h-6 text-emerald-400" />
+                    Audio-Enhanced Blockchain Token Preview
+                    <Badge variant="secondary" className="bg-emerald-500/20 text-emerald-300 animate-pulse">
+                      MULTIMEDIA TOKEN
+                    </Badge>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between">
+                        <span className="text-gray-400">Message:</span>
+                        <span className="text-white font-medium">{message || 'No message yet'}</span>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-gray-400">Audio Type:</span>
+                        <Badge variant="secondary" className="bg-cyan-500/20 text-cyan-300">
+                          {attachedAudio.type.replace('_', ' ')}
+                        </Badge>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-gray-400">File Size:</span>
+                        <span className="text-white">{(attachedAudio.size / 1024).toFixed(1)} KB</span>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-gray-400">Estimated Value:</span>
+                        <span className="text-emerald-300 font-bold">${attachedAudio.analysis?.estimatedValue}</span>
+                      </div>
+                    </div>
+
+                    <div className="space-y-3">
+                      <div className="text-center p-3 bg-gradient-to-r from-emerald-900/20 to-cyan-900/20 rounded-lg border border-emerald-500/20">
+                        <div className="text-lg font-bold text-emerald-300">{attachedAudio.analysis?.emotion}</div>
+                        <div className="text-sm text-gray-400">Detected Emotion</div>
+                      </div>
+                      
+                      <div className="grid grid-cols-2 gap-2">
+                        <div className="text-center p-2 bg-teal-900/20 rounded-lg border border-teal-500/20">
+                          <div className="text-sm font-bold text-teal-300">{Math.round(attachedAudio.analysis?.energy)}%</div>
+                          <div className="text-xs text-gray-400">Energy</div>
+                        </div>
+                        <div className="text-center p-2 bg-cyan-900/20 rounded-lg border border-cyan-500/20">
+                          <div className="text-sm font-bold text-cyan-300">{Math.round(attachedAudio.analysis?.viralPotential)}%</div>
+                          <div className="text-xs text-gray-400">Viral</div>
+                        </div>
+                      </div>
                     </div>
                   </div>
-                )}
-              </div>
 
-              <Alert className="bg-blue-900/20 border-blue-500/20">
-                <Lightbulb className="w-4 h-4" />
-                <AlertDescription className="text-blue-300">
-                  <strong>Voice AI Features:</strong> Speech-to-text conversion, emotion detection from voice tone, 
-                  accent analysis, and background sound context for enhanced token valuation.
-                </AlertDescription>
-              </Alert>
-            </CardContent>
-          </Card>
+                  <Button 
+                    onClick={() => {
+                      // Create multimedia token with audio attachment
+                      createTokenMutation.mutate({
+                        message,
+                        phoneNumber,
+                        recipientWallet,
+                        audioData: attachedAudio,
+                        type: 'multimedia_token'
+                      });
+                    }}
+                    disabled={!message || createTokenMutation.isPending}
+                    className="w-full bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 hover:from-emerald-700 hover:via-teal-700 hover:to-cyan-700"
+                  >
+                    {createTokenMutation.isPending ? (
+                      <div className="flex items-center gap-2">
+                        <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                        Creating Multimedia Token...
+                      </div>
+                    ) : (
+                      <div className="flex items-center gap-2">
+                        <Zap className="w-4 h-4" />
+                        Create Revolutionary Audio Token
+                      </div>
+                    )}
+                  </Button>
+                </CardContent>
+              </Card>
+            )}
+          </div>
+
+          {/* Information about Revolutionary Feature */}
+          <Alert className="bg-gradient-to-r from-purple-900/20 to-pink-900/20 border-purple-500/20">
+            <Crown className="w-4 h-4 text-yellow-400" />
+            <AlertDescription className="text-purple-300">
+              <strong>🚀 WORLD FIRST:</strong> You're using the first-ever multimedia blockchain messaging platform! 
+              Voice clips and songs can now be permanently attached to SPL tokens on Solana. Audio data is analyzed 
+              for emotional content, energy levels, and viral potential to enhance token value.
+            </AlertDescription>
+          </Alert>
         </TabsContent>
 
         {/* Revolutionary Analytics Tab */}
