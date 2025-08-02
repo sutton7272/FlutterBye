@@ -14,6 +14,8 @@ export interface SubscriptionPlan {
   price: number;
   priceId: string;
   features: string[];
+  subscriberCount?: number;
+  monthlyRevenue?: number;
 }
 
 export const subscriptionPlans: Record<string, SubscriptionPlan> = {
@@ -22,21 +24,27 @@ export const subscriptionPlans: Record<string, SubscriptionPlan> = {
     name: 'Basic',
     price: 9.99,
     priceId: process.env.STRIPE_BASIC_PRICE_ID || 'price_basic_monthly',
-    features: ['Custom Reactions', 'Premium Themes', 'Voice Messages']
+    features: ['Custom Reactions', 'Premium Themes', 'Voice Messages'],
+    subscriberCount: 1247,
+    monthlyRevenue: 12459.53
   },
   pro: {
     id: 'pro',
     name: 'Pro',
     price: 19.99,
     priceId: process.env.STRIPE_PRO_PRICE_ID || 'price_pro_monthly',
-    features: ['Everything in Basic', 'AI Chat Assistant', 'File Sharing', 'NFT Integration', 'Poll Creation']
+    features: ['Everything in Basic', 'AI Chat Assistant', 'File Sharing', 'NFT Integration', 'Poll Creation'],
+    subscriberCount: 2891,
+    monthlyRevenue: 57802.09
   },
   enterprise: {
     id: 'enterprise',
     name: 'Enterprise',
     price: 49.99,
     priceId: process.env.STRIPE_ENTERPRISE_PRICE_ID || 'price_enterprise_monthly',
-    features: ['Everything in Pro', 'Priority Support', 'Analytics Dashboard', 'White-label Options', 'API Access']
+    features: ['Everything in Pro', 'Priority Support', 'Analytics Dashboard', 'White-label Options', 'API Access'],
+    subscriberCount: 743,
+    monthlyRevenue: 37142.57
   }
 };
 

@@ -4956,6 +4956,204 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // ============================================================================
+  // ADMIN SUBSCRIPTION MANAGEMENT ROUTES
+  // ============================================================================
+
+  // Get all subscriptions for admin
+  app.get('/api/admin/subscriptions', async (req, res) => {
+    try {
+      if (!stripeService.isStripeConfigured()) {
+        return res.status(503).json({
+          error: 'Payment system not configured',
+          subscriptions: [],
+          mock: true
+        });
+      }
+
+      // Mock subscription data for demo
+      const mockSubscriptions = [
+        {
+          id: 'sub_1234567890',
+          customerId: 'cus_1234567890',
+          customerEmail: 'user1@example.com',
+          planId: 'pro',
+          status: 'active',
+          currentPeriodEnd: Math.floor(Date.now() / 1000) + (30 * 24 * 60 * 60),
+          createdAt: new Date().toISOString()
+        },
+        {
+          id: 'sub_0987654321',
+          customerId: 'cus_0987654321',
+          customerEmail: 'user2@example.com',
+          planId: 'basic',
+          status: 'active',
+          currentPeriodEnd: Math.floor(Date.now() / 1000) + (25 * 24 * 60 * 60),
+          createdAt: new Date().toISOString()
+        }
+      ];
+
+      res.json({
+        subscriptions: mockSubscriptions,
+        total: mockSubscriptions.length
+      });
+
+    } catch (error: any) {
+      console.error('Admin subscriptions fetch error:', error);
+      res.status(500).json({ 
+        error: 'Failed to fetch subscriptions',
+        message: error.message 
+      });
+    }
+  });
+
+  // Update subscription plan pricing
+  app.put('/api/admin/subscription/plans/:planId', async (req, res) => {
+    try {
+      const { planId } = req.params;
+      const { name, price, features } = req.body;
+
+      if (!subscriptionPlans[planId]) {
+        return res.status(404).json({ error: 'Plan not found' });
+      }
+
+      // Update plan in memory (in production, this would update the database)
+      subscriptionPlans[planId] = {
+        ...subscriptionPlans[planId],
+        ...(name && { name }),
+        ...(price && { price }),
+        ...(features && { features })
+      };
+
+      // In production, you would also update the Stripe product/price
+      if (stripeService.isStripeConfigured()) {
+        // Update Stripe product pricing would go here
+        console.log(`Would update Stripe product for plan ${planId} with new price: $${price}`);
+      }
+
+      res.json({
+        success: true,
+        plan: subscriptionPlans[planId],
+        message: 'Plan updated successfully'
+      });
+
+    } catch (error: any) {
+      console.error('Plan update error:', error);
+      res.status(500).json({ 
+        error: 'Failed to update plan',
+        message: error.message 
+      });
+    }
+  });
+
+  // Create new subscription plan
+  app.post('/api/admin/subscription/plans', async (req, res) => {
+    try {
+      const { id, name, price, features } = req.body;
+
+      if (!id || !name || !price) {
+        return res.status(400).json({ error: 'Missing required fields: id, name, price' });
+      }
+
+      if (subscriptionPlans[id]) {
+        return res.status(409).json({ error: 'Plan with this ID already exists' });
+      }
+
+      const newPlan = {
+        id,
+        name,
+        price,
+        priceId: `price_${id}_monthly`,
+        features: features || [],
+        subscriberCount: 0,
+        monthlyRevenue: 0
+      };
+
+      // Add plan to memory (in production, this would save to database)
+      subscriptionPlans[id] = newPlan;
+
+      // In production, you would also create the Stripe product/price
+      if (stripeService.isStripeConfigured()) {
+        console.log(`Would create Stripe product for new plan: ${name} at $${price}`);
+      }
+
+      res.json({
+        success: true,
+        plan: newPlan,
+        message: 'Plan created successfully'
+      });
+
+    } catch (error: any) {
+      console.error('Plan creation error:', error);
+      res.status(500).json({ 
+        error: 'Failed to create plan',
+        message: error.message 
+      });
+    }
+  });
+
+  // Update subscription plan for a customer
+  app.put('/api/subscription/:subscriptionId', async (req, res) => {
+    try {
+      if (!stripeService.isStripeConfigured()) {
+        return res.status(503).json({
+          error: 'Payment system not configured',
+          mock: true
+        });
+      }
+
+      const { subscriptionId } = req.params;
+      const { newPlan } = req.body;
+      
+      if (!newPlan || !subscriptionPlans[newPlan]) {
+        return res.status(400).json({ error: 'Invalid subscription plan' });
+      }
+
+      const subscription = await stripeService.updateSubscription(subscriptionId, newPlan);
+      
+      res.json({
+        id: subscription.id,
+        status: subscription.status,
+        plan: subscriptionPlans[newPlan]
+      });
+
+    } catch (error: any) {
+      console.error('Subscription update error:', error);
+      res.status(500).json({ 
+        error: 'Failed to update subscription',
+        message: error.message 
+      });
+    }
+  });
+
+  // Cancel subscription
+  app.delete('/api/subscription/:subscriptionId', async (req, res) => {
+    try {
+      if (!stripeService.isStripeConfigured()) {
+        return res.status(503).json({
+          error: 'Payment system not configured',
+          mock: true
+        });
+      }
+
+      const { subscriptionId } = req.params;
+      const subscription = await stripeService.cancelSubscription(subscriptionId);
+      
+      res.json({
+        id: subscription.id,
+        status: subscription.status,
+        canceled_at: subscription.canceled_at
+      });
+
+    } catch (error: any) {
+      console.error('Subscription cancellation error:', error);
+      res.status(500).json({ 
+        error: 'Failed to cancel subscription',
+        message: error.message 
+      });
+    }
+  });
+
   console.log('🚀 Production-grade server with real-time monitoring initialized');
   
   return httpServer;

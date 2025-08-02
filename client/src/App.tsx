@@ -40,6 +40,7 @@ import AdminStaking from "@/pages/admin-staking";
 import ReferralRewards from "@/pages/referral-rewards";
 import LaunchCountdown from "@/pages/launch-countdown";
 import Subscribe from "@/pages/subscribe";
+import AdminSubscriptions from "@/pages/admin-subscriptions";
 import AdminEarlyAccess from "@/pages/admin-early-access";
 import AdminFreeCodes from "@/pages/admin-free-codes";
 import AdminPricing from "@/pages/admin-pricing";
@@ -269,6 +270,12 @@ function Router() {
           <>
             <Navbar />
             <AdminPricing />
+          </>
+        )} />
+        <Route path="/admin/subscriptions" component={() => (
+          <>
+            <Navbar />
+            <AdminSubscriptions />
           </>
         )} />
         <Route path="/referrals" component={() => (
