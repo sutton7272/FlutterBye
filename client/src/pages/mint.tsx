@@ -946,12 +946,16 @@ export default function Mint() {
                       <p className="text-[10px] text-muted-foreground">Identify high-value holders</p>
                     </div>
                     <div className="border border-green-500/20 bg-green-500/5 rounded-lg p-2">
-                      <h4 className="font-medium text-green-400 mb-1 text-xs">Distribution Patterns</h4>
-                      <p className="text-[10px] text-muted-foreground">Understand holder behavior</p>
+                      <h4 className="font-medium text-green-400 mb-1 text-xs">Geographic Mapping</h4>
+                      <p className="text-[10px] text-muted-foreground">See global token distribution</p>
                     </div>
                     <div className="border border-purple-500/20 bg-purple-500/5 rounded-lg p-2">
-                      <h4 className="font-medium text-purple-400 mb-1 text-xs">Targeted Campaigns</h4>
-                      <p className="text-[10px] text-muted-foreground">Optimize your outreach</p>
+                      <h4 className="font-medium text-purple-400 mb-1 text-xs">Engagement Tracking</h4>
+                      <p className="text-[10px] text-muted-foreground">Monitor holder activity</p>
+                    </div>
+                    <div className="border border-orange-500/20 bg-orange-500/5 rounded-lg p-2">
+                      <h4 className="font-medium text-orange-400 mb-1 text-xs">Influence Scoring</h4>
+                      <p className="text-[10px] text-muted-foreground">Rate holder influence</p>
                     </div>
                   </div>
                   <div className="space-y-2">
@@ -995,13 +999,11 @@ export default function Mint() {
                           
                           const holders = await response.json();
                           
-                          // Show success toast with holder count
                           toast({
                             title: "Analysis Complete",
                             description: `Found ${holders.length} token holders for analysis.`,
                           });
                           
-                          // You could open a modal here or navigate to detailed view
                           console.log("Token holders:", holders);
                           
                         } catch (error) {
@@ -1016,6 +1018,78 @@ export default function Mint() {
                     >
                       <Target className="w-3 h-3 mr-1" />
                       Analyze Holders
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      className="w-full" 
+                      size="sm"
+                      onClick={async () => {
+                        if (!message.trim()) {
+                          toast({
+                            title: "Enter a message first",
+                            description: "Please enter a token message for export.",
+                            variant: "destructive",
+                          });
+                          return;
+                        }
+                        
+                        try {
+                          const response = await fetch('/api/tokens/export-holders', {
+                            method: 'POST',
+                            headers: {
+                              'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({
+                              tokenName: message,
+                              format: 'csv'
+                            }),
+                          });
+                          
+                          if (!response.ok) {
+                            throw new Error('Failed to export data');
+                          }
+                          
+                          const blob = await response.blob();
+                          const url = window.URL.createObjectURL(blob);
+                          const a = document.createElement('a');
+                          a.href = url;
+                          a.download = `${message}-holders.csv`;
+                          document.body.appendChild(a);
+                          a.click();
+                          window.URL.revokeObjectURL(url);
+                          document.body.removeChild(a);
+                          
+                          toast({
+                            title: "Export Complete",
+                            description: "Holder data exported successfully.",
+                          });
+                          
+                        } catch (error) {
+                          console.error('Error exporting holders:', error);
+                          toast({
+                            title: "Export Failed",
+                            description: "Failed to export holder data. Please try again.",
+                            variant: "destructive",
+                          });
+                        }
+                      }}
+                    >
+                      <FileImage className="w-3 h-3 mr-1" />
+                      Export Data
+                    </Button>
+                    <Button 
+                      variant="ghost" 
+                      className="w-full text-xs" 
+                      size="sm"
+                      onClick={() => {
+                        toast({
+                          title: "Campaign Builder",
+                          description: "Advanced campaign tools coming soon with AI-powered targeting.",
+                        });
+                      }}
+                    >
+                      <Wand2 className="w-3 h-3 mr-1" />
+                      Campaign Builder
                     </Button>
                   </div>
                 </div>
