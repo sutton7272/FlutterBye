@@ -1,7 +1,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-import { Coins, Wallet, Send, Flame, Shield, ArrowRight, CheckCircle } from 'lucide-react';
+import { Coins, Wallet, Send, Flame, Shield, ArrowRight, CheckCircle, Users, TrendingUp, Zap, MessageCircle } from 'lucide-react';
 
 export default function HowItWorksPage() {
   const steps = [
@@ -9,13 +9,19 @@ export default function HowItWorksPage() {
       icon: <Wallet className="w-8 h-8 text-blue-500" />,
       title: "Connect Your Wallet",
       description: "Connect your Solana wallet (Phantom, Solflare) to start creating and receiving tokens.",
-      details: ["Secure wallet integration", "No private key sharing", "One-click connection"]
+      details: ["Secure wallet integration", "No private key sharing", "One-click connection", "9 major wallets supported"]
     },
     {
       icon: <Coins className="w-8 h-8 text-green-500" />,
-      title: "Create Your Token",
-      description: "Write a 27-character message and optionally attach SOL or USDC value to create your Fluttercoin.",
-      details: ["27-character message limit", "Optional value attachment", "Custom images supported", "FlBY-MSG token standard"]
+      title: "Create Solo or Collaborate",
+      description: "Create tokens alone or join collaborative sessions with others in real-time.",
+      details: ["Solo creation with AI optimization", "Real-time collaborative sessions", "Live contribution tracking", "Multi-user decision making"]
+    },
+    {
+      icon: <Flame className="w-8 h-8 text-orange-500" />,
+      title: "Go Viral & Trending",
+      description: "Track viral potential and discover trending tokens with advanced engagement analytics.",
+      details: ["Real-time viral scoring", "Growth trend analysis", "Engagement optimization", "Trending discovery"]
     },
     {
       icon: <Send className="w-8 h-8 text-purple-500" />,
@@ -33,19 +39,34 @@ export default function HowItWorksPage() {
 
   const features = [
     {
+      title: "Real-Time Collaboration",
+      description: "Create tokens together with others in live collaborative sessions with instant updates.",
+      icon: <Users className="w-6 h-6 text-blue-500" />
+    },
+    {
+      title: "Viral Acceleration Engine",
+      description: "Advanced viral scoring tracks engagement trends and optimizes your token's viral potential.",
+      icon: <TrendingUp className="w-6 h-6 text-green-500" />
+    },
+    {
+      title: "AI-Powered Optimization",
+      description: "Smart text optimization helps you create the most effective 27-character messages.",
+      icon: <Zap className="w-6 h-6 text-yellow-500" />
+    },
+    {
       title: "Secure Escrow System",
       description: "Your attached value is safely held in secure escrow wallets until redemption.",
       icon: <Shield className="w-6 h-6 text-green-500" />
     },
     {
+      title: "SMS Integration",
+      description: "Send emotional tokens directly through SMS messages for cross-platform communication.",
+      icon: <MessageCircle className="w-6 h-6 text-purple-500" />
+    },
+    {
       title: "Transparent Tracking",
       description: "Track all your transactions, redemptions, and token activity in your dashboard.",
       icon: <CheckCircle className="w-6 h-6 text-blue-500" />
-    },
-    {
-      title: "Community Wall",
-      description: "Discover and explore public tokens shared by the Flutterbye community.",
-      icon: <Send className="w-6 h-6 text-purple-500" />
     }
   ];
 
@@ -53,17 +74,20 @@ export default function HowItWorksPage() {
     <div className="container mx-auto px-4 py-8">
       <div className="max-w-4xl mx-auto">
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold mb-4 bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+          <h1 className="text-4xl font-bold mb-4 bg-gradient-to-r from-blue-400 via-green-400 to-purple-400 bg-clip-text text-transparent electric-frame">
             How Flutterbye Works
           </h1>
-          <p className="text-xl text-muted-foreground">
-            Learn how to create, send, and redeem value-bearing messages on Solana
+          <p className="text-xl text-muted-foreground mb-4">
+            Revolutionary blockchain messaging with collaborative creation and viral acceleration
           </p>
+          <Badge variant="outline" className="mb-2 border-blue-500 text-blue-400">
+            Industry-First Collaborative Features
+          </Badge>
         </div>
 
         {/* Process Steps */}
         <div className="mb-12">
-          <h2 className="text-2xl font-bold mb-8 text-center">Simple 4-Step Process</h2>
+          <h2 className="text-2xl font-bold mb-8 text-center">Simple 5-Step Process</h2>
           <div className="space-y-8">
             {steps.map((step, index) => (
               <Card key={index} className="relative overflow-hidden">
@@ -109,10 +133,10 @@ export default function HowItWorksPage() {
 
         <Separator className="my-12" />
 
-        {/* Key Features */}
+        {/* Revolutionary Features */}
         <div className="mb-12">
-          <h2 className="text-2xl font-bold mb-8 text-center">Key Features</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <h2 className="text-2xl font-bold mb-8 text-center">Revolutionary Features</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {features.map((feature, index) => (
               <Card key={index} className="text-center">
                 <CardHeader>
@@ -132,6 +156,48 @@ export default function HowItWorksPage() {
         </div>
 
         <Separator className="my-12" />
+
+        {/* Collaborative & Viral Features */}
+        <Card className="mb-8 electric-frame">
+          <CardHeader>
+            <CardTitle className="text-2xl text-center bg-gradient-to-r from-blue-400 to-green-400 bg-clip-text text-transparent">
+              Industry-Disrupting Features
+            </CardTitle>
+            <CardDescription className="text-center">
+              Revolutionary collaborative and viral mechanics that no competitor offers
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-4">
+                <h3 className="font-semibold mb-2 flex items-center">
+                  <Users className="w-5 h-5 mr-2 text-blue-500" />
+                  Collaborative Creation
+                </h3>
+                <ul className="space-y-1 text-sm text-muted-foreground">
+                  <li>• Real-time multi-user token sessions</li>
+                  <li>• Live contribution tracking and analytics</li>
+                  <li>• Creator/contributor role management</li>
+                  <li>• Session discovery and joining</li>
+                  <li>• Collaborative decision making</li>
+                </ul>
+              </div>
+              <div className="space-y-4">
+                <h3 className="font-semibold mb-2 flex items-center">
+                  <TrendingUp className="w-5 h-5 mr-2 text-green-500" />
+                  Viral Acceleration
+                </h3>
+                <ul className="space-y-1 text-sm text-muted-foreground">
+                  <li>• Real-time viral score calculation</li>
+                  <li>• Growth trend analysis (hourly/daily/weekly)</li>
+                  <li>• Engagement optimization suggestions</li>
+                  <li>• Trending discovery mechanisms</li>
+                  <li>• Viral potential prediction</li>
+                </ul>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
 
         {/* Token Economics */}
         <Card className="mb-8">
@@ -195,6 +261,18 @@ export default function HowItWorksPage() {
               <h3 className="font-semibold mb-2">How long can I hold tokens before redeeming?</h3>
               <p className="text-sm text-muted-foreground">
                 Tokens with attached value can be held indefinitely. However, some tokens may have expiration dates set by their creators for automatic refunds.
+              </p>
+            </div>
+            <div>
+              <h3 className="font-semibold mb-2">How do collaborative sessions work?</h3>
+              <p className="text-sm text-muted-foreground">
+                Start a collaborative session from the Mint page, share the session ID, and invite others to contribute in real-time. All participants can suggest changes, vote on decisions, and track viral potential together.
+              </p>
+            </div>
+            <div>
+              <h3 className="font-semibold mb-2">What makes tokens go viral?</h3>
+              <p className="text-sm text-muted-foreground">
+                Our viral acceleration engine tracks engagement patterns, sharing velocity, and community interaction to calculate viral scores. Higher engagement leads to trending status and increased visibility.
               </p>
             </div>
             <div>
