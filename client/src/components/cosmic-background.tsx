@@ -17,19 +17,21 @@ export function CosmicBackground() {
 
   return (
     <div
-      className="fixed inset-0 w-full h-full z-[-2]"
+      className="fixed inset-0 w-full h-full"
       style={{
         backgroundImage: imageLoaded ? 'url(/images/cosmic-butterfly.png)' : 'none',
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         backgroundAttachment: 'fixed',
         backgroundRepeat: 'no-repeat',
+        zIndex: -10,
       }}
     >
       <div 
-        className="absolute inset-0 w-full h-full z-[-1]" 
+        className="absolute inset-0 w-full h-full" 
         style={{ 
-          background: 'rgba(0, 0, 0, 0.4)' 
+          background: 'rgba(0, 0, 0, 0.4)',
+          zIndex: -9,
         }} 
       />
     </div>

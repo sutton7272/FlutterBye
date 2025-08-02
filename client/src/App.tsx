@@ -49,6 +49,7 @@ function Router() {
   return (
     <div className="dark min-h-screen relative">
       <CosmicBackground />
+      <div className="relative z-10">
       <Switch>
         <Route path="/" component={LaunchCountdown} />
         <Route path="/launch" component={LaunchCountdown} />
@@ -273,6 +274,7 @@ function Router() {
         )} />
         <Route component={NotFound} />
       </Switch>
+      </div>
     </div>
   );
 }
