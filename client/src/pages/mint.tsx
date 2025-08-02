@@ -26,6 +26,7 @@ import TokenHolderAnalysis from "@/components/token-holder-analysis";
 import { TransactionSuccessOverlay } from "@/components/confetti-celebration";
 import { ShareSuccessModal } from "@/components/ShareSuccessModal";
 import { TokenPriceComparison } from "@/components/token-price-comparison";
+import { MintingProgressOverlay } from "@/components/MintingProgressOverlay";
 
 export default function Mint() {
   const { toast } = useToast();
@@ -100,6 +101,11 @@ export default function Mint() {
   // Progress tracking for step-by-step guidance
   const [currentStep, setCurrentStep] = useState(1);
   
+  // Minting progress states
+  const [showMintingProgress, setShowMintingProgress] = useState(false);
+  const [mintingStep, setMintingStep] = useState<string>("");
+  const [mintingError, setMintingError] = useState<string>("");
+  
   // Determine current step based on form completion
   const determineCurrentStep = () => {
     if (!message || message.length === 0) return 1; // Message step
@@ -127,10 +133,50 @@ export default function Mint() {
 
   const mintToken = useMutation({
     mutationFn: async (data: InsertToken) => {
-      const response = await apiRequest("POST", "/api/tokens", data);
-      return response.json();
+      // Show progress overlay
+      setShowMintingProgress(true);
+      setMintingError("");
+      
+      try {
+        // Step 1: Validation
+        setMintingStep("validation");
+        await new Promise(resolve => setTimeout(resolve, 1500));
+        
+        // Step 2: Wallet connection
+        setMintingStep("wallet");
+        await new Promise(resolve => setTimeout(resolve, 2000));
+        
+        // Step 3: Image processing (if applicable)
+        if (data.image) {
+          setMintingStep("image");
+          await new Promise(resolve => setTimeout(resolve, 3000));
+        }
+        
+        // Step 4: Token creation
+        setMintingStep("token");
+        const response = await apiRequest("POST", "/api/tokens", data);
+        await new Promise(resolve => setTimeout(resolve, 4000));
+        
+        // Step 5: Value attachment (if applicable)
+        if (data.attachedValue && parseFloat(data.attachedValue) > 0) {
+          setMintingStep("value");
+          await new Promise(resolve => setTimeout(resolve, 3000));
+        }
+        
+        // Step 6: Finalization
+        setMintingStep("finalization");
+        await new Promise(resolve => setTimeout(resolve, 2000));
+        
+        return response.json();
+      } catch (error) {
+        setMintingError(error instanceof Error ? error.message : "Unknown error occurred");
+        throw error;
+      }
     },
     onSuccess: (data) => {
+      setShowMintingProgress(false);
+      setMintingStep("");
+      
       // Show confetti celebration
       setSuccessData({
         message: message,
@@ -161,6 +207,9 @@ export default function Mint() {
       setMessageMedia([]);
     },
     onError: (error) => {
+      setShowMintingProgress(false);
+      setMintingStep("");
+      
       toast({
         title: "Minting Failed",
         description: error.message || "Failed to mint token. Please try again.",
@@ -1401,6 +1450,27 @@ export default function Mint() {
           mintData={successData}
         />
       )}
+
+      {/* Minting Progress Overlay */}
+      <MintingProgressOverlay
+        isVisible={showMintingProgress}
+        currentStep={mintingStep}
+        onComplete={() => {
+          setShowMintingProgress(false);
+          setMintingStep("");
+        }}
+        onError={(error) => {
+          setMintingError(error);
+          setShowMintingProgress(false);
+          setMintingStep("");
+        }}
+        mintingData={{
+          message: message,
+          quantity: parseInt(mintAmount) || 0,
+          hasValue: attachValue && parseFloat(attachedValue) > 0,
+          hasImage: !!tokenImage
+        }}
+      />
     </div>
   );
 }
