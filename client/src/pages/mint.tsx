@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,7 +12,6 @@ import { Switch } from "@/components/ui/switch";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
-import { useMutation, useQuery } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import ImageUpload from "@/components/image-upload";
 import { LoadingSpinner } from "@/components/loading-spinner";
@@ -389,7 +389,7 @@ export default function Mint() {
         </div>
 
         <Tabs defaultValue="individual" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-2 bg-slate-800/50">
+          <TabsList className="grid w-full grid-cols-3 bg-slate-800/50">
             <TabsTrigger value="individual" className="flex items-center gap-2">
               <Coins className="w-4 h-4" />
               Individual Token
@@ -397,6 +397,10 @@ export default function Mint() {
             <TabsTrigger value="limited" className="flex items-center gap-2">
               <Star className="w-4 h-4" />
               Limited Edition
+            </TabsTrigger>
+            <TabsTrigger value="collaborative" className="flex items-center gap-2">
+              <Users className="w-4 h-4" />
+              🚀 Collaborative Mode
             </TabsTrigger>
           </TabsList>
 
@@ -1425,6 +1429,10 @@ export default function Mint() {
               </CardContent>
             </Card>
           </TabsContent>
+
+          <TabsContent value="collaborative" className="space-y-6">
+            <CollaborativeCreationTab />
+          </TabsContent>
         </Tabs>
       </div>
       
@@ -1470,5 +1478,273 @@ export default function Mint() {
         }}
       />
     </div>
+  );
+}
+
+// Collaborative Creation Tab Component
+function CollaborativeCreationTab() {
+  const [selectedSessionId, setSelectedSessionId] = useState('');
+  const [sessionName, setSessionName] = useState('');
+  const [isCreatingSession, setIsCreatingSession] = useState(false);
+
+  const { data: sessions, refetch: refetchSessions } = useQuery<any[]>({
+    queryKey: ['/api/collaborative/sessions'],
+    refetchInterval: 5000
+  });
+
+  const createSessionMutation = useMutation({
+    mutationFn: async (data: { name: string; description?: string }) => {
+      const response = await fetch('/api/collaborative/create-session', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ...data,
+          creatorId: 'current-user'
+        })
+      });
+      return response.json();
+    },
+    onSuccess: (data) => {
+      setSelectedSessionId(data.sessionId);
+      setIsCreatingSession(false);
+      setSessionName('');
+      refetchSessions();
+    }
+  });
+
+  const joinSessionMutation = useMutation({
+    mutationFn: async (sessionId: string) => {
+      const response = await fetch('/api/collaborative/join-session', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          sessionId,
+          userId: 'current-user'
+        })
+      });
+      return response.json();
+    },
+    onSuccess: () => {
+      refetchSessions();
+    }
+  });
+
+  const handleCreateSession = () => {
+    if (!sessionName.trim()) return;
+    createSessionMutation.mutate({
+      name: sessionName,
+      description: 'Collaborative token creation session'
+    });
+  };
+
+  return (
+    <Card className="electric-frame">
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2 text-gradient">
+          <Users className="w-5 h-5" />
+          Collaborative Token Creation
+        </CardTitle>
+        <CardDescription>
+          Create tokens together in real-time with multiple contributors
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        {/* Session Creation */}
+        <div className="mb-6">
+          <h3 className="text-lg font-medium mb-3 text-white">Create New Session</h3>
+          <div className="flex gap-3">
+            <Input
+              placeholder="Session name..."
+              value={sessionName}
+              onChange={(e) => setSessionName(e.target.value)}
+              onKeyPress={(e) => e.key === 'Enter' && handleCreateSession()}
+              className="flex-1"
+            />
+            <Button 
+              onClick={handleCreateSession}
+              disabled={!sessionName.trim() || createSessionMutation.isPending}
+              className="bg-purple-600 hover:bg-purple-700"
+            >
+              {createSessionMutation.isPending ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <>
+                  <Plus className="h-4 w-4 mr-2" />
+                  Create
+                </>
+              )}
+            </Button>
+          </div>
+        </div>
+
+        {/* Active Sessions */}
+        <div className="space-y-4">
+          <h3 className="text-lg font-medium text-white">Active Sessions</h3>
+          
+          {sessions?.map((session: any) => (
+            <Card 
+              key={session.sessionId}
+              className={`transition-all duration-200 cursor-pointer ${
+                selectedSessionId === session.sessionId 
+                  ? 'ring-2 ring-purple-500 bg-purple-900/10' 
+                  : 'hover:ring-1 hover:ring-purple-400/50'
+              }`}
+              onClick={() => setSelectedSessionId(session.sessionId)}
+            >
+              <CardContent className="p-4">
+                <div className="flex items-center justify-between mb-3">
+                  <div>
+                    <h4 className="font-medium text-white">{session.name || 'Untitled Session'}</h4>
+                    <p className="text-sm text-slate-400">
+                      Created by {session.creatorId} • {session.collaborators?.length || 0} contributors
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Badge 
+                      variant={session.status === 'active' ? 'default' : 'secondary'}
+                      className={session.status === 'active' ? 'bg-green-600' : ''}
+                    >
+                      {session.status === 'active' ? 'Live' : 'Paused'}
+                    </Badge>
+                    <Button
+                      size="sm"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        joinSessionMutation.mutate(session.sessionId);
+                      }}
+                      disabled={joinSessionMutation.isPending}
+                      className="bg-blue-600 hover:bg-blue-700"
+                    >
+                      Join
+                    </Button>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-xs">
+                  <div>
+                    <span className="text-slate-400">Token Progress:</span>
+                    <div className="text-white font-medium">
+                      {session.tokenProgress?.message ? '✓ Message' : '○ Message'}
+                    </div>
+                  </div>
+                  <div>
+                    <span className="text-slate-400">Contributions:</span>
+                    <div className="text-white font-medium">
+                      {session.contributions?.length || 0}
+                    </div>
+                  </div>
+                  <div>
+                    <span className="text-slate-400">Viral Score:</span>
+                    <div className="text-green-400 font-medium">
+                      {session.viralPotential?.score || 0}/100
+                    </div>
+                  </div>
+                  <div>
+                    <span className="text-slate-400">Last Activity:</span>
+                    <div className="text-white font-medium">
+                      {session.lastActivity ? 'Just now' : 'N/A'}
+                    </div>
+                  </div>
+                </div>
+
+                {session.currentToken && (
+                  <div className="mt-3 pt-3 border-t border-slate-700">
+                    <div className="text-sm">
+                      <span className="text-slate-400">Current Token: </span>
+                      <span className="text-white font-mono">{session.currentToken.message || 'Working...'}</span>
+                    </div>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          ))}
+
+          {(!sessions || sessions.length === 0) && (
+            <Card className="text-center py-12">
+              <CardContent>
+                <Users className="h-12 w-12 text-slate-600 mx-auto mb-4" />
+                <h3 className="text-lg font-medium text-white mb-2">No Active Sessions</h3>
+                <p className="text-slate-400 mb-4">Create a new collaborative session to get started</p>
+                <Button 
+                  onClick={() => setIsCreatingSession(true)}
+                  className="bg-purple-600 hover:bg-purple-700"
+                >
+                  Create First Session
+                </Button>
+              </CardContent>
+            </Card>
+          )}
+        </div>
+
+        {/* Session Details */}
+        {selectedSessionId && (
+          <Card className="mt-6 bg-gradient-to-r from-purple-900/20 to-blue-900/20 border-purple-500/30">
+            <CardHeader>
+              <CardTitle className="text-sm text-purple-400">Session Active</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <Card className="bg-slate-800/50">
+                  <CardContent className="p-4">
+                    <div className="flex items-center space-x-2">
+                      <Users className="h-5 w-5 text-blue-400" />
+                      <div>
+                        <p className="text-sm text-slate-300">Active Contributors</p>
+                        <p className="text-xl font-bold text-white">3</p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card className="bg-slate-800/50">
+                  <CardContent className="p-4">
+                    <div className="flex items-center space-x-2">
+                      <Zap className="h-5 w-5 text-yellow-400" />
+                      <div>
+                        <p className="text-sm text-slate-300">Viral Potential</p>
+                        <p className="text-xl font-bold text-white">87/100</p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card className="bg-slate-800/50">
+                  <CardContent className="p-4">
+                    <div className="flex items-center space-x-2">
+                      <Target className="h-5 w-5 text-green-400" />
+                      <div>
+                        <p className="text-sm text-slate-300">Contributions</p>
+                        <p className="text-xl font-bold text-white">12</p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+
+              <div className="mt-4 p-4 bg-slate-800/30 rounded-lg">
+                <h4 className="text-sm font-medium text-white mb-2">Current Token Preview</h4>
+                <div className="text-lg font-mono text-gradient">
+                  "Building the future together..."
+                </div>
+                <p className="text-xs text-slate-400 mt-2">
+                  Last edited by user_123 • 2 minutes ago
+                </p>
+              </div>
+
+              <div className="mt-4 flex gap-2">
+                <Button size="sm" className="bg-green-600 hover:bg-green-700">
+                  <CheckCircle className="h-4 w-4 mr-2" />
+                  Finalize Token
+                </Button>
+                <Button size="sm" variant="outline">
+                  <X className="h-4 w-4 mr-2" />
+                  Leave Session
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+      </CardContent>
+    </Card>
   );
 }

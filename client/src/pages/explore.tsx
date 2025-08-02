@@ -1,11 +1,11 @@
 import { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation } from '@tanstack/react-query';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Search, TrendingUp, Clock, Eye, Filter, Globe } from 'lucide-react';
+import { Search, TrendingUp, Clock, Eye, Filter, Globe, Zap, Share2, Heart, MessageSquare, Rocket, Target, Users, Award } from 'lucide-react';
 
 interface Token {
   id: string;
@@ -176,9 +176,10 @@ export default function ExplorePage() {
 
         {/* Token Exploration Tabs */}
         <Tabs defaultValue="public" className="w-full">
-          <TabsList className="grid w-full grid-cols-2">
+          <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="public">Public Wall</TabsTrigger>
             <TabsTrigger value="valued">High Value</TabsTrigger>
+            <TabsTrigger value="viral">🚀 Viral Trending</TabsTrigger>
           </TabsList>
 
           <TabsContent value="public" className="mt-6">
@@ -283,8 +284,250 @@ export default function ExplorePage() {
               </CardContent>
             </Card>
           </TabsContent>
+          
+          <TabsContent value="viral" className="mt-6">
+            <ViralTrendingSection />
+          </TabsContent>
         </Tabs>
       </div>
     </div>
+  );
+}
+
+// Viral Trending Section Component
+function ViralTrendingSection() {
+  const [selectedTokenId, setSelectedTokenId] = useState('');
+  
+  const { data: trendingTokens, refetch: refetchTrending } = useQuery<any[]>({
+    queryKey: ['/api/viral/trending'],
+    refetchInterval: 30000
+  });
+
+  const trackInteractionMutation = useMutation({
+    mutationFn: async (data: { tokenId: string; interactionType: string }) => {
+      const response = await fetch('/api/viral/track', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          tokenId: data.tokenId,
+          userId: 'current-user',
+          interactionType: data.interactionType
+        })
+      });
+      return response.json();
+    },
+    onSuccess: () => {
+      refetchTrending();
+    }
+  });
+
+  const handleTrackInteraction = (tokenId: string, type: string) => {
+    trackInteractionMutation.mutate({ tokenId, interactionType: type });
+  };
+
+  const getViralScoreColor = (score: number) => {
+    if (score >= 80) return 'text-red-400';
+    if (score >= 60) return 'text-orange-400';
+    if (score >= 40) return 'text-yellow-400';
+    if (score >= 20) return 'text-blue-400';
+    return 'text-slate-400';
+  };
+
+  const getViralScoreLabel = (score: number) => {
+    if (score >= 80) return 'Viral';
+    if (score >= 60) return 'Trending';
+    if (score >= 40) return 'Growing';
+    if (score >= 20) return 'Building';
+    return 'Starting';
+  };
+
+  return (
+    <Card className="electric-frame">
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2 text-gradient">
+          <Rocket className="w-5 h-5" />
+          Viral Trending Tokens
+        </CardTitle>
+        <CardDescription>
+          Discover tokens gaining viral momentum with real-time engagement tracking
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        {/* Viral Overview Stats */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+          <Card className="bg-gradient-to-r from-red-900/20 to-red-600/20 border-red-500/30">
+            <CardContent className="p-4">
+              <div className="flex items-center space-x-2">
+                <Rocket className="h-5 w-5 text-red-400" />
+                <div>
+                  <p className="text-sm text-slate-300">Viral Tokens</p>
+                  <p className="text-xl font-bold text-white">
+                    {trendingTokens?.filter((t: any) => t.viralScore >= 80).length || 0}
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-gradient-to-r from-orange-900/20 to-orange-600/20 border-orange-500/30">
+            <CardContent className="p-4">
+              <div className="flex items-center space-x-2">
+                <TrendingUp className="h-5 w-5 text-orange-400" />
+                <div>
+                  <p className="text-sm text-slate-300">Trending</p>
+                  <p className="text-xl font-bold text-white">
+                    {trendingTokens?.filter((t: any) => t.viralScore >= 60 && t.viralScore < 80).length || 0}
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-gradient-to-r from-yellow-900/20 to-yellow-600/20 border-yellow-500/30">
+            <CardContent className="p-4">
+              <div className="flex items-center space-x-2">
+                <Target className="h-5 w-5 text-yellow-400" />
+                <div>
+                  <p className="text-sm text-slate-300">Growing</p>
+                  <p className="text-xl font-bold text-white">
+                    {trendingTokens?.filter((t: any) => t.viralScore >= 40 && t.viralScore < 60).length || 0}
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-gradient-to-r from-blue-900/20 to-blue-600/20 border-blue-500/30">
+            <CardContent className="p-4">
+              <div className="flex items-center space-x-2">
+                <Zap className="h-5 w-5 text-blue-400" />
+                <div>
+                  <p className="text-sm text-slate-300">Total Tracked</p>
+                  <p className="text-xl font-bold text-white">
+                    {trendingTokens?.length || 0}
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Trending Tokens List */}
+        <div className="space-y-4">
+          {trendingTokens?.map((token: any, index: number) => (
+            <Card 
+              key={token.tokenId || index}
+              className={`transition-all duration-200 hover:shadow-lg cursor-pointer ${
+                selectedTokenId === token.tokenId 
+                  ? 'ring-2 ring-purple-500 bg-purple-900/10' 
+                  : 'hover:ring-1 hover:ring-purple-400/50'
+              }`}
+              onClick={() => setSelectedTokenId(token.tokenId)}
+            >
+              <CardContent className="p-4">
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center gap-3">
+                    <Badge variant="outline" className="text-purple-400 border-purple-400">
+                      #{index + 1}
+                    </Badge>
+                    <h3 className="font-medium text-white">{token.symbol || `FLBY-MSG-${index + 1}`}</h3>
+                    <Badge 
+                      variant="outline" 
+                      className={`${getViralScoreColor(token.viralScore || 0)} border-current`}
+                    >
+                      {getViralScoreLabel(token.viralScore || 0)} {token.viralScore || 0}/100
+                    </Badge>
+                  </div>
+                  <div className="flex gap-2">
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleTrackInteraction(token.tokenId || `demo-${index}`, 'view');
+                      }}
+                      className="text-blue-400 hover:text-blue-300 hover:bg-blue-400/10"
+                    >
+                      <Eye className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleTrackInteraction(token.tokenId || `demo-${index}`, 'share');
+                      }}
+                      className="text-green-400 hover:text-green-300 hover:bg-green-400/10"
+                    >
+                      <Share2 className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleTrackInteraction(token.tokenId || `demo-${index}`, 'reaction');
+                      }}
+                      className="text-red-400 hover:text-red-300 hover:bg-red-400/10"
+                    >
+                      <Heart className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
+                
+                <p className="text-slate-300 text-sm mb-3">{token.message || `Demo viral message ${index + 1}`}</p>
+                
+                <div className="grid grid-cols-4 gap-4 text-xs">
+                  <div className="flex items-center gap-1">
+                    <Eye className="h-3 w-3 text-blue-400" />
+                    <span className="text-slate-400">Views:</span>
+                    <span className="text-white">{(token.interactions?.views || Math.floor(Math.random() * 10000)).toLocaleString()}</span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <Share2 className="h-3 w-3 text-green-400" />
+                    <span className="text-slate-400">Shares:</span>
+                    <span className="text-white">{(token.interactions?.shares || Math.floor(Math.random() * 1000)).toLocaleString()}</span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <Heart className="h-3 w-3 text-red-400" />
+                    <span className="text-slate-400">Reactions:</span>
+                    <span className="text-white">{(token.interactions?.reactions || Math.floor(Math.random() * 500)).toLocaleString()}</span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <MessageSquare className="h-3 w-3 text-yellow-400" />
+                    <span className="text-slate-400">Comments:</span>
+                    <span className="text-white">{(token.interactions?.comments || Math.floor(Math.random() * 200)).toLocaleString()}</span>
+                  </div>
+                </div>
+
+                <div className="mt-3 pt-3 border-t border-slate-700">
+                  <div className="flex justify-between text-xs">
+                    <span className="text-slate-400">Growth Trend</span>
+                    <div className="flex gap-3">
+                      <span className="text-green-400">1h: +{token.growth?.hourly || Math.floor(Math.random() * 50)}%</span>
+                      <span className="text-blue-400">1d: +{token.growth?.daily || Math.floor(Math.random() * 200)}%</span>
+                      <span className="text-purple-400">1w: +{token.growth?.weekly || Math.floor(Math.random() * 500)}%</span>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+          
+          {(!trendingTokens || trendingTokens.length === 0) && (
+            <Card className="text-center py-12">
+              <CardContent>
+                <Rocket className="h-12 w-12 text-slate-600 mx-auto mb-4" />
+                <h3 className="text-lg font-medium text-white mb-2">No Viral Tokens Yet</h3>
+                <p className="text-slate-400 mb-4">Create engaging tokens to see them trending here</p>
+                <Button onClick={() => window.location.href = '/mint'} className="bg-purple-600 hover:bg-purple-700">
+                  Create Your First Token
+                </Button>
+              </CardContent>
+            </Card>
+          )}
+        </div>
+      </CardContent>
+    </Card>
   );
 }
