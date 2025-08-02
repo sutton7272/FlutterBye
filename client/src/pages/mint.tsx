@@ -379,23 +379,30 @@ export default function Mint() {
               </div>
               
               <form onSubmit={handleSubmit} className="space-y-6">
-                <div>
+                <div className="electric-frame p-4 bg-gradient-to-r from-electric-blue/5 to-electric-green/5">
                   <div className="flex justify-between items-center mb-2">
-                    <Label htmlFor="message">Message (Max 27 characters)</Label>
-                    <Badge variant={remainingChars < 0 ? "destructive" : "secondary"}>
+                    <Label htmlFor="message" className="text-electric-blue font-semibold flex items-center gap-2">
+                      <Sparkles className="w-4 h-4" />
+                      Message (Max 27 characters)
+                    </Label>
+                    <Badge variant={remainingChars < 0 ? "destructive" : "secondary"} className="border-electric-blue/50">
                       {remainingChars}/27
                     </Badge>
                   </div>
-                  <Input
-                    id="message"
-                    value={message}
-                    onChange={(e) => setMessage(e.target.value)}
-                    maxLength={27}
-                    required
-                    placeholder="StakeNowForYield"
-                    className={remainingChars < 0 ? "border-destructive" : ""}
-                  />
-                  <p className="text-xs text-muted-foreground mt-1">
+                  <div className="relative">
+                    <Input
+                      id="message"
+                      value={message}
+                      onChange={(e) => setMessage(e.target.value)}
+                      maxLength={27}
+                      required
+                      placeholder="StakeNowForYield"
+                      className={`${remainingChars < 0 ? "border-destructive" : "border-electric-blue/50"} bg-black/40 text-white placeholder:text-gray-400 focus:border-electric-green focus:ring-electric-green/20`}
+                    />
+                    <div className="absolute inset-0 rounded-md border border-electric-blue/30 pointer-events-none animate-pulse"></div>
+                  </div>
+                  <p className="text-xs text-electric-blue/80 mt-2 flex items-center gap-1">
+                    <Zap className="w-3 h-3" />
                     Your message will become the token name with FLBY-MSG symbol
                   </p>
                 </div>
