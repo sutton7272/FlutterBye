@@ -97,6 +97,22 @@ export default function Mint() {
   const [validatedCode, setValidatedCode] = useState<any>(null);
   const [isFreeMode, setIsFreeMode] = useState(false);
   
+  // Progress tracking for step-by-step guidance
+  const [currentStep, setCurrentStep] = useState(1);
+  
+  // Determine current step based on form completion
+  const determineCurrentStep = () => {
+    if (!message || message.length === 0) return 1; // Message step
+    if (!mintAmount || parseInt(mintAmount) <= 0) return 2; // Quantity step
+    if (attachValue && (!attachedValue || parseFloat(attachedValue) <= 0)) return 3; // Value step
+    return 4; // Ready to mint (Image is optional)
+  };
+  
+  // Update current step when form changes
+  useEffect(() => {
+    setCurrentStep(determineCurrentStep());
+  }, [message, mintAmount, attachValue, attachedValue]);
+  
   // Confetti celebration state
   const [showSuccessOverlay, setShowSuccessOverlay] = useState(false);
   const [showShareModal, setShowShareModal] = useState(false);
@@ -353,12 +369,53 @@ export default function Mint() {
                 </div>
               </div>
               
+              {/* Progress Steps Header */}
+              <div className="mb-6 p-4 bg-gradient-to-r from-slate-900/80 to-black/60 rounded-xl border border-electric-blue/20">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-4">
+                    {[
+                      { step: 1, label: "Message", icon: Sparkles, completed: message.length > 0 },
+                      { step: 2, label: "Quantity", icon: Calculator, completed: mintAmount && parseInt(mintAmount) > 0 },
+                      { step: 3, label: "Value", icon: DollarSign, completed: !attachValue || (attachedValue && parseFloat(attachedValue) > 0) },
+                      { step: 4, label: "Mint", icon: Zap, completed: false }
+                    ].map(({ step, label, icon: Icon, completed }) => (
+                      <div key={step} className="flex items-center gap-2">
+                        <div className={`
+                          w-8 h-8 rounded-full flex items-center justify-center transition-all duration-300
+                          ${currentStep === step 
+                            ? 'bg-gradient-to-r from-electric-blue to-circuit-teal animate-pulse shadow-lg shadow-electric-blue/50' 
+                            : completed 
+                              ? 'bg-green-600 text-white' 
+                              : 'bg-gray-700 text-gray-400'
+                          }
+                        `}>
+                          <Icon className="w-4 h-4" />
+                        </div>
+                        <span className={`text-sm font-medium ${
+                          currentStep === step ? 'text-electric-blue' : completed ? 'text-green-400' : 'text-gray-400'
+                        }`}>
+                          {label}
+                        </span>
+                        {step < 4 && <div className="w-8 h-px bg-gray-600"></div>}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
               <form onSubmit={handleSubmit} className="space-y-6">
-                <div className="electric-frame p-4 bg-gradient-to-r from-electric-blue/5 to-electric-green/5">
+                <div className={`electric-frame p-4 transition-all duration-500 ${
+                  currentStep === 1 
+                    ? 'bg-gradient-to-r from-electric-blue/20 to-electric-green/20 ring-2 ring-electric-blue/50 shadow-lg shadow-electric-blue/25' 
+                    : 'bg-gradient-to-r from-electric-blue/5 to-electric-green/5'
+                }`}>
                   <div className="flex justify-between items-center mb-2">
-                    <Label htmlFor="message" className="text-electric-blue font-semibold flex items-center gap-2">
-                      <Sparkles className="w-4 h-4" />
+                    <Label htmlFor="message" className={`font-semibold flex items-center gap-2 ${
+                      currentStep === 1 ? 'text-electric-blue animate-pulse' : 'text-electric-blue'
+                    }`}>
+                      <Sparkles className={`w-4 h-4 ${currentStep === 1 ? 'animate-spin' : ''}`} />
                       Message (Max 27 characters)
+                      {currentStep === 1 && <Badge className="bg-electric-blue/20 text-electric-blue border-electric-blue animate-pulse ml-2">Step 1</Badge>}
                     </Label>
                     <Badge variant={remainingChars < 0 ? "destructive" : "secondary"} className="border-electric-blue/50">
                       {remainingChars}/27
@@ -390,9 +447,19 @@ export default function Mint() {
                   />
                 </div>
                 
-                <div className="space-y-4">
+                <div className={`space-y-4 transition-all duration-500 ${
+                  currentStep === 2 
+                    ? 'ring-2 ring-electric-blue/50 shadow-lg shadow-electric-blue/25 bg-gradient-to-r from-blue-900/20 to-green-900/20 p-4 rounded-xl' 
+                    : ''
+                }`}>
                   <div>
-                    <Label htmlFor="mintAmount">Mint Amount</Label>
+                    <Label htmlFor="mintAmount" className={`flex items-center gap-2 ${
+                      currentStep === 2 ? 'text-electric-blue animate-pulse' : ''
+                    }`}>
+                      <Calculator className={`w-4 h-4 ${currentStep === 2 ? 'animate-spin' : ''}`} />
+                      Mint Amount
+                      {currentStep === 2 && <Badge className="bg-electric-blue/20 text-electric-blue border-electric-blue animate-pulse ml-2">Step 2</Badge>}
+                    </Label>
                     <Input
                       id="mintAmount"
                       type="number"
@@ -612,10 +679,17 @@ export default function Mint() {
                 
                 <Separator />
                 
-                <div className="space-y-4">
-                  <h4 className="text-lg font-semibold flex items-center">
-                    <DollarSign className="w-5 h-5 mr-2 text-blue-500" />
+                <div className={`space-y-4 transition-all duration-500 ${
+                  currentStep === 3 
+                    ? 'ring-2 ring-electric-blue/50 shadow-lg shadow-electric-blue/25 bg-gradient-to-r from-blue-900/20 to-green-900/20 p-4 rounded-xl' 
+                    : ''
+                }`}>
+                  <h4 className={`text-lg font-semibold flex items-center ${
+                    currentStep === 3 ? 'text-electric-blue animate-pulse' : ''
+                  }`}>
+                    <DollarSign className={`w-5 h-5 mr-2 ${currentStep === 3 ? 'text-electric-blue animate-spin' : 'text-blue-500'}`} />
                     Value & Distribution Settings
+                    {currentStep === 3 && <Badge className="bg-electric-blue/20 text-electric-blue border-electric-blue animate-pulse ml-2">Step 3</Badge>}
                   </h4>
                   
                   <div className="flex items-center space-x-2">
@@ -871,9 +945,23 @@ export default function Mint() {
                 <Button 
                   type="submit" 
                   disabled={mintToken.isPending || remainingChars < 0}
-                  className="w-full bg-gradient-to-r from-primary to-blue-500 hover:from-blue-500 hover:to-primary py-4 text-lg cyber-glow"
+                  className={`w-full py-4 text-lg cyber-glow transition-all duration-500 ${
+                    currentStep === 4 
+                      ? 'bg-gradient-to-r from-electric-blue to-circuit-teal hover:from-electric-blue/80 hover:to-circuit-teal/80 animate-pulse ring-2 ring-electric-blue/50 shadow-lg shadow-electric-blue/50' 
+                      : 'bg-gradient-to-r from-primary to-blue-500 hover:from-blue-500 hover:to-primary'
+                  }`}
                 >
-                  {mintToken.isPending ? "Minting..." : "Mint Tokens"}
+                  {mintToken.isPending ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                      Minting...
+                    </>
+                  ) : (
+                    <>
+                      <Zap className={`w-4 h-4 mr-2 ${currentStep === 4 ? 'animate-spin' : ''}`} />
+                      {currentStep === 4 ? "Ready to Mint Tokens!" : "Mint Tokens"}
+                    </>
+                  )}
                 </Button>
               </form>
             </CardContent>
