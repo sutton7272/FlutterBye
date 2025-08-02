@@ -12,6 +12,7 @@ import { useState, useEffect } from "react";
 // Import core pages directly to avoid loading issues
 import Home from "@/pages/home";
 import NotFound from "@/pages/not-found";
+import LaunchCountdown from "@/pages/launch-countdown";
 
 function App() {
   const [hasEarlyAccess, setHasEarlyAccess] = useState(false);
@@ -70,6 +71,11 @@ function App() {
                   <Navbar />
                   <Home />
                   <FloatingActionHub />
+                </>
+              )} />
+              <Route path="/launch" component={() => (
+                <>
+                  <LaunchCountdown />
                 </>
               )} />
               <Route path="/mint" component={() => (
