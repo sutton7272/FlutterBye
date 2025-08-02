@@ -43,7 +43,7 @@ export default function Navbar() {
             <div className="w-9 h-9 modern-gradient rounded-xl flex items-center justify-center">
               <span className="text-sm font-bold text-white">F</span>
             </div>
-            <span className="hidden font-bold text-xl sm:inline-block text-gradient">
+            <span className="hidden font-bold text-xl sm:inline-block text-white">
               Flutterbye
             </span>
           </Link>
@@ -94,7 +94,7 @@ export default function Navbar() {
               <div className="w-9 h-9 modern-gradient rounded-xl flex items-center justify-center">
                 <span className="text-sm font-bold text-white">F</span>
               </div>
-              <span className="font-bold text-xl text-gradient">
+              <span className="font-bold text-xl text-white">
                 Flutterbye
               </span>
             </Link>

@@ -109,7 +109,7 @@ export function WalletConnect() {
     return (
       <div className="flex items-center gap-2 bg-green-500/10 border border-green-500/20 rounded-lg px-3 py-2">
         <Check className="w-4 h-4 text-green-400" />
-        <span className="text-sm font-medium text-green-400">
+        <span className="text-sm font-medium text-white">
           {walletAddress.slice(0, 4)}...{walletAddress.slice(-4)}
         </span>
         <Button
