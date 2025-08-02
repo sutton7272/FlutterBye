@@ -3,7 +3,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { WalletConnect } from "@/components/wallet-connect";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { Menu, Home, Coins, Trophy, Users, MessageSquare, Settings, Sparkles, Zap, Heart, Building2, MapPin } from "lucide-react";
+import { Menu, Home, Coins, Trophy, Users, MessageSquare, Settings, Sparkles, Zap, Heart, Building2, MapPin, Activity, Gift, Award, Star, Ticket, HelpCircle } from "lucide-react";
 
 export default function Navbar() {
   const [location] = useLocation();
@@ -22,13 +22,20 @@ export default function Navbar() {
 
   // Secondary items for mobile/dropdown
   const secondaryNavItems = [
+    { href: "/activity", label: "Activity", icon: Activity },
+    { href: "/redeem", label: "Redeem", icon: Gift },
+    { href: "/badges", label: "Badges", icon: Award },
+    { href: "/limited-edition", label: "Limited Edition", icon: Star },
     { href: "/chat", label: "Chat", icon: MessageSquare },
     { href: "/token-map", label: "Token Map", icon: MapPin },
     { href: "/rewards", label: "Rewards", icon: Trophy },
     { href: "/journey", label: "Journey", icon: Users },
     { href: "/flby/staking", label: "FLBY Staking", icon: Zap },
     { href: "/flby/governance", label: "Governance", icon: Users },
+    { href: "/flby/airdrop", label: "FLBY Airdrop", icon: Coins },
     { href: "/referrals", label: "Referrals", icon: Users },
+    { href: "/free-codes", label: "Free Codes", icon: Ticket },
+    { href: "/how-it-works", label: "How It Works", icon: HelpCircle },
     { href: "/admin", label: "Admin", icon: Settings },
     { href: "/admin/staking", label: "Admin Staking", icon: Settings },
   ];
