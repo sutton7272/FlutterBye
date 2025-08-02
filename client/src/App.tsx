@@ -321,6 +321,18 @@ function Router() {
             <ViralDashboard />
           </>
         )} />
+        <Route path="/analytics-dashboard" component={() => (
+          <>
+            <Navbar />
+            <AnalyticsDashboard />
+          </>
+        )} />
+        <Route path="/analytics" component={() => (
+          <>
+            <Navbar />
+            <AnalyticsDashboard />
+          </>
+        )} />
         <Route component={NotFound} />
       </Switch>
     </div>

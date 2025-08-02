@@ -15,6 +15,7 @@ import { monitoring } from "./monitoring";
 import { collaborativeTokenService } from "./collaborative-token-service";
 import { viralAccelerationService } from "./viral-acceleration-service";
 import { stripeService, subscriptionPlans } from "./stripe-service";
+import { analyticsService } from "./analytics-service";
 import { z } from "zod";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -1720,7 +1721,64 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Analytics routes
+  // Enhanced Analytics routes
+  app.get('/api/analytics/metrics', async (req, res) => {
+    try {
+      const timeRange = req.query.range as string || '7d';
+      const metrics = await analyticsService.getPlatformMetrics(timeRange);
+      res.json(metrics);
+    } catch (error) {
+      console.error('Analytics metrics error:', error);
+      res.status(500).json({ error: 'Failed to fetch analytics metrics' });
+    }
+  });
+
+  app.get('/api/analytics/top-tokens', async (req, res) => {
+    try {
+      const timeRange = req.query.range as string || '7d';
+      const limit = parseInt(req.query.limit as string) || 10;
+      const topTokens = await analyticsService.getTopPerformingTokens(timeRange, limit);
+      res.json(topTokens);
+    } catch (error) {
+      console.error('Top tokens analytics error:', error);
+      res.status(500).json({ error: 'Failed to fetch top tokens analytics' });
+    }
+  });
+
+  app.get('/api/analytics/engagement', async (req, res) => {
+    try {
+      const timeRange = req.query.range as string || '7d';
+      const engagement = await analyticsService.getUserEngagementTrends(timeRange);
+      res.json(engagement);
+    } catch (error) {
+      console.error('Engagement analytics error:', error);
+      res.status(500).json({ error: 'Failed to fetch engagement analytics' });
+    }
+  });
+
+  app.get('/api/analytics/geographic', async (req, res) => {
+    try {
+      const timeRange = req.query.range as string || '7d';
+      const geographic = await analyticsService.getGeographicData(timeRange);
+      res.json(geographic);
+    } catch (error) {
+      console.error('Geographic analytics error:', error);
+      res.status(500).json({ error: 'Failed to fetch geographic analytics' });
+    }
+  });
+
+  app.get('/api/analytics/report', async (req, res) => {
+    try {
+      const timeRange = req.query.range as string || '7d';
+      const report = await analyticsService.generateAnalyticsReport(timeRange);
+      res.json(report);
+    } catch (error) {
+      console.error('Analytics report error:', error);
+      res.status(500).json({ error: 'Failed to generate analytics report' });
+    }
+  });
+
+  // Legacy analytics route
   app.post("/api/analytics", async (req, res) => {
     try {
       const analyticsData = insertAnalyticsSchema.parse(req.body);
