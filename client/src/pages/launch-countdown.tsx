@@ -68,13 +68,20 @@ export default function LaunchCountdown() {
 
   const signupMutation = useMutation({
     mutationFn: async () => {
-      console.log("Submitting waitlist signup:", { email, walletAddress });
-      const result = await apiRequest("POST", "/api/launch/waitlist", { email, walletAddress });
-      console.log("Waitlist signup result:", result);
-      return result.json();
+      console.log("🚀 Starting API request:", { email, walletAddress });
+      try {
+        const result = await apiRequest("POST", "/api/launch/waitlist", { email, walletAddress });
+        console.log("✅ API Response received:", result);
+        const data = await result.json();
+        console.log("✅ JSON parsed:", data);
+        return data;
+      } catch (error) {
+        console.error("❌ API Error:", error);
+        throw error;
+      }
     },
     onSuccess: (data) => {
-      console.log("Signup successful:", data);
+      console.log("🎉 Mutation success:", data);
       setSubmitted(true);
       toast({
         title: "Welcome to the Revolution!",
@@ -82,7 +89,7 @@ export default function LaunchCountdown() {
       });
     },
     onError: (error) => {
-      console.error("Signup error:", error);
+      console.error("💥 Mutation error:", error);
       toast({
         title: "Error",
         description: `Failed to join waitlist: ${error.message || 'Please try again.'}`,
@@ -91,10 +98,11 @@ export default function LaunchCountdown() {
     }
   });
 
-  const handleSignup = () => {
-    console.log("Button clicked with:", { email, walletAddress });
+  const handleSignup = async () => {
+    console.log("🔘 Button clicked with:", { email, walletAddress });
     
     if (!email || email.trim() === "") {
+      console.log("❌ No email provided");
       toast({
         title: "Email Required",
         description: "Please enter your email address.",
@@ -106,6 +114,7 @@ export default function LaunchCountdown() {
     // Basic email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
+      console.log("❌ Invalid email format");
       toast({
         title: "Invalid Email",
         description: "Please enter a valid email address.",
@@ -114,7 +123,7 @@ export default function LaunchCountdown() {
       return;
     }
 
-    console.log("Starting mutation...");
+    console.log("🎯 Starting mutation...");
     signupMutation.mutate();
   };
 
