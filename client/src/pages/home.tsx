@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Link } from "wouter";
 import { ArrowRight, MessageSquare, Coins, Zap, TrendingUp, Users, Target, Sparkles, Heart, Building2 } from "lucide-react";
 import flutterbeyeLogoPath from "@assets/image_1754068877999.png";
+import backgroundImagePath from "@assets/image_1754020189669.png";
 import { QuickActionPanel } from "@/components/quick-action-panel";
 import { InteractiveStatsDashboard } from "@/components/interactive-stats-dashboard";
 import { EngagementBooster } from "@/components/engagement-booster";
@@ -67,7 +68,17 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen text-white pt-20 overflow-hidden bg-gradient-to-br from-slate-900 via-blue-900 to-slate-800 relative">
+    <div 
+      className="min-h-screen text-white pt-20 overflow-hidden relative"
+      style={{
+        backgroundImage: `url(${backgroundImagePath})`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat'
+      }}
+    >
+      {/* Dark Overlay */}
+      <div className="absolute inset-0 bg-black/50"></div>
       {/* Background Pattern */}
       <div className="absolute inset-0 opacity-10 bg-circuit-pattern"></div>
       

@@ -25,7 +25,7 @@ function App() {
     const savedAccess = localStorage.getItem('flutterbye_early_access');
     
     // Grant access immediately for now - remove this line to re-enable gate
-    setHasEarlyAccess(true);
+    // setHasEarlyAccess(true);
     
     if (savedAccess === 'granted' || codeFromUrl) {
       setHasEarlyAccess(true);
