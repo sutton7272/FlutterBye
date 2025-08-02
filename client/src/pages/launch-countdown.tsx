@@ -210,7 +210,7 @@ export default function LaunchCountdown() {
   // Loading state
   if (isCheckingAccess) {
     return (
-      <div className="min-h-screen bg-black text-white flex items-center justify-center">
+      <div className="min-h-screen text-white flex items-center justify-center">
         <div className="text-center">
           <div className="w-8 h-8 border-4 border-cyan-400/30 border-t-cyan-400 rounded-full animate-spin mx-auto mb-4"></div>
           <p className="text-muted-foreground">Loading Flutterbye...</p>
@@ -223,7 +223,7 @@ export default function LaunchCountdown() {
 
   // Main Launch Countdown & Waitlist (for authorized users)
   return (
-    <div className="min-h-screen bg-black text-white relative overflow-hidden">
+    <div className="min-h-screen text-white relative overflow-hidden">
       {/* Show navbar if access is granted */}
       {hasAccess && (
         <>

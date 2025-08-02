@@ -46,8 +46,7 @@ import { WalletProvider } from "@/components/wallet-adapter";
 import { TestImage } from "@/components/test-image";
 function Router() {
   return (
-    <div className="dark min-h-screen">
-      <TestImage />
+    <div className="dark min-h-screen" style={{ background: 'transparent' }}>
       <Switch>
         <Route path="/" component={LaunchCountdown} />
         <Route path="/launch" component={LaunchCountdown} />

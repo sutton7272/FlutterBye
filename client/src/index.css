@@ -77,6 +77,11 @@
     font-family: 'Inter', system-ui, -apple-system, sans-serif;
     position: relative;
   }
+
+  #root {
+    background: transparent !important;
+    min-height: 100vh;
+  }
   
   /* Add subtle overlay to maintain text readability */
   body::before {
