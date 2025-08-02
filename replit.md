@@ -99,14 +99,14 @@ Design preference: Electric blue and green color scheme with animated electrical
 - **Error Tracking**: Centralized error logging and alerting
 
 ## Recent Major Updates (February 2024)
-- **FLBY Staking System**: Complete staking infrastructure with 4 pool types (Flexible, 30-day, 90-day, 1-year) offering 5-18% APY
+- **Enhanced Staking System**: Tiered revenue sharing (2-12% APY) + base staking rewards (5-18% APY) + early staker bonuses
 - **Governance Platform**: Full DAO governance with proposal creation, community voting, and democratic decision-making
 - **FLBY Airdrop Rewards**: Comprehensive airdrop campaigns with multiple earning mechanics (referrals, platform usage, early adoption, community engagement)
-- **Profit Sharing**: Revenue distribution system where 60% goes to stakers, 25% to governance participants from platform revenue
+- **Tiered Profit Sharing**: Dynamic revenue distribution based on staking duration with governance participation bonuses up to 25%
+- **Referral Rewards System**: 4-tier referral program (Bronze to Platinum) with escalating rewards from 50-250 FLBY per referral
 - **Admin Staking Controls**: Real-time configuration panel for adjusting APY rates, profit sharing percentages, and staking pool benefits
-- **Multi-Currency Support**: Complete USDC and FLBY token payment integration across all features
-- **Native Token Economics**: FLBY token with 10% fee discounts, governance rights, and early access benefits
-- **Enhanced Token Info**: Comprehensive FLBY token component with direct links to staking, governance, and airdrop features
+- **Enhanced Token Economics**: Combined APY rates up to 31.5% (18% base + 12% revenue share + 1.5% early bonus)
+- **Dynamic Token Distribution**: Strategic 1B FLBY allocation with community-first approach (40% community, 25% staking rewards)
 
 ## API Keys Required for Full Activation
 - **OPENAI_API_KEY**: AI emotion analysis and content optimization

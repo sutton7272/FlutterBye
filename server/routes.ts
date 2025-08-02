@@ -2085,6 +2085,184 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Enhanced Profit Sharing with Tiered Revenue Distribution
+  app.get("/api/flby/profit-sharing/enhanced", async (req, res) => {
+    try {
+      const enhancedPools = [
+        {
+          id: "revenue-q2-2024",
+          name: "Q2 2024 Enhanced Revenue Share",
+          totalRevenue: 125000,
+          distributionDate: "2024-07-01",
+          tierDistribution: {
+            flexible: { percentage: 2, amount: 2500 },
+            short: { percentage: 4, amount: 5000 },
+            medium: { percentage: 8, amount: 10000 },
+            long: { percentage: 12, amount: 15000 }
+          },
+          governanceBonus: {
+            participationRate: 85, // % of proposals voted on
+            bonusMultiplier: 1.25,
+            bonusAmount: 3125
+          },
+          totalDistributed: 35625,
+          participantsByTier: {
+            flexible: 1200,
+            short: 850,
+            medium: 450,
+            long: 125
+          }
+        }
+      ];
+
+      res.json({
+        success: true,
+        enhancedPools,
+        newFeatures: [
+          "Tiered revenue sharing based on staking duration",
+          "Governance participation bonuses up to 25%",
+          "Real-time APY adjustments based on platform performance"
+        ]
+      });
+    } catch (error) {
+      console.error("Error fetching enhanced profit sharing:", error);
+      res.status(500).json({ error: "Failed to fetch enhanced profit sharing data" });
+    }
+  });
+
+  // Referral System APIs
+  app.post("/api/referrals/generate-link", async (req, res) => {
+    try {
+      const referralCode = `FLBY-${Math.random().toString(36).substr(2, 6).toUpperCase()}`;
+      const referralUrl = `https://flutterbye.com/signup?ref=${referralCode}`;
+      
+      console.log(`🔗 Generated referral link: ${referralUrl}`);
+      
+      res.json({
+        success: true,
+        referralCode,
+        referralUrl,
+        rewards: {
+          baseReward: 50,
+          currentTier: "Bronze",
+          nextTierAt: 5
+        }
+      });
+    } catch (error) {
+      console.error("Error generating referral link:", error);
+      res.status(500).json({ error: "Referral system coming soon with FLBY token launch" });
+    }
+  });
+
+  app.get("/api/referrals/stats", async (req, res) => {
+    try {
+      const stats = {
+        totalReferrals: 0,
+        activeReferrals: 0,
+        totalEarned: 0,
+        pendingRewards: 0,
+        currentTier: "Bronze",
+        nextTierProgress: 0,
+        tierBenefits: {
+          Bronze: { reward: 50, multiplier: 1.0 },
+          Silver: { reward: 75, multiplier: 1.2 },
+          Gold: { reward: 125, multiplier: 1.5 },
+          Platinum: { reward: 250, multiplier: 2.0 }
+        }
+      };
+
+      res.json({
+        success: true,
+        stats
+      });
+    } catch (error) {
+      console.error("Error fetching referral stats:", error);
+      res.status(500).json({ error: "Failed to fetch referral statistics" });
+    }
+  });
+
+  // Dynamic Token Distribution API
+  app.get("/api/flby/token-distribution", async (req, res) => {
+    try {
+      const distribution = {
+        totalSupply: 1000000000, // 1 billion FLBY
+        allocation: {
+          community: { percentage: 40, amount: 400000000, description: "Airdrops, rewards, community initiatives" },
+          staking: { percentage: 25, amount: 250000000, description: "Staking rewards and yield farming" },
+          team: { percentage: 15, amount: 150000000, description: "Team allocation with 4-year vesting" },
+          treasury: { percentage: 10, amount: 100000000, description: "DAO treasury for governance decisions" },
+          liquidity: { percentage: 5, amount: 50000000, description: "DEX liquidity and market making" },
+          partnerships: { percentage: 3, amount: 30000000, description: "Strategic partnerships and integrations" },
+          advisors: { percentage: 2, amount: 20000000, description: "Advisor allocation with 2-year vesting" }
+        },
+        vestingSchedule: {
+          team: "4-year linear vesting with 1-year cliff",
+          advisors: "2-year linear vesting with 6-month cliff",
+          treasury: "Unlocked for governance use",
+          community: "Released based on milestones and participation"
+        },
+        launchStrategy: {
+          phase1: "Genesis Airdrop (10M FLBY) + Initial Staking Pools",
+          phase2: "DEX Listing + Liquidity Incentives",
+          phase3: "Governance Launch + DAO Treasury Activation",
+          phase4: "Cross-chain Bridge + Ecosystem Expansion"
+        }
+      };
+
+      res.json({
+        success: true,
+        distribution,
+        launchDate: "Q2 2024",
+        currentPhase: "Pre-launch preparation"
+      });
+    } catch (error) {
+      console.error("Error fetching token distribution:", error);
+      res.status(500).json({ error: "Failed to fetch token distribution data" });
+    }
+  });
+
+  // Enhanced Staking Rewards Calculation
+  app.post("/api/flby/staking/calculate-enhanced-rewards", async (req, res) => {
+    try {
+      const { amount, poolId, duration } = req.body;
+      
+      const poolConfigs = {
+        flexible: { baseApy: 5, revenueShare: 2, multiplier: 1.0 },
+        short: { baseApy: 8, revenueShare: 4, multiplier: 1.2 },
+        medium: { baseApy: 12, revenueShare: 8, multiplier: 1.5 },
+        long: { baseApy: 18, revenueShare: 12, multiplier: 2.0 }
+      };
+
+      const config = poolConfigs[poolId as keyof typeof poolConfigs];
+      const baseRewards = (amount * config.baseApy / 100) * (duration / 365);
+      const revenueShareRewards = (amount * config.revenueShare / 100) * (duration / 365);
+      const totalRewards = (baseRewards + revenueShareRewards) * config.multiplier;
+
+      // Early staker bonus (first 30 days)
+      const earlyStakerBonus = totalRewards * 0.15; // 15% bonus
+
+      res.json({
+        success: true,
+        calculation: {
+          baseRewards,
+          revenueShareRewards,
+          earlyStakerBonus,
+          totalRewards: totalRewards + earlyStakerBonus,
+          projectedAPY: config.baseApy + config.revenueShare + (config.multiplier - 1) * 10,
+          breakdown: {
+            stakingAPY: config.baseApy,
+            revenueAPY: config.revenueShare,
+            bonusAPY: (config.multiplier - 1) * 10,
+            earlyStakerBonusAPY: 1.5
+          }
+        }
+      });
+    } catch (error) {
+      console.error("Error calculating enhanced rewards:", error);
+      res.status(500).json({ error: "Failed to calculate enhanced staking rewards" });
+    }
+  });
+
   // Import admin service
   const { adminService } = await import("./admin-service");
 

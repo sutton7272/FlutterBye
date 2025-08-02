@@ -129,8 +129,29 @@ export default function FlbyStaking() {
     }
   });
 
-  const calculateRewards = (amount: number, apy: number, days: number) => {
-    return (amount * (apy / 100) * days) / 365;
+  const calculateEnhancedRewards = (amount: number, poolId: string, days: number) => {
+    const poolConfigs = {
+      flexible: { baseApy: 5, revenueShare: 2, multiplier: 1.0 },
+      short: { baseApy: 8, revenueShare: 4, multiplier: 1.2 },
+      medium: { baseApy: 12, revenueShare: 8, multiplier: 1.5 },
+      long: { baseApy: 18, revenueShare: 12, multiplier: 2.0 }
+    };
+
+    const config = poolConfigs[poolId as keyof typeof poolConfigs] || poolConfigs.flexible;
+    const baseRewards = (amount * config.baseApy / 100) * (days / 365);
+    const revenueShareRewards = (amount * config.revenueShare / 100) * (days / 365);
+    const totalRewards = (baseRewards + revenueShareRewards) * config.multiplier;
+    
+    // Early staker bonus (first 30 days)
+    const earlyStakerBonus = totalRewards * 0.15;
+    
+    return {
+      baseRewards,
+      revenueShareRewards,
+      earlyStakerBonus,
+      totalRewards: totalRewards + earlyStakerBonus,
+      projectedAPY: config.baseApy + config.revenueShare + (config.multiplier - 1) * 10 + 1.5
+    };
   };
 
   return (
@@ -256,11 +277,11 @@ export default function FlbyStaking() {
 
                     {selectedPool && stakeAmount && (
                       <div className="bg-muted/20 rounded-lg p-4 space-y-2">
-                        <h4 className="font-medium">Staking Preview</h4>
+                        <h4 className="font-medium">Enhanced Staking Preview</h4>
                         {(() => {
                           const pool = stakingPools.find(p => p.id === selectedPool);
                           const amount = parseFloat(stakeAmount);
-                          const expectedRewards = pool ? calculateRewards(amount, pool.apy, pool.duration || 365) : 0;
+                          const rewards = pool ? calculateEnhancedRewards(amount, pool.id, pool.duration || 365) : null;
                           
                           return (
                             <div className="space-y-1 text-sm">
@@ -269,16 +290,24 @@ export default function FlbyStaking() {
                                 <span>{pool?.name}</span>
                               </div>
                               <div className="flex justify-between">
-                                <span>APY:</span>
+                                <span>Base APY:</span>
                                 <span className="text-green-400">{pool?.apy}%</span>
                               </div>
                               <div className="flex justify-between">
-                                <span>Duration:</span>
-                                <span>{pool?.duration === 0 ? "Flexible" : `${pool?.duration} days`}</span>
+                                <span>Revenue Share APY:</span>
+                                <span className="text-blue-400">+{pool?.id === 'long' ? '12%' : pool?.id === 'medium' ? '8%' : pool?.id === 'short' ? '4%' : '2%'}</span>
                               </div>
                               <div className="flex justify-between">
-                                <span>Est. Rewards:</span>
-                                <span className="text-cyan-400">+{expectedRewards.toFixed(2)} FLBY</span>
+                                <span>Early Staker Bonus:</span>
+                                <span className="text-yellow-400">+1.5%</span>
+                              </div>
+                              <div className="flex justify-between font-medium">
+                                <span>Total Projected APY:</span>
+                                <span className="text-cyan-400">{rewards?.projectedAPY.toFixed(1)}%</span>
+                              </div>
+                              <div className="flex justify-between">
+                                <span>Est. Total Rewards:</span>
+                                <span className="text-cyan-400">+{rewards?.totalRewards.toFixed(2)} FLBY</span>
                               </div>
                             </div>
                           );

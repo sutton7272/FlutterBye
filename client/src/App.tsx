@@ -34,6 +34,7 @@ import FlbyStaking from "@/pages/flby-staking";
 import FlbyGovernance from "@/pages/flby-governance";
 import FlbyAirdrop from "@/pages/flby-airdrop";
 import AdminStaking from "@/pages/admin-staking";
+import ReferralRewards from "@/pages/referral-rewards";
 import Navbar from "@/components/navbar";
 import { FloatingActionHub } from "@/components/floating-action-hub";
 import { WalletProvider } from "@/components/wallet-adapter";
@@ -72,6 +73,7 @@ function Router() {
         <Route path="/flby/governance" component={FlbyGovernance} />
         <Route path="/flby/airdrop" component={FlbyAirdrop} />
         <Route path="/admin/staking" component={AdminStaking} />
+        <Route path="/referrals" component={ReferralRewards} />
         <Route component={NotFound} />
       </Switch>
       <FloatingActionHub />

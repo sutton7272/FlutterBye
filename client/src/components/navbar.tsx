@@ -26,6 +26,7 @@ export default function Navbar() {
     { href: "/journey", label: "Journey", icon: Users },
     { href: "/flby/staking", label: "FLBY Staking", icon: Zap },
     { href: "/flby/governance", label: "Governance", icon: Users },
+    { href: "/referrals", label: "Referrals", icon: Users },
     { href: "/admin", label: "Admin", icon: Settings },
     { href: "/admin/staking", label: "Admin Staking", icon: Settings },
   ];
