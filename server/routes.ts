@@ -16,7 +16,6 @@ import { z } from "zod";
 export async function registerRoutes(app: Express): Promise<Server> {
   // Apply production-grade security middleware
   app.use(productionAuth.securityHeaders);
-  app.use(productionAuth.rateLimiter(100, 15 * 60 * 1000)); // 100 requests per 15 minutes
   
   // Request monitoring middleware
   app.use((req, res, next) => {

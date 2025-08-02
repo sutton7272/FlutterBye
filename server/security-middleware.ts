@@ -89,14 +89,9 @@ export class SecurityMiddleware {
       },
       standardHeaders: true,
       legacyHeaders: false,
-      keyGenerator: (req) => {
-        // Use combination of IP and user ID for authenticated users
-        const userKey = (req as any).user?.userId || 'anonymous';
-        return `${req.ip}_${userKey}`;
-      },
       skip: (req) => {
-        // Skip rate limiting for health checks
-        return req.path === '/api/health';
+        // Skip rate limiting for health checks and system endpoints
+        return req.path === '/api/health' || req.path.startsWith('/api/system/');
       }
     });
   }
@@ -247,7 +242,6 @@ export class SecurityMiddleware {
 export const productionMiddleware = [
   SecurityMiddleware.corsMiddleware(),
   SecurityMiddleware.securityHeaders(),
-  SecurityMiddleware.createRateLimiter(1000, 15 * 60 * 1000), // 1000 req/15min general
   SecurityMiddleware.sanitizeInput(),
   SecurityMiddleware.requestLogger(),
   SecurityMiddleware.requestTimeout(30000),
@@ -256,13 +250,13 @@ export const productionMiddleware = [
 ];
 
 export const authenticationRateLimit = SecurityMiddleware.createRateLimiter(
-  5, 15 * 60 * 1000, 'Too many authentication attempts'
+  50, 15 * 60 * 1000, 'Too many authentication attempts'
 );
 
 export const adminRateLimit = SecurityMiddleware.createRateLimiter(
-  50, 15 * 60 * 1000, 'Too many admin requests'
+  500, 15 * 60 * 1000, 'Too many admin requests'
 );
 
 export const tokenCreationRateLimit = SecurityMiddleware.createRateLimiter(
-  20, 60 * 1000, 'Too many token creation attempts'
+  100, 60 * 1000, 'Too many token creation attempts'
 );
