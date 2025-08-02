@@ -1019,9 +1019,6 @@ export default function Mint() {
               />
             </div>
           )}
-                </div>
-              </div>
-            </div>
           </TabsContent>
 
           <TabsContent value="limited" className="space-y-6">
