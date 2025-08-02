@@ -336,19 +336,6 @@ export default function Mint() {
           </TabsList>
 
           <TabsContent value="individual" className="space-y-6">
-            <Tabs defaultValue="create" className="space-y-4">
-              <TabsList className="grid w-full grid-cols-2 bg-slate-700/50">
-                <TabsTrigger value="create" className="flex items-center gap-2">
-                  <Coins className="w-4 h-4" />
-                  Create Token
-                </TabsTrigger>
-                <TabsTrigger value="holders" className="flex items-center gap-2">
-                  <Users className="w-4 h-4" />
-                  Token Holders
-                </TabsTrigger>
-              </TabsList>
-
-              <TabsContent value="create" className="space-y-6">
                 {/* Price Comparison Widget */}
                 <div className="mb-8">
                   <TokenPriceComparison 
@@ -954,6 +941,52 @@ export default function Mint() {
               </div>
             </CardContent>
           </Card>
+          
+          {/* Token Holder Analysis - Permanently Displayed */}
+          <Card className="premium-card electric-frame">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Users className="w-5 h-5" />
+                Token Holder Analysis
+              </CardTitle>
+              <CardDescription>
+                Analyze token holders for targeted distribution campaigns
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="p-6">
+              <div className="text-center py-8">
+                <Users className="w-12 h-12 mx-auto text-blue-400 mb-4" />
+                <h3 className="text-lg font-semibold mb-2">Token Holder Map</h3>
+                <p className="text-muted-foreground mb-4 text-sm">
+                  Analyze wallet addresses, token holdings, and distribution patterns to optimize your marketing campaigns.
+                </p>
+                <div className="grid grid-cols-1 gap-3 mb-4">
+                  <div className="border border-blue-500/20 bg-blue-500/5 rounded-lg p-3">
+                    <h4 className="font-medium text-blue-400 mb-1 text-sm">Wallet Analysis</h4>
+                    <p className="text-xs text-muted-foreground">Identify high-value holders</p>
+                  </div>
+                  <div className="border border-green-500/20 bg-green-500/5 rounded-lg p-3">
+                    <h4 className="font-medium text-green-400 mb-1 text-sm">Distribution Patterns</h4>
+                    <p className="text-xs text-muted-foreground">Understand holder behavior</p>
+                  </div>
+                  <div className="border border-purple-500/20 bg-purple-500/5 rounded-lg p-3">
+                    <h4 className="font-medium text-purple-400 mb-1 text-sm">Targeted Campaigns</h4>
+                    <p className="text-xs text-muted-foreground">Optimize your outreach</p>
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <Button className="w-full" size="sm">
+                    <Users className="w-4 h-4 mr-2" />
+                    View Token Map
+                  </Button>
+                  <Button variant="outline" className="w-full" size="sm">
+                    <Target className="w-4 h-4 mr-2" />
+                    Analyze Holders
+                  </Button>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
 
           {/* Game-Changing AI Features */}
           {message.trim() && (
@@ -987,54 +1020,8 @@ export default function Mint() {
             </div>
           )}
                 </div>
-              </TabsContent>
-
-              <TabsContent value="holders" className="space-y-6">
-                <Card className="premium-card electric-frame">
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <Users className="w-5 h-5" />
-                      Token Holder Analysis
-                    </CardTitle>
-                    <CardDescription>
-                      Analyze token holders for targeted distribution campaigns
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent className="p-6">
-                    <div className="text-center py-12">
-                      <Users className="w-16 h-16 mx-auto text-blue-400 mb-4" />
-                      <h3 className="text-xl font-semibold mb-2">Token Holder Map</h3>
-                      <p className="text-muted-foreground mb-6">
-                        Analyze wallet addresses, token holdings, and distribution patterns to optimize your marketing campaigns.
-                        Perfect for targeting specific token communities.
-                      </p>
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-2xl mx-auto mb-6">
-                        <div className="border border-blue-500/20 bg-blue-500/5 rounded-lg p-4">
-                          <h4 className="font-medium text-blue-400 mb-2">Wallet Analysis</h4>
-                          <p className="text-sm text-muted-foreground">Identify high-value holders</p>
-                        </div>
-                        <div className="border border-green-500/20 bg-green-500/5 rounded-lg p-4">
-                          <h4 className="font-medium text-green-400 mb-2">Distribution Patterns</h4>
-                          <p className="text-sm text-muted-foreground">Understand holder behavior</p>
-                        </div>
-                        <div className="border border-purple-500/20 bg-purple-500/5 rounded-lg p-4">
-                          <h4 className="font-medium text-purple-400 mb-2">Targeted Campaigns</h4>
-                          <p className="text-sm text-muted-foreground">Optimize your outreach</p>
-                        </div>
-                      </div>
-                      <Button className="mr-4">
-                        <Users className="w-4 h-4 mr-2" />
-                        View Token Map
-                      </Button>
-                      <Button variant="outline">
-                        <Target className="w-4 h-4 mr-2" />
-                        Analyze Holders
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              </TabsContent>
-            </Tabs>
+              </div>
+            </div>
           </TabsContent>
 
           <TabsContent value="limited" className="space-y-6">
