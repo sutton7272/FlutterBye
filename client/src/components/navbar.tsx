@@ -3,7 +3,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { WalletConnect } from "@/components/wallet-connect";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { Menu, Home, Coins, Trophy, Users, MessageSquare, Settings, Sparkles, Zap } from "lucide-react";
+import { Menu, Home, Coins, Trophy, Users, MessageSquare, Settings, Sparkles, Zap, Heart, Building2 } from "lucide-react";
 
 export default function Navbar() {
   const [location] = useLocation();
@@ -13,9 +13,10 @@ export default function Navbar() {
   const primaryNavItems = [
     { href: "/", label: "Home", icon: Home },
     { href: "/mint", label: "Mint", icon: Coins },
+    { href: "/greeting-cards", label: "Cards", icon: Heart },
+    { href: "/enterprise", label: "Enterprise", icon: Building2 },
     { href: "/portfolio", label: "Portfolio", icon: Trophy },
     { href: "/explore", label: "Explore", icon: Sparkles },
-    { href: "/electric-demo", label: "Electric", icon: Zap },
   ];
 
   // Secondary items for mobile/dropdown

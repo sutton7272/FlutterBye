@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Link } from "wouter";
-import { ArrowRight, MessageSquare, Coins, Zap, TrendingUp, Users, Target, Sparkles } from "lucide-react";
+import { ArrowRight, MessageSquare, Coins, Zap, TrendingUp, Users, Target, Sparkles, Heart, Building2 } from "lucide-react";
 import flutterbeyeLogoPath from "@assets/image_1754068877999.png";
 import { QuickActionPanel } from "@/components/quick-action-panel";
 import { InteractiveStatsDashboard } from "@/components/interactive-stats-dashboard";
@@ -262,16 +262,29 @@ export default function Home() {
           <p className="text-gray-400 mb-8 max-w-2xl mx-auto">
             Join the memeconomy revolution. Turn your thoughts into tokens, your messages into money.
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 max-w-5xl mx-auto">
+            <Link href="/greeting-cards">
+              <Button size="lg" className="w-full text-lg px-6 py-6 bg-gradient-to-r from-pink-600 to-rose-600 hover:from-pink-700 hover:to-rose-700 border-0 font-bold">
+                SEND CARDS
+                <Heart className="ml-2 h-5 w-5" />
+              </Button>
+            </Link>
+            <Link href="/enterprise">
+              <Button size="lg" className="w-full text-lg px-6 py-6 bg-gradient-to-r from-purple-600 to-violet-600 hover:from-purple-700 hover:to-violet-700 border-0 font-bold">
+                ENTERPRISE
+                <Building2 className="ml-2 h-5 w-5" />
+              </Button>
+            </Link>
             <Link href="/journey">
-              <Button size="lg" className="text-lg px-8 py-6 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 hover:to-blue-700 border-0 font-bold">
-                START YOUR JOURNEY
+              <Button size="lg" className="w-full text-lg px-6 py-6 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 hover:to-blue-700 border-0 font-bold">
+                START JOURNEY
                 <Target className="ml-2 h-5 w-5" />
               </Button>
             </Link>
-            <Link href="/rewards">
-              <Button variant="outline" size="lg" className="text-lg px-8 py-6 border-cyan-500 text-cyan-300 hover:bg-cyan-500/10 font-bold">
-                VIEW REWARDS
+            <Link href="/mint">
+              <Button variant="outline" size="lg" className="w-full text-lg px-6 py-6 border-cyan-500 text-cyan-300 hover:bg-cyan-500/10 font-bold">
+                MINT TOKENS
+                <Coins className="ml-2 h-5 w-5" />
               </Button>
             </Link>
           </div>
