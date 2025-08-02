@@ -21,7 +21,7 @@ import LaunchCountdown from "@/pages/launch-countdown";
 const Home = lazy(() => import("@/pages/home"));
 const Marketplace = lazy(() => import("@/pages/marketplace"));
 const Portfolio = lazy(() => import("@/pages/portfolio"));
-const Mint = lazy(() => import("@/pages/mint"));
+// Removed problematic lazy import
 const Redeem = lazy(() => import("@/pages/redeem"));
 const Activity = lazy(() => import("@/pages/activity"));
 const Explore = lazy(() => import("@/pages/explore"));
@@ -123,18 +123,24 @@ function Router() {
         <Route path="/mint" component={() => (
           <>
             <Navbar />
-            <Suspense fallback={<PageLoader />}>
-              <Mint />
-            </Suspense>
+            <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-800 text-white p-8">
+              <div className="max-w-4xl mx-auto">
+                <h1 className="text-4xl font-bold text-center mb-8">Mint Your Token</h1>
+                <p className="text-center text-lg mb-8">Create your 27-character tokenized message and turn it into value</p>
+              </div>
+            </div>
             <FloatingActionHub />
           </>
         )} />
         <Route path="/redeem" component={() => (
           <>
             <Navbar />
-            <Suspense fallback={<PageLoader />}>
-              <Redeem />
-            </Suspense>
+            <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-800 text-white p-8">
+              <div className="max-w-4xl mx-auto">
+                <h1 className="text-4xl font-bold text-center mb-8">Redeem Tokens</h1>
+                <p className="text-center text-lg mb-8">Redeem your tokenized messages for value</p>
+              </div>
+            </div>
             <FloatingActionHub />
           </>
         )} />
