@@ -46,7 +46,7 @@ import AdminDefaultImage from "@/pages/admin-default-image";
 import UnifiedAdminDashboard from "@/pages/admin-unified";
 import TokenHolderMapPage from "@/pages/token-holder-map";
 import Navbar from "@/components/navbar";
-import { FloatingActionHub } from "@/components/floating-action-hub";
+
 import { WalletProvider } from "@/components/wallet-adapter";
 import { TestImage } from "@/components/test-image";
 function Router() {
@@ -61,63 +61,54 @@ function Router() {
           <>
             <Navbar />
             <Home />
-            <FloatingActionHub />
           </>
         )} />
         <Route path="/marketplace" component={() => (
           <>
             <Navbar />
             <Marketplace />
-            <FloatingActionHub />
           </>
         )} />
         <Route path="/portfolio" component={() => (
           <>
             <Navbar />
             <Portfolio />
-            <FloatingActionHub />
           </>
         )} />
         <Route path="/mint" component={() => (
           <>
             <Navbar />
             <Mint />
-            <FloatingActionHub />
           </>
         )} />
         <Route path="/redeem" component={() => (
           <>
             <Navbar />
             <Redeem />
-            <FloatingActionHub />
           </>
         )} />
         <Route path="/activity" component={() => (
           <>
             <Navbar />
             <Activity />
-            <FloatingActionHub />
           </>
         )} />
         <Route path="/explore" component={() => (
           <>
             <Navbar />
             <Explore />
-            <FloatingActionHub />
           </>
         )} />
         <Route path="/how-it-works" component={() => (
           <>
             <Navbar />
             <HowItWorks />
-            <FloatingActionHub />
           </>
         )} />
         <Route path="/free-codes" component={() => (
           <>
             <Navbar />
             <FreeCodes />
-            <FloatingActionHub />
           </>
         )} />
         <Route path="/admin" component={() => (
@@ -130,182 +121,156 @@ function Router() {
           <>
             <Navbar />
             <Admin />
-            <FloatingActionHub />
           </>
         )} />
         <Route path="/sms" component={() => (
           <>
             <Navbar />
             <SmsIntegrationPage />
-            <FloatingActionHub />
           </>
         )} />
         <Route path="/wallets" component={() => (
           <>
             <Navbar />
             <WalletManagementPage />
-            <FloatingActionHub />
           </>
         )} />
         <Route path="/rewards" component={() => (
           <>
             <Navbar />
             <RewardsPage />
-            <FloatingActionHub />
           </>
         )} />
         <Route path="/journey" component={() => (
           <>
             <Navbar />
             <JourneyPage />
-            <FloatingActionHub />
           </>
         )} />
         <Route path="/heatmap" component={() => (
           <>
             <Navbar />
             <TransactionHeatmapPage />
-            <FloatingActionHub />
           </>
         )} />
         <Route path="/badges" component={() => (
           <>
             <Navbar />
             <BadgesPage />
-            <FloatingActionHub />
           </>
         )} />
         <Route path="/chat" component={() => (
           <>
             <Navbar />
             <Chat />
-            <FloatingActionHub />
           </>
         )} />
         <Route path="/limited-edition" component={() => (
           <>
             <Navbar />
             <LimitedEdition />
-            <FloatingActionHub />
           </>
         )} />
         <Route path="/search" component={() => (
           <>
             <Navbar />
             <AdvancedSearch />
-            <FloatingActionHub />
           </>
         )} />
         <Route path="/token-map" component={() => (
           <>
             <Navbar />
             <TokenHolderMapPage />
-            <FloatingActionHub />
           </>
         )} />
         <Route path="/admin-system" component={() => (
           <>
             <Navbar />
             <AdminSystem />
-            <FloatingActionHub />
           </>
         )} />
         <Route path="/confetti-demo" component={() => (
           <>
             <Navbar />
             <ConfettiDemo />
-            <FloatingActionHub />
           </>
         )} />
         <Route path="/electric-demo" component={() => (
           <>
             <Navbar />
             <ElectricDemo />
-            <FloatingActionHub />
           </>
         )} />
         <Route path="/greeting-cards" component={() => (
           <>
             <Navbar />
             <GreetingCards />
-            <FloatingActionHub />
           </>
         )} />
         <Route path="/enterprise" component={() => (
           <>
             <Navbar />
             <EnterpriseCampaigns />
-            <FloatingActionHub />
           </>
         )} />
         <Route path="/flby/staking" component={() => (
           <>
             <Navbar />
             <FlbyStaking />
-            <FloatingActionHub />
           </>
         )} />
         <Route path="/flby/governance" component={() => (
           <>
             <Navbar />
             <FlbyGovernance />
-            <FloatingActionHub />
           </>
         )} />
         <Route path="/flby/airdrop" component={() => (
           <>
             <Navbar />
             <FlbyAirdrop />
-            <FloatingActionHub />
           </>
         )} />
         <Route path="/admin/staking" component={() => (
           <>
             <Navbar />
             <AdminStaking />
-            <FloatingActionHub />
           </>
         )} />
         <Route path="/admin/early-access" component={() => (
           <>
             <Navbar />
             <AdminEarlyAccess />
-            <FloatingActionHub />
           </>
         )} />
         <Route path="/admin/free-codes" component={() => (
           <>
             <Navbar />
             <AdminFreeCodes />
-            <FloatingActionHub />
           </>
         )} />
         <Route path="/admin/default-image" component={() => (
           <>
             <Navbar />
             <AdminDefaultImage />
-            <FloatingActionHub />
           </>
         )} />
         <Route path="/admin/pricing" component={() => (
           <>
             <Navbar />
             <AdminPricing />
-            <FloatingActionHub />
           </>
         )} />
         <Route path="/referrals" component={() => (
           <>
             <Navbar />
             <ReferralRewards />
-            <FloatingActionHub />
           </>
         )} />
         <Route path="/info" component={() => (
           <>
             <Navbar />
             <InfoPage />
-            <FloatingActionHub />
           </>
         )} />
         <Route component={NotFound} />

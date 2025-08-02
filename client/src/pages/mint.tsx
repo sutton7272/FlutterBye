@@ -29,6 +29,10 @@ import { TokenPriceComparison } from "@/components/token-price-comparison";
 export default function Mint() {
   const { toast } = useToast();
 
+  const [message, setMessage] = useState("");
+  const [mintAmount, setMintAmount] = useState("");
+  const [mintAmountError, setMintAmountError] = useState("");
+
   // Listen for share modal trigger
   useEffect(() => {
     const handleOpenShareModal = () => {
@@ -45,12 +49,8 @@ export default function Mint() {
       const quantity = parseInt(mintAmount);
       if (quantity && quantity > 0) {
         try {
-          const response = await apiRequest("/api/calculate-token-price", {
-            method: "POST",
-            body: JSON.stringify({ quantity }),
-            headers: { "Content-Type": "application/json" }
-          });
-          setPriceCalculation(response);
+          const response = await apiRequest("/api/calculate-token-price", "POST", { quantity });
+          setPriceCalculation(response as any);
         } catch (error) {
           console.error("Failed to calculate price:", error);
           setPriceCalculation(null);
@@ -63,9 +63,6 @@ export default function Mint() {
     const timeoutId = setTimeout(calculatePrice, 300); // Debounce
     return () => clearTimeout(timeoutId);
   }, [mintAmount]);
-  const [message, setMessage] = useState("");
-  const [mintAmount, setMintAmount] = useState("");
-  const [mintAmountError, setMintAmountError] = useState("");
   
   // Price calculation state
   const [priceCalculation, setPriceCalculation] = useState<{
