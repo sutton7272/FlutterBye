@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiRequest } from '@/lib/queryClient';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
@@ -13,7 +13,7 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Send, Users, Hash, Coins, MessageSquare, Plus, Settings, Smile, Reply, Edit3, Copy, Star, AlertTriangle, Volume2, VolumeX, Maximize2, Minimize2, Search, Filter, Clock, CheckCircle2, Circle, MoreVertical, Trash2, Pin, Heart, Zap, Gift, BarChart3, RotateCcw, Crown, Sparkles, TrendingUp, DollarSign, Award, Shield, Image, Paperclip, Mic, Video, Calendar, MapPin, Users2, Bot, Lock, Unlock, Eye, EyeOff, Bell, BellOff, Palette, Wand2, Flame, Target, MessageCircle, ThumbsUp, Share2, Download, Upload, Bookmark, Flag, Coffee, Rocket } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { useWalletAuth } from '@/hooks/useAuth';
+import { useAuth } from '@/hooks/useAuth';
 
 interface ChatRoom {
   id: string;
@@ -64,7 +64,7 @@ import { WalletConnect } from '@/components/WalletConnect';
 
 export function Chat() {
   // Real authentication integration
-  const { user, walletAddress, isAuthenticated } = useWalletAuth();
+  const { user, walletAddress, isAuthenticated } = useAuth();
 
   // Authentication gate - prevent access if not authenticated
   if (!isAuthenticated || !walletAddress) {
@@ -890,7 +890,7 @@ export function Chat() {
                               </DialogContent>
                             </Dialog>
                             
-                            {msg.senderWallet === MOCK_WALLET && (
+                            {msg.senderWallet === walletAddress && (
                               <>
                                 <Tooltip>
                                   <TooltipTrigger asChild>
@@ -937,7 +937,7 @@ export function Chat() {
                           <div className="w-2 h-2 rounded-full bg-purple-500 animate-bounce" style={{ animationDelay: '0.1s' }}></div>
                           <div className="w-2 h-2 rounded-full bg-purple-500 animate-bounce" style={{ animationDelay: '0.2s' }}></div>
                         </div>
-                        {isTyping.filter(wallet => wallet !== MOCK_WALLET).map(wallet => truncateWallet(wallet)).join(', ')} typing...
+                        {isTyping.filter(wallet => wallet !== walletAddress).map(wallet => truncateWallet(wallet)).join(', ')} typing...
                       </div>
                     )}
                     
@@ -1190,7 +1190,7 @@ export function Chat() {
                           <div className="text-sm text-gray-300">{truncateWallet(participant)}</div>
                           <div className="text-xs text-green-400">Active</div>
                         </div>
-                        {participant === MOCK_WALLET && (
+                        {participant === walletAddress && (
                           <Badge className="bg-purple-500/20 text-purple-400 text-xs">You</Badge>
                         )}
                       </div>

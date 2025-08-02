@@ -1,7 +1,7 @@
 import { WebSocketServer, WebSocket } from 'ws';
 import type { Server } from 'http';
 import { storage } from './storage';
-import type { InsertChatMessage, InsertChatParticipant, ChatMessage, ChatRoom } from '@shared/schema';
+import type { ChatMessage, ChatRoom } from '@shared/schema';
 
 export interface ChatClient {
   ws: WebSocket;
@@ -13,11 +13,16 @@ export interface ChatClient {
 
 export interface WebSocketMessage {
   id: string;
-  type: 'message' | 'join' | 'leave' | 'typing' | 'token_share' | 'room_update';
+  type: 'message' | 'join' | 'leave' | 'typing' | 'token_share' | 'room_update' | 'reaction' | 'edit' | 'pin';
   roomId: string;
   senderId?: string;
   senderWallet?: string;
   message?: string;
+  messageId?: string;
+  emoji?: string;
+  isPinned?: boolean;
+  reactions?: { [emoji: string]: string[] };
+  replyTo?: string;
   data?: any;
   timestamp: string;
 }
@@ -61,7 +66,10 @@ export class ChatService {
     // Get or create user
     let user = await storage.getUserByWallet(walletAddress);
     if (!user) {
-      user = await storage.createUser({ walletAddress });
+      user = await storage.createUser({ 
+        walletAddress,
+        id: `user_${Date.now()}_${Math.random().toString(36).slice(2)}`
+      });
     }
 
     const clientId = `${user.id}_${Date.now()}`;
@@ -119,12 +127,26 @@ export class ChatService {
           await this.leaveRoom(clientId, message.roomId);
           break;
         
+        case 'message':
         case 'send_message':
           await this.handleChatMessage(clientId, message);
           break;
         
+        case 'token_share':
         case 'share_token':
           await this.handleTokenShare(clientId, message);
+          break;
+        
+        case 'reaction':
+          await this.handleReaction(clientId, message);
+          break;
+        
+        case 'edit':
+          await this.handleEditMessage(clientId, message);
+          break;
+        
+        case 'pin':
+          await this.handlePinMessage(clientId, message);
           break;
         
         case 'typing':
@@ -194,7 +216,7 @@ export class ChatService {
         senderWallet: msg.senderWallet,
         message: msg.message,
         data: { messageType: msg.messageType, mintAddress: msg.mintAddress },
-        timestamp: msg.createdAt.toISOString()
+        timestamp: msg.createdAt ? msg.createdAt.toISOString() : new Date().toISOString()
       });
     });
   }
@@ -310,6 +332,84 @@ export class ChatService {
     }, clientId);
   }
 
+  // Enhanced message handlers for reactions, editing, and pinning
+  private async handleReaction(clientId: string, message: any) {
+    const client = this.clients.get(clientId);
+    if (!client || !client.roomId) return;
+
+    try {
+      // Update message reactions in storage
+      await storage.addMessageReaction(message.messageId, client.walletAddress, message.emoji);
+      
+      // Get updated reactions
+      const reactions = await storage.getMessageReactions(message.messageId);
+      
+      // Broadcast reaction update to room
+      this.broadcastToRoom(client.roomId, {
+        id: `reaction_${Date.now()}`,
+        type: 'reaction',
+        roomId: client.roomId,
+        messageId: message.messageId,
+        senderWallet: client.walletAddress,
+        reactions,
+        timestamp: new Date().toISOString()
+      });
+    } catch (error) {
+      console.error('Error handling reaction:', error);
+    }
+  }
+
+  private async handleEditMessage(clientId: string, message: any) {
+    const client = this.clients.get(clientId);
+    if (!client || !client.roomId) return;
+
+    try {
+      // Update message in storage
+      await storage.updateChatMessage(message.messageId, { 
+        message: message.message,
+        isEdited: true 
+      });
+      
+      // Broadcast edit to room
+      this.broadcastToRoom(client.roomId, {
+        id: `edit_${Date.now()}`,
+        type: 'edit',
+        roomId: client.roomId,
+        messageId: message.messageId,
+        senderWallet: client.walletAddress,
+        message: message.message,
+        timestamp: new Date().toISOString()
+      });
+    } catch (error) {
+      console.error('Error handling message edit:', error);
+    }
+  }
+
+  private async handlePinMessage(clientId: string, message: any) {
+    const client = this.clients.get(clientId);
+    if (!client || !client.roomId) return;
+
+    try {
+      // Update message pin status in storage
+      await storage.updateChatMessage(message.messageId, { 
+        isPinned: message.isPinned 
+      });
+      
+      // Broadcast pin update to room
+      this.broadcastToRoom(client.roomId, {
+        id: `pin_${Date.now()}`,
+        type: 'pin',
+        roomId: client.roomId,
+        messageId: message.messageId,
+        senderWallet: client.walletAddress,
+        isPinned: message.isPinned,
+        timestamp: new Date().toISOString()
+      });
+    } catch (error) {
+      console.error('Error handling message pin:', error);
+    }
+  }
+
   private async commitMessageToBlockchain(message: ChatMessage) {
     try {
       // Create a mini token for the message (optional feature)
@@ -344,7 +444,7 @@ export class ChatService {
   private handleDisconnection(client: ChatClient) {
     // Find and remove client
     let clientId = '';
-    for (const [id, c] of this.clients.entries()) {
+    for (const [id, c] of Array.from(this.clients.entries())) {
       if (c === client) {
         clientId = id;
         break;
