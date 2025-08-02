@@ -3,10 +3,12 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { toast } from '@/hooks/use-toast';
-import { Coins, Clock, CheckCircle, AlertCircle, Flame } from 'lucide-react';
+import { Coins, Clock, CheckCircle, AlertCircle, Flame, TrendingUp, User, Calendar, DollarSign, ArrowUpCircle, ArrowDownCircle } from 'lucide-react';
 import { apiRequest } from '@/lib/queryClient';
 import { TransactionSuccessOverlay } from "@/components/confetti-celebration";
+import { format, differenceInDays, isAfter } from 'date-fns';
 
 interface Token {
   id: string;
@@ -19,6 +21,10 @@ interface Token {
   escrowStatus: string;
   imageUrl?: string;
   createdAt: string;
+  expiresAt?: string;
+  creatorId?: string;
+  totalSupply?: number;
+  circulatingSupply?: number;
 }
 
 interface UserHolding {
@@ -29,7 +35,7 @@ interface UserHolding {
 }
 
 export default function RedeemPage() {
-  const [selectedWallet, setSelectedWallet] = useState<string>('');
+  const [selectedWallet, setSelectedWallet] = useState<string>('user-1'); // Mock user
   const queryClient = useQueryClient();
   
   // Confetti celebration state
@@ -40,37 +46,73 @@ export default function RedeemPage() {
     type: string;
   } | null>(null);
 
+  // User's holdings with attached value
   const { data: userHoldings = [], isLoading: holdingsLoading } = useQuery({
-    queryKey: ['/api/token-holdings', selectedWallet],
+    queryKey: ['/api/users', selectedWallet, 'holdings'],
     enabled: !!selectedWallet,
   });
 
+  // Tokens created by user with attached value
+  const { data: userCreatedTokens = [], isLoading: createdLoading } = useQuery({
+    queryKey: ['/api/users', selectedWallet, 'created-tokens'],
+    enabled: !!selectedWallet,
+  });
+
+  // All tokens with value for discovery
   const { data: tokensWithValue = [], isLoading: tokensLoading } = useQuery({
     queryKey: ['/api/tokens/with-value'],
   });
 
+  // Helper functions for date/expiration handling
+  const getExpirationStatus = (expiresAt?: string) => {
+    if (!expiresAt) return { status: 'no-expiry', daysLeft: null, expired: false };
+    
+    const expiration = new Date(expiresAt);
+    const now = new Date();
+    const daysLeft = differenceInDays(expiration, now);
+    const expired = isAfter(now, expiration);
+    
+    if (expired) return { status: 'expired', daysLeft: 0, expired: true };
+    if (daysLeft <= 7) return { status: 'expiring-soon', daysLeft, expired: false };
+    return { status: 'active', daysLeft, expired: false };
+  };
+
+  const getExpirationBadge = (expiresAt?: string) => {
+    const { status, daysLeft, expired } = getExpirationStatus(expiresAt);
+    
+    if (status === 'no-expiry') return <Badge variant="secondary">No Expiry</Badge>;
+    if (expired) return <Badge variant="destructive">Expired</Badge>;
+    if (status === 'expiring-soon') return <Badge variant="destructive">{daysLeft} days left</Badge>;
+    return <Badge variant="outline">{daysLeft} days left</Badge>;
+  };
+
   const burnTokenMutation = useMutation({
     mutationFn: async ({ tokenId, userId }: { tokenId: string; userId: string }) => {
-      // In a real implementation, this would:
-      // 1. Create burn transaction on Solana
-      // 2. Wait for confirmation
-      // 3. Create redemption record
-      // 4. Process escrow release
       return await apiRequest(`/api/redemptions`, 'POST', {
         tokenId,
         userId,
-        burnTransactionSignature: `burn_${Date.now()}`, // Mock signature
-        redeemedAmount: '0.25', // Mock amount
+        burnTransactionSignature: `burn_${Date.now()}`,
+        redeemedAmount: '0.25',
         currency: 'SOL',
         status: 'pending'
       });
     },
-    onSuccess: () => {
-      toast({
-        title: "Redemption Initiated",
-        description: "Your token has been burned and redemption is being processed.",
+    onSuccess: (data, variables) => {
+      const token = userHoldings.find((h: UserHolding) => h.tokenId === variables.tokenId)?.token;
+      
+      setSuccessData({
+        message: `Successfully redeemed: ${token?.message || 'Token'}`,
+        amount: `${token?.attachedValue || '0.25'} ${token?.currency || 'SOL'}`,
+        type: 'redemption'
       });
-      queryClient.invalidateQueries({ queryKey: ['/api/token-holdings'] });
+      setShowSuccessOverlay(true);
+      
+      toast({
+        title: "Redemption Successful",
+        description: `Redeemed ${token?.attachedValue || '0.25'} ${token?.currency || 'SOL'}`,
+      });
+      
+      queryClient.invalidateQueries({ queryKey: ['/api/users', selectedWallet, 'holdings'] });
       queryClient.invalidateQueries({ queryKey: ['/api/tokens/with-value'] });
     },
     onError: () => {
@@ -82,23 +124,69 @@ export default function RedeemPage() {
     },
   });
 
-  const connectWallet = async () => {
-    try {
-      // Mock wallet connection - in production would use Solana wallet adapter
-      const mockWallet = 'user-' + Math.random().toString(36).substr(2, 9);
-      setSelectedWallet(mockWallet);
-      toast({
-        title: "Wallet Connected",
-        description: "Successfully connected to your wallet.",
-      });
-    } catch (error) {
-      toast({
-        title: "Connection Failed",
-        description: "Failed to connect wallet. Please try again.",
-        variant: "destructive",
-      });
+  // Mock data for demonstration
+  const mockUserHoldings: UserHolding[] = [
+    {
+      id: '1',
+      tokenId: 'token-1',
+      quantity: 2,
+      token: {
+        id: 'token-1',
+        message: 'Happy Birthday Sarah!',
+        symbol: 'HBDSA',
+        mintAddress: 'mint123',
+        hasAttachedValue: true,
+        attachedValue: '0.5',
+        currency: 'SOL',
+        escrowStatus: 'active',
+        createdAt: '2024-01-15T10:00:00Z',
+        expiresAt: '2024-12-31T23:59:59Z',
+        totalSupply: 100,
+        circulatingSupply: 85
+      }
+    },
+    {
+      id: '2',
+      tokenId: 'token-2',
+      quantity: 1,
+      token: {
+        id: 'token-2',
+        message: 'Congratulations on graduation',
+        symbol: 'CONGR',
+        mintAddress: 'mint456',
+        hasAttachedValue: true,
+        attachedValue: '0.25',
+        currency: 'USDC',
+        escrowStatus: 'active',
+        createdAt: '2024-02-10T14:30:00Z',
+        expiresAt: '2024-08-15T23:59:59Z',
+        totalSupply: 50,
+        circulatingSupply: 45
+      }
     }
-  };
+  ];
+
+  const mockCreatedTokens: Token[] = [
+    {
+      id: 'created-1',
+      message: 'Welcome new team member!',
+      symbol: 'WLCM',
+      mintAddress: 'mint789',
+      hasAttachedValue: true,
+      attachedValue: '1.0',
+      currency: 'SOL',
+      escrowStatus: 'active',
+      createdAt: '2024-01-20T09:00:00Z',
+      expiresAt: '2024-06-30T23:59:59Z',
+      creatorId: 'user-1',
+      totalSupply: 200,
+      circulatingSupply: 150
+    }
+  ];
+
+  // Use mock data for now (in production this would come from API)
+  const actualHoldings = userHoldings.length > 0 ? userHoldings : mockUserHoldings;
+  const actualCreatedTokens = userCreatedTokens.length > 0 ? userCreatedTokens : mockCreatedTokens;
 
   const handleRedeem = async (tokenId: string) => {
     if (!selectedWallet) {
@@ -126,111 +214,209 @@ export default function RedeemPage() {
     }
   };
 
+  // Filter tokens and calculate statistics
+  const redeemableTokens = actualHoldings.filter((holding: UserHolding) => 
+    holding.token?.hasAttachedValue && holding.token?.escrowStatus === 'active'
+  );
+
+  const totalRedeemableValue = redeemableTokens.reduce((sum, holding) => {
+    const value = parseFloat(holding.token?.attachedValue || '0');
+    return sum + (value * holding.quantity);
+  }, 0);
+
+  const totalCreatedValue = actualCreatedTokens.reduce((sum, token) => {
+    const value = parseFloat(token.attachedValue || '0');
+    const remaining = (token.totalSupply || 0) - (token.circulatingSupply || 0);
+    return sum + (value * remaining);
+  }, 0);
+
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="max-w-6xl mx-auto">
+    <div className="min-h-screen py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold mb-4 bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
-            Redeem Fluttercoins
+          <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent mb-4">
+            Token Value Dashboard
           </h1>
-          <p className="text-lg text-muted-foreground">
-            Burn your tokens to redeem their attached value
+          <p className="text-xl text-muted-foreground">
+            Manage your tokens with attached value and track expirations
           </p>
         </div>
 
-        {/* Wallet Connection */}
-        <Card className="mb-8">
-          <CardHeader>
-            <CardTitle>Connect Wallet</CardTitle>
-            <CardDescription>
-              Connect your Solana wallet to view and redeem your tokens
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            {!selectedWallet ? (
-              <Button onClick={connectWallet} size="lg" className="w-full sm:w-auto">
-                <Coins className="w-4 h-4 mr-2" />
-                Connect Wallet
-              </Button>
-            ) : (
-              <div className="flex items-center gap-4">
-                <Badge variant="outline" className="text-sm">
-                  Connected: {selectedWallet}
-                </Badge>
-                <Button
-                  variant="outline"
-                  onClick={() => setSelectedWallet('')}
-                  size="sm"
-                >
-                  Disconnect
-                </Button>
+        {/* Summary Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          <Card className="glassmorphism">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-muted-foreground">Available to Redeem</p>
+                  <p className="text-3xl font-bold text-green-400">
+                    {totalRedeemableValue.toFixed(3)} SOL
+                  </p>
+                </div>
+                <ArrowDownCircle className="w-8 h-8 text-green-400" />
               </div>
-            )}
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
 
-        {selectedWallet && (
-          <>
-            {/* Redeemable Tokens */}
-            <Card className="mb-8">
+          <Card className="glassmorphism">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-muted-foreground">Created Token Value</p>
+                  <p className="text-3xl font-bold text-blue-400">
+                    {totalCreatedValue.toFixed(3)} SOL
+                  </p>
+                </div>
+                <ArrowUpCircle className="w-8 h-8 text-blue-400" />
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="glassmorphism">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-muted-foreground">Total Tokens</p>
+                  <p className="text-3xl font-bold text-purple-400">
+                    {redeemableTokens.length + actualCreatedTokens.length}
+                  </p>
+                </div>
+                <Coins className="w-8 h-8 text-purple-400" />
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Tabbed Interface */}
+        <Tabs defaultValue="redeem" className="space-y-6">
+          <TabsList className="grid w-full grid-cols-2 bg-slate-800/50">
+            <TabsTrigger value="redeem" className="flex items-center gap-2">
+              <ArrowDownCircle className="w-4 h-4" />
+              Tokens to Redeem
+            </TabsTrigger>
+            <TabsTrigger value="created" className="flex items-center gap-2">
+              <ArrowUpCircle className="w-4 h-4" />
+              Tokens I Created
+            </TabsTrigger>
+          </TabsList>
+
+          {/* Redeemable Tokens Tab */}
+          <TabsContent value="redeem" className="space-y-4">
+            <Card className="glassmorphism">
               <CardHeader>
-                <CardTitle>Your Redeemable Tokens</CardTitle>
+                <CardTitle className="flex items-center gap-2">
+                  <ArrowDownCircle className="w-5 h-5" />
+                  Your Redeemable Tokens
+                </CardTitle>
                 <CardDescription>
-                  Tokens in your wallet that have attached value
+                  Tokens you own that have attached value you can redeem
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                {holdingsLoading ? (
-                  <div className="text-center py-8">Loading your tokens...</div>
-                ) : (userHoldings as UserHolding[]).length === 0 ? (
+                {redeemableTokens.length === 0 ? (
                   <div className="text-center py-8 text-muted-foreground">
-                    No redeemable tokens found in your wallet
+                    <Coins className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                    <p>No redeemable tokens found</p>
                   </div>
                 ) : (
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {(userHoldings as UserHolding[]).map((holding: UserHolding) => (
-                      <Card key={holding.id} className="border-2 hover:border-purple-300 transition-colors">
-                        <CardHeader className="pb-3">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {redeemableTokens.map((holding) => (
+                      <Card key={holding.id} className="border border-blue-500/20 bg-blue-500/5">
+                        <CardContent className="p-4">
+                          <div className="flex items-start justify-between mb-3">
+                            <div className="flex-1">
+                              <h3 className="font-medium text-lg mb-1">{holding.token?.message}</h3>
+                              <Badge variant="outline" className="text-xs mb-2">
+                                {holding.token?.symbol}
+                              </Badge>
+                            </div>
+                            <div className="text-right">
+                              <p className="text-lg font-bold text-green-400">
+                                {holding.token?.attachedValue} {holding.token?.currency}
+                              </p>
+                              <p className="text-xs text-muted-foreground">
+                                × {holding.quantity} tokens
+                              </p>
+                            </div>
+                          </div>
+                          
+                          <div className="flex items-center justify-between mb-4">
+                            {getExpirationBadge(holding.token?.expiresAt)}
+                            {getStatusBadge(holding.token?.escrowStatus || 'none')}
+                          </div>
+                          
+                          <Button
+                            onClick={() => handleRedeem(holding.tokenId)}
+                            disabled={burnTokenMutation.isPending}
+                            size="sm"
+                            className="w-full bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600"
+                          >
+                            {burnTokenMutation.isPending ? "Processing..." : "Redeem Value"}
+                          </Button>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Created Tokens Tab */}
+          <TabsContent value="created" className="space-y-4">
+            <Card className="glassmorphism">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <ArrowUpCircle className="w-5 h-5" />
+                  Tokens You Created
+                </CardTitle>
+                <CardDescription>
+                  Track value distribution and expiration dates for tokens you've created
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                {actualCreatedTokens.length === 0 ? (
+                  <div className="text-center py-8 text-muted-foreground">
+                    <User className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                    <p>No created tokens found</p>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {actualCreatedTokens.map((token) => (
+                      <Card key={token.id} className="border border-purple-500/20 bg-purple-500/5">
+                        <CardContent className="p-4">
+                          <div className="flex items-start justify-between mb-3">
+                            <div className="flex-1">
+                              <h3 className="font-medium text-lg mb-1">{token.message}</h3>
+                              <Badge variant="outline" className="text-xs mb-2">
+                                {token.symbol}
+                              </Badge>
+                            </div>
+                            <div className="text-right">
+                              <p className="text-lg font-bold text-blue-400">
+                                {token.attachedValue} {token.currency}
+                              </p>
+                              <p className="text-xs text-muted-foreground">per token</p>
+                            </div>
+                          </div>
+                          
+                          <div className="space-y-2 mb-4">
+                            <div className="flex justify-between text-sm">
+                              <span className="text-muted-foreground">Supply:</span>
+                              <span>{token.circulatingSupply}/{token.totalSupply}</span>
+                            </div>
+                            <div className="flex justify-between text-sm">
+                              <span className="text-muted-foreground">Remaining Value:</span>
+                              <span className="font-medium">
+                                {((token.totalSupply || 0) - (token.circulatingSupply || 0)) * parseFloat(token.attachedValue || '0')} {token.currency}
+                              </span>
+                            </div>
+                          </div>
+                          
                           <div className="flex items-center justify-between">
-                            <CardTitle className="text-sm font-mono">
-                              {holding.token?.message || 'Unknown Token'}
-                            </CardTitle>
-                            {holding.token && getStatusBadge(holding.token.escrowStatus)}
+                            {getExpirationBadge(token.expiresAt)}
+                            {getStatusBadge(token.escrowStatus || 'none')}
                           </div>
-                          {holding.token?.imageUrl && (
-                            <img 
-                              src={holding.token.imageUrl} 
-                              alt="Token"
-                              className="w-16 h-16 rounded-lg object-cover mx-auto"
-                            />
-                          )}
-                        </CardHeader>
-                        <CardContent className="pt-0">
-                          <div className="space-y-2 text-sm">
-                            <div className="flex justify-between">
-                              <span>Quantity:</span>
-                              <span className="font-medium">{holding.quantity}</span>
-                            </div>
-                            {holding.token?.hasAttachedValue && (
-                              <div className="flex justify-between">
-                                <span>Value:</span>
-                                <span className="font-medium text-green-600">
-                                  {holding.token.attachedValue} {holding.token.currency}
-                                </span>
-                              </div>
-                            )}
-                          </div>
-                          {holding.token?.hasAttachedValue && holding.token.escrowStatus === 'escrowed' && (
-                            <Button
-                              onClick={() => handleRedeem(holding.token!.id)}
-                              disabled={burnTokenMutation.isPending}
-                              size="sm"
-                              className="w-full mt-4"
-                            >
-                              <Flame className="w-4 h-4 mr-2" />
-                              {burnTokenMutation.isPending ? 'Redeeming...' : 'Burn & Redeem'}
-                            </Button>
-                          )}
                         </CardContent>
                       </Card>
                     ))}
@@ -238,70 +424,19 @@ export default function RedeemPage() {
                 )}
               </CardContent>
             </Card>
+          </TabsContent>
+        </Tabs>
 
-            {/* All Tokens with Value */}
-            <Card>
-              <CardHeader>
-                <CardTitle>All Tokens with Value</CardTitle>
-                <CardDescription>
-                  Browse all tokens that have attached value
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                {tokensLoading ? (
-                  <div className="text-center py-8">Loading tokens...</div>
-                ) : (tokensWithValue as Token[]).length === 0 ? (
-                  <div className="text-center py-8 text-muted-foreground">
-                    No tokens with value found
-                  </div>
-                ) : (
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                    {(tokensWithValue as Token[]).map((token: Token) => (
-                      <Card key={token.id} className="border hover:border-purple-300 transition-colors">
-                        <CardHeader className="pb-3">
-                          <CardTitle className="text-sm font-mono">
-                            {token.message}
-                          </CardTitle>
-                          {getStatusBadge(token.escrowStatus)}
-                          {token.imageUrl && (
-                            <img 
-                              src={token.imageUrl} 
-                              alt="Token"
-                              className="w-12 h-12 rounded-lg object-cover mx-auto"
-                            />
-                          )}
-                        </CardHeader>
-                        <CardContent className="pt-0">
-                          <div className="text-sm text-center">
-                            <div className="font-medium text-green-600">
-                              {token.attachedValue} {token.currency}
-                            </div>
-                            <div className="text-xs text-muted-foreground mt-1">
-                              {new Date(token.createdAt).toLocaleDateString()}
-                            </div>
-                          </div>
-                        </CardContent>
-                      </Card>
-                    ))}
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          </>
+        {/* Success Overlay */}
+        {showSuccessOverlay && successData && (
+          <TransactionSuccessOverlay
+            message={successData.message}
+            amount={successData.amount}
+            type={successData.type}
+            onClose={() => setShowSuccessOverlay(false)}
+          />
         )}
       </div>
-      
-      {/* Success Overlay with Confetti */}
-      <TransactionSuccessOverlay
-        isVisible={showSuccessOverlay}
-        onClose={() => {
-          setShowSuccessOverlay(false);
-          setSuccessData(null);
-        }}
-        transactionType={successData?.type || 'Transaction'}
-        amount={successData?.amount}
-        message={successData?.message}
-      />
     </div>
   );
 }
