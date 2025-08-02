@@ -4902,12 +4902,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post('/api/chat/rooms', authenticateWallet, async (req, res) => {
+  app.post('/api/chat/rooms', async (req, res) => {
     try {
-      const roomData = insertChatRoomSchema.parse(req.body);
+      const walletAddress = req.headers['x-wallet-address'] as string;
+      if (!walletAddress) {
+        return res.status(401).json({ error: 'Wallet authentication required' });
+      }
+      
+      const roomData = req.body;
       const room = await storage.createChatRoom({
         ...roomData,
-        createdBy: req.user!.walletAddress
+        createdBy: walletAddress
       });
       res.json(room);
     } catch (error) {
@@ -4919,17 +4924,53 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // User authentication endpoint
   app.get('/api/auth/user', async (req, res) => {
     try {
-      // For development, return mock auth user if wallet address is provided
       const walletAddress = req.headers['x-wallet-address'] as string;
       if (walletAddress) {
-        const user = { walletAddress, isAuthenticated: true };
-        res.json(user);
+        // Get or create user in storage
+        let user = await storage.getUserByWallet(walletAddress);
+        if (!user) {
+          user = await storage.createUser({
+            walletAddress,
+            role: 'user',
+            isAdmin: false,
+            adminPermissions: []
+          });
+        }
+        res.json({ ...user, isAuthenticated: true });
       } else {
         res.status(401).json({ error: 'No wallet address provided' });
       }
     } catch (error) {
       console.error('Error fetching user:', error);
       res.status(500).json({ error: 'Failed to fetch user data' });
+    }
+  });
+
+  // Login endpoint for wallet authentication
+  app.post('/api/auth/login', async (req, res) => {
+    try {
+      const { walletAddress, signature, message } = req.body;
+      
+      if (!walletAddress) {
+        return res.status(400).json({ error: 'Wallet address required' });
+      }
+
+      // In production, verify the signature here
+      // For now, accept any wallet address for development
+      let user = await storage.getUserByWallet(walletAddress);
+      if (!user) {
+        user = await storage.createUser({
+          walletAddress,
+          role: 'user',
+          isAdmin: false,
+          adminPermissions: []
+        });
+      }
+
+      res.json({ success: true, user });
+    } catch (error) {
+      console.error('Login error:', error);
+      res.status(500).json({ error: 'Login failed' });
     }
   });
 
