@@ -13,6 +13,7 @@ export default function Navbar() {
   const primaryNavItems = [
     { href: "/home", label: "Home", icon: Home },
     { href: "/mint", label: "Mint", icon: Coins },
+    { href: "/redeem", label: "Redeem", icon: Gift },
     { href: "/marketplace", label: "Marketplace", icon: Users },
     { href: "/portfolio", label: "Portfolio", icon: Trophy },
     { href: "/greeting-cards", label: "Cards", icon: Heart },
@@ -23,7 +24,6 @@ export default function Navbar() {
   // Secondary items for mobile/dropdown
   const secondaryNavItems = [
     { href: "/activity", label: "Activity", icon: Activity },
-    { href: "/redeem", label: "Redeem", icon: Gift },
     { href: "/badges", label: "Badges", icon: Award },
     { href: "/limited-edition", label: "Limited Edition", icon: Star },
     { href: "/chat", label: "Chat", icon: MessageSquare },
