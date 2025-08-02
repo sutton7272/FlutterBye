@@ -16,6 +16,7 @@ import { collaborativeTokenService } from "./collaborative-token-service";
 import { viralAccelerationService } from "./viral-acceleration-service";
 import { stripeService, subscriptionPlans } from "./stripe-service";
 import { analyticsService } from "./analytics-service";
+import { smsService } from "./sms-service";
 import { z } from "zod";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -1775,6 +1776,97 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error('Analytics report error:', error);
       res.status(500).json({ error: 'Failed to generate analytics report' });
+    }
+  });
+
+  // SMS Integration Routes - Enhanced emotional token creation
+  app.post('/api/sms/create-token', async (req, res) => {
+    try {
+      const { phoneNumber, message, recipientWallet, value, metadata } = req.body;
+      
+      if (!phoneNumber || !message) {
+        return res.status(400).json({ 
+          success: false, 
+          message: 'Phone number and message are required' 
+        });
+      }
+
+      const result = await smsService.createTokenFromSMS({
+        phoneNumber,
+        message,
+        recipientWallet,
+        value,
+        metadata
+      });
+
+      res.json(result);
+    } catch (error) {
+      console.error('SMS token creation error:', error);
+      res.status(500).json({ 
+        success: false, 
+        message: 'Failed to create token from SMS',
+        error: error instanceof Error ? error.message : 'Unknown error'
+      });
+    }
+  });
+
+  app.post('/api/sms/analyze', async (req, res) => {
+    try {
+      const { message } = req.body;
+      
+      if (!message) {
+        return res.status(400).json({ error: 'Message is required for analysis' });
+      }
+
+      const analysis = await smsService.analyzeEmotionalContent(message);
+      res.json({ success: true, analysis });
+    } catch (error) {
+      console.error('SMS analysis error:', error);
+      res.status(500).json({ 
+        success: false, 
+        error: 'Failed to analyze message',
+        details: error instanceof Error ? error.message : 'Unknown error'
+      });
+    }
+  });
+
+  app.post('/api/sms/webhook', async (req, res) => {
+    try {
+      // Twilio webhook endpoint for incoming SMS
+      const result = await smsService.processIncomingSMS(req.body);
+      
+      // Respond with TwiML for Twilio
+      const twimlResponse = `<?xml version="1.0" encoding="UTF-8"?>
+        <Response>
+          <Message>${result.message}</Message>
+        </Response>`;
+      
+      res.type('text/xml');
+      res.send(twimlResponse);
+    } catch (error) {
+      console.error('SMS webhook error:', error);
+      res.status(500).send('Internal Server Error');
+    }
+  });
+
+  app.get('/api/sms/status', async (req, res) => {
+    try {
+      const status = smsService.getServiceStatus();
+      res.json(status);
+    } catch (error) {
+      console.error('SMS status error:', error);
+      res.status(500).json({ error: 'Failed to get SMS service status' });
+    }
+  });
+
+  app.get('/api/sms/analytics', async (req, res) => {
+    try {
+      const timeRange = req.query.range as string || '7d';
+      const analytics = await smsService.getSMSAnalytics(timeRange);
+      res.json(analytics);
+    } catch (error) {
+      console.error('SMS analytics error:', error);
+      res.status(500).json({ error: 'Failed to fetch SMS analytics' });
     }
   });
 

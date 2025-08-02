@@ -49,6 +49,7 @@ import UnifiedAdminDashboard from "@/pages/admin-unified";
 import TokenHolderMapPage from "@/pages/token-holder-map";
 import CollaborativeCreation from "@/pages/collaborative-creation";
 import ViralDashboard from "@/pages/viral-dashboard";
+import SMSIntegration from "@/pages/sms-integration";
 import Navbar from "@/components/navbar";
 import { PersonalizedDashboard } from "@/components/PersonalizedDashboard";
 
@@ -331,6 +332,18 @@ function Router() {
           <>
             <Navbar />
             <AnalyticsDashboard />
+          </>
+        )} />
+        <Route path="/sms-integration" component={() => (
+          <>
+            <Navbar />
+            <SMSIntegration />
+          </>
+        )} />
+        <Route path="/sms" component={() => (
+          <>
+            <Navbar />
+            <SMSIntegration />
           </>
         )} />
         <Route component={NotFound} />
