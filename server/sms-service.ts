@@ -35,10 +35,10 @@ export class SMSService {
   private isConfigured = false;
 
   constructor() {
-    this.initializeTwilio();
+    this.initializeTwilio().catch(console.error);
   }
 
-  private initializeTwilio() {
+  private async initializeTwilio() {
     // Check for Twilio credentials
     const accountSid = process.env.TWILIO_ACCOUNT_SID;
     const authToken = process.env.TWILIO_AUTH_TOKEN;
@@ -46,10 +46,10 @@ export class SMSService {
 
     if (accountSid && authToken && phoneNumber) {
       try {
-        // In production, would use: const twilio = require('twilio');
-        // this.twilioClient = twilio(accountSid, authToken);
+        const { default: twilio } = await import('twilio');
+        this.twilioClient = twilio(accountSid, authToken);
         this.isConfigured = true;
-        console.log('✅ SMS service configured successfully');
+        console.log('✅ SMS service configured successfully with Twilio SDK');
       } catch (error) {
         console.error('❌ Failed to configure SMS service:', error);
         this.isConfigured = false;
@@ -316,11 +316,11 @@ export class SMSService {
     try {
       const message = `✨ Flutterbye: Your emotional token "${token.symbol}" has been created! Emotion: ${analysis.emotion}, Value: $${token.value?.toFixed(2)}. Your message is now on the blockchain! 🚀`;
       
-      // In production: await this.twilioClient.messages.create({
-      //   body: message,
-      //   from: process.env.TWILIO_PHONE_NUMBER,
-      //   to: phoneNumber
-      // });
+      await this.twilioClient.messages.create({
+        body: message,
+        from: process.env.TWILIO_PHONE_NUMBER,
+        to: phoneNumber
+      });
       
       console.log(`📱 SMS confirmation sent to ${phoneNumber}: ${message}`);
     } catch (error) {
@@ -401,7 +401,9 @@ export class SMSService {
         tokenCreation: true,
         confirmationSMS: this.isConfigured,
         webhookProcessing: true
-      }
+      },
+      twilioPhone: process.env.TWILIO_PHONE_NUMBER,
+      webhookUrl: `${process.env.REPLIT_DEV_DOMAIN || 'localhost:5000'}/api/sms/webhook`
     };
   }
 

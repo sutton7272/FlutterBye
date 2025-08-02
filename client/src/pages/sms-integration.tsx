@@ -25,7 +25,8 @@ import {
   XCircle,
   Sparkles,
   Phone,
-  MessageCircle
+  MessageCircle,
+  Eye
 } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
@@ -60,7 +61,7 @@ export default function SMSIntegration() {
     queryKey: ['/api/sms/status'],
     queryFn: async () => {
       const response = await apiRequest('GET', '/api/sms/status');
-      return response;
+      return response as any;
     }
   });
 
@@ -69,7 +70,7 @@ export default function SMSIntegration() {
     queryKey: ['/api/sms/analytics'],
     queryFn: async () => {
       const response = await apiRequest('GET', '/api/sms/analytics');
-      return response;
+      return response as any;
     }
   });
 
@@ -111,7 +112,7 @@ export default function SMSIntegration() {
   const analyzeMutation = useMutation({
     mutationFn: async (text: string) => {
       const response = await apiRequest('POST', '/api/sms/analyze', { message: text });
-      return response;
+      return response as any;
     },
     onSuccess: (data) => {
       if (data.success) {
@@ -251,6 +252,20 @@ export default function SMSIntegration() {
                   {getStatusIcon(smsStatus.features?.confirmationSMS)}
                   <span className="text-gray-300">SMS Confirmations</span>
                 </div>
+              </div>
+              
+              {smsStatus && smsStatus.twilioPhone && (
+                <div className="mt-4 p-3 bg-blue-900/20 border border-blue-500/20 rounded-lg">
+                  <div className="text-sm text-blue-300">
+                    <strong>Twilio Phone:</strong> {smsStatus.twilioPhone}
+                  </div>
+                  {smsStatus.webhookUrl && (
+                    <div className="text-xs text-blue-400 mt-1">
+                      <strong>Webhook URL:</strong> {smsStatus.webhookUrl}
+                    </div>
+                  )}
+                </div>
+              )}
               </div>
             ) : (
               <div className="text-red-400">Failed to load service status</div>

@@ -3,7 +3,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { WalletConnect } from "@/components/wallet-connect";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { Menu, Home, Coins, Trophy, Users, MessageSquare, Settings, Sparkles, Zap, Heart, Building2, MapPin, Activity, Gift, Award, Star, Ticket, HelpCircle, LayoutDashboard } from "lucide-react";
+import { Menu, Home, Coins, Trophy, Users, MessageSquare, Settings, Sparkles, Zap, Heart, Building2, MapPin, Activity, Gift, Award, Star, Ticket, HelpCircle, LayoutDashboard, Smartphone } from "lucide-react";
 
 export default function Navbar() {
   const [location] = useLocation();
@@ -15,6 +15,7 @@ export default function Navbar() {
     { href: "/mint", label: "Mint", icon: Coins },
     { href: "/redeem", label: "Redeem", icon: Coins },
     { href: "/chat", label: "Chat", icon: MessageSquare },
+    { href: "/sms", label: "SMS", icon: Smartphone },
     { href: "/marketplace", label: "Marketplace", icon: Users },
     { href: "/greeting-cards", label: "Cards", icon: Heart },
     { href: "/enterprise", label: "Marketing", icon: Building2 },
