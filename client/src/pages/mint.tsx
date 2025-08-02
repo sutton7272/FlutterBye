@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useLocation } from "wouter";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -28,6 +29,7 @@ import { TokenPriceComparison } from "@/components/token-price-comparison";
 
 export default function Mint() {
   const { toast } = useToast();
+  const [, navigate] = useLocation();
 
   const [message, setMessage] = useState("");
   const [mintAmount, setMintAmount] = useState("");
@@ -956,10 +958,7 @@ export default function Mint() {
                     <Button 
                       className="w-full" 
                       size="sm"
-                      onClick={() => {
-                        // Navigate to token holder map page
-                        window.location.href = '/token-holder-map';
-                      }}
+                      onClick={() => navigate('/token-holder-map')}
                     >
                       <Users className="w-3 h-3 mr-1" />
                       View Token Map
@@ -968,10 +967,51 @@ export default function Mint() {
                       variant="outline" 
                       className="w-full" 
                       size="sm"
-                      onClick={() => {
-                        // Open holder analysis modal or navigate to analysis page
-                        console.log("Opening holder analysis...");
-                        // This would open a modal or navigate to detailed analysis
+                      onClick={async () => {
+                        if (!message.trim()) {
+                          toast({
+                            title: "Enter a message first",
+                            description: "Please enter a token message to analyze holders for.",
+                            variant: "destructive",
+                          });
+                          return;
+                        }
+                        
+                        try {
+                          const response = await fetch('/api/tokens/analyze-holders', {
+                            method: 'POST',
+                            headers: {
+                              'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({
+                              tokenName: message,
+                              holderCount: parseInt(mintAmount) || 25,
+                            }),
+                          });
+                          
+                          if (!response.ok) {
+                            throw new Error('Failed to analyze holders');
+                          }
+                          
+                          const holders = await response.json();
+                          
+                          // Show success toast with holder count
+                          toast({
+                            title: "Analysis Complete",
+                            description: `Found ${holders.length} token holders for analysis.`,
+                          });
+                          
+                          // You could open a modal here or navigate to detailed view
+                          console.log("Token holders:", holders);
+                          
+                        } catch (error) {
+                          console.error('Error analyzing holders:', error);
+                          toast({
+                            title: "Analysis Failed",
+                            description: "Failed to analyze token holders. Please try again.",
+                            variant: "destructive",
+                          });
+                        }
                       }}
                     >
                       <Target className="w-3 h-3 mr-1" />
