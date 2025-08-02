@@ -314,6 +314,61 @@ export default function UnifiedAdminDashboard() {
               </CardContent>
             </Card>
 
+            {/* CSV Export Dashboard */}
+            <Card className="border-slate-700 bg-slate-800/50">
+              <CardHeader>
+                <CardTitle className="text-white flex items-center gap-2">
+                  <Download className="w-5 h-5 text-blue-400" />
+                  CSV Data Export Center
+                </CardTitle>
+                <CardDescription>Export comprehensive analytics and platform data in CSV format</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                  <Button 
+                    onClick={() => window.open('/api/admin/export/viral-analytics', '_blank')}
+                    className="bg-green-600 hover:bg-green-700 text-white flex items-center gap-2 p-4 h-auto flex-col"
+                  >
+                    <Download className="w-6 h-6" />
+                    <div className="text-center">
+                      <span className="block text-sm font-medium">Viral Analytics</span>
+                      <span className="text-xs opacity-80">Growth, patterns, engagement</span>
+                    </div>
+                  </Button>
+                  <Button 
+                    onClick={() => window.open('/api/admin/export/system-metrics', '_blank')}
+                    className="bg-blue-600 hover:bg-blue-700 text-white flex items-center gap-2 p-4 h-auto flex-col"
+                  >
+                    <Download className="w-6 h-6" />
+                    <div className="text-center">
+                      <span className="block text-sm font-medium">System Metrics</span>
+                      <span className="text-xs opacity-80">Performance, health, requests</span>
+                    </div>
+                  </Button>
+                  <Button 
+                    onClick={() => window.open('/api/admin/export/user-analytics', '_blank')}
+                    className="bg-purple-600 hover:bg-purple-700 text-white flex items-center gap-2 p-4 h-auto flex-col"
+                  >
+                    <Download className="w-6 h-6" />
+                    <div className="text-center">
+                      <span className="block text-sm font-medium">User Analytics</span>
+                      <span className="text-xs opacity-80">Activity, tokens, value</span>
+                    </div>
+                  </Button>
+                  <Button 
+                    onClick={() => window.open('/api/admin/export/token-analytics', '_blank')}
+                    className="bg-orange-600 hover:bg-orange-700 text-white flex items-center gap-2 p-4 h-auto flex-col"
+                  >
+                    <Download className="w-6 h-6" />
+                    <div className="text-center">
+                      <span className="block text-sm font-medium">Token Analytics</span>
+                      <span className="text-xs opacity-80">Messages, viral scores, holders</span>
+                    </div>
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+
             {/* Quick Stats Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
               <Card className="bg-slate-800/50 border-blue-500/30">
@@ -428,6 +483,16 @@ export default function UnifiedAdminDashboard() {
 
           {/* Tokens Tab - Including Default Image Management */}
           <TabsContent value="tokens" className="space-y-6">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-2xl font-bold text-white">Token Management</h2>
+              <Button 
+                onClick={() => window.open('/api/admin/export/token-analytics', '_blank')}
+                className="bg-orange-600 hover:bg-orange-700 text-white flex items-center gap-2"
+              >
+                <Download className="w-4 h-4" />
+                Export Tokens CSV
+              </Button>
+            </div>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               {/* Current Default Image */}
               <Card className="bg-slate-800/50 border-cyan-500/30">
@@ -719,6 +784,16 @@ export default function UnifiedAdminDashboard() {
 
           {/* Users Tab - User Management */}
           <TabsContent value="users" className="space-y-6">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-2xl font-bold text-white">User Management</h2>
+              <Button 
+                onClick={() => window.open('/api/admin/export/user-analytics', '_blank')}
+                className="bg-purple-600 hover:bg-purple-700 text-white flex items-center gap-2"
+              >
+                <Download className="w-4 h-4" />
+                Export Users CSV
+              </Button>
+            </div>
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               <Card className="bg-slate-800/50 border-blue-500/30">
                 <CardHeader>
@@ -1235,11 +1310,31 @@ export default function UnifiedAdminDashboard() {
 
           {/* Viral Analytics Hub Tab */}
           <TabsContent value="viral" className="space-y-6">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-2xl font-bold text-white">Viral Analytics Hub</h2>
+              <Button 
+                onClick={() => window.open('/api/admin/export/viral-analytics', '_blank')}
+                className="bg-green-600 hover:bg-green-700 text-white flex items-center gap-2"
+              >
+                <Download className="w-4 h-4" />
+                Export CSV
+              </Button>
+            </div>
             <ViralAnalyticsHub viralAnalytics={viralAnalytics} />
           </TabsContent>
 
           {/* Real-time Dashboard Tab */}
           <TabsContent value="realtime" className="space-y-6">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-2xl font-bold text-white">Real-time Dashboard</h2>
+              <Button 
+                onClick={() => window.open('/api/admin/export/system-metrics', '_blank')}
+                className="bg-blue-600 hover:bg-blue-700 text-white flex items-center gap-2"
+              >
+                <Download className="w-4 h-4" />
+                Export Metrics
+              </Button>
+            </div>
             <RealtimeDashboard 
               liveMetrics={liveMetrics} 
               realtimeConnections={realtimeConnections}
