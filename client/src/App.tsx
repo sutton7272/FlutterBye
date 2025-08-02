@@ -2,6 +2,8 @@ import { Switch, Route } from "wouter";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
+import { EarlyAccessGate } from "@/components/early-access-gate";
+import { useState, useEffect } from "react";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/not-found";
 import Home from "@/pages/home";
@@ -35,6 +37,8 @@ import FlbyGovernance from "@/pages/flby-governance";
 import FlbyAirdrop from "@/pages/flby-airdrop";
 import AdminStaking from "@/pages/admin-staking";
 import ReferralRewards from "@/pages/referral-rewards";
+import LaunchCountdown from "@/pages/launch-countdown";
+import AdminEarlyAccess from "@/pages/admin-early-access";
 import Navbar from "@/components/navbar";
 import { FloatingActionHub } from "@/components/floating-action-hub";
 import { WalletProvider } from "@/components/wallet-adapter";
@@ -73,7 +77,9 @@ function Router() {
         <Route path="/flby/governance" component={FlbyGovernance} />
         <Route path="/flby/airdrop" component={FlbyAirdrop} />
         <Route path="/admin/staking" component={AdminStaking} />
+        <Route path="/admin/early-access" component={AdminEarlyAccess} />
         <Route path="/referrals" component={ReferralRewards} />
+        <Route path="/launch" component={LaunchCountdown} />
         <Route component={NotFound} />
       </Switch>
       <FloatingActionHub />
@@ -82,6 +88,42 @@ function Router() {
 }
 
 function App() {
+  const [hasEarlyAccess, setHasEarlyAccess] = useState(false);
+  const [isCheckingAccess, setIsCheckingAccess] = useState(true);
+
+  useEffect(() => {
+    // Check if launch mode is enabled or user has early access
+    const storedAccess = localStorage.getItem("flutterbye_early_access");
+    const isLaunchMode = localStorage.getItem("flutterbye_launch_mode") === "true";
+    
+    if (isLaunchMode || storedAccess === "granted") {
+      setHasEarlyAccess(true);
+    }
+    setIsCheckingAccess(false);
+  }, []);
+
+  if (isCheckingAccess) {
+    return (
+      <div className="min-h-screen bg-black text-white flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-8 h-8 border-4 border-cyan-400/30 border-t-cyan-400 rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Loading Flutterbye...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!hasEarlyAccess) {
+    return (
+      <QueryClientProvider client={queryClient}>
+        <TooltipProvider>
+          <EarlyAccessGate onAccessGranted={() => setHasEarlyAccess(true)} />
+          <Toaster />
+        </TooltipProvider>
+      </QueryClientProvider>
+    );
+  }
+
   return (
     <QueryClientProvider client={queryClient}>
       <WalletProvider>

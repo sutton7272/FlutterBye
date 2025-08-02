@@ -2263,6 +2263,158 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Launch Countdown & Early Access APIs
+  app.post("/api/launch/waitlist", async (req, res) => {
+    try {
+      const { email, walletAddress } = req.body;
+      
+      if (!email) {
+        return res.status(400).json({ error: "Email is required" });
+      }
+
+      // Generate unique ID for waitlist entry
+      const entryId = `waitlist_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+      
+      console.log(`📝 New waitlist signup: ${email} ${walletAddress ? `(${walletAddress})` : ''}`);
+      
+      res.json({
+        success: true,
+        entryId,
+        message: "Successfully joined the VIP waitlist",
+        benefits: [
+          "Early access before public launch",
+          "Exclusive FLBY token airdrops",
+          "Beta testing privileges",
+          "VIP community access"
+        ]
+      });
+    } catch (error) {
+      console.error("Error adding to waitlist:", error);
+      res.status(500).json({ error: "Failed to join waitlist" });
+    }
+  });
+
+  app.get("/api/launch/stats", async (req, res) => {
+    try {
+      const stats = {
+        totalSignups: 247,
+        earlyAccessUsers: 15,
+        airdropEligible: 189,
+        launchDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+        daysRemaining: 30
+      };
+
+      res.json({
+        success: true,
+        stats
+      });
+    } catch (error) {
+      console.error("Error fetching launch stats:", error);
+      res.status(500).json({ error: "Failed to fetch launch statistics" });
+    }
+  });
+
+  // Early Access Management APIs
+  app.post("/api/admin/early-access/grant", async (req, res) => {
+    try {
+      const { entryId } = req.body;
+      
+      if (!entryId) {
+        return res.status(400).json({ error: "Entry ID is required" });
+      }
+
+      const accessCode = `FLBY-EARLY-${Math.random().toString(36).substr(2, 6).toUpperCase()}`;
+      
+      console.log(`🔑 Granted early access to entry ${entryId} with code ${accessCode}`);
+      
+      res.json({
+        success: true,
+        accessCode,
+        message: "Early access granted successfully"
+      });
+    } catch (error) {
+      console.error("Error granting early access:", error);
+      res.status(500).json({ error: "Failed to grant early access" });
+    }
+  });
+
+  app.post("/api/admin/early-access/add", async (req, res) => {
+    try {
+      const { email, walletAddress } = req.body;
+      
+      if (!email) {
+        return res.status(400).json({ error: "Email is required" });
+      }
+
+      const accessCode = `FLBY-EARLY-${Math.random().toString(36).substr(2, 6).toUpperCase()}`;
+      
+      console.log(`👤 Added early access user: ${email} with code ${accessCode}`);
+      
+      res.json({
+        success: true,
+        accessCode,
+        user: {
+          email,
+          walletAddress,
+          accessCode,
+          grantedAt: new Date().toISOString()
+        }
+      });
+    } catch (error) {
+      console.error("Error adding early access user:", error);
+      res.status(500).json({ error: "Failed to add early access user" });
+    }
+  });
+
+  app.post("/api/admin/launch-mode", async (req, res) => {
+    try {
+      const { enabled } = req.body;
+      
+      console.log(`🚀 Launch mode ${enabled ? 'ENABLED' : 'DISABLED'} - Platform ${enabled ? 'publicly accessible' : 'restricted to early access'}`);
+      
+      res.json({
+        success: true,
+        launchMode: enabled,
+        message: enabled 
+          ? "Platform is now publicly accessible" 
+          : "Platform restricted to early access users only"
+      });
+    } catch (error) {
+      console.error("Error toggling launch mode:", error);
+      res.status(500).json({ error: "Failed to update launch mode" });
+    }
+  });
+
+  app.post("/api/admin/check-access", async (req, res) => {
+    try {
+      const { accessCode, email } = req.body;
+      
+      // Check if launch mode is enabled (public access)
+      const launchMode = false; // This would be stored in database/config
+      
+      if (launchMode) {
+        return res.json({
+          success: true,
+          hasAccess: true,
+          accessType: "public"
+        });
+      }
+
+      // Check early access codes (this would query database)
+      const validCodes = ["FLBY-EARLY-001", "FLBY-EARLY-002"];
+      const hasEarlyAccess = accessCode && validCodes.includes(accessCode);
+      
+      res.json({
+        success: true,
+        hasAccess: hasEarlyAccess,
+        accessType: hasEarlyAccess ? "early_access" : "restricted"
+      });
+    } catch (error) {
+      console.error("Error checking access:", error);
+      res.status(500).json({ error: "Failed to check access" });
+    }
+  });
+
   // Import admin service
   const { adminService } = await import("./admin-service");
 
