@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
+import { useLocation } from "wouter";
 import { 
   Clock, 
   Mail, 
@@ -18,7 +19,10 @@ import {
   CheckCircle,
   Gift,
   Star,
-  Rocket
+  Rocket,
+  Key,
+  Lock,
+  Unlock
 } from "lucide-react";
 import flutterbeyeLogoPath from "@assets/image_1754068877999.png";
 
@@ -34,12 +38,26 @@ export default function LaunchCountdown() {
   const [email, setEmail] = useState("");
   const [walletAddress, setWalletAddress] = useState("");
   const [submitted, setSubmitted] = useState(false);
-  
-
+  const [hasAccess, setHasAccess] = useState(false);
+  const [isCheckingAccess, setIsCheckingAccess] = useState(true);
+  const [accessCode, setAccessCode] = useState("");
+  const [authorizedEmail, setAuthorizedEmail] = useState("");
   const { toast } = useToast();
+  const [, setLocation] = useLocation();
 
   // Set launch date to September 1, 2025
   const launchDate = new Date('2025-09-01T00:00:00Z'); // Public launch date
+
+  // Check early access on component mount
+  useEffect(() => {
+    const storedAccess = localStorage.getItem("flutterbye_early_access");
+    const isLaunchMode = localStorage.getItem("flutterbye_launch_mode") === "true";
+    
+    if (isLaunchMode || storedAccess === "granted") {
+      setHasAccess(true);
+    }
+    setIsCheckingAccess(false);
+  }, []);
 
   useEffect(() => {
     const updateCountdown = () => {
@@ -66,7 +84,7 @@ export default function LaunchCountdown() {
     const timer = setInterval(updateCountdown, 1000);
 
     return () => clearInterval(timer);
-  }, [launchDate]);
+  }, []); // Remove launchDate dependency to prevent re-renders
 
   const signupMutation = useMutation({
     mutationFn: async () => {
@@ -100,11 +118,58 @@ export default function LaunchCountdown() {
     }
   });
 
+  const checkAccessMutation = useMutation({
+    mutationFn: async () => {
+      const result = await apiRequest("POST", "/api/admin/check-access", { 
+        accessCode, 
+        email: authorizedEmail 
+      });
+      return result.json();
+    },
+    onSuccess: (data: any) => {
+      if (data.hasAccess) {
+        localStorage.setItem("flutterbye_early_access", "granted");
+        setHasAccess(true);
+        toast({
+          title: "Access Granted!",
+          description: `Welcome to Flutterbye (${data.accessMethod} verification).`
+        });
+        // Redirect to home after a brief delay
+        setTimeout(() => {
+          setLocation("/home");
+        }, 1000);
+      } else {
+        toast({
+          title: "Access Denied",
+          description: "Invalid access code or email. Please contact support.",
+          variant: "destructive"
+        });
+      }
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "Unable to verify access. Please try again.",
+        variant: "destructive"
+      });
+    }
+  });
+
+  const handleAccessRequest = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!accessCode && !authorizedEmail) {
+      toast({
+        title: "Credentials Required",
+        description: "Please enter your access code or email address.",
+        variant: "destructive"
+      });
+      return;
+    }
+    checkAccessMutation.mutate();
+  };
+
   const handleSignup = async () => {
-    console.log("🔘 Button clicked with:", { email, walletAddress });
-    
     if (!email || email.trim() === "") {
-      console.log("❌ No email provided");
       toast({
         title: "Email Required",
         description: "Please enter your email address.",
@@ -113,10 +178,8 @@ export default function LaunchCountdown() {
       return;
     }
 
-    // Basic email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
-      console.log("❌ Invalid email format");
       toast({
         title: "Invalid Email",
         description: "Please enter a valid email address.",
@@ -125,10 +188,113 @@ export default function LaunchCountdown() {
       return;
     }
 
-    console.log("🎯 Starting mutation...");
     signupMutation.mutate();
   };
 
+  // Loading state
+  if (isCheckingAccess) {
+    return (
+      <div className="min-h-screen bg-black text-white flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-8 h-8 border-4 border-cyan-400/30 border-t-cyan-400 rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Loading Flutterbye...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Access Gate
+  if (!hasAccess) {
+    return (
+      <div className="min-h-screen bg-black text-white relative overflow-hidden">
+        {/* Electric Background */}
+        <div className="fixed inset-0 bg-gradient-to-br from-blue-900/20 via-purple-900/20 to-cyan-900/20 pointer-events-none" />
+        
+        <div className="container mx-auto px-4 py-8 relative z-10 flex items-center justify-center min-h-screen">
+          <Card className="electric-frame w-full max-w-md">
+            <CardHeader className="text-center">
+              <img 
+                src={flutterbeyeLogoPath} 
+                alt="Flutterbye Logo" 
+                className="w-20 h-20 mx-auto mb-4 rounded-full electric-frame"
+              />
+              <CardTitle className="text-2xl text-gradient flex items-center justify-center gap-2">
+                <Lock className="w-6 h-6" />
+                Early Access Required
+              </CardTitle>
+              <p className="text-muted-foreground">
+                Flutterbye is currently in early access mode. Enter your credentials to continue.
+              </p>
+            </CardHeader>
+            
+            <CardContent>
+              <form onSubmit={handleAccessRequest} className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="access-code">Access Code</Label>
+                  <Input
+                    id="access-code"
+                    placeholder="FLBY-EARLY-XXX"
+                    value={accessCode}
+                    onChange={(e) => setAccessCode(e.target.value)}
+                    className="bg-muted/20"
+                  />
+                </div>
+                
+                <div className="text-center text-sm text-muted-foreground">
+                  OR
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="authorized-email">Authorized Email</Label>
+                  <Input
+                    id="authorized-email"
+                    type="email"
+                    placeholder="your@email.com"
+                    value={authorizedEmail}
+                    onChange={(e) => setAuthorizedEmail(e.target.value)}
+                    className="bg-muted/20"
+                  />
+                </div>
+
+                <Button 
+                  type="submit" 
+                  className="w-full"
+                  disabled={checkAccessMutation.isPending}
+                >
+                  {checkAccessMutation.isPending ? (
+                    "Verifying..."
+                  ) : (
+                    <>
+                      <Unlock className="w-4 h-4 mr-2" />
+                      Request Access
+                    </>
+                  )}
+                </Button>
+              </form>
+
+              <div className="mt-6 space-y-4">
+                <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-3">
+                  <h4 className="font-medium text-blue-400 mb-2">Need Access?</h4>
+                  <p className="text-sm text-muted-foreground">
+                    Early access users get exclusive benefits and FLBY token rewards.
+                  </p>
+                </div>
+
+                <div className="bg-muted/10 border border-muted/20 rounded-lg p-3">
+                  <h4 className="font-medium mb-2">Public Launch</h4>
+                  <p className="text-sm text-muted-foreground">
+                    Flutterbye will be publicly available on September 1, 2025.
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    );
+  }
+
+  // Main Launch Countdown & Waitlist (for authorized users)
   return (
     <div className="min-h-screen bg-black text-white relative overflow-hidden">
       {/* Animated Background */}

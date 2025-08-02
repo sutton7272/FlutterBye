@@ -48,7 +48,7 @@ function Router() {
     <div className="dark">
       <Navbar />
       <Switch>
-        <Route path="/" component={LaunchCountdown} />
+        <Route path="/" component={Home} />
         <Route path="/home" component={Home} />
         <Route path="/marketplace" component={Marketplace} />
         <Route path="/portfolio" component={Portfolio} />
@@ -89,42 +89,6 @@ function Router() {
 }
 
 function App() {
-  const [hasEarlyAccess, setHasEarlyAccess] = useState(false);
-  const [isCheckingAccess, setIsCheckingAccess] = useState(true);
-
-  useEffect(() => {
-    // Check if launch mode is enabled or user has early access
-    const storedAccess = localStorage.getItem("flutterbye_early_access");
-    const isLaunchMode = localStorage.getItem("flutterbye_launch_mode") === "true";
-    
-    if (isLaunchMode || storedAccess === "granted") {
-      setHasEarlyAccess(true);
-    }
-    setIsCheckingAccess(false);
-  }, []);
-
-  if (isCheckingAccess) {
-    return (
-      <div className="min-h-screen bg-black text-white flex items-center justify-center">
-        <div className="text-center">
-          <div className="w-8 h-8 border-4 border-cyan-400/30 border-t-cyan-400 rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-muted-foreground">Loading Flutterbye...</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (!hasEarlyAccess) {
-    return (
-      <QueryClientProvider client={queryClient}>
-        <TooltipProvider>
-          <Router />
-          <Toaster />
-        </TooltipProvider>
-      </QueryClientProvider>
-    );
-  }
-
   return (
     <QueryClientProvider client={queryClient}>
       <WalletProvider>
