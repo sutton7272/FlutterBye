@@ -987,6 +987,7 @@ export default function Mint() {
               </div>
             </CardContent>
           </Card>
+                </div>
 
           {/* Game-Changing AI Features */}
           {message.trim() && (
