@@ -338,20 +338,6 @@ export default function Mint() {
           </TabsList>
 
           <TabsContent value="individual" className="space-y-6">
-                {/* Price Comparison Widget */}
-                <div className="mb-8">
-                  <TokenPriceComparison 
-                    onQuantitySelect={(quantity) => {
-                      setMintAmount(quantity.toString());
-                      // Scroll to form
-                      document.getElementById('mint-form')?.scrollIntoView({ 
-                        behavior: 'smooth',
-                        block: 'start'
-                      });
-                    }}
-                  />
-                </div>
-                
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Minting Form */}
           <Card id="mint-form" className="premium-card electric-frame lg:col-span-2">
@@ -867,6 +853,20 @@ export default function Mint() {
                     </div>
                   </CardContent>
                 </Card>
+                
+                {/* Price Comparison Widget - Moved to bottom for better UX */}
+                <div className="mb-6">
+                  <TokenPriceComparison 
+                    onQuantitySelect={(quantity) => {
+                      setMintAmount(quantity.toString());
+                      // Scroll to mint button
+                      document.querySelector('button[type="submit"]')?.scrollIntoView({ 
+                        behavior: 'smooth',
+                        block: 'center'
+                      });
+                    }}
+                  />
+                </div>
                 
                 <Button 
                   type="submit" 
