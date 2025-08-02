@@ -15,12 +15,13 @@ export default function Navbar() {
     { href: "/mint", label: "Mint", icon: Coins },
     { href: "/marketplace", label: "Marketplace", icon: Users },
     { href: "/portfolio", label: "Portfolio", icon: Trophy },
-    { href: "/greeting-cards", label: "Cards", icon: Heart },
+    { href: "/enterprise", label: "Marketing", icon: Building2 },
     { href: "/explore", label: "Explore", icon: Sparkles },
   ];
 
   // Secondary items for mobile/dropdown
   const secondaryNavItems = [
+    { href: "/greeting-cards", label: "Greeting Cards", icon: Heart },
     { href: "/chat", label: "Chat", icon: MessageSquare },
     { href: "/token-map", label: "Token Map", icon: MapPin },
     { href: "/rewards", label: "Rewards", icon: Trophy },
