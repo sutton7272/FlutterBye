@@ -1,106 +1,223 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { useWalletAuth } from '@/hooks/useAuth';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Wallet, CheckCircle2 } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Wallet, LogOut, Copy, Check } from 'lucide-react';
+import { useAuth } from '@/hooks/useAuth';
+import { getWalletBalance, getFLBYBalance } from '@/lib/solana';
 
-export function WalletConnect() {
+interface WalletConnectProps {
+  className?: string;
+}
+
+export function WalletConnect({ className }: WalletConnectProps) {
+  const { user, isAuthenticated, login, logout, walletAddress } = useAuth();
   const [isConnecting, setIsConnecting] = useState(false);
-  const [walletAddress, setWalletAddress] = useState('');
-  const [showDialog, setShowDialog] = useState(false);
-  const { login, walletAddress: connectedWallet, isAuthenticated } = useWalletAuth();
-  const { toast } = useToast();
+  const [solBalance, setSolBalance] = useState<number>(0);
+  const [flbyBalance, setFlbyBalance] = useState<number>(0);
+  const [copied, setCopied] = useState(false);
 
-  const handleConnect = async () => {
-    if (!walletAddress.trim()) return;
+  // Load wallet balances when authenticated
+  useEffect(() => {
+    if (isAuthenticated && walletAddress) {
+      loadBalances();
+    }
+  }, [isAuthenticated, walletAddress]);
 
+  const loadBalances = async () => {
+    if (!walletAddress) return;
+    
+    try {
+      const [sol, flby] = await Promise.all([
+        getWalletBalance(walletAddress),
+        getFLBYBalance(walletAddress)
+      ]);
+      setSolBalance(sol);
+      setFlbyBalance(flby);
+    } catch (error) {
+      console.error('Error loading balances:', error);
+    }
+  };
+
+  const connectWallet = async () => {
     setIsConnecting(true);
     try {
-      // Create a simple signature message for authentication
-      const message = `Connect to Flutterbye Chat\nWallet: ${walletAddress}\nTime: ${Date.now()}`;
-      const mockSignature = `mock_signature_${Date.now()}`; // In production, this would come from wallet adapter
-      
-      const success = await login(walletAddress, mockSignature, message);
-      
-      if (success) {
-        toast({
-          title: "Wallet Connected",
-          description: "Successfully connected to Flutterbye Chat",
-        });
-        setShowDialog(false);
-        setWalletAddress('');
+      // Check if Phantom wallet is available
+      if (window.solana && window.solana.isPhantom) {
+        const response = await window.solana.connect();
+        const walletAddress = response.publicKey.toString();
+        
+        // Create signature message for authentication
+        const message = `Sign this message to authenticate with Flutterbye: ${Date.now()}`;
+        const encodedMessage = new TextEncoder().encode(message);
+        const signature = await window.solana.signMessage(encodedMessage);
+        
+        // Login with wallet credentials
+        const success = await login(walletAddress, signature.signature, message);
+        if (success) {
+          console.log('Wallet connected successfully');
+        }
       } else {
-        toast({
-          title: "Connection Failed",
-          description: "Failed to connect wallet. Please try again.",
-          variant: "destructive",
-        });
+        // Fallback for development - simulate wallet connection
+        const mockWallet = 'FlutterbyeDemoWallet' + Math.random().toString(36).substring(7);
+        await login(mockWallet, 'mock-signature', 'mock-message');
       }
     } catch (error) {
-      console.error('Connection error:', error);
-      toast({
-        title: "Connection Error",
-        description: "An error occurred while connecting",
-        variant: "destructive",
-      });
+      console.error('Wallet connection failed:', error);
     } finally {
       setIsConnecting(false);
     }
   };
 
-  if (isAuthenticated) {
+  const disconnectWallet = () => {
+    logout();
+    setSolBalance(0);
+    setFlbyBalance(0);
+  };
+
+  const copyAddress = async () => {
+    if (walletAddress) {
+      await navigator.clipboard.writeText(walletAddress);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
+  };
+
+  const truncateAddress = (address: string) => {
+    return `${address.substring(0, 4)}...${address.substring(address.length - 4)}`;
+  };
+
+  if (isAuthenticated && user) {
     return (
-      <div className="flex items-center space-x-2">
-        <CheckCircle2 className="w-4 h-4 text-green-500" />
-        <span className="text-sm text-green-400">
-          {connectedWallet?.slice(0, 8)}...{connectedWallet?.slice(-4)}
-        </span>
-      </div>
+      <Card className={`w-full max-w-md ${className}`}>
+        <CardHeader className="pb-3">
+          <CardTitle className="flex items-center gap-2 text-green-400">
+            <Wallet className="h-5 w-5" />
+            Wallet Connected
+          </CardTitle>
+          <CardDescription>
+            Connected to Solana network
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {/* Wallet Address */}
+          <div className="flex items-center justify-between p-3 bg-slate-900 rounded-lg">
+            <div className="flex-1">
+              <div className="text-sm font-medium text-slate-300">Address</div>
+              <div className="font-mono text-sm">
+                {walletAddress ? truncateAddress(walletAddress) : 'Unknown'}
+              </div>
+            </div>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={copyAddress}
+              className="h-8 w-8 p-0"
+            >
+              {copied ? (
+                <Check className="h-4 w-4 text-green-400" />
+              ) : (
+                <Copy className="h-4 w-4" />
+              )}
+            </Button>
+          </div>
+
+          {/* Balances */}
+          <div className="grid grid-cols-2 gap-3">
+            <div className="p-3 bg-slate-900 rounded-lg text-center">
+              <div className="text-sm font-medium text-slate-300">SOL</div>
+              <div className="text-lg font-bold text-blue-400">
+                {solBalance.toFixed(4)}
+              </div>
+            </div>
+            <div className="p-3 bg-slate-900 rounded-lg text-center">
+              <div className="text-sm font-medium text-slate-300">FLBY</div>
+              <div className="text-lg font-bold text-green-400">
+                {flbyBalance.toFixed(2)}
+              </div>
+            </div>
+          </div>
+
+          {/* User Info */}
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Badge variant={user.isAdmin ? "default" : "secondary"}>
+                {user.role}
+              </Badge>
+              {user.isAdmin && (
+                <Badge variant="outline" className="text-yellow-400 border-yellow-400">
+                  Admin
+                </Badge>
+              )}
+            </div>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={disconnectWallet}
+              className="text-red-400 border-red-400 hover:bg-red-400 hover:text-white"
+            >
+              <LogOut className="h-4 w-4 mr-2" />
+              Disconnect
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
     );
   }
 
   return (
-    <Dialog open={showDialog} onOpenChange={setShowDialog}>
-      <DialogTrigger asChild>
-        <Button variant="outline" className="bg-blue-600/20 border-blue-500 text-blue-300 hover:bg-blue-600/30">
-          <Wallet className="w-4 h-4 mr-2" />
+    <Card className={`w-full max-w-md ${className}`}>
+      <CardHeader className="text-center">
+        <CardTitle className="flex items-center justify-center gap-2">
+          <Wallet className="h-6 w-6" />
           Connect Wallet
+        </CardTitle>
+        <CardDescription>
+          Connect your Solana wallet to access Flutterbye
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <Button
+          onClick={connectWallet}
+          disabled={isConnecting}
+          className="w-full bg-gradient-to-r from-blue-500 to-green-500 hover:from-blue-600 hover:to-green-600"
+        >
+          {isConnecting ? (
+            <div className="flex items-center gap-2">
+              <div className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full" />
+              Connecting...
+            </div>
+          ) : (
+            <>
+              <Wallet className="h-4 w-4 mr-2" />
+              Connect Phantom Wallet
+            </>
+          )}
         </Button>
-      </DialogTrigger>
-      <DialogContent className="bg-gray-900 border-gray-700">
-        <DialogHeader>
-          <DialogTitle className="text-white">Connect Your Wallet</DialogTitle>
-          <DialogDescription className="text-gray-300">
-            Enter your Solana wallet address to connect to Flutterbye Chat
-          </DialogDescription>
-        </DialogHeader>
-        <div className="space-y-4">
-          <div>
-            <Label htmlFor="wallet" className="text-sm font-medium text-gray-300">
-              Wallet Address
-            </Label>
-            <Input
-              id="wallet"
-              type="text"
-              placeholder="Enter your Solana wallet address"
-              value={walletAddress}
-              onChange={(e) => setWalletAddress(e.target.value)}
-              className="bg-gray-800 border-gray-600 text-white"
-            />
-          </div>
-          <Button
-            onClick={handleConnect}
-            disabled={!walletAddress.trim() || isConnecting}
-            className="w-full bg-blue-600 hover:bg-blue-700"
+        
+        <div className="mt-4 text-xs text-slate-400 text-center">
+          Don't have a wallet?{' '}
+          <a 
+            href="https://phantom.app/" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="text-blue-400 hover:underline"
           >
-            {isConnecting ? 'Connecting...' : 'Connect'}
-          </Button>
+            Download Phantom
+          </a>
         </div>
-      </DialogContent>
-    </Dialog>
+      </CardContent>
+    </Card>
   );
+}
+
+// Extend window object for Phantom wallet
+declare global {
+  interface Window {
+    solana?: {
+      isPhantom: boolean;
+      connect: () => Promise<{ publicKey: { toString: () => string } }>;
+      signMessage: (message: Uint8Array) => Promise<{ signature: string }>;
+    };
+  }
 }

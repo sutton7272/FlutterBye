@@ -4975,6 +4975,110 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // ============================================================================
+  // SOLANA BLOCKCHAIN TOKEN ROUTES
+  // ============================================================================
+
+  // Create tokenized message
+  app.post('/api/tokens/create', async (req, res) => {
+    try {
+      const walletAddress = req.headers['x-wallet-address'] as string;
+      if (!walletAddress) {
+        return res.status(401).json({ error: 'Wallet authentication required' });
+      }
+
+      const tokenData = req.body;
+      const token = await storage.createToken({
+        ...tokenData,
+        creatorWallet: walletAddress,
+        createdAt: new Date().toISOString()
+      });
+
+      res.json(token);
+    } catch (error) {
+      console.error('Error creating token:', error);
+      res.status(500).json({ error: 'Failed to create tokenized message' });
+    }
+  });
+
+  // Distribute tokens to recipients
+  app.post('/api/tokens/distribute', async (req, res) => {
+    try {
+      const walletAddress = req.headers['x-wallet-address'] as string;
+      if (!walletAddress) {
+        return res.status(401).json({ error: 'Wallet authentication required' });
+      }
+
+      const { mintAddress, recipients, signatures } = req.body;
+      
+      // Store distribution records
+      const distributions = await Promise.all(
+        recipients.map((recipient: string, index: number) => 
+          storage.createTransaction({
+            fromWallet: walletAddress,
+            toWallet: recipient,
+            tokenMint: mintAddress,
+            amount: 1,
+            type: 'transfer',
+            signature: signatures[index] || `mock-sig-${Date.now()}-${index}`,
+            status: 'completed',
+            createdAt: new Date().toISOString()
+          })
+        )
+      );
+
+      res.json({ success: true, distributions });
+    } catch (error) {
+      console.error('Error recording distribution:', error);
+      res.status(500).json({ error: 'Failed to record token distribution' });
+    }
+  });
+
+  // Get user's created tokens
+  app.get('/api/tokens/created', async (req, res) => {
+    try {
+      const walletAddress = req.headers['x-wallet-address'] as string;
+      if (!walletAddress) {
+        return res.status(401).json({ error: 'Wallet authentication required' });
+      }
+
+      const tokens = await storage.getUserTokens(walletAddress);
+      res.json(tokens);
+    } catch (error) {
+      console.error('Error fetching user tokens:', error);
+      res.status(500).json({ error: 'Failed to fetch tokens' });
+    }
+  });
+
+  // Get token details by mint address
+  app.get('/api/tokens/:mintAddress', async (req, res) => {
+    try {
+      const { mintAddress } = req.params;
+      const token = await storage.getTokenByMint(mintAddress);
+      
+      if (!token) {
+        return res.status(404).json({ error: 'Token not found' });
+      }
+
+      res.json(token);
+    } catch (error) {
+      console.error('Error fetching token:', error);
+      res.status(500).json({ error: 'Failed to fetch token details' });
+    }
+  });
+
+  // Get token holders
+  app.get('/api/tokens/:mintAddress/holders', async (req, res) => {
+    try {
+      const { mintAddress } = req.params;
+      const holders = await storage.getTokenHolders(mintAddress);
+      res.json(holders);
+    } catch (error) {
+      console.error('Error fetching token holders:', error);
+      res.status(500).json({ error: 'Failed to fetch token holders' });
+    }
+  });
+
+  // ============================================================================
   // STRIPE PAYMENT ROUTES
   // ============================================================================
 
