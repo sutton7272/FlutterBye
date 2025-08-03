@@ -111,7 +111,7 @@ export default function AIFeaturesTest() {
           <p className="text-xl text-gray-300">
             Test your high-ROI AI features with real functionality
           </p>
-          <div className="flex justify-center gap-4">
+          <div className="flex justify-center gap-4 flex-wrap">
             <Badge variant="secondary" className="text-lg px-4 py-2">
               500% ROI Dynamic Pricing
             </Badge>
@@ -121,6 +121,18 @@ export default function AIFeaturesTest() {
             <Badge variant="secondary" className="text-lg px-4 py-2">
               400% ROI Self-Optimizing
             </Badge>
+          </div>
+          <div className="mt-4 p-4 bg-blue-900/20 rounded-lg border border-blue-500/30">
+            <h3 className="text-white font-semibold mb-2">Viral Amplification Creates Content For:</h3>
+            <div className="flex justify-center gap-4 text-blue-300">
+              <span>🐦 Twitter</span>
+              <span>📸 Instagram</span>
+              <span>🎵 TikTok</span>
+              <span>💼 LinkedIn</span>
+            </div>
+            <p className="text-gray-400 text-sm mt-2">
+              User decides the topic - AI creates platform-optimized viral content with hashtags, engagement hooks, and viral scoring
+            </p>
           </div>
         </div>
 

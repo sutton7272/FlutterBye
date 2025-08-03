@@ -32,11 +32,19 @@ export class ViralAmplificationAI {
   private viralPatterns: Record<string, any> = {};
 
   async generateViralContent(topic: string, platform: string, userContext?: any): Promise<ViralContent> {
+    console.log(`🚀 Generating viral content for ${platform}: "${topic}"`);
+    
     try {
+      // Check OpenAI API key
+      if (!process.env.OPENAI_API_KEY) {
+        console.warn('OpenAI API key not found, using fallback content');
+        return this.getFallbackContent(topic, platform);
+      }
+
       const viralStrategy = await this.analyzeViralPatterns(topic, platform);
       const content = await this.createViralContent(topic, platform, viralStrategy);
       
-      return {
+      const result = {
         id: `viral_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
         type: this.selectOptimalContentType(platform),
         platform: platform as any,
@@ -46,6 +54,9 @@ export class ViralAmplificationAI {
         engagement: { likes: 0, shares: 0, comments: 0, views: 0 },
         createdAt: new Date()
       };
+      
+      console.log(`✅ Generated viral content for ${platform} with score ${content.viralScore}`);
+      return result;
     } catch (error) {
       console.error('Viral content generation error:', error);
       return this.getFallbackContent(topic, platform);
@@ -209,7 +220,7 @@ export class ViralAmplificationAI {
   }
 
   private createPostingSchedule(content: ViralContent[], duration: number): any[] {
-    const schedule = [];
+    const schedule: any[] = [];
     const optimalTimes = ['09:00', '12:00', '15:00', '18:00', '21:00'];
     
     content.forEach((item, index) => {
