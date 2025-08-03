@@ -89,24 +89,6 @@ const initialSettings: AdminSettings = {
 };
 
 export default function Admin() {
-  // Debug early return to test if component is being called
-  console.log("Admin component rendered!");
-  
-  // Simple test render
-  return (
-    <div className="min-h-screen bg-slate-900 text-white p-8">
-      <div className="max-w-7xl mx-auto">
-        <h1 className="text-4xl font-bold mb-8 text-center">
-          🚀 Flutterbye Admin Dashboard
-        </h1>
-        <div className="bg-slate-800 p-6 rounded-lg">
-          <p className="text-green-400 text-xl">✅ Admin page is loading successfully!</p>
-          <p className="text-slate-300 mt-4">This is a simplified version to confirm the page loads properly.</p>
-        </div>
-      </div>
-    </div>
-  );
-  
   const [settings, setSettings] = useState<AdminSettings>(initialSettings);
   const [showSensitiveData, setShowSensitiveData] = useState(false);
   const [newImageUrl, setNewImageUrl] = useState("");
