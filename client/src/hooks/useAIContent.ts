@@ -1,6 +1,30 @@
 import { useState } from 'react';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { apiRequest } from '@/lib/queryClient';
+
+// ARIA Personality System Types
+export interface ARIAPersonality {
+  name: string;
+  description: string;
+  personality: {
+    traits: string[];
+    style: string;
+    intelligence: {
+      emotional: number;
+      curiosity: number;
+      helpfulness: number;
+      enthusiasm: number;
+      adaptability: number;
+    };
+    memoryCapabilities: {
+      usersRemembered: number;
+      conversationsTracked: number;
+      behaviorsLearned: number;
+    };
+  };
+  capabilities: string[];
+  uniqueFeatures: string[];
+}
 
 /**
  * Hook for AI-powered content enhancement throughout the platform
@@ -18,10 +42,7 @@ export function useAIContent() {
         audience?: string;
       } 
     }) => {
-      return apiRequest('/api/ai/optimize-text', {
-        method: 'POST',
-        body: data
-      });
+      return apiRequest('/api/ai/optimize-text', 'POST', data);
     }
   });
 
@@ -33,10 +54,7 @@ export function useAIContent() {
       messageType?: string;
       recipient?: string;
     }) => {
-      return apiRequest('/api/ai/chat-suggestions', {
-        method: 'POST',
-        body: { context }
-      });
+      return apiRequest('/api/ai/chat-suggestions', 'POST', { context });
     }
   });
 
@@ -179,10 +197,29 @@ export function useAIContent() {
       message: string;
       userContext?: any;
     }) => {
-      return apiRequest('/api/ai/enhance-chat', {
-        method: 'POST',
-        body: data
-      });
+      return apiRequest('/api/ai/enhance-chat', 'POST', data);
+    }
+  });
+
+  // ARIA Personality System
+  const ariaPersonalityQuery = useQuery({
+    queryKey: ['/api/ai/aria/personality'],
+    staleTime: 1000 * 60 * 30, // 30 minutes
+  });
+
+  const ariaLearningMutation = useMutation({
+    mutationFn: async (data: {
+      userId: string;
+      interaction: {
+        userMessage: string;
+        ariaResponse: string;
+        userReaction: 'positive' | 'negative' | 'neutral';
+        topic: string;
+        action?: string;
+        outcome?: string;
+      };
+    }) => {
+      return apiRequest('/api/ai/aria/learn', 'POST', data);
     }
   });
 
@@ -248,6 +285,13 @@ export function useAIContent() {
     enhanceChat: chatEnhancementMutation.mutate,
     chatEnhancement: chatEnhancementMutation.data,
     isEnhancingChat: chatEnhancementMutation.isPending,
+    
+    // ARIA Personality System
+    ariaPersonality: ariaPersonalityQuery.data?.aria as ARIAPersonality,
+    teachAria: ariaLearningMutation.mutate,
+    isLoadingPersonality: ariaPersonalityQuery.isLoading,
+    isTeachingAria: ariaLearningMutation.isPending,
+    ariaLearningResult: ariaLearningMutation.data
   };
 }
 

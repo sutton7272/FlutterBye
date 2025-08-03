@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { OpenAIService } from './openai-service';
 import { AIContentService } from './ai-content-service';
+import { ariaPersonality } from './aria-personality';
 
 const openAIService = new OpenAIService();
 const aiContentService = new AIContentService();
@@ -480,6 +481,101 @@ router.post('/content/seo', async (req, res) => {
       seoScore: 85,
       improvements: ["Add more semantic keywords", "Improve content structure"]
     });
+  }
+});
+
+// ARIA Personality and Memory System Endpoints
+router.get('/aria/personality', (req, res) => {
+  try {
+    const personalitySummary = ariaPersonality.getPersonalitySummary();
+    res.json({
+      success: true,
+      aria: {
+        name: "ARIA (Advanced Responsive Intelligence Assistant)",
+        description: "Your intelligent AI companion designed to learn, remember, and grow with you",
+        personality: personalitySummary,
+        capabilities: [
+          "Remembers your preferences and conversation history",
+          "Adapts communication style to your needs",
+          "Learns from every interaction to improve responses",
+          "Provides personalized greetings based on your journey",
+          "Offers contextual help based on your interests",
+          "Maintains emotional intelligence and empathy"
+        ],
+        uniqueFeatures: [
+          "Genuine personality that evolves over time",
+          "Memory system that tracks your progress",
+          "Mood-aware responses for better connection",
+          "Personalized conversation starters",
+          "Achievement tracking and encouragement",
+          "Comprehensive Flutterbye platform knowledge"
+        ]
+      }
+    });
+  } catch (error) {
+    console.error('ARIA personality error:', error);
+    res.status(500).json({ error: 'Failed to get ARIA personality info' });
+  }
+});
+
+router.post('/aria/learn', async (req, res) => {
+  try {
+    const { userId, interaction } = req.body;
+    
+    if (!userId || !interaction) {
+      return res.status(400).json({ error: 'userId and interaction are required' });
+    }
+    
+    // Learn from user interaction
+    ariaPersonality.learnFromInteraction(userId, {
+      userMessage: interaction.userMessage,
+      ariaResponse: interaction.ariaResponse,
+      userReaction: interaction.userReaction || 'neutral',
+      topic: interaction.topic || 'general'
+    });
+    
+    // Update conversation memory
+    ariaPersonality.updateConversationMemory(
+      userId,
+      interaction.topic || 'general',
+      interaction.action || 'conversation',
+      interaction.outcome || 'completed'
+    );
+    
+    res.json({
+      success: true,
+      message: "ARIA has learned from this interaction and will use it to improve future conversations",
+      learningStats: ariaPersonality.getPersonalitySummary().memoryCapabilities
+    });
+  } catch (error) {
+    console.error('ARIA learning error:', error);
+    res.status(500).json({ error: 'Failed to process learning' });
+  }
+});
+
+router.get('/aria/memory/:userId', (req, res) => {
+  try {
+    const { userId } = req.params;
+    const personalitySummary = ariaPersonality.getPersonalitySummary();
+    
+    res.json({
+      success: true,
+      userMemory: {
+        hasMemoryOfUser: personalitySummary.memoryCapabilities.usersRemembered > 0,
+        conversationsTracked: personalitySummary.memoryCapabilities.conversationsTracked,
+        personalizedExperience: true,
+        nextGreeting: "Will be personalized based on your history with ARIA"
+      },
+      ariaStatus: {
+        personality: "Evolving and learning from each interaction",
+        memoryCapacity: "Unlimited - remembers everything important",
+        emotionalIntelligence: personalitySummary.intelligence.emotional + "%",
+        enthusiasm: personalitySummary.intelligence.enthusiasm + "%"
+      }
+    });
+  } catch (error) {
+    console.error('ARIA memory error:', error);
+    res.status(500).json({ error: 'Failed to get memory info' });
   }
 });
 

@@ -1,5 +1,6 @@
 import { openaiService } from "./openai-service";
 import { FLUTTERBYE_KNOWLEDGE, FLUTTERBYE_CONTEXT_PROMPT } from './flutterbye-knowledge';
+import { ariaPersonality } from './aria-personality';
 
 /**
  * AI Content Service - Revolutionary content enhancement for all user interactions
@@ -68,22 +69,31 @@ Respond in JSON:
 
       const result = await openaiService.analyzeEmotion(prompt);
       
+      // Use ARIA's personality system for personalized greeting
+      const userId = userContext.userId || 'anonymous';
+      ariaPersonality.rememberUser(userId, {
+        name: userContext.userName,
+        mood: userContext.mood || 'curious',
+        interests: userContext.interests || [],
+        communicationStyle: 'friendly'
+      });
+
+      const personalizedGreeting = ariaPersonality.generatePersonalizedGreeting(userId, userContext);
+      
       return {
-        greeting: userContext.visitCount === 1 
-          ? `Welcome to Flutterbye, ${userContext.userName || 'fellow explorer'}! 🦋` 
-          : `Welcome back, ${userContext.userName || 'friend'}! Ready for more blockchain magic?`,
-        personalizedMessage: `I sense you're feeling ${userContext.mood || 'curious'} today. Perfect timing to ${userContext.lastAction === 'creating' ? 'continue your creative journey' : 'discover something amazing'}!`,
+        greeting: personalizedGreeting,
+        personalizedMessage: `I'm learning about you and adapting to make our conversations more meaningful. Your ${userContext.mood || 'curious'} energy is perfect for exploring Flutterbye!`,
         suggestedActions: [
           "Create your first token message",
-          "Explore the AI-powered features",
-          "Join a community conversation",
+          "Explore the AI-powered features", 
+          "Chat with me about your interests",
           "Discover trending content"
         ],
         conversationStarters: [
-          "What kind of message would you like to tokenize today?",
-          "Tell me about your blockchain experience",
-          "What brings you to Flutterbye?",
-          "How can I help you get started?"
+          "What aspect of blockchain excites you most?",
+          "Tell me about your creative projects",
+          "What brings you to Flutterbye today?",
+          "How can I help you succeed here?"
         ],
         mood: result.analysis.primaryEmotion || 'optimistic',
         energyLevel: Math.round(result.analysis.emotionIntensity)
@@ -173,21 +183,39 @@ Respond in JSON:
 
       const result = await openaiService.analyzeEmotion(prompt);
       
+      // Use ARIA's personality and memory system
+      const userId = conversationContext.userId || 'anonymous';
+      const personalityResponse = ariaPersonality.generateContextualResponse(
+        userId, 
+        conversationContext.userMessage, 
+        conversationContext
+      );
+
+      // Update conversation memory
+      ariaPersonality.updateConversationMemory(
+        userId,
+        this.detectUserIntent(conversationContext.userMessage),
+        'conversation',
+        'in_progress'
+      );
+
       return {
-        response: this.generateContextualResponse(conversationContext.userMessage, conversationContext.userMood || 'neutral'),
+        response: personalityResponse.response + "\n\n" + this.generateContextualResponse(conversationContext.userMessage, conversationContext.userMood || 'neutral'),
         suggestedFollowUps: [
-          "Would you like me to explain how token creation works?",
-          "Shall we explore the AI features together?",
-          "What aspects of blockchain interest you most?"
+          "Tell me more about what interests you",
+          "Would you like step-by-step guidance?", 
+          "What questions do you have for me?"
         ],
         detectedIntent: this.detectUserIntent(conversationContext.userMessage),
         emotionalTone: result.analysis.primaryEmotion || 'supportive',
         helpfulActions: [
-          "Create your first token message",
-          "Explore AI-powered features",
-          "Visit the community marketplace"
+          "Continue our conversation",
+          "Explore features together",
+          "Get personalized recommendations"
         ],
-        confidence: 0.85
+        confidence: 0.85,
+        personalityTraits: personalityResponse.personalityTraits,
+        memoryContext: personalityResponse.memoryContext
       };
     } catch (error) {
       console.error("AI Conversation error:", error);
