@@ -346,18 +346,15 @@ function Router() {
             <NFTMarketplace />
           </>
         )} />
-        <Route path="/ai-showcase" component={() => (
-          <>
-            <Navbar />
-            <AIShowcase />
-          </>
-        )} />
-        <Route path="/living-ai" component={() => (
-          <>
-            <Navbar />
-            <LivingAIPage />
-          </>
-        )} />
+        {/* Redirect old AI pages to unified AI Hub */}
+        <Route path="/ai-showcase" component={() => {
+          window.location.href = '/ai-overview?tab=showcase';
+          return null;
+        }} />
+        <Route path="/living-ai" component={() => {
+          window.location.href = '/ai-overview?tab=living';
+          return null;
+        }} />
         <Route path="/ai-overview" component={() => (
           <>
             <Navbar />

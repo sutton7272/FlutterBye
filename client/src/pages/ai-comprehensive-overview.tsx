@@ -101,8 +101,17 @@ export default function AIComprehensiveOverview() {
     isOptimizingRevenue
   } = useAIAdmin();
 
+  const [activeTab, setActiveTab] = useState('features');
+
   useEffect(() => {
     loadAIOverview();
+    
+    // Check URL parameters for initial tab
+    const urlParams = new URLSearchParams(window.location.search);
+    const tabParam = urlParams.get('tab');
+    if (tabParam) {
+      setActiveTab(tabParam);
+    }
     
     // Living AI behavior tracking
     const interval = setInterval(() => {
@@ -331,7 +340,7 @@ export default function AIComprehensiveOverview() {
           </CardContent>
         </Card>
 
-        <Tabs defaultValue="features" className="space-y-6">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
           <TabsList className="grid w-full grid-cols-6 bg-black/20 border-purple-500/30">
             <TabsTrigger value="features" className="text-white">AI Features</TabsTrigger>
             <TabsTrigger value="living" className="text-white">Living AI</TabsTrigger>
