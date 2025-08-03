@@ -4,6 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Link } from "wouter";
 import { ArrowRight, MessageSquare, Coins, Zap, TrendingUp, Users, Target, Sparkles, Heart, Building2, Mic, DollarSign, CreditCard, Palette, Bot, Shield, Star } from "lucide-react";
 import flutterbeyeLogoPath from "@assets/image_1754068877999.png";
+import cosmicBackgroundPath from "@assets/image_1754257222401.png";
 import { QuickActionPanel } from "@/components/quick-action-panel";
 import { InteractiveStatsDashboard } from "@/components/interactive-stats-dashboard";
 import { EngagementBooster } from "@/components/engagement-booster";
@@ -81,7 +82,16 @@ export default function Home() {
 
   return (
     <ErrorBoundary>
-      <div className="min-h-screen text-white pt-20 overflow-hidden">
+      <div 
+        className="min-h-screen text-white pt-20 overflow-hidden bg-cover bg-center bg-no-repeat" 
+        style={{
+          backgroundImage: `url(${cosmicBackgroundPath})`,
+          backgroundAttachment: 'fixed'
+        }}
+      >
+        {/* Dark overlay for better text readability */}
+        <div className="absolute inset-0 bg-black/20 backdrop-blur-[1px]"></div>
+        <div className="relative z-10">
         
         {/* Top Scrolling Marquee */}
         <div className="border-y border-primary/30 py-6 mb-12 overflow-hidden bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900">
@@ -541,14 +551,15 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Bottom Scrolling Marquee */}
-      <div className="border-t border-purple-500/20 bg-gradient-to-r from-blue-900/20 to-purple-900/20 py-4 mt-16 overflow-hidden">
-        <div className="flex animate-marquee whitespace-nowrap text-xl font-bold text-blue-300">
-          {[...marqueeText.slice().reverse(), ...marqueeText.slice().reverse()].map((text, i) => (
-            <span key={`bottom-${i}`} className="mx-8 flex-shrink-0">{text}</span>
-          ))}
+        {/* Bottom Scrolling Marquee */}
+        <div className="border-t border-purple-500/20 bg-gradient-to-r from-blue-900/20 to-purple-900/20 py-4 mt-16 overflow-hidden">
+          <div className="flex animate-marquee whitespace-nowrap text-xl font-bold text-blue-300">
+            {[...marqueeText.slice().reverse(), ...marqueeText.slice().reverse()].map((text, i) => (
+              <span key={`bottom-${i}`} className="mx-8 flex-shrink-0">{text}</span>
+            ))}
+          </div>
         </div>
-      </div>
+        </div>
       </div>
     </ErrorBoundary>
   );
