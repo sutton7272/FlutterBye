@@ -5325,6 +5325,83 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // REVOLUTIONARY AI ENDPOINTS
+
+  app.post("/api/living-ai/predictive-insights", async (req, res) => {
+    try {
+      const { userId, userHistory, marketData } = req.body;
+      const insights = await livingAIService.generatePredictiveInsights(
+        userId || "demo-user",
+        userHistory || [],
+        marketData || []
+      );
+      res.json(insights);
+    } catch (error) {
+      console.error("Predictive insights error:", error);
+      res.status(500).json({ error: "Failed to generate predictive insights" });
+    }
+  });
+
+  app.post("/api/living-ai/dynamic-ui", async (req, res) => {
+    try {
+      const { pageContext, userPreferences, currentMood } = req.body;
+      const uiAdaptations = await livingAIService.generateDynamicUI(
+        pageContext || "general",
+        userPreferences || {},
+        currentMood || "electric"
+      );
+      res.json(uiAdaptations);
+    } catch (error) {
+      console.error("Dynamic UI error:", error);
+      res.status(500).json({ error: "Failed to generate dynamic UI" });
+    }
+  });
+
+  app.post("/api/living-ai/emotional-intelligence", async (req, res) => {
+    try {
+      const { userMessages, interactions, timePatterns } = req.body;
+      const analysis = await livingAIService.analyzeEmotionalIntelligence(
+        userMessages || [],
+        interactions || [],
+        timePatterns || []
+      );
+      res.json(analysis);
+    } catch (error) {
+      console.error("Emotional intelligence error:", error);
+      res.status(500).json({ error: "Failed to analyze emotional intelligence" });
+    }
+  });
+
+  app.post("/api/living-ai/quantum-content", async (req, res) => {
+    try {
+      const { userIntent, creativityLevel, marketContext } = req.body;
+      const content = await livingAIService.generateQuantumContent(
+        userIntent || "Create engaging content",
+        creativityLevel || 80,
+        marketContext || {}
+      );
+      res.json(content);
+    } catch (error) {
+      console.error("Quantum content error:", error);
+      res.status(500).json({ error: "Failed to generate quantum content" });
+    }
+  });
+
+  app.post("/api/living-ai/evolve-personality", async (req, res) => {
+    try {
+      const { platformEvents, userFeedback, performanceMetrics } = req.body;
+      const evolution = await livingAIService.evolvePlatformPersonality(
+        platformEvents || [],
+        userFeedback || [],
+        performanceMetrics || {}
+      );
+      res.json(evolution);
+    } catch (error) {
+      console.error("Personality evolution error:", error);
+      res.status(500).json({ error: "Failed to evolve personality" });
+    }
+  });
+
   console.log('🚀 Production-grade server with real-time monitoring initialized');
   console.log('🤖 Living AI personality system activated');
   

@@ -181,6 +181,89 @@ export function useLivingAI(pageContext: string) {
 }
 
 /**
+ * Revolutionary AI hooks for groundbreaking features
+ */
+
+export function useRevolutionaryAI(userId: string) {
+  // Predictive insights
+  const predictiveInsightsMutation = useMutation({
+    mutationFn: async (data: { userHistory: any[]; marketData: any[] }) => {
+      return apiRequest('/api/living-ai/predictive-insights', {
+        method: 'POST',
+        body: { userId, ...data }
+      });
+    }
+  });
+
+  // Dynamic UI generation
+  const dynamicUIMutation = useMutation({
+    mutationFn: async (data: { pageContext: string; userPreferences: any; currentMood: string }) => {
+      return apiRequest('/api/living-ai/dynamic-ui', {
+        method: 'POST',
+        body: data
+      });
+    }
+  });
+
+  // Emotional intelligence analysis
+  const emotionalAnalysisMutation = useMutation({
+    mutationFn: async (data: { userMessages: string[]; interactions: any[]; timePatterns: any[] }) => {
+      return apiRequest('/api/living-ai/emotional-intelligence', {
+        method: 'POST',
+        body: data
+      });
+    }
+  });
+
+  // Quantum content generation
+  const quantumContentMutation = useMutation({
+    mutationFn: async (data: { userIntent: string; creativityLevel: number; marketContext: any }) => {
+      return apiRequest('/api/living-ai/quantum-content', {
+        method: 'POST',
+        body: data
+      });
+    }
+  });
+
+  // Platform personality evolution
+  const personalityEvolutionMutation = useMutation({
+    mutationFn: async (data: { platformEvents: any[]; userFeedback: any[]; performanceMetrics: any }) => {
+      return apiRequest('/api/living-ai/evolve-personality', {
+        method: 'POST',
+        body: data
+      });
+    }
+  });
+
+  return {
+    // Predictive capabilities
+    generatePredictiveInsights: predictiveInsightsMutation.mutate,
+    predictiveInsights: predictiveInsightsMutation.data,
+    isPredicting: predictiveInsightsMutation.isPending,
+
+    // Dynamic UI
+    generateDynamicUI: dynamicUIMutation.mutate,
+    dynamicUI: dynamicUIMutation.data,
+    isGeneratingUI: dynamicUIMutation.isPending,
+
+    // Emotional intelligence
+    analyzeEmotions: emotionalAnalysisMutation.mutate,
+    emotionalProfile: emotionalAnalysisMutation.data,
+    isAnalyzingEmotions: emotionalAnalysisMutation.isPending,
+
+    // Quantum content
+    generateQuantumContent: quantumContentMutation.mutate,
+    quantumContent: quantumContentMutation.data,
+    isGeneratingContent: quantumContentMutation.isPending,
+
+    // Personality evolution
+    evolvePlatformPersonality: personalityEvolutionMutation.mutate,
+    personalityEvolution: personalityEvolutionMutation.data,
+    isEvolving: personalityEvolutionMutation.isPending
+  };
+}
+
+/**
  * Simplified hook for basic AI personality integration
  */
 export function useBasicLivingAI() {
