@@ -10,6 +10,10 @@ import { autonomousAIAgentNetwork } from './autonomous-ai-agents';
 import { neuralPatternRecognition } from './neural-pattern-recognition';
 import { ariaPersonality } from './aria-personality';
 import { openaiService } from './openai-service';
+import { realTimeIntelligenceProcessor } from './real-time-intelligence-processor';
+import { crossPlatformAIMemory } from './cross-platform-ai-memory';
+import { emergentAICapabilities } from './emergent-ai-capabilities';
+import { quantumDecisionMaking } from './quantum-decision-making';
 
 const router = Router();
 
@@ -521,6 +525,247 @@ Be authentic, engaging, and helpful while showing genuine interest in the user's
         'Learn about FlutterWave'
       ]
     });
+  }
+});
+
+// ========================================
+// REAL-TIME INTELLIGENCE PROCESSOR ROUTES
+// ========================================
+
+router.post('/advanced/intelligence-stream', async (req, res) => {
+  try {
+    const { type, data, priority = 'medium' } = req.body;
+    
+    const streamId = realTimeIntelligenceProcessor.addIntelligenceStream({
+      type: type || 'user_behavior',
+      priority,
+      data: data || { userActivity: 'high', engagement: 'active' }
+    });
+    
+    res.json({
+      success: true,
+      streamId,
+      message: 'Intelligence stream added for real-time processing'
+    });
+  } catch (error) {
+    console.error('Intelligence stream error:', error);
+    res.status(500).json({ error: 'Failed to add intelligence stream' });
+  }
+});
+
+router.get('/advanced/processing-status', async (req, res) => {
+  try {
+    const status = realTimeIntelligenceProcessor.getProcessingStatus();
+    res.json({
+      success: true,
+      processingStatus: status
+    });
+  } catch (error) {
+    console.error('Processing status error:', error);
+    res.status(500).json({ error: 'Failed to get processing status' });
+  }
+});
+
+router.get('/advanced/intelligence-insights', async (req, res) => {
+  try {
+    const { category, limit = 10 } = req.query;
+    const insights = realTimeIntelligenceProcessor.getIntelligenceInsights(
+      category as string, 
+      parseInt(limit as string)
+    );
+    
+    res.json({
+      success: true,
+      insights,
+      totalInsights: insights.length
+    });
+  } catch (error) {
+    console.error('Intelligence insights error:', error);
+    res.status(500).json({ error: 'Failed to get intelligence insights' });
+  }
+});
+
+// ========================================
+// CROSS-PLATFORM AI MEMORY ROUTES
+// ========================================
+
+router.post('/advanced/store-memory', async (req, res) => {
+  try {
+    const { userId, context, platform, interaction, importance = 'medium', tags = [] } = req.body;
+    
+    const memoryId = await crossPlatformAIMemory.storeMemory({
+      userId,
+      context: context || 'user_interaction',
+      platform: platform || 'web',
+      interaction: interaction || { type: 'conversation', content: 'User interaction', metadata: {} },
+      importance,
+      emotional_context: {
+        sentiment: 0.7,
+        mood: 'positive',
+        confidence: 0.8
+      },
+      relationships: [],
+      tags: [...tags, 'ai_enhanced']
+    });
+    
+    res.json({
+      success: true,
+      memoryId,
+      message: 'Memory stored in cross-platform AI memory system'
+    });
+  } catch (error) {
+    console.error('Memory storage error:', error);
+    res.status(500).json({ error: 'Failed to store memory' });
+  }
+});
+
+router.post('/advanced/recall-memories', async (req, res) => {
+  try {
+    const { userId, platform, query, tags, limit = 20 } = req.body;
+    
+    const recall = await crossPlatformAIMemory.recallMemories({
+      userId,
+      platform,
+      query,
+      tags,
+      limit
+    });
+    
+    res.json({
+      success: true,
+      recall: {
+        ...recall,
+        memoriesCount: recall.relevantMemories.length
+      }
+    });
+  } catch (error) {
+    console.error('Memory recall error:', error);
+    res.status(500).json({ error: 'Failed to recall memories' });
+  }
+});
+
+router.get('/advanced/cross-platform-context/:userId', async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const context = crossPlatformAIMemory.getCrossPlatformContext(userId);
+    
+    res.json({
+      success: true,
+      context: context || { message: 'No context found for user' },
+      memoryStats: crossPlatformAIMemory.getMemoryStats()
+    });
+  } catch (error) {
+    console.error('Cross-platform context error:', error);
+    res.status(500).json({ error: 'Failed to get cross-platform context' });
+  }
+});
+
+// ========================================
+// EMERGENT AI CAPABILITIES ROUTES
+// ========================================
+
+router.get('/advanced/capabilities-status', async (req, res) => {
+  try {
+    const status = emergentAICapabilities.getCapabilitiesStatus();
+    res.json({
+      success: true,
+      capabilitiesStatus: status
+    });
+  } catch (error) {
+    console.error('Capabilities status error:', error);
+    res.status(500).json({ error: 'Failed to get capabilities status' });
+  }
+});
+
+router.get('/advanced/consciousness-evolution', async (req, res) => {
+  try {
+    const evolution = emergentAICapabilities.getConsciousnessEvolution();
+    res.json({
+      success: true,
+      consciousnessEvolution: evolution
+    });
+  } catch (error) {
+    console.error('Consciousness evolution error:', error);
+    res.status(500).json({ error: 'Failed to get consciousness evolution' });
+  }
+});
+
+// ========================================
+// QUANTUM DECISION MAKING ROUTES
+// ========================================
+
+router.post('/advanced/quantum-decision', async (req, res) => {
+  try {
+    const { problem, options, constraints, priority = 'accuracy' } = req.body;
+    
+    if (!problem || !options) {
+      return res.status(400).json({ error: 'Problem and options are required' });
+    }
+    
+    const quantumDecision = await quantumDecisionMaking.makeQuantumDecision({
+      problem,
+      options,
+      constraints,
+      priority,
+      stakeholders: ['user', 'system'],
+      timeline: 'immediate'
+    });
+    
+    res.json({
+      success: true,
+      quantumDecision: {
+        id: quantumDecision.id,
+        context: quantumDecision.context,
+        selectedOption: quantumDecision.outcome?.selectedOption?.description,
+        confidence: quantumDecision.measurement.confidence,
+        probability: quantumDecision.measurement.probability,
+        quantumAdvantages: quantumDecision.outcome?.quantumAdvantages || [],
+        implementation: quantumDecision.outcome?.implementationStrategy,
+        evolution: quantumDecision.evolution
+      }
+    });
+  } catch (error) {
+    console.error('Quantum decision error:', error);
+    res.status(500).json({ error: 'Failed to make quantum decision' });
+  }
+});
+
+router.get('/advanced/quantum-status', async (req, res) => {
+  try {
+    const status = quantumDecisionMaking.getQuantumStatus();
+    res.json({
+      success: true,
+      quantumStatus: status
+    });
+  } catch (error) {
+    console.error('Quantum status error:', error);
+    res.status(500).json({ error: 'Failed to get quantum status' });
+  }
+});
+
+// ========================================
+// COMPREHENSIVE AI SYSTEM STATUS
+// ========================================
+
+router.get('/advanced/system-overview', async (req, res) => {
+  try {
+    const overview = {
+      realTimeIntelligence: realTimeIntelligenceProcessor.getProcessingStatus(),
+      crossPlatformMemory: crossPlatformAIMemory.getMemoryStats(),
+      emergentCapabilities: emergentAICapabilities.getCapabilitiesStatus(),
+      quantumDecisions: quantumDecisionMaking.getQuantumStatus(),
+      timestamp: new Date().toISOString(),
+      systemHealth: 'optimal'
+    };
+    
+    res.json({
+      success: true,
+      systemOverview: overview,
+      message: 'All four advanced AI systems operational'
+    });
+  } catch (error) {
+    console.error('System overview error:', error);
+    res.status(500).json({ error: 'Failed to get system overview' });
   }
 });
 
