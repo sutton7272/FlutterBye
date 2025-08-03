@@ -35,6 +35,8 @@ export default function Portfolio() {
   useEffect(() => {
     if (isAuthenticated && walletAddress) {
       loadUserTokens();
+    } else {
+      setIsLoading(false);
     }
   }, [isAuthenticated, walletAddress]);
 
@@ -79,15 +81,49 @@ export default function Portfolio() {
 
   if (!isAuthenticated) {
     return (
-      <div className="max-w-2xl mx-auto p-6">
-        <Card>
-          <CardHeader className="text-center">
-            <CardTitle>Connect Wallet</CardTitle>
-            <CardDescription>
-              Please connect your wallet to view your token portfolio
-            </CardDescription>
-          </CardHeader>
-        </Card>
+      <div className="min-h-screen pt-20 pb-12">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h1 className="text-4xl font-bold mb-4 text-gradient">Token Portfolio</h1>
+            <p className="text-xl text-muted-foreground mb-8">Your created tokenized messages on Solana blockchain</p>
+          </div>
+          
+          <Card className="electric-frame">
+            <CardHeader className="text-center">
+              <Coins className="w-16 h-16 mx-auto mb-4 text-primary" />
+              <CardTitle className="text-2xl text-gradient">Connect Wallet to View Portfolio</CardTitle>
+              <CardDescription className="text-lg">
+                Connect your wallet to view your created tokens, track portfolio value, and manage your tokenized messages.
+                You can browse other pages without connecting your wallet.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="text-center pb-8">
+              <div className="space-y-4">
+                <p className="text-muted-foreground">
+                  Your portfolio will show:
+                </p>
+                <div className="grid grid-cols-2 gap-4 text-sm">
+                  <div className="flex items-center gap-2">
+                    <Coins className="w-4 h-4 text-primary" />
+                    Created tokens
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <TrendingUp className="w-4 h-4 text-primary" />
+                    Portfolio value
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Users className="w-4 h-4 text-primary" />
+                    Token holders
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Clock className="w-4 h-4 text-primary" />
+                    Creation history
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
       </div>
     );
   }

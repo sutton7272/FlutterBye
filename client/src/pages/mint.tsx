@@ -36,8 +36,8 @@ export default function Mint() {
   const handleCreateToken = async () => {
     if (!isAuthenticated) {
       toast({
-        title: "Wallet Required",
-        description: "Please connect your wallet to create tokenized messages",
+        title: "Wallet Connection Required",
+        description: "Please connect your wallet to create tokenized messages. You can browse without connecting.",
         variant: "destructive"
       });
       return;

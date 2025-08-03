@@ -66,33 +66,8 @@ export function Chat() {
   // Real authentication integration
   const { user, walletAddress, isAuthenticated } = useAuth();
 
-  // Authentication gate - prevent access if not authenticated
-  if (!isAuthenticated || !walletAddress) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-blue-900 to-black flex items-center justify-center">
-        <Card className="w-full max-w-md mx-4">
-          <CardHeader className="text-center">
-            <CardTitle className="text-2xl font-bold text-white">
-              Connect Wallet Required
-            </CardTitle>
-            <CardDescription className="text-gray-300">
-              Please connect your wallet to access the chat platform
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="text-center space-y-4">
-            <WalletConnect />
-            <Button 
-              onClick={() => window.location.href = '/'}
-              variant="outline"
-              className="w-full"
-            >
-              Go to Homepage
-            </Button>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
+  // Optional authentication - users can browse chat without wallet
+  // Wallet required only for sending messages and participating
   
   const [selectedRoom, setSelectedRoom] = useState<string>('general');
   const [message, setMessage] = useState('');
@@ -196,11 +171,11 @@ export function Chat() {
   const reconnectIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
   const connectWebSocket = useCallback(() => {
-    if (!selectedRoom || !walletAddress) return;
+    if (!selectedRoom) return;
 
     setConnectionStatus('connecting');
     const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
-    const wsUrl = `${protocol}//${window.location.host}/ws?wallet=${walletAddress}&room=${selectedRoom}`;
+    const wsUrl = `${protocol}//${window.location.host}/ws?wallet=${walletAddress || 'anonymous'}&room=${selectedRoom}`;
     
     const ws = new WebSocket(wsUrl);
     
@@ -335,6 +310,15 @@ export function Chat() {
   // Enhanced message sending with reply support
   const sendMessage = useCallback(() => {
     if (!socket || !message.trim()) return;
+    
+    if (!isAuthenticated || !walletAddress) {
+      toast({
+        title: "Wallet Required",
+        description: "Connect your wallet to send messages. You can browse without connecting.",
+        variant: "destructive"
+      });
+      return;
+    }
 
     const messageData = {
       type: editingMessage ? 'edit_message' : 'send_message',

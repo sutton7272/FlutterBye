@@ -51,6 +51,8 @@ export default function Redeem() {
     if (isAuthenticated && walletAddress) {
       loadRedeemableTokens();
       loadRedemptionRates();
+    } else {
+      setIsLoading(false);
     }
   }, [isAuthenticated, walletAddress]);
 
@@ -195,15 +197,49 @@ export default function Redeem() {
 
   if (!isAuthenticated) {
     return (
-      <div className="max-w-2xl mx-auto p-6">
-        <Card>
-          <CardHeader className="text-center">
-            <CardTitle>Connect Wallet</CardTitle>
-            <CardDescription>
-              Please connect your wallet to redeem your tokens
-            </CardDescription>
-          </CardHeader>
-        </Card>
+      <div className="min-h-screen pt-20 pb-12">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h1 className="text-4xl font-bold mb-4 text-gradient">Token Redemption</h1>
+            <p className="text-xl text-muted-foreground mb-8">Convert your tokenized messages back to value</p>
+          </div>
+          
+          <Card className="electric-frame">
+            <CardHeader className="text-center">
+              <ArrowRightLeft className="w-16 h-16 mx-auto mb-4 text-primary" />
+              <CardTitle className="text-2xl text-gradient">Connect Wallet to Redeem Tokens</CardTitle>
+              <CardDescription className="text-lg">
+                Connect your wallet to view redeemable tokens and convert them back to SOL, USDC, or FLBY.
+                You can browse other pages without connecting your wallet.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="text-center pb-8">
+              <div className="space-y-4">
+                <p className="text-muted-foreground">
+                  Token redemption features:
+                </p>
+                <div className="grid grid-cols-2 gap-4 text-sm">
+                  <div className="flex items-center gap-2">
+                    <Coins className="w-4 h-4 text-primary" />
+                    View owned tokens
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Clock className="w-4 h-4 text-primary" />
+                    Check expiration dates
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <TrendingUp className="w-4 h-4 text-primary" />
+                    Live exchange rates
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <ArrowRightLeft className="w-4 h-4 text-primary" />
+                    Instant redemption
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
       </div>
     );
   }

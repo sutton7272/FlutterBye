@@ -182,14 +182,49 @@ export default function AnalyticsDashboard() {
 
   if (!isAuthenticated) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900/20 to-slate-900 flex items-center justify-center">
-        <Card className="bg-slate-900/50 border-purple-500/20 p-8">
-          <CardContent className="text-center">
-            <Crown className="w-16 h-16 text-purple-400 mx-auto mb-4" />
-            <h2 className="text-2xl font-bold text-purple-400 mb-2">Authentication Required</h2>
-            <p className="text-gray-400">Please connect your wallet to access analytics dashboard</p>
-          </CardContent>
-        </Card>
+      <div className="min-h-screen pt-20 pb-12">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h1 className="text-4xl font-bold mb-4 text-gradient">Analytics Dashboard</h1>
+            <p className="text-xl text-muted-foreground mb-8">Platform performance and user insights</p>
+          </div>
+          
+          <Card className="electric-frame">
+            <CardHeader className="text-center">
+              <BarChart3 className="w-16 h-16 mx-auto mb-4 text-primary" />
+              <CardTitle className="text-2xl text-gradient">Connect Wallet to View Analytics</CardTitle>
+              <CardDescription className="text-lg">
+                Connect your wallet to access detailed analytics, performance metrics, and insights.
+                You can browse other pages without connecting your wallet.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="text-center pb-8">
+              <div className="space-y-4">
+                <p className="text-muted-foreground">
+                  Analytics features:
+                </p>
+                <div className="grid grid-cols-2 gap-4 text-sm">
+                  <div className="flex items-center gap-2">
+                    <TrendingUp className="w-4 h-4 text-primary" />
+                    Performance metrics
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Users className="w-4 h-4 text-primary" />
+                    User engagement
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <DollarSign className="w-4 h-4 text-primary" />
+                    Revenue tracking
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Activity className="w-4 h-4 text-primary" />
+                    Real-time data
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
       </div>
     );
   }
