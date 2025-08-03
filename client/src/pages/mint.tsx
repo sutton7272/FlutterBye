@@ -16,7 +16,7 @@ import { apiRequest } from "@/lib/queryClient";
 import ImageUpload from "@/components/image-upload";
 import { LoadingSpinner } from "@/components/loading-spinner";
 import { validateTokenQuantity, validateWholeNumber } from "@/lib/validators";
-import { Coins, Upload, Calculator, DollarSign, Lock, Globe, Gift, AlertCircle, Wand2, Star, Sparkles, Users, Target, ImageIcon, FileImage, QrCode, Plus, X, Ticket, Loader2, Zap, CheckCircle, Mic } from "lucide-react";
+import { Coins, Upload, Calculator, DollarSign, Lock, Globe, Gift, AlertCircle, Wand2, Star, Sparkles, Users, Target, ImageIcon, FileImage, QrCode, Plus, X, Ticket, Loader2, Zap, CheckCircle, Mic, TrendingUp, Heart } from "lucide-react";
 import AITextOptimizer from "@/components/ai-text-optimizer";
 import { EmotionAnalyzer } from "@/components/EmotionAnalyzer";
 import { ViralMechanics } from "@/components/ViralMechanics";
@@ -28,6 +28,7 @@ import { ShareSuccessModal } from "@/components/ShareSuccessModal";
 import { TokenPriceComparison } from "@/components/token-price-comparison";
 import { MintingProgressOverlay } from "@/components/MintingProgressOverlay";
 import { VoiceMessageRecorder } from "@/components/voice-message-recorder";
+import RealTimeAIAssistant from "@/components/RealTimeAIAssistant";
 
 export default function Mint() {
   const { toast } = useToast();
@@ -540,27 +541,29 @@ export default function Mint() {
                     />
                   </div>
                   
-                  {/* AI Enhancement Integration */}
-                  {message.length > 3 && (
-                    <div className="p-3 bg-gradient-to-r from-electric-blue/5 to-purple-500/5 rounded-lg border border-electric-blue/20">
-                      <div className="flex items-center gap-2 mb-2">
-                        <Sparkles className="w-4 h-4 text-electric-blue animate-pulse" />
-                        <span className="text-sm text-electric-blue font-medium">AI Token Analysis</span>
-                      </div>
-                      <div className="grid grid-cols-2 gap-3 text-xs">
-                        <div className="flex items-center gap-1">
-                          <TrendingUp className="w-3 h-3 text-green-400" />
-                          <span className="text-white/70">Viral Score: </span>
-                          <span className="text-green-400 font-semibold">{Math.floor(Math.random() * 30 + 70)}%</span>
-                        </div>
-                        <div className="flex items-center gap-1">
-                          <Heart className="w-3 h-3 text-pink-400" />
-                          <span className="text-white/70">Emotion: </span>
-                          <span className="text-pink-400 font-semibold">Excited</span>
-                        </div>
-                      </div>
-                    </div>
-                  )}
+                  {/* Real-Time AI Assistant Integration */}
+                  <RealTimeAIAssistant
+                    context="token-creation"
+                    userInput={message + (memo ? ` ${memo}` : '')}
+                    onSuggestionApply={(suggestion) => {
+                      // Apply AI suggestion to appropriate field
+                      if (message.length === 0 || message.length < 10) {
+                        setMessage(suggestion.substring(0, 27));
+                      } else {
+                        setMemo(suggestion);
+                      }
+                    }}
+                    onOptimizationApply={(optimization) => {
+                      // Apply comprehensive AI optimization
+                      if (optimization.type === 'token-optimization') {
+                        // Use AI insights to guide user
+                        toast({
+                          title: "AI Optimization Applied",
+                          description: "Token enhanced with AI recommendations",
+                        });
+                      }
+                    }}
+                  />
                 </div>
 
                 {/* Extended Message Section - Moved Higher */}

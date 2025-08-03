@@ -14,6 +14,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import { Send, Users, Hash, Coins, MessageSquare, Plus, Settings, Smile, Reply, Edit3, Copy, Star, AlertTriangle, Volume2, VolumeX, Maximize2, Minimize2, Search, Filter, Clock, CheckCircle2, Circle, MoreVertical, Trash2, Pin, Heart, Zap, Gift, BarChart3, RotateCcw, Crown, Sparkles, TrendingUp, DollarSign, Award, Shield, Image, Paperclip, Mic, Video, Calendar, MapPin, Users2, Bot, Lock, Unlock, Eye, EyeOff, Bell, BellOff, Palette, Wand2, Flame, Target, MessageCircle, ThumbsUp, Share2, Download, Upload, Bookmark, Flag, Coffee, Rocket } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { VoiceMessageRecorder } from '@/components/voice-message-recorder';
+import RealTimeAIAssistant from '@/components/RealTimeAIAssistant';
 
 interface ChatRoom {
   id: string;
