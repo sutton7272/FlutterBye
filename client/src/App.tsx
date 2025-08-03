@@ -8,7 +8,7 @@ import NotFound from "@/pages/not-found";
 import Home from "@/pages/home";
 import Marketplace from "@/pages/marketplace";
 import Portfolio from "@/pages/portfolio";
-import Mint from "@/pages/mint-fixed";
+import Mint from "@/pages/mint-restore-complete";
 
 import Redeem from "@/pages/redeem";
 import Activity from "@/pages/activity";
