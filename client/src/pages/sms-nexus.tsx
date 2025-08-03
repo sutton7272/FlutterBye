@@ -212,7 +212,7 @@ export function SMSNexusPage() {
             </div>
             <div className="space-y-2">
               <h1 className="text-6xl font-black bg-gradient-to-r from-purple-400 via-blue-400 to-cyan-400 bg-clip-text text-transparent drop-shadow-2xl">
-                SMS NEXUS
+                FLUTTERWAVE
               </h1>
               <div className="text-sm text-purple-300 font-semibold tracking-wider">
                 REVOLUTIONARY • AI-POWERED • BLOCKCHAIN-ENABLED
@@ -222,20 +222,20 @@ export function SMSNexusPage() {
           
           <div className="relative">
             <p className="text-2xl text-purple-200 max-w-5xl mx-auto leading-relaxed">
-              The world's first <span className="text-cyan-400 font-bold">Neural Emotional Intelligence</span> platform that transforms 
-              ordinary text messages into <span className="text-green-400 font-bold">quantum-enhanced blockchain treasures</span> with 
-              <span className="text-pink-400 font-bold">AI avatar collaboration</span>
+              Experience the <span className="text-cyan-400 font-bold">Butterfly Effect of Emotions</span> as FlutterWave transforms 
+              ordinary messages into <span className="text-green-400 font-bold">precious digital butterflies</span> that spread 
+              <span className="text-pink-400 font-bold">waves of feeling</span> across the blockchain universe
             </p>
             
-            {/* Floating feature badges */}
+            {/* Floating butterfly feature badges */}
             <div className="flex justify-center mt-6 space-x-4">
               {[
-                { text: "127 Emotions", color: "from-purple-500 to-pink-500" },
-                { text: "∞ Scalability", color: "from-green-500 to-blue-500" },
-                { text: "AI Avatars", color: "from-cyan-500 to-purple-500" },
-                { text: "Global Pulse", color: "from-orange-500 to-red-500" }
+                { text: "🦋 127 Emotions", color: "from-purple-500 to-pink-500" },
+                { text: "🌊 Infinite Waves", color: "from-green-500 to-blue-500" },
+                { text: "🤖 Butterfly AI", color: "from-cyan-500 to-purple-500" },
+                { text: "🌍 Global Flutter", color: "from-orange-500 to-red-500" }
               ].map((badge, index) => (
-                <div key={index} className={`px-4 py-2 bg-gradient-to-r ${badge.color} rounded-full text-white text-sm font-semibold shadow-lg hover:scale-110 transition-all duration-300 cursor-pointer`}>
+                <div key={index} className={`px-4 py-2 bg-gradient-to-r ${badge.color} rounded-full text-white text-sm font-semibold shadow-lg hover:scale-110 transition-all duration-300 cursor-pointer animate-pulse`}>
                   {badge.text}
                 </div>
               ))}
@@ -730,7 +730,7 @@ export function SMSNexusPage() {
                     Your Personal AI Avatar
                   </CardTitle>
                   <CardDescription className="text-cyan-200">
-                    Meet ARIA - your AI emotion composer that learns your patterns and co-creates viral content
+                    Meet ARIA - your AI butterfly companion that learns your emotion patterns and co-creates viral FlutterWaves
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
@@ -850,7 +850,7 @@ export function SMSNexusPage() {
                     
                     <div className="absolute bottom-4 left-4 right-4">
                       <div className="text-center text-emerald-300 text-sm font-semibold">
-                        Live Emotion Intensity: 8.7/10
+                        🦋 Global Butterfly Effect: 8.7/10 🌊
                       </div>
                     </div>
                   </div>
@@ -992,8 +992,8 @@ export function SMSNexusPage() {
           <CardContent className="p-6">
             <div className="flex flex-col md:flex-row items-center justify-between gap-4">
               <div className="text-center md:text-left">
-                <h3 className="text-2xl font-bold text-white mb-2">Ready to revolutionize messaging?</h3>
-                <p className="text-purple-200">Join the SMS Nexus and turn every text into a blockchain treasure</p>
+                <h3 className="text-2xl font-bold text-white mb-2">Ready to ride the FlutterWave?</h3>
+                <p className="text-purple-200">Join the revolution and transform every message into precious blockchain butterflies</p>
               </div>
               <div className="flex gap-3">
                 <Button className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-semibold px-8">
