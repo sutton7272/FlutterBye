@@ -19,6 +19,7 @@ import FreeCodes from "@/pages/free-codes";
 import Admin from "@/pages/admin";
 import TransactionHeatmapPage from "@/pages/heatmap";
 import { SmsIntegrationPage } from "@/pages/sms-integration";
+import { SMSDemoPage } from "@/pages/sms-demo";
 import { WalletManagementPage } from "@/pages/wallet-management";
 import { RewardsPage } from "@/pages/rewards";
 import JourneyPage from "@/pages/journey";
@@ -138,6 +139,12 @@ function Router() {
           <>
             <Navbar />
             <SmsIntegrationPage />
+          </>
+        )} />
+        <Route path="/sms-demo" component={() => (
+          <>
+            <Navbar />
+            <SMSDemoPage />
           </>
         )} />
         <Route path="/wallets" component={() => (

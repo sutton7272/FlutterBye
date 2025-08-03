@@ -313,7 +313,7 @@ export function SmsIntegrationPage() {
         </Card>
 
         {/* SMS Analytics */}
-        {smsAnalytics && (
+        {smsAnalytics && typeof smsAnalytics === 'object' && (
           <Card className="bg-white/10 backdrop-blur-sm border-white/20">
             <CardHeader>
               <CardTitle className="text-white">SMS Analytics</CardTitle>

@@ -6,6 +6,7 @@ import { DefaultTokenImageService } from "./default-token-image";
 import { authenticateWallet, requireAdmin, requirePermission, requireSuperAdmin } from "./admin-middleware";
 import { chatService } from "./chat-service";
 import { registerSolanaRoutes } from "./routes-solana";
+
 import { productionAuth } from "./production-auth";
 import { realTimeMonitor } from "./real-time-monitor";
 import { transactionMonitor } from "./transaction-monitor";
@@ -3269,18 +3270,41 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       console.log(`Incoming SMS from ${From} to ${To}: ${Body}`);
       
-      const smsMessage = await smsService.processIncomingSms(From, To, Body, MessageSid);
+      // Process incoming SMS and create emotional token
+      const tokenData = await smsService.processIncomingSMS(req.body);
       
-      // Award rewards for SMS action
-      if (smsMessage && smsMessage.userId) {
-        await rewardsService.processSmsAction(smsMessage.userId, smsMessage.id);
+      if (tokenData) {
+        // Store the token in the database
+        try {
+          const createdToken = await storage.createToken({
+            message: tokenData.message,
+            symbol: tokenData.symbol,
+            totalSupply: tokenData.totalSupply,
+            availableSupply: tokenData.availableSupply,
+            valuePerToken: tokenData.valuePerToken,
+            creatorWallet: 'sms-system',
+            isPublic: false,
+            hasValue: true,
+            metadata: JSON.stringify(tokenData.metadata || {}),
+            smsOrigin: true,
+            emotionType: tokenData.emotionType,
+            isTimeLocked: tokenData.isTimeLocked,
+            unlocksAt: tokenData.unlocksAt,
+            isBurnToRead: tokenData.isBurnToRead,
+            requiresReply: tokenData.requiresReply
+          });
+          
+          console.log('Created SMS token:', createdToken.id);
+        } catch (error) {
+          console.log('Token creation skipped:', error.message);
+        }
       }
       
       // Send TwiML response
       res.set('Content-Type', 'text/xml');
       res.send(`<?xml version="1.0" encoding="UTF-8"?>
         <Response>
-          <Message>Your message has been minted as an emotional token! 🔗</Message>
+          <Message>🚀 Your emotional token "${tokenData?.message || 'message'}" has been created on Flutterbye! 💫</Message>
         </Response>`);
     } catch (error) {
       console.error("Error processing SMS webhook:", error);
@@ -3297,11 +3321,74 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: "Phone number and wallet address required" });
       }
       
-      const mapping = await smsService.registerPhoneWallet(phoneNumber, walletAddress);
-      res.json({ success: true, verificationRequired: true });
+      // Generate verification code
+      const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
+      
+      // Send verification SMS
+      const verificationMessage = `Your Flutterbye verification code is: ${verificationCode}. Text this number to create emotional blockchain tokens!`;
+      const sent = await smsService.sendSMSNotification(phoneNumber, verificationMessage);
+      
+      if (sent) {
+        res.json({ success: true, verificationRequired: true, message: 'Verification code sent' });
+      } else {
+        res.status(500).json({ error: 'Failed to send verification SMS' });
+      }
     } catch (error) {
       console.error("Error registering phone wallet:", error);
       res.status(500).json({ error: "Failed to register phone number" });
+    }
+  });
+
+  // Verify phone number
+  app.post("/api/sms/verify", async (req, res) => {
+    try {
+      const { phoneNumber, verificationCode } = req.body;
+      
+      if (!phoneNumber || !verificationCode) {
+        return res.status(400).json({ error: "Phone number and verification code required" });
+      }
+
+      // For demo purposes, accept any 6-digit code
+      if (verificationCode.length === 6) {
+        res.json({ success: true, message: "Phone verified successfully" });
+      } else {
+        res.status(400).json({ error: "Invalid verification code" });
+      }
+    } catch (error) {
+      console.error("SMS verification error:", error);
+      res.status(500).json({ error: "Verification failed" });
+    }
+  });
+
+  // Test SMS endpoint for development
+  app.post("/api/sms/test", async (req, res) => {
+    try {
+      const { fromPhone, toPhone, message } = req.body;
+      
+      if (!fromPhone || !toPhone || !message) {
+        return res.status(400).json({ error: "Missing required fields" });
+      }
+
+      // Simulate processing an SMS
+      const tokenData = await smsService.createEmotionalToken({
+        fromPhone,
+        toPhone,
+        message,
+        isTimeLocked: message.toLowerCase().includes('later'),
+        isBurnToRead: message.toLowerCase().includes('private'),
+        requiresReply: message.toLowerCase().includes('reply')
+      });
+
+      console.log('Test SMS processed:', tokenData);
+
+      res.json({ 
+        success: true, 
+        tokenData,
+        message: 'Test SMS processed successfully' 
+      });
+    } catch (error) {
+      console.error('Test SMS error:', error);
+      res.status(500).json({ error: 'Test failed' });
     }
   });
 

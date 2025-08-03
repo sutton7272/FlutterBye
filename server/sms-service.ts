@@ -1,12 +1,19 @@
 // SMS-to-blockchain integration service
-// Simplified imports to avoid dependency issues
-let storage: any = null;
-try {
-  const storageModule = await import('./storage.js');
-  storage = storageModule.storage;
-} catch (error) {
-  console.log('Storage not available for SMS service');
+import type { DatabaseStorage } from './storage';
+
+let storage: DatabaseStorage | null = null;
+
+async function initializeStorage() {
+  try {
+    const storageModule = await import('./storage.js');
+    storage = storageModule.storage;
+  } catch (error) {
+    console.log('Storage not available for SMS service');
+  }
 }
+
+// Initialize storage
+initializeStorage();
 
 // Simple event tracking function
 const trackBusinessEvent = async (eventType: string, data: any, userId?: string) => {
@@ -85,9 +92,8 @@ class SMSService {
 
   private async configureTwilio(accountSid: string, authToken: string) {
     try {
-      // This would be implemented when Twilio package is available
-      // const twilio = require('twilio');
-      // this.twilioClient = twilio(accountSid, authToken);
+      const { default: twilio } = await import('twilio');
+      this.twilioClient = twilio(accountSid, authToken);
       console.log('Twilio configured successfully');
     } catch (error) {
       console.error('Failed to configure Twilio:', error);
@@ -127,7 +133,7 @@ class SMSService {
   async createEmotionalToken(request: SMSTokenRequest): Promise<any> {
     try {
       const emotionType = request.emotionType || this.analyzeMessageEmotion(request.message);
-      const emotionData = EMOTION_MAPPING[emotionType] || EMOTION_MAPPING.message;
+      const emotionData = EMOTION_MAPPING[emotionType as keyof typeof EMOTION_MAPPING] || EMOTION_MAPPING.message;
       
       // Create enhanced message with emotion context
       const enhancedMessage = request.message.length <= 23 
@@ -159,7 +165,7 @@ class SMSService {
           emotionData,
           smsContext: {
             originalLength: request.message.length,
-            hasEmoji: /[\u{1F600}-\u{1F64F}]|[\u{1F300}-\u{1F5FF}]|[\u{1F680}-\u{1F6FF}]|[\u{1F1E0}-\u{1F1FF}]/u.test(request.message)
+            hasEmoji: /[\u{1F600}-\u{1F64F}]|[\u{1F300}-\u{1F5FF}]|[\u{1F680}-\u{1F6FF}]|[\u{1F1E0}-\u{1F1FF}]/gu.test(request.message)
           }
         }
       };
@@ -187,13 +193,12 @@ class SMSService {
     }
     
     try {
-      // This would be implemented when Twilio is configured
-      // const result = await this.twilioClient.messages.create({
-      //   body: message,
-      //   from: process.env.TWILIO_PHONE_NUMBER,
-      //   to: to
-      // });
-      console.log('SMS sent successfully');
+      const result = await this.twilioClient.messages.create({
+        body: message,
+        from: process.env.TWILIO_PHONE_NUMBER,
+        to: to
+      });
+      console.log('SMS sent successfully:', result.sid);
       return true;
     } catch (error) {
       console.error('Failed to send SMS:', error);
