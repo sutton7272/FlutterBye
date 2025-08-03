@@ -316,13 +316,13 @@ interface PaymentCardProps {
 function PaymentCard({ option, onSelect, loading }: PaymentCardProps) {
   return (
     <Card 
-      className={`relative bg-slate-900/50 border-slate-700 hover:border-blue-500/50 transition-all duration-300 transform hover:scale-105 cursor-pointer ${
-        option.popular ? 'ring-2 ring-green-500/50' : ''
+      className={`relative bg-slate-900/80 border-electric-blue/30 hover:border-electric-green/70 transition-all duration-300 transform hover:scale-105 cursor-pointer backdrop-blur-lg ${
+        option.popular ? 'ring-2 ring-electric-green/70 shadow-lg shadow-electric-green/20' : ''
       }`}
       onClick={() => onSelect(option)}
     >
       {option.popular && (
-        <Badge className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-green-500 hover:bg-green-600">
+        <Badge className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-gradient-to-r from-electric-green to-electric-blue hover:opacity-90 animate-pulse-electric text-black font-bold">
           Most Popular
         </Badge>
       )}
@@ -345,7 +345,7 @@ function PaymentCard({ option, onSelect, loading }: PaymentCardProps) {
         <ul className="space-y-2 mb-6">
           {option.features.map((feature, index) => (
             <li key={index} className="flex items-center text-slate-300 text-sm">
-              <div className="w-2 h-2 bg-blue-400 rounded-full mr-3"></div>
+              <div className="w-2 h-2 bg-electric-blue rounded-full mr-3 animate-pulse"></div>
               {feature}
             </li>
           ))}
@@ -438,32 +438,78 @@ export default function Payments() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 p-4">
-      <div className="max-w-6xl mx-auto">
-        {/* Header */}
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 p-4 relative">
+      {/* Cosmic Butterfly Background */}
+      <div 
+        className="fixed inset-0 bg-cover bg-center bg-no-repeat opacity-20 z-0"
+        style={{
+          backgroundImage: "url('/images/cosmic-butterfly.png')",
+          backgroundAttachment: 'fixed'
+        }}
+      />
+      
+      {/* Electric Grid Overlay */}
+      <div className="fixed inset-0 opacity-5 z-0 pointer-events-none">
+        <div className="absolute inset-0 bg-gradient-to-r from-electric-blue/20 via-transparent to-electric-green/20" />
+        <div className="absolute inset-0 bg-grid-electric opacity-30" />
+      </div>
+
+      <div className="max-w-6xl mx-auto relative z-10">
+        {/* Header with Electric Effects */}
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-white mb-4">
+          <h1 className="text-4xl font-bold text-white mb-4 bg-gradient-to-r from-electric-blue to-electric-green bg-clip-text text-transparent">
             Power Up Your Flutterbye Experience
           </h1>
           <p className="text-xl text-slate-300 max-w-2xl mx-auto">
             Choose the perfect plan to unlock AI-powered messaging, viral content creation, 
             and blockchain communication features.
           </p>
+          
+          {/* Electric Pulse Animation */}
+          <div className="flex justify-center mt-6">
+            <div className="w-32 h-1 bg-gradient-to-r from-electric-blue via-electric-green to-electric-blue rounded-full">
+              <div className="w-full h-full bg-gradient-to-r from-transparent via-white to-transparent rounded-full animate-pulse-electric" />
+            </div>
+          </div>
         </div>
 
-        {/* AI Credits Status */}
+        {/* AI Credits Status with Electric Border */}
         <div className="mb-8">
-          <AICreditDisplay userId="demo-user" />
+          <div className="p-1 bg-gradient-to-r from-electric-blue/30 to-electric-green/30 rounded-lg animate-pulse-electric-slow">
+            <div className="bg-slate-900/80 rounded-lg">
+              <AICreditDisplay userId="demo-user" />
+            </div>
+          </div>
         </div>
 
         {!selectedOption ? (
           /* Tabbed Payment Interface */
           <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-            <TabsList className="grid w-full grid-cols-4 bg-slate-900/50 border-slate-700">
-              <TabsTrigger value="tokens" className="text-white">FLBY Tokens</TabsTrigger>
-              <TabsTrigger value="ai" className="text-white">AI Credits</TabsTrigger>
-              <TabsTrigger value="flutterwave" className="text-white">FlutterWave</TabsTrigger>
-              <TabsTrigger value="flutterart" className="text-white">FlutterArt</TabsTrigger>
+            <TabsList className="grid w-full grid-cols-4 bg-slate-900/80 border-electric-blue/30 backdrop-blur-lg">
+              <TabsTrigger 
+                value="tokens" 
+                className="text-white data-[state=active]:bg-gradient-to-r data-[state=active]:from-electric-blue/20 data-[state=active]:to-electric-green/20 data-[state=active]:text-electric-blue border-electric-blue/20"
+              >
+                FLBY Tokens
+              </TabsTrigger>
+              <TabsTrigger 
+                value="ai" 
+                className="text-white data-[state=active]:bg-gradient-to-r data-[state=active]:from-electric-blue/20 data-[state=active]:to-electric-green/20 data-[state=active]:text-electric-blue border-electric-blue/20"
+              >
+                AI Credits
+              </TabsTrigger>
+              <TabsTrigger 
+                value="flutterwave" 
+                className="text-white data-[state=active]:bg-gradient-to-r data-[state=active]:from-electric-blue/20 data-[state=active]:to-electric-green/20 data-[state=active]:text-electric-blue border-electric-blue/20"
+              >
+                FlutterWave
+              </TabsTrigger>
+              <TabsTrigger 
+                value="flutterart" 
+                className="text-white data-[state=active]:bg-gradient-to-r data-[state=active]:from-electric-blue/20 data-[state=active]:to-electric-green/20 data-[state=active]:text-electric-blue border-electric-blue/20"
+              >
+                FlutterArt
+              </TabsTrigger>
             </TabsList>
 
             <TabsContent value="tokens" className="space-y-4">
@@ -524,7 +570,7 @@ export default function Payments() {
                   setSelectedOption(null);
                   setClientSecret("");
                 }}
-                className="mb-4"
+                className="mb-4 border-electric-blue/50 text-electric-blue hover:bg-electric-blue/10"
               >
                 ← Back to Plans
               </Button>
@@ -540,9 +586,9 @@ export default function Payments() {
                 />
               </StripeProvider>
             ) : (
-              <Card className="bg-slate-900/50 border-blue-500/30">
+              <Card className="bg-slate-900/80 border-electric-blue/30 backdrop-blur-lg">
                 <CardContent className="p-8 text-center">
-                  <div className="animate-spin w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full mx-auto mb-4"></div>
+                  <div className="animate-spin w-8 h-8 border-4 border-electric-blue border-t-transparent rounded-full mx-auto mb-4"></div>
                   <p className="text-slate-300">Preparing your payment...</p>
                 </CardContent>
               </Card>
@@ -550,10 +596,10 @@ export default function Payments() {
           </div>
         )}
 
-        {/* Security Badge */}
+        {/* Security Badge with Electric Effects */}
         <div className="text-center mt-12">
-          <div className="inline-flex items-center gap-2 bg-slate-800/50 px-4 py-2 rounded-full border border-slate-700">
-            <Shield className="w-4 h-4 text-green-400" />
+          <div className="inline-flex items-center gap-2 bg-slate-900/80 px-4 py-2 rounded-full border border-electric-blue/30 backdrop-blur-lg">
+            <Shield className="w-4 h-4 text-electric-green animate-pulse" />
             <span className="text-slate-300 text-sm">Secured by Stripe • SSL Encrypted</span>
           </div>
         </div>
