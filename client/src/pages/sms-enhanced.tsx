@@ -528,12 +528,22 @@ export default function EnhancedSMSIntegration() {
                 {/* Action buttons */}
                 <div className="flex gap-2">
                   <Button
-                    onClick={() => createTokenMutation.mutate({
-                      phoneNumber: phoneNumber || '+1234567890',
-                      message,
-                      recipientWallet,
-                      value: customValue ? parseFloat(customValue) : undefined
-                    })}
+                    onClick={() => {
+                      if (!isAuthenticated) {
+                        toast({
+                          title: "Wallet Connection Required",
+                          description: "Connect your wallet to create tokens. You can browse SMS features without connecting.",
+                          variant: "destructive"
+                        });
+                        return;
+                      }
+                      createTokenMutation.mutate({
+                        phoneNumber: phoneNumber || '+1234567890',
+                        message,
+                        recipientWallet,
+                        value: customValue ? parseFloat(customValue) : undefined
+                      });
+                    }}
                     disabled={!message.trim() || createTokenMutation.isPending}
                     className="flex-1 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700"
                   >
@@ -826,6 +836,14 @@ export default function EnhancedSMSIntegration() {
 
                   <Button 
                     onClick={() => {
+                      if (!isAuthenticated) {
+                        toast({
+                          title: "Wallet Connection Required",
+                          description: "Connect your wallet to create multimedia tokens. You can browse features without connecting.",
+                          variant: "destructive"
+                        });
+                        return;
+                      }
                       // Create ultimate multimedia token
                       createTokenMutation.mutate({
                         message,

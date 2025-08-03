@@ -225,21 +225,7 @@ export default function Mint() {
     }
   };
 
-  if (!isAuthenticated) {
-    return (
-      <div className="max-w-2xl mx-auto p-6">
-        <Card>
-          <CardHeader className="text-center">
-            <AlertCircle className="h-12 w-12 mx-auto text-yellow-400 mb-4" />
-            <CardTitle>Wallet Connection Required</CardTitle>
-            <CardDescription>
-              Please connect your Solana wallet to create tokenized messages
-            </CardDescription>
-          </CardHeader>
-        </Card>
-      </div>
-    );
-  }
+
 
   return (
     <div className="max-w-4xl mx-auto p-6 space-y-6">

@@ -132,6 +132,15 @@ export default function SMSIntegration() {
   });
 
   const handleCreateToken = () => {
+    if (!isAuthenticated) {
+      toast({
+        title: "Wallet Connection Required",
+        description: "Connect your wallet to create emotional tokens. You can browse SMS features without connecting.",
+        variant: "destructive"
+      });
+      return;
+    }
+
     if (!phoneNumber || !message) {
       toast({
         title: "Missing Information",
@@ -194,19 +203,7 @@ export default function SMSIntegration() {
     );
   };
 
-  if (!isAuthenticated) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900/20 to-slate-900 flex items-center justify-center">
-        <Card className="bg-slate-900/50 border-purple-500/20 p-8">
-          <CardContent className="text-center">
-            <Smartphone className="w-16 h-16 text-purple-400 mx-auto mb-4" />
-            <h2 className="text-2xl font-bold text-purple-400 mb-2">Authentication Required</h2>
-            <p className="text-gray-400">Please connect your wallet to access SMS integration</p>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
+
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900/20 to-slate-900 p-6">
