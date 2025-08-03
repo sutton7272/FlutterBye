@@ -37,9 +37,11 @@ export class ViralAmplificationAI {
     try {
       // Check OpenAI API key
       if (!process.env.OPENAI_API_KEY) {
-        console.warn('OpenAI API key not found, using fallback content');
+        console.warn('⚠️ OpenAI API key not found, using fallback content');
         return this.getFallbackContent(topic, platform);
       }
+      
+      console.log('✅ OpenAI API key found, proceeding with AI generation');
 
       const viralStrategy = await this.analyzeViralPatterns(topic, platform);
       const content = await this.createViralContent(topic, platform, viralStrategy);

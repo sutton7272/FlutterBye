@@ -222,11 +222,27 @@ export default function AIFeaturesTest() {
               <Button 
                 onClick={testViralAmplification}
                 disabled={loading}
-                className="w-full bg-blue-600 hover:bg-blue-700"
+                className="w-full bg-blue-600 hover:bg-blue-700 relative"
               >
-                {loading ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
-                Test Viral Amplification
+                {loading ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                    Generating Viral Content...
+                  </>
+                ) : (
+                  <>
+                    <Zap className="w-4 h-4 mr-2" />
+                    Test Viral Amplification
+                  </>
+                )}
               </Button>
+              {results?.type === 'viral' && (
+                <div className="mt-2 text-center">
+                  <Badge variant="outline" className="text-green-400 border-green-400">
+                    Generated for {results.data.results?.length || 0} platforms
+                  </Badge>
+                </div>
+              )}
             </CardContent>
           </Card>
 
@@ -263,12 +279,160 @@ export default function AIFeaturesTest() {
               <CardTitle className="text-white flex items-center gap-2">
                 <Brain className="w-5 h-5 text-green-400" />
                 AI Results - {results.type.toUpperCase()}
+                <Badge className="bg-green-600 text-white">Generated Successfully</Badge>
               </CardTitle>
             </CardHeader>
-            <CardContent>
-              <pre className="text-gray-300 text-sm overflow-auto bg-black/40 p-4 rounded-lg border border-gray-600">
-                {JSON.stringify(results.data, null, 2)}
-              </pre>
+            <CardContent className="space-y-4">
+              {results.type === 'viral' && results.data.results && (
+                <div className="space-y-4">
+                  <div className="flex items-center gap-2 text-green-400">
+                    <Zap className="w-4 h-4" />
+                    <span className="font-semibold">Generated {results.data.results.length} Viral Content Pieces</span>
+                  </div>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {results.data.results.map((result: any, index: number) => (
+                      <Card key={index} className="bg-gray-900/50 border-gray-600">
+                        <CardHeader className="pb-3">
+                          <div className="flex items-center justify-between">
+                            <Badge variant="outline" className="text-blue-400 border-blue-400">
+                              {result.platform?.toUpperCase() || 'UNKNOWN'}
+                            </Badge>
+                            <Badge variant="secondary" className="text-green-400">
+                              Viral Score: {result.viralScore || 0}%
+                            </Badge>
+                          </div>
+                        </CardHeader>
+                        <CardContent className="space-y-3">
+                          <div>
+                            <h4 className="text-white font-medium mb-2">Content:</h4>
+                            <p className="text-gray-300 text-sm bg-black/30 p-3 rounded border">
+                              {result.content || 'No content generated'}
+                            </p>
+                          </div>
+                          
+                          {result.hashtags && result.hashtags.length > 0 && (
+                            <div>
+                              <h4 className="text-white font-medium mb-2">Hashtags:</h4>
+                              <div className="flex flex-wrap gap-1">
+                                {result.hashtags.map((tag: string, tagIndex: number) => (
+                                  <Badge key={tagIndex} variant="secondary" className="text-xs">
+                                    {tag}
+                                  </Badge>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                  
+                  {results.data.summary && (
+                    <div className="mt-4 p-4 bg-green-900/20 rounded-lg border border-green-500/30">
+                      <h4 className="text-green-400 font-medium mb-2">Campaign Summary:</h4>
+                      <div className="grid grid-cols-2 md:grid-cols-3 gap-4 text-sm">
+                        <div>
+                          <span className="text-gray-400">Total Content:</span>
+                          <span className="text-white ml-2">{results.data.summary.totalContent}</span>
+                        </div>
+                        <div>
+                          <span className="text-gray-400">Platforms:</span>
+                          <span className="text-white ml-2">{results.data.summary.platforms?.join(', ')}</span>
+                        </div>
+                        <div>
+                          <span className="text-gray-400">Avg Viral Score:</span>
+                          <span className="text-white ml-2">{Math.round(results.data.summary.averageViralScore || 0)}%</span>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+              
+              {results.type === 'pricing' && (
+                <div className="space-y-4">
+                  <div className="flex items-center gap-2 text-green-400">
+                    <DollarSign className="w-4 h-4" />
+                    <span className="font-semibold">Dynamic Pricing Analysis Complete</span>
+                  </div>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <Card className="bg-gray-900/50 border-gray-600">
+                      <CardContent className="p-4">
+                        <h4 className="text-white font-medium mb-2">Pricing Recommendation</h4>
+                        <div className="space-y-2">
+                          <div className="flex justify-between">
+                            <span className="text-gray-400">Current Price:</span>
+                            <span className="text-white">${testData.currentPrice}</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-gray-400">Suggested Price:</span>
+                            <span className="text-green-400 font-semibold">${results.data.pricing?.suggestedPrice || testData.currentPrice}</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-gray-400">Price Change:</span>
+                            <span className="text-yellow-400">
+                              {Math.round(((results.data.pricing?.priceMultiplier || 1) - 1) * 100)}%
+                            </span>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                    
+                    <Card className="bg-gray-900/50 border-gray-600">
+                      <CardContent className="p-4">
+                        <h4 className="text-white font-medium mb-2">AI Reasoning</h4>
+                        <p className="text-gray-300 text-sm">
+                          {results.data.pricing?.reasoning || 'Based on market analysis and user behavior patterns, this pricing optimizes for maximum revenue potential.'}
+                        </p>
+                      </CardContent>
+                    </Card>
+                  </div>
+                </div>
+              )}
+              
+              {results.type === 'optimization' && (
+                <div className="space-y-4">
+                  <div className="flex items-center gap-2 text-green-400">
+                    <BarChart3 className="w-4 h-4" />
+                    <span className="font-semibold">Platform Optimization Analysis</span>
+                  </div>
+                  
+                  {results.data.recommendations && results.data.recommendations.length > 0 && (
+                    <div className="space-y-3">
+                      {results.data.recommendations.map((rec: any, index: number) => (
+                        <Card key={index} className="bg-gray-900/50 border-gray-600">
+                          <CardContent className="p-4">
+                            <div className="flex items-start justify-between mb-2">
+                              <h4 className="text-white font-medium">{rec.category || `Recommendation ${index + 1}`}</h4>
+                              <Badge variant={rec.priority === 'Critical' ? 'destructive' : rec.priority === 'High' ? 'default' : 'secondary'}>
+                                {rec.priority || 'Medium'}
+                              </Badge>
+                            </div>
+                            <p className="text-gray-300 text-sm mb-2">{rec.description || rec.recommendation}</p>
+                            {rec.potentialROI && (
+                              <div className="text-green-400 text-sm font-medium">
+                                Expected Impact: {rec.potentialROI}
+                              </div>
+                            )}
+                          </CardContent>
+                        </Card>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+              
+              {/* Raw JSON fallback for debugging */}
+              <details className="mt-4">
+                <summary className="text-gray-400 cursor-pointer hover:text-white">
+                  View Raw API Response (Debug)
+                </summary>
+                <pre className="text-gray-300 text-xs overflow-auto bg-black/40 p-4 rounded-lg border border-gray-600 mt-2 max-h-60">
+                  {JSON.stringify(results.data, null, 2)}
+                </pre>
+              </details>
             </CardContent>
           </Card>
         )}
