@@ -244,38 +244,42 @@ export default function Admin() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                {/* Pricing Sub-Tabs Navigation */}
-                <Tabs defaultValue="flutterbye" className="space-y-6">
-                  <TabsList className="grid w-full grid-cols-2 md:grid-cols-4 gap-2 bg-black/40 p-3 rounded-xl border border-electric-blue/30">
-                    <TabsTrigger 
-                      value="flutterbye" 
-                      className="flex items-center gap-2 data-[state=active]:bg-electric-blue/30 data-[state=active]:text-white border border-electric-blue/50 hover:bg-electric-blue/20 text-white font-bold py-3 px-4"
-                    >
-                      <TrendingUp className="w-5 h-5" />
-                      Flutterbye
-                    </TabsTrigger>
-                    <TabsTrigger 
-                      value="flutterart" 
-                      className="flex items-center gap-2 data-[state=active]:bg-electric-green/30 data-[state=active]:text-white border border-electric-green/50 hover:bg-electric-green/20 text-white font-bold py-3 px-4"
-                    >
-                      <Edit className="w-5 h-5" />
-                      FlutterArt
-                    </TabsTrigger>
-                    <TabsTrigger 
-                      value="sms" 
-                      className="flex items-center gap-2 data-[state=active]:bg-circuit-teal/30 data-[state=active]:text-white border border-circuit-teal/50 hover:bg-circuit-teal/20 text-white font-bold py-3 px-4"
-                    >
-                      <Activity className="w-5 h-5" />
-                      SMS
-                    </TabsTrigger>
-                    <TabsTrigger 
-                      value="chat" 
-                      className="flex items-center gap-2 data-[state=active]:bg-electric-blue/30 data-[state=active]:text-white border border-electric-blue/50 hover:bg-electric-blue/20 text-white font-bold py-3 px-4"
-                    >
-                      <Users className="w-5 h-5" />
-                      Chat
-                    </TabsTrigger>
-                  </TabsList>
+                {/* Pricing Sub-Tabs Navigation - Make them HIGHLY VISIBLE */}
+                <div className="mb-8">
+                  <h3 className="text-2xl font-bold text-electric-green mb-6 text-center">
+                    🎯 SELECT PRICING CATEGORY
+                  </h3>
+                  <Tabs defaultValue="flutterbye" className="space-y-8">
+                    <TabsList className="grid w-full grid-cols-2 md:grid-cols-4 h-20 bg-gradient-to-r from-electric-blue/20 to-electric-green/20 p-2 rounded-2xl border-2 border-electric-blue/50 shadow-lg shadow-electric-blue/20">
+                      <TabsTrigger 
+                        value="flutterbye" 
+                        className="flex flex-col items-center gap-1 data-[state=active]:bg-electric-blue/50 data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:shadow-electric-blue/30 border-2 border-electric-blue/50 hover:bg-electric-blue/30 text-white font-bold py-4 px-2 rounded-xl transition-all duration-200 text-sm h-full"
+                      >
+                        <TrendingUp className="w-6 h-6" />
+                        <span>Flutterbye</span>
+                      </TabsTrigger>
+                      <TabsTrigger 
+                        value="flutterart" 
+                        className="flex flex-col items-center gap-1 data-[state=active]:bg-electric-green/50 data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:shadow-electric-green/30 border-2 border-electric-green/50 hover:bg-electric-green/30 text-white font-bold py-4 px-2 rounded-xl transition-all duration-200 text-sm h-full"
+                      >
+                        <Edit className="w-6 h-6" />
+                        <span>FlutterArt</span>
+                      </TabsTrigger>
+                      <TabsTrigger 
+                        value="sms" 
+                        className="flex flex-col items-center gap-1 data-[state=active]:bg-circuit-teal/50 data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:shadow-circuit-teal/30 border-2 border-circuit-teal/50 hover:bg-circuit-teal/30 text-white font-bold py-4 px-2 rounded-xl transition-all duration-200 text-sm h-full"
+                      >
+                        <Activity className="w-6 h-6" />
+                        <span>SMS</span>
+                      </TabsTrigger>
+                      <TabsTrigger 
+                        value="chat" 
+                        className="flex flex-col items-center gap-1 data-[state=active]:bg-electric-blue/50 data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:shadow-electric-blue/30 border-2 border-electric-blue/50 hover:bg-electric-blue/30 text-white font-bold py-4 px-2 rounded-xl transition-all duration-200 text-sm h-full"
+                      >
+                        <Users className="w-6 h-6" />
+                        <span>Chat</span>
+                      </TabsTrigger>
+                    </TabsList>
 
                   {/* Flutterbye Core Pricing */}
                   <TabsContent value="flutterbye" className="space-y-6 mt-6">
@@ -673,14 +677,15 @@ export default function Admin() {
                     </div>
                   </TabsContent>
 
-                  {/* Save Button */}
-                  <div className="flex justify-end pt-6 border-t border-electric-blue/20 mt-8">
-                    <Button className="bg-electric-green hover:bg-electric-green/80 text-black font-bold px-8 py-3">
-                      <Save className="w-5 h-5 mr-2" />
-                      Save All Pricing Changes
-                    </Button>
-                  </div>
-                </Tabs>
+                    {/* Save Button */}
+                    <div className="flex justify-end pt-6 border-t border-electric-blue/20 mt-8">
+                      <Button className="bg-electric-green hover:bg-electric-green/80 text-black font-bold px-8 py-3">
+                        <Save className="w-5 h-5 mr-2" />
+                        Save All Pricing Changes
+                      </Button>
+                    </div>
+                  </Tabs>
+                </div>
               </CardContent>
             </Card>
           </TabsContent>
