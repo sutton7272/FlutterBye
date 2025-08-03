@@ -6030,7 +6030,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // Revolutionary AI Routes - Complete four-system integration
   const revolutionaryAIRoutes = await import('./revolutionary-ai-routes');
-  app.use('/api/ai', revolutionaryAIRoutes.default);
+  revolutionaryAIRoutes.registerRevolutionaryAIRoutes(app);
 
   // COMPREHENSIVE AI ENHANCEMENT ROUTES - ALL 6 CRITICAL ENHANCEMENTS ✅
   const comprehensiveAIRoutes = await import("./comprehensive-ai-routes");
