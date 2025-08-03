@@ -394,6 +394,65 @@
     }
   }
 
+  /* Butterfly Animation Keyframes */
+  @keyframes butterfly-orbit {
+    0% { 
+      transform: rotate(0deg) translateX(400px) rotate(0deg);
+      opacity: 0.6;
+    }
+    25% { 
+      transform: rotate(90deg) translateX(400px) rotate(-90deg);
+      opacity: 1;
+    }
+    50% { 
+      transform: rotate(180deg) translateX(400px) rotate(-180deg);
+      opacity: 0.8;
+    }
+    75% { 
+      transform: rotate(270deg) translateX(400px) rotate(-270deg);
+      opacity: 1;
+    }
+    100% { 
+      transform: rotate(360deg) translateX(400px) rotate(-360deg);
+      opacity: 0.6;
+    }
+  }
+
+  @keyframes flutter-wing {
+    0%, 100% { 
+      transform: scaleY(1) rotateX(0deg);
+      opacity: 0.9;
+    }
+    50% { 
+      transform: scaleY(0.8) rotateX(15deg);
+      opacity: 1;
+    }
+  }
+
+  /* Responsive Butterfly Orbit for Mobile */
+  @keyframes butterfly-orbit-mobile {
+    0% { 
+      transform: rotate(0deg) translateX(200px) rotate(0deg);
+      opacity: 0.6;
+    }
+    25% { 
+      transform: rotate(90deg) translateX(200px) rotate(-90deg);
+      opacity: 1;
+    }
+    50% { 
+      transform: rotate(180deg) translateX(200px) rotate(-180deg);
+      opacity: 0.8;
+    }
+    75% { 
+      transform: rotate(270deg) translateX(200px) rotate(-270deg);
+      opacity: 1;
+    }
+    100% { 
+      transform: rotate(360deg) translateX(200px) rotate(-360deg);
+      opacity: 0.6;
+    }
+  }
+
   .modern-gradient {
     background: linear-gradient(135deg, 
       hsl(200, 100%, 50%) 0%, 
@@ -472,6 +531,41 @@
   
   .pulse-electric {
     animation: pulse-electric 3s ease-in-out infinite;
+  }
+
+  /* Butterfly Orbit Animation Styles */
+  .butterfly-orbit {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 1px;
+    height: 1px;
+    transform: translate(-50%, -50%);
+  }
+
+  .butterfly-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    animation: butterfly-orbit 12s linear infinite;
+    transform-origin: 0 0;
+  }
+
+  .butterfly-svg {
+    transform: translate(-50%, -50%);
+    filter: drop-shadow(0 0 8px #00D4FF) drop-shadow(0 0 16px #00FF88);
+  }
+
+  .animate-flutter-wing {
+    animation: flutter-wing 0.3s ease-in-out infinite;
+    transform-origin: 20px 15px;
+  }
+
+  /* Responsive butterfly orbit for smaller screens */
+  @media (max-width: 768px) {
+    .butterfly-container {
+      animation: butterfly-orbit-mobile 10s linear infinite;
+    }
   }
   
   /* Better text contrast for electric components */

@@ -98,9 +98,68 @@ export default function Home() {
         
         {/* Hero Section */}
         <div className="text-center mb-20">
-          <h1 className="text-6xl md:text-8xl font-black mb-8 text-gradient">
-            FLUTTERBYE
-          </h1>
+          <div className="relative inline-block">
+            <h1 className="text-6xl md:text-8xl font-black mb-8 text-gradient relative z-10">
+              FLUTTERBYE
+            </h1>
+            
+            {/* Animated Electric Blue Butterfly Circling */}
+            <div className="absolute inset-0 pointer-events-none">
+              <div className="butterfly-orbit">
+                <div className="butterfly-container">
+                  <svg 
+                    className="butterfly-svg animate-pulse" 
+                    width="40" 
+                    height="30" 
+                    viewBox="0 0 40 30" 
+                    fill="none"
+                  >
+                    {/* Butterfly Wings */}
+                    <path 
+                      d="M20 15 C15 5, 5 5, 8 15 C5 25, 15 25, 20 15 Z" 
+                      fill="url(#butterfly-gradient-left)"
+                      className="animate-flutter-wing"
+                    />
+                    <path 
+                      d="M20 15 C25 5, 35 5, 32 15 C35 25, 25 25, 20 15 Z" 
+                      fill="url(#butterfly-gradient-right)"
+                      className="animate-flutter-wing"
+                      style={{ animationDelay: '0.1s' }}
+                    />
+                    {/* Butterfly Body */}
+                    <line 
+                      x1="20" 
+                      y1="8" 
+                      x2="20" 
+                      y2="22" 
+                      stroke="#00D4FF" 
+                      strokeWidth="2"
+                      className="animate-pulse"
+                    />
+                    {/* Antennae */}
+                    <path 
+                      d="M20 8 L18 5 M20 8 L22 5" 
+                      stroke="#00FF88" 
+                      strokeWidth="1.5"
+                      fill="none"
+                    />
+                    
+                    {/* Gradients */}
+                    <defs>
+                      <linearGradient id="butterfly-gradient-left" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stopColor="#00D4FF" stopOpacity="0.9"/>
+                        <stop offset="100%" stopColor="#00FF88" stopOpacity="0.7"/>
+                      </linearGradient>
+                      <linearGradient id="butterfly-gradient-right" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stopColor="#00FF88" stopOpacity="0.9"/>
+                        <stop offset="100%" stopColor="#00D4FF" stopOpacity="0.7"/>
+                      </linearGradient>
+                    </defs>
+                  </svg>
+                </div>
+              </div>
+            </div>
+          </div>
           
           <p className="text-2xl md:text-3xl text-primary mb-6 font-bold">
             Turn Messages Into Money
