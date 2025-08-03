@@ -14,6 +14,7 @@ import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { useAdminAuth } from "@/hooks/use-admin-auth";
 import { AdminPricingManagement } from "@/components/admin-pricing-management";
+
 import { 
   Settings, 
   Users, 
@@ -404,7 +405,7 @@ export default function AdminDashboard() {
         </div>
 
         <Tabs defaultValue="overview" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-10 glassmorphism electric-frame border-0 p-2">
+          <TabsList className="grid w-full grid-cols-11 glassmorphism electric-frame border-0 p-2">
             <TabsTrigger value="overview" className="flex items-center gap-2 pulse-border hover:text-electric-blue transition-all">
               <BarChart3 className="w-4 h-4" />
               <span className="hidden sm:inline">Overview</span>
@@ -444,6 +445,10 @@ export default function AdminDashboard() {
             <TabsTrigger value="logs" className="flex items-center gap-2 pulse-border hover:text-electric-green transition-all">
               <Activity className="w-4 h-4" />
               <span className="hidden sm:inline">Logs</span>
+            </TabsTrigger>
+            <TabsTrigger value="api-monetization" className="flex items-center gap-2 pulse-border hover:text-electric-green transition-all">
+              <DollarSign className="w-4 h-4" />
+              <span className="hidden sm:inline">API $</span>
             </TabsTrigger>
           </TabsList>
 
@@ -1955,6 +1960,38 @@ export default function AdminDashboard() {
                   ) : (
                     <div className="text-gray-400">No activity data available</div>
                   )}
+                </CardContent>
+              </Card>
+            </div>
+          </TabsContent>
+
+          {/* API Monetization Tab */}
+          <TabsContent value="api-monetization" className="space-y-6">
+            <div className="grid grid-cols-1 gap-6">
+              <Card className="glassmorphism electric-frame">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <DollarSign className="w-5 h-5 text-electric-green" />
+                    API Monetization Dashboard
+                  </CardTitle>
+                  <CardDescription>
+                    Manage API subscriptions, revenue tracking, and monetization analytics
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-center py-8">
+                    <div className="text-6xl mb-4">🚀</div>
+                    <h3 className="text-2xl font-bold mb-4 text-electric-green">API Monetization System</h3>
+                    <p className="text-gray-400 mb-6 max-w-2xl mx-auto">
+                      Complete API monetization management with subscription tiers, revenue analytics, and intelligent rate limiting
+                    </p>
+                    <Link href="/admin/api-monetization">
+                      <Button size="lg" className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white font-bold">
+                        <DollarSign className="mr-2 h-5 w-5" />
+                        Open Full API Dashboard
+                      </Button>
+                    </Link>
+                  </div>
                 </CardContent>
               </Card>
             </div>
