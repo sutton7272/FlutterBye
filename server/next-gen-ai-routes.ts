@@ -74,6 +74,53 @@ export function registerNextGenAIRoutes(app: Express) {
   });
 
   // VIRAL AMPLIFICATION AI ROUTES
+  app.post("/api/ai/viral/generate", async (req, res) => {
+    try {
+      const { topic, platforms, targetAudience, tone } = req.body;
+      
+      const results = [];
+      const platformsToUse = platforms || ['twitter', 'instagram', 'tiktok'];
+      
+      for (const platform of platformsToUse) {
+        const viralContent = await viralAmplification.generateViralContent(
+          topic, 
+          platform, 
+          { targetAudience, tone }
+        );
+        results.push({
+          platform,
+          ...viralContent
+        });
+      }
+      
+      res.json({
+        success: true,
+        results,
+        summary: {
+          totalContent: results.length,
+          platforms: platformsToUse,
+          averageViralScore: results.reduce((sum, r) => sum + r.viralScore, 0) / results.length
+        }
+      });
+    } catch (error) {
+      console.error("Viral generation error:", error);
+      res.status(500).json({ 
+        success: false, 
+        error: "Failed to generate viral content",
+        fallback: {
+          results: [
+            {
+              platform: 'twitter',
+              content: `🚀 ${req.body.topic || 'Innovation'} is changing everything! What do you think? 💭`,
+              hashtags: ['#viral', '#trending', '#innovation'],
+              viralScore: 75
+            }
+          ]
+        }
+      });
+    }
+  });
+
   app.post("/api/ai/viral/generate-content", async (req, res) => {
     try {
       const { topic, platform, userContext } = req.body;

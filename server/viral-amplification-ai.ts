@@ -54,6 +54,9 @@ export class ViralAmplificationAI {
 
   private async analyzeViralPatterns(topic: string, platform: string): Promise<any> {
     try {
+      // Add delay to respect rate limits
+      await new Promise(resolve => setTimeout(resolve, 100));
+      
       const prompt = `
         Analyze viral content patterns for topic "${topic}" on ${platform}.
         
@@ -78,6 +81,7 @@ export class ViralAmplificationAI {
 
       return JSON.parse(response.choices[0].message.content || '{}');
     } catch (error) {
+      console.error('Viral pattern analysis error:', error);
       return this.getDefaultViralStrategy(platform);
     }
   }
@@ -88,6 +92,9 @@ export class ViralAmplificationAI {
     viralScore: number;
   }> {
     try {
+      // Add delay to respect rate limits
+      await new Promise(resolve => setTimeout(resolve, 100));
+      
       const prompt = `
         Create viral ${platform} content about "${topic}" using these viral elements:
         - Trending topics: ${strategy.trendingTopics?.join(', ')}
@@ -125,6 +132,7 @@ export class ViralAmplificationAI {
         viralScore: Math.min(100, Math.max(0, result.viralScore || 75))
       };
     } catch (error) {
+      console.error('Viral content creation error:', error);
       return {
         text: `🚀 ${topic} is revolutionizing the game! Who else is excited? 👇`,
         hashtags: ['#innovation', '#trending', '#gameChanger'],
