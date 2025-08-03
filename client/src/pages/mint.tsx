@@ -568,10 +568,10 @@ export default function Mint() {
                       Add Media to Message
                     </Label>
                     <p className="text-sm text-gray-400">
-                      Attach images, GIFs, or QR codes to enhance your extended message
+                      Attach images, GIFs, QR codes, or voice messages to enhance your extended message
                     </p>
                     
-                    <div className="flex gap-2">
+                    <div className="flex gap-2 flex-wrap">
                       <div className="relative">
                         <input
                           type="file"
@@ -617,6 +617,25 @@ export default function Mint() {
                           </Button>
                         </Label>
                       </div>
+                      <Button 
+                        type="button" 
+                        variant="outline" 
+                        size="sm"
+                        onClick={() => {
+                          // Scroll to voice section
+                          document.querySelector('[data-voice-section]')?.scrollIntoView({ 
+                            behavior: 'smooth',
+                            block: 'center'
+                          });
+                          toast({
+                            title: "Voice Recorder",
+                            description: "Scroll down to the Voice & Music section to record your message"
+                          });
+                        }}
+                      >
+                        <Mic className="w-4 h-4 mr-2" />
+                        Add Voice
+                      </Button>
                     </div>
 
                     {/* Display uploaded media */}
@@ -823,7 +842,7 @@ export default function Mint() {
                 </div>
 
                 {/* Voice Message Attachment Section */}
-                <div className="space-y-4">
+                <div className="space-y-4" data-voice-section>
                   <h4 className="text-lg font-semibold flex items-center">
                     <Mic className="w-5 h-5 mr-2 text-orange-500" />
                     Voice & Music Attachment (NEW!)
