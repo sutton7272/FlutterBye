@@ -16,6 +16,7 @@ import { viralAccelerationService } from "./viral-acceleration-service";
 import { stripeService, subscriptionPlans } from "./stripe-service";
 import { openaiService } from "./openai-service";
 import { messageNFTService } from "./message-nft-service";
+import { livingAIService } from "./living-ai-service";
 import { z } from "zod";
 export async function registerRoutes(app: Express): Promise<Server> {
   // Apply production-grade security middleware
@@ -5281,7 +5282,51 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Living AI Personality Routes
+  app.get("/api/living-ai/platform-mood", async (req, res) => {
+    try {
+      const activeUsers = Math.floor(Math.random() * 50) + 10; // Simulate active users
+      const recentActivity = []; // Would get from real activity logs
+      const timeOfDay = new Date().getHours() < 12 ? 'morning' : 
+                       new Date().getHours() < 18 ? 'afternoon' : 'evening';
+      
+      const mood = await livingAIService.generatePlatformMood(activeUsers, recentActivity, timeOfDay);
+      res.json(mood);
+    } catch (error) {
+      console.error("Platform mood error:", error);
+      res.status(500).json({ error: "Failed to generate platform mood" });
+    }
+  });
+
+  app.get("/api/living-ai/contextual-awareness", async (req, res) => {
+    try {
+      const { pageContext, userBehavior } = req.query;
+      const behavior = userBehavior ? JSON.parse(userBehavior as string) : [];
+      
+      const awareness = await livingAIService.generateContextualAwareness(
+        pageContext as string || "general",
+        behavior
+      );
+      res.json(awareness);
+    } catch (error) {
+      console.error("Contextual awareness error:", error);
+      res.status(500).json({ error: "Failed to generate contextual awareness" });
+    }
+  });
+
+  app.post("/api/living-ai/generate-response", async (req, res) => {
+    try {
+      const { action, context } = req.body;
+      const response = await livingAIService.generateLivingResponse(action, context);
+      res.json(response);
+    } catch (error) {
+      console.error("Living response error:", error);
+      res.status(500).json({ error: "Failed to generate living response" });
+    }
+  });
+
   console.log('🚀 Production-grade server with real-time monitoring initialized');
+  console.log('🤖 Living AI personality system activated');
   
   return httpServer;
 }
