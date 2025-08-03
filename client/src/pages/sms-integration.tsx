@@ -57,28 +57,32 @@ export default function SMSIntegration() {
   const [analysisText, setAnalysisText] = useState('');
 
   // Fetch SMS service status
-  const { data: smsStatus, isLoading: statusLoading } = useQuery({
+  const { data: smsStatus, isLoading: statusLoading, error: statusError } = useQuery({
     queryKey: ['/api/sms/status'],
     queryFn: async () => {
       const response = await apiRequest('GET', '/api/sms/status');
       return response as any;
-    }
+    },
+    retry: false,
+    staleTime: 30000
   });
 
   // Fetch SMS analytics
-  const { data: smsAnalytics, isLoading: analyticsLoading } = useQuery({
+  const { data: smsAnalytics, isLoading: analyticsLoading, error: analyticsError } = useQuery({
     queryKey: ['/api/sms/analytics'],
     queryFn: async () => {
       const response = await apiRequest('GET', '/api/sms/analytics');
       return response as any;
-    }
+    },
+    retry: false,
+    staleTime: 30000
   });
 
   // Create token from SMS mutation
   const createTokenMutation = useMutation({
     mutationFn: async (data: any) => {
       const response = await apiRequest('POST', '/api/sms/create-token', data);
-      return response as SMSResponse;
+      return response as unknown as SMSResponse;
     },
     onSuccess: (data) => {
       if (data.success) {

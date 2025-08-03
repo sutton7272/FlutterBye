@@ -48,6 +48,7 @@ import {
   Wand2,
   Waves,
   Gauge,
+  Crown,
   Flame,
   Snowflake,
   Sun,
@@ -127,6 +128,14 @@ export default function EnhancedSMSIntegration() {
   const [showTechnologyShowcase, setShowTechnologyShowcase] = useState(true);
   const [showGuidedTour, setShowGuidedTour] = useState(false);
   const [tourStep, setTourStep] = useState(0);
+  const [analysis, setAnalysis] = useState<EmotionalAnalysis>({
+    emotion: '',
+    sentiment: 0,
+    confidence: 0,
+    urgency: 'low',
+    keywords: [],
+    category: 'other'
+  });
 
   // References
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -162,12 +171,14 @@ export default function EnhancedSMSIntegration() {
   };
 
   // Fetch enhanced SMS service status
-  const { data: smsStatus, isLoading: statusLoading } = useQuery({
+  const { data: smsStatus, isLoading: statusLoading, error: statusError } = useQuery({
     queryKey: ['/api/sms/status'],
     queryFn: async () => {
       const response = await apiRequest('GET', '/api/sms/status');
       return response as any;
-    }
+    },
+    retry: false,
+    staleTime: 30000
   });
 
   // Real-time emotion tracking
@@ -204,7 +215,7 @@ export default function EnhancedSMSIntegration() {
         audioData: recordedAudio ? await blobToBase64(recordedAudio) : undefined
       };
       const response = await apiRequest('POST', '/api/sms/create-enhanced-token', enhancedData);
-      return response as EnhancedSMSResponse;
+      return response as unknown as EnhancedSMSResponse;
     },
     onSuccess: (data) => {
       if (data.success) {
@@ -247,7 +258,7 @@ export default function EnhancedSMSIntegration() {
         timeContext: new Date().getHours(),
         socialContext
       });
-      return response as any;
+      return response as unknown as any;
     },
     onSuccess: (data) => {
       if (data.success && data.analysis) {
@@ -894,7 +905,7 @@ export default function EnhancedSMSIntegration() {
             <EmotionPortal 
               message={message}
               onEmotionChange={(emotion) => {
-                setAnalysis(prev => ({
+                setAnalysis((prev: EmotionalAnalysis) => ({
                   ...prev,
                   emotion: emotion.type,
                   confidence: emotion.intensity || 0.8,
