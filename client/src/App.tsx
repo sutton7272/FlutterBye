@@ -54,6 +54,7 @@ import ViralDashboard from "@/pages/viral-dashboard";
 import MessageNFTCreator from "@/pages/message-nft-creator";
 import NFTClaim from "@/pages/nft-claim";
 import AllOpportunities from "@/pages/AllOpportunities";
+import AdminAPIMonetization from "@/pages/admin-api-monetization";
 import NFTMarketplace from "@/pages/nft-marketplace";
 import AIShowcase from "@/pages/ai-showcase";
 import { LivingAIPage } from "@/pages/living-ai";
@@ -367,6 +368,12 @@ function Router() {
           <>
             <Navbar />
             <AllOpportunities />
+          </>
+        )} />
+        <Route path="/admin/api-monetization" component={() => (
+          <>
+            <Navbar />
+            <AdminAPIMonetization />
           </>
         )} />
         <Route path="/revolutionary-ai" component={() => {

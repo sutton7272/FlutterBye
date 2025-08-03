@@ -509,6 +509,13 @@ export default function AdminDashboard() {
                       <ExternalLink className="h-3 w-3 opacity-60" />
                     </Button>
                   </Link>
+                  <Link href="/admin/api-monetization">
+                    <Button variant="outline" className="w-full h-20 flex flex-col gap-2 border-green-500/30 text-green-400 hover:bg-green-500/10">
+                      <DollarSign className="h-6 w-6" />
+                      <span className="text-sm">API Monetization</span>
+                      <ExternalLink className="h-3 w-3 opacity-60" />
+                    </Button>
+                  </Link>
                 </div>
               </CardContent>
             </Card>
