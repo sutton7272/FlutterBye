@@ -72,6 +72,7 @@ export class ARIAPersonality {
    * Remember user preferences and interactions
    */
   rememberUser(userId: string, userInfo: Partial<UserPreference>): void {
+    console.log(`🧠 ARIA: Remembering user ${userId} with info:`, userInfo);
     const existing = this.userMemories.get(userId) || {
       userId,
       preferredTopics: [],

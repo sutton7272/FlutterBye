@@ -44,7 +44,41 @@ export const FLUTTERBYE_KNOWLEDGE = {
     
     flutterart: {
       name: "FlutterArt", 
-      description: "Revolutionary multimedia NFT creator that transforms messages, images, and voice recordings into valuable blockchain collectibles"
+      description: "Revolutionary multimedia NFT creator that transforms messages, images, and voice recordings into valuable blockchain collectibles",
+      features: [
+        "Transform text messages into visual NFT art",
+        "Convert voice recordings into audio NFTs",
+        "Create multimedia blockchain collectibles",
+        "Attach value to creative content",
+        "Generate unique digital assets",
+        "Community-driven NFT marketplace integration"
+      ]
+    },
+    
+    tokens: {
+      name: "FLBY-MSG Token Messages",
+      description: "Unique SPL token messages that combine communication with blockchain value",
+      features: [
+        "Create tokenized messages with attached SOL/USDC value",
+        "Set expiration dates for time-sensitive content",
+        "Target specific wallet holders for marketing",
+        "Viral sharing mechanics with rewards",
+        "Limited edition collectible messages",
+        "Redeemable codes and promotional campaigns"
+      ]
+    },
+    
+    staking: {
+      name: "FLBY Token Staking",
+      description: "Earn rewards by staking FLBY tokens and participating in platform governance",
+      features: [
+        "Stake FLBY tokens for platform rewards",
+        "Reduced fees for staked token holders",
+        "Governance voting rights",
+        "Early access to new features",
+        "Exclusive token creation privileges",
+        "Enhanced AI feature access"
+      ]
     },
 
     aria: {
