@@ -245,26 +245,28 @@ export function LivingAIInterface({ userBehavior, onInterfaceChange }: LivingAIP
         </Button>
       </div>
 
-      {/* Evolution Status */}
+      {/* Evolution Status - Non-blocking notification */}
       <AnimatePresence>
         {isEvolving && (
           <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
+            initial={{ opacity: 0, y: -50 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -50 }}
+            className="fixed top-4 right-4 z-40 max-w-sm"
           >
-            <Card className="w-96 border-electric-blue/50">
-              <CardContent className="p-6">
-                <div className="text-center">
+            <Card className="border-electric-blue/50 bg-black/90 backdrop-blur-lg">
+              <CardContent className="p-4">
+                <div className="flex items-center gap-3">
                   <motion.div
                     animate={{ rotate: 360 }}
                     transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
                   >
-                    <Sparkles className="w-12 h-12 mx-auto text-electric-blue mb-4" />
+                    <Sparkles className="w-6 h-6 text-electric-blue" />
                   </motion.div>
-                  <h3 className="text-xl font-bold text-electric-blue mb-2">AI is Evolving...</h3>
-                  <p className="text-slate-400">The living AI is processing and adapting in real-time</p>
+                  <div>
+                    <h4 className="text-sm font-bold text-electric-blue">AI Processing</h4>
+                    <p className="text-xs text-slate-400">Living AI is adapting...</p>
+                  </div>
                 </div>
               </CardContent>
             </Card>
