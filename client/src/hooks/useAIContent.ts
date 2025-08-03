@@ -134,66 +134,6 @@ export function useAIContent() {
     }
   });
 
-  // AI Conversation - Personalized Greeting
-  const greetingMutation = useMutation({
-    mutationFn: async (userContext?: {
-      userName?: string;
-      visitCount?: number;
-      lastAction?: string;
-      mood?: string;
-    }) => {
-      return apiRequest('/api/ai/conversation/greeting', {
-        method: 'POST',
-        body: { userContext }
-      });
-    }
-  });
-
-  // AI Conversation - Interactive Chat
-  const conversationMutation = useMutation({
-    mutationFn: async (data: {
-      message: string;
-      conversationHistory?: Array<{role: string, content: string}>;
-      userContext?: {
-        mood?: string;
-        intent?: string;
-        userName?: string;
-      };
-    }) => {
-      return apiRequest('/api/ai/conversation/chat', {
-        method: 'POST',
-        body: data
-      });
-    }
-  });
-
-  // AI Mood Sync
-  const moodSyncMutation = useMutation({
-    mutationFn: async (data: {
-      userInput?: string;
-      behaviorData?: any;
-    }) => {
-      return apiRequest('/api/ai/conversation/mood-sync', {
-        method: 'POST',
-        body: data
-      });
-    }
-  });
-
-  // Smart Help System
-  const smartHelpMutation = useMutation({
-    mutationFn: async (data: {
-      question: string;
-      context?: any;
-      userLevel?: 'beginner' | 'intermediate' | 'advanced';
-    }) => {
-      return apiRequest('/api/ai/conversation/smart-help', {
-        method: 'POST',
-        body: data
-      });
-    }
-  });
-
   // Voice message enhancement
   const voiceEnhancementMutation = useMutation({
     mutationFn: async (data: {
@@ -325,11 +265,10 @@ export function useAITextOptimizer() {
         method: 'POST',
         body: { text, constraints }
       });
-      setOptimizedText(result.optimized);
-      return result;
+      setOptimizedText(result.optimized || result.text);
     } catch (error) {
-      console.error('Text optimization error:', error);
-      return null;
+      console.error('Text optimization failed:', error);
+      setOptimizedText(text); // Fallback to original
     } finally {
       setIsOptimizing(false);
     }
@@ -338,6 +277,7 @@ export function useAITextOptimizer() {
   return {
     optimizeText,
     optimizedText,
-    isOptimizing
+    isOptimizing,
+    reset: () => setOptimizedText('')
   };
 }
