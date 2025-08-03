@@ -142,6 +142,33 @@
     pointer-events: none;
     animation: borderPulse 4s ease-in-out infinite;
   }
+
+  /* Revolutionary SMS Nexus Animations */
+  .quantum-pulse {
+    animation: quantumPulse 3s ease-in-out infinite;
+  }
+  
+  .neural-glow {
+    animation: neuralGlow 2s ease-in-out infinite alternate;
+  }
+  
+  .viral-wave {
+    animation: viralWave 4s ease-in-out infinite;
+  }
+  
+  .emotion-flow {
+    animation: emotionFlow 6s ease-in-out infinite;
+  }
+
+  .hover-float {
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
+  
+  .hover-float:hover {
+    transform: translateY(-8px) scale(1.05);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+  }
+}
   
   .cyber-glow {
     transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
@@ -376,6 +403,84 @@
     border: 2px solid transparent;
     background: linear-gradient(hsl(220, 50%, 6%), hsl(220, 50%, 6%)) padding-box,
                 linear-gradient(45deg, hsl(210, 100%, 45%), hsl(140, 100%, 40%)) border-box;
+  }
+
+@layer utilities {
+  /* Revolutionary SMS Nexus Animation Keyframes */
+  @keyframes quantumPulse {
+    0%, 100% { 
+      background: linear-gradient(45deg, hsl(270, 100%, 60%), hsl(200, 100%, 50%));
+      box-shadow: 0 0 20px hsla(270, 100%, 60%, 0.5);
+    }
+    50% { 
+      background: linear-gradient(45deg, hsl(200, 100%, 50%), hsl(140, 100%, 40%));
+      box-shadow: 0 0 40px hsla(200, 100%, 50%, 0.8);
+    }
+  }
+  
+  @keyframes neuralGlow {
+    0% { 
+      box-shadow: 0 0 10px hsla(200, 100%, 50%, 0.3); 
+      border-color: hsla(200, 100%, 50%, 0.3);
+    }
+    100% { 
+      box-shadow: 0 0 30px hsla(140, 100%, 40%, 0.6); 
+      border-color: hsla(140, 100%, 40%, 0.6);
+    }
+  }
+  
+  @keyframes viralWave {
+    0%, 100% { transform: scale(1) rotate(0deg); }
+    25% { transform: scale(1.1) rotate(90deg); }
+    50% { transform: scale(1.2) rotate(180deg); }
+    75% { transform: scale(1.1) rotate(270deg); }
+  }
+  
+  @keyframes emotionFlow {
+    0% { 
+      background-position: 0% 50%; 
+      filter: hue-rotate(0deg);
+    }
+    50% { 
+      background-position: 100% 50%; 
+      filter: hue-rotate(180deg);
+    }
+    100% { 
+      background-position: 0% 50%; 
+      filter: hue-rotate(360deg);
+    }
+  }
+
+  @keyframes spin-slow {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+
+  /* Utility Classes for Revolutionary Features */
+  .animate-spin-slow {
+    animation: spin-slow 8s linear infinite;
+  }
+  
+  .gradient-neural {
+    background: linear-gradient(135deg, 
+      hsl(270, 100%, 60%) 0%,
+      hsl(200, 100%, 50%) 25%,
+      hsl(140, 100%, 40%) 50%,
+      hsl(320, 100%, 60%) 75%,
+      hsl(270, 100%, 60%) 100%);
+    background-size: 400% 400%;
+    animation: emotionFlow 8s ease-in-out infinite;
+  }
+  
+  .gradient-quantum {
+    background: linear-gradient(45deg,
+      hsl(200, 100%, 50%) 0%,
+      hsl(140, 100%, 40%) 25%,
+      hsl(270, 100%, 60%) 50%,
+      hsl(320, 100%, 60%) 75%,
+      hsl(200, 100%, 50%) 100%);
+    background-size: 300% 300%;
+    animation: quantumPulse 6s ease-in-out infinite;
   }
 }
 
