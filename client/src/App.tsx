@@ -18,8 +18,8 @@ import FreeCodes from "@/pages/free-codes";
 import Admin from "@/pages/admin";
 import TransactionHeatmapPage from "@/pages/heatmap";
 import SMSIntegration from "@/pages/sms-integration";
-import WalletManagementPage from "@/pages/wallet-management";
-import RewardsPage from "@/pages/rewards";
+import { WalletManagementPage } from "@/pages/wallet-management";
+import { RewardsPage } from "@/pages/rewards";
 import JourneyPage from "@/pages/journey";
 import BadgesPage from "@/pages/badges";
 import InfoPage from "@/pages/info";
@@ -51,6 +51,7 @@ import ViralDashboard from "@/pages/viral-dashboard";
 import EnhancedSMSIntegration from "@/pages/sms-enhanced";
 import SMSTest from "@/pages/sms-test";
 import AnalyticsDashboard from "@/pages/analytics-dashboard";
+import MinimalTest from "@/pages/minimal-test";
 import Navbar from "@/components/navbar";
 import { PersonalizedDashboard } from "@/components/PersonalizedDashboard";
 
@@ -167,6 +168,7 @@ function Router() {
             <SMSTest />
           </>
         )} />
+        <Route path="/minimal-test" component={MinimalTest} />
         <Route path="/wallets" component={() => (
           <>
             <Navbar />
