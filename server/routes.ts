@@ -5699,6 +5699,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // REVOLUTIONARY AI ENHANCEMENT ROUTES - Universal AI features
   app.use("/api/ai", aiEnhancementRoutes);
+  
+  // Register advanced AI features
+  const advancedAIRoutes = await import('./advanced-ai-features');
+  app.use('/api/ai', advancedAIRoutes.default);
 
   console.log('🚀 Production-grade server with real-time monitoring initialized');
   console.log('🤖 Living AI personality system activated');
