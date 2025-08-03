@@ -15,7 +15,7 @@ export default function Navbar() {
     { href: "/mint", label: "Mint", icon: Coins },
     { href: "/redeem", label: "Dashboard", icon: LayoutDashboard },
     { href: "/chat", label: "Chat", icon: MessageSquare },
-    { href: "/sms-nexus", label: "SMS Nexus", icon: Zap, special: true },
+    { href: "/sms-nexus", label: "FlutterWave", icon: Zap, special: true },
     { href: "/marketplace", label: "Marketplace", icon: Users },
     { href: "/greeting-cards", label: "Cards", icon: Heart },
     { href: "/enterprise", label: "Marketing", icon: Building2 },
