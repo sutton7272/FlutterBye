@@ -349,25 +349,7 @@ export class MemStorage implements IStorage {
       });
   }
 
-  async createRedemption(redemption: any): Promise<any> {
-    const id = randomUUID();
-    const newRedemption = {
-      id,
-      ...redemption,
-      createdAt: new Date()
-    };
-    if (!this.redemptions) {
-      this.redemptions = new Map();
-    }
-    this.redemptions.set(id, newRedemption);
-    return newRedemption;
-  }
-
-  async getRedemptionsByWallet(walletAddress: string): Promise<any[]> {
-    if (!this.redemptions) return [];
-    return Array.from(this.redemptions.values())
-      .filter(redemption => redemption.walletAddress === walletAddress);
-  }
+  // Legacy redemption methods - consolidated to avoid duplicates
 
   async getAllTokensWithOptions(options: {
     limit: number;
@@ -424,23 +406,7 @@ export class MemStorage implements IStorage {
     ];
   }
 
-  // Token Redemption methods
-  async createRedemption(redemption: any): Promise<any> {
-    const id = randomUUID();
-    const newRedemption = {
-      id,
-      ...redemption,
-      createdAt: new Date().toISOString()
-    };
-    this.tokenRedemptions.set(id, newRedemption);
-    return newRedemption;
-  }
-
-  async getRedemptionsByWallet(walletAddress: string): Promise<any[]> {
-    const redemptions = Array.from(this.tokenRedemptions.values())
-      .filter(r => r.walletAddress === walletAddress);
-    return redemptions;
-  }
+  // Token Redemption methods - Updated to avoid duplicates
 
   async getRedemptionHistory(limit = 50): Promise<any[]> {
     return Array.from(this.tokenRedemptions.values())
