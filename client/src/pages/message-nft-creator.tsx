@@ -134,7 +134,7 @@ export default function MessageNFTCreator() {
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold text-white mb-4 flex items-center justify-center gap-3">
             <Sparkles className="h-8 w-8 text-blue-400" />
-            Message NFT Creator
+            FlutterArt Creator
             <Hash className="h-8 w-8 text-green-400" />
           </h1>
           <p className="text-slate-300 text-lg max-w-2xl mx-auto">
