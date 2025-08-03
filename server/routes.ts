@@ -13,7 +13,7 @@ import { registerProductionEndpoints } from "./production-endpoints";
 import { monitoring } from "./monitoring";
 import { collaborativeTokenService } from "./collaborative-token-service";
 import { viralAccelerationService } from "./viral-acceleration-service";
-import { stripeService, subscriptionPlans } from "./stripe-service";
+import { stripeService } from "./stripe-service";
 import { openaiService } from "./openai-service";
 import { messageNFTService } from "./message-nft-service";
 import { livingAIService } from "./living-ai-service";
@@ -344,6 +344,190 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("SMS webhook error:", error);
       res.status(500).send("Error processing SMS");
+    }
+  });
+
+  // ============ STRIPE PAYMENT ROUTES ============
+  
+  // Create payment intent for one-time payments (token purchases)
+  app.post("/api/stripe/create-payment-intent", async (req, res) => {
+    try {
+      if (!stripeService) {
+        return res.status(503).json({ 
+          error: "Stripe service not available. Please configure STRIPE_SECRET_KEY." 
+        });
+      }
+
+      const { amount, description, metadata } = req.body;
+      
+      if (!amount || amount <= 0) {
+        return res.status(400).json({ error: "Invalid amount" });
+      }
+
+      const result = await stripeService.createPaymentIntent(amount, "usd", {
+        description: description || "Flutterbye Token Purchase",
+        ...metadata
+      });
+
+      res.json(result);
+    } catch (error) {
+      console.error("Error creating payment intent:", error);
+      res.status(500).json({ 
+        error: error instanceof Error ? error.message : "Failed to create payment intent" 
+      });
+    }
+  });
+
+  // Create subscription for premium features
+  app.post("/api/stripe/create-subscription", async (req, res) => {
+    try {
+      if (!stripeService) {
+        return res.status(503).json({ 
+          error: "Stripe service not available. Please configure STRIPE_SECRET_KEY." 
+        });
+      }
+
+      const { email, name, priceId, metadata } = req.body;
+      
+      if (!email || !priceId) {
+        return res.status(400).json({ error: "Email and priceId are required" });
+      }
+
+      // Create or get customer
+      const customer = await stripeService.createOrGetCustomer(email, name);
+      
+      // Create subscription
+      const result = await stripeService.createSubscription(customer.id, priceId, metadata);
+
+      res.json({
+        ...result,
+        customerId: customer.id
+      });
+    } catch (error) {
+      console.error("Error creating subscription:", error);
+      res.status(500).json({ 
+        error: error instanceof Error ? error.message : "Failed to create subscription" 
+      });
+    }
+  });
+
+  // Get payment intent status
+  app.get("/api/stripe/payment-intent/:id", async (req, res) => {
+    try {
+      if (!stripeService) {
+        return res.status(503).json({ 
+          error: "Stripe service not available" 
+        });
+      }
+
+      const paymentIntent = await stripeService.getPaymentIntent(req.params.id);
+      res.json({
+        id: paymentIntent.id,
+        status: paymentIntent.status,
+        amount: paymentIntent.amount,
+        currency: paymentIntent.currency
+      });
+    } catch (error) {
+      console.error("Error retrieving payment intent:", error);
+      res.status(500).json({ 
+        error: "Failed to retrieve payment intent" 
+      });
+    }
+  });
+
+  // Get subscription details
+  app.get("/api/stripe/subscription/:id", async (req, res) => {
+    try {
+      if (!stripeService) {
+        return res.status(503).json({ 
+          error: "Stripe service not available" 
+        });
+      }
+
+      const subscription = await stripeService.getSubscription(req.params.id);
+      res.json({
+        id: subscription.id,
+        status: subscription.status,
+        current_period_start: subscription.current_period_start,
+        current_period_end: subscription.current_period_end,
+        cancel_at_period_end: subscription.cancel_at_period_end
+      });
+    } catch (error) {
+      console.error("Error retrieving subscription:", error);
+      res.status(500).json({ 
+        error: "Failed to retrieve subscription" 
+      });
+    }
+  });
+
+  // Cancel subscription
+  app.post("/api/stripe/subscription/:id/cancel", async (req, res) => {
+    try {
+      if (!stripeService) {
+        return res.status(503).json({ 
+          error: "Stripe service not available" 
+        });
+      }
+
+      const canceledSubscription = await stripeService.cancelSubscription(req.params.id);
+      res.json({
+        id: canceledSubscription.id,
+        status: canceledSubscription.status,
+        canceled_at: canceledSubscription.canceled_at
+      });
+    } catch (error) {
+      console.error("Error canceling subscription:", error);
+      res.status(500).json({ 
+        error: "Failed to cancel subscription" 
+      });
+    }
+  });
+
+  // Stripe webhook endpoint
+  app.post("/api/stripe/webhook", async (req, res) => {
+    try {
+      if (!stripeService) {
+        return res.status(503).send("Stripe service not available");
+      }
+
+      const signature = req.headers['stripe-signature'] as string;
+      const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET;
+
+      if (!endpointSecret) {
+        console.error("Stripe webhook secret not configured");
+        return res.status(400).send("Webhook secret not configured");
+      }
+
+      const event = stripeService.constructEvent(req.body, signature, endpointSecret);
+
+      // Handle different event types
+      switch (event.type) {
+        case 'payment_intent.succeeded':
+          const paymentIntent = event.data.object;
+          console.log(`PaymentIntent succeeded: ${paymentIntent.id}`);
+          // TODO: Update user's token balance, create transaction record
+          break;
+
+        case 'invoice.payment_succeeded':
+          const invoice = event.data.object;
+          console.log(`Invoice payment succeeded: ${invoice.id}`);
+          // TODO: Update subscription status, grant premium access
+          break;
+
+        case 'customer.subscription.deleted':
+          const subscription = event.data.object;
+          console.log(`Subscription canceled: ${subscription.id}`);
+          // TODO: Revoke premium access
+          break;
+
+        default:
+          console.log(`Unhandled event type: ${event.type}`);
+      }
+
+      res.json({ received: true });
+    } catch (error) {
+      console.error("Webhook error:", error);
+      res.status(400).send(`Webhook Error: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   });
   // Real Solana token creation endpoint
