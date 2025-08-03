@@ -416,64 +416,7 @@ export function SMSNexusPage() {
                     </div>
                   </div>
 
-                  {/* Phone Number & Wallet Setup */}
-                  <div className="space-y-4 pt-4 border-t border-white/10">
-                    <div className="space-y-3">
-                      <Label className="text-white text-lg flex items-center gap-2">
-                        <Phone className="h-5 w-5 text-green-400" />
-                        📱 SMS Delivery Setup
-                      </Label>
-                      
-                      <div className="space-y-3">
-                        <div>
-                          <label className="block text-sm font-medium text-white mb-2">
-                            Recipient Phone Number
-                          </label>
-                          <div className="relative">
-                            <input
-                              type="tel"
-                              value={phoneNumber}
-                              onChange={(e) => setPhoneNumber(e.target.value)}
-                              placeholder="+1 555 123 4567"
-                              className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 pr-24"
-                            />
-                            <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                              <Badge className="bg-green-600/20 text-green-200 text-xs">
-                                SMS Ready
-                              </Badge>
-                            </div>
-                          </div>
-                          <div className="text-xs text-gray-400 mt-2 space-y-1">
-                            <div>• SMS will be sent automatically when token is created</div>
-                            <div>• Phone numbers are encrypted for privacy</div>
-                            <div>• Supports international numbers (+1, +44, +49, etc.)</div>
-                          </div>
-                        </div>
 
-                        <div>
-                          <label className="block text-sm font-medium text-white mb-2">
-                            Wallet Connection Status
-                          </label>
-                          <div className="flex items-center justify-between p-3 bg-white/10 border border-white/20 rounded-xl">
-                            <div className="flex items-center gap-3">
-                              <div className="w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
-                              <span className="text-white text-sm">Wallet Connected</span>
-                              <Badge className="bg-blue-600/20 text-blue-200 text-xs">
-                                Demo Mode
-                              </Badge>
-                            </div>
-                            <div className="text-right">
-                              <div className="text-green-400 text-xs font-mono">3xK8...mN9d</div>
-                              <div className="text-xs text-gray-400">Solana Wallet</div>
-                            </div>
-                          </div>
-                          <div className="text-xs text-gray-400 mt-2">
-                            • Tokens will be created from your connected wallet
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
 
                   <Button
                     onClick={() => analyzeEmotionMutation.mutate(aiMessage)}
@@ -492,6 +435,96 @@ export function SMSNexusPage() {
                       </>
                     )}
                   </Button>
+                </CardContent>
+              </Card>
+
+              {/* SMS Delivery Setup - Right Column */}
+              <Card className="bg-black/40 backdrop-blur-sm border-green-500/30">
+                <CardHeader>
+                  <CardTitle className="text-white flex items-center gap-2">
+                    <Phone className="h-6 w-6 text-green-400" />
+                    SMS Delivery Setup 📱
+                  </CardTitle>
+                  <CardDescription className="text-green-200">
+                    Configure phone number and wallet for automatic SMS delivery
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  <div className="space-y-4">
+                    <div>
+                      <label className="block text-sm font-medium text-white mb-2">
+                        Recipient Phone Number
+                      </label>
+                      <div className="relative">
+                        <input
+                          type="tel"
+                          value={phoneNumber}
+                          onChange={(e) => setPhoneNumber(e.target.value)}
+                          placeholder="+1 555 123 4567"
+                          className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 pr-24"
+                        />
+                        <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                          <Badge className="bg-green-600/20 text-green-200 text-xs">
+                            SMS Ready
+                          </Badge>
+                        </div>
+                      </div>
+                      <div className="text-xs text-gray-400 mt-3 space-y-1">
+                        <div>• SMS sent automatically when token is created</div>
+                        <div>• Phone numbers encrypted for privacy</div>
+                        <div>• Supports international numbers globally</div>
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-white mb-2">
+                        Wallet Connection Status
+                      </label>
+                      <div className="flex items-center justify-between p-3 bg-white/10 border border-white/20 rounded-xl">
+                        <div className="flex items-center gap-3">
+                          <div className="w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
+                          <span className="text-white text-sm">Wallet Connected</span>
+                          <Badge className="bg-blue-600/20 text-blue-200 text-xs">
+                            Demo Mode
+                          </Badge>
+                        </div>
+                        <div className="text-right">
+                          <div className="text-green-400 text-xs font-mono">3xK8...mN9d</div>
+                          <div className="text-xs text-gray-400">Solana Wallet</div>
+                        </div>
+                      </div>
+                      <div className="text-xs text-gray-400 mt-2">
+                        • Tokens created from your connected wallet
+                      </div>
+                    </div>
+
+                    <div className="pt-4 border-t border-white/10">
+                      <div className="flex items-center justify-between mb-3">
+                        <span className="text-sm text-white font-medium">SMS Features Active</span>
+                        <Badge className="bg-green-600/20 text-green-200">
+                          All Systems Ready
+                        </Badge>
+                      </div>
+                      <div className="grid grid-cols-2 gap-3 text-xs">
+                        <div className="flex items-center gap-2 text-gray-300">
+                          <div className="w-2 h-2 bg-green-400 rounded-full"></div>
+                          <span>Twilio API</span>
+                        </div>
+                        <div className="flex items-center gap-2 text-gray-300">
+                          <div className="w-2 h-2 bg-green-400 rounded-full"></div>
+                          <span>Emotion Analysis</span>
+                        </div>
+                        <div className="flex items-center gap-2 text-gray-300">
+                          <div className="w-2 h-2 bg-green-400 rounded-full"></div>
+                          <span>Token Creation</span>
+                        </div>
+                        <div className="flex items-center gap-2 text-gray-300">
+                          <div className="w-2 h-2 bg-green-400 rounded-full"></div>
+                          <span>Blockchain Integration</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 </CardContent>
               </Card>
 
