@@ -1,4 +1,5 @@
 import { openaiService } from "./openai-service";
+import { FLUTTERBYE_KNOWLEDGE, FLUTTERBYE_CONTEXT_PROMPT } from './flutterbye-knowledge';
 
 /**
  * AI Content Service - Revolutionary content enhancement for all user interactions
@@ -24,7 +25,7 @@ export class AIContentService {
     energyLevel: number;
   }> {
     try {
-      const prompt = `You are ARIA, Flutterbye's advanced AI assistant. Generate a personalized greeting for a user visiting the platform.
+      const prompt = `${FLUTTERBYE_CONTEXT_PROMPT}
 
 User Context:
 - Time: ${userContext.timeOfDay || 'unknown'}
@@ -34,7 +35,20 @@ User Context:
 - Current mood: ${userContext.mood || 'curious'}
 - Platform: ${userContext.platform || 'web'}
 
-Create a warm, engaging greeting that acknowledges their context and suggests next steps. Respond in JSON:
+Generate a personalized greeting that:
+1. Welcomes them to Flutterbye with knowledge of our platform
+2. Mentions specific features that match their context
+3. Offers help with getting started or continuing their journey
+4. Suggests relevant actions based on their profile
+
+Key information to potentially reference:
+- Token message creation (FLBY-MSG tokens)
+- FlutterWave emotional messaging
+- AI-powered features and ARIA companion
+- FLBY token benefits
+- Marketplace and trending content
+
+Respond in JSON:
 {
   "greeting": "personalized welcome message",
   "personalizedMessage": "context-aware message about their journey",
@@ -115,24 +129,34 @@ Create a warm, engaging greeting that acknowledges their context and suggests ne
     try {
       const historyContext = conversationContext.conversationHistory?.slice(-5) || [];
       
-      const prompt = `You are ARIA, Flutterbye's intelligent AI assistant. You're conversing with ${conversationContext.userName || 'a user'}.
+      const prompt = `${FLUTTERBYE_CONTEXT_PROMPT}
 
 Conversation History:
 ${historyContext.map(msg => `${msg.role}: ${msg.content}`).join('\n')}
 
 Current User Message: "${conversationContext.userMessage}"
+User: ${conversationContext.userName || 'Anonymous'}
 User Mood: ${conversationContext.userMood || 'neutral'}
 Detected Intent: ${conversationContext.intent || 'general'}
 
-Generate a helpful, engaging response that:
-1. Addresses their specific message
-2. Provides value and insights
-3. Suggests next steps
-4. Maintains Flutterbye's innovative, friendly tone
+Generate a helpful, knowledgeable response that:
+1. Addresses their specific question with accurate Flutterbye information
+2. References relevant platform features when appropriate
+3. Provides step-by-step guidance if they need help
+4. Suggests related features they might find valuable
+5. Maintains an enthusiastic but helpful tone
+
+Use the knowledge about Flutterbye to give specific, accurate answers about:
+- How to create token messages (FLBY-MSG)
+- FlutterWave emotional messaging features
+- FLBY token benefits and economics
+- Platform navigation and features
+- AI capabilities and tools
+- Community features and marketplace
 
 Respond in JSON:
 {
-  "response": "your conversational response",
+  "response": "your helpful, knowledgeable response",
   "suggestedFollowUps": [
     "follow-up question 1",
     "follow-up question 2",
@@ -188,19 +212,187 @@ Respond in JSON:
   private generateContextualResponse(message: string, mood: string): string {
     const lowerMessage = message.toLowerCase();
     
-    if (lowerMessage.includes('help') || lowerMessage.includes('how')) {
-      return `I'd be delighted to help! ${mood === 'frustrated' ? 'I can sense you might be feeling a bit stuck, but don\'t worry - ' : ''}Flutterbye makes blockchain communication simple and powerful. What specific area would you like guidance on?`;
+    // Token creation questions
+    if (lowerMessage.includes('token') || lowerMessage.includes('create') || lowerMessage.includes('flby-msg')) {
+      return this.getTokenCreationResponse(lowerMessage, mood);
     }
     
-    if (lowerMessage.includes('token') || lowerMessage.includes('create')) {
-      return `Excellent! Creating tokens on Flutterbye is where the magic happens. ${mood === 'excited' ? 'I can feel your enthusiasm - that\'s the perfect energy for creating something amazing!' : ''} Our AI-powered system helps you craft messages that resonate and create real value.`;
+    // FlutterWave questions
+    if (lowerMessage.includes('flutterwave') || lowerMessage.includes('emotional') || lowerMessage.includes('butterfly')) {
+      return this.getFlutterWaveResponse(lowerMessage, mood);
     }
     
-    if (lowerMessage.includes('ai') || lowerMessage.includes('artificial')) {
-      return `You've discovered the heart of Flutterbye! Our AI system is truly revolutionary - it doesn't just assist, it evolves and learns with every interaction. ${mood === 'curious' ? 'Your curiosity is exactly what drives innovation here!' : ''} Would you like to see what our AI can do for you?`;
+    // FLBY token questions
+    if (lowerMessage.includes('flby') && !lowerMessage.includes('msg')) {
+      return this.getFLBYTokenResponse(lowerMessage, mood);
     }
     
-    return `That's a great ${lowerMessage.includes('?') ? 'question' : 'point'}! ${mood === 'confused' ? 'Let me help clarify things for you. ' : ''}Flutterbye is designed to transform how we communicate through blockchain technology. What aspect interests you most?`;
+    // AI features questions
+    if (lowerMessage.includes('ai') || lowerMessage.includes('aria') || lowerMessage.includes('artificial')) {
+      return this.getAIFeaturesResponse(lowerMessage, mood);
+    }
+    
+    // Getting started questions
+    if (lowerMessage.includes('help') || lowerMessage.includes('how') || lowerMessage.includes('start') || lowerMessage.includes('begin')) {
+      return this.getGettingStartedResponse(lowerMessage, mood);
+    }
+    
+    // Platform questions
+    if (lowerMessage.includes('flutterbye') || lowerMessage.includes('platform') || lowerMessage.includes('what')) {
+      return this.getPlatformOverviewResponse(lowerMessage, mood);
+    }
+    
+    // Pricing and cost questions
+    if (lowerMessage.includes('price') || lowerMessage.includes('cost') || lowerMessage.includes('fee')) {
+      return this.getPricingResponse(lowerMessage, mood);
+    }
+    
+    // Technical questions
+    if (lowerMessage.includes('solana') || lowerMessage.includes('blockchain') || lowerMessage.includes('wallet')) {
+      return this.getTechnicalResponse(lowerMessage, mood);
+    }
+    
+    return `That's a great ${lowerMessage.includes('?') ? 'question' : 'point'}! ${mood === 'confused' ? 'Let me help clarify things for you. ' : ''}I'm here to help you explore Flutterbye's revolutionary blockchain communication platform. What specific aspect interests you most?`;
+  }
+
+  private getTokenCreationResponse(message: string, mood: string): string {
+    const moodResponse = mood === 'excited' ? "I love your enthusiasm! " : mood === 'confused' ? "Don't worry, I'll make this crystal clear! " : "";
+    
+    return `${moodResponse}Creating token messages is Flutterbye's core feature! Here's the simple process:
+
+1. **Connect your Solana wallet** (Phantom, Solflare, etc.)
+2. **Click 'Create Token'** in the main navigation
+3. **Write your message** - anything you want to tokenize
+4. **Set parameters** - value, expiration, distribution
+5. **Mint your FLBY-MSG token** - it becomes a blockchain asset
+6. **Share or trade** - your message now has real value!
+
+Each token message becomes tradeable on the Solana blockchain. Would you like me to walk you through any specific step?`;
+  }
+
+  private getFlutterWaveResponse(message: string, mood: string): string {
+    const moodResponse = mood === 'curious' ? "Perfect curiosity for our most innovative feature! " : "";
+    
+    return `${moodResponse}FlutterWave is our revolutionary emotional messaging system! It features:
+
+🦋 **Neural Emotional Spectrum** - Detects 127 emotions with 97.3% accuracy
+🤖 **AI Avatar Companions** - ARIA v2.0 integration for personalized experiences  
+🌍 **Global Butterfly Effect** - Track how emotions spread worldwide
+⚡ **Quantum Message Threads** - Advanced conversation linking
+⏰ **Temporal Capsules** - Schedule messages for future delivery
+💰 **Emotional Exchange** - Trade emotional value as digital assets
+
+It transforms your emotions into digital butterflies that create real impact! Want to experience the butterfly effect?`;
+  }
+
+  private getFLBYTokenResponse(message: string, mood: string): string {
+    return `FLBY is our native platform token with incredible benefits:
+
+💰 **Fee Discounts** - Pay less when using FLBY for transactions
+🗳️ **Governance Rights** - Vote on important platform decisions
+🎁 **Staking Rewards** - Earn passive income by holding tokens
+⭐ **Exclusive Access** - Premium features and early feature releases
+🚀 **Priority Support** - Enhanced customer service and assistance
+
+FLBY powers the entire Flutterbye ecosystem and provides real utility. How would you like to get started with FLBY?`;
+  }
+
+  private getAIFeaturesResponse(message: string, mood: string): string {
+    const moodResponse = mood === 'curious' ? "Your curiosity is exactly what drives our AI innovation! " : "";
+    
+    return `${moodResponse}Our AI capabilities are truly revolutionary! Here's what I can help with:
+
+🧠 **Advanced Emotion Analysis** - Deep sentiment understanding with 97.3% accuracy
+📈 **Viral Prediction** - Forecast how your messages will spread
+✨ **Content Optimization** - Enhance messages for maximum impact
+🎯 **Personalized Recommendations** - Tailored suggestions based on your behavior
+💬 **Conversational AI (ARIA)** - That's me! Your intelligent companion
+🔮 **Predictive Analytics** - Behavior and trend forecasting
+🎨 **Dynamic Content** - AI-generated personalized experiences
+
+All powered by OpenAI GPT-4o with cost-effective implementation at ~$0.002 per interaction. Which AI feature excites you most?`;
+  }
+
+  private getGettingStartedResponse(message: string, mood: string): string {
+    const moodResponse = mood === 'overwhelmed' ? "Don't worry, I'll make this super simple! " : mood === 'excited' ? "Love the enthusiasm! " : "";
+    
+    return `${moodResponse}Welcome to Flutterbye! Here's your simple getting started guide:
+
+**Essential First Steps:**
+1. **Connect Wallet** - Set up Phantom or Solflare (free!)
+2. **Explore AI Hub** - Chat with me and discover features
+3. **Create First Token** - Turn any message into blockchain value
+4. **Try FlutterWave** - Experience emotional messaging magic
+5. **Join Community** - Connect with other innovative users
+
+**Pro Tips:**
+- Start with a simple message to learn the process
+- Use our AI features to optimize your content
+- Check Trending to see what's popular right now
+- Consider getting FLBY tokens for amazing benefits
+
+What sounds most interesting to try first?`;
+  }
+
+  private getPlatformOverviewResponse(message: string, mood: string): string {
+    return `Flutterbye is the revolutionary blockchain communication platform transforming Web3!
+
+**What Makes Us Revolutionary:**
+🚀 **Transform messages** into valuable SPL tokens (FLBY-MSG)
+🤖 **AI-powered intelligence** with ARIA companion system
+🦋 **FlutterWave messaging** with emotional butterfly effects
+💎 **Real utility** - every token has genuine value and purpose
+🌐 **Solana blockchain** - fast, cheap, and environmentally friendly
+🎮 **Gamified experience** - rewards, levels, and community features
+
+**Our Vision:** Become the universal communication protocol for Web3, revolutionizing how value and emotion flow across blockchain ecosystems.
+
+We're not just another messaging app - we're the future of valuable communication! Ready to experience it?`;
+  }
+
+  private getPricingResponse(message: string, mood: string): string {
+    return `Flutterbye offers transparent, value-driven pricing:
+
+**Free Features:**
+- Platform access and basic messaging
+- AI conversations with ARIA
+- Community participation and browsing
+- Basic token creation (small fees apply)
+
+**Transaction Fees:**
+- **Token Creation:** Configurable percentage-based fees
+- **Value Transfers:** Dynamic fees based on payment method
+- **FLBY Token Discounts:** Significant savings when paying with FLBY
+
+**Premium Benefits with FLBY:**
+- Reduced fees up to 50% off
+- Exclusive features and early access
+- Enhanced AI capabilities
+- Priority customer support
+
+The platform is designed to be accessible while rewarding active participants. Would you like details about any specific feature costs?`;
+  }
+
+  private getTechnicalResponse(message: string, mood: string): string {
+    return `Here's the technical foundation that makes Flutterbye revolutionary:
+
+**Blockchain Infrastructure:**
+🔗 **Solana Network** - Fast, cheap, environmentally friendly
+🪙 **SPL Tokens** - Every message becomes a standard Solana token
+💳 **Wallet Integration** - Phantom, Solflare, and other Solana wallets
+
+**Technical Stack:**
+⚡ **Frontend:** React with TypeScript for smooth experiences
+🔧 **Backend:** Node.js with Express for robust API handling  
+🗄️ **Database:** PostgreSQL with Drizzle ORM for data integrity
+🤖 **AI Integration:** OpenAI GPT-4o for intelligent features
+
+**Security & Performance:**
+🛡️ **Production-grade** rate limiting and input validation
+📊 **Real-time monitoring** with comprehensive analytics
+🔐 **Wallet-based authentication** for secure access
+
+Everything is built for scale, security, and user experience. Need help with wallet setup or technical questions?`;
   }
 
   private detectUserIntent(message: string): string {
