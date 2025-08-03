@@ -6,7 +6,6 @@ import { DefaultTokenImageService } from "./default-token-image";
 import { authenticateWallet, requireAdmin, requirePermission, requireSuperAdmin } from "./admin-middleware";
 import { chatService } from "./chat-service";
 import { registerSolanaRoutes } from "./routes-solana";
-
 import { productionAuth } from "./production-auth";
 import { realTimeMonitor } from "./real-time-monitor";
 import { transactionMonitor } from "./transaction-monitor";
@@ -17,7 +16,6 @@ import { viralAccelerationService } from "./viral-acceleration-service";
 import { stripeService, subscriptionPlans } from "./stripe-service";
 import { openaiService } from "./openai-service";
 import { z } from "zod";
-
 export async function registerRoutes(app: Express): Promise<Server> {
   // Apply production-grade security middleware
   app.use(productionAuth.securityHeaders);
@@ -48,20 +46,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
       realTimeMetrics: metrics
     });
   });
-
   // Production-grade authentication routes
   app.post('/api/auth/login', productionAuth.rateLimiter(5, 15 * 60 * 1000), async (req, res) => {
     try {
       const { walletAddress, signature, message, deviceInfo } = req.body;
       const ipAddress = req.ip || req.connection.remoteAddress;
-
       if (!walletAddress || !signature || !message) {
         return res.status(400).json({
           error: 'Missing required fields',
           required: ['walletAddress', 'signature', 'message']
         });
       }
-
       const authResult = await productionAuth.authenticateUser(
         walletAddress,
         signature,
@@ -69,14 +64,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         deviceInfo,
         ipAddress
       );
-
       if (!authResult) {
         return res.status(401).json({
           error: 'Authentication failed',
           message: 'Invalid wallet signature or expired message'
         });
       }
-
       res.json({
         success: true,
         user: authResult.user,
@@ -84,7 +77,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
         refreshToken: authResult.refreshToken,
         expiresIn: '24h'
       });
-
       console.log(`✅ User authenticated: ${walletAddress}`);
     } catch (error) {
       console.error('Login error:', error);
@@ -94,25 +86,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     }
   });
-
   app.post('/api/auth/refresh', async (req, res) => {
     try {
       const { refreshToken } = req.body;
-
       if (!refreshToken) {
         return res.status(400).json({
           error: 'Refresh token required'
         });
       }
-
       const result = await productionAuth.refreshAccessToken(refreshToken);
-
       if (!result) {
         return res.status(401).json({
           error: 'Invalid or expired refresh token'
         });
       }
-
       res.json({
         success: true,
         accessToken: result.accessToken,
@@ -127,7 +114,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     }
   });
-
   app.post('/api/auth/logout', productionAuth.authenticateToken, async (req, res) => {
     try {
       const { refreshToken } = req.body;
@@ -135,7 +121,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (refreshToken) {
         await productionAuth.logout(refreshToken);
       }
-
       res.json({
         success: true,
         message: 'Logged out successfully'
@@ -147,7 +132,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     }
   });
-
   app.get('/api/auth/me', productionAuth.authenticateToken, async (req, res) => {
     try {
       const user = (req as any).user;
@@ -158,7 +142,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
           error: 'User not found'
         });
       }
-
       res.json({
         user: {
           id: dbUser.id,
@@ -176,7 +159,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     }
   });
-
   // Admin cache management
   app.post('/api/admin/cache/clear', async (req, res) => {
     try {
@@ -189,7 +171,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: 'Failed to clear cache' });
     }
   });
-
   // Admin backup management
   app.post('/api/admin/backup', async (req, res) => {
     try {
@@ -201,7 +182,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: 'Failed to create backup' });
     }
   });
-
   // System metrics endpoint
   app.get('/api/admin/metrics', (req, res) => {
     res.json({
@@ -214,7 +194,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       activeConnections: Math.floor(Math.random() * 50) + 10
     });
   });
-
   // Advanced search endpoints
   app.post('/api/search/tokens', async (req, res) => {
     try {
@@ -226,7 +205,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: 'Search failed' });
     }
   });
-
   app.get('/api/search/trending', async (req, res) => {
     try {
       const { searchService } = await import('./search-service.js');
@@ -237,7 +215,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: 'Failed to get trending tokens' });
     }
   });
-
   app.get('/api/search/popular', async (req, res) => {
     try {
       const { searchService } = await import('./search-service.js');
@@ -248,7 +225,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: 'Failed to get popular searches' });
     }
   });
-
   app.get('/api/search/suggestions', async (req, res) => {
     try {
       const { searchService } = await import('./search-service.js');
@@ -278,7 +254,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(400).json({ message: error instanceof Error ? error.message : "Invalid user data" });
     }
   });
-
   app.get("/api/users/:walletAddress", async (req, res) => {
     try {
       const user = await storage.getUserByWallet(req.params.walletAddress);
@@ -290,7 +265,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Internal server error" });
     }
   });
-
   // Airdrop signup routes
   app.post("/api/airdrop/signup", async (req, res) => {
     try {
@@ -301,7 +275,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(400).json({ message: error instanceof Error ? error.message : "Invalid signup data" });
     }
   });
-
   app.get("/api/airdrop/signups", async (req, res) => {
     try {
       const signups = await storage.getAirdropSignups();
@@ -310,7 +283,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Internal server error" });
     }
   });
-
   // SMS webhook for Twilio integration
   app.post("/api/sms/webhook", async (req, res) => {
     try {
@@ -321,7 +293,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).send("Error processing SMS");
     }
   });
-
   // Real Solana token creation endpoint
   app.post("/api/tokens/solana", async (req, res) => {
     try {
@@ -346,7 +317,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     }
   });
-
   // Token routes - Real Solana minting
   app.post("/api/tokens", async (req, res) => {
     try {
@@ -398,18 +368,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (tokenData.message.length > 27) {
         return res.status(400).json({ message: "Message must be 27 characters or less" });
       }
-
       // Import Solana service (standard SPL tokens)
       const { SolanaBackendService } = await import("./solana-service-wallet-fix");
       const solanaService = new SolanaBackendService();
-
       // Debug: Log received data to see what fields are available
       console.log('Token creation request data:', {
         ...tokenData,
         recipientWallets: (req.body as any).recipientWallets,
         creatorWallet: (req.body as any).creatorWallet
       });
-
       // Mint actual token on Solana DevNet with optimized distribution
       const solanaResult = await solanaService.createFlutterbyeToken({
         message: tokenData.message,
@@ -417,14 +384,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         targetWallet: (req.body as any).creatorWallet || tokenData.creatorId, // Minter's wallet (gets surplus)
         distributionWallets: (req.body as any).recipientWallets || [] // Each gets 1 token
       });
-
       if (!solanaResult.success) {
         return res.status(500).json({ 
           message: "Failed to mint token on Solana blockchain",
           error: solanaResult.error 
         });
       }
-
       // Validate whole number tokens  
       if (!Number.isInteger(tokenData.totalSupply) || tokenData.totalSupply <= 0) {
         return res.status(400).json({ message: "Total supply must be a whole number greater than 0" });
@@ -446,7 +411,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
           solscanUrl: `https://explorer.solana.com/tx/${solanaResult.signature}?cluster=devnet`
         }
       };
-
       // Apply default image if no custom image provided
       const finalTokenData = await DefaultTokenImageService.applyDefaultImageIfNeeded(finalTokenDataRaw);
       
@@ -479,7 +443,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(400).json({ message: error instanceof Error ? error.message : "Invalid token data" });
     }
   });
-
   // Redemption code validation endpoint
   app.post("/api/validate-redemption-code", async (req, res) => {
     try {
@@ -488,7 +451,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!code || typeof code !== 'string') {
         return res.status(400).json({ error: "Code is required" });
       }
-
       // Check if code exists and is valid in redemption codes
       const allRedemptionCodes = await storage.getAllRedemptionCodes();
       const redemptionCode = allRedemptionCodes.find(rc => rc.code === code) || null;
@@ -496,17 +458,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!redemptionCode) {
         return res.status(400).json({ error: "Invalid redemption code" });
       }
-
       // Check if code is expired
       if (redemptionCode.expiresAt && new Date(redemptionCode.expiresAt) < new Date()) {
         return res.status(400).json({ error: "Redemption code has expired" });
       }
-
       // Check if code has remaining uses (maxUses = -1 means unlimited)
       if (redemptionCode.maxUses > 0 && redemptionCode.currentUses >= redemptionCode.maxUses) {
         return res.status(400).json({ error: "Redemption code has been fully used" });
       }
-
       // Return valid code info
       res.json({
         id: redemptionCode.id,
@@ -521,7 +480,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: "Internal server error" });
     }
   });
-
   app.get("/api/tokens", async (req, res) => {
     try {
       const { limit = "50", offset = "0", search, creator } = req.query;
@@ -540,7 +498,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Internal server error" });
     }
   });
-
   app.get("/api/tokens/:id", async (req, res) => {
     try {
       const token = await storage.getToken(req.params.id);
@@ -552,7 +509,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Internal server error" });
     }
   });
-
   // Enhanced token minting endpoint with metadata and pricing
   app.post("/api/tokens/enhanced", async (req, res) => {
     try {
@@ -578,7 +534,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
         targetType,
         targetWallets
       } = req.body;
-
       const enhancedTokenDataRaw: any = {
         message,
         symbol: "FLBY-MSG",
@@ -607,12 +562,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         },
         createdAt: new Date()
       };
-
       // Apply default image if no custom image provided
       const enhancedTokenData = await DefaultTokenImageService.applyDefaultImageIfNeeded(enhancedTokenDataRaw);
-
       const newToken = await storage.createToken(enhancedTokenData);
-
       res.json({
         success: true,
         token: newToken,
@@ -630,7 +582,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     }
   });
-
   // Admin fee configuration endpoints
   app.get("/api/admin/fee-config", async (req, res) => {
     try {
@@ -663,7 +614,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: "Failed to fetch fee configuration" });
     }
   });
-
   app.put("/api/admin/fee-config", async (req, res) => {
     try {
       const { valueCreationFees, redemptionFees, platformFees } = req.body;
@@ -676,7 +626,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (redemptionFees.percentage < 0 || redemptionFees.percentage > 50) {
         return res.status(400).json({ error: "Redemption fee percentage must be between 0-50%" });
       }
-
       // In real app, save to database and validate wallet address
       console.log("Updating fee configuration:", { valueCreationFees, redemptionFees, platformFees });
       
@@ -690,7 +639,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: "Failed to update fee configuration" });
     }
   });
-
   // Calculate fees for value operations
   app.post("/api/calculate-fees", async (req, res) => {
     try {
@@ -702,19 +650,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
         redemption: { percentage: 5, min: 0.001, max: 0.1 },
         platform: { percentage: 1, min: 0.0001, max: 0.2 }
       };
-
       const rate = feeRates[operation as keyof typeof feeRates];
       if (!rate) {
         return res.status(400).json({ error: "Invalid operation type" });
       }
-
       const calculatedFee = Math.min(
         Math.max((parseFloat(amount) * rate.percentage / 100), rate.min),
         rate.max
       );
-
       const netAmount = parseFloat(amount) - calculatedFee;
-
       res.json({
         operation,
         originalAmount: amount,
@@ -728,7 +672,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: "Failed to calculate fees" });
     }
   });
-
   // Token holdings routes
   app.get("/api/users/:userId/holdings", async (req, res) => {
     try {
@@ -738,7 +681,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Internal server error" });
     }
   });
-
   // Transaction routes
   app.post("/api/transactions", async (req, res) => {
     try {
@@ -749,7 +691,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(400).json({ message: error instanceof Error ? error.message : "Invalid transaction data" });
     }
   });
-
   app.get("/api/users/:userId/transactions", async (req, res) => {
     try {
       const transactions = await storage.getTransactionsByUser(req.params.userId);
@@ -758,7 +699,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Internal server error" });
     }
   });
-
   app.patch("/api/transactions/:id/status", async (req, res) => {
     try {
       const { status, signature } = req.body;
@@ -768,7 +708,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(400).json({ message: error instanceof Error ? error.message : "Invalid status update" });
     }
   });
-
   // Market listing routes
   app.post("/api/market/listings", async (req, res) => {
     try {
@@ -779,7 +718,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(400).json({ message: error instanceof Error ? error.message : "Invalid listing data" });
     }
   });
-
   app.get("/api/market/listings", async (req, res) => {
     try {
       const { tokenId, active } = req.query;
@@ -796,7 +734,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Internal server error" });
     }
   });
-
   // Redemption analytics for admin panel
   app.get("/api/admin/redemption-analytics", async (req, res) => {
     try {
@@ -809,7 +746,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     }
   });
-
   // Comprehensive pricing configuration endpoints
   app.get("/api/admin/pricing-config", async (req, res) => {
     try {
@@ -839,7 +775,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     }
   });
-
   app.get("/api/admin/pricing-config/:category", async (req, res) => {
     try {
       const { category } = req.params;
@@ -852,7 +787,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     }
   });
-
   // Wallet validation endpoint
   app.post("/api/validate-wallets", async (req, res) => {
     try {
@@ -877,7 +811,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Internal server error" });
     }
   });
-
   // Image upload endpoint
   app.post("/api/upload-image", async (req, res) => {
     try {
@@ -903,7 +836,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Image upload failed" });
     }
   });
-
   // ============ ADMIN PROTECTED ROUTES ============
   
   // Admin authentication check
@@ -914,7 +846,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       permissions: req.user?.adminPermissions || []
     });
   });
-
   // Admin dashboard data (requires admin access)
   app.get("/api/admin/dashboard", authenticateWallet, requireAdmin, async (req, res) => {
     try {
@@ -935,7 +866,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Failed to fetch dashboard data" });
     }
   });
-
   // User management (requires user management permission)
   app.get("/api/admin/users", authenticateWallet, requirePermission('users'), async (req, res) => {
     try {
@@ -945,7 +875,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Failed to fetch users" });
     }
   });
-
   app.patch("/api/admin/users/:userId/block", authenticateWallet, requirePermission('users'), async (req, res) => {
     try {
       const { userId } = req.params;
@@ -967,7 +896,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Failed to update user status" });
     }
   });
-
   // Wallet management (requires wallet_management permission)
   app.get("/api/admin/escrow-wallets", authenticateWallet, requirePermission('wallet_management'), async (req, res) => {
     try {
@@ -977,7 +905,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Failed to fetch escrow wallets" });
     }
   });
-
   app.post("/api/admin/escrow-wallets", authenticateWallet, requirePermission('wallet_management'), async (req, res) => {
     try {
       const walletData = insertEscrowWalletSchema.parse(req.body);
@@ -996,7 +923,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(400).json({ message: error instanceof Error ? error.message : "Invalid wallet data" });
     }
   });
-
   // Admin user management (requires super admin)
   app.get("/api/admin/admins", authenticateWallet, requireSuperAdmin, async (req, res) => {
     try {
@@ -1006,7 +932,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Failed to fetch admin users" });
     }
   });
-
   app.post("/api/admin/admins", authenticateWallet, requireSuperAdmin, async (req, res) => {
     try {
       const { walletAddress, permissions, role } = req.body;
@@ -1014,7 +939,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!walletAddress) {
         return res.status(400).json({ message: "Wallet address is required" });
       }
-
       const AdminService = (await import("./admin-service")).AdminService;
       const newAdmin = await AdminService.createAdmin(
         walletAddress,
@@ -1028,7 +952,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(400).json({ message: error instanceof Error ? error.message : "Failed to create admin" });
     }
   });
-
   app.delete("/api/admin/admins/:userId", authenticateWallet, requireSuperAdmin, async (req, res) => {
     try {
       const { userId } = req.params;
@@ -1041,7 +964,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: error instanceof Error ? error.message : "Failed to remove admin" });
     }
   });
-
   // System settings (requires settings permission)
   app.get("/api/admin/settings", authenticateWallet, requirePermission('settings'), async (req, res) => {
     try {
@@ -1051,7 +973,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Failed to fetch settings" });
     }
   });
-
   app.patch("/api/admin/settings", authenticateWallet, requirePermission('settings'), async (req, res) => {
     try {
       const settings = await storage.updatePlatformSettings(req.body);
@@ -1069,7 +990,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Failed to update settings" });
     }
   });
-
   // Initialize super admin (one-time setup)
   app.post("/api/admin/initialize", async (req, res) => {
     try {
@@ -1079,7 +999,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (initKey !== process.env.ADMIN_INIT_KEY && initKey !== "INIT_FLUTTERBYE_ADMIN_2025") {
         return res.status(401).json({ message: "Invalid initialization key" });
       }
-
       const AdminService = (await import("./admin-service")).AdminService;
       const superAdmin = await AdminService.initializeSuperAdmin(walletAddress);
       
@@ -1092,10 +1011,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(400).json({ message: error instanceof Error ? error.message : "Initialization failed" });
     }
   });
-
   // ============ PHASE 1 ANALYSIS API ENDPOINTS (No AI Dependencies) ============
   // Phase 2 AI features moved to roadmap - these are simple rule-based implementations
-
   // Enhanced Emotion Analysis using OpenAI
   app.post("/api/ai/analyze-emotion", async (req, res) => {
     try {
@@ -1105,7 +1022,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!inputText || typeof inputText !== 'string') {
         return res.status(400).json({ error: "Text or message is required" });
       }
-
       // Use OpenAI service for advanced emotion analysis
       const result = await openaiService.analyzeEmotion(inputText, userId);
       
@@ -1134,7 +1050,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
           aiPowered: true
         }
       };
-
       res.json({
         success: true,
         analysis,
@@ -1151,7 +1066,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: 'AI emotion analysis failed' });
     }
   });
-
   // Simple Value Suggestion (Phase 1 - No OpenAI required)
   app.post("/api/ai/suggest-value", async (req, res) => {
     try {
@@ -1160,7 +1074,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!message || typeof message !== 'string') {
         return res.status(400).json({ error: "Message is required" });
       }
-
       // Phase 1: Rule-based value suggestions
       const messageText = message.toLowerCase();
       let baseValue = 0.01;
@@ -1201,7 +1114,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: "Failed to generate value suggestion" });
     }
   });
-
   // Simple Viral Analysis (Phase 1 - No OpenAI required)
   app.post("/api/ai/analyze-viral", async (req, res) => {
     try {
@@ -1210,7 +1122,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!message || typeof message !== 'string') {
         return res.status(400).json({ error: "Message is required" });
       }
-
       // Phase 1: Simple viral potential scoring
       const messageText = message.toLowerCase();
       let score = 0.3; // Base score
@@ -1249,7 +1160,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: "Failed to analyze viral potential" });
     }
   });
-
   // Simple Personalized Suggestions (Phase 1 - No OpenAI required)
   app.post("/api/ai/personalized-suggestions", async (req, res) => {
     try {
@@ -1291,9 +1201,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: "Failed to generate suggestions" });
     }
   });
-
   // ============ MARKETING ANALYTICS API ENDPOINTS ============
-
   // Marketing Analytics API Endpoints
   app.get("/api/admin/marketing", authenticateWallet, requirePermission('dashboard'), async (req, res) => {
     try {
@@ -1355,7 +1263,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: "Failed to fetch marketing analytics" });
     }
   });
-
   app.get("/api/admin/behavior", authenticateWallet, requirePermission('dashboard'), async (req, res) => {
     try {
       const behaviorData = {
@@ -1398,7 +1305,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: "Failed to fetch behavior analytics" });
     }
   });
-
   app.get("/api/admin/revenue", authenticateWallet, requirePermission('dashboard'), async (req, res) => {
     try {
       const revenueData = {
@@ -1429,7 +1335,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: "Failed to fetch revenue analytics" });
     }
   });
-
   app.get("/api/admin/stats", authenticateWallet, requirePermission('dashboard'), async (req, res) => {
     try {
       const stats = {
@@ -1453,7 +1358,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: "Failed to fetch platform statistics" });
     }
   });
-
   app.get("/api/admin/users", authenticateWallet, requirePermission('users'), async (req, res) => {
     try {
       const users = [
@@ -1487,7 +1391,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: "Failed to fetch user data" });
     }
   });
-
   app.get("/api/admin/logs", authenticateWallet, requirePermission('dashboard'), async (req, res) => {
     try {
       const logs = [
@@ -1517,7 +1420,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: "Failed to fetch admin logs" });
     }
   });
-
   // ============ VOICE MESSAGE ROUTES ============
   
   // Voice message upload and processing with OpenAI
@@ -1528,7 +1430,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!audioData) {
         return res.status(400).json({ message: "Audio data is required" });
       }
-
       // Convert base64 audio data to buffer
       const audioBuffer = Buffer.from(audioData.split(',')[1] || audioData, 'base64');
       
@@ -1574,9 +1475,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Failed to stream audio" });
     }
   });
-
   // ============ PHASE 2: NEW API ROUTES ============
-
   // Token value and escrow routes
   app.patch("/api/tokens/:tokenId/escrow", async (req, res) => {
     try {
@@ -1589,7 +1488,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Failed to update escrow status" });
     }
   });
-
   app.get("/api/tokens/with-value", async (req, res) => {
     try {
       const tokens = await storage.getTokensWithValue();
@@ -1598,7 +1496,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Failed to fetch tokens with value" });
     }
   });
-
   app.get("/api/tokens/public", async (req, res) => {
     try {
       const { limit = 50, offset = 0 } = req.query;
@@ -1608,7 +1505,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Failed to fetch public tokens" });
     }
   });
-
   // Redemption routes
   app.post("/api/redemptions", async (req, res) => {
     try {
@@ -1619,7 +1515,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(400).json({ message: error instanceof Error ? error.message : "Invalid redemption data" });
     }
   });
-
   app.get("/api/redemptions/:id", async (req, res) => {
     try {
       const redemption = await storage.getRedemption(req.params.id);
@@ -1631,7 +1526,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Internal server error" });
     }
   });
-
   app.get("/api/users/:userId/redemptions", async (req, res) => {
     try {
       const redemptions = await storage.getUserRedemptions(req.params.userId);
@@ -1640,7 +1534,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Failed to fetch user redemptions" });
     }
   });
-
   app.patch("/api/redemptions/:id/status", async (req, res) => {
     try {
       const { id } = req.params;
@@ -1652,7 +1545,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Failed to update redemption status" });
     }
   });
-
   app.get("/api/tokens/:tokenId/redemptions", async (req, res) => {
     try {
       const redemptions = await storage.getRedemptionsByToken(req.params.tokenId);
@@ -1661,7 +1553,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Failed to fetch token redemptions" });
     }
   });
-
   // Escrow wallet routes
   app.post("/api/escrow-wallets", async (req, res) => {
     try {
@@ -1672,7 +1563,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(400).json({ message: error instanceof Error ? error.message : "Invalid wallet data" });
     }
   });
-
   app.get("/api/escrow-wallets/active", async (req, res) => {
     try {
       const wallet = await storage.getActiveEscrowWallet();
@@ -1684,7 +1574,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Failed to fetch active escrow wallet" });
     }
   });
-
   app.patch("/api/escrow-wallets/:id/balance", async (req, res) => {
     try {
       const { id } = req.params;
@@ -1696,7 +1585,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Failed to update escrow balance" });
     }
   });
-
   // Admin routes
   app.post("/api/admin/users", async (req, res) => {
     try {
@@ -1707,7 +1595,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(400).json({ message: error instanceof Error ? error.message : "Invalid admin data" });
     }
   });
-
   app.get("/api/admin/users/:walletAddress", async (req, res) => {
     try {
       const admin = await storage.getAdminByWallet(req.params.walletAddress);
@@ -1719,7 +1606,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Internal server error" });
     }
   });
-
   app.patch("/api/admin/users/:id/status", async (req, res) => {
     try {
       const { id } = req.params;
@@ -1731,7 +1617,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Failed to update admin status" });
     }
   });
-
   // Admin action routes
   app.post("/api/admin/tokens/:tokenId/flag", async (req, res) => {
     try {
@@ -1744,7 +1629,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Failed to flag token" });
     }
   });
-
   app.post("/api/admin/tokens/:tokenId/block", async (req, res) => {
     try {
       const { tokenId } = req.params;
@@ -1756,7 +1640,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Failed to block token" });
     }
   });
-
   app.get("/api/admin/logs", async (req, res) => {
     try {
       const { limit = 50, offset = 0 } = req.query;
@@ -1766,7 +1649,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Failed to fetch admin logs" });
     }
   });
-
   // Analytics routes
   app.post("/api/analytics", async (req, res) => {
     try {
@@ -1777,7 +1659,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(400).json({ message: error instanceof Error ? error.message : "Invalid analytics data" });
     }
   });
-
   app.get("/api/analytics/:metric", async (req, res) => {
     try {
       const { metric } = req.params;
@@ -1792,7 +1673,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Failed to fetch analytics" });
     }
   });
-
   app.get("/api/dashboard/stats", async (req, res) => {
     try {
       const stats = await storage.getDashboardStats();
@@ -1801,7 +1681,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Failed to fetch dashboard stats" });
     }
   });
-
   // Free Flutterbye Code Routes
   app.get("/api/codes/free-flutterbye", async (req, res) => {
     try {
@@ -1833,7 +1712,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: "Failed to fetch codes" });
     }
   });
-
   app.post("/api/codes/redeem", async (req, res) => {
     try {
       const { code, userId, codeType } = req.body;
@@ -1859,7 +1737,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: "Failed to redeem code" });
     }
   });
-
   app.get("/api/codes/redemptions/:userId", async (req, res) => {
     try {
       const { userId } = req.params;
@@ -1880,7 +1757,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: "Failed to fetch redemptions" });
     }
   });
-
   // Token holder analysis endpoint
   app.post("/api/tokens/analyze-holders", async (req, res) => {
     try {
@@ -1889,9 +1765,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!token) {
         return res.status(400).json({ error: "Token address or symbol is required" });
       }
-
       console.log(`📊 Analyzing token holders for: ${token}, count: ${count}`);
-
       // Enhanced token holder data with more realistic addresses and balances
       const holderCount = Math.min(count || 25, 500);
       const mockHolders = Array.from({ length: holderCount }, (_, i) => {
@@ -1914,7 +1788,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
           // Smaller holders
           balance = Math.floor(Math.random() * 100000) + 1000;
         }
-
         return {
           address,
           balance,
@@ -1922,7 +1795,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
           rank: i + 1
         };
       });
-
       // Sort by balance descending
       mockHolders.sort((a, b) => b.balance - a.balance);
       
@@ -1932,7 +1804,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
         holder.rank = index + 1;
         holder.percentage = (holder.balance / totalSupply) * 100;
       });
-
       console.log(`✅ Generated ${mockHolders.length} token holders for analysis`);
       res.json(mockHolders);
     } catch (error) {
@@ -1940,7 +1811,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: "Failed to analyze token holders. Please check the token address and try again." });
     }
   });
-
   // Token holder map analysis endpoint
   app.post("/api/tokens/analyze-holders-map", async (req, res) => {
     try {
@@ -1949,9 +1819,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!token) {
         return res.status(400).json({ error: "Token address or symbol is required" });
       }
-
       console.log(`🗺️ Analyzing token holder map for: ${token}, limit: ${limit}`);
-
       // Generate realistic geographical distribution of token holders
       const cities = [
         { name: 'New York', country: 'United States', lat: 40.7128, lng: -74.0060, region: 'North America' },
@@ -1975,7 +1843,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
         { name: 'São Paulo', country: 'Brazil', lat: -23.5505, lng: -46.6333, region: 'South America' },
         { name: 'Mexico City', country: 'Mexico', lat: 19.4326, lng: -99.1332, region: 'North America' }
       ];
-
       const holderLimit = Math.min(limit || 1000, 2000);
       const mockHolders = Array.from({ length: holderLimit }, (_, i) => {
         const city = cities[Math.floor(Math.random() * cities.length)];
@@ -1986,14 +1853,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         else if (balance > 1000000) holderType = 'dolphin';
         else if (balance > 100000) holderType = 'fish';
         else holderType = 'shrimp';
-
         // Generate realistic Solana address
         const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz123456789';
         let address = '';
         for (let j = 0; j < 44; j++) {
           address += chars.charAt(Math.floor(Math.random() * chars.length));
         }
-
         return {
           id: `holder_${i}`,
           address: `${address.substring(0, 6)}...${address.substring(38)}`,
@@ -2009,10 +1874,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
           lastActivity: new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000).toISOString()
         };
       });
-
       // Sort by balance descending
       mockHolders.sort((a, b) => b.balance - a.balance);
-
       console.log(`✅ Generated ${mockHolders.length} geographic token holders for map visualization`);
       res.json(mockHolders);
     } catch (error) {
@@ -2020,7 +1883,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: "Failed to analyze token holder map. Please check the token address and try again." });
     }
   });
-
   // Greeting Cards API
   app.post("/api/greeting-cards", async (req, res) => {
     try {
@@ -2035,9 +1897,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         cardType,
         templateId
       } = req.body;
-
       console.log(`🎉 Creating greeting card: ${message} -> ${recipientAddress}`);
-
       const greetingCard = {
         id: `card_${Date.now()}`,
         message: message.substring(0, 27),
@@ -2066,9 +1926,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         },
         createdAt: new Date()
       };
-
       const newCard = await storage.createToken(greetingCard);
-
       res.json({
         success: true,
         card: newCard,
@@ -2080,7 +1938,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: "Failed to create greeting card" });
     }
   });
-
   // Enterprise Campaigns API
   app.post("/api/enterprise/campaigns", async (req, res) => {
     try {
@@ -2097,9 +1954,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         advancedFeatures,
         expectedMetrics
       } = req.body;
-
       console.log(`🚀 Creating enterprise campaign: ${name}`);
-
       const estimatedReach = Math.floor(totalBudget / valuePerToken);
       
       const campaign = {
@@ -2132,9 +1987,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         createdAt: new Date(),
         status: "active"
       };
-
       const newCampaign = await storage.createToken(campaign);
-
       res.json({
         success: true,
         campaign: newCampaign,
@@ -2154,7 +2007,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: "Failed to create enterprise campaign" });
     }
   });
-
   // Marketing Insights API
   app.get("/api/enterprise/marketing-insights", async (req, res) => {
     try {
@@ -2198,14 +2050,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
           }
         }
       };
-
       res.json(insights);
     } catch (error) {
       console.error("Error fetching marketing insights:", error);
       res.status(500).json({ error: "Failed to fetch marketing insights" });
     }
   });
-
   // Currency Exchange Rates API
   app.get("/api/currencies/rates", async (req, res) => {
     try {
@@ -2215,7 +2065,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
         USDC: { rate: 0.01, symbol: "USDC", name: "USD Coin", decimals: 6 }, // 1 USDC = 0.01 SOL
         FLBY: { rate: 0.001, symbol: "FLBY", name: "Flutterbye Token", decimals: 6 } // 1 FLBY = 0.001 SOL
       };
-
       res.json({
         success: true,
         rates: exchangeRates,
@@ -2227,7 +2076,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: "Failed to fetch exchange rates" });
     }
   });
-
   // FLBY Token Information API
   app.get("/api/flby/info", async (req, res) => {
     try {
@@ -2252,14 +2100,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         },
         status: "pre_launch"
       };
-
       res.json(tokenInfo);
     } catch (error) {
       console.error("Error fetching FLBY info:", error);
       res.status(500).json({ error: "Failed to fetch FLBY token information" });
     }
   });
-
   // FLBY Staking APIs
   app.post("/api/flby/stake", async (req, res) => {
     try {
@@ -2282,7 +2128,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
           expectedApy: poolId === 'long' ? 18 : poolId === 'medium' ? 12 : poolId === 'short' ? 8 : 5
         }
       };
-
       res.json({
         success: true,
         position: stakingPosition,
@@ -2298,7 +2143,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: "Staking feature coming soon with FLBY token launch" });
     }
   });
-
   app.get("/api/flby/staking/positions", async (req, res) => {
     try {
       // Mock staking positions for demo
@@ -2316,7 +2160,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: "Failed to fetch staking positions" });
     }
   });
-
   // FLBY Governance APIs
   app.get("/api/flby/governance/proposals", async (req, res) => {
     try {
@@ -2352,7 +2195,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
           hasVoted: false
         }
       ];
-
       res.json({
         success: true,
         proposals,
@@ -2369,7 +2211,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: "Failed to fetch governance proposals" });
     }
   });
-
   app.post("/api/flby/governance/vote", async (req, res) => {
     try {
       const { proposalId, vote } = req.body;
@@ -2391,7 +2232,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: "Governance voting coming soon with FLBY token launch" });
     }
   });
-
   app.post("/api/flby/governance/proposals", async (req, res) => {
     try {
       const { title, description, category } = req.body;
@@ -2414,7 +2254,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
         hasVoted: false,
         createdAt: new Date().toISOString()
       };
-
       res.json({
         success: true,
         proposal,
@@ -2425,7 +2264,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: "Proposal creation coming soon with FLBY token launch" });
     }
   });
-
   // FLBY Airdrop APIs
   app.get("/api/flby/airdrops", async (req, res) => {
     try {
@@ -2448,7 +2286,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
           rewardAmount: 500
         }
       ];
-
       res.json({
         success: true,
         campaigns,
@@ -2460,7 +2297,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: "Failed to fetch airdrop campaigns" });
     }
   });
-
   app.post("/api/flby/airdrop/claim", async (req, res) => {
     try {
       const { campaignId, walletAddress } = req.body;
@@ -2483,7 +2319,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: "Airdrop claiming coming soon with FLBY token launch" });
     }
   });
-
   // Profit Sharing APIs
   app.get("/api/flby/profit-sharing", async (req, res) => {
     try {
@@ -2501,7 +2336,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
           userShare: 0
         }
       ];
-
       res.json({
         success: true,
         pools,
@@ -2513,7 +2347,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: "Failed to fetch profit sharing data" });
     }
   });
-
   app.post("/api/flby/profit-share/claim", async (req, res) => {
     try {
       const { poolId } = req.body;
@@ -2534,7 +2367,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: "Profit sharing coming soon with FLBY token launch" });
     }
   });
-
   // Admin Staking Configuration APIs
   app.get("/api/admin/staking/config", async (req, res) => {
     try {
@@ -2593,7 +2425,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
           autoDistribute: true
         }
       };
-
       res.json({
         success: true,
         config
@@ -2603,7 +2434,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: "Failed to fetch staking configuration" });
     }
   });
-
   app.put("/api/admin/staking/pools/:poolId", async (req, res) => {
     try {
       const { poolId } = req.params;
@@ -2622,7 +2452,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: "Failed to update staking pool configuration" });
     }
   });
-
   app.put("/api/admin/profit-sharing/config", async (req, res) => {
     try {
       const config = req.body;
@@ -2639,7 +2468,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: "Failed to update profit sharing configuration" });
     }
   });
-
   // Enhanced Profit Sharing with Tiered Revenue Distribution
   app.get("/api/flby/profit-sharing/enhanced", async (req, res) => {
     try {
@@ -2669,7 +2497,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
           }
         }
       ];
-
       res.json({
         success: true,
         enhancedPools,
@@ -2684,7 +2511,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: "Failed to fetch enhanced profit sharing data" });
     }
   });
-
   // Referral System APIs
   app.post("/api/referrals/generate-link", async (req, res) => {
     try {
@@ -2708,7 +2534,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: "Referral system coming soon with FLBY token launch" });
     }
   });
-
   app.get("/api/referrals/stats", async (req, res) => {
     try {
       const stats = {
@@ -2725,7 +2550,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
           Platinum: { reward: 250, multiplier: 2.0 }
         }
       };
-
       res.json({
         success: true,
         stats
@@ -2735,7 +2559,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: "Failed to fetch referral statistics" });
     }
   });
-
   // Dynamic Token Distribution API
   app.get("/api/flby/token-distribution", async (req, res) => {
     try {
@@ -2763,7 +2586,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
           phase4: "Cross-chain Bridge + Ecosystem Expansion"
         }
       };
-
       res.json({
         success: true,
         distribution,
@@ -2775,7 +2597,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: "Failed to fetch token distribution data" });
     }
   });
-
   // Enhanced Staking Rewards Calculation
   app.post("/api/flby/staking/calculate-enhanced-rewards", async (req, res) => {
     try {
@@ -2787,15 +2608,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         medium: { baseApy: 12, revenueShare: 8, multiplier: 1.5 },
         long: { baseApy: 18, revenueShare: 12, multiplier: 2.0 }
       };
-
       const config = poolConfigs[poolId as keyof typeof poolConfigs];
       const baseRewards = (amount * config.baseApy / 100) * (duration / 365);
       const revenueShareRewards = (amount * config.revenueShare / 100) * (duration / 365);
       const totalRewards = (baseRewards + revenueShareRewards) * config.multiplier;
-
       // Early staker bonus (first 30 days)
       const earlyStakerBonus = totalRewards * 0.15; // 15% bonus
-
       res.json({
         success: true,
         calculation: {
@@ -2817,7 +2635,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: "Failed to calculate enhanced staking rewards" });
     }
   });
-
   // Launch Countdown & Early Access APIs
   app.post("/api/launch/waitlist", async (req, res) => {
     try {
@@ -2826,7 +2643,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!email) {
         return res.status(400).json({ error: "Email is required" });
       }
-
       // Generate unique ID for waitlist entry
       const entryId = `waitlist_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
       
@@ -2848,14 +2664,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: "Failed to join waitlist" });
     }
   });
-
   app.get("/api/launch/stats", async (req, res) => {
     try {
       const launchDate = new Date('2024-03-05T00:00:00Z');
       const now = new Date();
       const timeRemaining = launchDate.getTime() - now.getTime();
       const daysRemaining = Math.max(0, Math.ceil(timeRemaining / (1000 * 60 * 60 * 24)));
-
       const stats = {
         totalSignups: 247,
         earlyAccessUsers: 15,
@@ -2870,7 +2684,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
         },
         isLaunched: timeRemaining <= 0
       };
-
       res.json({
         success: true,
         stats
@@ -2880,7 +2693,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: "Failed to fetch launch statistics" });
     }
   });
-
   // Early Access Management APIs
   app.post("/api/admin/early-access/grant", async (req, res) => {
     try {
@@ -2889,7 +2701,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!entryId) {
         return res.status(400).json({ error: "Entry ID is required" });
       }
-
       const accessCode = `FLBY-EARLY-${Math.random().toString(36).substr(2, 6).toUpperCase()}`;
       
       console.log(`🔑 Granted early access to entry ${entryId} with code ${accessCode}`);
@@ -2904,7 +2715,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: "Failed to grant early access" });
     }
   });
-
   app.post("/api/admin/early-access/add", async (req, res) => {
     try {
       const { email, walletAddress } = req.body;
@@ -2912,7 +2722,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!email) {
         return res.status(400).json({ error: "Email is required" });
       }
-
       const accessCode = `FLBY-EARLY-${Math.random().toString(36).substr(2, 6).toUpperCase()}`;
       
       console.log(`👤 Added early access user: ${email} with code ${accessCode}`);
@@ -2932,7 +2741,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: "Failed to add early access user" });
     }
   });
-
   app.post("/api/admin/launch-mode", async (req, res) => {
     try {
       const { enabled } = req.body;
@@ -2951,7 +2759,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: "Failed to update launch mode" });
     }
   });
-
   app.post("/api/admin/check-access", async (req, res) => {
     try {
       const { accessCode, email } = req.body;
@@ -2966,7 +2773,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
           accessType: "public"
         });
       }
-
       // Check early access codes (this would query database)
       const validCodes = ["FLBY-EARLY-001", "FLBY-EARLY-002"];
       const authorizedEmails = ["admin@flutterbye.com", "beta@flutterbye.com"];
@@ -2986,7 +2792,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: "Failed to check access" });
     }
   });
-
   // Dynamic Pricing Tier Management APIs
   app.get("/api/admin/pricing-tiers", async (req, res) => {
     try {
@@ -3000,7 +2805,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: "Failed to fetch pricing tiers" });
     }
   });
-
   app.post("/api/admin/pricing-tiers", async (req, res) => {
     try {
       const { tierName, minQuantity, maxQuantity, basePricePerToken, discountPercentage, currency, gasFeeIncluded, sortOrder } = req.body;
@@ -3008,7 +2812,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!tierName || !basePricePerToken) {
         return res.status(400).json({ error: "Tier name and base price are required" });
       }
-
       const finalPrice = parseFloat(basePricePerToken) * (1 - (parseFloat(discountPercentage) || 0) / 100);
       
       const newTier = await storage.createPricingTier({
@@ -3034,7 +2837,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: "Failed to create pricing tier" });
     }
   });
-
   app.put("/api/admin/pricing-tiers/:tierId", async (req, res) => {
     try {
       const { tierId } = req.params;
@@ -3057,7 +2859,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: "Failed to update pricing tier" });
     }
   });
-
   app.delete("/api/admin/pricing-tiers/:tierId", async (req, res) => {
     try {
       const { tierId } = req.params;
@@ -3072,7 +2873,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: "Failed to delete pricing tier" });
     }
   });
-
   // Token pricing calculation endpoint
   app.post("/api/calculate-token-price", async (req, res) => {
     try {
@@ -3093,7 +2893,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: "Failed to calculate token price" });
     }
   });
-
   // Access Codes Management APIs
   app.post("/api/admin/access-codes", async (req, res) => {
     try {
@@ -3102,7 +2901,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!code) {
         return res.status(400).json({ error: "Access code is required" });
       }
-
       // In production, this would save to database
       console.log(`🔑 Added new access code: ${code}`);
       
@@ -3116,7 +2914,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: "Failed to add access code" });
     }
   });
-
   app.delete("/api/admin/access-codes", async (req, res) => {
     try {
       const { code } = req.body;
@@ -3124,7 +2921,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!code) {
         return res.status(400).json({ error: "Access code is required" });
       }
-
       // In production, this would remove from database
       console.log(`🗑️ Removed access code: ${code}`);
       
@@ -3137,7 +2933,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: "Failed to remove access code" });
     }
   });
-
   app.get("/api/admin/access-codes", async (req, res) => {
     try {
       // In production, this would query database
@@ -3152,7 +2947,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: "Failed to fetch access codes" });
     }
   });
-
   // Authorized Emails Management APIs
   app.post("/api/admin/authorized-emails", async (req, res) => {
     try {
@@ -3161,7 +2955,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!email) {
         return res.status(400).json({ error: "Email address is required" });
       }
-
       // In production, this would save to database
       console.log(`📧 Added authorized email: ${email}`);
       
@@ -3175,7 +2968,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: "Failed to authorize email" });
     }
   });
-
   app.delete("/api/admin/authorized-emails", async (req, res) => {
     try {
       const { email } = req.body;
@@ -3183,7 +2975,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!email) {
         return res.status(400).json({ error: "Email address is required" });
       }
-
       // In production, this would remove from database
       console.log(`🗑️ Removed authorized email: ${email}`);
       
@@ -3196,7 +2987,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: "Failed to remove email authorization" });
     }
   });
-
   app.get("/api/admin/authorized-emails", async (req, res) => {
     try {
       // In production, this would query database
@@ -3211,10 +3001,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: "Failed to fetch authorized emails" });
     }
   });
-
   // Import admin service
   const { adminService } = await import("./admin-service");
-
   // Enhanced Admin Dashboard Routes with Real Data
   app.get("/api/admin/stats", async (req, res) => {
     try {
@@ -3225,7 +3013,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: "Failed to fetch admin stats" });
     }
   });
-
   app.get("/api/admin/users", async (req, res) => {
     try {
       const users = await adminService.getUsers();
@@ -3235,7 +3022,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: "Failed to fetch users" });
     }
   });
-
   app.get("/api/admin/logs", async (req, res) => {
     try {
       const logs = await adminService.getAdminLogs();
@@ -3245,7 +3031,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: "Failed to fetch admin logs" });
     }
   });
-
   app.get("/api/admin/settings", async (req, res) => {
     try {
       const settings = await adminService.getSettings();
@@ -3255,7 +3040,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: "Failed to fetch settings" });
     }
   });
-
   app.put("/api/admin/settings", async (req, res) => {
     try {
       const newSettings = req.body;
@@ -3267,7 +3051,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: "Failed to update settings" });
     }
   });
-
   app.patch("/api/admin/users/:userId/block", async (req, res) => {
     try {
       const { userId } = req.params;
@@ -3280,7 +3063,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: "Failed to update user status" });
     }
   });
-
   app.post("/api/admin/codes/generate", async (req, res) => {
     try {
       const { type, count } = req.body;
@@ -3292,7 +3074,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: "Failed to generate codes" });
     }
   });
-
   app.post("/api/admin/export", async (req, res) => {
     try {
       const { dataType } = req.body;
@@ -3304,12 +3085,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: "Failed to export data" });
     }
   });
-
   // SMS-to-Blockchain Integration Routes
   const { smsService } = await import("./sms-service");
   const { rewardsService } = await import("./rewards-service");
   const { journeyService } = await import("./journey-service");
-
   // Webhook for incoming SMS messages (Twilio webhook)
   app.post("/api/sms/webhook", async (req, res) => {
     try {
@@ -3358,7 +3137,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).send("Error processing message");
     }
   });
-
   // Register phone number with wallet
   app.post("/api/sms/register", async (req, res) => {
     try {
@@ -3385,7 +3163,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: "Failed to register phone number" });
     }
   });
-
   // Verify phone number
   app.post("/api/sms/verify", async (req, res) => {
     try {
@@ -3394,7 +3171,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!phoneNumber || !verificationCode) {
         return res.status(400).json({ error: "Phone number and verification code required" });
       }
-
       // For demo purposes, accept any 6-digit code
       if (verificationCode.length === 6) {
         res.json({ success: true, message: "Phone verified successfully" });
@@ -3406,7 +3182,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: "Verification failed" });
     }
   });
-
   // Test SMS endpoint for development
   app.post("/api/sms/test", async (req, res) => {
     try {
@@ -3415,7 +3190,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!fromPhone || !toPhone || !message) {
         return res.status(400).json({ error: "Missing required fields" });
       }
-
       // Simulate processing an SMS
       const tokenData = await smsService.createEmotionalToken({
         fromPhone,
@@ -3425,9 +3199,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         isBurnToRead: message.toLowerCase().includes('private'),
         requiresReply: message.toLowerCase().includes('reply')
       });
-
       console.log('Test SMS processed:', tokenData);
-
       res.json({ 
         success: true, 
         tokenData,
@@ -3438,7 +3210,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: 'Test failed' });
     }
   });
-
   // Revolutionary AI emotion analysis endpoint
   app.post("/api/ai/analyze-emotion", async (req, res) => {
     try {
@@ -3447,7 +3218,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!text) {
         return res.status(400).json({ error: "Text is required for analysis" });
       }
-
       const result = await openaiService.analyzeEmotion(text, userId);
       
       res.json({
@@ -3461,7 +3231,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: 'Analysis failed' });
     }
   });
-
   // AI-powered campaign generation
   app.post("/api/ai/generate-campaign", async (req, res) => {
     try {
@@ -3485,7 +3254,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: 'Campaign generation failed' });
     }
   });
-
   // AI message optimization endpoint
   app.post("/api/ai/optimize-message", async (req, res) => {
     try {
@@ -3494,7 +3262,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!message) {
         return res.status(400).json({ error: "Message is required" });
       }
-
       const result = await openaiService.optimizeMessage(message, targetEmotion);
       
       res.json({
@@ -3507,7 +3274,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: 'Optimization failed' });
     }
   });
-
   // AI personalized suggestions endpoint  
   app.post("/api/ai/personalized-suggestions", async (req, res) => {
     try {
@@ -3516,7 +3282,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!userId) {
         return res.status(400).json({ error: "User ID is required" });
       }
-
       // Use personalization engine with AI integration
       const { personalizationEngine } = await import("./personalization-engine");
       let profile = await personalizationEngine.getProfile(userId);
@@ -3524,7 +3289,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!profile) {
         profile = await personalizationEngine.initializeProfile(userId);
       }
-
       const suggestions = await personalizationEngine.generateRecommendations(profile);
       
       res.json({
@@ -3542,7 +3306,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: 'Personalization failed' });
     }
   });
-
   // Live viral trends endpoint
   app.get("/api/ai/viral-trends", async (req, res) => {
     try {
@@ -3559,7 +3322,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: 'Failed to get viral trends' });
     }
   });
-
   // ============ MESSAGE NFT API ENDPOINTS ============
   
   // Create Message NFT Collection
@@ -3570,15 +3332,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!message || !creator || !totalSupply || !valuePerNFT || !currency) {
         return res.status(400).json({ error: "Missing required fields: message, creator, totalSupply, valuePerNFT, currency" });
       }
-
       if (totalSupply < 1 || totalSupply > 10000) {
         return res.status(400).json({ error: "Total supply must be between 1 and 10,000" });
       }
-
       if (valuePerNFT < 0) {
         return res.status(400).json({ error: "Value per NFT must be non-negative" });
       }
-
       const { messageNFTService } = await import("./message-nft-service");
       const result = await messageNFTService.createMessageNFTCollection({
         message,
@@ -3591,19 +3350,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
         description,
         customAttributes
       });
-
       res.json({
         success: true,
         ...result,
         timestamp: new Date().toISOString()
       });
-
     } catch (error) {
       console.error('Message NFT creation error:', error);
       res.status(500).json({ error: error.message || 'Failed to create Message NFT collection' });
     }
   });
-
   // Claim Message NFT
   app.post("/api/message-nfts/claim", async (req, res) => {
     try {
@@ -3612,23 +3368,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!collectionId || !claimerAddress) {
         return res.status(400).json({ error: "Collection ID and claimer address are required" });
       }
-
       const { messageNFTService } = await import("./message-nft-service");
       const nft = await messageNFTService.claimMessageNFT(collectionId, claimerAddress, tokenNumber);
-
       res.json({
         success: true,
         nft,
         message: `Successfully claimed NFT #${nft.tokenNumber}!`,
         timestamp: new Date().toISOString()
       });
-
     } catch (error) {
       console.error('Message NFT claim error:', error);
       res.status(400).json({ error: error.message || 'Failed to claim Message NFT' });
     }
   });
-
   // Get Collection Details
   app.get("/api/message-nfts/collection/:collectionId", async (req, res) => {
     try {
@@ -3636,19 +3388,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const { messageNFTService } = await import("./message-nft-service");
       const result = await messageNFTService.getCollection(collectionId);
-
       res.json({
         success: true,
         ...result,
         timestamp: new Date().toISOString()
       });
-
     } catch (error) {
       console.error('Get collection error:', error);
       res.status(404).json({ error: error.message || 'Collection not found' });
     }
   });
-
   // Get User's NFTs
   app.get("/api/message-nfts/user/:userAddress", async (req, res) => {
     try {
@@ -3656,20 +3405,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const { messageNFTService } = await import("./message-nft-service");
       const nfts = await messageNFTService.getUserNFTs(userAddress);
-
       res.json({
         success: true,
         nfts,
         count: nfts.length,
         timestamp: new Date().toISOString()
       });
-
     } catch (error) {
       console.error('Get user NFTs error:', error);
       res.status(500).json({ error: 'Failed to get user NFTs' });
     }
   });
-
   // Generate Claim QR Code
   app.post("/api/message-nfts/qr", async (req, res) => {
     try {
@@ -3678,32 +3424,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!collectionId) {
         return res.status(400).json({ error: "Collection ID is required" });
       }
-
       const { messageNFTService } = await import("./message-nft-service");
       const qrCode = await messageNFTService.generateClaimQR(collectionId, tokenNumber);
-
       res.json({
         success: true,
         qrCode,
         claimUrl: `${process.env.BASE_URL || 'https://flutterbye.com'}/claim/${collectionId}${tokenNumber ? `/${tokenNumber}` : ''}`,
         timestamp: new Date().toISOString()
       });
-
     } catch (error) {
       console.error('QR generation error:', error);
       res.status(500).json({ error: 'Failed to generate QR code' });
     }
   });
-
   // Browse All Collections
   app.get("/api/message-nfts/browse", async (req, res) => {
     try {
       const page = parseInt(req.query.page as string) || 1;
       const limit = parseInt(req.query.limit as string) || 20;
-
       const { messageNFTService } = await import("./message-nft-service");
       const result = await messageNFTService.getAllCollections(page, limit);
-
       res.json({
         success: true,
         ...result,
@@ -3711,13 +3451,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         limit,
         timestamp: new Date().toISOString()
       });
-
     } catch (error) {
       console.error('Browse collections error:', error);
       res.status(500).json({ error: 'Failed to browse collections' });
     }
   });
-
   // Get Collection Analytics
   app.get("/api/message-nfts/analytics/:collectionId", async (req, res) => {
     try {
@@ -3725,20 +3463,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const { messageNFTService } = await import("./message-nft-service");
       const analytics = await messageNFTService.getCollectionAnalytics(collectionId);
-
       res.json({
         success: true,
         analytics,
         collectionId,
         timestamp: new Date().toISOString()
       });
-
     } catch (error) {
       console.error('Collection analytics error:', error);
       res.status(404).json({ error: error.message || 'Failed to get analytics' });
     }
   });
-
   // Verify phone number with code
   app.post("/api/sms/verify", async (req, res) => {
     try {
@@ -3763,7 +3498,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(400).json({ error: error.message || "Failed to verify phone number" });
     }
   });
-
   // Handle token interactions (burn to read, reply, etc.)
   app.post("/api/tokens/:tokenId/interact", async (req, res) => {
     try {
@@ -3778,7 +3512,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: "Failed to process interaction" });
     }
   });
-
   // Get SMS analytics for admin
   app.get("/api/admin/sms/analytics", async (req, res) => {
     try {
@@ -3789,7 +3522,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: "Failed to fetch SMS analytics" });
     }
   });
-
   // Send test SMS (for development)
   app.post("/api/sms/test", async (req, res) => {
     try {
@@ -3807,7 +3539,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: "Failed to send test SMS" });
     }
   });
-
   // Gamified Rewards System Routes
   
   // Initialize user rewards profile
@@ -3821,7 +3552,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: "Failed to initialize user rewards" });
     }
   });
-
   // Get user rewards profile
   app.get("/api/rewards/user/:userId", async (req, res) => {
     try {
@@ -3836,7 +3566,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: "Failed to fetch user rewards" });
     }
   });
-
   // Get user badges
   app.get("/api/rewards/user/:userId/badges", async (req, res) => {
     try {
@@ -3848,7 +3577,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: "Failed to fetch user badges" });
     }
   });
-
   // Get user transaction history
   app.get("/api/rewards/user/:userId/transactions", async (req, res) => {
     try {
@@ -3861,7 +3589,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: "Failed to fetch user transactions" });
     }
   });
-
   // Get leaderboard
   app.get("/api/rewards/leaderboard", async (req, res) => {
     try {
@@ -3873,7 +3600,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: "Failed to fetch leaderboard" });
     }
   });
-
   // Get active daily challenges
   app.get("/api/rewards/challenges", async (req, res) => {
     try {
@@ -3884,7 +3610,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: "Failed to fetch daily challenges" });
     }
   });
-
   // Get user challenge progress
   app.get("/api/rewards/user/:userId/challenges", async (req, res) => {
     try {
@@ -3896,7 +3621,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: "Failed to fetch user challenge progress" });
     }
   });
-
   // Process daily login
   app.post("/api/rewards/user/:userId/login", async (req, res) => {
     try {
@@ -3908,7 +3632,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: "Failed to process daily login" });
     }
   });
-
   // Blockchain Journey Dashboard Routes
   
   // Get user's complete journey dashboard
@@ -3922,7 +3645,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: "Failed to fetch journey dashboard" });
     }
   });
-
   // Get user preferences
   app.get("/api/journey/preferences/:userId", async (req, res) => {
     try {
@@ -3934,7 +3656,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: "Failed to fetch user preferences" });
     }
   });
-
   // Update user preferences
   app.patch("/api/journey/preferences/:userId", async (req, res) => {
     try {
@@ -3947,7 +3668,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: "Failed to update user preferences" });
     }
   });
-
   // Mark insight as read
   app.patch("/api/journey/insights/:insightId/read", async (req, res) => {
     try {
@@ -3960,7 +3680,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: "Failed to mark insight as read" });
     }
   });
-
   // Generate personalized insights
   app.post("/api/journey/insights/:userId/generate", async (req, res) => {
     try {
@@ -3972,13 +3691,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: "Failed to generate insights" });
     }
   });
-
   const httpServer = createServer(app);
-
   // WebSocket server for real-time heatmap data and chat
   const { WebSocketServer, WebSocket } = await import('ws');
   const wss = new WebSocketServer({ server: httpServer, path: '/ws' });
-
   wss.on('connection', (ws, request) => {
     const url = new URL(request.url!, `http://${request.headers.host}`);
     const isChat = url.pathname === '/ws' && url.searchParams.has('wallet');
@@ -4005,7 +3721,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
     }));
-
     // Simulate real-time transaction data
     const interval = setInterval(() => {
       if (ws.readyState === WebSocket.OPEN) {
@@ -4020,7 +3735,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
           'BullMarketVibes',
           'happy birthday friend'
         ];
-
         ws.send(JSON.stringify({
           type: 'transaction',
           data: {
@@ -4036,26 +3750,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }));
       }
     }, 2000 + Math.random() * 3000);
-
     ws.on('close', () => {
       console.log('Client disconnected from heatmap WebSocket');
       clearInterval(interval);
     });
-
     ws.on('error', (error) => {
       console.error('WebSocket error:', error);
       clearInterval(interval);
     });
     }
   });
-
   function generateRandomWallet(): string {
     const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz123456789';
     const start = Array.from({length: 4}, () => chars[Math.floor(Math.random() * chars.length)]).join('');
     const end = Array.from({length: 4}, () => chars[Math.floor(Math.random() * chars.length)]).join('');
     return `${start}...${end}`;
   }
-
   // Custom Badge Routes
   app.get('/api/badges/custom', async (req, res) => {
     try {
@@ -4098,7 +3808,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: 'Failed to fetch badges' });
     }
   });
-
   app.post('/api/badges/custom', async (req, res) => {
     try {
       const badgeData = req.body;
@@ -4107,7 +3816,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!badgeData.name || badgeData.name.length > 50) {
         return res.status(400).json({ error: 'Invalid badge name' });
       }
-
       // In production, save to database
       const savedBadge = {
         id: `badge_${Date.now()}`,
@@ -4117,14 +3825,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString()
       };
-
       res.json(savedBadge);
     } catch (error) {
       console.error('Error saving custom badge:', error);
       res.status(500).json({ error: 'Failed to save badge' });
     }
   });
-
   app.post('/api/badges/custom/:badgeId/mint', async (req, res) => {
     try {
       const { badgeId } = req.params;
@@ -4139,14 +3845,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         isNFT: true,
         transactionSignature: generateMockTransactionSignature()
       };
-
       res.json(nftData);
     } catch (error) {
       console.error('Error minting badge NFT:', error);
       res.status(500).json({ error: 'Failed to mint NFT' });
     }
   });
-
   app.get('/badges/shared/:badgeId', async (req, res) => {
     try {
       const { badgeId } = req.params;
@@ -4162,7 +3866,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
         icon: 'star',
         pattern: 'gradient'
       };
-
       // Render a simple HTML page showing the badge
       const html = `
         <!DOCTYPE html>
@@ -4199,17 +3902,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).send('Badge not found');
     }
   });
-
   function generateMockMintAddress(): string {
     const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz123456789';
     return Array.from({length: 44}, () => chars[Math.floor(Math.random() * chars.length)]).join('');
   }
-
   function generateMockTransactionSignature(): string {
     const chars = '0123456789abcdef';
     return Array.from({length: 64}, () => chars[Math.floor(Math.random() * chars.length)]).join('');
   }
-
   // ============= CONTENT MANAGEMENT SYSTEM ROUTES =============
   
   // Content sections management  
@@ -4222,7 +3922,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Failed to fetch content sections" });
     }
   });
-
   app.put("/api/admin/content/sections/:id", async (req, res) => {
     try {
       const { contentService } = await import("./content-management");
@@ -4232,7 +3931,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Failed to update content section" });
     }
   });
-
   // Text content management
   app.get("/api/admin/content/text", async (req, res) => {
     try {
@@ -4243,7 +3941,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Failed to fetch text content" });
     }
   });
-
   app.put("/api/admin/content/text", async (req, res) => {
     try {
       const { contentService } = await import("./content-management");
@@ -4253,7 +3950,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Failed to update text content" });
     }
   });
-
   // Image assets management
   app.get("/api/admin/content/images", async (req, res) => {
     try {
@@ -4264,7 +3960,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Failed to fetch image assets" });
     }
   });
-
   // Theme settings management
   app.get("/api/admin/content/theme", requireAdmin, async (req, res) => {
     try {
@@ -4275,7 +3970,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Failed to fetch theme settings" });
     }
   });
-
   app.put("/api/admin/content/theme", requireAdmin, async (req, res) => {
     try {
       const { contentService } = await import("./content-management");  
@@ -4285,7 +3979,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Failed to update theme settings" });
     }
   });
-
   // Layout configurations
   app.get("/api/admin/content/layouts", requireAdmin, async (req, res) => {
     try {
@@ -4296,7 +3989,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Failed to fetch layout configs" });
     }
   });
-
   // Export all content
   app.get("/api/admin/content/export", requireAdmin, async (req, res) => {
     try {
@@ -4307,7 +3999,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Failed to export content" });
     }
   });
-
   // Token metadata endpoint for wallets
   app.get("/api/metadata/:mintAddress", async (req, res) => {
     try {
@@ -4318,7 +4009,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!token) {
         return res.status(404).json({ error: "Token not found" });
       }
-
       // Return metadata in standard format - message as name, FLBY-MSG as symbol
       const metadata = {
         name: token.message,
@@ -4341,14 +4031,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
           decimals: 0
         }
       };
-
       res.json(metadata);
     } catch (error) {
       console.error("Error serving token metadata:", error);
       res.status(500).json({ error: "Failed to fetch token metadata" });
     }
   });
-
   // **CRITICAL WALLET DISPLAY FIX**: Token List endpoint for wallet recognition
   app.get("/api/token-list", async (req, res) => {
     try {
@@ -4389,7 +4077,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: "Failed to generate token list" });
     }
   });
-
   // Individual token info endpoint for wallet integration
   app.get("/api/token-info/:mintAddress", async (req, res) => {
     try {
@@ -4400,7 +4087,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!token) {
         return res.status(404).json({ error: "Token not found" });
       }
-
       // Return in token info format that wallets use for display
       const tokenInfo = {
         chainId: 103, // Solana DevNet
@@ -4419,14 +4105,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
           description: `Flutterbye Message Token: "${token.message}"`
         }
       };
-
       res.json(tokenInfo);
     } catch (error) {
       console.error("Error serving token info:", error);
       res.status(500).json({ error: "Failed to fetch token info" });
     }
   });
-
   // Chat routes
   app.get('/api/chat/rooms', async (req, res) => {
     try {
@@ -4437,7 +4121,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: 'Failed to fetch chat rooms' });
     }
   });
-
   app.post('/api/chat/rooms', async (req, res) => {
     try {
       const roomData = insertChatRoomSchema.parse(req.body);
@@ -4448,7 +4131,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: 'Failed to create chat room' });
     }
   });
-
   app.get('/api/chat/rooms/:roomId/messages', async (req, res) => {
     try {
       const { roomId } = req.params;
@@ -4460,7 +4142,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: 'Failed to fetch chat messages' });
     }
   });
-
   app.get('/api/chat/rooms/:roomId/participants', async (req, res) => {
     try {
       const { roomId } = req.params;
@@ -4471,7 +4152,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: 'Failed to fetch chat participants' });
     }
   });
-
   // Limited Edition Sets API
   app.post('/api/limited-edition-sets', async (req, res) => {
     try {
@@ -4486,7 +4166,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: 'Failed to create limited edition set' });
     }
   });
-
   app.get('/api/limited-edition-sets', async (req, res) => {
     try {
       const { creatorId } = req.query;
@@ -4497,7 +4176,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: 'Failed to fetch limited edition sets' });
     }
   });
-
   app.get('/api/limited-edition-sets/:id', async (req, res) => {
     try {
       const { id } = req.params;
@@ -4511,7 +4189,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: 'Failed to fetch limited edition set' });
     }
   });
-
   app.post('/api/limited-edition-sets/:id/mint', async (req, res) => {
     try {
       const { id } = req.params;
@@ -4521,11 +4198,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!set) {
         return res.status(404).json({ error: 'Limited edition set not found' });
       }
-
       if (set.mintedEditions >= set.totalEditions) {
         return res.status(400).json({ error: 'All editions have been minted' });
       }
-
       // Check if sale is active
       const now = new Date();
       if (set.saleStartsAt && now < set.saleStartsAt) {
@@ -4534,7 +4209,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (set.saleEndsAt && now > set.saleEndsAt) {
         return res.status(400).json({ error: 'Sale has ended' });
       }
-
       // Create the limited edition token
       const editionNumber = set.mintedEditions + 1;
       const tokenMessage = `${set.baseMessage} ${set.editionPrefix}${editionNumber}`;
@@ -4553,10 +4227,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         category: set.category,
         mintAddress: `LE${set.id.slice(0, 8)}E${editionNumber}`, // Mock mint address
       };
-
       const token = await storage.createToken(tokenData);
       await storage.incrementMintedEditions(id);
-
       res.json({
         token,
         editionNumber,
@@ -4567,7 +4239,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: 'Failed to mint limited edition' });
     }
   });
-
   app.get('/api/limited-edition-sets/:id/tokens', async (req, res) => {
     try {
       const { id } = req.params;
@@ -4578,7 +4249,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: 'Failed to fetch tokens' });
     }
   });
-
   // Redemption Code Management API
   app.get("/api/admin/redemption-codes", async (req, res) => {
     try {
@@ -4589,7 +4259,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Failed to fetch redemption codes" });
     }
   });
-
   app.post("/api/admin/redemption-codes", async (req, res) => {
     try {
       const codeData = req.body;
@@ -4600,7 +4269,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Failed to create redemption code" });
     }
   });
-
   app.patch("/api/admin/redemption-codes/:id/toggle", async (req, res) => {
     try {
       const { id } = req.params;
@@ -4612,7 +4280,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Failed to update redemption code" });
     }
   });
-
   app.delete("/api/admin/redemption-codes/:id", async (req, res) => {
     try {
       const { id } = req.params;
@@ -4623,7 +4290,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Failed to delete redemption code" });
     }
   });
-
   app.post("/api/redeem-code", async (req, res) => {
     try {
       const { code } = req.body;
@@ -4637,7 +4303,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Failed to validate redemption code" });
     }
   });
-
   // System Settings API routes (Admin only)
   app.get("/api/admin/system-settings", async (req, res) => {
     try {
@@ -4650,7 +4315,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     }
   });
-
   app.get("/api/admin/system-settings/:key", async (req, res) => {
     try {
       const setting = await storage.getSystemSetting(req.params.key);
@@ -4665,7 +4329,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     }
   });
-
   app.post("/api/admin/system-settings", async (req, res) => {
     try {
       const settingData = insertSystemSettingSchema.parse(req.body);
@@ -4678,7 +4341,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     }
   });
-
   app.put("/api/admin/system-settings/:key", async (req, res) => {
     try {
       const { value } = req.body;
@@ -4695,7 +4357,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     }
   });
-
   app.delete("/api/admin/system-settings/:key", async (req, res) => {
     try {
       await storage.deleteSystemSetting(req.params.key);
@@ -4707,7 +4368,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     }
   });
-
   // Default token image endpoints
   app.get("/api/default-token-image", async (req, res) => {
     try {
@@ -4720,7 +4380,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     }
   });
-
   app.put("/api/admin/default-token-image", async (req, res) => {
     try {
       const { imageUrl } = req.body;
@@ -4737,7 +4396,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     }
   });
-
   // Personalization Engine routes
   app.get('/api/personalization/profile', async (req, res) => {
     try {
@@ -4755,7 +4413,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: 'Failed to get personalization profile' });
     }
   });
-
   app.put('/api/personalization/preferences', async (req, res) => {
     try {
       const { personalizationEngine } = await import('./personalization-engine.js');
@@ -4768,7 +4425,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: 'Failed to update preferences' });
     }
   });
-
   app.post('/api/personalization/track', async (req, res) => {
     try {
       const { personalizationEngine } = await import('./personalization-engine.js');
@@ -4782,7 +4438,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: 'Failed to track behavior' });
     }
   });
-
   app.get('/api/personalization/recommendations', async (req, res) => {
     try {
       const { personalizationEngine } = await import('./personalization-engine.js');
@@ -4797,18 +4452,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: 'Failed to get recommendations' });
     }
   });
-
   // Register Solana blockchain integration routes
   registerSolanaRoutes(app);
-
   // Register production monitoring endpoints
   registerProductionEndpoints(app);
-
   // Industry-disrupting feature: Real-time collaborative token creation
   app.get('/api/collaborative/metrics', (req, res) => {
     res.json(collaborativeTokenService.getSessionMetrics());
   });
-
   // Industry-disrupting feature: Viral acceleration protocol
   app.post('/api/viral/track', async (req, res) => {
     try {
@@ -4819,7 +4470,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: 'Failed to track interaction' });
     }
   });
-
   app.get('/api/viral/trending', async (req, res) => {
     try {
       const limit = parseInt(req.query.limit as string) || 10;
@@ -4829,7 +4479,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: 'Failed to get trending tokens' });
     }
   });
-
   app.get('/api/viral/metrics/:tokenId', async (req, res) => {
     try {
       const { tokenId } = req.params;
@@ -4839,7 +4488,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: 'Failed to get viral metrics' });
     }
   });
-
   app.get('/api/viral/prediction/:tokenId', async (req, res) => {
     try {
       const { tokenId } = req.params;
@@ -4849,7 +4497,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: 'Failed to get viral prediction' });
     }
   });
-
   app.get('/api/viral/rewards/:creatorId', async (req, res) => {
     try {
       const { creatorId } = req.params;
@@ -4859,7 +4506,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: 'Failed to get creator rewards' });
     }
   });
-
   app.get('/api/viral/network/:userId', async (req, res) => {
     try {
       const { userId } = req.params;
@@ -4869,7 +4515,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: 'Failed to get network analysis' });
     }
   });
-
   // Initialize chat service heartbeat
   chatService.startHeartbeat();
   
@@ -4909,7 +4554,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: "Failed to fetch viral analytics" });
     }
   });
-
   app.get("/api/admin/ai-insights", async (req, res) => {
     try {
       const insights = [
@@ -4941,7 +4585,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: "Failed to fetch AI insights" });
     }
   });
-
   // CSV Export endpoints
   app.get("/api/admin/export/viral-analytics", async (req, res) => {
     try {
@@ -4959,7 +4602,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
           { pattern: "Viral Loops", status: "Stable", count: 6 }
         ]
       };
-
       let csvContent = "Metric,Value,Timestamp\n";
       csvContent += `Viral Tokens,${analytics.viralTokens},${new Date().toISOString()}\n`;
       csvContent += `Growth Rate,${analytics.growthRate}%,${new Date().toISOString()}\n`;
@@ -4972,7 +4614,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       analytics.viralPatterns.forEach(pattern => {
         csvContent += `${pattern.pattern},${pattern.status},${pattern.count},${new Date().toISOString()}\n`;
       });
-
       res.setHeader('Content-Type', 'text/csv');
       res.setHeader('Content-Disposition', `attachment; filename="viral-analytics-${new Date().toISOString().split('T')[0]}.csv"`);
       res.send(csvContent);
@@ -4981,7 +4622,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: "Failed to export viral analytics" });
     }
   });
-
   app.get("/api/admin/export/system-metrics", async (req, res) => {
     try {
       const metrics = {
@@ -4995,7 +4635,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
         newUsersToday: 89,
         apiRequests: 234
       };
-
       let csvContent = "Metric,Value,Timestamp\n";
       csvContent += `Total Requests,${metrics.requests.total},${new Date().toISOString()}\n`;
       csvContent += `Successful Requests,${metrics.requests.successful},${new Date().toISOString()}\n`;
@@ -5010,7 +4649,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       csvContent += `Active Users,${metrics.activeUsers},${new Date().toISOString()}\n`;
       csvContent += `New Users Today,${metrics.newUsersToday},${new Date().toISOString()}\n`;
       csvContent += `API Requests Per Minute,${metrics.apiRequests},${new Date().toISOString()}\n`;
-
       res.setHeader('Content-Type', 'text/csv');
       res.setHeader('Content-Disposition', `attachment; filename="system-metrics-${new Date().toISOString().split('T')[0]}.csv"`);
       res.send(csvContent);
@@ -5019,7 +4657,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: "Failed to export system metrics" });
     }
   });
-
   app.get("/api/admin/export/user-analytics", async (req, res) => {
     try {
       const users = await storage.getAllUsers();
@@ -5035,7 +4672,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
           csvContent += `user-${i},user${i}@example.com,${new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000).toISOString()},${Math.floor(Math.random() * 50)},${(Math.random() * 100).toFixed(2)} SOL,Active\n`;
         }
       }
-
       res.setHeader('Content-Type', 'text/csv');
       res.setHeader('Content-Disposition', `attachment; filename="user-analytics-${new Date().toISOString().split('T')[0]}.csv"`);
       res.send(csvContent);
@@ -5044,7 +4680,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: "Failed to export user analytics" });
     }
   });
-
   app.get("/api/admin/export/token-analytics", async (req, res) => {
     try {
       const tokens = await storage.getAllTokens();
@@ -5071,7 +4706,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
           csvContent += `FLBY-MSG-${i},${message},creator-${i},${(Math.random() * 10).toFixed(2)} SOL,${Math.floor(Math.random() * 50)},${new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000).toISOString()},Active,${viralScore}\n`;
         }
       }
-
       res.setHeader('Content-Type', 'text/csv');
       res.setHeader('Content-Disposition', `attachment; filename="token-analytics-${new Date().toISOString().split('T')[0]}.csv"`);
       res.send(csvContent);
@@ -5080,7 +4714,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: "Failed to export token analytics" });
     }
   });
-
   // World-Class Admin Dashboard Enhancements
   
   // Advanced Revenue Analytics
@@ -5108,7 +4741,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: "Failed to fetch revenue analytics" });
     }
   });
-
   // Security Monitoring Dashboard
   app.get("/api/admin/security-monitoring", async (req, res) => {
     try {
@@ -5134,7 +4766,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: "Failed to fetch security monitoring" });
     }
   });
-
   // Performance Optimization Insights
   app.get("/api/admin/performance-insights", async (req, res) => {
     try {
@@ -5181,7 +4812,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: "Failed to fetch performance insights" });
     }
   });
-
   // Advanced User Behavior Analytics
   app.get("/api/admin/user-behavior", async (req, res) => {
     try {
@@ -5218,7 +4848,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: "Failed to fetch user behavior analytics" });
     }
   });
-
   // Competitive Intelligence Dashboard
   app.get("/api/admin/competitive-intelligence", async (req, res) => {
     try {
@@ -5264,7 +4893,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: "Failed to fetch competitive intelligence" });
     }
   });
-
   app.get("/api/admin/predictive-analytics", async (req, res) => {
     try {
       const analytics = {
@@ -5290,7 +4918,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: "Failed to fetch predictive analytics" });
     }
   });
-
   app.get("/api/system/realtime", async (req, res) => {
     try {
       const realtimeData = {
@@ -5307,16 +4934,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: "Failed to fetch realtime data" });
     }
   });
-
   // ============================================================================
   // STRIPE PAYMENT ROUTES
   // ============================================================================
-
   // Get subscription plans
   app.get('/api/subscription/plans', (req, res) => {
     res.json(subscriptionPlans);
   });
-
   // Create subscription
   app.post('/api/create-subscription', async (req, res) => {
     try {
@@ -5327,13 +4951,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
           mock: true
         });
       }
-
       const { plan, email = 'user@example.com', name = 'Test User' } = req.body;
       
       if (!plan || !subscriptionPlans[plan]) {
         return res.status(400).json({ error: 'Invalid subscription plan' });
       }
-
       // Create or get customer
       const customer = await stripeService.createCustomer(email, name);
       
@@ -5342,13 +4964,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         customer.id, 
         plan
       );
-
       res.json({
         subscriptionId: subscription.id,
         clientSecret,
         plan: subscriptionPlans[plan]
       });
-
     } catch (error: any) {
       console.error('Subscription creation error:', error);
       res.status(500).json({ 
@@ -5357,7 +4977,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     }
   });
-
   // Create one-time payment intent
   app.post('/api/create-payment-intent', async (req, res) => {
     try {
@@ -5367,20 +4986,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
           mock: true
         });
       }
-
       const { amount } = req.body;
       
       if (!amount || amount <= 0) {
         return res.status(400).json({ error: 'Invalid amount' });
       }
-
       const paymentIntent = await stripeService.createPaymentIntent(amount);
       
       res.json({
         clientSecret: paymentIntent.client_secret,
         amount: paymentIntent.amount
       });
-
     } catch (error: any) {
       console.error('Payment intent creation error:', error);
       res.status(500).json({ 
@@ -5389,11 +5005,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     }
   });
-
   // ============================================================================
   // ADMIN SUBSCRIPTION MANAGEMENT ROUTES
   // ============================================================================
-
   // Get all subscriptions for admin
   app.get('/api/admin/subscriptions', async (req, res) => {
     try {
@@ -5404,7 +5018,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
           mock: true
         });
       }
-
       // Mock subscription data for demo
       const mockSubscriptions = [
         {
@@ -5426,12 +5039,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
           createdAt: new Date().toISOString()
         }
       ];
-
       res.json({
         subscriptions: mockSubscriptions,
         total: mockSubscriptions.length
       });
-
     } catch (error: any) {
       console.error('Admin subscriptions fetch error:', error);
       res.status(500).json({ 
@@ -5440,17 +5051,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     }
   });
-
   // Update subscription plan pricing
   app.put('/api/admin/subscription/plans/:planId', async (req, res) => {
     try {
       const { planId } = req.params;
       const { name, price, features } = req.body;
-
       if (!subscriptionPlans[planId]) {
         return res.status(404).json({ error: 'Plan not found' });
       }
-
       // Update plan in memory (in production, this would update the database)
       subscriptionPlans[planId] = {
         ...subscriptionPlans[planId],
@@ -5458,19 +5066,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
         ...(price && { price }),
         ...(features && { features })
       };
-
       // In production, you would also update the Stripe product/price
       if (stripeService.isStripeConfigured()) {
         // Update Stripe product pricing would go here
         console.log(`Would update Stripe product for plan ${planId} with new price: $${price}`);
       }
-
       res.json({
         success: true,
         plan: subscriptionPlans[planId],
         message: 'Plan updated successfully'
       });
-
     } catch (error: any) {
       console.error('Plan update error:', error);
       res.status(500).json({ 
@@ -5479,20 +5084,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     }
   });
-
   // Create new subscription plan
   app.post('/api/admin/subscription/plans', async (req, res) => {
     try {
       const { id, name, price, features } = req.body;
-
       if (!id || !name || !price) {
         return res.status(400).json({ error: 'Missing required fields: id, name, price' });
       }
-
       if (subscriptionPlans[id]) {
         return res.status(409).json({ error: 'Plan with this ID already exists' });
       }
-
       const newPlan = {
         id,
         name,
@@ -5502,21 +5103,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
         subscriberCount: 0,
         monthlyRevenue: 0
       };
-
       // Add plan to memory (in production, this would save to database)
       subscriptionPlans[id] = newPlan;
-
       // In production, you would also create the Stripe product/price
       if (stripeService.isStripeConfigured()) {
         console.log(`Would create Stripe product for new plan: ${name} at $${price}`);
       }
-
       res.json({
         success: true,
         plan: newPlan,
         message: 'Plan created successfully'
       });
-
     } catch (error: any) {
       console.error('Plan creation error:', error);
       res.status(500).json({ 
@@ -5525,7 +5122,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     }
   });
-
   // Update subscription plan for a customer
   app.put('/api/subscription/:subscriptionId', async (req, res) => {
     try {
@@ -5535,14 +5131,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
           mock: true
         });
       }
-
       const { subscriptionId } = req.params;
       const { newPlan } = req.body;
       
       if (!newPlan || !subscriptionPlans[newPlan]) {
         return res.status(400).json({ error: 'Invalid subscription plan' });
       }
-
       const subscription = await stripeService.updateSubscription(subscriptionId, newPlan);
       
       res.json({
@@ -5550,7 +5144,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
         status: subscription.status,
         plan: subscriptionPlans[newPlan]
       });
-
     } catch (error: any) {
       console.error('Subscription update error:', error);
       res.status(500).json({ 
@@ -5559,7 +5152,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     }
   });
-
   // Cancel subscription
   app.delete('/api/subscription/:subscriptionId', async (req, res) => {
     try {
@@ -5569,7 +5161,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
           mock: true
         });
       }
-
       const { subscriptionId } = req.params;
       const subscription = await stripeService.cancelSubscription(subscriptionId);
       
@@ -5578,12 +5169,68 @@ export async function registerRoutes(app: Express): Promise<Server> {
         status: subscription.status,
         canceled_at: subscription.canceled_at
       });
-
     } catch (error: any) {
       console.error('Subscription cancellation error:', error);
       res.status(500).json({ 
         error: 'Failed to cancel subscription',
         message: error.message 
+      });
+    }
+  });
+  // NFT Marketplace Routes
+  app.get("/api/marketplace/nfts", async (req, res) => {
+    try {
+      const result = await messageNFTService.getMarketplaceListings();
+      res.json({ success: true, ...result });
+    } catch (error) {
+      console.error("Get marketplace listings error:", error);
+      res.status(500).json({
+        success: false,
+        error: error instanceof Error ? error.message : "Failed to get marketplace listings"
+      });
+    }
+  });
+
+  app.post("/api/marketplace/buy/:nftId", async (req, res) => {
+    try {
+      const { nftId } = req.params;
+      const buyerId = req.body.buyerId || "demo-buyer";
+      const result = await messageNFTService.buyNFT(nftId, buyerId);
+      res.json({ success: true, ...result });
+    } catch (error) {
+      console.error("Buy NFT error:", error);
+      res.status(500).json({
+        success: false,
+        error: error instanceof Error ? error.message : "Failed to buy NFT"
+      });
+    }
+  });
+
+  app.post("/api/marketplace/burn/:nftId", async (req, res) => {
+    try {
+      const { nftId } = req.params;
+      const burnerId = req.body.burnerId || "demo-burner";
+      const result = await messageNFTService.burnNFTForValue(nftId, burnerId);
+      res.json({ success: true, ...result });
+    } catch (error) {
+      console.error("Burn NFT error:", error);
+      res.status(500).json({
+        success: false,
+        error: error instanceof Error ? error.message : "Failed to burn NFT"
+      });
+    }
+  });
+
+  app.get("/api/nft-analytics/:userId", async (req, res) => {
+    try {
+      const { userId } = req.params;
+      const result = await messageNFTService.getNFTAnalytics(userId);
+      res.json({ success: true, ...result });
+    } catch (error) {
+      console.error("Get NFT analytics error:", error);
+      res.status(500).json({
+        success: false,
+        error: error instanceof Error ? error.message : "Failed to get NFT analytics"
       });
     }
   });

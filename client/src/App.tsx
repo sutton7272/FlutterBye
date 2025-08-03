@@ -53,6 +53,7 @@ import CollaborativeCreation from "@/pages/collaborative-creation";
 import ViralDashboard from "@/pages/viral-dashboard";
 import MessageNFTCreator from "@/pages/message-nft-creator";
 import NFTClaim from "@/pages/nft-claim";
+import NFTMarketplace from "@/pages/nft-marketplace";
 import Navbar from "@/components/navbar";
 import { PersonalizedDashboard } from "@/components/PersonalizedDashboard";
 
@@ -334,6 +335,12 @@ function Router() {
           <>
             <Navbar />
             <MessageNFTCreator />
+          </>
+        )} />
+        <Route path="/nft-marketplace" component={() => (
+          <>
+            <Navbar />
+            <NFTMarketplace />
           </>
         )} />
         <Route path="/claim/:collectionId" component={NFTClaim} />

@@ -7,6 +7,7 @@ import flutterbeyeLogoPath from "@assets/image_1754068877999.png";
 import { QuickActionPanel } from "@/components/quick-action-panel";
 import { InteractiveStatsDashboard } from "@/components/interactive-stats-dashboard";
 import { EngagementBooster } from "@/components/engagement-booster";
+import { NFTPortfolioQuickView } from "@/components/dashboard/NFTPortfolioQuickView";
 import { ViralSharingAssistant } from "@/components/viral-sharing-assistant";
 import { TutorialLaunchButton } from "@/components/interactive-tutorial";
 import { VoiceMessageRecorder } from "@/components/voice-message-recorder";
@@ -155,6 +156,11 @@ export default function Home() {
         {/* Interactive Stats Dashboard */}
         <div className="mb-16">
           <InteractiveStatsDashboard />
+        </div>
+
+        {/* NFT Portfolio Quick View */}
+        <div className="mb-16">
+          <NFTPortfolioQuickView />
         </div>
 
         {/* Quick Actions Panel */}

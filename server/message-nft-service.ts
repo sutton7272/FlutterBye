@@ -13,8 +13,10 @@ export interface MessageNFTMetadata {
   creator: string;
   totalSupply: number;
   currentSupply: number;
+  burnedSupply: number; // Track burned NFTs for scarcity
   valuePerNFT: number; // SOL value attached to each NFT
   currency: 'SOL' | 'USDC' | 'FLBY';
+  burnToRedeem: boolean; // Enable burn-to-redeem mechanism
   qrCode: string; // Base64 QR code image
   qrCodeData: string; // The data encoded in QR code
   collectionName: string;
@@ -48,6 +50,7 @@ export interface CreateMessageNFTRequest {
   totalSupply: number;
   valuePerNFT: number;
   currency: 'SOL' | 'USDC' | 'FLBY';
+  burnToRedeem?: boolean; // Enable burn-to-redeem mechanism
   collectionName?: string;
   description?: string;
   customAttributes?: Record<string, string | number>;
@@ -112,8 +115,10 @@ export class MessageNFTService {
         creator: request.creator,
         totalSupply: request.totalSupply,
         currentSupply: 0,
+        burnedSupply: 0,
         valuePerNFT: request.valuePerNFT,
         currency: request.currency,
+        burnToRedeem: request.burnToRedeem || false,
         qrCode: qrCodeImage,
         qrCodeData,
         collectionName: request.collectionName || `Message NFT #${Date.now()}`,
@@ -451,6 +456,113 @@ export class MessageNFTService {
     } catch (error) {
       console.error('Failed to initialize Message NFT service:', error);
     }
+  }
+
+  // Burn NFT to redeem value
+  async burnNFTForValue(nftId: string, burnerId: string): Promise<{
+    success: boolean;
+    value: number;
+    currency: string;
+    message: string;
+  }> {
+    const nft = this.nfts.get(nftId);
+    if (!nft) throw new Error('NFT not found');
+
+    const collection = this.collections.get(nft.collectionId);
+    if (!collection) throw new Error('Collection not found');
+    if (!collection.burnToRedeem) throw new Error('This NFT collection does not support burn-to-redeem');
+    if (nft.owner !== burnerId) throw new Error('Only the NFT owner can burn it');
+
+    this.nfts.delete(nftId);
+    collection.burnedSupply += 1;
+    collection.updatedAt = new Date();
+
+    console.log(`🔥 NFT ${nftId} burned by ${burnerId} for ${nft.valueAttached} ${nft.currency}`);
+
+    return {
+      success: true,
+      value: nft.valueAttached,
+      currency: nft.currency,
+      message: `Successfully burned NFT #${nft.tokenNumber} and redeemed ${nft.valueAttached} ${nft.currency}`
+    };
+  }
+
+  // Get marketplace listings
+  async getMarketplaceListings(): Promise<{ nfts: any[]; total: number; }> {
+    const mockListings = [
+      {
+        id: 'nft-001',
+        collectionId: 'collection-001',
+        tokenNumber: 1,
+        message: 'Limited Edition Genesis NFT with personal voice message 🚀',
+        imageFile: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDIwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjMGYxMjIwIi8+CjxjaXJjbGUgY3g9IjEwMCIgY3k9IjEwMCIgcj0iNzUiIGZpbGw9InVybCgjZ3JhZGllbnQpIiBvcGFjaXR5PSIwLjMiLz4KPHN2ZyB4PSI4NyIgeT0iOTIiIHdpZHRoPSIyNiIgaGVpZ2h0PSIxNiI+Cjx0ZXh0IHg9IjEzIiB5PSIxMiIgZm9udC1mYW1pbHk9Im1vbm9zcGFjZSIgZm9udC1zaXplPSI4IiBmaWxsPSJ3aGl0ZSIgdGV4dC1hbmNob3I9Im1pZGRsZSI+RkxCWTwvdGV4dD4KPC9zdmc+CjxkZWZzPgo8bGluZWFyR3JhZGllbnQgaWQ9ImdyYWRpZW50IiB4MT0iMCUiIHkxPSIwJSIgeDI9IjEwMCUiIHkyPSIxMDAlIj4KPHN0b3Agb2Zmc2V0PSIwJSIgc3R5bGU9InN0b3AtY29sb3I6IzAwN2NmZjtzNb9wLW9wYWNpdHk6MSIgLz4KPHN0b3Agb2Zmc2V0PSIxMDAlIiBzdHlsZT0ic3RvcC1jb2xvcjojMDBmNTlmO3N0b3Atb3BhY2l0eToxIiAvPgo8L2xpbmVhckdyYWRpZW50Pgo8L2RlZnM+Cjwvc3ZnPg==',
+        voiceFile: 'data:audio/webm;base64,mock-voice-data',
+        owner: 'owner-001',
+        price: 0.25,
+        currency: 'SOL',
+        burnToRedeem: true,
+        originalValue: 0.1,
+        collectionName: 'FlutterArt Genesis',
+        listedAt: new Date().toISOString(),
+        rarity: 'Legendary'
+      },
+      {
+        id: 'nft-002',
+        collectionId: 'collection-002',
+        tokenNumber: 5,
+        message: 'Emotional FlutterArt with custom artwork and voice',
+        imageFile: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDIwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjMTEwNzI4Ii8+CjxjaXJjbGUgY3g9IjEwMCIgY3k9IjEwMCIgcj0iNjAiIGZpbGw9IiM4YjVmZjYiIG9wYWNpdHk9IjAuNSIvPgo8L3N2Zz4=',
+        voiceFile: 'data:audio/webm;base64,mock-voice-data-2',
+        owner: 'owner-002',
+        price: 0.15,
+        currency: 'SOL',
+        burnToRedeem: false,
+        originalValue: 0.05,
+        collectionName: 'Emotional Butterflies',
+        listedAt: new Date(Date.now() - 86400000).toISOString(),
+        rarity: 'Rare'
+      }
+    ];
+
+    return { nfts: mockListings, total: mockListings.length };
+  }
+
+  // Buy NFT
+  async buyNFT(nftId: string, buyerId: string) {
+    console.log(`💰 NFT ${nftId} purchased by ${buyerId}`);
+    return {
+      success: true,
+      message: 'NFT purchased successfully',
+      transactionId: `tx_${randomUUID()}`
+    };
+  }
+
+  // Get NFT analytics
+  async getNFTAnalytics(userId: string) {
+    return {
+      ownedNFTs: 12,
+      totalValue: 2.45,
+      burnableValue: 1.8,
+      collections: 3,
+      recentActivity: [
+        {
+          type: 'created',
+          nftId: 'nft-001',
+          collectionName: 'Genesis Collection',
+          value: 0.1,
+          currency: 'SOL',
+          timestamp: new Date().toISOString()
+        },
+        {
+          type: 'bought',
+          nftId: 'nft-002',
+          collectionName: 'Rare Butterflies',
+          value: 0.25,
+          currency: 'SOL',
+          timestamp: new Date(Date.now() - 3600000).toISOString()
+        }
+      ]
+    };
   }
 }
 

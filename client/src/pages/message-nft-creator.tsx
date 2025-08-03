@@ -54,6 +54,7 @@ export default function MessageNFTCreator() {
     currency: "SOL" as "SOL" | "USDC" | "FLBY",
     collectionName: "",
     description: "",
+    burnToRedeem: false, // Enable burn-to-redeem mechanism
     customAttributes: {}
   });
   const [imagePreview, setImagePreview] = useState<string | null>(null);
@@ -340,6 +341,27 @@ export default function MessageNFTCreator() {
                       </SelectContent>
                     </Select>
                   </div>
+                </div>
+
+                {/* Burn-to-Redeem Option */}
+                <div className="space-y-2">
+                  <div className="flex items-center space-x-2">
+                    <input
+                      type="checkbox"
+                      id="burnToRedeem"
+                      checked={formData.burnToRedeem}
+                      onChange={(e) => setFormData(prev => ({ ...prev, burnToRedeem: e.target.checked }))}
+                      className="w-4 h-4 text-orange-600 bg-slate-700 border-slate-600 rounded focus:ring-orange-500"
+                    />
+                    <Label htmlFor="burnToRedeem" className="text-white flex items-center gap-2">
+                      <Zap className="h-4 w-4 text-orange-400" />
+                      Enable Burn-to-Redeem (Creates Scarcity)
+                    </Label>
+                  </div>
+                  <p className="text-sm text-slate-400 ml-6">
+                    Allows NFT holders to burn their NFT to redeem the attached {formData.currency} value. 
+                    This permanently reduces supply and creates scarcity for remaining NFTs.
+                  </p>
                 </div>
 
                 {/* Custom Image Upload */}
