@@ -44,6 +44,7 @@ export default function MessageNFTCreator() {
   const [formData, setFormData] = useState({
     message: "",
     image: "",
+    imageFile: "", // Base64 encoded custom image
     creator: "demo-creator", // TODO: Get from wallet connection
     totalSupply: 10,
     valuePerNFT: 0.01,
@@ -52,6 +53,7 @@ export default function MessageNFTCreator() {
     description: "",
     customAttributes: {}
   });
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [createdCollection, setCreatedCollection] = useState<{
     collection: MessageNFTCollection;
     nfts: MessageNFT[];
@@ -106,6 +108,44 @@ export default function MessageNFTCreator() {
     }
 
     createMutation.mutate(formData);
+  };
+
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      toast({
+        title: "Invalid File Type",
+        description: "Please select an image file (PNG, JPG, GIF, etc.)",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    // Validate file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      toast({
+        title: "File Too Large",
+        description: "Please select an image smaller than 5MB",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const base64String = event.target?.result as string;
+      setFormData(prev => ({ ...prev, imageFile: base64String }));
+      setImagePreview(base64String);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const removeImage = () => {
+    setFormData(prev => ({ ...prev, imageFile: "" }));
+    setImagePreview(null);
   };
 
   const copyToClipboard = (text: string, label: string) => {
@@ -233,19 +273,64 @@ export default function MessageNFTCreator() {
                   </div>
                 </div>
 
-                {/* Image Upload */}
+                {/* Custom Image Upload */}
                 <div className="space-y-2">
-                  <Label htmlFor="image" className="text-white flex items-center gap-2">
+                  <Label className="text-white flex items-center gap-2">
                     <ImageIcon className="h-4 w-4" />
-                    Image URL (Optional)
+                    Custom Image (Optional)
                   </Label>
-                  <Input
-                    id="image"
-                    placeholder="https://example.com/image.png"
-                    value={formData.image}
-                    onChange={(e) => setFormData(prev => ({ ...prev, image: e.target.value }))}
-                    className="bg-slate-700 border-slate-600 text-white"
-                  />
+                  {!imagePreview ? (
+                    <div className="border-2 border-dashed border-slate-600 rounded-lg p-6 text-center hover:border-blue-500 transition-colors">
+                      <ImageIcon className="w-12 h-12 text-slate-400 mx-auto mb-4" />
+                      <p className="text-slate-300 mb-2">Upload a custom image for your NFT collection</p>
+                      <p className="text-sm text-slate-400 mb-4">PNG, JPG, GIF up to 5MB</p>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={() => document.getElementById('image-upload')?.click()}
+                        className="border-blue-500/50 text-blue-300 hover:bg-blue-500/20"
+                      >
+                        <ImageIcon className="w-4 h-4 mr-2" />
+                        Choose Image
+                      </Button>
+                      <input
+                        id="image-upload"
+                        type="file"
+                        accept="image/*"
+                        onChange={handleImageUpload}
+                        className="hidden"
+                      />
+                    </div>
+                  ) : (
+                    <div className="relative">
+                      <img
+                        src={imagePreview}
+                        alt="NFT Preview"
+                        className="w-full max-h-64 object-cover rounded-lg border border-slate-600"
+                      />
+                      <Button
+                        type="button"
+                        variant="destructive"
+                        size="sm"
+                        onClick={removeImage}
+                        className="absolute top-2 right-2"
+                      >
+                        Remove
+                      </Button>
+                    </div>
+                  )}
+                  
+                  {/* URL Alternative */}
+                  <div className="mt-4">
+                    <Label htmlFor="image" className="text-white text-sm">Or enter image URL:</Label>
+                    <Input
+                      id="image"
+                      placeholder="https://example.com/image.png"
+                      value={formData.image}
+                      onChange={(e) => setFormData(prev => ({ ...prev, image: e.target.value }))}
+                      className="bg-slate-700 border-slate-600 text-white mt-1"
+                    />
+                  </div>
                 </div>
 
                 {/* Description */}
