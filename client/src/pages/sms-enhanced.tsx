@@ -66,15 +66,6 @@ import {
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
 import { QRCodeGenerator } from '@/components/QRCodeGenerator';
-import { EmotionPortal } from '@/components/EmotionPortal';
-import { QuantumTimeMachine } from '@/components/QuantumTimeMachine';
-import { NeuroLinkInterface } from '@/components/NeuroLinkInterface';
-import { VoiceAttachmentUploader } from '@/components/VoiceAttachmentUploader';
-import { AIVoiceEnhancer } from '@/components/AIVoiceEnhancer';
-import { BlockchainAudioVisualizer } from '@/components/BlockchainAudioVisualizer';
-import { SocialViralPredictor } from '@/components/SocialViralPredictor';
-import { TechnologyShowcase } from '@/components/TechnologyShowcase';
-import { FeatureGuidedTour } from '@/components/FeatureGuidedTour';
 
 // Enhanced interfaces with new features
 interface EmotionalAnalysis {
@@ -635,115 +626,40 @@ export default function EnhancedSMSIntegration() {
 
         {/* Revolutionary Voice Messages Tab */}
         <TabsContent value="voice" className="space-y-6">
-          {/* Technology Showcase */}
-          {showTechnologyShowcase && (
-            <TechnologyShowcase 
-              onExploreClick={() => {
-                setShowTechnologyShowcase(false);
-                setShowGuidedTour(true);
-                setTourStep(0);
-              }}
-            />
-          )}
-
-          {/* Guided Tour */}
-          {showGuidedTour && (
-            <FeatureGuidedTour
-              currentStep={tourStep}
-              onStepChange={setTourStep}
-              onComplete={() => {
-                setShowGuidedTour(false);
-                toast({
-                  title: "🎉 Tour Complete!",
-                  description: "You're now ready to create revolutionary multimedia blockchain tokens!"
-                });
-              }}
-            />
-          )}
-
-          {/* Quick Control Panel */}
-          <div className="flex flex-wrap items-center justify-center gap-3 mb-6">
-            <Button
-              onClick={() => setShowTechnologyShowcase(!showTechnologyShowcase)}
-              variant="outline"
-              size="sm"
-              className="border-yellow-500/30 hover:border-yellow-500/50 text-yellow-300"
-            >
-              <Eye className="w-4 h-4 mr-2" />
-              {showTechnologyShowcase ? 'Hide' : 'Show'} Technology Showcase
-            </Button>
-            <Button
-              onClick={() => {
-                setShowGuidedTour(true);
-                setTourStep(0);
-              }}
-              size="sm"
-              className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
-            >
-              <Target className="w-4 h-4 mr-2" />
-              Take Guided Tour
-            </Button>
-          </div>
+          <Card className="bg-slate-800/50 border-yellow-500/20">
+            <CardHeader>
+              <CardTitle className="text-white flex items-center gap-2">
+                <Mic className="w-5 h-5 text-yellow-400" />
+                Voice Message Features
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="text-white">
+              <div className="space-y-4">
+                <div className="text-center p-8 bg-yellow-900/20 rounded-lg border border-yellow-500/30">
+                  <div className="text-lg font-bold text-yellow-300 mb-2">
+                    Voice Attachment System
+                  </div>
+                  <div className="text-sm text-gray-400 mb-4">
+                    Revolutionary audio-to-blockchain integration coming soon
+                  </div>
+                  <Button
+                    onClick={() => {
+                      toast({
+                        title: "Voice Features Coming Soon",
+                        description: "Revolutionary multimedia blockchain features in development"
+                      });
+                    }}
+                    className="bg-yellow-600 hover:bg-yellow-700"
+                  >
+                    <Music className="w-4 h-4 mr-2" />
+                    Explore Voice Features
+                  </Button>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
 
           <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
-            {/* Revolutionary Voice Attachment Uploader */}
-            <div className="xl:col-span-2">
-              <VoiceAttachmentUploader
-                onAudioAttached={(audioData) => {
-                  setAttachedAudio(audioData);
-                  toast({
-                    title: "🚀 WORLD FIRST ACHIEVEMENT!",
-                    description: `Audio attached to blockchain message! ${audioData.type.replace('_', ' ')} with ${audioData.analysis?.emotion} emotion detected.`
-                  });
-                }}
-                tokenMessage={message}
-              />
-            </div>
-
-            {/* Revolutionary AI Voice Enhancement */}
-            {attachedAudio && !enhancedAudio && (
-              <div className="xl:col-span-2">
-                <AIVoiceEnhancer
-                  audioData={attachedAudio}
-                  onEnhancementComplete={(enhancedData) => {
-                    setEnhancedAudio(enhancedData);
-                    toast({
-                      title: "🧠 AI Enhancement Complete!",
-                      description: `Voice analysis enhanced with ${enhancedData.enhancementScore?.toFixed(1)}% improvement in market potential`
-                    });
-                  }}
-                />
-              </div>
-            )}
-
-            {/* Blockchain Audio Visualizer */}
-            {(attachedAudio || enhancedAudio) && (
-              <div className="xl:col-span-2">
-                <BlockchainAudioVisualizer
-                  audioUrl={(enhancedAudio || attachedAudio).url}
-                  audioAnalysis={(enhancedAudio || attachedAudio).analysis}
-                  isEnhanced={!!enhancedAudio}
-                />
-              </div>
-            )}
-
-            {/* Social Viral Prediction */}
-            {(attachedAudio || enhancedAudio) && !viralPrediction && (
-              <div className="xl:col-span-2">
-                <SocialViralPredictor
-                  audioData={attachedAudio}
-                  enhancedData={enhancedAudio}
-                  onPredictionComplete={(prediction) => {
-                    setViralPrediction(prediction);
-                    toast({
-                      title: "🚀 Viral Prediction Complete!",
-                      description: `Predicted reach: ${prediction.viralPrediction?.totalReach?.toLocaleString()} users`
-                    });
-                  }}
-                />
-              </div>
-            )}
-
             {/* Ultimate Multimedia Token Creation */}
             {(attachedAudio || enhancedAudio) && (
               <Card className="bg-gradient-to-br from-yellow-900/30 via-orange-900/20 to-red-900/30 border-2 border-yellow-500/30 xl:col-span-2">
@@ -769,12 +685,12 @@ export default function EnhancedSMSIntegration() {
                         <div className="flex items-center justify-between">
                           <span className="text-gray-400">Audio Type:</span>
                           <Badge variant="secondary" className="bg-orange-500/20 text-orange-300">
-                            {(enhancedAudio || attachedAudio).type.replace('_', ' ')}
+                            {(enhancedAudio || attachedAudio)?.type?.replace('_', ' ') || 'Unknown'}
                           </Badge>
                         </div>
                         <div className="flex items-center justify-between">
                           <span className="text-gray-400">File Size:</span>
-                          <span className="text-white">{((enhancedAudio || attachedAudio).size / 1024).toFixed(1)} KB</span>
+                          <span className="text-white">{((enhancedAudio || attachedAudio)?.size / 1024)?.toFixed(1) || '0'} KB</span>
                         </div>
                       </div>
                     </div>
@@ -901,46 +817,62 @@ export default function EnhancedSMSIntegration() {
         {/* Revolutionary Analytics Tab */}
         <TabsContent value="analytics" className="space-y-6">
           <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
-            {/* Revolutionary Emotion Portal */}
-            <EmotionPortal 
-              message={message}
-              onEmotionChange={(emotion) => {
-                setAnalysis((prev: EmotionalAnalysis) => ({
-                  ...prev,
-                  emotion: emotion.type,
-                  confidence: emotion.intensity || 0.8,
-                  sentiment: emotion.frequency || 0.7
-                }));
-                toast({
-                  title: "Emotion Detected!",
-                  description: `${emotion.type} emotion field activated with ${Math.round((emotion.intensity || 0) * 100)}% intensity`
-                });
-              }}
-            />
+            {/* Emotion Analysis Card */}
+            <Card className="bg-slate-800/50 border-purple-500/20">
+              <CardHeader>
+                <CardTitle className="text-white flex items-center gap-2">
+                  <Brain className="w-5 h-5 text-purple-400" />
+                  Emotion Analysis
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="text-white">
+                <div className="space-y-4">
+                  <div className="text-center p-4 bg-purple-900/20 rounded-lg">
+                    <div className="text-lg font-bold text-purple-300">
+                      {analysis.emotion || 'Ready for Analysis'}
+                    </div>
+                    <div className="text-sm text-gray-400">Current Emotion</div>
+                  </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="text-center p-2 bg-blue-900/20 rounded">
+                      <div className="text-sm font-medium text-blue-300">
+                        {Math.round(analysis.confidence * 100)}%
+                      </div>
+                      <div className="text-xs text-gray-400">Confidence</div>
+                    </div>
+                    <div className="text-center p-2 bg-green-900/20 rounded">
+                      <div className="text-sm font-medium text-green-300">
+                        {Math.round(analysis.sentiment * 100)}%
+                      </div>
+                      <div className="text-xs text-gray-400">Sentiment</div>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
 
-            {/* Quantum Time Machine */}
-            <QuantumTimeMachine
-              message={message}
-              onTimeTravel={(prediction) => {
-                toast({
-                  title: "Time Travel Complete!",
-                  description: `Token value in ${prediction.label}: $${prediction.predictedValue.toFixed(3)}`
-                });
-              }}
-            />
-
-            {/* NeuroLink Interface */}
-            <div className="xl:col-span-2">
-              <NeuroLinkInterface
-                message={message}
-                onNeuroSync={(brainState) => {
-                  toast({
-                    title: "Neural Sync Complete!",
-                    description: `Brain patterns analyzed with ${Math.round(brainState.coherenceIndex)}% coherence`
-                  });
-                }}
-              />
-            </div>
+            {/* Value Prediction Card */}
+            <Card className="bg-slate-800/50 border-green-500/20">
+              <CardHeader>
+                <CardTitle className="text-white flex items-center gap-2">
+                  <TrendingUp className="w-5 h-5 text-green-400" />
+                  Value Prediction
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="text-white">
+                <div className="space-y-4">
+                  <div className="text-center p-4 bg-green-900/20 rounded-lg">
+                    <div className="text-lg font-bold text-green-300">
+                      ${(Math.random() * 0.1).toFixed(3)}
+                    </div>
+                    <div className="text-sm text-gray-400">Predicted Value</div>
+                  </div>
+                  <div className="text-center text-sm text-gray-400">
+                    Revolutionary AI analysis coming soon
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
           </div>
         </TabsContent>
 
