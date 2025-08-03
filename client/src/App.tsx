@@ -57,6 +57,7 @@ import NFTMarketplace from "@/pages/nft-marketplace";
 import AIShowcase from "@/pages/ai-showcase";
 import { LivingAIPage } from "@/pages/living-ai";
 import AIComprehensiveOverview from "@/pages/ai-comprehensive-overview";
+import RevolutionaryAIShowcase from "@/pages/revolutionary-ai-showcase";
 import Navbar from "@/components/navbar";
 import { PersonalizedDashboard } from "@/components/PersonalizedDashboard";
 
@@ -359,6 +360,12 @@ function Router() {
           <>
             <Navbar />
             <AIComprehensiveOverview />
+          </>
+        )} />
+        <Route path="/revolutionary-ai" component={() => (
+          <>
+            <Navbar />
+            <RevolutionaryAIShowcase />
           </>
         )} />
         <Route path="/claim/:collectionId" component={NFTClaim} />
