@@ -55,6 +55,7 @@ import MessageNFTCreator from "@/pages/message-nft-creator";
 import NFTClaim from "@/pages/nft-claim";
 import NFTMarketplace from "@/pages/nft-marketplace";
 import AIShowcase from "@/pages/ai-showcase";
+import { LivingAIPage } from "@/pages/living-ai";
 import Navbar from "@/components/navbar";
 import { PersonalizedDashboard } from "@/components/PersonalizedDashboard";
 
@@ -348,6 +349,12 @@ function Router() {
           <>
             <Navbar />
             <AIShowcase />
+          </>
+        )} />
+        <Route path="/living-ai" component={() => (
+          <>
+            <Navbar />
+            <LivingAIPage />
           </>
         )} />
         <Route path="/claim/:collectionId" component={NFTClaim} />
