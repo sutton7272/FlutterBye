@@ -74,7 +74,7 @@ export function useAIContent() {
       keywords: string[];
       purpose: string;
     }) => {
-      return apiRequest('/api/ai/optimize-seo', {
+      return apiRequest('/api/ai/content/seo', {
         method: 'POST',
         body: data
       });

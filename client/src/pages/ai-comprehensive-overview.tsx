@@ -17,8 +17,10 @@ import {
   BarChart3,
   MessageSquare,
   Lightbulb,
-  Atom
+  Atom,
+  Search
 } from 'lucide-react';
+import { AISEOOptimizer } from '@/components/ai-seo-optimizer';
 
 interface AIFeature {
   name: string;
@@ -256,9 +258,10 @@ export default function AIComprehensiveOverview() {
         </Card>
 
         <Tabs defaultValue="features" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4 bg-black/20 border-purple-500/30">
+          <TabsList className="grid w-full grid-cols-5 bg-black/20 border-purple-500/30">
             <TabsTrigger value="features" className="text-white">AI Features</TabsTrigger>
             <TabsTrigger value="admin" className="text-white">Admin AI</TabsTrigger>
+            <TabsTrigger value="seo" className="text-white">SEO Tools</TabsTrigger>
             <TabsTrigger value="advanced" className="text-white">Advanced</TabsTrigger>
             <TabsTrigger value="future" className="text-white">Future</TabsTrigger>
           </TabsList>
@@ -335,6 +338,23 @@ export default function AIComprehensiveOverview() {
                     </div>
                   ))}
                 </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="seo" className="space-y-4">
+            <Card className="bg-black/20 border-purple-500/30">
+              <CardHeader>
+                <CardTitle className="text-white flex items-center gap-2">
+                  <Search className="w-6 h-6 text-purple-400" />
+                  AI SEO Optimization Tools
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-gray-300 mb-6">
+                  Optimize your content for search engines with advanced AI-powered SEO analysis and recommendations.
+                </p>
+                <AISEOOptimizer />
               </CardContent>
             </Card>
           </TabsContent>
