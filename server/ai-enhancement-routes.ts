@@ -58,7 +58,8 @@ router.post('/conversation/chat', async (req, res) => {
       conversationHistory: conversationHistory || [],
       userMood: userContext?.mood,
       intent: userContext?.intent,
-      userName: userContext?.userName
+      userName: userContext?.userName,
+      userId: userContext?.userId || 'anonymous'
     });
     
     res.json({

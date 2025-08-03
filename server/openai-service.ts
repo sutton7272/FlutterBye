@@ -283,6 +283,51 @@ Focus on emotional triggers, social sharing potential, and blockchain messaging 
     }
   }
 
+  /**
+   * ARIA Conversation System - Direct conversation with OpenAI
+   */
+  async generateConversationResponse(prompt: string, conversationHistory: Array<{role: string, content: string}> = []): Promise<string> {
+    if (!this.isAvailable()) {
+      console.log("🤖 ARIA: OpenAI not available, using fallback");
+      return "I understand you're interested in exploring Flutterbye! I'm here to help guide you through our revolutionary blockchain communication platform.";
+    }
+
+    try {
+      console.log("🤖 ARIA: Making direct OpenAI conversation call...");
+      
+      const messages = [
+        {
+          role: "system" as const,
+          content: `You are ARIA, the AI companion for Flutterbye. You have access to comprehensive knowledge about the platform. 
+
+${prompt}
+
+Respond naturally as ARIA would, with enthusiasm and helpfulness. Keep responses conversational but informative.`
+        },
+        ...conversationHistory.slice(-5),
+        {
+          role: "user" as const,
+          content: "Please respond as ARIA with your personality and knowledge."
+        }
+      ];
+
+      const response = await openai.chat.completions.create({
+        model: "gpt-4o",
+        messages,
+        temperature: 0.7,
+        max_tokens: 500
+      });
+
+      const conversationResponse = response.choices[0].message.content || "";
+      console.log("🤖 ARIA: OpenAI conversation successful, length:", conversationResponse.length);
+      return conversationResponse;
+
+    } catch (error) {
+      console.error("🤖 ARIA: OpenAI conversation error:", error);
+      return "I'm experiencing some technical difficulties, but I'm still here to help! Could you tell me more about what you're looking for with Flutterbye?";
+    }
+  }
+
   private getFallbackEmotionAnalysis(text: string): {
     analysis: AIEmotionAnalysis;
     viralPrediction: AIViralPrediction;

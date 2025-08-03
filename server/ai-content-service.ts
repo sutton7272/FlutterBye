@@ -17,6 +17,8 @@ export class AIContentService {
     lastAction?: string;
     mood?: string;
     platform?: string;
+    userId?: string;
+    interests?: string[];
   } = {}): Promise<{
     greeting: string;
     personalizedMessage: string;
@@ -72,10 +74,15 @@ Respond in JSON:
       // Use ARIA's personality system for personalized greeting
       const userId = userContext.userId || 'anonymous';
       ariaPersonality.rememberUser(userId, {
+        userId,
         name: userContext.userName,
         mood: userContext.mood || 'curious',
         interests: userContext.interests || [],
-        communicationStyle: 'friendly'
+        communicationStyle: 'friendly' as const,
+        lastInteraction: new Date(),
+        preferredTopics: [],
+        helpfulActions: [],
+        personalNotes: []
       });
 
       const personalizedGreeting = ariaPersonality.generatePersonalizedGreeting(userId, userContext);
@@ -128,6 +135,7 @@ Respond in JSON:
     userMood?: string;
     intent?: string;
     userName?: string;
+    userId?: string;
   }): Promise<{
     response: string;
     suggestedFollowUps: string[];
@@ -181,7 +189,15 @@ Respond in JSON:
   "confidence": number 0-1
 }`;
 
-      const result = await openaiService.analyzeEmotion(prompt);
+      console.log("🤖 ARIA: Attempting OpenAI conversation API call...");
+      
+      // Use OpenAI for actual conversation response
+      const conversationResponse = await openaiService.generateConversationResponse(
+        prompt, 
+        conversationContext.conversationHistory || []
+      );
+      
+      console.log("🤖 ARIA: OpenAI conversation successful");
       
       // Use ARIA's personality and memory system
       const userId = conversationContext.userId || 'anonymous';
@@ -200,25 +216,24 @@ Respond in JSON:
       );
 
       return {
-        response: personalityResponse.response + "\n\n" + this.generateContextualResponse(conversationContext.userMessage, conversationContext.userMood || 'neutral'),
+        response: conversationResponse || personalityResponse.response,
         suggestedFollowUps: [
           "Tell me more about what interests you",
           "Would you like step-by-step guidance?", 
           "What questions do you have for me?"
         ],
         detectedIntent: this.detectUserIntent(conversationContext.userMessage),
-        emotionalTone: result.analysis.primaryEmotion || 'supportive',
+        emotionalTone: 'supportive',
         helpfulActions: [
           "Continue our conversation",
           "Explore features together",
           "Get personalized recommendations"
         ],
-        confidence: 0.85,
-        personalityTraits: personalityResponse.personalityTraits,
-        memoryContext: personalityResponse.memoryContext
+        confidence: 0.95
       };
     } catch (error) {
-      console.error("AI Conversation error:", error);
+      console.error("🤖 ARIA: AI Conversation error:", error);
+      console.error("🤖 ARIA: Falling back to generic response due to error");
       return {
         response: "I understand you're interested in exploring Flutterbye! I'm here to help guide you through our revolutionary blockchain communication platform.",
         suggestedFollowUps: [
