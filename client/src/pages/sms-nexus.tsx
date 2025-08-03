@@ -39,7 +39,8 @@ import {
   Send,
   BookOpen,
   Trophy,
-  Filter
+  Filter,
+  Phone
 } from "lucide-react";
 import { MessageTemplates } from '@/components/message-templates';
 import { AdvancedFilters } from '@/components/advanced-filters';
