@@ -1028,10 +1028,8 @@ export function SMSNexusPage() {
               </CardContent>
             </Card>
           </TabsContent>
-        </Tabs>
-
-        {/* How It Works Tab - Simple Explanation */}
-        <TabsContent value="help" className="space-y-6">
+          {/* How It Works Tab - Simple Explanation */}
+          <TabsContent value="help" className="space-y-6">
           <div className="max-w-4xl mx-auto space-y-8">
             <Card className="bg-gradient-to-r from-blue-500/10 to-purple-500/10 border-blue-400/30">
               <CardContent className="p-8">
@@ -1176,6 +1174,8 @@ export function SMSNexusPage() {
             </CardContent>
           </Card>
         </TabsContent>
+
+        </Tabs>
 
         {/* Quick Action Bar */}
         <Card className="bg-gradient-to-r from-purple-900/40 to-blue-900/40 backdrop-blur-sm border border-purple-500/30">
