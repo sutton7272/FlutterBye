@@ -74,8 +74,8 @@ class EdgeAIOptimizationService {
         edgeOptimized: false // Requires cloud processing for accuracy
       });
 
-      // Preload common AI responses for edge caching
-      await this.preloadEdgeResponses();
+      // Skip aggressive caching to avoid rate limits - cache on demand instead
+      console.log('🔄 Predictive caching set to on-demand mode to respect rate limits');
 
       console.log('Edge AI optimization initialized with model ensemble');
     } catch (error) {
