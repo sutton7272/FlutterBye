@@ -8,7 +8,7 @@ const router = Router();
 router.post('/suggestions', async (req, res) => {
   try {
     const { context, userContext } = req.body;
-    const campaign = await openAIService.generateCampaign(`Generate smart suggestions for: ${context}`, 'flby');
+    const campaign = await openAIService.generateCampaign(`Generate smart suggestions for: ${context}`);
     
     res.json({
       suggestions: [
