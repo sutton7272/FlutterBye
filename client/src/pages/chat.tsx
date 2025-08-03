@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiRequest } from '@/lib/queryClient';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
@@ -13,7 +13,6 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Send, Users, Hash, Coins, MessageSquare, Plus, Settings, Smile, Reply, Edit3, Copy, Star, AlertTriangle, Volume2, VolumeX, Maximize2, Minimize2, Search, Filter, Clock, CheckCircle2, Circle, MoreVertical, Trash2, Pin, Heart, Zap, Gift, BarChart3, RotateCcw, Crown, Sparkles, TrendingUp, DollarSign, Award, Shield, Image, Paperclip, Mic, Video, Calendar, MapPin, Users2, Bot, Lock, Unlock, Eye, EyeOff, Bell, BellOff, Palette, Wand2, Flame, Target, MessageCircle, ThumbsUp, Share2, Download, Upload, Bookmark, Flag, Coffee, Rocket } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { useAuth } from '@/hooks/useAuth';
 
 interface ChatRoom {
   id: string;
@@ -59,16 +58,16 @@ interface ChatMessageExtended extends ChatMessage {
   isPinned?: boolean;
 }
 
-// Real authentication integration - PRODUCTION READY
-import { WalletConnect } from '@/components/WalletConnect';
+// TODO: Replace with real wallet authentication from useWallet hook
+// This is a critical production issue that needs immediate fixing
+const MOCK_WALLET = "4xY2D8F3nQ9sM1pR6tZ5bV7wX0aH8cJ2kL4mN7oP9qS3uT";
+
+// Production authentication integration needed:
+// import { useWallet } from '@/components/wallet-adapter';
+// const { publicKey, connected } = useWallet();
+// const userWallet = publicKey?.toBase58() || null;
 
 export function Chat() {
-  // Real authentication integration
-  const { user, walletAddress, isAuthenticated } = useAuth();
-
-  // Optional authentication - users can browse chat without wallet
-  // Wallet required only for sending messages and participating
-  
   const [selectedRoom, setSelectedRoom] = useState<string>('general');
   const [message, setMessage] = useState('');
   const [socket, setSocket] = useState<WebSocket | null>(null);
@@ -175,7 +174,7 @@ export function Chat() {
 
     setConnectionStatus('connecting');
     const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
-    const wsUrl = `${protocol}//${window.location.host}/ws?wallet=${walletAddress || 'anonymous'}&room=${selectedRoom}`;
+    const wsUrl = `${protocol}//${window.location.host}/ws?wallet=${MOCK_WALLET}&room=${selectedRoom}`;
     
     const ws = new WebSocket(wsUrl);
     
@@ -198,7 +197,7 @@ export function Chat() {
           case 'message':
           case 'token_share':
             setMessages(prev => [...prev, data]);
-            if (data.senderWallet && data.senderWallet !== walletAddress) {
+            if (data.senderWallet !== MOCK_WALLET) {
               setUnreadCount(prev => prev + 1);
               playNotificationSound();
             }
@@ -310,15 +309,6 @@ export function Chat() {
   // Enhanced message sending with reply support
   const sendMessage = useCallback(() => {
     if (!socket || !message.trim()) return;
-    
-    if (!isAuthenticated || !walletAddress) {
-      toast({
-        title: "Wallet Required",
-        description: "Connect your wallet to send messages. You can browse without connecting.",
-        variant: "destructive"
-      });
-      return;
-    }
 
     const messageData = {
       type: editingMessage ? 'edit_message' : 'send_message',
@@ -874,7 +864,7 @@ export function Chat() {
                               </DialogContent>
                             </Dialog>
                             
-                            {msg.senderWallet === walletAddress && (
+                            {msg.senderWallet === MOCK_WALLET && (
                               <>
                                 <Tooltip>
                                   <TooltipTrigger asChild>
@@ -921,7 +911,7 @@ export function Chat() {
                           <div className="w-2 h-2 rounded-full bg-purple-500 animate-bounce" style={{ animationDelay: '0.1s' }}></div>
                           <div className="w-2 h-2 rounded-full bg-purple-500 animate-bounce" style={{ animationDelay: '0.2s' }}></div>
                         </div>
-                        {isTyping.filter(wallet => wallet !== walletAddress).map(wallet => truncateWallet(wallet)).join(', ')} typing...
+                        {isTyping.filter(wallet => wallet !== MOCK_WALLET).map(wallet => truncateWallet(wallet)).join(', ')} typing...
                       </div>
                     )}
                     
@@ -1174,7 +1164,7 @@ export function Chat() {
                           <div className="text-sm text-gray-300">{truncateWallet(participant)}</div>
                           <div className="text-xs text-green-400">Active</div>
                         </div>
-                        {participant === walletAddress && (
+                        {participant === MOCK_WALLET && (
                           <Badge className="bg-purple-500/20 text-purple-400 text-xs">You</Badge>
                         )}
                       </div>

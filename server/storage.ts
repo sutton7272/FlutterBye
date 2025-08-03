@@ -56,20 +56,14 @@ export interface IStorage {
 
   // Token operations
   getToken(id: string): Promise<Token | undefined>;
-  getTokenByMint(mintAddress: string): Promise<Token | undefined>;
+  getTokenByMintAddress(mintAddress: string): Promise<Token | undefined>;
   createToken(token: InsertToken): Promise<Token>;
   updateTokenSupply(tokenId: string, availableSupply: number): Promise<Token>;
-  getUserTokens(walletAddress: string): Promise<Token[]>;
+  getTokensByCreator(creatorId: string): Promise<Token[]>;
   getAllTokens(limit?: number, offset?: number): Promise<Token[]>;
   searchTokens(query: string): Promise<Token[]>;
   updateToken(tokenId: string, updateData: Partial<Token>): Promise<Token>;
   deleteToken(tokenId: string): Promise<void>;
-  getTokenHolders(mintAddress: string): Promise<Array<{address: string, amount: number}>>;
-
-  // Redemption operations
-  createRedemption(redemption: any): Promise<any>;
-  getRedemptionsByWallet(walletAddress: string): Promise<any[]>;
-  getRedemptionHistory(limit?: number): Promise<any[]>;
 
   // Token holdings
   getTokenHolding(userId: string, tokenId: string): Promise<TokenHolding | undefined>;
@@ -79,12 +73,6 @@ export interface IStorage {
 
   // Transactions
   createTransaction(transaction: InsertTransaction): Promise<Transaction>;
-
-  // Chat operations
-  getAllChatRooms(): Promise<ChatRoom[]>;
-  getChatMessages(roomId: string, limit: number, offset: number): Promise<ChatMessage[]>;
-  createChatRoom(room: InsertChatRoom): Promise<ChatRoom>;
-  createChatMessage(message: InsertChatMessage): Promise<ChatMessage>;
   getTransactionsByUser(userId: string): Promise<Transaction[]>;
 
   // Airdrop signups
@@ -209,7 +197,6 @@ export class MemStorage implements IStorage {
   private redemptionCodes: Map<string, RedemptionCode> = new Map();
   private pricingTiers: Map<string, PricingTier> = new Map();
   private systemSettings: Map<string, SystemSetting> = new Map();
-  private tokenRedemptions: Map<string, any> = new Map();
 
   constructor() {
     this.initializeTestData();
@@ -349,7 +336,25 @@ export class MemStorage implements IStorage {
       });
   }
 
-  // Legacy redemption methods - consolidated to avoid duplicates
+  async createRedemption(redemption: any): Promise<any> {
+    const id = randomUUID();
+    const newRedemption = {
+      id,
+      ...redemption,
+      createdAt: new Date()
+    };
+    if (!this.redemptions) {
+      this.redemptions = new Map();
+    }
+    this.redemptions.set(id, newRedemption);
+    return newRedemption;
+  }
+
+  async getRedemptionsByWallet(walletAddress: string): Promise<any[]> {
+    if (!this.redemptions) return [];
+    return Array.from(this.redemptions.values())
+      .filter(redemption => redemption.walletAddress === walletAddress);
+  }
 
   async getAllTokensWithOptions(options: {
     limit: number;
@@ -388,30 +393,10 @@ export class MemStorage implements IStorage {
     return updatedToken;
   }
 
-  async getUserTokens(walletAddress: string): Promise<Token[]> {
+  async getTokensByCreator(creatorId: string): Promise<Token[]> {
     return Array.from(this.tokens.values())
-      .filter(token => (token as any).creatorWallet === walletAddress)
+      .filter(token => token.creatorId === creatorId)
       .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
-  }
-
-  async getTokenByMint(mintAddress: string): Promise<Token | undefined> {
-    return Array.from(this.tokens.values()).find(token => token.mintAddress === mintAddress);
-  }
-
-  async getTokenHolders(mintAddress: string): Promise<Array<{address: string, amount: number}>> {
-    // In production, this would query the Solana blockchain
-    return [
-      { address: 'ExampleHolder1...', amount: 1 },
-      { address: 'ExampleHolder2...', amount: 2 }
-    ];
-  }
-
-  // Token Redemption methods - Updated to avoid duplicates
-
-  async getRedemptionHistory(limit = 50): Promise<any[]> {
-    return Array.from(this.tokenRedemptions.values())
-      .sort((a, b) => new Date(b.processedAt).getTime() - new Date(a.processedAt).getTime())
-      .slice(0, limit);
   }
 
   async getAllTokens(limit = 50, offset = 0): Promise<Token[]> {

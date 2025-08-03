@@ -1,314 +1,226 @@
-import { useState, useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Coins, Send, Clock, TrendingUp, Users, Copy, Check } from 'lucide-react';
-import { useAuth } from '@/hooks/useAuth';
-import { useToast } from '@/hooks/use-toast';
-
-interface TokenPortfolio {
-  id: string;
-  mintAddress: string;
-  title: string;
-  content: string;
-  value: number;
-  currency: string;
-  isLimitedEdition: boolean;
-  maxSupply?: number;
-  signature: string;
-  metadata: {
-    name: string;
-    symbol: string;
-    description: string;
-    image: string;
-  };
-  createdAt: string;
-}
+import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import TokenCard from "@/components/token-card";
+import { Link } from "wouter";
+import { type Token, type TokenHolding } from "@shared/schema";
+import { useToast } from "@/hooks/use-toast";
+import { TrendingUp, TrendingDown, Wallet, Coins, CreditCard, Download } from "lucide-react";
 
 export default function Portfolio() {
-  const { isAuthenticated, walletAddress } = useAuth();
   const { toast } = useToast();
-  const [tokens, setTokens] = useState<TokenPortfolio[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [copiedMint, setCopiedMint] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState("owned");
+  
+  // Mock user ID - in real app, this would come from wallet connection
+  const userId = "user-1";
+  
+  const { data: tokens = [] } = useQuery<Token[]>({
+    queryKey: ["/api/tokens"],
+  });
 
-  useEffect(() => {
-    if (isAuthenticated && walletAddress) {
-      loadUserTokens();
-    } else {
-      setIsLoading(false);
-    }
-  }, [isAuthenticated, walletAddress]);
+  const { data: holdings = [] } = useQuery<TokenHolding[]>({
+    queryKey: ["/api/users", userId, "holdings"],
+  });
 
-  const loadUserTokens = async () => {
-    try {
-      const response = await fetch('/api/tokens/created', {
-        headers: {
-          'X-Wallet-Address': walletAddress!
-        }
-      });
-
-      if (response.ok) {
-        const userTokens = await response.json();
-        setTokens(userTokens);
-      }
-    } catch (error) {
-      console.error('Error loading tokens:', error);
-      toast({
-        title: "Loading Failed",
-        description: "Failed to load your token portfolio",
-        variant: "destructive"
-      });
-    } finally {
-      setIsLoading(false);
-    }
+  // Mock portfolio data
+  const portfolioStats = {
+    totalValue: "12.75",
+    tokensOwned: 47,
+    tokensCreated: 8,
+    creditsAvailable: "2.4"
   };
 
-  const copyMintAddress = async (mintAddress: string) => {
-    await navigator.clipboard.writeText(mintAddress);
-    setCopiedMint(mintAddress);
-    setTimeout(() => setCopiedMint(null), 2000);
-    
+  // Mock owned tokens with price changes
+  const ownedTokensWithData = [
+    { token: tokens[0], quantity: 5, priceChange: 15.2 },
+    { token: tokens[1], quantity: 12, priceChange: 8.5 },
+    { token: tokens[2], quantity: 2, priceChange: -2.1 },
+  ].filter(item => item.token);
+
+  const handleSellToken = (token: Token) => {
     toast({
-      title: "Copied!",
-      description: "Mint address copied to clipboard",
+      title: "Sell Order Placed",
+      description: `Listing ${token.message} tokens for sale`,
     });
   };
 
-  const truncateAddress = (address: string) => {
-    return `${address.substring(0, 8)}...${address.substring(address.length - 8)}`;
+  const handleQuickAction = (action: string) => {
+    toast({
+      title: "Action Initiated",
+      description: `${action} functionality coming soon`,
+    });
   };
 
-  if (!isAuthenticated) {
-    return (
-      <div className="min-h-screen pt-20 pb-12">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h1 className="text-4xl font-bold mb-4 text-gradient">Token Portfolio</h1>
-            <p className="text-xl text-muted-foreground mb-8">Your created tokenized messages on Solana blockchain</p>
-          </div>
-          
-          <Card className="electric-frame">
-            <CardHeader className="text-center">
-              <Coins className="w-16 h-16 mx-auto mb-4 text-primary" />
-              <CardTitle className="text-2xl text-gradient">Connect Wallet to View Portfolio</CardTitle>
-              <CardDescription className="text-lg">
-                Connect your wallet to view your created tokens, track portfolio value, and manage your tokenized messages.
-                You can browse other pages without connecting your wallet.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="text-center pb-8">
-              <div className="space-y-4">
-                <p className="text-muted-foreground">
-                  Your portfolio will show:
-                </p>
-                <div className="grid grid-cols-2 gap-4 text-sm">
-                  <div className="flex items-center gap-2">
-                    <Coins className="w-4 h-4 text-primary" />
-                    Created tokens
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <TrendingUp className="w-4 h-4 text-primary" />
-                    Portfolio value
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Users className="w-4 h-4 text-primary" />
-                    Token holders
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Clock className="w-4 h-4 text-primary" />
-                    Creation history
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      </div>
-    );
-  }
-
-  if (isLoading) {
-    return (
-      <div className="max-w-6xl mx-auto p-6">
-        <div className="space-y-6">
-          <div className="text-center">
-            <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-400 to-green-400 bg-clip-text text-transparent">
-              Token Portfolio
-            </h1>
-            <p className="text-slate-400 mt-2">Loading your tokenized messages...</p>
-          </div>
-          
-          <div className="grid gap-6">
-            {[1, 2, 3].map((i) => (
-              <Card key={i} className="animate-pulse">
-                <CardContent className="p-6">
-                  <div className="h-6 bg-slate-700 rounded w-1/3 mb-4"></div>
-                  <div className="h-4 bg-slate-700 rounded w-full mb-2"></div>
-                  <div className="h-4 bg-slate-700 rounded w-2/3"></div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </div>
-    );
-  }
-
   return (
-    <div className="max-w-6xl mx-auto p-6 space-y-6">
-      <div className="text-center">
-        <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-400 to-green-400 bg-clip-text text-transparent">
-          Token Portfolio
-        </h1>
-        <p className="text-slate-400 mt-2">
-          Your created tokenized messages on Solana blockchain
-        </p>
-      </div>
-
-      {/* Portfolio Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card>
-          <CardContent className="p-4 text-center">
-            <Coins className="h-8 w-8 mx-auto text-blue-400 mb-2" />
-            <div className="text-2xl font-bold text-blue-400">{tokens.length}</div>
-            <div className="text-sm text-slate-400">Tokens Created</div>
-          </CardContent>
-        </Card>
+    <div className="min-h-screen pt-20 pb-12">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="text-center mb-12">
+          <h1 className="text-4xl font-bold mb-4 text-gradient">Your FlBY-MSG Portfolio</h1>
+          <p className="text-xl text-muted-foreground">Manage your created and owned message tokens</p>
+        </div>
         
-        <Card>
-          <CardContent className="p-4 text-center">
-            <TrendingUp className="h-8 w-8 mx-auto text-green-400 mb-2" />
-            <div className="text-2xl font-bold text-green-400">
-              {tokens.reduce((sum, token) => sum + token.value, 0).toFixed(2)}
-            </div>
-            <div className="text-sm text-slate-400">Total Value</div>
-          </CardContent>
-        </Card>
-        
-        <Card>
-          <CardContent className="p-4 text-center">
-            <Users className="h-8 w-8 mx-auto text-purple-400 mb-2" />
-            <div className="text-2xl font-bold text-purple-400">
-              {tokens.filter(t => t.isLimitedEdition).length}
-            </div>
-            <div className="text-sm text-slate-400">Limited Edition</div>
-          </CardContent>
-        </Card>
-        
-        <Card>
-          <CardContent className="p-4 text-center">
-            <Clock className="h-8 w-8 mx-auto text-yellow-400 mb-2" />
-            <div className="text-2xl font-bold text-yellow-400">
-              {tokens.length > 0 ? Math.ceil((Date.now() - new Date(tokens[tokens.length - 1].createdAt).getTime()) / (1000 * 60 * 60 * 24)) : 0}
-            </div>
-            <div className="text-sm text-slate-400">Days Since Last</div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Token List */}
-      {tokens.length === 0 ? (
-        <Card>
-          <CardContent className="p-12 text-center">
-            <Coins className="h-16 w-16 mx-auto text-slate-600 mb-4" />
-            <h3 className="text-xl font-semibold text-slate-300 mb-2">No Tokens Created</h3>
-            <p className="text-slate-400 mb-6">
-              You haven't created any tokenized messages yet. Start by minting your first token!
-            </p>
-            <Button 
-              onClick={() => window.location.href = '/mint'}
-              className="bg-gradient-to-r from-blue-500 to-green-500 hover:from-blue-600 hover:to-green-600"
-            >
-              <Coins className="h-4 w-4 mr-2" />
-              Create Your First Token
-            </Button>
-          </CardContent>
-        </Card>
-      ) : (
-        <div className="space-y-4">
-          {tokens.map((token) => (
-            <Card key={token.id} className="border border-slate-700 hover:border-blue-500 transition-colors">
-              <CardHeader className="pb-3">
-                <div className="flex items-start justify-between">
-                  <div className="flex-1">
-                    <CardTitle className="text-lg font-semibold text-white">
-                      {token.metadata.name}
-                    </CardTitle>
-                    <CardDescription className="text-slate-400 mt-1">
-                      {token.content}
-                    </CardDescription>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Portfolio Stats */}
+          <div className="lg:col-span-1 space-y-6">
+            <Card className="premium-card electric-frame">
+              <CardContent className="p-6">
+                <h3 className="text-xl font-bold mb-4 text-gradient">Portfolio Overview</h3>
+                <div className="space-y-4">
+                  <div className="flex justify-between items-center">
+                    <span className="text-muted-foreground">Total Value</span>
+                    <span className="text-2xl font-bold text-primary">{portfolioStats.totalValue} SOL</span>
                   </div>
-                  <div className="flex items-center gap-2">
-                    {token.isLimitedEdition && (
-                      <Badge variant="outline" className="text-purple-400 border-purple-400">
-                        Limited Edition
-                      </Badge>
-                    )}
-                    <Badge variant="outline" className="text-green-400 border-green-400">
-                      {token.value} {token.currency}
-                    </Badge>
+                  <div className="flex justify-between items-center">
+                    <span className="text-muted-foreground">Tokens Owned</span>
+                    <span className="text-xl font-semibold">{portfolioStats.tokensOwned}</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-muted-foreground">Tokens Created</span>
+                    <span className="text-xl font-semibold">{portfolioStats.tokensCreated}</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-muted-foreground">Credits Available</span>
+                    <span className="text-xl font-semibold">{portfolioStats.creditsAvailable} SOL</span>
                   </div>
                 </div>
-              </CardHeader>
-              
-              <CardContent className="pt-0">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-between">
-                      <span className="text-slate-400">Mint Address:</span>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => copyMintAddress(token.mintAddress)}
-                        className="h-6 px-2 text-xs"
-                      >
-                        {copiedMint === token.mintAddress ? (
-                          <Check className="h-3 w-3 text-green-400" />
-                        ) : (
-                          <Copy className="h-3 w-3" />
-                        )}
-                      </Button>
-                    </div>
-                    <div className="font-mono text-xs text-blue-400">
-                      {truncateAddress(token.mintAddress)}
-                    </div>
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <div className="text-slate-400">Created:</div>
-                    <div className="text-white">
-                      {new Date(token.createdAt).toLocaleDateString()}
-                    </div>
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <div className="text-slate-400">Symbol:</div>
-                    <div className="text-white font-mono">
-                      {token.metadata.symbol}
-                    </div>
-                  </div>
-                </div>
-                
-                <div className="flex items-center justify-between mt-4 pt-4 border-t border-slate-700">
-                  <div className="text-xs text-slate-400">
-                    Transaction: {token.signature.substring(0, 16)}...
-                  </div>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => window.open(`https://explorer.solana.com/tx/${token.signature}?cluster=devnet`, '_blank')}
-                    className="h-8 text-xs"
+              </CardContent>
+            </Card>
+            
+            <Card className="glassmorphism">
+              <CardContent className="p-6">
+                <h3 className="text-xl font-bold mb-4">Quick Actions</h3>
+                <div className="space-y-3">
+                  <Link href="/mint">
+                    <Button className="w-full bg-gradient-to-r from-primary to-blue-500">
+                      <Coins className="w-4 h-4 mr-2" />
+                      Create New Token
+                    </Button>
+                  </Link>
+                  <Button 
+                    variant="outline" 
+                    className="w-full glassmorphism"
+                    onClick={() => handleQuickAction("Redeem Credits")}
                   >
-                    <Send className="h-3 w-3 mr-1" />
-                    View on Explorer
+                    <CreditCard className="w-4 h-4 mr-2" />
+                    Redeem Credits
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    className="w-full glassmorphism"
+                    onClick={() => handleQuickAction("Export Portfolio")}
+                  >
+                    <Download className="w-4 h-4 mr-2" />
+                    Export Portfolio
                   </Button>
                 </div>
               </CardContent>
             </Card>
-          ))}
+          </div>
+          
+          {/* Portfolio Content */}
+          <div className="lg:col-span-2">
+            <Card className="glassmorphism">
+              <CardContent className="p-6">
+                <Tabs value={activeTab} onValueChange={setActiveTab}>
+                  <TabsList className="grid w-full grid-cols-3">
+                    <TabsTrigger value="owned">Owned Tokens</TabsTrigger>
+                    <TabsTrigger value="created">Created Tokens</TabsTrigger>
+                    <TabsTrigger value="history">Trading History</TabsTrigger>
+                  </TabsList>
+                  
+                  <TabsContent value="owned" className="mt-6">
+                    {ownedTokensWithData.length === 0 ? (
+                      <div className="text-center py-12">
+                        <Wallet className="w-16 h-16 mx-auto text-muted-foreground mb-4" />
+                        <h3 className="text-xl font-semibold mb-2">No tokens owned</h3>
+                        <p className="text-muted-foreground mb-6">Start by purchasing tokens from the marketplace</p>
+                        <Link href="/marketplace">
+                          <Button className="bg-gradient-to-r from-primary to-blue-500">
+                            Browse Marketplace
+                          </Button>
+                        </Link>
+                      </div>
+                    ) : (
+                      <div className="space-y-4">
+                        {ownedTokensWithData.map(({ token, quantity, priceChange }) => (
+                          <div key={token.id} className="flex items-center justify-between bg-slate-700/50 p-4 rounded-lg">
+                            <div className="flex items-center space-x-4">
+                              <div className="w-10 h-10 bg-gradient-to-r from-primary to-blue-500 rounded-full flex items-center justify-center">
+                                <Coins className="w-5 h-5 text-white" />
+                              </div>
+                              <div>
+                                <h4 className="font-semibold">{token.message}</h4>
+                                <p className="text-sm text-muted-foreground">FLBY-MSG • Qty: {quantity}</p>
+                              </div>
+                            </div>
+                            <div className="text-right">
+                              <p className="font-semibold text-primary">{(parseFloat(token.valuePerToken) * quantity).toFixed(3)} SOL</p>
+                              <p className={`text-sm flex items-center ${
+                                priceChange >= 0 ? "text-green-400" : "text-red-400"
+                              }`}>
+                                {priceChange >= 0 ? (
+                                  <TrendingUp className="w-3 h-3 mr-1" />
+                                ) : (
+                                  <TrendingDown className="w-3 h-3 mr-1" />
+                                )}
+                                {priceChange >= 0 ? "+" : ""}{priceChange}%
+                              </p>
+                            </div>
+                            <Button
+                              variant="destructive"
+                              size="sm"
+                              onClick={() => handleSellToken(token)}
+                            >
+                              Sell
+                            </Button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </TabsContent>
+                  
+                  <TabsContent value="created" className="mt-6">
+                    {tokens.length === 0 ? (
+                      <div className="text-center py-12">
+                        <Coins className="w-16 h-16 mx-auto text-muted-foreground mb-4" />
+                        <h3 className="text-xl font-semibold mb-2">No tokens created</h3>
+                        <p className="text-muted-foreground mb-6">Create your first tokenized message</p>
+                        <Link href="/mint">
+                          <Button className="bg-gradient-to-r from-primary to-blue-500">
+                            Create Token
+                          </Button>
+                        </Link>
+                      </div>
+                    ) : (
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        {tokens.slice(0, 4).map((token) => (
+                          <TokenCard
+                            key={token.id}
+                            token={token}
+                            showActions={false}
+                          />
+                        ))}
+                      </div>
+                    )}
+                  </TabsContent>
+                  
+                  <TabsContent value="history" className="mt-6">
+                    <div className="text-center py-12">
+                      <div className="w-16 h-16 mx-auto bg-muted rounded-full flex items-center justify-center mb-4">
+                        <TrendingUp className="w-8 h-8 text-muted-foreground" />
+                      </div>
+                      <h3 className="text-xl font-semibold mb-2">No trading history</h3>
+                      <p className="text-muted-foreground">Your transaction history will appear here</p>
+                    </div>
+                  </TabsContent>
+                </Tabs>
+              </CardContent>
+            </Card>
+          </div>
         </div>
-      )}
+      </div>
     </div>
   );
 }

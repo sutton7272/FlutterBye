@@ -68,23 +68,6 @@ export const tokens = pgTable("tokens", {
   flaggedAt: timestamp("flagged_at"),
   flaggedReason: text("flagged_reason"),
   
-  // Audio Attachment fields - WORLD FIRST FEATURE
-  hasAudioAttachment: boolean("has_audio_attachment").default(false),
-  audioUrl: text("audio_url"), // URL to audio file in object storage
-  audioType: text("audio_type"), // 'voice_recording', 'song', 'music', 'sound_effect'
-  audioFilename: text("audio_filename"),
-  audioSize: integer("audio_size"), // File size in bytes
-  audioDuration: decimal("audio_duration", { precision: 8, scale: 2 }), // Duration in seconds
-  audioAnalysis: json("audio_analysis").$type<{
-    emotion?: string;
-    energy?: number;
-    frequency?: number;
-    clarity?: number;
-    uniqueness?: number;
-    viralPotential?: number;
-    estimatedValue?: string;
-  }>(),
-  
   // Limited Edition fields
   isLimitedEdition: boolean("is_limited_edition").default(false),
   editionNumber: integer("edition_number"), // Current edition number (1, 2, 3...)
