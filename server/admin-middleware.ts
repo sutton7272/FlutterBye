@@ -19,6 +19,18 @@ declare global {
 // Middleware to authenticate wallet-based requests
 export const authenticateWallet = async (req: Request, res: Response, next: NextFunction) => {
   try {
+    // DEVELOPMENT BYPASS: Allow admin access without wallet authentication
+    if (process.env.NODE_ENV === 'development') {
+      req.user = req.user || {
+        id: 'dev-admin',
+        walletAddress: 'dev-wallet',
+        role: 'super_admin',
+        isAdmin: true,
+        adminPermissions: ['pricing', 'content', 'users', 'analytics', 'system', 'dashboard', 'settings']
+      };
+      return next();
+    }
+
     const walletAddress = req.headers['x-wallet-address'] as string;
     
     if (!walletAddress) {
