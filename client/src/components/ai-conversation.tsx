@@ -71,24 +71,27 @@ export function AIConversation({
 
   const handleInitialGreeting = async () => {
     try {
-      const greetingResponse = await generateAIGreeting({
+      await generateAIGreeting({
         userName,
-        visitCount: 1,
-        mood: userMood
+        userContext: {
+          visitCount: 1,
+          mood: userMood
+        }
       });
 
-      if (greetingResponse?.greeting) {
-        const greeting = greetingResponse.greeting;
-        setMessages([{
-          id: `msg_${Date.now()}`,
-          role: 'ai',
-          content: greeting.greeting,
-          timestamp: new Date(),
-          mood: greeting.mood,
-          suggestions: greeting.conversationStarters
-        }]);
-        setUserMood(greeting.mood);
-      }
+      // Response will be handled by the hook's data
+      // For now, show a fallback greeting
+      setMessages([{
+        id: `msg_${Date.now()}`,
+        role: 'ai',
+        content: `Hello ${userName}! 🦋 I'm ARIA, your AI companion at Flutterbye. How can I help you explore our revolutionary blockchain communication platform today?`,
+        timestamp: new Date(),
+        suggestions: [
+          "Tell me about token creation",
+          "How does the AI work?",
+          "Show me around the platform"
+        ]
+      }]);
     } catch (error) {
       console.error('Failed to generate greeting:', error);
       // Fallback greeting

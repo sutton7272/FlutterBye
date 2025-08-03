@@ -67,6 +67,59 @@ export function useAIContent() {
     }
   });
 
+  // AI Greeting generation
+  const greetingMutation = useMutation({
+    mutationFn: async (data: {
+      userName?: string;
+      userContext?: any;
+    }) => {
+      return apiRequest('/api/ai/conversation/greeting', {
+        method: 'POST',
+        body: data
+      });
+    }
+  });
+
+  // AI Conversation
+  const conversationMutation = useMutation({
+    mutationFn: async (data: {
+      message: string;
+      conversationHistory?: any[];
+      userContext?: any;
+    }) => {
+      return apiRequest('/api/ai/conversation/chat', {
+        method: 'POST',
+        body: data
+      });
+    }
+  });
+
+  // Mood synchronization
+  const moodSyncMutation = useMutation({
+    mutationFn: async (data: {
+      userMood: string;
+      context?: any;
+    }) => {
+      return apiRequest('/api/ai/conversation/mood-sync', {
+        method: 'POST',
+        body: data
+      });
+    }
+  });
+
+  // Smart help system
+  const smartHelpMutation = useMutation({
+    mutationFn: async (data: {
+      query: string;
+      context?: any;
+    }) => {
+      return apiRequest('/api/ai/conversation/help', {
+        method: 'POST',
+        body: data
+      });
+    }
+  });
+
   // SEO optimization
   const seoOptimizationMutation = useMutation({
     mutationFn: async (data: {
