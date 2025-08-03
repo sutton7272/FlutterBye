@@ -2,8 +2,10 @@ import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { StripeProvider } from "@/components/stripe/StripeProvider";
 import { CheckoutForm } from "@/components/stripe/CheckoutForm";
+import { AICreditDisplay } from "@/components/ai-credit-display";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { 
@@ -14,7 +16,11 @@ import {
   Rocket,
   Coins,
   TrendingUp,
-  Shield
+  Shield,
+  Brain,
+  Sparkles,
+  Bot,
+  Cpu
 } from "lucide-react";
 
 interface PaymentOption {
@@ -26,9 +32,13 @@ interface PaymentOption {
   icon: React.ReactNode;
   color: string;
   popular?: boolean;
+  type: 'token' | 'ai' | 'subscription';
+  credits?: number;
+  tokens?: number;
+  apiCalls?: number;
 }
 
-const paymentOptions: PaymentOption[] = [
+const tokenOptions: PaymentOption[] = [
   {
     id: "token-pack-small",
     name: "Starter Pack",
@@ -41,7 +51,9 @@ const paymentOptions: PaymentOption[] = [
       "7-day money-back guarantee"
     ],
     icon: <Coins className="w-6 h-6" />,
-    color: "from-blue-500 to-cyan-500"
+    color: "from-blue-500 to-cyan-500",
+    type: "token",
+    tokens: 100
   },
   {
     id: "token-pack-medium",
@@ -57,7 +69,9 @@ const paymentOptions: PaymentOption[] = [
     ],
     icon: <TrendingUp className="w-6 h-6" />,
     color: "from-green-500 to-emerald-500",
-    popular: true
+    popular: true,
+    type: "token",
+    tokens: 300
   },
   {
     id: "token-pack-large",
@@ -73,7 +87,9 @@ const paymentOptions: PaymentOption[] = [
       "Early access to features"
     ],
     icon: <Star className="w-6 h-6" />,
-    color: "from-purple-500 to-pink-500"
+    color: "from-purple-500 to-pink-500",
+    type: "token",
+    tokens: 750
   },
   {
     id: "subscription-premium",
@@ -89,7 +105,84 @@ const paymentOptions: PaymentOption[] = [
       "Revenue sharing"
     ],
     icon: <Crown className="w-6 h-6" />,
-    color: "from-yellow-500 to-orange-500"
+    color: "from-yellow-500 to-orange-500",
+    type: "subscription"
+  }
+];
+
+const aiCreditOptions: PaymentOption[] = [
+  {
+    id: "ai-starter",
+    name: "AI Starter",
+    description: "Perfect for exploring AI features",
+    price: 4.99,
+    features: [
+      "100 AI Credits",
+      "500 AI API Calls",
+      "Basic AI features",
+      "Text optimization",
+      "Standard support"
+    ],
+    icon: <Brain className="w-6 h-6" />,
+    color: "from-blue-500 to-cyan-500",
+    type: "ai",
+    credits: 100,
+    apiCalls: 500
+  },
+  {
+    id: "ai-professional",
+    name: "AI Professional",
+    description: "Most popular for regular users",
+    price: 14.99,
+    features: [
+      "500 AI Credits",
+      "2,500 AI API Calls",
+      "All AI features unlocked",
+      "Priority AI processing",
+      "Advanced analytics"
+    ],
+    icon: <Sparkles className="w-6 h-6" />,
+    color: "from-green-500 to-emerald-500",
+    popular: true,
+    type: "ai",
+    credits: 500,
+    apiCalls: 2500
+  },
+  {
+    id: "ai-enterprise",
+    name: "AI Enterprise",
+    description: "For power users and businesses",
+    price: 39.99,
+    features: [
+      "2,000 AI Credits",
+      "10,000 AI API Calls",
+      "Premium AI models",
+      "Custom AI training",
+      "Priority support",
+      "API access"
+    ],
+    icon: <Bot className="w-6 h-6" />,
+    color: "from-purple-500 to-pink-500",
+    type: "ai",
+    credits: 2000,
+    apiCalls: 10000
+  },
+  {
+    id: "ai-unlimited",
+    name: "AI Unlimited",
+    description: "Unlimited AI power for creators",
+    price: 29.99,
+    features: [
+      "Unlimited AI Credits",
+      "Unlimited AI API Calls",
+      "All premium AI models",
+      "Custom AI personalities",
+      "White-label options",
+      "24/7 priority support"
+    ],
+    icon: <Cpu className="w-6 h-6" />,
+    color: "from-yellow-500 to-orange-500",
+    type: "subscription"
   }
 ];
 
