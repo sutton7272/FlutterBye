@@ -72,6 +72,8 @@ import { VoiceAttachmentUploader } from '@/components/VoiceAttachmentUploader';
 import { AIVoiceEnhancer } from '@/components/AIVoiceEnhancer';
 import { BlockchainAudioVisualizer } from '@/components/BlockchainAudioVisualizer';
 import { SocialViralPredictor } from '@/components/SocialViralPredictor';
+import { TechnologyShowcase } from '@/components/TechnologyShowcase';
+import { FeatureGuidedTour } from '@/components/FeatureGuidedTour';
 
 // Enhanced interfaces with new features
 interface EmotionalAnalysis {
@@ -122,6 +124,9 @@ export default function EnhancedSMSIntegration() {
   const [attachedAudio, setAttachedAudio] = useState<any>(null);
   const [enhancedAudio, setEnhancedAudio] = useState<any>(null);
   const [viralPrediction, setViralPrediction] = useState<any>(null);
+  const [showTechnologyShowcase, setShowTechnologyShowcase] = useState(true);
+  const [showGuidedTour, setShowGuidedTour] = useState(false);
+  const [tourStep, setTourStep] = useState(0);
 
   // References
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -609,6 +614,56 @@ export default function EnhancedSMSIntegration() {
 
         {/* Revolutionary Voice Messages Tab */}
         <TabsContent value="voice" className="space-y-6">
+          {/* Technology Showcase */}
+          {showTechnologyShowcase && (
+            <TechnologyShowcase 
+              onExploreClick={() => {
+                setShowTechnologyShowcase(false);
+                setShowGuidedTour(true);
+                setTourStep(0);
+              }}
+            />
+          )}
+
+          {/* Guided Tour */}
+          {showGuidedTour && (
+            <FeatureGuidedTour
+              currentStep={tourStep}
+              onStepChange={setTourStep}
+              onComplete={() => {
+                setShowGuidedTour(false);
+                toast({
+                  title: "🎉 Tour Complete!",
+                  description: "You're now ready to create revolutionary multimedia blockchain tokens!"
+                });
+              }}
+            />
+          )}
+
+          {/* Quick Control Panel */}
+          <div className="flex flex-wrap items-center justify-center gap-3 mb-6">
+            <Button
+              onClick={() => setShowTechnologyShowcase(!showTechnologyShowcase)}
+              variant="outline"
+              size="sm"
+              className="border-yellow-500/30 hover:border-yellow-500/50 text-yellow-300"
+            >
+              <Eye className="w-4 h-4 mr-2" />
+              {showTechnologyShowcase ? 'Hide' : 'Show'} Technology Showcase
+            </Button>
+            <Button
+              onClick={() => {
+                setShowGuidedTour(true);
+                setTourStep(0);
+              }}
+              size="sm"
+              className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+            >
+              <Target className="w-4 h-4 mr-2" />
+              Take Guided Tour
+            </Button>
+          </div>
+
           <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
             {/* Revolutionary Voice Attachment Uploader */}
             <div className="xl:col-span-2">
