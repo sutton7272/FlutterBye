@@ -8,6 +8,8 @@ export interface MessageNFTMetadata {
   id: string;
   message: string;
   image?: string; // Base64 or URL
+  imageFile?: string; // Base64 encoded custom image
+  voiceFile?: string; // Base64 encoded voice message
   creator: string;
   totalSupply: number;
   currentSupply: number;
@@ -40,6 +42,8 @@ export interface MessageNFT {
 export interface CreateMessageNFTRequest {
   message: string;
   image?: string;
+  imageFile?: string; // Base64 encoded image
+  voiceFile?: string; // Base64 encoded voice message
   creator: string;
   totalSupply: number;
   valuePerNFT: number;
@@ -103,6 +107,8 @@ export class MessageNFTService {
         id: collectionId,
         message: request.message,
         image: request.image,
+        imageFile: request.imageFile,
+        voiceFile: request.voiceFile,
         creator: request.creator,
         totalSupply: request.totalSupply,
         currentSupply: 0,

@@ -10,12 +10,14 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
-import { QrCode, Sparkles, Image as ImageIcon, Zap, Copy, Share2, Eye, Hash } from "lucide-react";
+import { QrCode, Sparkles, Image as ImageIcon, Zap, Copy, Share2, Eye, Hash, Mic, Play, Pause, Square } from "lucide-react";
 
 interface MessageNFTCollection {
   id: string;
   message: string;
   image?: string;
+  imageFile?: string;
+  voiceFile?: string;
   creator: string;
   totalSupply: number;
   currentSupply: number;
@@ -45,6 +47,7 @@ export default function MessageNFTCreator() {
     message: "",
     image: "",
     imageFile: "", // Base64 encoded custom image
+    voiceFile: "", // Base64 encoded voice attachment
     creator: "demo-creator", // TODO: Get from wallet connection
     totalSupply: 10,
     valuePerNFT: 0.01,
@@ -54,6 +57,11 @@ export default function MessageNFTCreator() {
     customAttributes: {}
   });
   const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [voicePreview, setVoicePreview] = useState<string | null>(null);
+  const [isRecording, setIsRecording] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null);
+  const [audioChunks, setAudioChunks] = useState<Blob[]>([]);
   const [createdCollection, setCreatedCollection] = useState<{
     collection: MessageNFTCollection;
     nfts: MessageNFT[];
@@ -146,6 +154,67 @@ export default function MessageNFTCreator() {
   const removeImage = () => {
     setFormData(prev => ({ ...prev, imageFile: "" }));
     setImagePreview(null);
+  };
+
+  const startRecording = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const recorder = new MediaRecorder(stream, { mimeType: 'audio/webm' });
+      
+      recorder.ondataavailable = (event) => {
+        if (event.data.size > 0) {
+          setAudioChunks(prev => [...prev, event.data]);
+        }
+      };
+
+      recorder.onstop = () => {
+        const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          const base64String = event.target?.result as string;
+          setFormData(prev => ({ ...prev, voiceFile: base64String }));
+          setVoicePreview(base64String);
+        };
+        reader.readAsDataURL(audioBlob);
+        
+        // Stop all tracks
+        stream.getTracks().forEach(track => track.stop());
+      };
+
+      setMediaRecorder(recorder);
+      setAudioChunks([]);
+      recorder.start();
+      setIsRecording(true);
+    } catch (error) {
+      toast({
+        title: "Recording Failed",
+        description: "Could not access microphone. Please check permissions.",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const stopRecording = () => {
+    if (mediaRecorder && isRecording) {
+      mediaRecorder.stop();
+      setIsRecording(false);
+    }
+  };
+
+  const playVoice = () => {
+    if (voicePreview) {
+      const audio = new Audio(voicePreview);
+      audio.onplay = () => setIsPlaying(true);
+      audio.onended = () => setIsPlaying(false);
+      audio.onerror = () => setIsPlaying(false);
+      audio.play();
+    }
+  };
+
+  const removeVoice = () => {
+    setFormData(prev => ({ ...prev, voiceFile: "" }));
+    setVoicePreview(null);
+    setIsPlaying(false);
   };
 
   const copyToClipboard = (text: string, label: string) => {
@@ -333,6 +402,84 @@ export default function MessageNFTCreator() {
                   </div>
                 </div>
 
+                {/* Voice Attachment */}
+                <div className="space-y-2">
+                  <Label className="text-white flex items-center gap-2">
+                    <Mic className="h-4 w-4" />
+                    Voice Message (Optional)
+                  </Label>
+                  
+                  {!voicePreview ? (
+                    <div className="border-2 border-dashed border-slate-600 rounded-lg p-6 text-center hover:border-green-500 transition-colors">
+                      <Mic className="w-12 h-12 text-slate-400 mx-auto mb-4" />
+                      <p className="text-slate-300 mb-2">Record a voice message for your NFT collection</p>
+                      <p className="text-sm text-slate-400 mb-4">Add emotional depth with your voice</p>
+                      
+                      <Button
+                        type="button"
+                        variant={isRecording ? "destructive" : "outline"}
+                        onClick={isRecording ? stopRecording : startRecording}
+                        className={isRecording 
+                          ? "border-red-500 text-red-300 bg-red-500/20" 
+                          : "border-green-500/50 text-green-300 hover:bg-green-500/20"
+                        }
+                      >
+                        {isRecording ? (
+                          <>
+                            <Square className="w-4 h-4 mr-2" />
+                            Stop Recording
+                          </>
+                        ) : (
+                          <>
+                            <Mic className="w-4 h-4 mr-2" />
+                            Start Recording
+                          </>
+                        )}
+                      </Button>
+                    </div>
+                  ) : (
+                    <div className="border border-slate-600 rounded-lg p-4 bg-slate-700/30">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 bg-green-500/20 rounded-full flex items-center justify-center">
+                            <Mic className="w-5 h-5 text-green-400" />
+                          </div>
+                          <div>
+                            <p className="text-white font-medium">Voice Message</p>
+                            <p className="text-slate-400 text-sm">Ready to attach to NFT</p>
+                          </div>
+                        </div>
+                        
+                        <div className="flex items-center gap-2">
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={playVoice}
+                            disabled={isPlaying}
+                            className="border-blue-500/50 text-blue-300 hover:bg-blue-500/20"
+                          >
+                            {isPlaying ? (
+                              <Pause className="w-4 h-4" />
+                            ) : (
+                              <Play className="w-4 h-4" />
+                            )}
+                          </Button>
+                          
+                          <Button
+                            type="button"
+                            variant="destructive"
+                            size="sm"
+                            onClick={removeVoice}
+                          >
+                            Remove
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
                 {/* Description */}
                 <div className="space-y-2">
                   <Label htmlFor="description" className="text-white">Description (Optional)</Label>
@@ -408,6 +555,35 @@ export default function MessageNFTCreator() {
                       Scan to claim NFTs from this collection
                     </p>
                   </div>
+
+                  {/* Voice Message Display */}
+                  {createdCollection.collection.voiceFile && (
+                    <div className="border border-slate-600 rounded-lg p-4 bg-slate-700/30">
+                      <h4 className="text-white font-medium mb-3 flex items-center gap-2">
+                        <Mic className="h-4 w-4 text-green-400" />
+                        Attached Voice Message
+                      </h4>
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <div className="w-8 h-8 bg-green-500/20 rounded-full flex items-center justify-center">
+                            <Mic className="w-4 h-4 text-green-400" />
+                          </div>
+                          <p className="text-slate-300 text-sm">Voice attachment included in NFT</p>
+                        </div>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => {
+                            const audio = new Audio(createdCollection.collection.voiceFile);
+                            audio.play();
+                          }}
+                          className="border-green-500/50 text-green-300 hover:bg-green-500/20"
+                        >
+                          <Play className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  )}
 
                   {/* Action Buttons */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
