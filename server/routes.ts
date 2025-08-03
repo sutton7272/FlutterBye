@@ -1530,25 +1530,41 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // ============ VOICE MESSAGE ROUTES ============
   
-  // Voice message upload and processing
+  // Voice message upload and processing with OpenAI
   app.post("/api/voice/upload", async (req, res) => {
     try {
       const { audioData, type, userId } = req.body;
       
-      // In production, you would:
-      // 1. Store audio file in object storage
-      // 2. Process with speech-to-text if needed
-      // 3. Save metadata to database
+      if (!audioData) {
+        return res.status(400).json({ message: "Audio data is required" });
+      }
+
+      // Convert base64 audio data to buffer
+      const audioBuffer = Buffer.from(audioData.split(',')[1] || audioData, 'base64');
+      
+      // Process with OpenAI voice service
+      const { openaiVoiceService } = await import("./openai-voice-service");
+      const analysis = await openaiVoiceService.processVoiceMessage(audioBuffer, userId, type);
+      
+      // In production, you would store the audio file in object storage here
+      const audioId = Date.now().toString();
+      const audioUrl = `/api/voice/stream/${audioId}`;
       
       const voiceMessage = {
-        id: Date.now().toString(),
-        audioUrl: `/api/voice/stream/${Date.now()}`,
-        duration: 30, // Mock duration
+        id: audioId,
+        audioUrl,
+        duration: Math.floor(audioBuffer.length / 16000), // Approximate duration calculation
         type: type || 'voice',
-        transcription: type === 'voice' ? 'Mock transcription' : undefined,
+        transcription: analysis.transcription,
+        emotion: analysis.emotion,
+        sentiment: analysis.sentiment,
+        confidence: analysis.confidence,
+        voiceCharacteristics: analysis.voiceCharacteristics,
         createdAt: new Date(),
         userId
       };
+      
+      console.log(`Voice message processed: ${analysis.emotion} (${Math.round(analysis.confidence * 100)}% confidence)`);
       
       res.json(voiceMessage);
     } catch (error) {

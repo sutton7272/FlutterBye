@@ -57,20 +57,17 @@ class VoiceMessageService {
     }
   }
 
-  // Analyze voice message for emotion and characteristics
+  // Analyze voice message for emotion and characteristics using OpenAI
   async analyzeVoiceMessage(audioData: Buffer): Promise<VoiceAnalysis> {
     try {
-      // Mock analysis - in production you would use:
-      // - Google Cloud Speech-to-Text API
-      // - Azure Cognitive Services
-      // - AWS Transcribe + Comprehend
-      // - Custom ML models for voice emotion detection
+      const { openaiVoiceService } = await import("./openai-voice-service");
+      const analysis = await openaiVoiceService.processVoiceMessage(audioData, 'system', 'voice');
       
-      const mockAnalysis: VoiceAnalysis = {
-        emotion: this.detectMockEmotion(),
-        confidence: Math.random() * 0.3 + 0.7, // 70-100% confidence
-        transcription: await this.getTranscription(audioData),
-        sentiment: 'positive',
+      return {
+        emotion: analysis.emotion,
+        confidence: analysis.confidence,
+        transcription: analysis.transcription,
+        sentiment: analysis.sentiment,
         voiceCharacteristics: {
           pitch: 'medium',
           speed: 'medium',

@@ -7,7 +7,7 @@ import { Mic, MicOff, Play, Pause, Square, Music, Upload, Volume2, Trash2 } from
 import { useToast } from '@/hooks/use-toast';
 
 interface VoiceMessageRecorderProps {
-  onVoiceAttached: (audioData: { url: string; duration: number; type: 'voice' | 'music' }) => void;
+  onVoiceAttached: (audioData: { url: string; duration: number; type: 'voice' | 'music'; audioData?: string }) => void;
   maxDuration?: number;
   showMusicUpload?: boolean;
 }
@@ -127,18 +127,39 @@ export function VoiceMessageRecorder({
     }
   };
 
-  const attachVoiceMessage = () => {
-    if (audioUrl) {
-      onVoiceAttached({
-        url: audioUrl,
-        duration: audioDuration,
-        type: 'voice'
-      });
-      
-      toast({
-        title: "Voice Message Attached",
-        description: "Your voice message has been added to the token"
-      });
+  const attachVoiceMessage = async () => {
+    if (audioUrl && audioDuration > 0) {
+      try {
+        // Convert audio URL to base64 for backend processing
+        const response = await fetch(audioUrl);
+        const audioBlob = await response.blob();
+        const reader = new FileReader();
+        
+        reader.onloadend = () => {
+          const base64Audio = reader.result as string;
+          
+          onVoiceAttached({
+            url: audioUrl,
+            duration: audioDuration,
+            type: 'voice',
+            audioData: base64Audio // Pass audio data for OpenAI processing
+          });
+          
+          toast({
+            title: "Voice Attached",
+            description: `${Math.round(audioDuration)}s voice message ready for AI processing`
+          });
+        };
+        
+        reader.readAsDataURL(audioBlob);
+      } catch (error) {
+        console.error('Error processing voice:', error);
+        toast({
+          title: "Error",
+          description: "Failed to process voice message",
+          variant: "destructive"
+        });
+      }
     }
   };
 
@@ -163,18 +184,39 @@ export function VoiceMessageRecorder({
     }
   };
 
-  const attachMusic = () => {
+  const attachMusic = async () => {
     if (uploadedMusic) {
-      onVoiceAttached({
-        url: uploadedMusic.url,
-        duration: uploadedMusic.duration,
-        type: 'music'
-      });
-      
-      toast({
-        title: "Music Attached",
-        description: `${uploadedMusic.name} added to your message`
-      });
+      try {
+        // Convert music file to base64 for backend processing
+        const response = await fetch(uploadedMusic.url);
+        const audioBlob = await response.blob();
+        const reader = new FileReader();
+        
+        reader.onloadend = () => {
+          const base64Audio = reader.result as string;
+          
+          onVoiceAttached({
+            url: uploadedMusic.url,
+            duration: uploadedMusic.duration,
+            type: 'music',
+            audioData: base64Audio // Pass audio data for processing
+          });
+          
+          toast({
+            title: "Music Attached",
+            description: `${uploadedMusic.name} added to your message`
+          });
+        };
+        
+        reader.readAsDataURL(audioBlob);
+      } catch (error) {
+        console.error('Error processing music:', error);
+        toast({
+          title: "Error",
+          description: "Failed to process music file",
+          variant: "destructive"
+        });
+      }
     }
   };
 
