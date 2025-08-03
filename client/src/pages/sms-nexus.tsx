@@ -33,7 +33,7 @@ import {
   Eye,
   ChevronRight,
   Star,
-  Lightning,
+  Zap,
   Coins,
   Calendar,
   MessageCircle,
@@ -513,7 +513,7 @@ export function SMSNexusPage() {
             <Card className="bg-black/40 backdrop-blur-sm border-green-500/30">
               <CardHeader>
                 <CardTitle className="text-white flex items-center gap-2">
-                  <Lightning className="h-6 w-6 text-yellow-400" />
+                  <Zap className="h-6 w-6 text-yellow-400" />
                   Viral Acceleration Engine
                 </CardTitle>
                 <CardDescription className="text-green-200">
