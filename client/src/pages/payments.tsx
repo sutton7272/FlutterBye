@@ -20,7 +20,13 @@ import {
   Brain,
   Sparkles,
   Bot,
-  Cpu
+  Cpu,
+  Palette,
+  Music,
+  Image,
+  Video,
+  Heart,
+  Waves
 } from "lucide-react";
 
 interface PaymentOption {
@@ -186,10 +192,181 @@ const aiCreditOptions: PaymentOption[] = [
   }
 ];
 
+const flutterWaveOptions: PaymentOption[] = [
+  {
+    id: "flutterwave-basic",
+    name: "FlutterWave Basic",
+    description: "AI-powered emotional messaging starter pack",
+    price: 7.99,
+    features: [
+      "50 AI emotional tokens",
+      "Basic butterfly effect analysis",
+      "SMS-to-blockchain integration",
+      "Neural emotion detection",
+      "Basic viral tracking"
+    ],
+    icon: <Waves className="w-6 h-6" />,
+    color: "from-pink-500 to-purple-500",
+    type: "token",
+    tokens: 50
+  },
+  {
+    id: "flutterwave-pro",
+    name: "FlutterWave Pro",
+    description: "Advanced emotional intelligence messaging",
+    price: 19.99,
+    features: [
+      "200 AI emotional tokens",
+      "Advanced butterfly effect simulation",
+      "Quantum message threads",
+      "Temporal message capsules",
+      "Global butterfly pulse tracking",
+      "ARIA AI companion access"
+    ],
+    icon: <Heart className="w-6 h-6" />,
+    color: "from-purple-500 to-pink-500",
+    popular: true,
+    type: "token",
+    tokens: 200
+  },
+  {
+    id: "flutterwave-enterprise",
+    name: "FlutterWave Enterprise",
+    description: "Complete emotional ecosystem for businesses",
+    price: 49.99,
+    features: [
+      "500 AI emotional tokens",
+      "Custom ARIA personalities",
+      "Emotional market exchange access",
+      "Advanced analytics dashboard",
+      "White-label integration",
+      "Priority neural processing"
+    ],
+    icon: <Brain className="w-6 h-6" />,
+    color: "from-purple-600 to-blue-600",
+    type: "token",
+    tokens: 500
+  }
+];
+
+const flutterArtOptions: PaymentOption[] = [
+  {
+    id: "flutterart-creative",
+    name: "FlutterArt Creative",
+    description: "Revolutionary multimedia NFT creation starter",
+    price: 12.99,
+    features: [
+      "25 multimedia NFT creations",
+      "Basic AI art generation",
+      "Standard templates",
+      "Image & audio NFTs",
+      "Basic marketplace access"
+    ],
+    icon: <Palette className="w-6 h-6" />,
+    color: "from-orange-500 to-red-500",
+    type: "token",
+    tokens: 25
+  },
+  {
+    id: "flutterart-professional",
+    name: "FlutterArt Professional",
+    description: "Advanced multimedia NFT creator suite",
+    price: 34.99,
+    features: [
+      "100 multimedia NFT creations",
+      "Advanced AI art generation",
+      "Video & interactive NFTs",
+      "Custom templates & styles",
+      "Premium marketplace features",
+      "Revenue sharing eligible"
+    ],
+    icon: <Video className="w-6 h-6" />,
+    color: "from-red-500 to-pink-500",
+    popular: true,
+    type: "token",
+    tokens: 100
+  },
+  {
+    id: "flutterart-studio",
+    name: "FlutterArt Studio",
+    description: "Complete creative studio for artists",
+    price: 79.99,
+    features: [
+      "300 multimedia NFT creations",
+      "AI-powered music generation",
+      "3D & VR NFT support",
+      "Collaborative creation tools",
+      "Advanced analytics",
+      "Custom branding & galleries",
+      "Priority marketplace placement"
+    ],
+    icon: <Music className="w-6 h-6" />,
+    color: "from-pink-500 to-purple-500",
+    type: "token",
+    tokens: 300
+  }
+];
+
+interface PaymentCardProps {
+  option: PaymentOption;
+  onSelect: (option: PaymentOption) => void;
+  loading: boolean;
+}
+
+function PaymentCard({ option, onSelect, loading }: PaymentCardProps) {
+  return (
+    <Card 
+      className={`relative bg-slate-900/50 border-slate-700 hover:border-blue-500/50 transition-all duration-300 transform hover:scale-105 cursor-pointer ${
+        option.popular ? 'ring-2 ring-green-500/50' : ''
+      }`}
+      onClick={() => onSelect(option)}
+    >
+      {option.popular && (
+        <Badge className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-green-500 hover:bg-green-600">
+          Most Popular
+        </Badge>
+      )}
+      
+      <CardHeader className="text-center">
+        <div className={`w-16 h-16 mx-auto rounded-full bg-gradient-to-r ${option.color} flex items-center justify-center text-white mb-4`}>
+          {option.icon}
+        </div>
+        <CardTitle className="text-white text-xl">{option.name}</CardTitle>
+        <p className="text-slate-400 text-sm">{option.description}</p>
+        <div className="text-3xl font-bold text-white">
+          ${option.price}
+          {(option.id === "subscription-premium" || option.id === "ai-unlimited") && (
+            <span className="text-sm text-slate-400">/month</span>
+          )}
+        </div>
+      </CardHeader>
+
+      <CardContent>
+        <ul className="space-y-2 mb-6">
+          {option.features.map((feature, index) => (
+            <li key={index} className="flex items-center text-slate-300 text-sm">
+              <div className="w-2 h-2 bg-blue-400 rounded-full mr-3"></div>
+              {feature}
+            </li>
+          ))}
+        </ul>
+
+        <Button 
+          className={`w-full bg-gradient-to-r ${option.color} hover:opacity-90 text-white font-medium`}
+          disabled={loading}
+        >
+          {loading ? "Processing..." : "Select Plan"}
+        </Button>
+      </CardContent>
+    </Card>
+  );
+}
+
 export default function Payments() {
   const [selectedOption, setSelectedOption] = useState<PaymentOption | null>(null);
   const [clientSecret, setClientSecret] = useState<string>("");
   const [loading, setLoading] = useState(false);
+  const [activeTab, setActiveTab] = useState("tokens");
   const { toast } = useToast();
 
   const handleSelectOption = async (option: PaymentOption) => {
@@ -208,13 +385,26 @@ export default function Payments() {
             plan: option.id
           }
         });
+      } else if (option.type === "ai") {
+        // Handle AI credits purchase
+        response = await apiRequest("POST", "/api/stripe/create-payment-intent", {
+          amount: option.price,
+          description: option.description,
+          metadata: {
+            type: "ai_credits_purchase",
+            aiCredits: option.credits?.toString() || "0",
+            apiCalls: option.apiCalls?.toString() || "0",
+            package: option.id
+          }
+        });
       } else {
-        // Handle one-time payment
+        // Handle regular token purchase
         response = await apiRequest("POST", "/api/stripe/create-payment-intent", {
           amount: option.price,
           description: option.description,
           metadata: {
             type: "token_purchase",
+            tokens: option.tokens?.toString() || "0",
             package: option.id
           }
         });
@@ -261,57 +451,69 @@ export default function Payments() {
           </p>
         </div>
 
+        {/* AI Credits Status */}
+        <div className="mb-8">
+          <AICreditDisplay userId="demo-user" />
+        </div>
+
         {!selectedOption ? (
-          /* Payment Options Grid */
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
-            {paymentOptions.map((option) => (
-              <Card 
-                key={option.id}
-                className={`relative bg-slate-900/50 border-slate-700 hover:border-blue-500/50 transition-all duration-300 transform hover:scale-105 cursor-pointer ${
-                  option.popular ? 'ring-2 ring-green-500/50' : ''
-                }`}
-                onClick={() => handleSelectOption(option)}
-              >
-                {option.popular && (
-                  <Badge className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-green-500 hover:bg-green-600">
-                    Most Popular
-                  </Badge>
-                )}
-                
-                <CardHeader className="text-center">
-                  <div className={`w-16 h-16 mx-auto rounded-full bg-gradient-to-r ${option.color} flex items-center justify-center text-white mb-4`}>
-                    {option.icon}
-                  </div>
-                  <CardTitle className="text-white text-xl">{option.name}</CardTitle>
-                  <p className="text-slate-400 text-sm">{option.description}</p>
-                  <div className="text-3xl font-bold text-white">
-                    ${option.price}
-                    {option.id === "subscription-premium" && (
-                      <span className="text-sm text-slate-400">/month</span>
-                    )}
-                  </div>
-                </CardHeader>
+          /* Tabbed Payment Interface */
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+            <TabsList className="grid w-full grid-cols-4 bg-slate-900/50 border-slate-700">
+              <TabsTrigger value="tokens" className="text-white">FLBY Tokens</TabsTrigger>
+              <TabsTrigger value="ai" className="text-white">AI Credits</TabsTrigger>
+              <TabsTrigger value="flutterwave" className="text-white">FlutterWave</TabsTrigger>
+              <TabsTrigger value="flutterart" className="text-white">FlutterArt</TabsTrigger>
+            </TabsList>
 
-                <CardContent>
-                  <ul className="space-y-2 mb-6">
-                    {option.features.map((feature, index) => (
-                      <li key={index} className="flex items-center text-slate-300 text-sm">
-                        <div className="w-2 h-2 bg-blue-400 rounded-full mr-3"></div>
-                        {feature}
-                      </li>
-                    ))}
-                  </ul>
+            <TabsContent value="tokens" className="space-y-4">
+              <div className="text-center mb-6">
+                <h2 className="text-2xl font-bold text-white mb-2">FLBY Token Packages</h2>
+                <p className="text-slate-400">Power your blockchain messaging with FLBY tokens</p>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                {tokenOptions.map((option) => (
+                  <PaymentCard key={option.id} option={option} onSelect={handleSelectOption} loading={loading} />
+                ))}
+              </div>
+            </TabsContent>
 
-                  <Button 
-                    className={`w-full bg-gradient-to-r ${option.color} hover:opacity-90 text-white font-medium`}
-                    disabled={loading}
-                  >
-                    {loading ? "Processing..." : "Select Plan"}
-                  </Button>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+            <TabsContent value="ai" className="space-y-4">
+              <div className="text-center mb-6">
+                <h2 className="text-2xl font-bold text-white mb-2">AI Credit Packages</h2>
+                <p className="text-slate-400">Unlock advanced AI features and capabilities</p>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                {aiCreditOptions.map((option) => (
+                  <PaymentCard key={option.id} option={option} onSelect={handleSelectOption} loading={loading} />
+                ))}
+              </div>
+            </TabsContent>
+
+            <TabsContent value="flutterwave" className="space-y-4">
+              <div className="text-center mb-6">
+                <h2 className="text-2xl font-bold text-white mb-2">FlutterWave Packages</h2>
+                <p className="text-slate-400">AI-powered emotional messaging with butterfly effect simulation</p>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                {flutterWaveOptions.map((option) => (
+                  <PaymentCard key={option.id} option={option} onSelect={handleSelectOption} loading={loading} />
+                ))}
+              </div>
+            </TabsContent>
+
+            <TabsContent value="flutterart" className="space-y-4">
+              <div className="text-center mb-6">
+                <h2 className="text-2xl font-bold text-white mb-2">FlutterArt Packages</h2>
+                <p className="text-slate-400">Revolutionary multimedia NFT creation and management</p>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                {flutterArtOptions.map((option) => (
+                  <PaymentCard key={option.id} option={option} onSelect={handleSelectOption} loading={loading} />
+                ))}
+              </div>
+            </TabsContent>
+          </Tabs>
         ) : (
           /* Checkout Form */
           <div className="max-w-2xl mx-auto">

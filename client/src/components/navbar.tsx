@@ -14,7 +14,7 @@ export default function Navbar() {
     { href: "/home", label: "Home", icon: Home },
     { href: "/mint", label: "Mint", icon: Coins },
     { href: "/payments", label: "Payments", icon: CreditCard, featured: true },
-    { href: "/ai-payments", label: "AI Credits", icon: Brain, special: true },
+
     { href: "/redeem", label: "Dashboard", icon: LayoutDashboard },
     { href: "/chat", label: "Chat", icon: MessageSquare },
     { href: "/sms-nexus", label: "FlutterWave", icon: Zap, special: true },
