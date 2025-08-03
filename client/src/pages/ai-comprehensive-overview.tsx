@@ -32,7 +32,7 @@ import {
 } from 'lucide-react';
 import { Link } from "wouter";
 import { AISEOOptimizer } from '@/components/ai-seo-optimizer';
-import { LivingAIInterface } from '@/components/living-ai-interface';
+import { LivingAIInterfaceEnhanced } from '@/components/living-ai-interface-enhanced';
 import { AIConversation } from '@/components/ai-conversation';
 import { AIEnhancementButton } from '@/components/ai-enhancement-button';
 import { useAIContent } from '@/hooks/useAIContent';
@@ -619,7 +619,7 @@ export default function AIComprehensiveOverview() {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <LivingAIInterface 
+                <LivingAIInterfaceEnhanced 
                   userBehavior={userBehavior}
                 />
               </CardContent>
