@@ -20,6 +20,7 @@ import { livingAIService } from "./living-ai-service";
 import { immersiveAIService } from "./immersive-ai-service";
 import { aiAdminService } from "./ai-admin-service";
 import { aiContentService } from "./ai-content-service";
+import aiEnhancementRoutes from "./ai-enhancement-routes";
 import { z } from "zod";
 export async function registerRoutes(app: Express): Promise<Server> {
   // Apply production-grade security middleware
@@ -5696,10 +5697,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // REVOLUTIONARY AI ENHANCEMENT ROUTES - Universal AI features
+  app.use("/api/ai", aiEnhancementRoutes);
+
   console.log('🚀 Production-grade server with real-time monitoring initialized');
   console.log('🤖 Living AI personality system activated');
   console.log('🌟 Immersive AI experience system launched');
   console.log('🧠 AI admin intelligence and content enhancement activated');
+  console.log('⚡ Revolutionary AI enhancement routes activated - AI EVERYWHERE!');
   
   return httpServer;
 }

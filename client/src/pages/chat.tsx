@@ -988,23 +988,38 @@ export function Chat() {
                         </div>
                       )}
                       
-                      <Textarea
-                        ref={messageInputRef}
-                        value={message}
-                        onChange={(e) => setMessage(e.target.value)}
-                        onKeyDown={handleKeyPress}
-                        placeholder={
-                          messageType === 'token' ? 'Share a token with the room...' :
-                          messageType === 'nft' ? 'Share an NFT (Premium feature)...' :
-                          messageType === 'poll' ? 'Create a poll (Premium feature)...' :
-                          replyingTo ? `Reply to ${truncateWallet(replyingTo.senderWallet || '')}...` : 
-                          "Type your message..."
-                        }
-                        className={`min-h-[50px] max-h-[100px] bg-slate-800/50 border-purple-500/20 resize-none ${
-                          currentTypingMode === 'ai' ? 'border-cyan-500/50' : ''
-                        }`}
-                        disabled={!socket}
-                      />
+                      <div className="space-y-2">
+                        <Textarea
+                          ref={messageInputRef}
+                          value={message}
+                          onChange={(e) => setMessage(e.target.value)}
+                          onKeyDown={handleKeyPress}
+                          placeholder={
+                            messageType === 'token' ? 'Share a token with the room...' :
+                            messageType === 'nft' ? 'Share an NFT (Premium feature)...' :
+                            messageType === 'poll' ? 'Create a poll (Premium feature)...' :
+                            replyingTo ? `Reply to ${truncateWallet(replyingTo.senderWallet || '')}...` : 
+                            "Type your message..."
+                          }
+                          className={`min-h-[50px] max-h-[100px] bg-slate-800/50 border-purple-500/20 resize-none ${
+                            currentTypingMode === 'ai' ? 'border-cyan-500/50' : ''
+                          }`}
+                          disabled={!socket}
+                        />
+                        
+                        {/* AI Enhancement Integration */}
+                        {currentTypingMode === 'ai' && message.length > 5 && (
+                          <div className="p-3 bg-cyan-900/20 border border-cyan-500/30 rounded-lg">
+                            <div className="flex items-center gap-2 mb-2">
+                              <Brain className="w-4 h-4 text-cyan-400 animate-pulse" />
+                              <span className="text-sm text-cyan-400 font-medium">AI Assistant Active</span>
+                            </div>
+                            <p className="text-xs text-white/70">
+                              AI is analyzing your message for optimization, sentiment, and viral potential...
+                            </p>
+                          </div>
+                        )}
+                      </div>
                     </div>
                     
                     <div className="flex flex-col gap-2">
