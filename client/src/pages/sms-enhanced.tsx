@@ -69,6 +69,9 @@ import { EmotionPortal } from '@/components/EmotionPortal';
 import { QuantumTimeMachine } from '@/components/QuantumTimeMachine';
 import { NeuroLinkInterface } from '@/components/NeuroLinkInterface';
 import { VoiceAttachmentUploader } from '@/components/VoiceAttachmentUploader';
+import { AIVoiceEnhancer } from '@/components/AIVoiceEnhancer';
+import { BlockchainAudioVisualizer } from '@/components/BlockchainAudioVisualizer';
+import { SocialViralPredictor } from '@/components/SocialViralPredictor';
 
 // Enhanced interfaces with new features
 interface EmotionalAnalysis {
@@ -117,6 +120,8 @@ export default function EnhancedSMSIntegration() {
   const [isRealTimeMode, setIsRealTimeMode] = useState(false);
   const [emotionHistory, setEmotionHistory] = useState<any[]>([]);
   const [attachedAudio, setAttachedAudio] = useState<any>(null);
+  const [enhancedAudio, setEnhancedAudio] = useState<any>(null);
+  const [viralPrediction, setViralPrediction] = useState<any>(null);
 
   // References
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -619,83 +624,177 @@ export default function EnhancedSMSIntegration() {
               />
             </div>
 
-            {/* Audio-Enhanced Token Creation */}
-            {attachedAudio && (
-              <Card className="bg-gradient-to-br from-emerald-900/30 via-teal-900/20 to-cyan-900/30 border-2 border-emerald-500/30 xl:col-span-2">
+            {/* Revolutionary AI Voice Enhancement */}
+            {attachedAudio && !enhancedAudio && (
+              <div className="xl:col-span-2">
+                <AIVoiceEnhancer
+                  audioData={attachedAudio}
+                  onEnhancementComplete={(enhancedData) => {
+                    setEnhancedAudio(enhancedData);
+                    toast({
+                      title: "🧠 AI Enhancement Complete!",
+                      description: `Voice analysis enhanced with ${enhancedData.enhancementScore?.toFixed(1)}% improvement in market potential`
+                    });
+                  }}
+                />
+              </div>
+            )}
+
+            {/* Blockchain Audio Visualizer */}
+            {(attachedAudio || enhancedAudio) && (
+              <div className="xl:col-span-2">
+                <BlockchainAudioVisualizer
+                  audioUrl={(enhancedAudio || attachedAudio).url}
+                  audioAnalysis={(enhancedAudio || attachedAudio).analysis}
+                  isEnhanced={!!enhancedAudio}
+                />
+              </div>
+            )}
+
+            {/* Social Viral Prediction */}
+            {(attachedAudio || enhancedAudio) && !viralPrediction && (
+              <div className="xl:col-span-2">
+                <SocialViralPredictor
+                  audioData={attachedAudio}
+                  enhancedData={enhancedAudio}
+                  onPredictionComplete={(prediction) => {
+                    setViralPrediction(prediction);
+                    toast({
+                      title: "🚀 Viral Prediction Complete!",
+                      description: `Predicted reach: ${prediction.viralPrediction?.totalReach?.toLocaleString()} users`
+                    });
+                  }}
+                />
+              </div>
+            )}
+
+            {/* Ultimate Multimedia Token Creation */}
+            {(attachedAudio || enhancedAudio) && (
+              <Card className="bg-gradient-to-br from-yellow-900/30 via-orange-900/20 to-red-900/30 border-2 border-yellow-500/30 xl:col-span-2">
                 <CardHeader>
-                  <CardTitle className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-cyan-400 flex items-center gap-2">
-                    <Music className="w-6 h-6 text-emerald-400" />
-                    Audio-Enhanced Blockchain Token Preview
-                    <Badge variant="secondary" className="bg-emerald-500/20 text-emerald-300 animate-pulse">
-                      MULTIMEDIA TOKEN
+                  <CardTitle className="text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 via-orange-500 to-red-500 flex items-center gap-2">
+                    <Crown className="w-6 h-6 text-yellow-400" />
+                    Ultimate Multimedia Blockchain Token
+                    <Badge variant="secondary" className="bg-yellow-500/20 text-yellow-300 animate-pulse">
+                      {enhancedAudio ? 'AI ENHANCED' : 'PREMIUM'}
                     </Badge>
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    {/* Basic Info */}
                     <div className="space-y-3">
-                      <div className="flex items-center justify-between">
-                        <span className="text-gray-400">Message:</span>
-                        <span className="text-white font-medium">{message || 'No message yet'}</span>
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <span className="text-gray-400">Audio Type:</span>
-                        <Badge variant="secondary" className="bg-cyan-500/20 text-cyan-300">
-                          {attachedAudio.type.replace('_', ' ')}
-                        </Badge>
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <span className="text-gray-400">File Size:</span>
-                        <span className="text-white">{(attachedAudio.size / 1024).toFixed(1)} KB</span>
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <span className="text-gray-400">Estimated Value:</span>
-                        <span className="text-emerald-300 font-bold">${attachedAudio.analysis?.estimatedValue}</span>
+                      <h4 className="font-medium text-yellow-300">Token Details</h4>
+                      <div className="space-y-2 text-sm">
+                        <div className="flex items-center justify-between">
+                          <span className="text-gray-400">Message:</span>
+                          <span className="text-white font-medium">{message || 'No message yet'}</span>
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <span className="text-gray-400">Audio Type:</span>
+                          <Badge variant="secondary" className="bg-orange-500/20 text-orange-300">
+                            {(enhancedAudio || attachedAudio).type.replace('_', ' ')}
+                          </Badge>
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <span className="text-gray-400">File Size:</span>
+                          <span className="text-white">{((enhancedAudio || attachedAudio).size / 1024).toFixed(1)} KB</span>
+                        </div>
                       </div>
                     </div>
 
-                    <div className="space-y-3">
-                      <div className="text-center p-3 bg-gradient-to-r from-emerald-900/20 to-cyan-900/20 rounded-lg border border-emerald-500/20">
-                        <div className="text-lg font-bold text-emerald-300">{attachedAudio.analysis?.emotion}</div>
-                        <div className="text-sm text-gray-400">Detected Emotion</div>
-                      </div>
-                      
-                      <div className="grid grid-cols-2 gap-2">
-                        <div className="text-center p-2 bg-teal-900/20 rounded-lg border border-teal-500/20">
-                          <div className="text-sm font-bold text-teal-300">{Math.round(attachedAudio.analysis?.energy)}%</div>
-                          <div className="text-xs text-gray-400">Energy</div>
+                    {/* AI Enhancement Data */}
+                    {enhancedAudio && (
+                      <div className="space-y-3">
+                        <h4 className="font-medium text-purple-300">AI Enhancement</h4>
+                        <div className="grid grid-cols-2 gap-2">
+                          <div className="text-center p-2 bg-purple-900/20 rounded-lg border border-purple-500/20">
+                            <div className="text-sm font-bold text-purple-300">{Math.round(enhancedAudio.aiInsights?.emotionalDepth || 0)}%</div>
+                            <div className="text-xs text-gray-400">Emotional Depth</div>
+                          </div>
+                          <div className="text-center p-2 bg-pink-900/20 rounded-lg border border-pink-500/20">
+                            <div className="text-sm font-bold text-pink-300">{Math.round(enhancedAudio.aiInsights?.voiceRarity || 0)}%</div>
+                            <div className="text-xs text-gray-400">Voice Rarity</div>
+                          </div>
+                          <div className="text-center p-2 bg-indigo-900/20 rounded-lg border border-indigo-500/20">
+                            <div className="text-sm font-bold text-indigo-300">{enhancedAudio.aiInsights?.personalityType || 'N/A'}</div>
+                            <div className="text-xs text-gray-400">Personality</div>
+                          </div>
+                          <div className="text-center p-2 bg-blue-900/20 rounded-lg border border-blue-500/20">
+                            <div className="text-sm font-bold text-blue-300">{enhancedAudio.aiInsights?.uniqueVoicePrint || 'N/A'}</div>
+                            <div className="text-xs text-gray-400">Voice ID</div>
+                          </div>
                         </div>
-                        <div className="text-center p-2 bg-cyan-900/20 rounded-lg border border-cyan-500/20">
-                          <div className="text-sm font-bold text-cyan-300">{Math.round(attachedAudio.analysis?.viralPotential)}%</div>
-                          <div className="text-xs text-gray-400">Viral</div>
+                      </div>
+                    )}
+
+                    {/* Viral Prediction Data */}
+                    {viralPrediction && (
+                      <div className="space-y-3">
+                        <h4 className="font-medium text-green-300">Viral Potential</h4>
+                        <div className="grid grid-cols-2 gap-2">
+                          <div className="text-center p-2 bg-green-900/20 rounded-lg border border-green-500/20">
+                            <div className="text-sm font-bold text-green-300">{Math.round(viralPrediction.viralPrediction?.overallScore || 0)}</div>
+                            <div className="text-xs text-gray-400">Viral Score</div>
+                          </div>
+                          <div className="text-center p-2 bg-emerald-900/20 rounded-lg border border-emerald-500/20">
+                            <div className="text-sm font-bold text-emerald-300">{viralPrediction.socialMetrics?.viralCoefficient || '0'}x</div>
+                            <div className="text-xs text-gray-400">Viral Coefficient</div>
+                          </div>
+                          <div className="text-center p-2 bg-teal-900/20 rounded-lg border border-teal-500/20">
+                            <div className="text-sm font-bold text-teal-300">{viralPrediction.viralPrediction?.viralTiming || 'TBD'}</div>
+                            <div className="text-xs text-gray-400">Time to Viral</div>
+                          </div>
+                          <div className="text-center p-2 bg-cyan-900/20 rounded-lg border border-cyan-500/20">
+                            <div className="text-sm font-bold text-cyan-300">${viralPrediction.viralPrediction?.monetizationPotential ? (parseInt(viralPrediction.viralPrediction.monetizationPotential) / 1000).toFixed(1) + 'K' : '0'}</div>
+                            <div className="text-xs text-gray-400">Revenue</div>
+                          </div>
                         </div>
                       </div>
+                    )}
+                  </div>
+
+                  {/* Enhanced Value Display */}
+                  <div className="text-center p-4 bg-gradient-to-r from-yellow-900/30 to-orange-900/30 rounded-lg border border-yellow-500/30">
+                    <div className="text-2xl font-bold text-yellow-300 mb-1">
+                      ${enhancedAudio?.marketPrediction?.predictedValue || attachedAudio?.analysis?.estimatedValue || '0.000'}
                     </div>
+                    <div className="text-sm text-gray-400">
+                      {enhancedAudio ? 'AI-Enhanced Token Value' : 'Estimated Token Value'}
+                    </div>
+                    {enhancedAudio && (
+                      <div className="text-xs text-green-400 mt-1">
+                        +{Math.round(enhancedAudio.enhancementScore || 0)}% enhancement bonus
+                      </div>
+                    )}
                   </div>
 
                   <Button 
                     onClick={() => {
-                      // Create multimedia token with audio attachment
+                      // Create ultimate multimedia token
                       createTokenMutation.mutate({
                         message,
                         phoneNumber,
                         recipientWallet,
-                        audioData: attachedAudio,
+                        audioData: enhancedAudio || attachedAudio,
+                        enhancedData: enhancedAudio,
+                        viralPrediction: viralPrediction,
                         type: 'multimedia_token'
                       });
                     }}
                     disabled={!message || createTokenMutation.isPending}
-                    className="w-full bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 hover:from-emerald-700 hover:via-teal-700 hover:to-cyan-700"
+                    className="w-full bg-gradient-to-r from-yellow-600 via-orange-600 to-red-600 hover:from-yellow-700 hover:via-orange-700 hover:to-red-700 text-lg py-3"
                   >
                     {createTokenMutation.isPending ? (
                       <div className="flex items-center gap-2">
-                        <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                        Creating Multimedia Token...
+                        <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                        Creating Ultimate Token...
                       </div>
                     ) : (
                       <div className="flex items-center gap-2">
-                        <Zap className="w-4 h-4" />
-                        Create Revolutionary Audio Token
+                        <Crown className="w-5 h-5" />
+                        Create Ultimate Multimedia Token
+                        {enhancedAudio && <span className="text-yellow-200">(AI Enhanced)</span>}
                       </div>
                     )}
                   </Button>
@@ -704,13 +803,13 @@ export default function EnhancedSMSIntegration() {
             )}
           </div>
 
-          {/* Information about Revolutionary Feature */}
-          <Alert className="bg-gradient-to-r from-purple-900/20 to-pink-900/20 border-purple-500/20">
-            <Crown className="w-4 h-4 text-yellow-400" />
-            <AlertDescription className="text-purple-300">
-              <strong>🚀 WORLD FIRST:</strong> You're using the first-ever multimedia blockchain messaging platform! 
-              Voice clips and songs can now be permanently attached to SPL tokens on Solana. Audio data is analyzed 
-              for emotional content, energy levels, and viral potential to enhance token value.
+          {/* Ultimate Revolutionary Feature Information */}
+          <Alert className="bg-gradient-to-r from-purple-900/20 via-yellow-900/20 to-blue-900/20 border-yellow-500/20">
+            <Crown className="w-4 h-4 text-yellow-400 animate-bounce" />
+            <AlertDescription className="text-yellow-300">
+              <strong>🌟 ABSOLUTELY IMPOSSIBLE TO FIND ELSEWHERE:</strong> You're using the world's most advanced multimedia blockchain platform! 
+              Voice/music + AI enhancement + viral prediction + blockchain permanence = The ultimate token creation experience. 
+              This combination of technologies has never existed before and creates entirely new possibilities for digital value creation.
             </AlertDescription>
           </Alert>
         </TabsContent>
