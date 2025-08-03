@@ -54,6 +54,7 @@ import ViralDashboard from "@/pages/viral-dashboard";
 import MessageNFTCreator from "@/pages/message-nft-creator";
 import NFTClaim from "@/pages/nft-claim";
 import NFTMarketplace from "@/pages/nft-marketplace";
+import AIShowcase from "@/pages/ai-showcase";
 import Navbar from "@/components/navbar";
 import { PersonalizedDashboard } from "@/components/PersonalizedDashboard";
 
@@ -341,6 +342,12 @@ function Router() {
           <>
             <Navbar />
             <NFTMarketplace />
+          </>
+        )} />
+        <Route path="/ai-showcase" component={() => (
+          <>
+            <Navbar />
+            <AIShowcase />
           </>
         )} />
         <Route path="/claim/:collectionId" component={NFTClaim} />

@@ -18,6 +18,8 @@ import { openaiService } from "./openai-service";
 import { messageNFTService } from "./message-nft-service";
 import { livingAIService } from "./living-ai-service";
 import { immersiveAIService } from "./immersive-ai-service";
+import { aiAdminService } from "./ai-admin-service";
+import { aiContentService } from "./ai-content-service";
 import { z } from "zod";
 export async function registerRoutes(app: Express): Promise<Server> {
   // Apply production-grade security middleware
@@ -5485,9 +5487,219 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // ADMIN AI ENDPOINTS - Revolutionary admin intelligence
+
+  app.post("/api/admin/ai-insights", async (req, res) => {
+    try {
+      const { userBehaviorData } = req.body;
+      const insights = await aiAdminService.generateUserInsights(
+        userBehaviorData || []
+      );
+      res.json(insights);
+    } catch (error) {
+      console.error("Admin AI insights error:", error);
+      res.status(500).json({ error: "Failed to generate AI insights" });
+    }
+  });
+
+  app.post("/api/admin/security-analysis", async (req, res) => {
+    try {
+      const { securityLogs, systemMetrics } = req.body;
+      const analysis = await aiAdminService.analyzeSecurityThreats(
+        securityLogs || [],
+        systemMetrics || {}
+      );
+      res.json(analysis);
+    } catch (error) {
+      console.error("Security analysis error:", error);
+      res.status(500).json({ error: "Failed to analyze security threats" });
+    }
+  });
+
+  app.post("/api/admin/performance-optimization", async (req, res) => {
+    try {
+      const { performanceMetrics } = req.body;
+      const optimization = await aiAdminService.optimizeSystemPerformance(
+        performanceMetrics || {}
+      );
+      res.json(optimization);
+    } catch (error) {
+      console.error("Performance optimization error:", error);
+      res.status(500).json({ error: "Failed to optimize performance" });
+    }
+  });
+
+  app.post("/api/admin/revenue-optimization", async (req, res) => {
+    try {
+      const { revenueData, userMetrics } = req.body;
+      const optimization = await aiAdminService.optimizeRevenue(
+        revenueData || {},
+        userMetrics || {}
+      );
+      res.json(optimization);
+    } catch (error) {
+      console.error("Revenue optimization error:", error);
+      res.status(500).json({ error: "Failed to optimize revenue" });
+    }
+  });
+
+  // CONTENT AI ENDPOINTS - Revolutionary content enhancement
+
+  app.post("/api/ai/optimize-text", async (req, res) => {
+    try {
+      const { text, constraints } = req.body;
+      if (!text) {
+        return res.status(400).json({ error: "Text is required" });
+      }
+      
+      const optimization = await aiContentService.optimizeTextWithAI(
+        text,
+        constraints || {}
+      );
+      res.json(optimization);
+    } catch (error) {
+      console.error("Text optimization error:", error);
+      res.status(500).json({ error: "Failed to optimize text" });
+    }
+  });
+
+  app.post("/api/ai/chat-suggestions", async (req, res) => {
+    try {
+      const { context } = req.body;
+      const suggestions = await aiContentService.generateChatSuggestions(
+        context || {}
+      );
+      res.json(suggestions);
+    } catch (error) {
+      console.error("Chat suggestions error:", error);
+      res.status(500).json({ error: "Failed to generate chat suggestions" });
+    }
+  });
+
+  app.post("/api/ai/enhance-form", async (req, res) => {
+    try {
+      const { formData, formType } = req.body;
+      const enhancement = await aiContentService.enhanceFormFields(
+        formData || {},
+        formType || "general"
+      );
+      res.json(enhancement);
+    } catch (error) {
+      console.error("Form enhancement error:", error);
+      res.status(500).json({ error: "Failed to enhance form" });
+    }
+  });
+
+  app.post("/api/ai/generate-marketing", async (req, res) => {
+    try {
+      const { product, audience, goal } = req.body;
+      const marketing = await aiContentService.generateMarketingCopy(
+        product || "Flutterbye Platform",
+        audience || "blockchain enthusiasts",
+        goal || "engagement"
+      );
+      res.json(marketing);
+    } catch (error) {
+      console.error("Marketing generation error:", error);
+      res.status(500).json({ error: "Failed to generate marketing copy" });
+    }
+  });
+
+  app.post("/api/ai/optimize-seo", async (req, res) => {
+    try {
+      const { content, keywords, purpose } = req.body;
+      if (!content) {
+        return res.status(400).json({ error: "Content is required" });
+      }
+      
+      const seoOptimization = await aiContentService.optimizeForSEO(
+        content,
+        keywords || [],
+        purpose || "general"
+      );
+      res.json(seoOptimization);
+    } catch (error) {
+      console.error("SEO optimization error:", error);
+      res.status(500).json({ error: "Failed to optimize for SEO" });
+    }
+  });
+
+  app.post("/api/ai/enhance-voice", async (req, res) => {
+    try {
+      const { transcript, audioMetadata } = req.body;
+      if (!transcript) {
+        return res.status(400).json({ error: "Transcript is required" });
+      }
+      
+      const enhancement = await aiContentService.enhanceVoiceMessage(
+        transcript,
+        audioMetadata || {}
+      );
+      res.json(enhancement);
+    } catch (error) {
+      console.error("Voice enhancement error:", error);
+      res.status(500).json({ error: "Failed to enhance voice message" });
+    }
+  });
+
+  app.post("/api/ai/generate-image-suggestions", async (req, res) => {
+    try {
+      const { tokenMessage, style } = req.body;
+      if (!tokenMessage) {
+        return res.status(400).json({ error: "Token message is required" });
+      }
+      
+      const suggestions = await aiAdminService.generateImageSuggestions(
+        tokenMessage,
+        style
+      );
+      res.json(suggestions);
+    } catch (error) {
+      console.error("Image suggestions error:", error);
+      res.status(500).json({ error: "Failed to generate image suggestions" });
+    }
+  });
+
+  app.post("/api/ai/generate-token-content", async (req, res) => {
+    try {
+      const { userInput, context } = req.body;
+      if (!userInput) {
+        return res.status(400).json({ error: "User input is required" });
+      }
+      
+      const content = await aiAdminService.generateTokenContent(
+        userInput,
+        context || {}
+      );
+      res.json(content);
+    } catch (error) {
+      console.error("Token content generation error:", error);
+      res.status(500).json({ error: "Failed to generate token content" });
+    }
+  });
+
+  app.post("/api/ai/enhance-chat", async (req, res) => {
+    try {
+      const { message, userContext } = req.body;
+      if (!message) {
+        return res.status(400).json({ error: "Message is required" });
+      }
+      
+      const enhancement = await aiAdminService.enhanceChat(
+        message,
+        userContext || {}
+      );
+      res.json(enhancement);
+    } catch (error) {
+      console.error("Chat enhancement error:", error);
+      res.status(500).json({ error: "Failed to enhance chat" });
+    }
+  });
+
   console.log('🚀 Production-grade server with real-time monitoring initialized');
   console.log('🤖 Living AI personality system activated');
   console.log('🌟 Immersive AI experience system launched');
+  console.log('🧠 AI admin intelligence and content enhancement activated');
   
   return httpServer;
 }

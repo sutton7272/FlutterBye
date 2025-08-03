@@ -18,6 +18,7 @@ export default function Navbar() {
     { href: "/sms-nexus", label: "FlutterWave", icon: Zap, special: true },
     { href: "/message-nfts", label: "FlutterArt", icon: Sparkles, featured: true },
     { href: "/marketplace", label: "Marketplace", icon: Users },
+    { href: "/ai-showcase", label: "AI Showcase", icon: Sparkles, special: true },
     { href: "/greeting-cards", label: "Cards", icon: Heart },
     { href: "/enterprise", label: "Marketing", icon: Building2 },
     { href: "/info", label: "Info", icon: HelpCircle },

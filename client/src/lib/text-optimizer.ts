@@ -1,5 +1,53 @@
 // Smart text optimization for 27-character messages
 // Uses common abbreviations, shorthand, and compression techniques
+// Enhanced with AI-powered optimization
+
+// AI-Enhanced text optimization
+import { apiRequest } from './queryClient';
+
+export async function optimizeTextWithAI(text: string, maxLength: number = 27): Promise<{
+  aiOptimized: string;
+  alternatives: string[];
+  viralScore: number;
+  fallbackOptimizations: OptimizationSuggestion[];
+}> {
+  try {
+    // Try AI optimization first
+    const response = await fetch('/api/ai/optimize-text', {
+      method: 'POST',
+      body: JSON.stringify({ 
+        text, 
+        constraints: { 
+          maxLength, 
+          tone: 'engaging', 
+          purpose: 'token_message',
+          audience: 'crypto_enthusiasts'
+        } 
+      }),
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
+    
+    const aiResult = await response.json();
+
+    return {
+      aiOptimized: aiResult.optimized || text,
+      alternatives: aiResult.alternatives || [],
+      viralScore: aiResult.viralScore || 70,
+      fallbackOptimizations: optimizeTextFor27Chars(text)
+    };
+  } catch (error) {
+    console.error('AI optimization failed, using fallback:', error);
+    // Fallback to rule-based optimization
+    return {
+      aiOptimized: text,
+      alternatives: [],
+      viralScore: 70,
+      fallbackOptimizations: optimizeTextFor27Chars(text)
+    };
+  }
+}
 
 interface OptimizationSuggestion {
   text: string;
