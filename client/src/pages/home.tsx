@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Link } from "wouter";
-import { ArrowRight, MessageSquare, Coins, Zap, TrendingUp, Users, Target, Sparkles, Heart, Building2, Mic } from "lucide-react";
+import { ArrowRight, MessageSquare, Coins, Zap, TrendingUp, Users, Target, Sparkles, Heart, Building2, Mic, DollarSign } from "lucide-react";
 import flutterbeyeLogoPath from "@assets/image_1754068877999.png";
 import { QuickActionPanel } from "@/components/quick-action-panel";
 import { InteractiveStatsDashboard } from "@/components/interactive-stats-dashboard";
@@ -306,7 +306,7 @@ export default function Home() {
           <p className="text-gray-400 mb-8 max-w-2xl mx-auto">
             Join the memeconomy revolution. Turn your thoughts into tokens, your messages into money.
           </p>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 max-w-5xl mx-auto">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 max-w-6xl mx-auto">
             <Link href="/greeting-cards">
               <Button size="lg" className="w-full text-lg px-6 py-6 bg-gradient-to-r from-pink-600 to-rose-600 hover:from-pink-700 hover:to-rose-700 border-0 font-bold">
                 SEND CARDS
@@ -323,6 +323,12 @@ export default function Home() {
               <Button size="lg" className="w-full text-lg px-6 py-6 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 hover:to-blue-700 border-0 font-bold">
                 START JOURNEY
                 <Target className="ml-2 h-5 w-5" />
+              </Button>
+            </Link>
+            <Link href="/admin/api-monetization">
+              <Button size="lg" className="w-full text-lg px-6 py-6 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 border-0 font-bold">
+                API MONETIZATION
+                <DollarSign className="ml-2 h-5 w-5" />
               </Button>
             </Link>
             <Link href="/flby/staking">
