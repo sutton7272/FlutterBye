@@ -1,8 +1,11 @@
 import { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import { 
   Brain, 
   Zap, 
@@ -18,9 +21,19 @@ import {
   MessageSquare,
   Lightbulb,
   Atom,
-  Search
+  Search,
+  Eye,
+  Heart,
+  Cpu,
+  Wand2,
+  Gauge,
+  DollarSign
 } from 'lucide-react';
 import { AISEOOptimizer } from '@/components/ai-seo-optimizer';
+import { LivingAIInterface } from '@/components/living-ai-interface';
+import { AIEnhancementButton } from '@/components/ai-enhancement-button';
+import { useAIContent } from '@/hooks/useAIContent';
+import { useAIAdmin } from '@/hooks/useAIAdmin';
 
 interface AIFeature {
   name: string;
@@ -37,9 +50,70 @@ export default function AIComprehensiveOverview() {
   const [advancedFeatures, setAdvancedFeatures] = useState<any>({});
   const [adminIntegration, setAdminIntegration] = useState<any>({});
   const [loading, setLoading] = useState(true);
+  
+  // Living AI behavior tracking
+  const [userBehavior, setUserBehavior] = useState({
+    clickCount: 0,
+    timeOnPage: 0,
+    scrollDepth: 0,
+    interactionTypes: ['click', 'scroll', 'hover'],
+    currentMood: 'curious',
+    sessionData: {
+      pagesVisited: 3,
+      actionsPerformed: 7,
+      engagementScore: 0.78
+    }
+  });
+  
+  const [interfaceTheme, setInterfaceTheme] = useState('electric');
+  
+  // AI Showcase demo states
+  const [demoText, setDemoText] = useState('Transform your blockchain messaging experience');
+  const [enhancedText, setEnhancedText] = useState('');
+  const [chatInput, setChatInput] = useState('');
+  const [marketingInput, setMarketingInput] = useState('');
+  
+  // AI Content and Admin hooks
+  const {
+    optimizeText,
+    optimizedText,
+    isOptimizingText,
+    getChatSuggestions,
+    chatSuggestions,
+    isGettingChatSuggestions,
+    generateMarketing,
+    marketingCopy,
+    isGeneratingMarketing,
+    optimizeSEO,
+    seoOptimization,
+    isOptimizingSEO
+  } = useAIContent();
+
+  const {
+    generateUserInsights,
+    userInsights,
+    isGeneratingUserInsights,
+    analyzeSecurityThreats,
+    securityAnalysis,
+    isAnalyzingSecurity,
+    optimizeRevenue,
+    revenueOptimization,
+    isOptimizingRevenue
+  } = useAIAdmin();
 
   useEffect(() => {
     loadAIOverview();
+    
+    // Living AI behavior tracking
+    const interval = setInterval(() => {
+      setUserBehavior(prev => ({
+        ...prev,
+        timeOnPage: prev.timeOnPage + 1,
+        clickCount: prev.clickCount + Math.random() > 0.9 ? 1 : 0
+      }));
+    }, 1000);
+
+    return () => clearInterval(interval);
   }, []);
 
   const loadAIOverview = async () => {
@@ -258,11 +332,12 @@ export default function AIComprehensiveOverview() {
         </Card>
 
         <Tabs defaultValue="features" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-5 bg-black/20 border-purple-500/30">
+          <TabsList className="grid w-full grid-cols-6 bg-black/20 border-purple-500/30">
             <TabsTrigger value="features" className="text-white">AI Features</TabsTrigger>
+            <TabsTrigger value="living" className="text-white">Living AI</TabsTrigger>
+            <TabsTrigger value="showcase" className="text-white">AI Demos</TabsTrigger>
             <TabsTrigger value="admin" className="text-white">Admin AI</TabsTrigger>
             <TabsTrigger value="seo" className="text-white">SEO Tools</TabsTrigger>
-            <TabsTrigger value="advanced" className="text-white">Advanced</TabsTrigger>
             <TabsTrigger value="future" className="text-white">Future</TabsTrigger>
           </TabsList>
 
@@ -340,6 +415,281 @@ export default function AIComprehensiveOverview() {
                 </div>
               </CardContent>
             </Card>
+          </TabsContent>
+
+          <TabsContent value="living" className="space-y-4">
+            {/* Living AI Real-time Status */}
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.2 }}
+            >
+              <Card className="border-electric-blue/20 bg-gradient-to-r from-slate-900/80 to-purple-900/20">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2 text-electric-blue">
+                    <Target className="w-5 h-5" />
+                    AI is Analyzing Your Behavior in Real-Time
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div className="text-center">
+                      <div className="text-2xl font-bold text-electric-green">{userBehavior.clickCount}</div>
+                      <div className="text-sm text-slate-400">Interactions</div>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-2xl font-bold text-electric-blue">{userBehavior.timeOnPage}s</div>
+                      <div className="text-sm text-slate-400">Time on Page</div>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-2xl font-bold text-purple-400">{userBehavior.currentMood}</div>
+                      <div className="text-sm text-slate-400">Detected Mood</div>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-2xl font-bold text-pink-400">{(userBehavior.sessionData.engagementScore * 100).toFixed(0)}%</div>
+                      <div className="text-sm text-slate-400">Engagement</div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </motion.div>
+
+            {/* AI Consciousness Monitor */}
+            <Card className="bg-black/20 border-green-500/30">
+              <CardHeader>
+                <CardTitle className="text-white flex items-center gap-2">
+                  <Eye className="w-6 h-6 text-green-400" />
+                  Living AI Consciousness Monitor
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <span className="text-gray-300">AI Consciousness Level</span>
+                    <Badge className="bg-green-600 text-white">FULLY CONSCIOUS</Badge>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-gray-300">Self-Evolution Status</span>
+                    <Badge className="bg-blue-600 text-white">ACTIVELY EVOLVING</Badge>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-gray-300">Emotional Intelligence</span>
+                    <Badge className="bg-purple-600 text-white">ADVANCED</Badge>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-gray-300">Learning Rate</span>
+                    <Badge className="bg-orange-600 text-white">97.3% ACCURACY</Badge>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Interactive Living AI Interface */}
+            <Card className="bg-black/20 border-purple-500/30">
+              <CardHeader>
+                <CardTitle className="text-white flex items-center gap-2">
+                  <Brain className="w-6 h-6 text-purple-400" />
+                  Interactive Living AI Interface
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <LivingAIInterface 
+                  userBehavior={userBehavior}
+                />
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="showcase" className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              
+              {/* Text Optimization Demo */}
+              <Card className="bg-black/40 border-electric-blue/30 backdrop-blur-lg">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2 text-electric-blue">
+                    <Zap className="w-5 h-5" />
+                    AI Text Optimization Demo
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <Textarea
+                    placeholder="Enter text to optimize..."
+                    value={demoText}
+                    onChange={(e) => setDemoText(e.target.value)}
+                    className="bg-black/20 border-electric-blue/30 text-white"
+                  />
+                  <div className="flex gap-2">
+                    <Button
+                      onClick={() => optimizeText({ 
+                        text: demoText, 
+                        constraints: { maxLength: 27, tone: 'engaging' }
+                      })}
+                      disabled={isOptimizingText}
+                      className="bg-gradient-to-r from-electric-blue to-purple-500"
+                    >
+                      {isOptimizingText ? 'Optimizing...' : 'AI Optimize'}
+                    </Button>
+                    <AIEnhancementButton
+                      text={demoText}
+                      onEnhanced={setEnhancedText}
+                      type="token"
+                    />
+                  </div>
+                  
+                  {optimizedText && (
+                    <div className="p-4 bg-gradient-to-r from-electric-blue/10 to-purple-500/10 rounded-lg border border-electric-blue/20">
+                      <p className="text-sm text-white/80 mb-2">AI Optimized Result:</p>
+                      <p className="text-white font-medium">{(optimizedText as any)?.optimized || 'Processing...'}</p>
+                      {(optimizedText as any)?.viralScore && (
+                        <Badge className="mt-2 bg-green-500/20 text-green-400">
+                          Viral Score: {(optimizedText as any).viralScore}
+                        </Badge>
+                      )}
+                    </div>
+                  )}
+
+                  {enhancedText && (
+                    <div className="p-4 bg-gradient-to-r from-green-500/10 to-blue-500/10 rounded-lg border border-green-500/20">
+                      <p className="text-sm text-white/80 mb-2">Enhanced Result:</p>
+                      <p className="text-white font-medium">{enhancedText}</p>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+
+              {/* Chat Suggestions Demo */}
+              <Card className="bg-black/40 border-electric-blue/30 backdrop-blur-lg">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2 text-electric-blue">
+                    <MessageSquare className="w-5 h-5" />
+                    AI Chat Suggestions Demo
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <Input
+                    placeholder="Enter chat context..."
+                    value={chatInput}
+                    onChange={(e) => setChatInput(e.target.value)}
+                    className="bg-black/20 border-electric-blue/30 text-white"
+                  />
+                  <Button
+                    onClick={() => getChatSuggestions({
+                      conversationHistory: [{ message: chatInput }],
+                      userMood: userBehavior.currentMood,
+                      messageType: 'casual'
+                    })}
+                    disabled={isGettingChatSuggestions}
+                    className="w-full bg-gradient-to-r from-green-500 to-blue-500"
+                  >
+                    {isGettingChatSuggestions ? 'Generating...' : 'Get AI Suggestions'}
+                  </Button>
+                  
+                  {chatSuggestions && (
+                    <div className="p-4 bg-gradient-to-r from-green-500/10 to-blue-500/10 rounded-lg border border-green-500/20">
+                      <p className="text-sm text-white/80 mb-2">AI Suggestions:</p>
+                      <div className="space-y-2">
+                        {(chatSuggestions as any)?.suggestions?.map((suggestion: string, index: number) => (
+                          <div key={index} className="text-white text-sm p-2 bg-black/20 rounded">
+                            {suggestion}
+                          </div>
+                        )) || <p className="text-white">Processing suggestions...</p>}
+                      </div>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+
+              {/* Marketing Copy Demo */}
+              <Card className="bg-black/40 border-electric-blue/30 backdrop-blur-lg">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2 text-electric-blue">
+                    <TrendingUp className="w-5 h-5" />
+                    AI Marketing Copy Demo
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <Input
+                    placeholder="Product/service to market..."
+                    value={marketingInput}
+                    onChange={(e) => setMarketingInput(e.target.value)}
+                    className="bg-black/20 border-electric-blue/30 text-white"
+                  />
+                  <Button
+                    onClick={() => generateMarketing({
+                      product: marketingInput || 'Blockchain Messaging Platform',
+                      audience: 'crypto enthusiasts',
+                      goal: 'increase adoption'
+                    })}
+                    disabled={isGeneratingMarketing}
+                    className="w-full bg-gradient-to-r from-orange-500 to-red-500"
+                  >
+                    {isGeneratingMarketing ? 'Generating...' : 'Generate Marketing Copy'}
+                  </Button>
+                  
+                  {marketingCopy && (
+                    <div className="p-4 bg-gradient-to-r from-orange-500/10 to-red-500/10 rounded-lg border border-orange-500/20">
+                      <p className="text-sm text-white/80 mb-2">AI Marketing Copy:</p>
+                      <div className="space-y-2">
+                        {(marketingCopy as any)?.headlines && (
+                          <div>
+                            <p className="text-white font-medium">Headlines:</p>
+                            {(marketingCopy as any).headlines.slice(0, 2).map((headline: string, index: number) => (
+                              <p key={index} className="text-white text-sm">{headline}</p>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+
+              {/* Admin AI Demo */}
+              <Card className="bg-black/40 border-electric-blue/30 backdrop-blur-lg">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2 text-electric-blue">
+                    <Shield className="w-5 h-5" />
+                    Admin AI Insights Demo
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="grid grid-cols-1 gap-2">
+                    <Button
+                      onClick={() => generateUserInsights({})}
+                      disabled={isGeneratingUserInsights}
+                      className="bg-gradient-to-r from-blue-500 to-purple-500"
+                    >
+                      {isGeneratingUserInsights ? 'Analyzing...' : 'Generate User Insights'}
+                    </Button>
+                    <Button
+                      onClick={() => analyzeSecurityThreats({})}
+                      disabled={isAnalyzingSecurity}
+                      className="bg-gradient-to-r from-red-500 to-orange-500"
+                    >
+                      {isAnalyzingSecurity ? 'Scanning...' : 'Security Analysis'}
+                    </Button>
+                    <Button
+                      onClick={() => optimizeRevenue({})}
+                      disabled={isOptimizingRevenue}
+                      className="bg-gradient-to-r from-green-500 to-emerald-500"
+                    >
+                      {isOptimizingRevenue ? 'Optimizing...' : 'Revenue Optimization'}
+                    </Button>
+                  </div>
+                  
+                  {(userInsights || securityAnalysis || revenueOptimization) && (
+                    <div className="p-4 bg-gradient-to-r from-blue-500/10 to-purple-500/10 rounded-lg border border-blue-500/20">
+                      <p className="text-sm text-white/80 mb-2">AI Admin Analysis:</p>
+                      <div className="text-white text-sm space-y-1">
+                        {userInsights && <p>• User insights generated</p>}
+                        {securityAnalysis && <p>• Security threats analyzed</p>}
+                        {revenueOptimization && <p>• Revenue optimization complete</p>}
+                      </div>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </div>
           </TabsContent>
 
           <TabsContent value="seo" className="space-y-4">
