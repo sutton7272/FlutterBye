@@ -13,6 +13,7 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Send, Users, Hash, Coins, MessageSquare, Plus, Settings, Smile, Reply, Edit3, Copy, Star, AlertTriangle, Volume2, VolumeX, Maximize2, Minimize2, Search, Filter, Clock, CheckCircle2, Circle, MoreVertical, Trash2, Pin, Heart, Zap, Gift, BarChart3, RotateCcw, Crown, Sparkles, TrendingUp, DollarSign, Award, Shield, Image, Paperclip, Mic, Video, Calendar, MapPin, Users2, Bot, Lock, Unlock, Eye, EyeOff, Bell, BellOff, Palette, Wand2, Flame, Target, MessageCircle, ThumbsUp, Share2, Download, Upload, Bookmark, Flag, Coffee, Rocket } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { VoiceMessageRecorder } from '@/components/voice-message-recorder';
 
 interface ChatRoom {
   id: string;
@@ -98,6 +99,8 @@ export function Chat() {
   const [showGifPicker, setShowGifPicker] = useState(false);
   const [currentTypingMode, setCurrentTypingMode] = useState<'normal' | 'premium' | 'ai'>('normal');
   const [isMobile, setIsMobile] = useState(false);
+  const [attachedVoice, setAttachedVoice] = useState<{ url: string; duration: number; type: 'voice' | 'music' } | null>(null);
+  const [showVoiceRecorder, setShowVoiceRecorder] = useState(false);
   
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const messageInputRef = useRef<HTMLTextAreaElement>(null);
@@ -1013,13 +1016,9 @@ export function Chat() {
                               variant="outline" 
                               size="sm"
                               className="border-purple-500/20 w-8 h-8 p-0"
-                              disabled={!isPremiumUser}
-                              onClick={() => {
-                                if (isPremiumUser) setIsRecording(!isRecording);
-                                else setShowPremiumModal(true);
-                              }}
+                              onClick={() => setShowVoiceRecorder(!showVoiceRecorder)}
                             >
-                              <Mic className={`w-3 h-3 ${isRecording ? 'text-red-400' : ''}`} />
+                              <Mic className={`w-3 h-3 ${showVoiceRecorder ? 'text-purple-400' : ''}`} />
                             </Button>
                           </TooltipTrigger>
                           <TooltipContent>
@@ -1077,7 +1076,7 @@ export function Chat() {
                       {/* Send Button */}
                       <Button 
                         onClick={sendMessage}
-                        disabled={!socket || !message.trim()}
+                        disabled={!socket || (!message.trim() && !attachedVoice)}
                         className="bg-purple-600 hover:bg-purple-700 w-8 h-8 p-0"
                       >
                         <Send className="w-3 h-3" />
@@ -1133,6 +1132,55 @@ export function Chat() {
                       </Dialog>
                     </div>
                   </div>
+                  
+                  {/* Voice Message Recorder */}
+                  {showVoiceRecorder && (
+                    <div className="mt-3">
+                      <VoiceMessageRecorder
+                        onVoiceAttached={(voiceData) => {
+                          setAttachedVoice(voiceData);
+                          toast({
+                            title: "Voice Attached!",
+                            description: `${voiceData.type === 'voice' ? 'Voice message' : 'Music'} ready to send`
+                          });
+                        }}
+                        maxDuration={120}
+                        showMusicUpload={true}
+                      />
+                    </div>
+                  )}
+                  
+                  {/* Attached Voice Preview */}
+                  {attachedVoice && (
+                    <div className="mt-3 p-3 bg-purple-900/20 rounded-lg border border-purple-500/20">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <div className="w-8 h-8 bg-purple-600/20 rounded-full flex items-center justify-center">
+                            {attachedVoice.type === 'voice' ? 
+                              <Mic className="w-4 h-4 text-purple-400" /> : 
+                              <Volume2 className="w-4 h-4 text-purple-400" />
+                            }
+                          </div>
+                          <div>
+                            <div className="text-sm font-medium text-white">
+                              {attachedVoice.type === 'voice' ? 'Voice Message' : 'Background Music'}
+                            </div>
+                            <div className="text-xs text-gray-400">
+                              {Math.round(attachedVoice.duration)}s duration
+                            </div>
+                          </div>
+                        </div>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => setAttachedVoice(null)}
+                          className="text-gray-400 hover:text-white"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </CardContent>
             </Card>

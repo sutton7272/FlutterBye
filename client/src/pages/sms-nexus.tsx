@@ -50,6 +50,7 @@ import { SmartScheduling } from '@/components/smart-scheduling';
 import { CommunityInsights } from '@/components/community-insights';
 import { ViralAccelerationEngine } from '@/components/viral-acceleration-engine';
 import { MonetizationHub } from '@/components/monetization-hub';
+import { VoiceMessageRecorder } from '@/components/voice-message-recorder';
 
 export function SMSNexusPage() {
   const [aiMessage, setAiMessage] = useState("");
@@ -59,6 +60,7 @@ export function SMSNexusPage() {
   const [emotionIntensity, setEmotionIntensity] = useState(5);
   const [viralScore, setViralScore] = useState(0);
   const [lastAnalysis, setLastAnalysis] = useState<any>(null);
+  const [attachedVoice, setAttachedVoice] = useState<{ url: string; duration: number; type: 'voice' | 'music' } | null>(null);
   const [showTemplates, setShowTemplates] = useState(false);
   const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
   const { toast } = useToast();
@@ -526,6 +528,18 @@ export function SMSNexusPage() {
                     </div>
                   </div>
                 </CardContent>
+                {/* Voice Message Recorder */}
+                <VoiceMessageRecorder
+                  onVoiceAttached={(voiceData) => {
+                    setAttachedVoice(voiceData);
+                    toast({
+                      title: "Voice Attached!",
+                      description: `${voiceData.type === 'voice' ? 'Voice message' : 'Music'} added to your FlutterWave message`
+                    });
+                  }}
+                  maxDuration={60}
+                  showMusicUpload={true}
+                />
               </Card>
 
               {/* Your Butterfly Results */}

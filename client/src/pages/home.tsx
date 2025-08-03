@@ -2,13 +2,14 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Link } from "wouter";
-import { ArrowRight, MessageSquare, Coins, Zap, TrendingUp, Users, Target, Sparkles, Heart, Building2 } from "lucide-react";
+import { ArrowRight, MessageSquare, Coins, Zap, TrendingUp, Users, Target, Sparkles, Heart, Building2, Mic } from "lucide-react";
 import flutterbeyeLogoPath from "@assets/image_1754068877999.png";
 import { QuickActionPanel } from "@/components/quick-action-panel";
 import { InteractiveStatsDashboard } from "@/components/interactive-stats-dashboard";
 import { EngagementBooster } from "@/components/engagement-booster";
 import { ViralSharingAssistant } from "@/components/viral-sharing-assistant";
 import { TutorialLaunchButton } from "@/components/interactive-tutorial";
+import { VoiceMessageRecorder } from "@/components/voice-message-recorder";
 
 interface RecentActivity {
   id: string;
@@ -253,6 +254,18 @@ export default function Home() {
                     <div>
                       <h3 className="font-bold text-lg">BUILD CULTS</h3>
                       <p className="text-gray-400 text-sm">Create communities around your tokenized messages</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="bg-gradient-to-r from-orange-900/40 to-amber-900/40 border-orange-500/20 backdrop-blur-sm">
+                <CardContent className="p-6">
+                  <div className="flex items-center gap-4">
+                    <Mic className="h-8 w-8 text-orange-400" />
+                    <div>
+                      <h3 className="font-bold text-lg">VOICE MESSAGES</h3>
+                      <p className="text-gray-400 text-sm">Attach voice notes and music to your emotional tokens</p>
                     </div>
                   </div>
                 </CardContent>

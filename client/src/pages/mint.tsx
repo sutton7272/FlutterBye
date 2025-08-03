@@ -16,7 +16,7 @@ import { apiRequest } from "@/lib/queryClient";
 import ImageUpload from "@/components/image-upload";
 import { LoadingSpinner } from "@/components/loading-spinner";
 import { validateTokenQuantity, validateWholeNumber } from "@/lib/validators";
-import { Coins, Upload, Calculator, DollarSign, Lock, Globe, Gift, AlertCircle, Wand2, Star, Sparkles, Users, Target, ImageIcon, FileImage, QrCode, Plus, X, Ticket, Loader2, Zap, CheckCircle } from "lucide-react";
+import { Coins, Upload, Calculator, DollarSign, Lock, Globe, Gift, AlertCircle, Wand2, Star, Sparkles, Users, Target, ImageIcon, FileImage, QrCode, Plus, X, Ticket, Loader2, Zap, CheckCircle, Mic } from "lucide-react";
 import AITextOptimizer from "@/components/ai-text-optimizer";
 import { EmotionAnalyzer } from "@/components/EmotionAnalyzer";
 import { ViralMechanics } from "@/components/ViralMechanics";
@@ -27,6 +27,7 @@ import { TransactionSuccessOverlay } from "@/components/confetti-celebration";
 import { ShareSuccessModal } from "@/components/ShareSuccessModal";
 import { TokenPriceComparison } from "@/components/token-price-comparison";
 import { MintingProgressOverlay } from "@/components/MintingProgressOverlay";
+import { VoiceMessageRecorder } from "@/components/voice-message-recorder";
 
 export default function Mint() {
   const { toast } = useToast();
@@ -97,6 +98,7 @@ export default function Mint() {
   const [isValidatingCode, setIsValidatingCode] = useState(false);
   const [validatedCode, setValidatedCode] = useState<any>(null);
   const [isFreeMode, setIsFreeMode] = useState(false);
+  const [attachedVoice, setAttachedVoice] = useState<{ url: string; duration: number; type: 'voice' | 'music' } | null>(null);
   
   // Progress tracking for step-by-step guidance
   const [currentStep, setCurrentStep] = useState(1);
@@ -205,6 +207,7 @@ export default function Mint() {
       setValidatedCode(null);
       setIsFreeMode(false);
       setMessageMedia([]);
+      setAttachedVoice(null);
     },
     onError: (error) => {
       setShowMintingProgress(false);
@@ -814,6 +817,39 @@ export default function Mint() {
                       <p className="text-sm text-green-700 dark:text-green-300 flex items-center">
                         <Sparkles className="w-4 h-4 mr-2" />
                         Image attached! Your token will stand out with this custom visual.
+                      </p>
+                    </div>
+                  )}
+                </div>
+
+                {/* Voice Message Attachment Section */}
+                <div className="space-y-4">
+                  <h4 className="text-lg font-semibold flex items-center">
+                    <Mic className="w-5 h-5 mr-2 text-orange-500" />
+                    Voice & Music Attachment (NEW!)
+                  </h4>
+                  <p className="text-sm text-muted-foreground">
+                    Add a personal voice message or background music to make your token truly special
+                  </p>
+                  
+                  <VoiceMessageRecorder
+                    onVoiceAttached={(voiceData) => {
+                      setAttachedVoice(voiceData);
+                      toast({
+                        title: "Voice Attached!",
+                        description: `${voiceData.type === 'voice' ? 'Voice message' : 'Music'} attached to your token`
+                      });
+                    }}
+                    maxDuration={90}
+                    showMusicUpload={true}
+                  />
+                  
+                  {attachedVoice && (
+                    <div className="p-3 bg-orange-50 dark:bg-orange-950/20 border border-orange-200 dark:border-orange-800 rounded-lg">
+                      <p className="text-sm text-orange-700 dark:text-orange-300 flex items-center">
+                        <CheckCircle className="w-4 h-4 mr-2" />
+                        {attachedVoice.type === 'voice' ? 'Voice message' : 'Background music'} attached! 
+                        ({Math.round(attachedVoice.duration)}s duration)
                       </p>
                     </div>
                   )}
