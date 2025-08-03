@@ -5704,6 +5704,91 @@ export async function registerRoutes(app: Express): Promise<Server> {
   const revolutionaryAIRoutes = await import('./revolutionary-ai-routes');
   app.use('/api/ai', revolutionaryAIRoutes.default);
 
+  // AI Marketing Analytics & Dynamic Pricing Routes
+  const { aiMarketingAnalytics } = await import('./ai-marketing-analytics');
+  const { aiPricingEngine } = await import('./ai-pricing-engine');
+
+  // Marketing Analytics Dashboard
+  app.get('/api/admin/marketing-analytics', async (req, res) => {
+    try {
+      const dashboard = await aiMarketingAnalytics.getMarketingDashboard();
+      res.json({ success: true, dashboard });
+    } catch (error) {
+      console.error('Marketing analytics error:', error);
+      res.status(500).json({ error: 'Failed to get marketing analytics' });
+    }
+  });
+
+  // User Behavior Analysis
+  app.post('/api/admin/analyze-user-behavior', async (req, res) => {
+    try {
+      const { userId, walletAddress } = req.body;
+      const behavior = await aiMarketingAnalytics.analyzeUserBehavior(userId, walletAddress);
+      res.json({ success: true, behavior });
+    } catch (error) {
+      console.error('User behavior analysis error:', error);
+      res.status(500).json({ error: 'Failed to analyze user behavior' });
+    }
+  });
+
+  // Marketing Insights Generation
+  app.get('/api/admin/marketing-insights', async (req, res) => {
+    try {
+      const insights = await aiMarketingAnalytics.generateMarketingInsights();
+      res.json({ success: true, insights });
+    } catch (error) {
+      console.error('Marketing insights error:', error);
+      res.status(500).json({ error: 'Failed to generate insights' });
+    }
+  });
+
+  // Dynamic Pricing Recommendations
+  app.post('/api/admin/dynamic-pricing', async (req, res) => {
+    try {
+      const { productId, basePrice } = req.body;
+      const recommendation = await aiMarketingAnalytics.generateDynamicPricing(productId, basePrice);
+      res.json({ success: true, recommendation });
+    } catch (error) {
+      console.error('Dynamic pricing error:', error);
+      res.status(500).json({ error: 'Failed to generate pricing recommendation' });
+    }
+  });
+
+  // Site-wide Pricing Configuration
+  app.get('/api/admin/site-wide-pricing', async (req, res) => {
+    try {
+      const pricing = aiPricingEngine.getSiteWidePricing();
+      res.json({ success: true, pricing });
+    } catch (error) {
+      console.error('Site-wide pricing error:', error);
+      res.status(500).json({ error: 'Failed to get pricing configuration' });
+    }
+  });
+
+  // Personalized Pricing for User
+  app.post('/api/pricing/personalized', async (req, res) => {
+    try {
+      const { userId, walletAddress } = req.body;
+      const personalizedPricing = await aiPricingEngine.getPersonalizedPricing(userId, walletAddress);
+      res.json({ success: true, personalizedPricing });
+    } catch (error) {
+      console.error('Personalized pricing error:', error);
+      res.status(500).json({ error: 'Failed to get personalized pricing' });
+    }
+  });
+
+  // User Activity Factors Analysis
+  app.post('/api/admin/user-activity-factors', async (req, res) => {
+    try {
+      const { userId, walletAddress } = req.body;
+      const factors = await aiPricingEngine.calculateUserActivityFactors(userId, walletAddress);
+      res.json({ success: true, factors });
+    } catch (error) {
+      console.error('Activity factors error:', error);
+      res.status(500).json({ error: 'Failed to calculate activity factors' });
+    }
+  });
+
   console.log('🚀 Production-grade server with real-time monitoring initialized');
   console.log('🤖 Living AI personality system activated');
   console.log('🌟 Immersive AI experience system launched');

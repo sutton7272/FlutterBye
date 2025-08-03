@@ -380,6 +380,24 @@ function Router() {
             </>
           );
         }} />
+        <Route path="/ai-marketing-dashboard" component={() => {
+          const AIMarketingDashboard = lazy(() => import('./pages/ai-marketing-dashboard'));
+          return (
+            <>
+              <Navbar />
+              <Suspense fallback={
+                <div className="flex items-center justify-center min-h-screen">
+                  <div className="text-center">
+                    <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-green-500 mx-auto mb-4"></div>
+                    <p className="text-lg text-gray-600">Loading AI Marketing Dashboard...</p>
+                  </div>
+                </div>
+              }>
+                <AIMarketingDashboard />
+              </Suspense>
+            </>
+          );
+        }} />
         <Route path="/claim/:collectionId" component={NFTClaim} />
         <Route path="/claim/:collectionId/:tokenNumber" component={NFTClaim} />
         <Route component={NotFound} />
