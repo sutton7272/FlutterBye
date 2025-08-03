@@ -799,10 +799,10 @@ export default function AdminDashboard() {
           {/* Pricing Management Tab */}
           <TabsContent value="pricing" className="space-y-6">
             <AdminPricingManagement />
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              
-              {/* Redemption Code Analytics */}
-              <Card className="glassmorphism">
+          </TabsContent>
+
+          <TabsContent value="content" className="space-y-6">
+            <Card className="glassmorphism">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <Ticket className="w-5 h-5" />
