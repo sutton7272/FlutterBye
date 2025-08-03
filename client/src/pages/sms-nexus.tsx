@@ -36,8 +36,14 @@ import {
   Coins,
   Calendar,
   MessageCircle,
-  Send
+  Send,
+  BookOpen,
+  Trophy,
+  Filter
 } from "lucide-react";
+import { MessageTemplates } from '@/components/message-templates';
+import { AdvancedFilters } from '@/components/advanced-filters';
+import { EnhancedAnalytics } from '@/components/enhanced-analytics';
 
 export function SMSNexusPage() {
   const [aiMessage, setAiMessage] = useState("");
@@ -47,6 +53,8 @@ export function SMSNexusPage() {
   const [emotionIntensity, setEmotionIntensity] = useState(5);
   const [viralScore, setViralScore] = useState(0);
   const [lastAnalysis, setLastAnalysis] = useState<any>(null);
+  const [showTemplates, setShowTemplates] = useState(false);
+  const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
   const { toast } = useToast();
 
   // Revolutionary AI-powered emotion analysis
@@ -338,9 +346,50 @@ export function SMSNexusPage() {
                       placeholder="Example: 'Thank you for your support!' or 'Hope you have a great day!'"
                       className="bg-white/10 border-white/20 text-white placeholder:text-gray-400 min-h-[120px] text-lg"
                     />
-                    <div className="text-sm text-gray-400">
-                      💡 Tip: Messages with positive emotions like gratitude, love, or encouragement perform best
+                    <div className="flex items-center justify-between text-sm">
+                      <div className="text-gray-400">
+                        💡 Tip: Messages with positive emotions like gratitude, love, or encouragement perform best
+                      </div>
+                      <div className="text-gray-500">
+                        {aiMessage.length}/500 characters
+                      </div>
                     </div>
+                    
+                    {/* Quick Message Templates */}
+                    {!aiMessage && (
+                      <div className="space-y-2">
+                        <div className="flex items-center justify-between">
+                          <div className="text-sm text-gray-400">Or try these popular templates:</div>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => setShowTemplates(true)}
+                            className="text-xs bg-white/5 border-white/20 text-gray-300 hover:bg-white/10 hover:text-white"
+                          >
+                            <Star className="h-3 w-3 mr-1" />
+                            View All Templates
+                          </Button>
+                        </div>
+                        <div className="flex flex-wrap gap-2">
+                          {[
+                            "Thank you for believing in me! 💕",
+                            "Sending you positive vibes today! ✨",
+                            "You are amazing and deserve great things! 🌟",
+                            "Hope your day is filled with joy! 😊"
+                          ].map((template, index) => (
+                            <Button
+                              key={index}
+                              variant="outline"
+                              size="sm"
+                              onClick={() => setAiMessage(template)}
+                              className="text-xs bg-white/5 border-white/20 text-gray-300 hover:bg-white/10 hover:text-white"
+                            >
+                              {template}
+                            </Button>
+                          ))}
+                        </div>
+                      </div>
+                    )}
                   </div>
                   
                   <div className="space-y-3">
@@ -445,6 +494,21 @@ export function SMSNexusPage() {
                       </div>
                     </div>
 
+                    {/* Action Buttons */}
+                    <div className="flex gap-3 pt-4">
+                      <Button className="flex-1 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700">
+                        <Send className="h-4 w-4 mr-2" />
+                        Send Message
+                      </Button>
+                      <Button variant="outline" className="border-white/20 text-white hover:bg-white/10">
+                        <Share2 className="h-4 w-4 mr-2" />
+                        Share
+                      </Button>
+                      <Button variant="outline" className="border-white/20 text-white hover:bg-white/10">
+                        Save Draft
+                      </Button>
+                    </div>
+
                     {lastAnalysis.emotionalTriggers && lastAnalysis.emotionalTriggers.length > 0 && (
                       <div className="space-y-2">
                         <div className="text-sm text-gray-300">Emotional Triggers Detected</div>
@@ -516,6 +580,26 @@ export function SMSNexusPage() {
 
           {/* Campaigns Tab - Easy Campaign Creation */}
           <TabsContent value="campaigns" className="space-y-6">
+            {/* Campaign Templates */}
+            <div className="grid md:grid-cols-3 gap-4 mb-6">
+              {[
+                { name: "Gratitude Blast", description: "Thank your community", icon: Heart, color: "from-pink-500 to-red-500" },
+                { name: "Motivation Wave", description: "Inspire and energize", icon: Rocket, color: "from-orange-500 to-yellow-500" },
+                { name: "Celebration Share", description: "Share good news", icon: Star, color: "from-purple-500 to-blue-500" }
+              ].map((template, index) => (
+                <Card key={index} className={`bg-gradient-to-br ${template.color}/10 border-${template.color.split('-')[1]}-500/30 hover:scale-105 transition-all cursor-pointer`}>
+                  <CardContent className="p-4 text-center space-y-2">
+                    <template.icon className="h-8 w-8 mx-auto text-white" />
+                    <h3 className="text-white font-semibold">{template.name}</h3>
+                    <p className="text-gray-300 text-sm">{template.description}</p>
+                    <Button size="sm" className={`bg-gradient-to-r ${template.color} text-white`}>
+                      Use Template
+                    </Button>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+
             <div className="grid lg:grid-cols-2 gap-6">
               <Card className="bg-black/40 backdrop-blur-sm border-blue-500/30">
                 <CardHeader>
@@ -1031,6 +1115,31 @@ export function SMSNexusPage() {
           {/* How It Works Tab - Simple Explanation */}
           <TabsContent value="help" className="space-y-6">
           <div className="max-w-4xl mx-auto space-y-8">
+            
+            {/* Interactive Tutorial */}
+            <Card className="bg-gradient-to-r from-indigo-500/10 to-purple-500/10 border-indigo-400/30">
+              <CardContent className="p-8">
+                <div className="text-center space-y-4">
+                  <div className="w-16 h-16 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full mx-auto flex items-center justify-center">
+                    <BookOpen className="h-8 w-8 text-white" />
+                  </div>
+                  <h2 className="text-3xl font-bold text-white">Interactive Tutorial</h2>
+                  <p className="text-indigo-200 text-lg max-w-2xl mx-auto">
+                    Take a 5-minute guided tour to master FlutterWave and start earning from your emotions
+                  </p>
+                  <div className="flex gap-4 justify-center">
+                    <Button className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 px-8 py-3">
+                      <Rocket className="h-5 w-5 mr-2" />
+                      Start Tutorial
+                    </Button>
+                    <Button variant="outline" className="border-white/20 text-white hover:bg-white/10 px-8 py-3">
+                      <Trophy className="h-5 w-5 mr-2" />
+                      View Achievements
+                    </Button>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
             <Card className="bg-gradient-to-r from-blue-500/10 to-purple-500/10 border-blue-400/30">
               <CardContent className="p-8">
                 <div className="text-center space-y-4">
@@ -1164,12 +1273,17 @@ export function SMSNexusPage() {
                 </div>
               </div>
               
-              <div className="text-center text-gray-300">
-                <p className="text-lg mb-4">Create your first FlutterWave message to see detailed analytics here!</p>
-                <Button className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700">
-                  <MessageSquare className="h-4 w-4 mr-2" />
-                  Create Your First Message
-                </Button>
+              <div className="space-y-6">
+                <div className="text-center text-gray-300">
+                  <p className="text-lg mb-4">Create your first FlutterWave message to see detailed analytics here!</p>
+                  <Button className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700">
+                    <MessageSquare className="h-4 w-4 mr-2" />
+                    Create Your First Message
+                  </Button>
+                </div>
+
+                {/* Enhanced Analytics Dashboard */}
+                <EnhancedAnalytics />
               </div>
             </CardContent>
           </Card>
@@ -1181,17 +1295,74 @@ export function SMSNexusPage() {
         <Card className="bg-gradient-to-r from-purple-900/40 to-blue-900/40 backdrop-blur-sm border border-purple-500/30">
           <CardContent className="p-6">
             <div className="flex items-center justify-center">
-              <div className="text-center">
+              <div className="text-center space-y-4">
                 <h3 className="text-2xl font-bold text-white mb-2">Ready to ride the FlutterWave?</h3>
                 <p className="text-purple-200 mb-4">Join the revolution and transform every message into precious blockchain butterflies</p>
-                <Button className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 px-6 py-3">
-                  <Sparkles className="h-4 w-4 mr-2" />
-                  Get Started Now
-                </Button>
+                <div className="flex gap-4 justify-center">
+                  <Button className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 px-6 py-3">
+                    <Sparkles className="h-4 w-4 mr-2" />
+                    Get Started Now
+                  </Button>
+                  <Button variant="outline" className="border-white/20 text-white hover:bg-white/10 px-6 py-3">
+                    <Eye className="h-4 w-4 mr-2" />
+                    Watch Demo
+                  </Button>
+                </div>
+                
+                {/* Quick Stats */}
+                <div className="grid grid-cols-3 gap-4 mt-6 pt-6 border-t border-white/10">
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-green-400">1,247</div>
+                    <div className="text-xs text-gray-400">Messages Sent</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-blue-400">89.3%</div>
+                    <div className="text-xs text-gray-400">Success Rate</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-purple-400">42.7 SOL</div>
+                    <div className="text-xs text-gray-400">Value Created</div>
+                  </div>
+                </div>
               </div>
             </div>
           </CardContent>
         </Card>
+
+        {/* Enhanced Modals */}
+        {showTemplates && (
+          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+            <div className="bg-gray-900 rounded-lg border border-purple-500/30 max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+              <div className="p-6">
+                <div className="flex justify-between items-center mb-6">
+                  <h2 className="text-2xl font-bold text-white">Message Templates</h2>
+                  <Button variant="ghost" onClick={() => setShowTemplates(false)}>
+                    <Eye className="h-4 w-4 text-gray-400" />
+                  </Button>
+                </div>
+                <MessageTemplates onSelectTemplate={(template) => {
+                  setAiMessage(template);
+                  setShowTemplates(false);
+                }} />
+              </div>
+            </div>
+          </div>
+        )}
+
+        {showAdvancedFilters && (
+          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+            <AdvancedFilters 
+              onFiltersChange={(filters) => {
+                console.log('Applied filters:', filters);
+                toast({
+                  title: "Filters Applied",
+                  description: "Your results have been filtered successfully"
+                });
+              }}
+              onClose={() => setShowAdvancedFilters(false)}
+            />
+          </div>
+        )}
       </div>
     </div>
   );
