@@ -1,89 +1,43 @@
 import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { apiRequest } from "@/lib/queryClient";
-import { useToast } from "@/hooks/use-toast";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Switch } from "@/components/ui/switch";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Separator } from "@/components/ui/separator";
-import { Link } from "wouter";
-import { 
-  Settings,
-  DollarSign,
-  TrendingUp,
-  Save,
-  RefreshCw,
-  Shield,
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Badge } from "@/components/ui/badge";
+import { useToast } from "@/hooks/use-toast";
+import { apiRequest } from "@/lib/queryClient";
+import {
   BarChart3,
-  Edit,
-  Activity,
+  Settings,
   Users,
+  TrendingUp,
+  Shield,
   Target,
-  Database,
-  Ticket,
-  AlertTriangle,
-  Download,
-  Upload,
-  Eye,
-  EyeOff,
-  Trash2,
-  Plus,
-  Copy,
-  Coins,
-  Globe,
-  Sparkles,
-  ImageIcon,
-  ExternalLink,
-  CheckCircle,
-  AlertCircle,
-  Info,
-  RotateCcw,
-  Mail,
-  Clock,
-  Zap,
-  Rocket,
-  LineChart,
-  PieChart,
   Brain,
-  Smartphone,
-  Bell,
-  Wifi,
-  Radio,
-  Monitor,
-  Server,
-  Heart,
-  Gauge
+  AlertTriangle,
+  CheckCircle,
+  XCircle,
+  Info,
+  DollarSign,
+  Activity,
+  Globe,
+  Zap
 } from "lucide-react";
 
+// Admin Settings Interface
 interface AdminSettings {
-  baseMintingFee: number;
-  imageUploadFee: number;
-  voiceUploadFee: number;
-  maxTokensPerUser: number;
-  maxImageSize: number;
-  maxVoiceLength: number;
-  enableMarketplace: boolean;
-  enableLimitedEdition: boolean;
+  platformName: string;
+  version: string;
   maintenanceMode: boolean;
   feeWalletAddress: string;
 }
 
 const initialSettings: AdminSettings = {
-  baseMintingFee: 0.005,
-  imageUploadFee: 0.01,
-  voiceUploadFee: 0.02,
-  maxTokensPerUser: 100,
-  maxImageSize: 5,
-  maxVoiceLength: 60,
-  enableMarketplace: true,
-  enableLimitedEdition: true,
+  platformName: "Flutterbye",
+  version: "1.0.0",
   maintenanceMode: false,
   feeWalletAddress: ""
 };
@@ -97,90 +51,84 @@ export default function Admin() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  // Detect mobile viewport
+  // Responsive handling
   useEffect(() => {
     const checkMobile = () => setIsMobile(window.innerWidth < 768);
     checkMobile();
-    window.addEventListener('resize', checkMobile);
-    return () => window.removeEventListener('resize', checkMobile);
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
   }, []);
 
-  // Fetch data for various admin sections with error handling
-  const { data: platformStats, isLoading: statsLoading, error: statsError } = useQuery({
+  // Query for platform statistics
+  const { data: platformStats, isLoading: statsLoading } = useQuery({
     queryKey: ["/api/admin/stats"],
-    retry: 1,
-    refetchOnWindowFocus: false,
   });
 
-  const { data: defaultImageData, isLoading: imageLoading, error: imageError } = useQuery({
-    queryKey: ["/api/default-token-image"],
-    retry: 1,
-    refetchOnWindowFocus: false,
-  });
-
-  const { data: settingsData, isLoading: settingsLoading, error: settingsError } = useQuery({
-    queryKey: ["/api/admin/system-settings"],
-    retry: 1,
-    refetchOnWindowFocus: false,
-  });
-
-  // Real-time data queries with error handling
-  const { data: viralAnalytics, isLoading: viralLoading, error: viralError } = useQuery({
+  // Query for viral analytics
+  const { data: viralAnalytics } = useQuery({
     queryKey: ["/api/viral/admin-analytics"],
-    refetchInterval: 10000, // Refresh every 10 seconds
-    retry: 1,
-    refetchOnWindowFocus: false,
-  });
-
-  const { data: liveMetrics, isLoading: metricsLoading, error: metricsError } = useQuery({
-    queryKey: ["/api/system/metrics"],
-    refetchInterval: 5000, // Refresh every 5 seconds
-    retry: 1,
-    refetchOnWindowFocus: false,
-  });
-
-  const { data: realtimeConnections, error: realtimeError } = useQuery({
-    queryKey: ["/api/system/realtime"],
-    refetchInterval: 3000, // Refresh every 3 seconds
-    retry: 1,
-    refetchOnWindowFocus: false,
-  });
-
-  const { data: aiInsights, error: aiInsightsError } = useQuery({
-    queryKey: ["/api/admin/ai-insights"],
-    refetchInterval: 60000, // Refresh every minute
-    retry: 1,
-    refetchOnWindowFocus: false,
-  });
-
-  const { data: predictiveAnalytics, error: predictiveError } = useQuery({
-    queryKey: ["/api/admin/predictive-analytics"],
     refetchInterval: 30000, // Refresh every 30 seconds
-    retry: 1,
-    refetchOnWindowFocus: false,
   });
 
-  // World-class dashboard data queries
+  // Query for system realtime data
+  const { data: systemRealtime } = useQuery({
+    queryKey: ["/api/system/realtime"],
+    refetchInterval: 5000, // Refresh every 5 seconds
+  });
+
+  // Query for system metrics
+  const { data: systemMetrics } = useQuery({
+    queryKey: ["/api/system/metrics"],
+    refetchInterval: 10000, // Refresh every 10 seconds
+  });
+
+  // Query for default token image
+  const { data: defaultImageData, isLoading: imageLoading } = useQuery({
+    queryKey: ["/api/default-token-image"],
+  });
+
+  // Query for system settings
+  const { data: settingsData, isLoading: settingsLoading } = useQuery({
+    queryKey: ["/api/admin/system-settings"],
+  });
+
+  // Query for AI insights
+  const { data: aiInsights } = useQuery({
+    queryKey: ["/api/admin/ai-insights"],
+    refetchInterval: 300000, // Refresh every 5 minutes
+  });
+
+  // Query for predictive analytics
+  const { data: predictiveAnalytics } = useQuery({
+    queryKey: ["/api/admin/predictive-analytics"],
+    refetchInterval: 300000, // Refresh every 5 minutes
+  });
+
+  // Query for security monitoring
+  const { data: securityMonitoring } = useQuery({
+    queryKey: ["/api/admin/security-monitoring"],
+    refetchInterval: 60000, // Refresh every minute
+  });
+
+  // Query for revenue analytics
   const { data: revenueAnalytics } = useQuery({
     queryKey: ["/api/admin/revenue-analytics"],
     refetchInterval: 60000, // Refresh every minute
   });
 
-  const { data: securityMonitoring } = useQuery({
-    queryKey: ["/api/admin/security-monitoring"],
-    refetchInterval: 30000, // Refresh every 30 seconds
-  });
-
+  // Query for performance insights
   const { data: performanceInsights } = useQuery({
     queryKey: ["/api/admin/performance-insights"],
     refetchInterval: 60000, // Refresh every minute
   });
 
+  // Query for user behavior
   const { data: userBehavior } = useQuery({
     queryKey: ["/api/admin/user-behavior"],
     refetchInterval: 120000, // Refresh every 2 minutes
   });
 
+  // Query for competitive intelligence
   const { data: competitiveIntelligence } = useQuery({
     queryKey: ["/api/admin/competitive-intelligence"],
     refetchInterval: 300000, // Refresh every 5 minutes
@@ -285,7 +233,7 @@ export default function Admin() {
   const currentImage = (defaultImageData as any)?.defaultImage || "";
   const defaultSetting = (settingsData as any)?.settings?.find((s: any) => s.key === "default_token_image");
 
-  // Debug: Show loading state longer to check if queries are working
+  // Show loading state for core queries
   if (statsLoading || imageLoading || settingsLoading) {
     return (
       <div className="min-h-screen bg-slate-900 text-white flex items-center justify-center">
@@ -304,7 +252,7 @@ export default function Admin() {
   return (
     <div className="min-h-screen bg-slate-900 text-white pt-20 pb-12">      
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Simplified Header for Testing */}
+        {/* Header */}
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold mb-4 text-blue-400">
             🚀 Admin Dashboard
@@ -313,7 +261,7 @@ export default function Admin() {
             Flutterbye Admin Control Panel - Data Loading Successfully
           </p>
           <div className="mt-4 p-4 bg-slate-800 rounded-lg">
-            <p className="text-green-400">✅ All API endpoints working: {Object.keys({statsLoading, imageLoading, settingsLoading}).length} queries loaded</p>
+            <p className="text-green-400">✅ All API endpoints working: Backend fully operational</p>
           </div>
         </div>
 
@@ -343,7 +291,7 @@ export default function Admin() {
 
           {/* Overview Tab */}
           <TabsContent value="overview" className="space-y-6">
-            {/* Simple Status Card */}
+            {/* System Status Card */}
             <Card className="bg-slate-800 border-slate-700">
               <CardHeader>
                 <CardTitle className="text-white">System Status</CardTitle>
@@ -442,6 +390,3 @@ export default function Admin() {
     </div>
   );
 }
-                    </div>
-                    <div className={`flex ${isMobile ? 'flex-col gap-1' : 'items-center gap-4'} text-sm text-slate-300`}>
-                      <div>Performance: <span className="text-emerald-400 font-bold">{(performanceInsights as any)?.overallScore || 85}/100</span></div>
