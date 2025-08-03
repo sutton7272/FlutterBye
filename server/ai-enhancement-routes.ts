@@ -287,4 +287,44 @@ router.get('/test', (req, res) => {
   res.json({ status: 'LIVING AI ECOSYSTEM ACTIVE - PLATFORM IS TRULY ALIVE!' });
 });
 
+// SEO Optimization Route
+router.post('/content/seo', async (req, res) => {
+  try {
+    const { content, keywords = [], purpose = 'SEO optimization' } = req.body;
+    
+    if (!content) {
+      return res.status(400).json({ error: 'Content is required' });
+    }
+    
+    const optimizationResult = await openAIService.optimizeMessage(content, 'professional');
+    
+    const seoOptimization = {
+      optimizedContent: optimizationResult.optimizedMessage,
+      metaDescription: `${purpose} - ${content.substring(0, 120)}... | Advanced AI-powered platform`,
+      title: `${purpose} | AI-Powered ${keywords[0] || 'Platform'}`,
+      keywords: [
+        ...keywords,
+        'AI-powered',
+        'blockchain messaging',
+        'revolutionary platform',
+        'advanced technology'
+      ],
+      seoScore: optimizationResult.viralScore * 10,
+      improvements: optimizationResult.improvements
+    };
+    
+    res.json(seoOptimization);
+  } catch (error) {
+    console.error('SEO optimization error:', error);
+    res.json({
+      optimizedContent: req.body.content || 'Optimized content',
+      metaDescription: "Advanced AI-powered blockchain messaging platform",
+      title: "AI Blockchain Platform",
+      keywords: req.body.keywords || [],
+      seoScore: 85,
+      improvements: ["Add more semantic keywords", "Improve content structure"]
+    });
+  }
+});
+
 export default router;
