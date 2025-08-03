@@ -164,22 +164,22 @@ export default function Marketplace() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-indigo-950 pt-20 pb-12 text-white">
+    <div className="min-h-screen text-white pt-20 pb-12 overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold mb-4 bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
-            Flutterbye Marketplace
+          <h1 className="text-4xl font-bold mb-4 text-gradient">
+            🚀 UNIFIED MARKETPLACE
           </h1>
-          <p className="text-xl text-slate-300">Trade FLBY tokens and FlutterArt NFTs with burn-to-redeem mechanics</p>
+          <p className="text-xl text-gray-300">Trade FLBY tokens and revolutionary FlutterArt NFTs with burn-to-redeem mechanics</p>
         </div>
         
         <Tabs defaultValue="tokens" className="w-full">
-          <TabsList className="grid w-full grid-cols-2 mb-8 bg-slate-800 border-slate-700">
-            <TabsTrigger value="tokens" className="flex items-center gap-2 data-[state=active]:bg-slate-700">
+          <TabsList className="grid w-full grid-cols-2 mb-8 glassmorphism electric-frame">
+            <TabsTrigger value="tokens" className="flex items-center gap-2 data-[state=active]:bg-primary/20 text-white">
               <Zap className="w-4 h-4" />
               FLBY Tokens
             </TabsTrigger>
-            <TabsTrigger value="nfts" className="flex items-center gap-2 data-[state=active]:bg-slate-700">
+            <TabsTrigger value="nfts" className="flex items-center gap-2 data-[state=active]:bg-secondary/20 text-white">
               <Gem className="w-4 h-4" />
               FlutterArt NFTs
             </TabsTrigger>
@@ -187,7 +187,7 @@ export default function Marketplace() {
 
           <TabsContent value="tokens" className="space-y-8">
             {/* Search and Filters for Tokens */}
-            <Card className="bg-slate-900/50 border-slate-700">
+            <Card className="glassmorphism electric-frame">
               <CardContent className="p-6">
                 <div className="flex flex-col md:flex-row gap-4 items-center">
                   <div className="flex-1 relative">
@@ -196,12 +196,12 @@ export default function Marketplace() {
                       placeholder="Search tokens by message or creator..."
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
-                      className="pl-10 bg-slate-800 border-slate-600 text-white"
+                      className="pl-10 glassmorphism border-primary/30 text-white"
                     />
                   </div>
                   
                   <Select value={priceFilter} onValueChange={setPriceFilter}>
-                    <SelectTrigger className="w-full md:w-48 bg-slate-800 border-slate-600 text-white">
+                    <SelectTrigger className="w-full md:w-48 glassmorphism border-primary/30 text-white">
                       <SelectValue placeholder="Filter by price" />
                     </SelectTrigger>
                     <SelectContent>

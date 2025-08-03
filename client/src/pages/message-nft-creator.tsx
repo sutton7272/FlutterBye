@@ -238,31 +238,31 @@ export default function MessageNFTCreator() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900">
+    <div className="min-h-screen text-white pt-20 pb-12 overflow-hidden">
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
         <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-white mb-4 flex items-center justify-center gap-3">
-            <Sparkles className="h-8 w-8 text-blue-400" />
-            FlutterArt Creator
-            <Hash className="h-8 w-8 text-green-400" />
+          <h1 className="text-4xl font-bold text-gradient mb-4 flex items-center justify-center gap-3">
+            <Sparkles className="h-8 w-8 text-primary" />
+            FLUTTERART CREATOR
+            <Hash className="h-8 w-8 text-secondary" />
           </h1>
-          <p className="text-slate-300 text-lg max-w-2xl mx-auto">
+          <p className="text-gray-300 text-lg max-w-2xl mx-auto">
             Transform your messages into limited edition NFTs with attached value, QR codes, and blockchain ownership
           </p>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Creation Form */}
-          <Card className="bg-slate-800/80 border-blue-500/30 backdrop-blur-sm">
+          <Card className="glassmorphism electric-frame">
             <CardHeader>
               <CardTitle className="text-white flex items-center gap-2">
-                <Zap className="h-5 w-5 text-yellow-400" />
+                <Zap className="h-5 w-5 text-primary" />
                 Create Collection
               </CardTitle>
-              <CardDescription className="text-slate-300">
+              <CardDescription className="text-gray-300">
                 Design your limited edition Message NFT collection
-|| </CardDescription>
+              </CardDescription>
             </CardHeader>
             <CardContent>
               <form onSubmit={handleSubmit} className="space-y-6">
@@ -274,9 +274,9 @@ export default function MessageNFTCreator() {
                     placeholder="Enter your message that will be minted as NFTs..."
                     value={formData.message}
                     onChange={(e) => setFormData(prev => ({ ...prev, message: e.target.value }))}
-                    className="bg-slate-700 border-slate-600 text-white min-h-[100px]"
+                    className="glassmorphism border-primary/30 text-white min-h-[100px]"
                   />
-                  <p className="text-sm text-slate-400">
+                  <p className="text-sm text-gray-400">
                     {formData.message.length} characters
                   </p>
                 </div>
@@ -290,7 +290,7 @@ export default function MessageNFTCreator() {
                       placeholder="My Message Collection"
                       value={formData.collectionName}
                       onChange={(e) => setFormData(prev => ({ ...prev, collectionName: e.target.value }))}
-                      className="bg-slate-700 border-slate-600 text-white"
+                      className="glassmorphism border-primary/30 text-white"
                     />
                   </div>
                   
@@ -303,7 +303,7 @@ export default function MessageNFTCreator() {
                       max="10000"
                       value={formData.totalSupply}
                       onChange={(e) => setFormData(prev => ({ ...prev, totalSupply: parseInt(e.target.value) }))}
-                      className="bg-slate-700 border-slate-600 text-white"
+                      className="glassmorphism border-primary/30 text-white"
                     />
                   </div>
                 </div>
