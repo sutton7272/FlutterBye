@@ -130,7 +130,7 @@ function Router() {
         <Route path="/admin" component={() => (
           <>
             <Navbar />
-            <UnifiedAdminDashboard />
+            <Admin />
           </>
         )} />
         <Route path="/admin-legacy" component={() => (
