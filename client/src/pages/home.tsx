@@ -278,7 +278,7 @@ export default function Home() {
             </Link>
 
             {/* Admin Portal */}
-            <Link href="/admin">
+            <Link href="/admin-unified">
               <Card className="bg-gradient-to-br from-blue-900/60 to-cyan-900/60 border-blue-500/30 backdrop-blur-sm hover:border-blue-400/60 transition-all duration-300 h-full cursor-pointer group">
                 <CardContent className="p-6 text-center">
                   <Shield className="h-12 w-12 text-blue-400 mx-auto mb-4 group-hover:scale-110 transition-transform" />

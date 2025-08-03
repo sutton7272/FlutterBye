@@ -3,7 +3,7 @@ import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { EarlyAccessGate } from "@/components/early-access-gate";
-import { useState, useEffect } from "react";
+import { useState, useEffect, lazy, Suspense } from "react";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/not-found";
 import Home from "@/pages/home";
@@ -142,6 +142,12 @@ function Router() {
             <UnifiedAdminDashboard />
           </>
         )} />
+        <Route path="/admin-unified" component={() => (
+          <>
+            <Navbar />
+            <UnifiedAdminDashboard />
+          </>
+        )} />
         <Route path="/admin-legacy" component={() => (
           <>
             <Navbar />
@@ -268,42 +274,31 @@ function Router() {
             <FlbyAirdrop />
           </>
         )} />
-        <Route path="/admin/staking" component={() => (
-          <>
-            <Navbar />
-            <AdminStaking />
-          </>
-        )} />
-        <Route path="/admin/early-access" component={() => (
-          <>
-            <Navbar />
-            <AdminEarlyAccess />
-          </>
-        )} />
-        <Route path="/admin/free-codes" component={() => (
-          <>
-            <Navbar />
-            <AdminFreeCodes />
-          </>
-        )} />
-        <Route path="/admin/default-image" component={() => (
-          <>
-            <Navbar />
-            <AdminDefaultImage />
-          </>
-        )} />
-        <Route path="/admin/pricing" component={() => (
-          <>
-            <Navbar />
-            <AdminPricing />
-          </>
-        )} />
-        <Route path="/admin/subscriptions" component={() => (
-          <>
-            <Navbar />
-            <AdminSubscriptions />
-          </>
-        )} />
+        {/* Redirect old admin routes to unified dashboard */}
+        <Route path="/admin/staking" component={() => {
+          window.location.href = '/admin-unified?tab=staking';
+          return null;
+        }} />
+        <Route path="/admin/early-access" component={() => {
+          window.location.href = '/admin-unified?tab=access';
+          return null;
+        }} />
+        <Route path="/admin/free-codes" component={() => {
+          window.location.href = '/admin-unified?tab=codes';
+          return null;
+        }} />
+        <Route path="/admin/default-image" component={() => {
+          window.location.href = '/admin-unified?tab=settings';
+          return null;
+        }} />
+        <Route path="/admin/pricing" component={() => {
+          window.location.href = '/admin-unified?tab=pricing';
+          return null;
+        }} />
+        <Route path="/admin/subscriptions" component={() => {
+          window.location.href = '/admin-unified?tab=pricing';
+          return null;
+        }} />
         <Route path="/referrals" component={() => (
           <>
             <Navbar />
@@ -386,12 +381,10 @@ function Router() {
             <AllOpportunities />
           </>
         )} />
-        <Route path="/admin/api-monetization" component={() => (
-          <>
-            <Navbar />
-            <AdminAPIMonetization />
-          </>
-        )} />
+        <Route path="/admin/api-monetization" component={() => {
+          window.location.href = '/admin-unified?tab=api';
+          return null;
+        }} />
         <Route path="/revolutionary-ai" component={() => {
           const RevolutionaryAIShowcase = lazy(() => import('./pages/revolutionary-ai-showcase'));
           return (
