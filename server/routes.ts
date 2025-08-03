@@ -5700,7 +5700,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // REVOLUTIONARY AI ENHANCEMENT ROUTES - Universal AI features
   app.use("/api/ai", aiEnhancementRoutes);
   
-  // Advanced AI features are now included in ai-enhancement-routes
+  // Revolutionary AI Routes - Complete four-system integration
+  const revolutionaryAIRoutes = await import('./revolutionary-ai-routes');
+  app.use('/api/ai', revolutionaryAIRoutes.default);
 
   console.log('🚀 Production-grade server with real-time monitoring initialized');
   console.log('🤖 Living AI personality system activated');
