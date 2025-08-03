@@ -98,17 +98,6 @@ export default function Home() {
         
         {/* Hero Section */}
         <div className="text-center mb-20">
-          <div className="flex justify-center mb-10">
-            <div className="relative">
-              <img 
-                src={flutterbeyeLogoPath} 
-                alt="Flutterbye Logo" 
-                className="h-36 md:h-44 object-contain flutter-animate pulse-electric"
-              />
-              <div className="absolute inset-0 bg-gradient-to-r from-electric-blue to-electric-green opacity-20 rounded-full blur-3xl"></div>
-            </div>
-          </div>
-          
           <h1 className="text-6xl md:text-8xl font-black mb-8 text-gradient">
             FLUTTERBYE
           </h1>
