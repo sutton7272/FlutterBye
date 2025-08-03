@@ -1,5 +1,6 @@
 import { storage } from './storage';
 import { errorTracker } from './error-tracking';
+import { openaiService } from './openai-service';
 
 export interface UserPreferences {
   theme: 'electric' | 'minimal' | 'dark' | 'neon';
@@ -156,7 +157,7 @@ export class PersonalizationEngine {
       this.updateEngagementLevel(profile);
 
       // Generate new recommendations
-      profile.recommendations = this.generateRecommendations(profile);
+      profile.recommendations = await this.generateRecommendations(profile);
       profile.insights = this.generateInsights(profile);
 
       profile.updatedAt = new Date();
@@ -168,8 +169,77 @@ export class PersonalizationEngine {
     }
   }
 
-  // Generate personalized recommendations
-  generateRecommendations(profile: PersonalizationProfile): string[] {
+  // AI-powered personalized recommendations using OpenAI
+  async generateRecommendations(profile: PersonalizationProfile): Promise<string[]> {
+    try {
+      // Gather user context for AI analysis
+      const userContext = {
+        engagementLevel: profile.engagementLevel,
+        tradingPattern: profile.behavior.tradingPattern,
+        preferredCurrency: profile.preferences.defaultCurrency,
+        topFeatures: Object.entries(profile.behavior.featureUsageCount)
+          .sort(([,a], [,b]) => b - a)
+          .slice(0, 3)
+          .map(([feature]) => feature),
+        riskScore: profile.riskScore,
+        sessionCount: profile.behavior.totalSessions,
+        userSegment: profile.userSegment
+      };
+
+      // Use OpenAI to generate personalized recommendations
+      const aiRecommendations = await this.generateAIRecommendations(userContext);
+      
+      // Fallback to rule-based if AI fails
+      if (aiRecommendations.length === 0) {
+        return this.getFallbackRecommendations(profile);
+      }
+      
+      return aiRecommendations.slice(0, 5);
+    } catch (error) {
+      console.error('AI recommendation generation failed:', error);
+      return this.getFallbackRecommendations(profile);
+    }
+  }
+
+  private async generateAIRecommendations(userContext: any): Promise<string[]> {
+    const prompt = `Generate 5 personalized recommendations for a FlutterWave blockchain messaging platform user:
+
+User Profile:
+- Engagement Level: ${userContext.engagementLevel}
+- Trading Pattern: ${userContext.tradingPattern}  
+- Preferred Currency: ${userContext.preferredCurrency}
+- Top Features: ${userContext.topFeatures.join(', ')}
+- Risk Score: ${userContext.riskScore}
+- Sessions: ${userContext.sessionCount}
+- User Segment: ${userContext.userSegment}
+
+Platform Features:
+- Emotional token minting
+- Value-attached messaging
+- Blockchain chat
+- Token staking (FLBY)
+- Limited edition collections
+- Viral messaging campaigns
+- SMS-to-blockchain integration
+
+Return 5 specific, actionable recommendations in JSON array format that would increase user engagement and platform value.`;
+
+    try {
+      const result = await openaiService.optimizeMessage(prompt);
+      // Parse recommendations from the optimized response
+      const recommendations = [
+        result.optimizedMessage,
+        ...result.improvements
+      ];
+      
+      return recommendations.slice(0, 5);
+    } catch (error) {
+      console.error('OpenAI recommendations failed:', error); 
+      return [];
+    }
+  }
+
+  private getFallbackRecommendations(profile: PersonalizationProfile): string[] {
     const recommendations: string[] = [];
 
     // Currency recommendations
@@ -433,15 +503,16 @@ export class PersonalizationEngine {
       // In a real implementation, save to database
       // For now, we'll use the analytics system to store user preferences
       await storage.createAnalytics({
-        userId: profile.userId,
-        eventType: 'personalization_update',
-        eventData: {
+        date: new Date(),
+        metric: 'personalization_update',
+        value: `Profile updated for user ${profile.userId}`,
+        metadata: {
+          userId: profile.userId,
           preferences: profile.preferences,
           behavior: profile.behavior,
           segment: profile.userSegment,
           engagementLevel: profile.engagementLevel
-        },
-        timestamp: new Date()
+        }
       });
     } catch (error) {
       errorTracker.logError(error as Error, undefined, 'error', ['personalization', 'save']);
@@ -451,21 +522,22 @@ export class PersonalizationEngine {
   private async loadProfile(userId: string): Promise<PersonalizationProfile | null> {
     try {
       // Load from analytics data
-      const analytics = await storage.getAnalyticsByUser(userId);
-      const personalizationData = analytics.find(a => a.eventType === 'personalization_update');
+      const analytics = await storage.getAnalytics();
+      const userAnalytics = analytics.filter(entry => entry.metadata?.userId === userId);
+      const personalizationData = userAnalytics.find((a: any) => a.metric === 'personalization_update');
       
-      if (personalizationData?.eventData) {
+      if (personalizationData?.metadata) {
         return {
           userId,
-          preferences: personalizationData.eventData.preferences || this.getDefaultPreferences(),
-          behavior: personalizationData.eventData.behavior || this.getDefaultBehavior(),
+          preferences: personalizationData.metadata.preferences || this.getDefaultPreferences(),
+          behavior: personalizationData.metadata.behavior || this.getDefaultBehavior(),
           recommendations: [],
           insights: [],
           riskScore: 0.5,
-          engagementLevel: personalizationData.eventData.engagementLevel || 'medium',
-          userSegment: personalizationData.eventData.segment || 'casual',
-          createdAt: personalizationData.timestamp,
-          updatedAt: personalizationData.timestamp
+          engagementLevel: personalizationData.metadata.engagementLevel || 'medium',
+          userSegment: personalizationData.metadata.segment || 'casual',
+          createdAt: personalizationData.date,
+          updatedAt: personalizationData.date
         };
       }
       

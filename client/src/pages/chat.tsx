@@ -1015,9 +1015,8 @@ export function Chat() {
                             <Button 
                               variant="outline" 
                               size="sm"
-                              className="border-purple-500/20 w-8 h-8 p-0"
+                              className={`border-purple-500/20 hover:bg-purple-900/20 w-8 h-8 p-0 ${showVoiceRecorder ? 'bg-purple-900/30 border-purple-400/50' : ''}`}
                               onClick={() => setShowVoiceRecorder(!showVoiceRecorder)}
-                              className={`border-purple-500/20 hover:bg-purple-900/20 ${showVoiceRecorder ? 'bg-purple-900/30 border-purple-400/50' : ''}`}
                             >
                               <Mic className={`w-3 h-3 ${showVoiceRecorder ? 'text-purple-400 animate-pulse' : 'text-gray-400'}`} />
                             </Button>
