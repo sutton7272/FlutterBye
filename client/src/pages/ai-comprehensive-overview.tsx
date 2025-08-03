@@ -664,21 +664,30 @@ export default function AIComprehensiveOverview() {
                 <CardContent className="space-y-4">
                   <div className="grid grid-cols-1 gap-2">
                     <Button
-                      onClick={() => generateUserInsights({})}
+                      onClick={() => generateUserInsights([
+                        { userId: 'demo1', activity: 'high', engagement: 85 },
+                        { userId: 'demo2', activity: 'medium', engagement: 65 }
+                      ])}
                       disabled={isGeneratingUserInsights}
                       className="bg-gradient-to-r from-blue-500 to-purple-500"
                     >
                       {isGeneratingUserInsights ? 'Analyzing...' : 'Generate User Insights'}
                     </Button>
                     <Button
-                      onClick={() => analyzeSecurityThreats({})}
+                      onClick={() => analyzeSecurityThreats({
+                        securityLogs: ['login_attempt', 'api_access', 'token_creation'],
+                        systemMetrics: { activeUsers: 150, threats: 0 }
+                      })}
                       disabled={isAnalyzingSecurity}
                       className="bg-gradient-to-r from-red-500 to-orange-500"
                     >
                       {isAnalyzingSecurity ? 'Scanning...' : 'Security Analysis'}
                     </Button>
                     <Button
-                      onClick={() => optimizeRevenue({})}
+                      onClick={() => optimizeRevenue({
+                        revenueData: { monthly: 12500, growth: '15%' },
+                        userMetrics: { retention: '78%', conversion: '3.2%' }
+                      })}
                       disabled={isOptimizingRevenue}
                       className="bg-gradient-to-r from-green-500 to-emerald-500"
                     >
