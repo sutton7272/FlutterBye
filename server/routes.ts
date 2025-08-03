@@ -5704,6 +5704,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   const revolutionaryAIRoutes = await import('./revolutionary-ai-routes');
   app.use('/api/ai', revolutionaryAIRoutes.default);
 
+  // COMPREHENSIVE AI ENHANCEMENT ROUTES - ALL 6 CRITICAL ENHANCEMENTS ✅
+  const comprehensiveAIRoutes = await import("./comprehensive-ai-routes");
+  app.use("/api/comprehensive-ai", comprehensiveAIRoutes.default);
+
   // AI Marketing Analytics & Dynamic Pricing Routes
   const { aiMarketingAnalytics } = await import('./ai-marketing-analytics');
   const { aiPricingEngine } = await import('./ai-pricing-engine');

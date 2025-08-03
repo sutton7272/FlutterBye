@@ -364,6 +364,46 @@ Focus on emotional triggers, social sharing potential, and blockchain messaging 
       }
     };
   }
+
+  /**
+   * General-purpose OpenAI response generation for comprehensive AI services
+   */
+  async generateResponse(
+    prompt: string,
+    options: {
+      temperature?: number;
+      max_tokens?: number;
+      response_format?: { type: "json_object" | "text" };
+    } = {}
+  ): Promise<string> {
+    if (!this.isAvailable()) {
+      throw new Error("OpenAI service not available - API key missing");
+    }
+
+    try {
+      const response = await openai.chat.completions.create({
+        model: "gpt-4o", // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
+        messages: [
+          {
+            role: "system",
+            content: "You are an advanced AI assistant specializing in blockchain, viral marketing, and user behavior analysis. Provide detailed, accurate responses in the requested format."
+          },
+          {
+            role: "user",
+            content: prompt
+          }
+        ],
+        temperature: options.temperature || 0.3,
+        max_tokens: options.max_tokens || 500,
+        response_format: options.response_format
+      });
+
+      return response.choices[0].message.content || "";
+    } catch (error) {
+      console.error('OpenAI generateResponse error:', error);
+      throw error;
+    }
+  }
 }
 
 export const openaiService = new OpenAIService();
