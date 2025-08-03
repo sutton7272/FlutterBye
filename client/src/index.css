@@ -394,26 +394,26 @@
     }
   }
 
-  /* Butterfly Animation Keyframes */
-  @keyframes butterfly-orbit {
+  /* Butterfly Rectangle Path Animation */
+  @keyframes butterfly-rectangle {
     0% { 
-      transform: rotate(0deg) translateX(250px) rotate(0deg);
+      transform: translate(280px, -80px);
       opacity: 0.8;
     }
     25% { 
-      transform: rotate(90deg) translateX(250px) rotate(-90deg);
+      transform: translate(280px, 80px);
       opacity: 1;
     }
     50% { 
-      transform: rotate(180deg) translateX(250px) rotate(-180deg);
+      transform: translate(-280px, 80px);
       opacity: 0.9;
     }
     75% { 
-      transform: rotate(270deg) translateX(250px) rotate(-270deg);
+      transform: translate(-280px, -80px);
       opacity: 1;
     }
     100% { 
-      transform: rotate(360deg) translateX(250px) rotate(-360deg);
+      transform: translate(280px, -80px);
       opacity: 0.8;
     }
   }
@@ -429,26 +429,26 @@
     }
   }
 
-  /* Responsive Butterfly Orbit for Mobile */
-  @keyframes butterfly-orbit-mobile {
+  /* Responsive Butterfly Rectangle for Mobile */
+  @keyframes butterfly-rectangle-mobile {
     0% { 
-      transform: rotate(0deg) translateX(140px) rotate(0deg);
+      transform: translate(160px, -50px);
       opacity: 0.8;
     }
     25% { 
-      transform: rotate(90deg) translateX(140px) rotate(-90deg);
+      transform: translate(160px, 50px);
       opacity: 1;
     }
     50% { 
-      transform: rotate(180deg) translateX(140px) rotate(-180deg);
+      transform: translate(-160px, 50px);
       opacity: 0.9;
     }
     75% { 
-      transform: rotate(270deg) translateX(140px) rotate(-270deg);
+      transform: translate(-160px, -50px);
       opacity: 1;
     }
     100% { 
-      transform: rotate(360deg) translateX(140px) rotate(-360deg);
+      transform: translate(160px, -50px);
       opacity: 0.8;
     }
   }
@@ -572,9 +572,9 @@
 
   .butterfly-container {
     position: absolute;
-    top: 0;
-    left: 0;
-    animation: butterfly-orbit 8s linear infinite;
+    top: 50%;
+    left: 50%;
+    animation: butterfly-rectangle 10s linear infinite;
     transform-origin: 0 0;
   }
 
@@ -615,10 +615,10 @@
     pointer-events: none;
   }
 
-  /* Responsive butterfly orbit for smaller screens */
+  /* Responsive butterfly rectangle for smaller screens */
   @media (max-width: 768px) {
     .butterfly-container {
-      animation: butterfly-orbit-mobile 6s linear infinite;
+      animation: butterfly-rectangle-mobile 8s linear infinite;
     }
     
     .electric-trail-frame {
