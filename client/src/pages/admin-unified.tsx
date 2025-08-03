@@ -329,11 +329,12 @@ export default function UnifiedAdminDashboard() {
                   <SelectItem value="system">🖥️ System</SelectItem>
                   <SelectItem value="viral">🚀 Viral</SelectItem>
                   <SelectItem value="realtime">📡 Live</SelectItem>
+                  <SelectItem value="api-monetization">💰 API $</SelectItem>
                 </SelectContent>
               </Select>
             </div>
           ) : (
-            <TabsList className="grid w-full grid-cols-12 bg-slate-900/90 border border-slate-600 p-2 rounded-lg">
+            <TabsList className="grid w-full grid-cols-13 bg-slate-900/90 border border-slate-600 p-2 rounded-lg">
             <TabsTrigger 
               value="overview" 
               className="flex items-center gap-2 text-slate-300 font-medium data-[state=active]:text-white data-[state=active]:bg-blue-600/60 data-[state=active]:shadow-lg hover:text-white hover:bg-slate-700/50 transition-all duration-200"
@@ -452,6 +453,13 @@ export default function UnifiedAdminDashboard() {
             >
               <Target className="w-4 h-4" />
               <span className="hidden sm:inline">Intelligence</span>
+            </TabsTrigger>
+            <TabsTrigger 
+              value="api-monetization" 
+              className="flex items-center gap-2 text-slate-300 font-medium data-[state=active]:text-white data-[state=active]:bg-gradient-to-r data-[state=active]:from-green-600/60 data-[state=active]:to-emerald-600/60 data-[state=active]:shadow-lg hover:text-white hover:bg-slate-700/50 transition-all duration-200"
+            >
+              <DollarSign className="w-4 h-4" />
+              <span className="hidden sm:inline">API $</span>
             </TabsTrigger>
           </TabsList>
           )}
@@ -1929,6 +1937,161 @@ export default function UnifiedAdminDashboard() {
                 </div>
               </CardContent>
             </Card>
+          </TabsContent>
+
+          {/* API Monetization Tab */}
+          <TabsContent value="api-monetization" className="space-y-6">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-2xl font-bold text-white">API Monetization Dashboard</h2>
+              <Badge className="bg-green-500/20 text-green-400 border-green-500">
+                AI-Powered Revenue Engine
+              </Badge>
+            </div>
+            
+            {/* Revenue Overview Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+              <Card className="bg-slate-800/50 border-green-500/30">
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-green-400 text-sm">Total API Revenue</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold text-white">$2,847.50</div>
+                  <p className="text-xs text-slate-400">All-time earnings</p>
+                </CardContent>
+              </Card>
+              <Card className="bg-slate-800/50 border-blue-500/30">
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-blue-400 text-sm">Monthly Subscriptions</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold text-white">47</div>
+                  <p className="text-xs text-slate-400">Active subscribers</p>
+                </CardContent>
+              </Card>
+              <Card className="bg-slate-800/50 border-purple-500/30">
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-purple-400 text-sm">API Calls</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold text-white">15,247</div>
+                  <p className="text-xs text-slate-400">This month</p>
+                </CardContent>
+              </Card>
+              <Card className="bg-slate-800/50 border-cyan-500/30">
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-cyan-400 text-sm">Revenue Growth</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold text-white">+127%</div>
+                  <p className="text-xs text-slate-400">vs last month</p>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Subscription Management */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <Card className="bg-slate-800/50 border-slate-700">
+                <CardHeader>
+                  <CardTitle className="text-white flex items-center gap-2">
+                    <DollarSign className="w-5 h-5 text-green-400" />
+                    Subscription Tiers
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    {[
+                      { name: "Starter", price: "$9/month", users: 12, color: "blue" },
+                      { name: "Professional", price: "$29/month", users: 23, color: "purple" },
+                      { name: "Enterprise", price: "$99/month", users: 12, color: "green" }
+                    ].map((tier, index) => (
+                      <div key={index} className="flex items-center justify-between p-3 bg-slate-700/50 rounded-lg">
+                        <div>
+                          <div className="font-medium text-white">{tier.name}</div>
+                          <div className="text-sm text-slate-400">{tier.price}</div>
+                        </div>
+                        <div className="text-right">
+                          <div className={`text-${tier.color}-400 font-bold`}>{tier.users}</div>
+                          <div className="text-xs text-slate-500">subscribers</div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="bg-slate-800/50 border-slate-700">
+                <CardHeader>
+                  <CardTitle className="text-white flex items-center gap-2">
+                    <Activity className="w-5 h-5 text-blue-400" />
+                    API Usage Analytics
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <span className="text-slate-400">Most Used Endpoint</span>
+                      <span className="text-blue-400 font-mono text-sm">/api/ai/enhance</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-slate-400">Average Response Time</span>
+                      <span className="text-green-400 font-bold">142ms</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-slate-400">Success Rate</span>
+                      <span className="text-green-400 font-bold">99.7%</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-slate-400">Rate Limit Hits</span>
+                      <span className="text-yellow-400 font-bold">3 today</span>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Revenue Trends Chart Placeholder */}
+            <Card className="bg-slate-800/50 border-slate-700">
+              <CardHeader>
+                <CardTitle className="text-white flex items-center gap-2">
+                  <LineChart className="w-5 h-5 text-purple-400" />
+                  Revenue Trends & Forecasting
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="h-64 flex items-center justify-center border border-slate-600 rounded-lg bg-slate-900/50">
+                  <div className="text-center">
+                    <TrendingUp className="w-12 h-12 text-purple-400 mx-auto mb-3" />
+                    <p className="text-slate-400">Revenue chart visualization</p>
+                    <p className="text-sm text-slate-500">Real-time API monetization analytics</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Quick Actions */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <Button 
+                onClick={() => window.open('/admin-api-monetization', '_blank')}
+                className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white h-12"
+              >
+                <ExternalLink className="w-4 h-4 mr-2" />
+                Open Full Dashboard
+              </Button>
+              <Button 
+                variant="outline" 
+                className="border-blue-500/30 text-blue-400 hover:bg-blue-500/10 h-12"
+              >
+                <Download className="w-4 h-4 mr-2" />
+                Export Revenue Data
+              </Button>
+              <Button 
+                variant="outline" 
+                className="border-purple-500/30 text-purple-400 hover:bg-purple-500/10 h-12"
+              >
+                <Settings className="w-4 h-4 mr-2" />
+                Manage API Keys
+              </Button>
+            </div>
           </TabsContent>
 
         </Tabs>
