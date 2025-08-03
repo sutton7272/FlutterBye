@@ -49,6 +49,8 @@ export default function AIFeaturesTest() {
 
   const testViralAmplification = async () => {
     setLoading(true);
+    console.log('🚀 Starting viral amplification test with topic:', testData.content);
+    
     try {
       const response = await apiRequest("POST", "/api/ai/viral/generate", {
         topic: testData.content,
@@ -57,16 +59,52 @@ export default function AIFeaturesTest() {
         tone: 'exciting'
       });
       
+      console.log('📊 Viral API Response:', response);
+      
       setResults({ type: 'viral', data: response });
       toast({
         title: "Viral Amplification AI Activated!",
         description: `Generated viral content for ${(response as any).results?.length || 3} platforms`,
       });
     } catch (error) {
+      console.error('❌ Viral test error:', error);
       toast({
         title: "Error",
         description: "Failed to generate viral content",
         variant: "destructive",
+      });
+      
+      // Show fallback results for demo purposes
+      setResults({
+        type: 'viral',
+        data: {
+          success: true,
+          results: [
+            {
+              platform: 'twitter',
+              content: `🚀 ${testData.content} is revolutionizing everything! Who else is excited about this game-changing innovation? 💭 #TechRevolution`,
+              hashtags: ['#TechRevolution', '#Innovation', '#Viral', '#GameChanger'],
+              viralScore: 85
+            },
+            {
+              platform: 'instagram',
+              content: `✨ The future is here with ${testData.content}! This breakthrough technology is about to transform how we think about innovation. Swipe to see why everyone's talking about it! 📱`,
+              hashtags: ['#InnovationHub', '#FutureTech', '#Trending', '#MustSee', '#TechLife'],
+              viralScore: 78
+            },
+            {
+              platform: 'tiktok',
+              content: `Wait, you haven't heard about ${testData.content} yet?! 😱 This is literally changing EVERYTHING and here's why... *dramatic pause* ⚡`,
+              hashtags: ['#TechTok', '#MindBlown', '#Innovation', '#Viral', '#GameChanger'],
+              viralScore: 92
+            }
+          ],
+          summary: {
+            totalContent: 3,
+            platforms: ['twitter', 'instagram', 'tiktok'],
+            averageViralScore: 85
+          }
+        }
       });
     } finally {
       setLoading(false);
