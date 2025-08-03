@@ -84,10 +84,17 @@ export default function Home() {
       <div className="min-h-screen text-white pt-20 overflow-hidden">
         
         {/* Top Scrolling Marquee */}
-        <div className="border-y border-primary/30 modern-gradient py-6 mb-12 overflow-hidden electric-frame">
-          <div className="flex animate-marquee whitespace-nowrap text-3xl font-bold text-white text-gradient">
+        <div className="border-y border-primary/30 py-6 mb-12 overflow-hidden bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900">
+          <div className="flex animate-marquee whitespace-nowrap text-3xl font-bold">
             {[...marqueeText, ...marqueeText].map((text, i) => (
-              <span key={i} className="mx-12 flex-shrink-0 flutter-animate" style={{animationDelay: `${i * 0.2}s`}}>
+              <span 
+                key={i} 
+                className="mx-12 flex-shrink-0 flutter-animate bg-gradient-to-r from-electric-blue via-electric-green to-electric-blue bg-clip-text text-transparent font-black drop-shadow-lg" 
+                style={{
+                  animationDelay: `${i * 0.2}s`,
+                  textShadow: '0 0 20px rgba(0, 212, 255, 0.5), 0 0 40px rgba(0, 255, 136, 0.3)'
+                }}
+              >
                 {text}
               </span>
             ))}
