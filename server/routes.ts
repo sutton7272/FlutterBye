@@ -1528,6 +1528,47 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // ============ VOICE MESSAGE ROUTES ============
+  
+  // Voice message upload and processing
+  app.post("/api/voice/upload", async (req, res) => {
+    try {
+      const { audioData, type, userId } = req.body;
+      
+      // In production, you would:
+      // 1. Store audio file in object storage
+      // 2. Process with speech-to-text if needed
+      // 3. Save metadata to database
+      
+      const voiceMessage = {
+        id: Date.now().toString(),
+        audioUrl: `/api/voice/stream/${Date.now()}`,
+        duration: 30, // Mock duration
+        type: type || 'voice',
+        transcription: type === 'voice' ? 'Mock transcription' : undefined,
+        createdAt: new Date(),
+        userId
+      };
+      
+      res.json(voiceMessage);
+    } catch (error) {
+      console.error("Voice upload error:", error);
+      res.status(500).json({ message: "Failed to process voice message" });
+    }
+  });
+  
+  // Stream voice message audio
+  app.get("/api/voice/stream/:id", async (req, res) => {
+    try {
+      // In production, this would stream from object storage
+      res.setHeader('Content-Type', 'audio/wav');
+      res.status(200).send('Mock audio stream');
+    } catch (error) {
+      console.error("Voice stream error:", error);
+      res.status(500).json({ message: "Failed to stream audio" });
+    }
+  });
+
   // ============ PHASE 2: NEW API ROUTES ============
 
   // Token value and escrow routes

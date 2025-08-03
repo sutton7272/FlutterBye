@@ -1,4 +1,4 @@
-import { DatabaseStorage } from './storage';
+import { storage } from './storage';
 
 interface VoiceMessage {
   id: string;
@@ -25,10 +25,8 @@ interface VoiceAnalysis {
 }
 
 class VoiceMessageService {
-  private storage: DatabaseStorage;
-
-  constructor(storage: DatabaseStorage) {
-    this.storage = storage;
+  constructor() {
+    // Using the global storage instance
   }
 
   // Process uploaded voice message

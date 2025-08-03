@@ -711,6 +711,21 @@ export type RedeemableCode = typeof redeemableCodes.$inferSelect;
 export type InsertRedeemableCode = z.infer<typeof insertRedeemableCodeSchema>;
 
 export type CodeRedemption = typeof codeRedemptions.$inferSelect;
+// Voice messages table for production voice functionality
+export const voiceMessages = pgTable("voice_messages", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  audioUrl: text("audio_url").notNull(),
+  duration: integer("duration").notNull(), // in seconds
+  type: text("type").notNull().default("voice"), // 'voice' | 'music'
+  transcription: text("transcription"),
+  tokenId: varchar("token_id").references(() => tokens.id),
+  chatMessageId: varchar("chat_message_id").references(() => chatMessages.id),
+  userId: varchar("user_id").references(() => users.id).notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export type VoiceMessage = typeof voiceMessages.$inferSelect;
+export type InsertVoiceMessage = typeof voiceMessages.$inferInsert;
 export type InsertCodeRedemption = typeof codeRedemptions.$inferInsert;
 export type PricingConfig = typeof pricingConfig.$inferSelect;
 export type InsertPricingConfig = typeof pricingConfig.$inferInsert;
