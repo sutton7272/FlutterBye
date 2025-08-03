@@ -10,6 +10,9 @@ import { EngagementBooster } from "@/components/engagement-booster";
 import { ViralSharingAssistant } from "@/components/viral-sharing-assistant";
 import { TutorialLaunchButton } from "@/components/interactive-tutorial";
 import { VoiceMessageRecorder } from "@/components/voice-message-recorder";
+import { ErrorBoundary } from "@/components/error-boundary";
+import { LoadingState } from "@/components/loading-state";
+import { usePerformance } from "@/hooks/use-performance";
 
 interface RecentActivity {
   id: string;
@@ -21,6 +24,13 @@ interface RecentActivity {
 }
 
 export default function Home() {
+  const { measureRender, endRenderMeasurement } = usePerformance('HomePage');
+  
+  // Measure render performance in development
+  if (process.env.NODE_ENV === 'development') {
+    measureRender();
+  }
+
   const marqueeText = [
     "TURN MESSAGES INTO MONEY",
     "27 CHARACTERS TO RICHES", 
@@ -63,19 +73,25 @@ export default function Home() {
     }
   };
 
+  // End render measurement for development
+  if (process.env.NODE_ENV === 'development') {
+    setTimeout(() => endRenderMeasurement(), 0);
+  }
+
   return (
-    <div className="min-h-screen text-white pt-20 overflow-hidden">
-      
-      {/* Top Scrolling Marquee */}
-      <div className="border-y border-primary/30 modern-gradient py-6 mb-12 overflow-hidden electric-frame">
-        <div className="flex animate-marquee whitespace-nowrap text-3xl font-bold text-white text-gradient">
-          {[...marqueeText, ...marqueeText].map((text, i) => (
-            <span key={i} className="mx-12 flex-shrink-0 flutter-animate" style={{animationDelay: `${i * 0.2}s`}}>
-              {text}
-            </span>
-          ))}
+    <ErrorBoundary>
+      <div className="min-h-screen text-white pt-20 overflow-hidden">
+        
+        {/* Top Scrolling Marquee */}
+        <div className="border-y border-primary/30 modern-gradient py-6 mb-12 overflow-hidden electric-frame">
+          <div className="flex animate-marquee whitespace-nowrap text-3xl font-bold text-white text-gradient">
+            {[...marqueeText, ...marqueeText].map((text, i) => (
+              <span key={i} className="mx-12 flex-shrink-0 flutter-animate" style={{animationDelay: `${i * 0.2}s`}}>
+                {text}
+              </span>
+            ))}
+          </div>
         </div>
-      </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         
@@ -321,6 +337,7 @@ export default function Home() {
           ))}
         </div>
       </div>
-    </div>
+      </div>
+    </ErrorBoundary>
   );
 }

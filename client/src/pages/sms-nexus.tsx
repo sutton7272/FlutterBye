@@ -51,6 +51,8 @@ import { CommunityInsights } from '@/components/community-insights';
 import { ViralAccelerationEngine } from '@/components/viral-acceleration-engine';
 import { MonetizationHub } from '@/components/monetization-hub';
 import { VoiceMessageRecorder } from '@/components/voice-message-recorder';
+import { ErrorBoundary } from '@/components/error-boundary';
+import { LoadingState } from '@/components/loading-state';
 
 export function SMSNexusPage() {
   const [aiMessage, setAiMessage] = useState("");
@@ -212,8 +214,9 @@ export function SMSNexusPage() {
   ];
 
   return (
-    <div className="min-h-screen p-6 bg-gradient-to-b from-gray-900 via-purple-900/20 to-black">
-      <div className="max-w-7xl mx-auto space-y-8">
+    <ErrorBoundary>
+      <div className="min-h-screen p-6 bg-gradient-to-b from-gray-900 via-purple-900/20 to-black">
+        <div className="max-w-7xl mx-auto space-y-8">
         {/* Revolutionary Hero Header */}
         <div className="text-center space-y-6 relative">
           {/* Animated Background Effects */}
@@ -1546,7 +1549,8 @@ export function SMSNexusPage() {
             />
           </div>
         )}
+        </div>
       </div>
-    </div>
+    </ErrorBoundary>
   );
 }

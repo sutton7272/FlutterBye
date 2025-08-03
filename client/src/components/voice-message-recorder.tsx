@@ -130,6 +130,11 @@ export function VoiceMessageRecorder({
   const attachVoiceMessage = async () => {
     if (audioUrl && audioDuration > 0) {
       try {
+        toast({
+          title: "Processing Voice",
+          description: "Analyzing audio with AI..."
+        });
+
         // Convert audio URL to base64 for backend processing
         const response = await fetch(audioUrl);
         const audioBlob = await response.blob();
@@ -146,17 +151,20 @@ export function VoiceMessageRecorder({
           });
           
           toast({
-            title: "Voice Attached",
-            description: `${Math.round(audioDuration)}s voice message ready for AI processing`
+            title: "Voice Attached Successfully",
+            description: `${Math.round(audioDuration)}s voice message ready for AI emotion analysis`
           });
+
+          // Clear the recording after successful attachment
+          clearRecording();
         };
         
         reader.readAsDataURL(audioBlob);
       } catch (error) {
         console.error('Error processing voice:', error);
         toast({
-          title: "Error",
-          description: "Failed to process voice message",
+          title: "Processing Failed",
+          description: "Unable to process voice message. Please try again.",
           variant: "destructive"
         });
       }
@@ -242,8 +250,8 @@ export function VoiceMessageRecorder({
         <div className="space-y-3">
           <div className="flex items-center justify-between">
             <span className="text-white font-medium">Voice Message</span>
-            <Badge className="bg-purple-600/20 text-purple-200">
-              {isRecording ? 'Recording...' : 'Ready'}
+            <Badge className={`${isRecording ? 'bg-red-600/20 text-red-200 animate-pulse' : 'bg-purple-600/20 text-purple-200'}`}>
+              {isRecording ? 'Recording...' : audioUrl ? 'Recorded' : 'Ready'}
             </Badge>
           </div>
           
