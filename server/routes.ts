@@ -25,6 +25,8 @@ import comprehensiveAIEnhancementRoutes from "./comprehensive-ai-enhancement-rou
 import { aiMonetizationService } from "./ai-monetization-service";
 import { aiPaymentService } from "./ai-payment-service";
 import { z } from "zod";
+import { registerNextGenAIRoutes } from "./next-gen-ai-routes";
+
 export async function registerRoutes(app: Express): Promise<Server> {
   // Apply production-grade security middleware
   app.use(productionAuth.securityHeaders);

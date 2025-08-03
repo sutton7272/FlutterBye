@@ -71,7 +71,7 @@ export class DynamicPricingAI {
     
     try {
       // Get user data and calculate value score based on engagement, spending, etc.
-      const user = await storage.getUser(parseInt(userId));
+      const user = await storage.getUser(userId);
       if (!user) return 0.5;
       
       // Simple scoring based on user activity (0-1 scale)

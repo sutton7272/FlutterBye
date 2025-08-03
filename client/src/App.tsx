@@ -63,6 +63,7 @@ import AIShowcase from "@/pages/ai-showcase";
 import { LivingAIPage } from "@/pages/living-ai";
 import AIComprehensiveOverview from "@/pages/ai-comprehensive-overview";
 import RevolutionaryAIShowcase from "@/pages/revolutionary-ai-showcase";
+import AIFeaturesTest from "@/pages/ai-features-test";
 import Navbar from "@/components/navbar";
 import { PersonalizedDashboard } from "@/components/PersonalizedDashboard";
 
@@ -373,6 +374,12 @@ function Router() {
           <>
             <Navbar />
             <AIComprehensiveOverview />
+          </>
+        )} />
+        <Route path="/ai-test" component={() => (
+          <>
+            <Navbar />
+            <AIFeaturesTest />
           </>
         )} />
         <Route path="/all-opportunities" component={() => (
