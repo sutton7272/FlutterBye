@@ -47,6 +47,8 @@ import { EnhancedAnalytics } from '@/components/enhanced-analytics';
 import { AICoach } from '@/components/ai-coach';
 import { SmartScheduling } from '@/components/smart-scheduling';
 import { CommunityInsights } from '@/components/community-insights';
+import { ViralAccelerationEngine } from '@/components/viral-acceleration-engine';
+import { MonetizationHub } from '@/components/monetization-hub';
 
 export function SMSNexusPage() {
   const [aiMessage, setAiMessage] = useState("");
@@ -287,14 +289,16 @@ export function SMSNexusPage() {
         {/* Simplified Main Interface */}
         <Tabs defaultValue="create-message" className="space-y-6">
           <div className="flex justify-center mb-6">
-            <TabsList className="grid grid-cols-7 bg-black/40 backdrop-blur-sm border border-purple-500/30 p-1">
-              <TabsTrigger value="create-message" className="data-[state=active]:bg-purple-600/30 text-xs px-2">Create</TabsTrigger>
-              <TabsTrigger value="campaigns" className="data-[state=active]:bg-green-600/30 text-xs px-2">Campaigns</TabsTrigger>
-              <TabsTrigger value="results" className="data-[state=active]:bg-blue-600/30 text-xs px-2">Results</TabsTrigger>
-              <TabsTrigger value="coach" className="data-[state=active]:bg-indigo-600/30 text-xs px-2">AI Coach</TabsTrigger>
-              <TabsTrigger value="schedule" className="data-[state=active]:bg-cyan-600/30 text-xs px-2">Schedule</TabsTrigger>
-              <TabsTrigger value="community" className="data-[state=active]:bg-yellow-600/30 text-xs px-2">Community</TabsTrigger>
-              <TabsTrigger value="help" className="data-[state=active]:bg-orange-600/30 text-xs px-2">Guide</TabsTrigger>
+            <TabsList className="grid grid-cols-9 bg-black/40 backdrop-blur-sm border border-purple-500/30 p-1 text-xs">
+              <TabsTrigger value="create-message" className="data-[state=active]:bg-purple-600/30 px-1">Create</TabsTrigger>
+              <TabsTrigger value="campaigns" className="data-[state=active]:bg-green-600/30 px-1">Campaigns</TabsTrigger>
+              <TabsTrigger value="results" className="data-[state=active]:bg-blue-600/30 px-1">Results</TabsTrigger>
+              <TabsTrigger value="coach" className="data-[state=active]:bg-indigo-600/30 px-1">AI Coach</TabsTrigger>
+              <TabsTrigger value="schedule" className="data-[state=active]:bg-cyan-600/30 px-1">Schedule</TabsTrigger>
+              <TabsTrigger value="community" className="data-[state=active]:bg-yellow-600/30 px-1">Community</TabsTrigger>
+              <TabsTrigger value="viral" className="data-[state=active]:bg-red-600/30 px-1">Viral Engine</TabsTrigger>
+              <TabsTrigger value="monetize" className="data-[state=active]:bg-emerald-600/30 px-1">Monetize</TabsTrigger>
+              <TabsTrigger value="help" className="data-[state=active]:bg-orange-600/30 px-1">Guide</TabsTrigger>
             </TabsList>
           </div>
 
@@ -1326,6 +1330,36 @@ export function SMSNexusPage() {
               toast({
                 title: "Joined Viral Trend",
                 description: `You're now part of the ${trend} movement!`
+              });
+            }}
+          />
+        </TabsContent>
+
+        {/* Viral Acceleration Engine Tab - Supercharge Viral Potential */}
+        <TabsContent value="viral" className="space-y-6">
+          <ViralAccelerationEngine 
+            onBoostMessage={(boostType) => {
+              toast({
+                title: "Viral Boost Activated!",
+                description: `${boostType} is now amplifying your message's viral potential`
+              });
+            }}
+          />
+        </TabsContent>
+
+        {/* Monetization Hub Tab - Revenue and Earnings */}
+        <TabsContent value="monetize" className="space-y-6">
+          <MonetizationHub 
+            onUpgrade={(plan) => {
+              toast({
+                title: "Upgrade Initiated",
+                description: `Upgrading to ${plan}...`
+              });
+            }}
+            onPurchase={(item) => {
+              toast({
+                title: "Purchase Successful",
+                description: `${item} has been added to your account`
               });
             }}
           />
