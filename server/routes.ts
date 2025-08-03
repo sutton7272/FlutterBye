@@ -914,25 +914,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // User management (requires user management permission)
   app.get("/api/admin/users", authenticateWallet, requirePermission('users'), async (req, res) => {
     try {
-      // Fallback for admin dashboard - provide sample data structure
-      const users = [
-        {
-          id: "dev-user-1",
-          email: "admin@flutterbye.com",
-          firstName: "Admin",
-          lastName: "User",
-          createdAt: new Date(),
-          isActive: true
-        },
-        {
-          id: "dev-user-2", 
-          email: "demo@flutterbye.com",
-          firstName: "Demo",
-          lastName: "User",
-          createdAt: new Date(),
-          isActive: true
-        }
-      ];
+      const users = await storage.getAllUsersForAdmin();
       res.json(users);
     } catch (error) {
       res.status(500).json({ message: "Failed to fetch users" });
@@ -1030,16 +1012,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // System settings (requires settings permission)
   app.get("/api/admin/settings", authenticateWallet, requirePermission('settings'), async (req, res) => {
     try {
-      // Fallback for admin dashboard - provide default settings structure
-      const settings = {
-        platformName: "Flutterbye",
-        version: "1.0.0",
-        maintenanceMode: false,
-        enableRegistration: true,
-        maxTokensPerUser: 1000,
-        baseMintingFee: 0.01,
-        marketplaceEnabled: true
-      };
+      const settings = await storage.getPlatformSettings();
       res.json(settings);
     } catch (error) {
       res.status(500).json({ message: "Failed to fetch settings" });

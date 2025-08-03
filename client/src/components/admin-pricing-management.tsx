@@ -114,7 +114,10 @@ export function AdminPricingManagement() {
   // NFT Pricing update mutation
   const updateNFTPricingMutation = useMutation({
     mutationFn: async (pricingData: any) => {
-      return await apiRequest("/api/admin/nft-pricing", "PUT", pricingData);
+      return await apiRequest("/api/admin/nft-pricing", {
+        method: "PUT",
+        body: JSON.stringify(pricingData),
+      });
     },
     onSuccess: () => {
       toast({
@@ -182,7 +185,7 @@ export function AdminPricingManagement() {
   });
 
   // Use fetched data or defaults
-  const nftMarketingData = (nftMarketingDataResponse as any)?.data || {
+  const nftMarketingData = nftMarketingDataResponse?.data || {
     totalNFTsCreated: 0,
     totalNFTsSold: 0,
     totalNFTsBurned: 0,
@@ -201,8 +204,8 @@ export function AdminPricingManagement() {
 
   // Update local state when API data is fetched
   useEffect(() => {
-    if ((nftPricingData as any)?.data) {
-      setNFTPricing((nftPricingData as any).data);
+    if (nftPricingData?.data) {
+      setNFTPricing(nftPricingData.data);
     }
   }, [nftPricingData]);
 
@@ -536,7 +539,7 @@ export function AdminPricingManagement() {
                   {nftMarketingData.popularCollections.length === 0 ? (
                     <p className="text-gray-400 text-sm">No collections created yet</p>
                   ) : (
-                    nftMarketingData.popularCollections.slice(0, 3).map((collection: any, index: number) => (
+                    nftMarketingData.popularCollections.slice(0, 3).map((collection, index) => (
                       <div key={index} className="flex justify-between items-center">
                         <div>
                           <p className="text-white font-medium text-sm">{collection.name}</p>
