@@ -321,15 +321,15 @@ export default function AIFeaturesTest() {
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              {results.type === 'viral' && results.data.results && (
+              {results.type === 'viral' && results.data && (results.data.results || results.data.fallback?.results) && (
                 <div className="space-y-4">
                   <div className="flex items-center gap-2 text-green-400">
                     <Zap className="w-4 h-4" />
-                    <span className="font-semibold">Generated {results.data.results.length} Viral Content Pieces</span>
+                    <span className="font-semibold">Generated {(results.data.results || results.data.fallback?.results || []).length} Viral Content Pieces</span>
                   </div>
                   
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {results.data.results.map((result: any, index: number) => (
+                    {(results.data.results || results.data.fallback?.results || []).map((result: any, index: number) => (
                       <Card key={index} className="bg-gray-900/50 border-gray-600">
                         <CardHeader className="pb-3">
                           <div className="flex items-center justify-between">
