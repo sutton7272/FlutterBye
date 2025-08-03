@@ -394,26 +394,42 @@
     }
   }
 
-  /* Butterfly Rectangle Path Animation */
-  @keyframes butterfly-rectangle {
+  /* Butterfly Frame Path Animation - Follows Electric Trail Frame */
+  @keyframes butterfly-frame-path {
     0% { 
-      transform: translate(280px, -80px);
+      transform: translate(320px, -120px);
       opacity: 0.8;
     }
+    12.5% { 
+      transform: translate(320px, -60px);
+      opacity: 0.9;
+    }
     25% { 
-      transform: translate(280px, 80px);
+      transform: translate(320px, 120px);
       opacity: 1;
     }
+    37.5% { 
+      transform: translate(160px, 120px);
+      opacity: 0.9;
+    }
     50% { 
-      transform: translate(-280px, 80px);
+      transform: translate(-320px, 120px);
+      opacity: 0.8;
+    }
+    62.5% { 
+      transform: translate(-320px, 60px);
       opacity: 0.9;
     }
     75% { 
-      transform: translate(-280px, -80px);
+      transform: translate(-320px, -120px);
       opacity: 1;
     }
+    87.5% { 
+      transform: translate(-160px, -120px);
+      opacity: 0.9;
+    }
     100% { 
-      transform: translate(280px, -80px);
+      transform: translate(320px, -120px);
       opacity: 0.8;
     }
   }
@@ -429,26 +445,42 @@
     }
   }
 
-  /* Responsive Butterfly Rectangle for Mobile */
-  @keyframes butterfly-rectangle-mobile {
+  /* Responsive Butterfly Frame Path for Mobile */
+  @keyframes butterfly-frame-path-mobile {
     0% { 
-      transform: translate(160px, -50px);
+      transform: translate(200px, -80px);
       opacity: 0.8;
     }
+    12.5% { 
+      transform: translate(200px, -40px);
+      opacity: 0.9;
+    }
     25% { 
-      transform: translate(160px, 50px);
+      transform: translate(200px, 80px);
       opacity: 1;
     }
+    37.5% { 
+      transform: translate(100px, 80px);
+      opacity: 0.9;
+    }
     50% { 
-      transform: translate(-160px, 50px);
+      transform: translate(-200px, 80px);
+      opacity: 0.8;
+    }
+    62.5% { 
+      transform: translate(-200px, 40px);
       opacity: 0.9;
     }
     75% { 
-      transform: translate(-160px, -50px);
+      transform: translate(-200px, -80px);
       opacity: 1;
     }
+    87.5% { 
+      transform: translate(-100px, -80px);
+      opacity: 0.9;
+    }
     100% { 
-      transform: translate(160px, -50px);
+      transform: translate(200px, -80px);
       opacity: 0.8;
     }
   }
@@ -574,7 +606,7 @@
     position: absolute;
     top: 50%;
     left: 50%;
-    animation: butterfly-rectangle 10s linear infinite;
+    animation: butterfly-frame-path 12s linear infinite;
     transform-origin: 0 0;
   }
 
@@ -615,10 +647,10 @@
     pointer-events: none;
   }
 
-  /* Responsive butterfly rectangle for smaller screens */
+  /* Responsive butterfly frame path for smaller screens */
   @media (max-width: 768px) {
     .butterfly-container {
-      animation: butterfly-rectangle-mobile 8s linear infinite;
+      animation: butterfly-frame-path-mobile 10s linear infinite;
     }
     
     .electric-trail-frame {
