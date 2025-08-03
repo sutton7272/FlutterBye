@@ -16,6 +16,7 @@ export default function Navbar() {
     { href: "/redeem", label: "Dashboard", icon: LayoutDashboard },
     { href: "/chat", label: "Chat", icon: MessageSquare },
     { href: "/sms-nexus", label: "FlutterWave", icon: Zap, special: true },
+    { href: "/message-nfts", label: "Message NFTs", icon: Sparkles, featured: true },
     { href: "/marketplace", label: "Marketplace", icon: Users },
     { href: "/greeting-cards", label: "Cards", icon: Heart },
     { href: "/enterprise", label: "Marketing", icon: Building2 },
@@ -53,12 +54,15 @@ export default function Navbar() {
                     ? "modern-gradient text-white shadow-lg" 
                     : item.special
                     ? "bg-gradient-to-r from-purple-600/20 to-blue-600/20 text-purple-200 border border-purple-500/30 hover:from-purple-600/30 hover:to-blue-600/30 hover:text-white transition-all duration-300"
+                    : item.featured
+                    ? "bg-gradient-to-r from-yellow-600/20 to-orange-600/20 text-yellow-200 border border-yellow-500/30 hover:from-yellow-600/30 hover:to-orange-600/30 hover:text-white transition-all duration-300"
                     : "text-text-secondary hover:text-text-primary hover:bg-muted"
                 }`}
               >
                 <item.icon className="h-4 w-4" />
                 {item.label}
                 {item.special && <span className="text-xs bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent font-bold">NEW</span>}
+                {item.featured && <span className="text-xs bg-gradient-to-r from-yellow-400 to-orange-400 bg-clip-text text-transparent font-bold">💎</span>}
               </Button>
             </Link>
           ))}

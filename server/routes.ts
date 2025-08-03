@@ -3560,6 +3560,185 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // ============ MESSAGE NFT API ENDPOINTS ============
+  
+  // Create Message NFT Collection
+  app.post("/api/message-nfts/create", async (req, res) => {
+    try {
+      const { message, image, creator, totalSupply, valuePerNFT, currency, collectionName, description, customAttributes } = req.body;
+      
+      if (!message || !creator || !totalSupply || !valuePerNFT || !currency) {
+        return res.status(400).json({ error: "Missing required fields: message, creator, totalSupply, valuePerNFT, currency" });
+      }
+
+      if (totalSupply < 1 || totalSupply > 10000) {
+        return res.status(400).json({ error: "Total supply must be between 1 and 10,000" });
+      }
+
+      if (valuePerNFT < 0) {
+        return res.status(400).json({ error: "Value per NFT must be non-negative" });
+      }
+
+      const { messageNFTService } = await import("./message-nft-service");
+      const result = await messageNFTService.createMessageNFTCollection({
+        message,
+        image,
+        creator,
+        totalSupply: parseInt(totalSupply),
+        valuePerNFT: parseFloat(valuePerNFT),
+        currency,
+        collectionName,
+        description,
+        customAttributes
+      });
+
+      res.json({
+        success: true,
+        ...result,
+        timestamp: new Date().toISOString()
+      });
+
+    } catch (error) {
+      console.error('Message NFT creation error:', error);
+      res.status(500).json({ error: error.message || 'Failed to create Message NFT collection' });
+    }
+  });
+
+  // Claim Message NFT
+  app.post("/api/message-nfts/claim", async (req, res) => {
+    try {
+      const { collectionId, claimerAddress, tokenNumber } = req.body;
+      
+      if (!collectionId || !claimerAddress) {
+        return res.status(400).json({ error: "Collection ID and claimer address are required" });
+      }
+
+      const { messageNFTService } = await import("./message-nft-service");
+      const nft = await messageNFTService.claimMessageNFT(collectionId, claimerAddress, tokenNumber);
+
+      res.json({
+        success: true,
+        nft,
+        message: `Successfully claimed NFT #${nft.tokenNumber}!`,
+        timestamp: new Date().toISOString()
+      });
+
+    } catch (error) {
+      console.error('Message NFT claim error:', error);
+      res.status(400).json({ error: error.message || 'Failed to claim Message NFT' });
+    }
+  });
+
+  // Get Collection Details
+  app.get("/api/message-nfts/collection/:collectionId", async (req, res) => {
+    try {
+      const { collectionId } = req.params;
+      
+      const { messageNFTService } = await import("./message-nft-service");
+      const result = await messageNFTService.getCollection(collectionId);
+
+      res.json({
+        success: true,
+        ...result,
+        timestamp: new Date().toISOString()
+      });
+
+    } catch (error) {
+      console.error('Get collection error:', error);
+      res.status(404).json({ error: error.message || 'Collection not found' });
+    }
+  });
+
+  // Get User's NFTs
+  app.get("/api/message-nfts/user/:userAddress", async (req, res) => {
+    try {
+      const { userAddress } = req.params;
+      
+      const { messageNFTService } = await import("./message-nft-service");
+      const nfts = await messageNFTService.getUserNFTs(userAddress);
+
+      res.json({
+        success: true,
+        nfts,
+        count: nfts.length,
+        timestamp: new Date().toISOString()
+      });
+
+    } catch (error) {
+      console.error('Get user NFTs error:', error);
+      res.status(500).json({ error: 'Failed to get user NFTs' });
+    }
+  });
+
+  // Generate Claim QR Code
+  app.post("/api/message-nfts/qr", async (req, res) => {
+    try {
+      const { collectionId, tokenNumber } = req.body;
+      
+      if (!collectionId) {
+        return res.status(400).json({ error: "Collection ID is required" });
+      }
+
+      const { messageNFTService } = await import("./message-nft-service");
+      const qrCode = await messageNFTService.generateClaimQR(collectionId, tokenNumber);
+
+      res.json({
+        success: true,
+        qrCode,
+        claimUrl: `${process.env.BASE_URL || 'https://flutterbye.com'}/claim/${collectionId}${tokenNumber ? `/${tokenNumber}` : ''}`,
+        timestamp: new Date().toISOString()
+      });
+
+    } catch (error) {
+      console.error('QR generation error:', error);
+      res.status(500).json({ error: 'Failed to generate QR code' });
+    }
+  });
+
+  // Browse All Collections
+  app.get("/api/message-nfts/browse", async (req, res) => {
+    try {
+      const page = parseInt(req.query.page as string) || 1;
+      const limit = parseInt(req.query.limit as string) || 20;
+
+      const { messageNFTService } = await import("./message-nft-service");
+      const result = await messageNFTService.getAllCollections(page, limit);
+
+      res.json({
+        success: true,
+        ...result,
+        currentPage: page,
+        limit,
+        timestamp: new Date().toISOString()
+      });
+
+    } catch (error) {
+      console.error('Browse collections error:', error);
+      res.status(500).json({ error: 'Failed to browse collections' });
+    }
+  });
+
+  // Get Collection Analytics
+  app.get("/api/message-nfts/analytics/:collectionId", async (req, res) => {
+    try {
+      const { collectionId } = req.params;
+      
+      const { messageNFTService } = await import("./message-nft-service");
+      const analytics = await messageNFTService.getCollectionAnalytics(collectionId);
+
+      res.json({
+        success: true,
+        analytics,
+        collectionId,
+        timestamp: new Date().toISOString()
+      });
+
+    } catch (error) {
+      console.error('Collection analytics error:', error);
+      res.status(404).json({ error: error.message || 'Failed to get analytics' });
+    }
+  });
+
   // Verify phone number with code
   app.post("/api/sms/verify", async (req, res) => {
     try {
