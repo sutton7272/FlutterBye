@@ -798,6 +798,7 @@ export default function AdminDashboard() {
 
           {/* Pricing Management Tab */}
           <TabsContent value="pricing" className="space-y-6">
+            <AdminPricingManagement />
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               
               {/* Redemption Code Analytics */}
