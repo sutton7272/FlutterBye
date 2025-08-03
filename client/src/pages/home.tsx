@@ -99,9 +99,6 @@ export default function Home() {
         {/* Hero Section */}
         <div className="text-center mb-20">
           <div className="relative inline-block">
-            {/* Electric Trail Frame */}
-            <div className="electric-trail-frame"></div>
-            
             <h1 className="text-6xl md:text-8xl font-black mb-8 text-gradient relative z-10">
               FLUTTERBYE
             </h1>
