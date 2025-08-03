@@ -139,14 +139,14 @@ export default function Home() {
                       y1="8" 
                       x2="20" 
                       y2="22" 
-                      stroke="#00D4FF" 
+                      stroke="#0066CC" 
                       strokeWidth="3"
                       className="animate-pulse"
                     />
                     {/* Antennae */}
                     <path 
                       d="M20 8 L18 5 M20 8 L22 5" 
-                      stroke="#00FF88" 
+                      stroke="#004499" 
                       strokeWidth="2"
                       fill="none"
                     />
@@ -154,12 +154,12 @@ export default function Home() {
                     {/* Gradients */}
                     <defs>
                       <linearGradient id="butterfly-gradient-left" x1="0%" y1="0%" x2="100%" y2="100%">
-                        <stop offset="0%" stopColor="#00D4FF" stopOpacity="0.95"/>
-                        <stop offset="100%" stopColor="#00FF88" stopOpacity="0.8"/>
+                        <stop offset="0%" stopColor="#0066CC" stopOpacity="0.95"/>
+                        <stop offset="100%" stopColor="#004499" stopOpacity="0.8"/>
                       </linearGradient>
                       <linearGradient id="butterfly-gradient-right" x1="0%" y1="0%" x2="100%" y2="100%">
-                        <stop offset="0%" stopColor="#00FF88" stopOpacity="0.95"/>
-                        <stop offset="100%" stopColor="#00D4FF" stopOpacity="0.8"/>
+                        <stop offset="0%" stopColor="#004499" stopOpacity="0.95"/>
+                        <stop offset="100%" stopColor="#0066CC" stopOpacity="0.8"/>
                       </linearGradient>
                     </defs>
                   </svg>

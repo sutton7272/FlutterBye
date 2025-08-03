@@ -612,7 +612,7 @@
 
   .butterfly-svg {
     transform: translate(-50%, -50%);
-    filter: drop-shadow(0 0 12px #00D4FF) drop-shadow(0 0 24px #00FF88);
+    filter: drop-shadow(0 0 12px #0066CC) drop-shadow(0 0 24px #004499);
   }
 
   .animate-flutter-wing {
