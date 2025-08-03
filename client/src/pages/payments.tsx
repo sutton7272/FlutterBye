@@ -438,15 +438,8 @@ export default function Payments() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 p-4 relative">
-      {/* Cosmic Butterfly Background */}
-      <div 
-        className="fixed inset-0 bg-cover bg-center bg-no-repeat opacity-20 z-0"
-        style={{
-          backgroundImage: "url('/images/cosmic-butterfly.png')",
-          backgroundAttachment: 'fixed'
-        }}
-      />
+    <div className="min-h-screen p-4 relative">
+      {/* Global background is now handled by body CSS */}
       
       {/* Electric Grid Overlay */}
       <div className="fixed inset-0 opacity-5 z-0 pointer-events-none">

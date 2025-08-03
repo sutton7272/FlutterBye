@@ -231,7 +231,7 @@ export default function LaunchCountdown() {
           <Navbar />
         </>
       )}
-      {/* Animated Background - removed gradient overlay to show cosmic butterfly */}
+      {/* Global cosmic background is handled by body CSS */}
       
       {/* Electric Circuit Animation */}
       <div className="fixed inset-0 pointer-events-none">

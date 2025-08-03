@@ -4,7 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Link } from "wouter";
 import { ArrowRight, MessageSquare, Coins, Zap, TrendingUp, Users, Target, Sparkles, Heart, Building2, Mic, DollarSign, CreditCard, Palette, Bot, Shield, Star } from "lucide-react";
 import flutterbeyeLogoPath from "@assets/image_1754068877999.png";
-import cosmicBackgroundPath from "@assets/image_1754257222401.png";
+import cosmicBackgroundPath from "@assets/image_1754257352191.png";
 import { QuickActionPanel } from "@/components/quick-action-panel";
 import { InteractiveStatsDashboard } from "@/components/interactive-stats-dashboard";
 import { EngagementBooster } from "@/components/engagement-booster";

@@ -76,6 +76,7 @@
     min-height: 100vh;
     font-family: 'Inter', system-ui, -apple-system, sans-serif;
     position: relative;
+    background: url('/attached_assets/image_1754257352191.png') center/cover fixed no-repeat;
   }
 
   #root {
@@ -91,7 +92,7 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.6);
+    background: rgba(0, 0, 0, 0.3);
     z-index: -1;
     pointer-events: none;
   }

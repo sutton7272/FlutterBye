@@ -33,7 +33,7 @@ export default function ModernHomePage() {
     <div className="min-h-screen">
       {/* Modern Hero Section */}
       <div className="relative overflow-hidden py-20 lg:py-32">
-        <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-secondary/5 to-accent/5"></div>
+        {/* Global cosmic background is handled by body CSS */}
         
         <div className="relative z-10 container mx-auto px-4">
           <div className="text-center space-y-8 max-w-4xl mx-auto">

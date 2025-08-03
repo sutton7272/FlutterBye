@@ -246,9 +246,8 @@ export default function AdminEarlyAccess() {
   };
 
   return (
-    <div className="min-h-screen bg-black text-white relative overflow-hidden">
-      {/* Electric Background */}
-      <div className="fixed inset-0 bg-gradient-to-br from-blue-900/20 via-purple-900/20 to-cyan-900/20 pointer-events-none" />
+    <div className="min-h-screen text-white relative overflow-hidden">
+      {/* Global cosmic background is handled by body CSS */}
       
       <div className="container mx-auto px-4 py-8 relative z-10">
         {/* Header */}

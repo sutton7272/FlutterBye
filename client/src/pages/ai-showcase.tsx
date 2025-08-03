@@ -60,11 +60,8 @@ export default function AIShowcase() {
   } = useAIAdmin();
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#0a0b14] via-[#1a1b3a] to-[#0a0b14] text-white">
-      {/* Electric circuit background */}
-      <div className="absolute inset-0 opacity-20">
-        <div className="absolute inset-0 bg-[linear-gradient(45deg,transparent_48%,#00ffff_49%,#00ffff_51%,transparent_52%)] bg-[length:20px_20px] animate-pulse"></div>
-      </div>
+    <div className="min-h-screen text-white">
+      {/* Global cosmic background is handled by body CSS */}
 
       <div className="relative z-10 container mx-auto p-6 space-y-8">
         {/* Header */}
