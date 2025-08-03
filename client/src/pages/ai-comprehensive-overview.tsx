@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { AICreditDisplay } from '@/components/ai-credit-display';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -29,6 +30,7 @@ import {
   Gauge,
   DollarSign
 } from 'lucide-react';
+import { Link } from "wouter";
 import { AISEOOptimizer } from '@/components/ai-seo-optimizer';
 import { LivingAIInterface } from '@/components/living-ai-interface';
 import { AIConversation } from '@/components/ai-conversation';
@@ -382,6 +384,47 @@ export default function AIComprehensiveOverview() {
           <p className="text-lg text-gray-300">
             World's first truly living AI ecosystem - Every feature enhanced by artificial intelligence
           </p>
+        </div>
+
+        {/* AI Credits Display & Payment Integration */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+          <div className="lg:col-span-2">
+            <AICreditDisplay userId="demo-user" />
+          </div>
+          <div>
+            <Card className="bg-gradient-to-r from-purple-900/50 to-blue-900/50 border-purple-500/30">
+              <CardHeader>
+                <CardTitle className="text-white flex items-center gap-2">
+                  <DollarSign className="w-5 h-5 text-green-400" />
+                  AI Power Plans
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  <div className="text-sm text-slate-300">
+                    Unlock advanced AI features with our credit system
+                  </div>
+                  <div className="grid grid-cols-2 gap-2">
+                    <div className="text-center p-2 bg-black/20 rounded">
+                      <div className="text-lg font-bold text-blue-400">$4.99</div>
+                      <div className="text-xs text-slate-400">100 Credits</div>
+                    </div>
+                    <div className="text-center p-2 bg-black/20 rounded">
+                      <div className="text-lg font-bold text-green-400">$14.99</div>
+                      <div className="text-xs text-slate-400">500 Credits</div>
+                    </div>
+                  </div>
+                  <Button 
+                    className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700"
+                    onClick={() => window.location.href = '/ai-payments'}
+                  >
+                    <Zap className="w-4 h-4 mr-2" />
+                    Buy AI Credits
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
         </div>
 
         {/* AI Coverage Summary */}

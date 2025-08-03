@@ -23,6 +23,7 @@ import { aiContentService } from "./ai-content-service";
 import aiEnhancementRoutes from "./ai-enhancement-routes";
 import comprehensiveAIEnhancementRoutes from "./comprehensive-ai-enhancement-routes";
 import { aiMonetizationService } from "./ai-monetization-service";
+import { aiPaymentService } from "./ai-payment-service";
 import { z } from "zod";
 export async function registerRoutes(app: Express): Promise<Server> {
   // Apply production-grade security middleware
@@ -505,19 +506,37 @@ export async function registerRoutes(app: Express): Promise<Server> {
         case 'payment_intent.succeeded':
           const paymentIntent = event.data.object;
           console.log(`PaymentIntent succeeded: ${paymentIntent.id}`);
-          // TODO: Update user's token balance, create transaction record
+          
+          // Handle AI credits purchase
+          if (paymentIntent.metadata?.type === 'ai_credits_purchase') {
+            const aiCredits = parseInt(paymentIntent.metadata.aiCredits || '0');
+            const apiCalls = parseInt(paymentIntent.metadata.apiCalls || '0');
+            console.log(`AI Credits purchased: ${aiCredits} credits, ${apiCalls} API calls`);
+            // TODO: Add AI credits to user account
+          }
+          
+          // Handle regular token purchase
+          if (paymentIntent.metadata?.type === 'token_purchase') {
+            console.log(`Token package purchased: ${paymentIntent.metadata.package}`);
+            // TODO: Add tokens to user account
+          }
           break;
 
         case 'invoice.payment_succeeded':
           const invoice = event.data.object;
           console.log(`Invoice payment succeeded: ${invoice.id}`);
-          // TODO: Update subscription status, grant premium access
+          
+          // Handle AI subscription
+          if (invoice.metadata?.type === 'ai_subscription') {
+            console.log(`AI subscription renewed: unlimited access`);
+            // TODO: Grant unlimited AI access
+          }
           break;
 
         case 'customer.subscription.deleted':
           const subscription = event.data.object;
           console.log(`Subscription canceled: ${subscription.id}`);
-          // TODO: Revoke premium access
+          // TODO: Revoke premium/AI access
           break;
 
         default:
@@ -528,6 +547,129 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Webhook error:", error);
       res.status(400).send(`Webhook Error: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+  });
+
+  // ============ AI PAYMENT ROUTES ============
+  
+  // Get user's AI usage stats
+  app.get("/api/ai/usage/:userId", async (req, res) => {
+    try {
+      const { userId } = req.params;
+      const usage = aiPaymentService.getUserUsage(userId);
+      res.json(usage);
+    } catch (error) {
+      console.error("Error getting AI usage:", error);
+      res.status(500).json({ error: "Failed to get AI usage" });
+    }
+  });
+
+  // Check if user can perform AI operation
+  app.post("/api/ai/check-operation", async (req, res) => {
+    try {
+      const { userId, operation } = req.body;
+      
+      if (!userId || !operation) {
+        return res.status(400).json({ error: "userId and operation are required" });
+      }
+
+      const canPerform = aiPaymentService.canPerformOperation(userId, operation);
+      const cost = aiPaymentService.getOperationCost(operation);
+      const usage = aiPaymentService.getUserUsage(userId);
+
+      res.json({
+        canPerform,
+        cost,
+        remainingCredits: usage.remainingCredits,
+        subscriptionType: usage.subscriptionType
+      });
+    } catch (error) {
+      console.error("Error checking AI operation:", error);
+      res.status(500).json({ error: "Failed to check AI operation" });
+    }
+  });
+
+  // Use AI credits for operation
+  app.post("/api/ai/use-credits", async (req, res) => {
+    try {
+      const { userId, operation, creditsUsed } = req.body;
+      
+      if (!userId || !operation) {
+        return res.status(400).json({ error: "userId and operation are required" });
+      }
+
+      const cost = creditsUsed || aiPaymentService.getOperationCost(operation);
+      const success = aiPaymentService.useCredits(userId, cost, operation);
+
+      if (!success) {
+        return res.status(402).json({ 
+          error: "Insufficient credits or API limit exceeded",
+          requiresPayment: true
+        });
+      }
+
+      const updatedUsage = aiPaymentService.getUserUsage(userId);
+      res.json({
+        success: true,
+        creditsUsed: cost,
+        remainingCredits: updatedUsage.remainingCredits,
+        usage: updatedUsage
+      });
+    } catch (error) {
+      console.error("Error using AI credits:", error);
+      res.status(500).json({ error: "Failed to use AI credits" });
+    }
+  });
+
+  // Get user's AI transaction history
+  app.get("/api/ai/transactions/:userId", async (req, res) => {
+    try {
+      const { userId } = req.params;
+      const transactions = aiPaymentService.getUserTransactions(userId);
+      res.json(transactions);
+    } catch (error) {
+      console.error("Error getting AI transactions:", error);
+      res.status(500).json({ error: "Failed to get AI transactions" });
+    }
+  });
+
+  // Admin: Get all users AI usage
+  app.get("/api/admin/ai/usage", async (req, res) => {
+    try {
+      const allUsage = aiPaymentService.getAllUsersUsage();
+      res.json(allUsage);
+    } catch (error) {
+      console.error("Error getting all AI usage:", error);
+      res.status(500).json({ error: "Failed to get AI usage data" });
+    }
+  });
+
+  // Handle successful AI payment (called by webhook)
+  app.post("/api/ai/payment-success", async (req, res) => {
+    try {
+      const { userId, paymentIntentId, credits, apiCalls, subscriptionType, expiryDate } = req.body;
+      
+      if (!userId || !paymentIntentId) {
+        return res.status(400).json({ error: "userId and paymentIntentId are required" });
+      }
+
+      if (subscriptionType) {
+        // Handle subscription
+        const expiry = expiryDate ? new Date(expiryDate) : new Date(Date.now() + 30 * 24 * 60 * 60 * 1000); // 30 days
+        aiPaymentService.setSubscription(userId, subscriptionType, expiry);
+      } else if (credits) {
+        // Handle credit purchase
+        aiPaymentService.addCredits(userId, credits, apiCalls || 0, paymentIntentId);
+      }
+
+      const updatedUsage = aiPaymentService.getUserUsage(userId);
+      res.json({
+        success: true,
+        usage: updatedUsage
+      });
+    } catch (error) {
+      console.error("Error processing AI payment success:", error);
+      res.status(500).json({ error: "Failed to process AI payment" });
     }
   });
   // Real Solana token creation endpoint

@@ -43,6 +43,7 @@ import ReferralRewards from "@/pages/referral-rewards";
 import LaunchCountdown from "@/pages/launch-countdown";
 import Subscribe from "@/pages/subscribe";
 import Payments from "@/pages/payments";
+import AIPayments from "@/pages/ai-payments";
 import PaymentSuccess from "@/pages/payment-success";
 import AdminSubscriptions from "@/pages/admin-subscriptions";
 import AdminEarlyAccess from "@/pages/admin-early-access";
@@ -319,6 +320,12 @@ function Router() {
           <>
             <Navbar />
             <Payments />
+          </>
+        )} />
+        <Route path="/ai-payments" component={() => (
+          <>
+            <Navbar />
+            <AIPayments />
           </>
         )} />
         <Route path="/payment-success" component={PaymentSuccess} />
