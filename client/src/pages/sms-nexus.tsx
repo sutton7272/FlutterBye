@@ -33,7 +33,6 @@ import {
   Eye,
   ChevronRight,
   Star,
-  Zap,
   Coins,
   Calendar,
   MessageCircle,
@@ -119,7 +118,7 @@ export function SMSNexusPage() {
   const { data: realtimeStats } = useQuery({
     queryKey: ['/api/sms/analytics'],
     refetchInterval: 5000,
-    select: (data) => data?.analytics || {
+    select: (data: any) => data?.analytics || {
       totalMessages: 2847,
       activeUsers: 1234,
       conversionRate: 23.4,
