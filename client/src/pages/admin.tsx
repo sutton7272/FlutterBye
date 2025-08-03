@@ -89,6 +89,24 @@ const initialSettings: AdminSettings = {
 };
 
 export default function Admin() {
+  // Debug early return to test if component is being called
+  console.log("Admin component rendered!");
+  
+  // Simple test render
+  return (
+    <div className="min-h-screen bg-slate-900 text-white p-8">
+      <div className="max-w-7xl mx-auto">
+        <h1 className="text-4xl font-bold mb-8 text-center">
+          🚀 Flutterbye Admin Dashboard
+        </h1>
+        <div className="bg-slate-800 p-6 rounded-lg">
+          <p className="text-green-400 text-xl">✅ Admin page is loading successfully!</p>
+          <p className="text-slate-300 mt-4">This is a simplified version to confirm the page loads properly.</p>
+        </div>
+      </div>
+    </div>
+  );
+  
   const [settings, setSettings] = useState<AdminSettings>(initialSettings);
   const [showSensitiveData, setShowSensitiveData] = useState(false);
   const [newImageUrl, setNewImageUrl] = useState("");
@@ -105,43 +123,59 @@ export default function Admin() {
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
-  // Fetch data for various admin sections
-  const { data: platformStats, isLoading: statsLoading } = useQuery({
+  // Fetch data for various admin sections with error handling
+  const { data: platformStats, isLoading: statsLoading, error: statsError } = useQuery({
     queryKey: ["/api/admin/stats"],
+    retry: 1,
+    refetchOnWindowFocus: false,
   });
 
-  const { data: defaultImageData, isLoading: imageLoading } = useQuery({
+  const { data: defaultImageData, isLoading: imageLoading, error: imageError } = useQuery({
     queryKey: ["/api/default-token-image"],
+    retry: 1,
+    refetchOnWindowFocus: false,
   });
 
-  const { data: settingsData, isLoading: settingsLoading } = useQuery({
+  const { data: settingsData, isLoading: settingsLoading, error: settingsError } = useQuery({
     queryKey: ["/api/admin/system-settings"],
+    retry: 1,
+    refetchOnWindowFocus: false,
   });
 
-  // Real-time data queries with aggressive refresh intervals
-  const { data: viralAnalytics, isLoading: viralLoading } = useQuery({
+  // Real-time data queries with error handling
+  const { data: viralAnalytics, isLoading: viralLoading, error: viralError } = useQuery({
     queryKey: ["/api/viral/admin-analytics"],
     refetchInterval: 10000, // Refresh every 10 seconds
+    retry: 1,
+    refetchOnWindowFocus: false,
   });
 
-  const { data: liveMetrics, isLoading: metricsLoading } = useQuery({
+  const { data: liveMetrics, isLoading: metricsLoading, error: metricsError } = useQuery({
     queryKey: ["/api/system/metrics"],
     refetchInterval: 5000, // Refresh every 5 seconds
+    retry: 1,
+    refetchOnWindowFocus: false,
   });
 
-  const { data: realtimeConnections } = useQuery({
+  const { data: realtimeConnections, error: realtimeError } = useQuery({
     queryKey: ["/api/system/realtime"],
     refetchInterval: 3000, // Refresh every 3 seconds
+    retry: 1,
+    refetchOnWindowFocus: false,
   });
 
-  const { data: aiInsights } = useQuery({
+  const { data: aiInsights, error: aiInsightsError } = useQuery({
     queryKey: ["/api/admin/ai-insights"],
     refetchInterval: 60000, // Refresh every minute
+    retry: 1,
+    refetchOnWindowFocus: false,
   });
 
-  const { data: predictiveAnalytics } = useQuery({
+  const { data: predictiveAnalytics, error: predictiveError } = useQuery({
     queryKey: ["/api/admin/predictive-analytics"],
     refetchInterval: 30000, // Refresh every 30 seconds
+    retry: 1,
+    refetchOnWindowFocus: false,
   });
 
   // World-class dashboard data queries
