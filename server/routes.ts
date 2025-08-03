@@ -15,6 +15,7 @@ import { collaborativeTokenService } from "./collaborative-token-service";
 import { viralAccelerationService } from "./viral-acceleration-service";
 import { stripeService, subscriptionPlans } from "./stripe-service";
 import { openaiService } from "./openai-service";
+import { messageNFTService } from "./message-nft-service";
 import { z } from "zod";
 export async function registerRoutes(app: Express): Promise<Server> {
   // Apply production-grade security middleware
