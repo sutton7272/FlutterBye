@@ -33,6 +33,7 @@ import {
 import { Link } from "wouter";
 import { AISEOOptimizer } from '@/components/ai-seo-optimizer';
 import { LivingAIInterfaceEnhanced } from '@/components/living-ai-interface-enhanced';
+import { NextGenerationAIFeatures } from '@/components/next-generation-ai-features';
 import { AIConversation } from '@/components/ai-conversation';
 import { AIEnhancementButton } from '@/components/ai-enhancement-button';
 import { useAIContent } from '@/hooks/useAIContent';
@@ -176,7 +177,7 @@ export default function AIComprehensiveOverview() {
     isOptimizingRevenue
   } = useAIAdmin();
 
-  const [activeTab, setActiveTab] = useState('features');
+  const [activeTab, setActiveTab] = useState('next-gen');
 
   useEffect(() => {
     loadAIOverview();
@@ -457,7 +458,11 @@ export default function AIComprehensiveOverview() {
         </Card>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-7 bg-black/20 border-purple-500/30">
+          <TabsList className="grid w-full grid-cols-8 bg-black/20 border-purple-500/30">
+            <TabsTrigger value="next-gen" className="text-white flex items-center gap-1">
+              <DollarSign className="w-3 h-3" />
+              Next-Gen
+            </TabsTrigger>
             <TabsTrigger value="features" className="text-white">AI Features</TabsTrigger>
             <TabsTrigger value="living" className="text-white">Living AI</TabsTrigger>
             <TabsTrigger value="conversation" className="text-white">AI Chat</TabsTrigger>
@@ -466,6 +471,10 @@ export default function AIComprehensiveOverview() {
             <TabsTrigger value="seo" className="text-white">SEO Tools</TabsTrigger>
             <TabsTrigger value="future" className="text-white">Future</TabsTrigger>
           </TabsList>
+
+          <TabsContent value="next-gen" className="space-y-4">
+            <NextGenerationAIFeatures />
+          </TabsContent>
 
           <TabsContent value="features" className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
