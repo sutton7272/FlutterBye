@@ -17,6 +17,7 @@ import { stripeService, subscriptionPlans } from "./stripe-service";
 import { openaiService } from "./openai-service";
 import { messageNFTService } from "./message-nft-service";
 import { livingAIService } from "./living-ai-service";
+import { immersiveAIService } from "./immersive-ai-service";
 import { z } from "zod";
 export async function registerRoutes(app: Express): Promise<Server> {
   // Apply production-grade security middleware
@@ -5402,8 +5403,91 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // IMMERSIVE AI ENDPOINTS - Next-level engagement
+
+  app.post("/api/immersive-ai/environment", async (req, res) => {
+    try {
+      const { userMood, context, timeOfDay, activity } = req.body;
+      const environment = await immersiveAIService.generateImmersiveEnvironment(
+        userMood || "electric",
+        context || "general",
+        timeOfDay || "afternoon",
+        activity || "browsing"
+      );
+      res.json(environment);
+    } catch (error) {
+      console.error("Immersive environment error:", error);
+      res.status(500).json({ error: "Failed to generate immersive environment" });
+    }
+  });
+
+  app.post("/api/immersive-ai/companion", async (req, res) => {
+    try {
+      const { userPersonality, goals, interactionHistory, preferredStyle } = req.body;
+      const companion = await immersiveAIService.createAICompanion(
+        userPersonality || {},
+        goals || ["engagement", "creativity"],
+        interactionHistory || [],
+        preferredStyle || "friendly"
+      );
+      res.json(companion);
+    } catch (error) {
+      console.error("AI companion error:", error);
+      res.status(500).json({ error: "Failed to create AI companion" });
+    }
+  });
+
+  app.post("/api/immersive-ai/optimize-engagement", async (req, res) => {
+    try {
+      const { userInteractions, attentionMetrics, sessionData, platformGoals } = req.body;
+      const optimization = await immersiveAIService.optimizeEngagement(
+        userInteractions || [],
+        attentionMetrics || {},
+        sessionData || {},
+        platformGoals || ["engagement"]
+      );
+      res.json(optimization);
+    } catch (error) {
+      console.error("Engagement optimization error:", error);
+      res.status(500).json({ error: "Failed to optimize engagement" });
+    }
+  });
+
+  app.post("/api/immersive-ai/predictive-journey", async (req, res) => {
+    try {
+      const { currentState, userHistory, patterns, externalFactors } = req.body;
+      const journey = await immersiveAIService.mapPredictiveJourney(
+        currentState || {},
+        userHistory || [],
+        patterns || [],
+        externalFactors || {}
+      );
+      res.json(journey);
+    } catch (error) {
+      console.error("Predictive journey error:", error);
+      res.status(500).json({ error: "Failed to map predictive journey" });
+    }
+  });
+
+  app.post("/api/immersive-ai/emotional-resonance", async (req, res) => {
+    try {
+      const { userEmotions, contextualFactors, desiredOutcome, personalityProfile } = req.body;
+      const resonance = await immersiveAIService.amplifyEmotionalResonance(
+        userEmotions || [],
+        contextualFactors || {},
+        desiredOutcome || "engagement",
+        personalityProfile || {}
+      );
+      res.json(resonance);
+    } catch (error) {
+      console.error("Emotional resonance error:", error);
+      res.status(500).json({ error: "Failed to amplify emotional resonance" });
+    }
+  });
+
   console.log('🚀 Production-grade server with real-time monitoring initialized');
   console.log('🤖 Living AI personality system activated');
+  console.log('🌟 Immersive AI experience system launched');
   
   return httpServer;
 }

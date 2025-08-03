@@ -6,7 +6,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { LivingPersonality, LivingIndicator } from "@/components/LivingPersonality";
+import { ImmersiveBackground } from "@/components/ImmersiveBackground";
 import { useLivingAI, useBasicLivingAI, useRevolutionaryAI } from "@/hooks/useLivingAI";
+import { useImmersiveAI } from "@/hooks/useImmersiveAI";
 import { motion } from "framer-motion";
 import { 
   Zap, 
@@ -40,9 +42,11 @@ export default function LivingAIDemo() {
 
   const basicAI = useBasicLivingAI();
   const revolutionaryAI = useRevolutionaryAI('demo-user');
+  const immersiveAI = useImmersiveAI('demo-user', 'living-ai-demo');
   const [userInput, setUserInput] = useState('');
   const [demoActions, setDemoActions] = useState<string[]>([]);
   const [revolutionaryDemos, setRevolutionaryDemos] = useState<any[]>([]);
+  const [currentMood, setCurrentMood] = useState('electric');
 
   // Demo interaction tracking
   useEffect(() => {
@@ -64,6 +68,9 @@ export default function LivingAIDemo() {
 
   return (
     <div className="min-h-screen text-white pt-20 pb-12 overflow-hidden relative">
+      {/* Immersive Background */}
+      <ImmersiveBackground mood={currentMood} intensity={platformEnergy} context="living-ai-demo" />
+      
       {/* Living AI Personality Component */}
       <LivingPersonality pageContext="living-ai-demo" />
       <LivingIndicator />
@@ -115,30 +122,34 @@ export default function LivingAIDemo() {
         </motion.div>
 
         <Tabs defaultValue="revolutionary" className="w-full">
-          <TabsList className="grid w-full grid-cols-6 glassmorphism electric-frame mb-8">
-            <TabsTrigger value="revolutionary" className="flex items-center gap-2">
-              <Brain className="w-4 h-4" />
-              Revolutionary AI
+          <TabsList className="grid w-full grid-cols-7 glassmorphism electric-frame mb-8 text-xs">
+            <TabsTrigger value="revolutionary" className="flex items-center gap-1">
+              <Brain className="w-3 h-3" />
+              Revolutionary
             </TabsTrigger>
-            <TabsTrigger value="interactive" className="flex items-center gap-2">
-              <Bot className="w-4 h-4" />
-              Interactive Demo
+            <TabsTrigger value="immersive" className="flex items-center gap-1">
+              <Activity className="w-3 h-3" />
+              Immersive
             </TabsTrigger>
-            <TabsTrigger value="awareness" className="flex items-center gap-2">
-              <Eye className="w-4 h-4" />
-              Contextual Awareness
+            <TabsTrigger value="interactive" className="flex items-center gap-1">
+              <Bot className="w-3 h-3" />
+              Interactive
             </TabsTrigger>
-            <TabsTrigger value="personality" className="flex items-center gap-2">
-              <Heart className="w-4 h-4" />
-              AI Personality
+            <TabsTrigger value="awareness" className="flex items-center gap-1">
+              <Eye className="w-3 h-3" />
+              Awareness
             </TabsTrigger>
-            <TabsTrigger value="quantum" className="flex items-center gap-2">
-              <Sparkles className="w-4 h-4" />
-              Quantum Content
+            <TabsTrigger value="personality" className="flex items-center gap-1">
+              <Heart className="w-3 h-3" />
+              Personality
             </TabsTrigger>
-            <TabsTrigger value="insights" className="flex items-center gap-2">
-              <Lightbulb className="w-4 h-4" />
-              Living Insights
+            <TabsTrigger value="quantum" className="flex items-center gap-1">
+              <Sparkles className="w-3 h-3" />
+              Quantum
+            </TabsTrigger>
+            <TabsTrigger value="insights" className="flex items-center gap-1">
+              <Lightbulb className="w-3 h-3" />
+              Insights
             </TabsTrigger>
           </TabsList>
 
@@ -329,6 +340,192 @@ export default function LivingAIDemo() {
                     <p className="text-gray-400 italic text-center py-8">
                       Try the revolutionary AI features above to see the magic happen!
                     </p>
+                  )}
+                </CardContent>
+              </Card>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="immersive" className="space-y-8">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+              {/* Immersive Controls */}
+              <Card className="glassmorphism electric-frame">
+                <CardHeader>
+                  <CardTitle className="text-white flex items-center gap-2">
+                    <Activity className="h-5 w-5 text-primary" />
+                    Immersive Experience Controls
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="space-y-3">
+                    <Label className="text-white">Mood Selection</Label>
+                    <div className="grid grid-cols-2 gap-2">
+                      {['electric', 'calm', 'energetic', 'creative', 'focused', 'celebratory'].map((mood) => (
+                        <Button
+                          key={mood}
+                          size="sm"
+                          variant={currentMood === mood ? "default" : "outline"}
+                          onClick={() => {
+                            setCurrentMood(mood);
+                            immersiveAI.updateEnvironment(mood, 'mood_change');
+                            immersiveAI.trackMicroInteraction('mood_selection', { mood });
+                          }}
+                          className={`capitalize ${currentMood === mood ? 'bg-primary' : 'border-primary/50'}`}
+                        >
+                          {mood}
+                        </Button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <Button
+                    onClick={() => {
+                      immersiveAI.updateCompanion(
+                        { type: 'creative', energy: 'high' },
+                        ['engagement', 'creativity', 'innovation'],
+                        'enthusiastic'
+                      );
+                      immersiveAI.trackMicroInteraction('companion_creation', { style: 'enthusiastic' });
+                    }}
+                    disabled={immersiveAI.isCreatingCompanion}
+                    className="w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white"
+                  >
+                    {immersiveAI.isCreatingCompanion ? "Creating..." : "🤖 Create AI Companion"}
+                  </Button>
+
+                  <Button
+                    onClick={() => {
+                      immersiveAI.predictJourney({
+                        currentPage: 'living-ai-demo',
+                        mood: currentMood,
+                        engagement: immersiveAI.getEngagementLevel(),
+                        sessionTime: immersiveAI.getAverageSessionTime()
+                      });
+                    }}
+                    disabled={immersiveAI.isPredictingJourney}
+                    className="w-full bg-gradient-to-r from-blue-600 to-cyan-600 text-white"
+                  >
+                    {immersiveAI.isPredictingJourney ? "Predicting..." : "🔮 Predict My Journey"}
+                  </Button>
+
+                  <Button
+                    onClick={() => {
+                      immersiveAI.amplifyResonance(
+                        [{ emotion: currentMood, intensity: 8 }],
+                        'maximum_engagement',
+                        { type: 'creative', preferences: ['visual', 'interactive'] }
+                      );
+                    }}
+                    disabled={immersiveAI.isAmplifyingResonance}
+                    className="w-full bg-gradient-to-r from-pink-600 to-red-600 text-white"
+                  >
+                    {immersiveAI.isAmplifyingResonance ? "Amplifying..." : "💖 Amplify Resonance"}
+                  </Button>
+
+                  <Button
+                    onClick={() => {
+                      immersiveAI.triggerCelebration();
+                      immersiveAI.trackMicroInteraction('celebration_trigger', { mood: currentMood });
+                    }}
+                    className="w-full bg-gradient-to-r from-yellow-600 to-orange-600 text-white"
+                  >
+                    🎉 Trigger Celebration
+                  </Button>
+                </CardContent>
+              </Card>
+
+              {/* Immersive Results */}
+              <Card className="glassmorphism electric-frame">
+                <CardHeader>
+                  <CardTitle className="text-white flex items-center gap-2">
+                    <Activity className="h-5 w-5 text-secondary" />
+                    Immersive System Status
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="text-center p-3 bg-white/5 rounded-lg">
+                      <div className="text-2xl font-bold text-primary">{immersiveAI.getEngagementLevel()}%</div>
+                      <div className="text-xs text-gray-400">Engagement Level</div>
+                    </div>
+                    <div className="text-center p-3 bg-white/5 rounded-lg">
+                      <div className="text-2xl font-bold text-secondary">{immersiveAI.getInteractionCount()}</div>
+                      <div className="text-xs text-gray-400">Interactions</div>
+                    </div>
+                  </div>
+
+                  {immersiveAI.currentEnvironment && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="p-4 bg-blue-500/10 rounded-lg border border-blue-500/30"
+                    >
+                      <h4 className="text-white font-semibold mb-2">🌟 Current Environment</h4>
+                      <p className="text-gray-300 text-sm mb-2">
+                        Background: {immersiveAI.currentEnvironment.dynamicBackground.animation}
+                      </p>
+                      <p className="text-gray-300 text-sm">
+                        Intensity: {immersiveAI.currentEnvironment.dynamicBackground.intensity}%
+                      </p>
+                    </motion.div>
+                  )}
+
+                  {immersiveAI.companion && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="p-4 bg-purple-500/10 rounded-lg border border-purple-500/30"
+                    >
+                      <h4 className="text-white font-semibold mb-2">🤖 AI Companion</h4>
+                      <p className="text-gray-300 text-sm mb-2">{immersiveAI.companion.personality}</p>
+                      <p className="text-xs text-gray-400">Voice: {immersiveAI.companion.voice}</p>
+                    </motion.div>
+                  )}
+
+                  {immersiveAI.journeyData && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="p-4 bg-green-500/10 rounded-lg border border-green-500/30"
+                    >
+                      <h4 className="text-white font-semibold mb-2">🔮 Journey Prediction</h4>
+                      <p className="text-gray-300 text-sm mb-2">
+                        Confidence: {immersiveAI.journeyData.confidence}%
+                      </p>
+                      <p className="text-xs text-gray-400">
+                        Timeframe: {immersiveAI.journeyData.timeframe}
+                      </p>
+                    </motion.div>
+                  )}
+
+                  {immersiveAI.resonanceData && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="p-4 bg-pink-500/10 rounded-lg border border-pink-500/30"
+                    >
+                      <h4 className="text-white font-semibold mb-2">💖 Emotional Resonance</h4>
+                      <div className="grid grid-cols-3 gap-2 text-xs">
+                        <div className="text-center">
+                          <div className="text-primary font-bold">
+                            {immersiveAI.resonanceData.expectedImpact?.engagement || 0}%
+                          </div>
+                          <div className="text-gray-400">Engagement</div>
+                        </div>
+                        <div className="text-center">
+                          <div className="text-secondary font-bold">
+                            {immersiveAI.resonanceData.expectedImpact?.satisfaction || 0}%
+                          </div>
+                          <div className="text-gray-400">Satisfaction</div>
+                        </div>
+                        <div className="text-center">
+                          <div className="text-pink-400 font-bold">
+                            {immersiveAI.resonanceData.expectedImpact?.retention || 0}%
+                          </div>
+                          <div className="text-gray-400">Retention</div>
+                        </div>
+                      </div>
+                    </motion.div>
                   )}
                 </CardContent>
               </Card>
