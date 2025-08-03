@@ -273,55 +273,78 @@ export function SMSNexusPage() {
           </div>
         </div>
 
-        {/* Revolutionary Main Interface */}
-        <Tabs defaultValue="neural-composer" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-6 bg-black/40 backdrop-blur-sm border border-purple-500/30">
-            <TabsTrigger value="neural-composer" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-600 data-[state=active]:to-pink-600">
-              🧠 Neural Composer
+        {/* Simplified Main Interface */}
+        <Tabs defaultValue="create-message" className="space-y-6">
+          <TabsList className="grid w-full grid-cols-4 bg-black/40 backdrop-blur-sm border border-purple-500/30">
+            <TabsTrigger value="create-message" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-600 data-[state=active]:to-pink-600">
+              ✍️ Create Message
             </TabsTrigger>
-            <TabsTrigger value="quantum-threads" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-green-600 data-[state=active]:to-emerald-600">
-              🌐 Quantum Threads
+            <TabsTrigger value="campaigns" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-green-600 data-[state=active]:to-emerald-600">
+              🚀 Campaigns
             </TabsTrigger>
-            <TabsTrigger value="time-capsules" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-cyan-600">
-              ⏰ Time Capsules
+            <TabsTrigger value="results" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-cyan-600">
+              📊 Results
             </TabsTrigger>
-            <TabsTrigger value="emotion-exchange" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-orange-600 data-[state=active]:to-red-600">
-              💎 Emotion Exchange
-            </TabsTrigger>
-            <TabsTrigger value="ai-avatars" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-cyan-600 data-[state=active]:to-blue-600">
-              🤖 AI Avatars
-            </TabsTrigger>
-            <TabsTrigger value="global-pulse" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-emerald-600 data-[state=active]:to-green-600">
-              🌍 Global Pulse
+            <TabsTrigger value="help" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-orange-600 data-[state=active]:to-red-600">
+              💡 How It Works
             </TabsTrigger>
           </TabsList>
 
-          {/* Neural Composer Tab - Revolutionary AI Enhancement */}
-          <TabsContent value="neural-composer" className="space-y-6">
+          {/* Create Message Tab - Simple Message Creation */}
+          <TabsContent value="create-message" className="space-y-6">
+            {/* Simple Step-by-Step Guide */}
+            <Card className="bg-gradient-to-r from-blue-500/10 to-purple-500/10 border-blue-400/30">
+              <CardContent className="p-6">
+                <div className="text-center space-y-4">
+                  <h2 className="text-2xl font-bold text-white">Create Your FlutterWave Message</h2>
+                  <p className="text-gray-300 text-lg">Transform your text into a valuable blockchain butterfly in 3 easy steps</p>
+                  <div className="flex justify-center items-center space-x-8 mt-6">
+                    <div className="text-center">
+                      <div className="w-12 h-12 bg-purple-600 rounded-full flex items-center justify-center text-white font-bold text-xl mb-2">1</div>
+                      <div className="text-sm text-gray-300">Write Message</div>
+                    </div>
+                    <ArrowRight className="h-6 w-6 text-gray-400" />
+                    <div className="text-center">
+                      <div className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold text-xl mb-2">2</div>
+                      <div className="text-sm text-gray-300">AI Analyzes</div>
+                    </div>
+                    <ArrowRight className="h-6 w-6 text-gray-400" />
+                    <div className="text-center">
+                      <div className="w-12 h-12 bg-green-600 rounded-full flex items-center justify-center text-white font-bold text-xl mb-2">3</div>
+                      <div className="text-sm text-gray-300">Send & Earn</div>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
             <div className="grid lg:grid-cols-2 gap-6">
               <Card className="bg-black/40 backdrop-blur-sm border-purple-500/30">
                 <CardHeader>
                   <CardTitle className="text-white flex items-center gap-2">
-                    <Brain className="h-6 w-6 text-purple-400" />
-                    AI-Powered Message Composer
+                    <MessageSquare className="h-6 w-6 text-purple-400" />
+                    Write Your Message
                   </CardTitle>
                   <CardDescription className="text-purple-200">
-                    Let our neural networks optimize your message for maximum emotional impact
+                    Write any message and our AI will optimize it to create more value and engagement
                   </CardDescription>
                 </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="space-y-2">
-                    <Label className="text-white">Your Message</Label>
+                <CardContent className="space-y-6">
+                  <div className="space-y-3">
+                    <Label className="text-white text-lg">What do you want to say?</Label>
                     <Textarea
                       value={aiMessage}
                       onChange={(e) => setAiMessage(e.target.value)}
-                      placeholder="Type your emotional message here..."
-                      className="bg-white/10 border-white/20 text-white placeholder:text-gray-400 min-h-[120px]"
+                      placeholder="Example: 'Thank you for your support!' or 'Hope you have a great day!'"
+                      className="bg-white/10 border-white/20 text-white placeholder:text-gray-400 min-h-[120px] text-lg"
                     />
+                    <div className="text-sm text-gray-400">
+                      💡 Tip: Messages with positive emotions like gratitude, love, or encouragement perform best
+                    </div>
                   </div>
                   
-                  <div className="space-y-2">
-                    <Label className="text-white">Emotional Intensity</Label>
+                  <div className="space-y-3">
+                    <Label className="text-white text-lg">How strong should the emotion be?</Label>
                     <div className="px-3">
                       <input
                         type="range"
@@ -329,12 +352,12 @@ export function SMSNexusPage() {
                         max="10"
                         value={emotionIntensity}
                         onChange={(e) => setEmotionIntensity(Number(e.target.value))}
-                        className="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer slider"
+                        className="w-full h-3 bg-gray-700 rounded-lg appearance-none cursor-pointer slider"
                       />
-                      <div className="flex justify-between text-sm text-gray-400 mt-1">
-                        <span>Subtle</span>
-                        <span className="text-purple-400 font-bold">{emotionIntensity}/10</span>
-                        <span>Intense</span>
+                      <div className="flex justify-between text-sm text-gray-400 mt-2">
+                        <span>Gentle (1)</span>
+                        <span className="text-purple-400 font-bold text-lg">{emotionIntensity}/10</span>
+                        <span>Powerful (10)</span>
                       </div>
                     </div>
                   </div>
@@ -342,67 +365,81 @@ export function SMSNexusPage() {
                   <Button
                     onClick={() => analyzeEmotionMutation.mutate(aiMessage)}
                     disabled={!aiMessage.trim() || analyzeEmotionMutation.isPending}
-                    className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700"
+                    className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 h-12 text-lg font-semibold"
                   >
                     {analyzeEmotionMutation.isPending ? (
-                      "Analyzing..."
+                      <>
+                        <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
+                        Creating your butterfly...
+                      </>
                     ) : (
                       <>
-                        <Brain className="h-4 w-4 mr-2" />
-                        Analyze & Optimize
+                        <Sparkles className="h-5 w-5 mr-2" />
+                        Create My FlutterWave Message
                       </>
                     )}
                   </Button>
                 </CardContent>
               </Card>
 
-              {/* Analysis Results */}
+              {/* Your Butterfly Results */}
               {lastAnalysis && (
                 <Card className="bg-gradient-to-br from-green-900/20 to-blue-900/20 border-green-400/30">
                   <CardHeader>
                     <CardTitle className="text-green-300 flex items-center gap-2">
                       <Sparkles className="h-6 w-6" />
-                      AI Analysis Results
+                      Your Digital Butterfly is Ready! 🦋
                     </CardTitle>
+                    <CardDescription className="text-green-200">
+                      Your message has been transformed into a valuable blockchain asset
+                    </CardDescription>
                   </CardHeader>
-                  <CardContent className="space-y-4">
+                  <CardContent className="space-y-6">
                     <div className="grid grid-cols-2 gap-4">
                       <div className="space-y-2">
-                        <div className="text-sm text-gray-300">Detected Emotion</div>
-                        <Badge className="bg-purple-600/20 text-purple-200 text-lg">
-                          {lastAnalysis.emotion}
+                        <div className="text-sm text-gray-300">Main Emotion Detected</div>
+                        <Badge className="bg-purple-600/20 text-purple-200 text-lg px-4 py-2">
+                          {lastAnalysis.emotion.charAt(0).toUpperCase() + lastAnalysis.emotion.slice(1)} ✨
                         </Badge>
                       </div>
                       <div className="space-y-2">
-                        <div className="text-sm text-gray-300">Confidence</div>
-                        <div className="text-2xl font-bold text-green-400">
+                        <div className="text-sm text-gray-300">AI Accuracy</div>
+                        <div className="text-3xl font-bold text-green-400">
                           {Math.round(lastAnalysis.confidence * 100)}%
+                        </div>
+                        <div className="text-xs text-gray-400">Very confident!</div>
+                      </div>
+                    </div>
+
+                    <div className="space-y-3">
+                      <div className="text-sm text-gray-300">How Viral Could This Go? 🚀</div>
+                      <div className="relative">
+                        <Progress value={viralScore} className="h-4" />
+                        <div className="flex justify-between text-sm mt-2">
+                          <span className="text-gray-400">Limited</span>
+                          <span className="text-blue-400 font-bold">{Math.round(viralScore)}% Viral Potential</span>
+                          <span className="text-gray-400">Explosive</span>
                         </div>
                       </div>
                     </div>
 
-                    <div className="space-y-2">
-                      <div className="text-sm text-gray-300">Viral Potential</div>
-                      <Progress value={viralScore} className="h-3" />
-                      <div className="text-right text-sm text-blue-400">
-                        {Math.round(viralScore)}% viral score
+                    <div className="space-y-3">
+                      <div className="text-sm text-gray-300">Your Enhanced Message</div>
+                      <div className="p-4 bg-gradient-to-r from-purple-500/10 to-blue-500/10 rounded-lg text-white border border-green-400/30">
+                        <div className="text-lg">"{lastAnalysis.optimizedMessage}"</div>
                       </div>
+                      <div className="text-xs text-green-300">✨ Enhanced with AI optimization</div>
                     </div>
 
-                    <div className="space-y-2">
-                      <div className="text-sm text-gray-300">Optimized Message</div>
-                      <div className="p-3 bg-black/40 rounded-lg text-white border border-green-400/30">
-                        "{lastAnalysis.optimizedMessage}"
-                      </div>
-                    </div>
-
-                    <div className="space-y-2">
-                      <div className="text-sm text-gray-300">AI Recommendations</div>
-                      <div className="space-y-1">
-                        {lastAnalysis.suggestions.map((suggestion: string, index: number) => (
-                          <div key={index} className="flex items-center gap-2 text-sm text-blue-200">
-                            <ArrowRight className="h-3 w-3" />
-                            {suggestion}
+                    <div className="space-y-3">
+                      <div className="text-sm text-gray-300">Ways to Make It Even Better</div>
+                      <div className="space-y-2">
+                        {lastAnalysis.suggestions.slice(0, 3).map((suggestion: string, index: number) => (
+                          <div key={index} className="flex items-start gap-3 text-sm text-blue-200 p-2 bg-blue-500/10 rounded-lg">
+                            <div className="w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center text-white text-xs font-bold mt-0.5">
+                              {index + 1}
+                            </div>
+                            <span>{suggestion}</span>
                           </div>
                         ))}
                       </div>
@@ -477,38 +514,44 @@ export function SMSNexusPage() {
             </div>
           </TabsContent>
 
-          {/* Quantum Threads Tab - Revolutionary Message Networks */}
-          <TabsContent value="quantum-threads" className="space-y-6">
+          {/* Campaigns Tab - Easy Campaign Creation */}
+          <TabsContent value="campaigns" className="space-y-6">
             <div className="grid lg:grid-cols-2 gap-6">
               <Card className="bg-black/40 backdrop-blur-sm border-blue-500/30">
                 <CardHeader>
                   <CardTitle className="text-white flex items-center gap-2">
-                    <Target className="h-6 w-6 text-blue-400" />
-                    Smart Campaign Generator
+                    <Users className="h-6 w-6 text-blue-400" />
+                    Create a Campaign
                   </CardTitle>
                   <CardDescription className="text-blue-200">
-                    AI-powered campaigns tailored to your audience and goals
+                    Send your message to multiple people at once with targeted campaigns
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="space-y-2">
-                    <Label className="text-white">Target Audience</Label>
+                    <Label className="text-white text-lg">Who do you want to reach?</Label>
                     <Input
                       value={targetAudience}
                       onChange={(e) => setTargetAudience(e.target.value)}
-                      placeholder="e.g., Millennials, Entrepreneurs, Families"
-                      className="bg-white/10 border-white/20 text-white"
+                      placeholder="Example: Young professionals, Parents, Students"
+                      className="bg-white/10 border-white/20 text-white text-lg"
                     />
+                    <div className="text-sm text-gray-400">
+                      💡 Be specific about your audience for better results
+                    </div>
                   </div>
                   
                   <div className="space-y-2">
-                    <Label className="text-white">Campaign Goal</Label>
+                    <Label className="text-white text-lg">What's your goal?</Label>
                     <Input
                       value={campaignGoal}
                       onChange={(e) => setCampaignGoal(e.target.value)}
-                      placeholder="e.g., Increase engagement, Drive sales, Build community"
-                      className="bg-white/10 border-white/20 text-white"
+                      placeholder="Example: Spread positivity, Thank customers, Announce news"
+                      className="bg-white/10 border-white/20 text-white text-lg"
                     />
+                    <div className="text-sm text-gray-400">
+                      💡 Clear goals help AI create better campaigns
+                    </div>
                   </div>
 
                   <Button
@@ -987,20 +1030,163 @@ export function SMSNexusPage() {
           </TabsContent>
         </Tabs>
 
+        {/* How It Works Tab - Simple Explanation */}
+        <TabsContent value="help" className="space-y-6">
+          <div className="max-w-4xl mx-auto space-y-8">
+            <Card className="bg-gradient-to-r from-blue-500/10 to-purple-500/10 border-blue-400/30">
+              <CardContent className="p-8">
+                <div className="text-center space-y-4">
+                  <h2 className="text-3xl font-bold text-white">How FlutterWave Works</h2>
+                  <p className="text-xl text-gray-300">
+                    Transform your messages into valuable digital assets that spread across the blockchain
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+
+            <div className="grid md:grid-cols-3 gap-6">
+              <Card className="bg-black/40 backdrop-blur-sm border-purple-500/30">
+                <CardContent className="p-6 text-center space-y-4">
+                  <div className="w-16 h-16 bg-purple-600 rounded-full flex items-center justify-center mx-auto">
+                    <MessageSquare className="h-8 w-8 text-white" />
+                  </div>
+                  <h3 className="text-xl font-bold text-white">1. Write Your Message</h3>
+                  <p className="text-gray-300">
+                    Type any message - from "thank you" to "have a great day". Our AI will understand the emotion behind your words.
+                  </p>
+                </CardContent>
+              </Card>
+
+              <Card className="bg-black/40 backdrop-blur-sm border-blue-500/30">
+                <CardContent className="p-6 text-center space-y-4">
+                  <div className="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center mx-auto">
+                    <Brain className="h-8 w-8 text-white" />
+                  </div>
+                  <h3 className="text-xl font-bold text-white">2. AI Creates Value</h3>
+                  <p className="text-gray-300">
+                    Our advanced AI analyzes your message's emotional impact and predicts how valuable and viral it could become.
+                  </p>
+                </CardContent>
+              </Card>
+
+              <Card className="bg-black/40 backdrop-blur-sm border-green-500/30">
+                <CardContent className="p-6 text-center space-y-4">
+                  <div className="w-16 h-16 bg-green-600 rounded-full flex items-center justify-center mx-auto">
+                    <Coins className="h-8 w-8 text-white" />
+                  </div>
+                  <h3 className="text-xl font-bold text-white">3. Earn Real Value</h3>
+                  <p className="text-gray-300">
+                    Your message becomes a blockchain token that can be traded, shared, and appreciated by others around the world.
+                  </p>
+                </CardContent>
+              </Card>
+            </div>
+
+            <Card className="bg-black/40 backdrop-blur-sm border-yellow-500/30">
+              <CardHeader>
+                <CardTitle className="text-white text-xl">Why FlutterWave?</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid md:grid-cols-2 gap-6">
+                  <div className="space-y-4">
+                    <div className="flex items-start gap-3">
+                      <Heart className="h-6 w-6 text-pink-400 mt-1" />
+                      <div>
+                        <h4 className="text-white font-semibold">Emotional Value</h4>
+                        <p className="text-gray-300 text-sm">Your feelings and messages have real worth that can be shared and appreciated.</p>
+                      </div>
+                    </div>
+                    <div className="flex items-start gap-3">
+                      <TrendingUp className="h-6 w-6 text-green-400 mt-1" />
+                      <div>
+                        <h4 className="text-white font-semibold">Viral Potential</h4>
+                        <p className="text-gray-300 text-sm">Messages with high emotional impact can spread widely and create more value.</p>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="space-y-4">
+                    <div className="flex items-start gap-3">
+                      <Shield className="h-6 w-6 text-blue-400 mt-1" />
+                      <div>
+                        <h4 className="text-white font-semibold">Blockchain Security</h4>
+                        <p className="text-gray-300 text-sm">Your messages are permanently stored and protected on the blockchain.</p>
+                      </div>
+                    </div>
+                    <div className="flex items-start gap-3">
+                      <Globe className="h-6 w-6 text-purple-400 mt-1" />
+                      <div>
+                        <h4 className="text-white font-semibold">Global Reach</h4>
+                        <p className="text-gray-300 text-sm">Connect with people worldwide through the universal language of emotions.</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-gradient-to-r from-green-500/10 to-blue-500/10 border-green-400/30">
+              <CardContent className="p-6 text-center">
+                <h3 className="text-2xl font-bold text-white mb-4">Ready to Start?</h3>
+                <p className="text-gray-300 mb-6">
+                  Click on "Create Message" to begin transforming your words into valuable digital butterflies.
+                </p>
+                <Button className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 px-8 py-3 text-lg">
+                  <Sparkles className="h-5 w-5 mr-2" />
+                  Create My First Message
+                </Button>
+              </CardContent>
+            </Card>
+          </div>
+        </TabsContent>
+
+        {/* Results Tab - Performance Analytics */}
+        <TabsContent value="results" className="space-y-6">
+          <Card className="bg-black/40 backdrop-blur-sm border-green-500/30">
+            <CardHeader>
+              <CardTitle className="text-white text-2xl">Your FlutterWave Performance</CardTitle>
+              <CardDescription className="text-green-200">Track how your messages are performing and earning value</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="grid md:grid-cols-4 gap-6 mb-6">
+                <div className="text-center p-4 bg-purple-500/20 rounded-lg">
+                  <div className="text-3xl font-bold text-purple-300">{realtimeStats?.totalMessages || 0}</div>
+                  <div className="text-sm text-gray-300">Messages Created</div>
+                </div>
+                <div className="text-center p-4 bg-blue-500/20 rounded-lg">
+                  <div className="text-3xl font-bold text-blue-300">{realtimeStats?.conversionRate || 0}%</div>
+                  <div className="text-sm text-gray-300">Success Rate</div>
+                </div>
+                <div className="text-center p-4 bg-green-500/20 rounded-lg">
+                  <div className="text-3xl font-bold text-green-300">{realtimeStats?.averageValue || 0}</div>
+                  <div className="text-sm text-gray-300">Avg Value (SOL)</div>
+                </div>
+                <div className="text-center p-4 bg-yellow-500/20 rounded-lg">
+                  <div className="text-3xl font-bold text-yellow-300">{realtimeStats?.viralCoefficient || 0}x</div>
+                  <div className="text-sm text-gray-300">Viral Impact</div>
+                </div>
+              </div>
+              
+              <div className="text-center text-gray-300">
+                <p className="text-lg mb-4">Create your first FlutterWave message to see detailed analytics here!</p>
+                <Button className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700">
+                  <MessageSquare className="h-4 w-4 mr-2" />
+                  Create Your First Message
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
         {/* Quick Action Bar */}
         <Card className="bg-gradient-to-r from-purple-900/40 to-blue-900/40 backdrop-blur-sm border border-purple-500/30">
           <CardContent className="p-6">
-            <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-              <div className="text-center md:text-left">
+            <div className="flex items-center justify-center">
+              <div className="text-center">
                 <h3 className="text-2xl font-bold text-white mb-2">Ready to ride the FlutterWave?</h3>
-                <p className="text-purple-200">Join the revolution and transform every message into precious blockchain butterflies</p>
-              </div>
-              <div className="flex gap-3">
-                <Button className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-semibold px-8">
-                  Start Creating
-                </Button>
-                <Button variant="outline" className="border-white/20 text-white hover:bg-white/10">
-                  Learn More
+                <p className="text-purple-200 mb-4">Join the revolution and transform every message into precious blockchain butterflies</p>
+                <Button className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 px-6 py-3">
+                  <Sparkles className="h-4 w-4 mr-2" />
+                  Get Started Now
                 </Button>
               </div>
             </div>
