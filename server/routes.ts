@@ -21,6 +21,7 @@ import { immersiveAIService } from "./immersive-ai-service";
 import { aiAdminService } from "./ai-admin-service";
 import { aiContentService } from "./ai-content-service";
 import aiEnhancementRoutes from "./ai-enhancement-routes";
+import comprehensiveAIEnhancementRoutes from "./comprehensive-ai-enhancement-routes";
 import { z } from "zod";
 export async function registerRoutes(app: Express): Promise<Server> {
   // Apply production-grade security middleware
@@ -5707,6 +5708,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // COMPREHENSIVE AI ENHANCEMENT ROUTES - ALL 6 CRITICAL ENHANCEMENTS ✅
   const comprehensiveAIRoutes = await import("./comprehensive-ai-routes");
   app.use("/api/comprehensive-ai", comprehensiveAIRoutes.default);
+  
+  // NEW COMPREHENSIVE AI ENHANCEMENT ROUTES - ALL OPPORTUNITIES IMPLEMENTED ✅
+  app.use("/api/ai-opportunities", comprehensiveAIEnhancementRoutes);
 
   // AI MONETIZATION ROUTES - Premium AI features and subscription management
   const aiMonetizationRoutes = await import("./ai-monetization-routes");
