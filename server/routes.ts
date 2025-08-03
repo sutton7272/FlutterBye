@@ -46,6 +46,51 @@ export async function registerRoutes(app: Express): Promise<Server> {
       realTimeMetrics: metrics
     });
   });
+
+  // NFT Pricing Management API Endpoints
+  app.get('/api/admin/nft-pricing', async (req, res) => {
+    try {
+      const nftPricingSettings = await storage.getNFTPricingSettings();
+      res.json({ success: true, data: nftPricingSettings });
+    } catch (error) {
+      console.error('Error fetching NFT pricing settings:', error);
+      res.status(500).json({ 
+        success: false, 
+        error: 'Failed to fetch NFT pricing settings' 
+      });
+    }
+  });
+
+  app.put('/api/admin/nft-pricing', async (req, res) => {
+    try {
+      const nftPricingData = req.body;
+      const updatedSettings = await storage.updateNFTPricingSettings(nftPricingData);
+      res.json({ 
+        success: true, 
+        data: updatedSettings,
+        message: 'NFT pricing settings updated successfully' 
+      });
+    } catch (error) {
+      console.error('Error updating NFT pricing settings:', error);
+      res.status(500).json({ 
+        success: false, 
+        error: 'Failed to update NFT pricing settings' 
+      });
+    }
+  });
+
+  app.get('/api/admin/nft-marketing-data', async (req, res) => {
+    try {
+      const marketingData = await storage.getNFTMarketingData();
+      res.json({ success: true, data: marketingData });
+    } catch (error) {
+      console.error('Error fetching NFT marketing data:', error);
+      res.status(500).json({ 
+        success: false, 
+        error: 'Failed to fetch NFT marketing data' 
+      });
+    }
+  });
   // Production-grade authentication routes
   app.post('/api/auth/login', productionAuth.rateLimiter(5, 15 * 60 * 1000), async (req, res) => {
     try {

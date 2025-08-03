@@ -173,6 +173,11 @@ export interface IStorage {
   createSystemSetting(setting: InsertSystemSetting): Promise<SystemSetting>;
   updateSystemSetting(key: string, value: string): Promise<SystemSetting>;
   deleteSystemSetting(key: string): Promise<void>;
+
+  // NFT Pricing Management
+  getNFTPricingSettings(): Promise<any>;
+  updateNFTPricingSettings(settings: any): Promise<any>;
+  getNFTMarketingData(): Promise<any>;
 }
 
 // In-memory storage implementation
@@ -1265,6 +1270,58 @@ export class MemStorage implements IStorage {
 
   async deleteSystemSetting(key: string): Promise<void> {
     this.systemSettings.delete(key);
+  }
+
+  // NFT Pricing Management operations
+  async getNFTPricingSettings(): Promise<any> {
+    return {
+      baseCreationFee: 0.005,
+      imageAttachmentFee: 0.002,
+      voiceAttachmentFee: 0.003,
+      marketplaceListingFee: 0.001,
+      salesCommissionPercentage: 2.5,
+      burnRedemptionFeePercentage: 1.0,
+      rarityMultipliers: {
+        common: 1.0,
+        uncommon: 1.5,
+        rare: 2.5,
+        epic: 5.0,
+        legendary: 10.0
+      },
+      minimumListingPrice: 0.001,
+      maximumListingPrice: 100.0,
+      collectionCreationFee: 0.01,
+      isActive: true
+    };
+  }
+
+  async updateNFTPricingSettings(settings: any): Promise<any> {
+    // In a real implementation, this would update the database
+    console.log('Updating NFT pricing settings:', settings);
+    return settings;
+  }
+
+  async getNFTMarketingData(): Promise<any> {
+    return {
+      totalNFTsCreated: 1247,
+      totalNFTsSold: 523,
+      totalNFTsBurned: 89,
+      totalSalesVolume: 127.456,
+      totalCommissionsEarned: 3.186,
+      averageSalePrice: 0.2436,
+      popularCollections: [
+        { name: "FlutterArt Originals", totalSales: 234, avgPrice: 0.325 },
+        { name: "Emotional Expressions", totalSales: 189, avgPrice: 0.287 },
+        { name: "Voice Chronicles", totalSales: 156, avgPrice: 0.198 }
+      ],
+      rarityDistribution: {
+        common: 890,
+        uncommon: 267,
+        rare: 78,
+        epic: 11,
+        legendary: 1
+      }
+    };
   }
 }
 

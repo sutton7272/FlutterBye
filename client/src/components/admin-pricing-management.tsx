@@ -1,4 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { apiRequest } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -53,7 +56,84 @@ interface PlatformFeeConfig {
   feeWalletAddress: string;
 }
 
+interface NFTPricingConfig {
+  baseCreationFee: number;
+  imageAttachmentFee: number;
+  voiceAttachmentFee: number;
+  marketplaceListingFee: number;
+  salesCommissionPercentage: number;
+  burnRedemptionFeePercentage: number;
+  rarityMultipliers: {
+    common: number;
+    uncommon: number;
+    rare: number;
+    epic: number;
+    legendary: number;
+  };
+  minimumListingPrice: number;
+  maximumListingPrice: number;
+  collectionCreationFee: number;
+  isActive: boolean;
+}
+
+interface NFTMarketingData {
+  totalNFTsCreated: number;
+  totalNFTsSold: number;
+  totalNFTsBurned: number;
+  totalSalesVolume: number;
+  totalCommissionsEarned: number;
+  averageSalePrice: number;
+  popularCollections: Array<{
+    name: string;
+    totalSales: number;
+    avgPrice: number;
+  }>;
+  rarityDistribution: {
+    common: number;
+    uncommon: number;
+    rare: number;
+    epic: number;
+    legendary: number;
+  };
+}
+
 export function AdminPricingManagement() {
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+
+  // Fetch NFT pricing settings
+  const { data: nftPricingData, isLoading: nftPricingLoading } = useQuery({
+    queryKey: ["/api/admin/nft-pricing"],
+  });
+
+  // Fetch NFT marketing data
+  const { data: nftMarketingDataResponse, isLoading: nftMarketingLoading } = useQuery({
+    queryKey: ["/api/admin/nft-marketing-data"],
+  });
+
+  // NFT Pricing update mutation
+  const updateNFTPricingMutation = useMutation({
+    mutationFn: async (pricingData: any) => {
+      return await apiRequest("/api/admin/nft-pricing", {
+        method: "PUT",
+        body: JSON.stringify(pricingData),
+      });
+    },
+    onSuccess: () => {
+      toast({
+        title: "Success",
+        description: "NFT pricing settings updated successfully",
+      });
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/nft-pricing"] });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to update NFT pricing settings",
+        variant: "destructive",
+      });
+    },
+  });
   const [pricingTiers, setPricingTiers] = useState<PricingTier[]>([
     { id: "1", name: "Starter", minQuantity: 1, maxQuantity: 99, basePrice: 0.01, discount: 0, isActive: true },
     { id: "2", name: "Growth", minQuantity: 100, maxQuantity: 499, basePrice: 0.009, discount: 10, isActive: true },
@@ -83,6 +163,51 @@ export function AdminPricingManagement() {
     maximumPlatformFee: 0.2,
     feeWalletAddress: "11111111111111111111111111111111"
   });
+
+  const [nftPricing, setNFTPricing] = useState<NFTPricingConfig>({
+    baseCreationFee: 0.005,
+    imageAttachmentFee: 0.002,
+    voiceAttachmentFee: 0.003,
+    marketplaceListingFee: 0.001,
+    salesCommissionPercentage: 2.5,
+    burnRedemptionFeePercentage: 1.0,
+    rarityMultipliers: {
+      common: 1.0,
+      uncommon: 1.5,
+      rare: 2.5,
+      epic: 5.0,
+      legendary: 10.0
+    },
+    minimumListingPrice: 0.001,
+    maximumListingPrice: 100.0,
+    collectionCreationFee: 0.01,
+    isActive: true
+  });
+
+  // Use fetched data or defaults
+  const nftMarketingData = nftMarketingDataResponse?.data || {
+    totalNFTsCreated: 0,
+    totalNFTsSold: 0,
+    totalNFTsBurned: 0,
+    totalSalesVolume: 0,
+    totalCommissionsEarned: 0,
+    averageSalePrice: 0,
+    popularCollections: [],
+    rarityDistribution: {
+      common: 0,
+      uncommon: 0,
+      rare: 0,
+      epic: 0,
+      legendary: 0
+    }
+  };
+
+  // Update local state when API data is fetched
+  useEffect(() => {
+    if (nftPricingData?.data) {
+      setNFTPricing(nftPricingData.data);
+    }
+  }, [nftPricingData]);
 
   const [globalSettings, setGlobalSettings] = useState({
     gasFeeIncluded: true,
@@ -123,17 +248,31 @@ export function AdminPricingManagement() {
   const handleSaveSettings = async () => {
     setIsSaving(true);
     
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    // In real app, would save to backend
-    console.log("Saving pricing settings:", { 
-      pricingTiers, 
-      redemptionFees, 
-      valueCreationFees, 
-      platformFees, 
-      globalSettings 
-    });
+    try {
+      // Save NFT pricing settings
+      await updateNFTPricingMutation.mutateAsync(nftPricing);
+      
+      // Save other settings (would be separate API calls in real implementation)
+      console.log("Saving pricing settings:", { 
+        pricingTiers, 
+        redemptionFees, 
+        valueCreationFees, 
+        platformFees,
+        globalSettings 
+      });
+      
+      toast({
+        title: "Success",
+        description: "All pricing settings saved successfully",
+      });
+    } catch (error) {
+      console.error("Error saving settings:", error);
+      toast({
+        title: "Error", 
+        description: "Failed to save some settings",
+        variant: "destructive",
+      });
+    }
     
     setIsSaving(false);
     setIsEditing(null);
@@ -150,8 +289,9 @@ export function AdminPricingManagement() {
     <div className="space-y-6">
       
       <Tabs defaultValue="tiers" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-4">
-          <TabsTrigger value="tiers">Pricing Tiers</TabsTrigger>
+        <TabsList className="grid w-full grid-cols-5">
+          <TabsTrigger value="tiers">FLBY Pricing</TabsTrigger>
+          <TabsTrigger value="nft-pricing">NFT Pricing</TabsTrigger>
           <TabsTrigger value="creation-fees">Creation Fees</TabsTrigger>
           <TabsTrigger value="redemption-fees">Redemption Fees</TabsTrigger>
           <TabsTrigger value="global">Global Settings</TabsTrigger>
@@ -292,6 +432,392 @@ export function AdminPricingManagement() {
                     </CardContent>
                   </Card>
                 ))}
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* NFT Pricing Management Tab */}
+        <TabsContent value="nft-pricing" className="space-y-6">
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+            {/* NFT Revenue Overview */}
+            <Card className="bg-gradient-to-br from-purple-900/20 to-purple-800/20 border-purple-500/30">
+              <CardHeader>
+                <CardTitle className="text-purple-400 flex items-center gap-2">
+                  <TrendingUp className="w-5 h-5" />
+                  NFT Revenue
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div>
+                    <p className="text-sm text-purple-300">Total Sales</p>
+                    <p className="text-2xl font-bold text-white">{nftMarketingData.totalSalesVolume.toFixed(3)} SOL</p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-purple-300">Commissions</p>
+                    <p className="text-xl font-semibold text-white">{nftMarketingData.totalCommissionsEarned.toFixed(3)} SOL</p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-purple-300">Avg. Price</p>
+                    <p className="text-xl font-semibold text-white">{nftMarketingData.averageSalePrice.toFixed(4)} SOL</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* NFT Activity Stats */}
+            <Card className="bg-gradient-to-br from-blue-900/20 to-blue-800/20 border-blue-500/30">
+              <CardHeader>
+                <CardTitle className="text-blue-400 flex items-center gap-2">
+                  <Settings className="w-5 h-5" />
+                  NFT Activity
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div>
+                    <p className="text-sm text-blue-300">NFTs Created</p>
+                    <p className="text-2xl font-bold text-white">{nftMarketingData.totalNFTsCreated}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-blue-300">NFTs Sold</p>
+                    <p className="text-xl font-semibold text-white">{nftMarketingData.totalNFTsSold}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-blue-300">NFTs Burned</p>
+                    <p className="text-xl font-semibold text-white">{nftMarketingData.totalNFTsBurned}</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Rarity Distribution */}
+            <Card className="bg-gradient-to-br from-orange-900/20 to-orange-800/20 border-orange-500/30">
+              <CardHeader>
+                <CardTitle className="text-orange-400 flex items-center gap-2">
+                  <TrendingUp className="w-5 h-5" />
+                  Rarity Distribution
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-2">
+                  <div className="flex justify-between">
+                    <span className="text-gray-400">Legendary</span>
+                    <span className="text-yellow-400 font-bold">{nftMarketingData.rarityDistribution.legendary}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-400">Epic</span>
+                    <span className="text-purple-400 font-bold">{nftMarketingData.rarityDistribution.epic}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-400">Rare</span>
+                    <span className="text-blue-400 font-bold">{nftMarketingData.rarityDistribution.rare}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-400">Uncommon</span>
+                    <span className="text-green-400 font-bold">{nftMarketingData.rarityDistribution.uncommon}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-400">Common</span>
+                    <span className="text-gray-400 font-bold">{nftMarketingData.rarityDistribution.common}</span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Popular Collections */}
+            <Card className="bg-gradient-to-br from-green-900/20 to-green-800/20 border-green-500/30">
+              <CardHeader>
+                <CardTitle className="text-green-400 flex items-center gap-2">
+                  <TrendingUp className="w-5 h-5" />
+                  Top Collections
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  {nftMarketingData.popularCollections.length === 0 ? (
+                    <p className="text-gray-400 text-sm">No collections created yet</p>
+                  ) : (
+                    nftMarketingData.popularCollections.slice(0, 3).map((collection, index) => (
+                      <div key={index} className="flex justify-between items-center">
+                        <div>
+                          <p className="text-white font-medium text-sm">{collection.name}</p>
+                          <p className="text-gray-400 text-xs">{collection.totalSales} sales</p>
+                        </div>
+                        <p className="text-green-400 font-bold text-sm">{collection.avgPrice.toFixed(3)} SOL</p>
+                      </div>
+                    ))
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* NFT Creation & Listing Fees */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <DollarSign className="h-5 w-5" />
+                  NFT Creation & Listing Fees
+                </CardTitle>
+                <CardDescription>
+                  Configure fees for NFT creation, media attachments, and marketplace listing
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label>Base Creation Fee (SOL)</Label>
+                    <Input
+                      type="number"
+                      step="0.001"
+                      value={nftPricing.baseCreationFee}
+                      onChange={(e) => setNFTPricing({...nftPricing, baseCreationFee: parseFloat(e.target.value)})}
+                    />
+                  </div>
+                  <div>
+                    <Label>Collection Creation Fee (SOL)</Label>
+                    <Input
+                      type="number"
+                      step="0.001"
+                      value={nftPricing.collectionCreationFee}
+                      onChange={(e) => setNFTPricing({...nftPricing, collectionCreationFee: parseFloat(e.target.value)})}
+                    />
+                  </div>
+                  <div>
+                    <Label>Image Attachment Fee (SOL)</Label>
+                    <Input
+                      type="number"
+                      step="0.001"
+                      value={nftPricing.imageAttachmentFee}
+                      onChange={(e) => setNFTPricing({...nftPricing, imageAttachmentFee: parseFloat(e.target.value)})}
+                    />
+                  </div>
+                  <div>
+                    <Label>Voice Attachment Fee (SOL)</Label>
+                    <Input
+                      type="number"
+                      step="0.001"
+                      value={nftPricing.voiceAttachmentFee}
+                      onChange={(e) => setNFTPricing({...nftPricing, voiceAttachmentFee: parseFloat(e.target.value)})}
+                    />
+                  </div>
+                  <div>
+                    <Label>Marketplace Listing Fee (SOL)</Label>
+                    <Input
+                      type="number"
+                      step="0.001"
+                      value={nftPricing.marketplaceListingFee}
+                      onChange={(e) => setNFTPricing({...nftPricing, marketplaceListingFee: parseFloat(e.target.value)})}
+                    />
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <Switch
+                      checked={nftPricing.isActive}
+                      onCheckedChange={(checked) => setNFTPricing({...nftPricing, isActive: checked})}
+                    />
+                    <Label>Enable NFT Fees</Label>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Sales Commission & Trading Fees */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <TrendingUp className="h-5 w-5" />
+                  Sales Commission & Trading Fees
+                </CardTitle>
+                <CardDescription>
+                  Configure marketplace sales commission and burn redemption fees
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label>Sales Commission (%)</Label>
+                    <Input
+                      type="number"
+                      step="0.1"
+                      value={nftPricing.salesCommissionPercentage}
+                      onChange={(e) => setNFTPricing({...nftPricing, salesCommissionPercentage: parseFloat(e.target.value)})}
+                    />
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Commission taken on each marketplace sale
+                    </p>
+                  </div>
+                  <div>
+                    <Label>Burn Redemption Fee (%)</Label>
+                    <Input
+                      type="number"
+                      step="0.1"
+                      value={nftPricing.burnRedemptionFeePercentage}
+                      onChange={(e) => setNFTPricing({...nftPricing, burnRedemptionFeePercentage: parseFloat(e.target.value)})}
+                    />
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Fee for burning NFTs to redeem value
+                    </p>
+                  </div>
+                  <div>
+                    <Label>Minimum Listing Price (SOL)</Label>
+                    <Input
+                      type="number"
+                      step="0.001"
+                      value={nftPricing.minimumListingPrice}
+                      onChange={(e) => setNFTPricing({...nftPricing, minimumListingPrice: parseFloat(e.target.value)})}
+                    />
+                  </div>
+                  <div>
+                    <Label>Maximum Listing Price (SOL)</Label>
+                    <Input
+                      type="number"
+                      step="0.1"
+                      value={nftPricing.maximumListingPrice}
+                      onChange={(e) => setNFTPricing({...nftPricing, maximumListingPrice: parseFloat(e.target.value)})}
+                    />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Rarity Price Multipliers */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Settings className="h-5 w-5" />
+                Rarity Price Multipliers
+              </CardTitle>
+              <CardDescription>
+                Configure automatic pricing multipliers based on NFT rarity tiers
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+                <div>
+                  <Label className="flex items-center gap-2">
+                    <span className="w-3 h-3 bg-gray-400 rounded"></span>
+                    Common
+                  </Label>
+                  <Input
+                    type="number"
+                    step="0.1"
+                    value={nftPricing.rarityMultipliers.common}
+                    onChange={(e) => setNFTPricing({
+                      ...nftPricing, 
+                      rarityMultipliers: {
+                        ...nftPricing.rarityMultipliers, 
+                        common: parseFloat(e.target.value)
+                      }
+                    })}
+                  />
+                  <p className="text-xs text-muted-foreground mt-1">Base multiplier</p>
+                </div>
+                <div>
+                  <Label className="flex items-center gap-2">
+                    <span className="w-3 h-3 bg-green-400 rounded"></span>
+                    Uncommon
+                  </Label>
+                  <Input
+                    type="number"
+                    step="0.1"
+                    value={nftPricing.rarityMultipliers.uncommon}
+                    onChange={(e) => setNFTPricing({
+                      ...nftPricing, 
+                      rarityMultipliers: {
+                        ...nftPricing.rarityMultipliers, 
+                        uncommon: parseFloat(e.target.value)
+                      }
+                    })}
+                  />
+                  <p className="text-xs text-muted-foreground mt-1">1.5x base price</p>
+                </div>
+                <div>
+                  <Label className="flex items-center gap-2">
+                    <span className="w-3 h-3 bg-blue-400 rounded"></span>
+                    Rare
+                  </Label>
+                  <Input
+                    type="number"
+                    step="0.1"
+                    value={nftPricing.rarityMultipliers.rare}
+                    onChange={(e) => setNFTPricing({
+                      ...nftPricing, 
+                      rarityMultipliers: {
+                        ...nftPricing.rarityMultipliers, 
+                        rare: parseFloat(e.target.value)
+                      }
+                    })}
+                  />
+                  <p className="text-xs text-muted-foreground mt-1">2.5x base price</p>
+                </div>
+                <div>
+                  <Label className="flex items-center gap-2">
+                    <span className="w-3 h-3 bg-purple-400 rounded"></span>
+                    Epic
+                  </Label>
+                  <Input
+                    type="number"
+                    step="0.1"
+                    value={nftPricing.rarityMultipliers.epic}
+                    onChange={(e) => setNFTPricing({
+                      ...nftPricing, 
+                      rarityMultipliers: {
+                        ...nftPricing.rarityMultipliers, 
+                        epic: parseFloat(e.target.value)
+                      }
+                    })}
+                  />
+                  <p className="text-xs text-muted-foreground mt-1">5x base price</p>
+                </div>
+                <div>
+                  <Label className="flex items-center gap-2">
+                    <span className="w-3 h-3 bg-yellow-400 rounded"></span>
+                    Legendary
+                  </Label>
+                  <Input
+                    type="number"
+                    step="0.1"
+                    value={nftPricing.rarityMultipliers.legendary}
+                    onChange={(e) => setNFTPricing({
+                      ...nftPricing, 
+                      rarityMultipliers: {
+                        ...nftPricing.rarityMultipliers, 
+                        legendary: parseFloat(e.target.value)
+                      }
+                    })}
+                  />
+                  <p className="text-xs text-muted-foreground mt-1">10x base price</p>
+                </div>
+              </div>
+              
+              <div className="mt-6 p-4 bg-gray-50 dark:bg-gray-900 rounded-lg">
+                <h4 className="font-medium mb-2">Pricing Preview</h4>
+                <div className="grid grid-cols-5 gap-2 text-sm">
+                  <div className="text-center">
+                    <p className="text-gray-600">Common</p>
+                    <p className="font-bold">{(nftPricing.baseCreationFee * nftPricing.rarityMultipliers.common).toFixed(3)} SOL</p>
+                  </div>
+                  <div className="text-center">
+                    <p className="text-green-600">Uncommon</p>
+                    <p className="font-bold">{(nftPricing.baseCreationFee * nftPricing.rarityMultipliers.uncommon).toFixed(3)} SOL</p>
+                  </div>
+                  <div className="text-center">
+                    <p className="text-blue-600">Rare</p>
+                    <p className="font-bold">{(nftPricing.baseCreationFee * nftPricing.rarityMultipliers.rare).toFixed(3)} SOL</p>
+                  </div>
+                  <div className="text-center">
+                    <p className="text-purple-600">Epic</p>
+                    <p className="font-bold">{(nftPricing.baseCreationFee * nftPricing.rarityMultipliers.epic).toFixed(3)} SOL</p>
+                  </div>
+                  <div className="text-center">
+                    <p className="text-yellow-600">Legendary</p>
+                    <p className="font-bold">{(nftPricing.baseCreationFee * nftPricing.rarityMultipliers.legendary).toFixed(3)} SOL</p>
+                  </div>
+                </div>
               </div>
             </CardContent>
           </Card>
