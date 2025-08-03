@@ -20,6 +20,7 @@ import Admin from "@/pages/admin";
 import TransactionHeatmapPage from "@/pages/heatmap";
 import { SmsIntegrationPage } from "@/pages/sms-integration";
 import { SMSDemoPage } from "@/pages/sms-demo";
+import { SMSNexusPage } from "@/pages/sms-nexus";
 import { WalletManagementPage } from "@/pages/wallet-management";
 import { RewardsPage } from "@/pages/rewards";
 import JourneyPage from "@/pages/journey";
@@ -145,6 +146,12 @@ function Router() {
           <>
             <Navbar />
             <SMSDemoPage />
+          </>
+        )} />
+        <Route path="/sms-nexus" component={() => (
+          <>
+            <Navbar />
+            <SMSNexusPage />
           </>
         )} />
         <Route path="/wallets" component={() => (
