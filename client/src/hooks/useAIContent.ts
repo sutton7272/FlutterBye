@@ -74,7 +74,67 @@ export function useAIContent() {
       keywords: string[];
       purpose: string;
     }) => {
-      return apiRequest('/api/ai/content/seo', {
+      return apiRequest('/api/ai/optimize-seo', {
+        method: 'POST',
+        body: data
+      });
+    }
+  });
+
+  // AI Conversation - Personalized Greeting
+  const greetingMutation = useMutation({
+    mutationFn: async (userContext?: {
+      userName?: string;
+      visitCount?: number;
+      lastAction?: string;
+      mood?: string;
+    }) => {
+      return apiRequest('/api/ai/conversation/greeting', {
+        method: 'POST',
+        body: { userContext }
+      });
+    }
+  });
+
+  // AI Conversation - Interactive Chat
+  const conversationMutation = useMutation({
+    mutationFn: async (data: {
+      message: string;
+      conversationHistory?: Array<{role: string, content: string}>;
+      userContext?: {
+        mood?: string;
+        intent?: string;
+        userName?: string;
+      };
+    }) => {
+      return apiRequest('/api/ai/conversation/chat', {
+        method: 'POST',
+        body: data
+      });
+    }
+  });
+
+  // AI Mood Sync
+  const moodSyncMutation = useMutation({
+    mutationFn: async (data: {
+      userInput?: string;
+      behaviorData?: any;
+    }) => {
+      return apiRequest('/api/ai/conversation/mood-sync', {
+        method: 'POST',
+        body: data
+      });
+    }
+  });
+
+  // Smart Help System
+  const smartHelpMutation = useMutation({
+    mutationFn: async (data: {
+      question: string;
+      context?: any;
+      userLevel?: 'beginner' | 'intermediate' | 'advanced';
+    }) => {
+      return apiRequest('/api/ai/conversation/smart-help', {
         method: 'POST',
         body: data
       });
@@ -158,6 +218,23 @@ export function useAIContent() {
     optimizeSEO: seoOptimizationMutation.mutate,
     seoOptimization: seoOptimizationMutation.data,
     isOptimizingSEO: seoOptimizationMutation.isPending,
+
+    // AI Conversations
+    generateAIGreeting: greetingMutation.mutate,
+    aiGreeting: greetingMutation.data,
+    isGeneratingGreeting: greetingMutation.isPending,
+
+    startConversation: conversationMutation.mutate,
+    conversationResponse: conversationMutation.data,
+    isConversingWithAI: conversationMutation.isPending,
+
+    syncMoodWithAI: moodSyncMutation.mutate,
+    moodSyncData: moodSyncMutation.data,
+    isSyncingMood: moodSyncMutation.isPending,
+
+    getSmartHelp: smartHelpMutation.mutate,
+    smartHelpData: smartHelpMutation.data,
+    isGettingSmartHelp: smartHelpMutation.isPending,
     
     // Voice enhancement
     enhanceVoice: voiceEnhancementMutation.mutate,

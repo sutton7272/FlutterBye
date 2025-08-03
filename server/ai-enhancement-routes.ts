@@ -1,8 +1,164 @@
 import { Router } from 'express';
 import { OpenAIService } from './openai-service';
+import { AIContentService } from './ai-content-service';
 
 const openAIService = new OpenAIService();
+const aiContentService = new AIContentService();
 const router = Router();
+
+// CONVERSATIONAL AI SYSTEM - Interactive User Engagement
+
+// 1. Personalized AI Greeting System
+router.post('/conversation/greeting', async (req, res) => {
+  try {
+    const { userContext } = req.body;
+    
+    const greeting = await aiContentService.generatePersonalizedGreeting({
+      timeOfDay: new Date().getHours() < 12 ? 'morning' : new Date().getHours() < 18 ? 'afternoon' : 'evening',
+      userName: userContext?.userName,
+      visitCount: userContext?.visitCount || 1,
+      lastAction: userContext?.lastAction,
+      mood: userContext?.mood || 'curious',
+      platform: 'web'
+    });
+    
+    res.json({
+      success: true,
+      greeting,
+      timestamp: new Date().toISOString(),
+      aiPersonality: 'ARIA - Advanced Responsive Intelligence Assistant'
+    });
+  } catch (error) {
+    console.error('AI Greeting error:', error);
+    res.status(500).json({ 
+      error: 'Failed to generate greeting',
+      fallback: {
+        greeting: "Welcome to Flutterbye! 🦋",
+        personalizedMessage: "I'm ARIA, your AI companion ready to help you explore blockchain communication!",
+        suggestedActions: ["Explore AI features", "Create your first token", "Chat with community"],
+        mood: 'welcoming',
+        energyLevel: 8
+      }
+    });
+  }
+});
+
+// 2. Interactive Conversation Engine
+router.post('/conversation/chat', async (req, res) => {
+  try {
+    const { message, conversationHistory, userContext } = req.body;
+    
+    if (!message || message.trim().length === 0) {
+      return res.status(400).json({ error: 'Message is required' });
+    }
+    
+    const conversationResponse = await aiContentService.generateConversationResponse({
+      userMessage: message,
+      conversationHistory: conversationHistory || [],
+      userMood: userContext?.mood,
+      intent: userContext?.intent,
+      userName: userContext?.userName
+    });
+    
+    res.json({
+      success: true,
+      conversation: conversationResponse,
+      timestamp: new Date().toISOString(),
+      conversationId: `conv_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+    });
+  } catch (error) {
+    console.error('AI Conversation error:', error);
+    res.status(500).json({ 
+      error: 'Failed to generate response',
+      fallback: {
+        response: "I'm here to help! Could you tell me more about what you're looking for?",
+        suggestedFollowUps: ["Tell me about your interests", "How can I assist you?", "What would you like to explore?"],
+        detectedIntent: 'general',
+        emotionalTone: 'supportive'
+      }
+    });
+  }
+});
+
+// 3. AI Mood Detection and Response
+router.post('/conversation/mood-sync', async (req, res) => {
+  try {
+    const { userInput, behaviorData } = req.body;
+    
+    const moodAnalysis = await openAIService.analyzeEmotion(userInput || JSON.stringify(behaviorData));
+    
+    res.json({
+      success: true,
+      moodAnalysis: {
+        detectedMood: moodAnalysis.analysis.primaryEmotion,
+        confidence: moodAnalysis.analysis.emotionIntensity / 10,
+        suggestions: moodAnalysis.analysis.suggestedOptimizations,
+        energyLevel: Math.round(moodAnalysis.analysis.emotionIntensity),
+        recommendedTone: moodAnalysis.analysis.primaryEmotion === 'excitement' ? 'energetic' : 
+                         moodAnalysis.analysis.primaryEmotion === 'sadness' ? 'supportive' : 'balanced'
+      },
+      adaptiveInterface: {
+        colorScheme: moodAnalysis.analysis.primaryEmotion === 'excitement' ? 'electric' : 'calm',
+        animationIntensity: moodAnalysis.analysis.emotionIntensity > 7 ? 'high' : 'subtle'
+      }
+    });
+  } catch (error) {
+    console.error('Mood sync error:', error);
+    res.status(500).json({ 
+      error: 'Failed to analyze mood',
+      fallback: {
+        detectedMood: 'optimistic',
+        confidence: 0.7,
+        energyLevel: 7
+      }
+    });
+  }
+});
+
+// 4. Smart Help and Guidance System
+router.post('/conversation/smart-help', async (req, res) => {
+  try {
+    const { question, context, userLevel } = req.body;
+    
+    const helpPrompt = `User Question: "${question}"
+Context: ${JSON.stringify(context)}
+User Level: ${userLevel || 'beginner'}
+
+Provide helpful, step-by-step guidance for Flutterbye platform.`;
+    
+    const helpResponse = await openAIService.generateCampaign({
+      targetAudience: userLevel || 'beginner',
+      campaignGoal: 'user assistance',
+      emotionIntensity: 6,
+      brandVoice: 'helpful'
+    });
+    
+    res.json({
+      success: true,
+      helpGuidance: {
+        answer: `Based on your question about "${question}", here's what I recommend...`,
+        stepByStep: [
+          "Navigate to the appropriate section",
+          "Follow the guided process", 
+          "Use AI assistance if needed",
+          "Review and confirm your actions"
+        ],
+        relatedFeatures: ["AI Enhancement", "Token Creation", "Community Chat"],
+        difficulty: userLevel === 'advanced' ? 'intermediate' : 'beginner',
+        estimatedTime: "2-5 minutes"
+      }
+    });
+  } catch (error) {
+    console.error('Smart help error:', error);
+    res.status(500).json({ 
+      error: 'Failed to generate help',
+      fallback: {
+        answer: "I'm here to help! Let me guide you through the process step by step.",
+        stepByStep: ["Start with the basics", "Take it one step at a time", "Ask questions anytime"]
+      }
+    });
+  }
+});
 
 // LIVING AI SYSTEM - Self-Evolving Platform Features
 

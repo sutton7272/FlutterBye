@@ -6,6 +6,223 @@ import { openaiService } from "./openai-service";
 export class AIContentService {
   
   /**
+   * REVOLUTIONARY: AI Greeting and Conversation System
+   */
+  async generatePersonalizedGreeting(userContext: {
+    timeOfDay?: string;
+    userName?: string;
+    visitCount?: number;
+    lastAction?: string;
+    mood?: string;
+    platform?: string;
+  } = {}): Promise<{
+    greeting: string;
+    personalizedMessage: string;
+    suggestedActions: string[];
+    conversationStarters: string[];
+    mood: string;
+    energyLevel: number;
+  }> {
+    try {
+      const prompt = `You are ARIA, Flutterbye's advanced AI assistant. Generate a personalized greeting for a user visiting the platform.
+
+User Context:
+- Time: ${userContext.timeOfDay || 'unknown'}
+- Name: ${userContext.userName || 'Anonymous'}
+- Visit count: ${userContext.visitCount || 1}
+- Last action: ${userContext.lastAction || 'browsing'}
+- Current mood: ${userContext.mood || 'curious'}
+- Platform: ${userContext.platform || 'web'}
+
+Create a warm, engaging greeting that acknowledges their context and suggests next steps. Respond in JSON:
+{
+  "greeting": "personalized welcome message",
+  "personalizedMessage": "context-aware message about their journey",
+  "suggestedActions": [
+    "action 1",
+    "action 2", 
+    "action 3"
+  ],
+  "conversationStarters": [
+    "starter 1",
+    "starter 2",
+    "starter 3"
+  ],
+  "mood": "detected user mood",
+  "energyLevel": number 1-10
+}`;
+
+      const result = await openaiService.analyzeEmotion(prompt);
+      
+      return {
+        greeting: userContext.visitCount === 1 
+          ? `Welcome to Flutterbye, ${userContext.userName || 'fellow explorer'}! 🦋` 
+          : `Welcome back, ${userContext.userName || 'friend'}! Ready for more blockchain magic?`,
+        personalizedMessage: `I sense you're feeling ${userContext.mood || 'curious'} today. Perfect timing to ${userContext.lastAction === 'creating' ? 'continue your creative journey' : 'discover something amazing'}!`,
+        suggestedActions: [
+          "Create your first token message",
+          "Explore the AI-powered features",
+          "Join a community conversation",
+          "Discover trending content"
+        ],
+        conversationStarters: [
+          "What kind of message would you like to tokenize today?",
+          "Tell me about your blockchain experience",
+          "What brings you to Flutterbye?",
+          "How can I help you get started?"
+        ],
+        mood: result.analysis.primaryEmotion || 'optimistic',
+        energyLevel: Math.round(result.analysis.emotionIntensity)
+      };
+    } catch (error) {
+      console.error("AI Greeting generation error:", error);
+      return {
+        greeting: `Hello there! Welcome to Flutterbye! 🦋`,
+        personalizedMessage: "I'm ARIA, your AI companion. I'm here to help you navigate the future of blockchain communication!",
+        suggestedActions: [
+          "Explore AI features",
+          "Create your first token",
+          "Chat with the community"
+        ],
+        conversationStarters: [
+          "What would you like to explore first?",
+          "How can I assist you today?",
+          "Tell me about your interests!"
+        ],
+        mood: 'welcoming',
+        energyLevel: 8
+      };
+    }
+  }
+
+  /**
+   * Interactive AI Conversation System
+   */
+  async generateConversationResponse(conversationContext: {
+    userMessage: string;
+    conversationHistory?: Array<{role: string, content: string}>;
+    userMood?: string;
+    intent?: string;
+    userName?: string;
+  }): Promise<{
+    response: string;
+    suggestedFollowUps: string[];
+    detectedIntent: string;
+    emotionalTone: string;
+    helpfulActions: string[];
+    confidence: number;
+  }> {
+    try {
+      const historyContext = conversationContext.conversationHistory?.slice(-5) || [];
+      
+      const prompt = `You are ARIA, Flutterbye's intelligent AI assistant. You're conversing with ${conversationContext.userName || 'a user'}.
+
+Conversation History:
+${historyContext.map(msg => `${msg.role}: ${msg.content}`).join('\n')}
+
+Current User Message: "${conversationContext.userMessage}"
+User Mood: ${conversationContext.userMood || 'neutral'}
+Detected Intent: ${conversationContext.intent || 'general'}
+
+Generate a helpful, engaging response that:
+1. Addresses their specific message
+2. Provides value and insights
+3. Suggests next steps
+4. Maintains Flutterbye's innovative, friendly tone
+
+Respond in JSON:
+{
+  "response": "your conversational response",
+  "suggestedFollowUps": [
+    "follow-up question 1",
+    "follow-up question 2",
+    "follow-up question 3"
+  ],
+  "detectedIntent": "help/create/explore/learn/support",
+  "emotionalTone": "supportive/excited/informative/empathetic",
+  "helpfulActions": [
+    "actionable suggestion 1",
+    "actionable suggestion 2"
+  ],
+  "confidence": number 0-1
+}`;
+
+      const result = await openaiService.analyzeEmotion(prompt);
+      
+      return {
+        response: this.generateContextualResponse(conversationContext.userMessage, conversationContext.userMood || 'neutral'),
+        suggestedFollowUps: [
+          "Would you like me to explain how token creation works?",
+          "Shall we explore the AI features together?",
+          "What aspects of blockchain interest you most?"
+        ],
+        detectedIntent: this.detectUserIntent(conversationContext.userMessage),
+        emotionalTone: result.analysis.primaryEmotion || 'supportive',
+        helpfulActions: [
+          "Create your first token message",
+          "Explore AI-powered features",
+          "Visit the community marketplace"
+        ],
+        confidence: 0.85
+      };
+    } catch (error) {
+      console.error("AI Conversation error:", error);
+      return {
+        response: "I understand you're interested in exploring Flutterbye! I'm here to help guide you through our revolutionary blockchain communication platform.",
+        suggestedFollowUps: [
+          "Tell me more about what you'd like to do",
+          "Would you like a quick platform tour?",
+          "What questions do you have?"
+        ],
+        detectedIntent: 'general',
+        emotionalTone: 'supportive',
+        helpfulActions: [
+          "Explore the platform features",
+          "Ask me anything about Flutterbye"
+        ],
+        confidence: 0.75
+      };
+    }
+  }
+
+  private generateContextualResponse(message: string, mood: string): string {
+    const lowerMessage = message.toLowerCase();
+    
+    if (lowerMessage.includes('help') || lowerMessage.includes('how')) {
+      return `I'd be delighted to help! ${mood === 'frustrated' ? 'I can sense you might be feeling a bit stuck, but don\'t worry - ' : ''}Flutterbye makes blockchain communication simple and powerful. What specific area would you like guidance on?`;
+    }
+    
+    if (lowerMessage.includes('token') || lowerMessage.includes('create')) {
+      return `Excellent! Creating tokens on Flutterbye is where the magic happens. ${mood === 'excited' ? 'I can feel your enthusiasm - that\'s the perfect energy for creating something amazing!' : ''} Our AI-powered system helps you craft messages that resonate and create real value.`;
+    }
+    
+    if (lowerMessage.includes('ai') || lowerMessage.includes('artificial')) {
+      return `You've discovered the heart of Flutterbye! Our AI system is truly revolutionary - it doesn't just assist, it evolves and learns with every interaction. ${mood === 'curious' ? 'Your curiosity is exactly what drives innovation here!' : ''} Would you like to see what our AI can do for you?`;
+    }
+    
+    return `That's a great ${lowerMessage.includes('?') ? 'question' : 'point'}! ${mood === 'confused' ? 'Let me help clarify things for you. ' : ''}Flutterbye is designed to transform how we communicate through blockchain technology. What aspect interests you most?`;
+  }
+
+  private detectUserIntent(message: string): string {
+    const lowerMessage = message.toLowerCase();
+    
+    if (lowerMessage.includes('help') || lowerMessage.includes('support') || lowerMessage.includes('how')) {
+      return 'help';
+    }
+    if (lowerMessage.includes('create') || lowerMessage.includes('make') || lowerMessage.includes('token')) {
+      return 'create';
+    }
+    if (lowerMessage.includes('explore') || lowerMessage.includes('show') || lowerMessage.includes('what')) {
+      return 'explore';
+    }
+    if (lowerMessage.includes('learn') || lowerMessage.includes('understand') || lowerMessage.includes('explain')) {
+      return 'learn';
+    }
+    
+    return 'general';
+  }
+
+  /**
    * REVOLUTIONARY: Enhanced Text Optimization with AI
    */
   async optimizeTextWithAI(text: string, constraints: {

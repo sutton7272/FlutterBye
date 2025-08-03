@@ -31,6 +31,7 @@ import {
 } from 'lucide-react';
 import { AISEOOptimizer } from '@/components/ai-seo-optimizer';
 import { LivingAIInterface } from '@/components/living-ai-interface';
+import { AIConversation } from '@/components/ai-conversation';
 import { AIEnhancementButton } from '@/components/ai-enhancement-button';
 import { useAIContent } from '@/hooks/useAIContent';
 import { useAIAdmin } from '@/hooks/useAIAdmin';
@@ -341,9 +342,10 @@ export default function AIComprehensiveOverview() {
         </Card>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-6 bg-black/20 border-purple-500/30">
+          <TabsList className="grid w-full grid-cols-7 bg-black/20 border-purple-500/30">
             <TabsTrigger value="features" className="text-white">AI Features</TabsTrigger>
             <TabsTrigger value="living" className="text-white">Living AI</TabsTrigger>
+            <TabsTrigger value="conversation" className="text-white">AI Chat</TabsTrigger>
             <TabsTrigger value="showcase" className="text-white">AI Demos</TabsTrigger>
             <TabsTrigger value="admin" className="text-white">Admin AI</TabsTrigger>
             <TabsTrigger value="seo" className="text-white">SEO Tools</TabsTrigger>
@@ -507,6 +509,78 @@ export default function AIComprehensiveOverview() {
                 />
               </CardContent>
             </Card>
+          </TabsContent>
+
+          <TabsContent value="conversation" className="space-y-4">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <div className="space-y-4">
+                <Card className="bg-black/20 border-electric-blue/30">
+                  <CardHeader>
+                    <CardTitle className="text-white flex items-center gap-2">
+                      <MessageSquare className="w-6 h-6 text-electric-blue" />
+                      Interactive AI Conversation
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-gray-300 mb-4">
+                      Experience ARIA, our advanced AI companion that greets users, understands context, 
+                      and provides personalized assistance throughout their Flutterbye journey.
+                    </p>
+                    <div className="grid grid-cols-2 gap-4 mb-4">
+                      <div className="text-center">
+                        <div className="text-2xl font-bold text-electric-blue">100%</div>
+                        <div className="text-sm text-gray-400">Personalized</div>
+                      </div>
+                      <div className="text-center">
+                        <div className="text-2xl font-bold text-green-400">Real-time</div>
+                        <div className="text-sm text-gray-400">Responses</div>
+                      </div>
+                    </div>
+                    <Badge className="bg-electric-blue/20 text-electric-blue">
+                      Powered by OpenAI GPT-4o
+                    </Badge>
+                  </CardContent>
+                </Card>
+
+                <Card className="bg-black/20 border-purple-500/30">
+                  <CardHeader>
+                    <CardTitle className="text-white flex items-center gap-2">
+                      <Brain className="w-6 h-6 text-purple-400" />
+                      AI Capabilities
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-3">
+                      <div className="flex items-center gap-2">
+                        <Heart className="w-4 h-4 text-pink-400" />
+                        <span className="text-white">Mood detection and adaptation</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Target className="w-4 h-4 text-blue-400" />
+                        <span className="text-white">Intent recognition</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Lightbulb className="w-4 h-4 text-yellow-400" />
+                        <span className="text-white">Context-aware responses</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Sparkles className="w-4 h-4 text-purple-400" />
+                        <span className="text-white">Personalized suggestions</span>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+
+              <div>
+                <AIConversation 
+                  userName="AI Explorer"
+                  initialGreeting={true}
+                  showMoodSync={true}
+                  compactMode={false}
+                />
+              </div>
+            </div>
           </TabsContent>
 
           <TabsContent value="showcase" className="space-y-4">
