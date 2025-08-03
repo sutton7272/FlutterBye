@@ -450,6 +450,12 @@ Respond naturally as ARIA would, with enthusiasm and helpfulness. Keep responses
         response_format: options.response_format
       });
 
+      // Track costs for monitoring
+      const usage = response.usage;
+      if (usage) {
+        this.trackCost(usage.prompt_tokens, usage.completion_tokens);
+      }
+
       return response.choices[0].message.content || "";
     } catch (error: any) {
       console.error('OpenAI generateResponse error:', error);
@@ -465,6 +471,45 @@ Respond naturally as ARIA would, with enthusiasm and helpfulness. Keep responses
   }
 
   private lastRequestTime: number = 0;
+  private requestCount: number = 0;
+  private dailyBudgetLimit: number = 50; // $50 daily limit
+  private estimatedDailyCost: number = 0;
+
+  /**
+   * Cost tracking and budget monitoring
+   */
+  private trackCost(inputTokens: number, outputTokens: number): void {
+    const inputCost = (inputTokens / 1000) * 0.005;
+    const outputCost = (outputTokens / 1000) * 0.015;
+    const totalCost = inputCost + outputCost;
+    
+    this.estimatedDailyCost += totalCost;
+    this.requestCount++;
+    
+    console.log(`💰 OpenAI Cost: $${totalCost.toFixed(4)} (Daily total: $${this.estimatedDailyCost.toFixed(2)})`);
+    
+    // Alert if approaching budget limit
+    if (this.estimatedDailyCost > this.dailyBudgetLimit * 0.8) {
+      console.warn(`⚠️ AI Budget Alert: 80% of daily budget used ($${this.estimatedDailyCost.toFixed(2)}/$${this.dailyBudgetLimit})`);
+    }
+  }
+
+  /**
+   * Get current usage statistics
+   */
+  getUsageStats(): {
+    requestCount: number;
+    estimatedDailyCost: number;
+    budgetLimit: number;
+    averageCostPerRequest: number;
+  } {
+    return {
+      requestCount: this.requestCount,
+      estimatedDailyCost: this.estimatedDailyCost,
+      budgetLimit: this.dailyBudgetLimit,
+      averageCostPerRequest: this.requestCount > 0 ? this.estimatedDailyCost / this.requestCount : 0
+    };
+  }
 
   private getFallbackResponse(prompt: string, options: any): string {
     // Provide intelligent fallback responses based on prompt content
