@@ -397,24 +397,24 @@
   /* Butterfly Animation Keyframes */
   @keyframes butterfly-orbit {
     0% { 
-      transform: rotate(0deg) translateX(400px) rotate(0deg);
-      opacity: 0.6;
+      transform: rotate(0deg) translateX(250px) rotate(0deg);
+      opacity: 0.8;
     }
     25% { 
-      transform: rotate(90deg) translateX(400px) rotate(-90deg);
+      transform: rotate(90deg) translateX(250px) rotate(-90deg);
       opacity: 1;
     }
     50% { 
-      transform: rotate(180deg) translateX(400px) rotate(-180deg);
-      opacity: 0.8;
+      transform: rotate(180deg) translateX(250px) rotate(-180deg);
+      opacity: 0.9;
     }
     75% { 
-      transform: rotate(270deg) translateX(400px) rotate(-270deg);
+      transform: rotate(270deg) translateX(250px) rotate(-270deg);
       opacity: 1;
     }
     100% { 
-      transform: rotate(360deg) translateX(400px) rotate(-360deg);
-      opacity: 0.6;
+      transform: rotate(360deg) translateX(250px) rotate(-360deg);
+      opacity: 0.8;
     }
   }
 
@@ -432,24 +432,51 @@
   /* Responsive Butterfly Orbit for Mobile */
   @keyframes butterfly-orbit-mobile {
     0% { 
-      transform: rotate(0deg) translateX(200px) rotate(0deg);
-      opacity: 0.6;
+      transform: rotate(0deg) translateX(140px) rotate(0deg);
+      opacity: 0.8;
     }
     25% { 
-      transform: rotate(90deg) translateX(200px) rotate(-90deg);
+      transform: rotate(90deg) translateX(140px) rotate(-90deg);
       opacity: 1;
     }
     50% { 
-      transform: rotate(180deg) translateX(200px) rotate(-180deg);
-      opacity: 0.8;
+      transform: rotate(180deg) translateX(140px) rotate(-180deg);
+      opacity: 0.9;
     }
     75% { 
-      transform: rotate(270deg) translateX(200px) rotate(-270deg);
+      transform: rotate(270deg) translateX(140px) rotate(-270deg);
       opacity: 1;
     }
     100% { 
-      transform: rotate(360deg) translateX(200px) rotate(-360deg);
-      opacity: 0.6;
+      transform: rotate(360deg) translateX(140px) rotate(-360deg);
+      opacity: 0.8;
+    }
+  }
+
+  /* Electric Trail Effect */
+  @keyframes electric-trail {
+    0% { 
+      opacity: 1;
+      transform: scale(1);
+    }
+    100% { 
+      opacity: 0;
+      transform: scale(0.3);
+    }
+  }
+
+  @keyframes trail-pulse {
+    0%, 100% {
+      border-color: rgba(0, 212, 255, 0.4);
+      box-shadow: 
+        inset 0 0 20px rgba(0, 212, 255, 0.2),
+        0 0 20px rgba(0, 212, 255, 0.3);
+    }
+    50% {
+      border-color: rgba(0, 255, 136, 0.6);
+      box-shadow: 
+        inset 0 0 30px rgba(0, 255, 136, 0.3),
+        0 0 30px rgba(0, 255, 136, 0.4);
     }
   }
 
@@ -547,13 +574,13 @@
     position: absolute;
     top: 0;
     left: 0;
-    animation: butterfly-orbit 12s linear infinite;
+    animation: butterfly-orbit 8s linear infinite;
     transform-origin: 0 0;
   }
 
   .butterfly-svg {
     transform: translate(-50%, -50%);
-    filter: drop-shadow(0 0 8px #00D4FF) drop-shadow(0 0 16px #00FF88);
+    filter: drop-shadow(0 0 12px #00D4FF) drop-shadow(0 0 24px #00FF88);
   }
 
   .animate-flutter-wing {
@@ -561,10 +588,41 @@
     transform-origin: 20px 15px;
   }
 
+  /* Electric Trail Frame */
+  .electric-trail-frame {
+    position: absolute;
+    inset: -60px;
+    border: 2px solid transparent;
+    border-radius: 20px;
+    background: linear-gradient(45deg, 
+      transparent, 
+      rgba(0, 212, 255, 0.3), 
+      rgba(0, 255, 136, 0.3), 
+      transparent) border-box;
+    mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
+    mask-composite: exclude;
+    animation: trail-pulse 2s ease-in-out infinite;
+    pointer-events: none;
+  }
+
+  .trail-particle {
+    position: absolute;
+    width: 4px;
+    height: 4px;
+    background: radial-gradient(circle, #00D4FF, #00FF88);
+    border-radius: 50%;
+    animation: electric-trail 1s ease-out forwards;
+    pointer-events: none;
+  }
+
   /* Responsive butterfly orbit for smaller screens */
   @media (max-width: 768px) {
     .butterfly-container {
-      animation: butterfly-orbit-mobile 10s linear infinite;
+      animation: butterfly-orbit-mobile 6s linear infinite;
+    }
+    
+    .electric-trail-frame {
+      inset: -40px;
     }
   }
   

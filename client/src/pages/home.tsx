@@ -99,6 +99,9 @@ export default function Home() {
         {/* Hero Section */}
         <div className="text-center mb-20">
           <div className="relative inline-block">
+            {/* Electric Trail Frame */}
+            <div className="electric-trail-frame"></div>
+            
             <h1 className="text-6xl md:text-8xl font-black mb-8 text-gradient relative z-10">
               FLUTTERBYE
             </h1>
@@ -109,8 +112,8 @@ export default function Home() {
                 <div className="butterfly-container">
                   <svg 
                     className="butterfly-svg animate-pulse" 
-                    width="40" 
-                    height="30" 
+                    width="45" 
+                    height="35" 
                     viewBox="0 0 40 30" 
                     fill="none"
                   >
@@ -133,26 +136,26 @@ export default function Home() {
                       x2="20" 
                       y2="22" 
                       stroke="#00D4FF" 
-                      strokeWidth="2"
+                      strokeWidth="3"
                       className="animate-pulse"
                     />
                     {/* Antennae */}
                     <path 
                       d="M20 8 L18 5 M20 8 L22 5" 
                       stroke="#00FF88" 
-                      strokeWidth="1.5"
+                      strokeWidth="2"
                       fill="none"
                     />
                     
                     {/* Gradients */}
                     <defs>
                       <linearGradient id="butterfly-gradient-left" x1="0%" y1="0%" x2="100%" y2="100%">
-                        <stop offset="0%" stopColor="#00D4FF" stopOpacity="0.9"/>
-                        <stop offset="100%" stopColor="#00FF88" stopOpacity="0.7"/>
+                        <stop offset="0%" stopColor="#00D4FF" stopOpacity="0.95"/>
+                        <stop offset="100%" stopColor="#00FF88" stopOpacity="0.8"/>
                       </linearGradient>
                       <linearGradient id="butterfly-gradient-right" x1="0%" y1="0%" x2="100%" y2="100%">
-                        <stop offset="0%" stopColor="#00FF88" stopOpacity="0.9"/>
-                        <stop offset="100%" stopColor="#00D4FF" stopOpacity="0.7"/>
+                        <stop offset="0%" stopColor="#00FF88" stopOpacity="0.95"/>
+                        <stop offset="100%" stopColor="#00D4FF" stopOpacity="0.8"/>
                       </linearGradient>
                     </defs>
                   </svg>
