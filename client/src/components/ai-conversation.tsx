@@ -3,7 +3,6 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { useAIContent } from '@/hooks/useAIContent';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   MessageCircle, 
@@ -46,17 +45,6 @@ export function AIConversation({
   const [conversationId, setConversationId] = useState<string>('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  const {
-    generateAIGreeting,
-    isGeneratingGreeting,
-    startConversation,
-    isConversingWithAI,
-    syncMoodWithAI,
-    isSyncingMood,
-    getSmartHelp,
-    isGettingSmartHelp
-  } = useAIContent();
-
   // Auto-scroll to bottom
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -65,49 +53,19 @@ export function AIConversation({
   // Generate initial greeting
   useEffect(() => {
     if (initialGreeting && messages.length === 0) {
-      handleInitialGreeting();
+      setMessages([{
+        id: `msg_${Date.now()}`,
+        role: 'ai',
+        content: `Hello ${userName}! 🦋 I'm ARIA, your AI companion at Flutterbye. How can I help you explore our revolutionary blockchain communication platform today?`,
+        timestamp: new Date(),
+        suggestions: [
+          "Tell me about token creation",
+          "How does the AI work?",
+          "Show me around the platform"
+        ]
+      }]);
     }
   }, []);
-
-  const handleInitialGreeting = async () => {
-    try {
-      await generateAIGreeting({
-        userName,
-        userContext: {
-          visitCount: 1,
-          mood: userMood
-        }
-      });
-
-      // Response will be handled by the hook's data
-      // For now, show a fallback greeting
-      setMessages([{
-        id: `msg_${Date.now()}`,
-        role: 'ai',
-        content: `Hello ${userName}! 🦋 I'm ARIA, your AI companion at Flutterbye. How can I help you explore our revolutionary blockchain communication platform today?`,
-        timestamp: new Date(),
-        suggestions: [
-          "Tell me about token creation",
-          "How does the AI work?",
-          "Show me around the platform"
-        ]
-      }]);
-    } catch (error) {
-      console.error('Failed to generate greeting:', error);
-      // Fallback greeting
-      setMessages([{
-        id: `msg_${Date.now()}`,
-        role: 'ai',
-        content: `Hello ${userName}! 🦋 I'm ARIA, your AI companion at Flutterbye. How can I help you explore our revolutionary blockchain communication platform today?`,
-        timestamp: new Date(),
-        suggestions: [
-          "Tell me about token creation",
-          "How does the AI work?",
-          "Show me around the platform"
-        ]
-      }]);
-    }
-  };
 
   const handleSendMessage = async () => {
     if (!inputMessage.trim()) return;
@@ -120,52 +78,69 @@ export function AIConversation({
     };
 
     setMessages(prev => [...prev, userMessage]);
+    const currentMessage = inputMessage;
     setInputMessage('');
     setIsTyping(true);
 
     try {
-      const conversationHistory = messages.slice(-5).map(msg => ({
-        role: msg.role === 'ai' ? 'assistant' : 'user',
-        content: msg.content
-      }));
-
-      const response = await startConversation({
-        message: inputMessage,
-        conversationHistory,
-        userContext: {
-          userName,
-          mood: userMood
-        }
+      // Call the actual ARIA conversation API
+      const response = await fetch('/api/ai/conversation/chat', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          message: currentMessage,
+          userContext: {
+            userName,
+            mood: userMood,
+            userId: `user_${Date.now()}`,
+            intent: 'conversation'
+          },
+          conversationHistory: messages.slice(-5).map(msg => ({
+            role: msg.role === 'ai' ? 'assistant' : 'user',
+            content: msg.content
+          }))
+        })
       });
 
-      // For now, just show the AI response directly
-      const aiMessage: Message = {
-        id: `msg_${Date.now()}_ai`,
-        role: 'ai',
-        content: "That's an interesting point! I'm here to help you explore Flutterbye's amazing features. What would you like to know more about?",
-        timestamp: new Date(),
-        suggestions: [
-          "Create a token message",
-          "Learn about AI features", 
-          "Explore the marketplace"
-        ]
-      };
+      if (!response.ok) {
+        throw new Error('Failed to get AI response');
+      }
 
-      setMessages(prev => [...prev, aiMessage]);
+      const data = await response.json();
+      
+      if (data.success && data.conversation) {
+        const aiMessage: Message = {
+          id: `msg_${Date.now()}_ai`,
+          role: 'ai',
+          content: data.conversation.response,
+          timestamp: new Date(),
+          mood: data.conversation.emotionalTone,
+          suggestions: data.conversation.suggestedFollowUps || []
+        };
+
+        setMessages(prev => [...prev, aiMessage]);
+        setConversationId(data.conversationId || '');
+      } else {
+        throw new Error('Invalid response format');
+      }
     } catch (error) {
-      console.error('Failed to get AI response:', error);
+      console.error('AI conversation error:', error);
+      
       // Fallback response
       const fallbackMessage: Message = {
         id: `msg_${Date.now()}_ai`,
         role: 'ai',
-        content: "I'm here to help! Could you tell me more about what you're looking for? I can assist with token creation, AI features, or any questions about Flutterbye.",
+        content: "I'm experiencing some technical difficulties, but I'm still here to help! Could you try asking your question again?",
         timestamp: new Date(),
         suggestions: [
-          "Tell me about your interests",
-          "How can I assist you?",
-          "What would you like to explore?"
+          "Tell me about Flutterbye features",
+          "How do I create a token?", 
+          "What can ARIA do?"
         ]
       };
+      
       setMessages(prev => [...prev, fallbackMessage]);
     } finally {
       setIsTyping(false);
@@ -178,12 +153,6 @@ export function AIConversation({
 
   const syncMood = async () => {
     try {
-      const recentMessages = messages.slice(-3).map(m => m.content).join(' ');
-      await syncMoodWithAI({
-        userMood: userMood,
-        context: { currentConversation: conversationId }
-      });
-
       // Update mood with a simple rotation for demo purposes
       const moods = ['curious', 'excited', 'focused', 'creative'];
       const currentIndex = moods.indexOf(userMood);
@@ -208,7 +177,6 @@ export function AIConversation({
           {showMoodSync && (
             <Button
               onClick={syncMood}
-              disabled={isSyncingMood}
               size="sm"
               variant="ghost"
               className="text-purple-400 hover:text-purple-300"
@@ -260,92 +228,90 @@ export function AIConversation({
           {/* Typing indicator */}
           {isTyping && (
             <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="flex gap-2 items-center text-electric-blue"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="flex gap-3 justify-start"
             >
-              <Bot className="w-4 h-4" />
-              <div className="flex gap-1">
-                <div className="w-2 h-2 bg-electric-blue rounded-full animate-pulse"></div>
-                <div className="w-2 h-2 bg-electric-blue rounded-full animate-pulse" style={{ animationDelay: '0.2s' }}></div>
-                <div className="w-2 h-2 bg-electric-blue rounded-full animate-pulse" style={{ animationDelay: '0.4s' }}></div>
+              <div className="flex gap-2">
+                <div className="w-8 h-8 rounded-full bg-electric-blue/20 text-electric-blue flex items-center justify-center">
+                  <Bot className="w-4 h-4" />
+                </div>
+                <div className="bg-electric-blue/10 border border-electric-blue/20 rounded-lg p-3">
+                  <div className="flex items-center gap-1">
+                    <div className="w-2 h-2 bg-electric-blue rounded-full animate-pulse"></div>
+                    <div className="w-2 h-2 bg-electric-blue rounded-full animate-pulse delay-100"></div>
+                    <div className="w-2 h-2 bg-electric-blue rounded-full animate-pulse delay-200"></div>
+                    <span className="text-white/70 text-sm ml-2">ARIA is thinking...</span>
+                  </div>
+                </div>
               </div>
-              <span className="text-sm">ARIA is thinking...</span>
             </motion.div>
           )}
-          
+
           <div ref={messagesEndRef} />
         </div>
 
-        {/* Suggestions */}
+        {/* AI Suggestions */}
         {lastAIMessage?.suggestions && lastAIMessage.suggestions.length > 0 && (
-          <div className="flex flex-wrap gap-2">
-            {lastAIMessage.suggestions.slice(0, 3).map((suggestion, index) => (
-              <Button
-                key={index}
-                onClick={() => handleSuggestionClick(suggestion)}
-                variant="ghost"
-                size="sm"
-                className="text-xs bg-electric-blue/10 hover:bg-electric-blue/20 text-electric-blue border border-electric-blue/20"
-              >
-                <Lightbulb className="w-3 h-3 mr-1" />
-                {suggestion}
-              </Button>
-            ))}
+          <div className="space-y-2">
+            <p className="text-white/60 text-xs flex items-center gap-1">
+              <Lightbulb className="w-3 h-3" />
+              Suggested responses:
+            </p>
+            <div className="flex flex-wrap gap-2">
+              {lastAIMessage.suggestions.map((suggestion, index) => (
+                <Button
+                  key={index}
+                  onClick={() => handleSuggestionClick(suggestion)}
+                  size="sm"
+                  variant="ghost"
+                  className="text-electric-blue border border-electric-blue/30 hover:bg-electric-blue/10 text-xs h-7"
+                >
+                  {suggestion}
+                </Button>
+              ))}
+            </div>
           </div>
         )}
 
-        {/* Input */}
-        <div className="flex gap-2">
-          <Input
-            value={inputMessage}
-            onChange={(e) => setInputMessage(e.target.value)}
-            onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
-            placeholder="Ask ARIA anything about Flutterbye..."
-            className="bg-black/20 border-electric-blue/30 text-white placeholder:text-gray-400"
-            disabled={isConversingWithAI || isTyping}
-          />
+        {/* Input area */}
+        <div className="flex gap-2 items-end">
+          <div className="flex-1">
+            <Input
+              value={inputMessage}
+              onChange={(e) => setInputMessage(e.target.value)}
+              onKeyPress={(e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                  e.preventDefault();
+                  handleSendMessage();
+                }
+              }}
+              placeholder="Ask ARIA anything about Flutterbye..."
+              className="bg-black/30 border-electric-blue/20 text-white placeholder:text-white/40 focus:border-electric-blue/50"
+              disabled={isTyping}
+            />
+          </div>
           <Button
             onClick={handleSendMessage}
-            disabled={!inputMessage.trim() || isConversingWithAI || isTyping}
-            className="bg-electric-blue hover:bg-electric-blue/80"
+            disabled={!inputMessage.trim() || isTyping}
+            size="sm"
+            className="bg-electric-blue hover:bg-electric-blue/80 text-black px-3"
           >
             <Send className="w-4 h-4" />
           </Button>
         </div>
 
-        {/* Quick Actions */}
-        {!compactMode && (
-          <div className="flex gap-2 pt-2 border-t border-electric-blue/20">
-            <Button
-              onClick={() => handleSuggestionClick("How do I create my first token?")}
-              variant="ghost"
-              size="sm"
-              className="text-xs text-green-400 hover:text-green-300"
-            >
-              <Sparkles className="w-3 h-3 mr-1" />
-              Create Token
-            </Button>
-            <Button
-              onClick={() => handleSuggestionClick("Show me the AI features")}
-              variant="ghost"
-              size="sm"
-              className="text-xs text-purple-400 hover:text-purple-300"
-            >
-              <Brain className="w-3 h-3 mr-1" />
-              AI Features
-            </Button>
-            <Button
-              onClick={() => handleSuggestionClick("What makes Flutterbye special?")}
-              variant="ghost"
-              size="sm"
-              className="text-xs text-blue-400 hover:text-blue-300"
-            >
-              <Zap className="w-3 h-3 mr-1" />
-              Learn More
-            </Button>
+        {/* AI Status */}
+        <div className="flex items-center justify-between text-xs text-white/40">
+          <div className="flex items-center gap-1">
+            <Sparkles className="w-3 h-3" />
+            <span>Powered by OpenAI GPT-4o</span>
           </div>
-        )}
+          <div className="flex items-center gap-1">
+            <Brain className="w-3 h-3" />
+            <span>ARIA v2.0</span>
+          </div>
+        </div>
       </CardContent>
     </Card>
   );
