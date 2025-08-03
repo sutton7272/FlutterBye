@@ -334,129 +334,129 @@ export default function UnifiedAdminDashboard() {
               </Select>
             </div>
           ) : (
-            <TabsList className="grid w-full grid-cols-13 bg-slate-900/90 border border-slate-600 p-2 rounded-lg">
+            <TabsList className="flex w-full bg-slate-900/90 border border-slate-600 p-2 rounded-lg overflow-x-auto gap-1">
             <TabsTrigger 
               value="overview" 
-              className="flex items-center gap-2 text-slate-300 font-medium data-[state=active]:text-white data-[state=active]:bg-blue-600/60 data-[state=active]:shadow-lg hover:text-white hover:bg-slate-700/50 transition-all duration-200"
+              className="flex-shrink-0 flex items-center gap-2 text-slate-300 font-medium data-[state=active]:text-white data-[state=active]:bg-blue-600/60 data-[state=active]:shadow-lg hover:text-white hover:bg-slate-700/50 transition-all duration-200 px-4 py-2"
             >
               <BarChart3 className="w-4 h-4" />
               <span className="hidden sm:inline">Overview</span>
             </TabsTrigger>
             <TabsTrigger 
               value="settings" 
-              className="flex items-center gap-2 text-slate-300 font-medium data-[state=active]:text-white data-[state=active]:bg-green-600/60 data-[state=active]:shadow-lg hover:text-white hover:bg-slate-700/50 transition-all duration-200"
+              className="flex-shrink-0 flex items-center gap-2 text-slate-300 font-medium data-[state=active]:text-white data-[state=active]:bg-green-600/60 data-[state=active]:shadow-lg hover:text-white hover:bg-slate-700/50 transition-all duration-200 px-4 py-2"
             >
               <Settings className="w-4 h-4" />
               <span className="hidden sm:inline">Settings</span>
             </TabsTrigger>
             <TabsTrigger 
               value="users" 
-              className="flex items-center gap-2 text-slate-300 font-medium data-[state=active]:text-white data-[state=active]:bg-purple-600/60 data-[state=active]:shadow-lg hover:text-white hover:bg-slate-700/50 transition-all duration-200"
+              className="flex-shrink-0 flex items-center gap-2 text-slate-300 font-medium data-[state=active]:text-white data-[state=active]:bg-purple-600/60 data-[state=active]:shadow-lg hover:text-white hover:bg-slate-700/50 transition-all duration-200 px-4 py-2"
             >
               <Users className="w-4 h-4" />
               <span className="hidden sm:inline">Users</span>
             </TabsTrigger>
             <TabsTrigger 
               value="tokens" 
-              className="flex items-center gap-2 text-slate-300 font-medium data-[state=active]:text-white data-[state=active]:bg-cyan-600/60 data-[state=active]:shadow-lg hover:text-white hover:bg-slate-700/50 transition-all duration-200"
+              className="flex-shrink-0 flex items-center gap-2 text-slate-300 font-medium data-[state=active]:text-white data-[state=active]:bg-cyan-600/60 data-[state=active]:shadow-lg hover:text-white hover:bg-slate-700/50 transition-all duration-200 px-4 py-2"
             >
               <ImageIcon className="w-4 h-4" />
               <span className="hidden sm:inline">Tokens</span>
             </TabsTrigger>
             <TabsTrigger 
               value="pricing" 
-              className="flex items-center gap-2 text-slate-300 font-medium data-[state=active]:text-white data-[state=active]:bg-yellow-600/60 data-[state=active]:shadow-lg hover:text-white hover:bg-slate-700/50 transition-all duration-200"
+              className="flex-shrink-0 flex items-center gap-2 text-slate-300 font-medium data-[state=active]:text-white data-[state=active]:bg-yellow-600/60 data-[state=active]:shadow-lg hover:text-white hover:bg-slate-700/50 transition-all duration-200 px-4 py-2"
             >
               <DollarSign className="w-4 h-4" />
               <span className="hidden sm:inline">Pricing</span>
             </TabsTrigger>
             <TabsTrigger 
               value="codes" 
-              className="flex items-center gap-2 text-slate-300 font-medium data-[state=active]:text-white data-[state=active]:bg-pink-600/60 data-[state=active]:shadow-lg hover:text-white hover:bg-slate-700/50 transition-all duration-200"
+              className="flex-shrink-0 flex items-center gap-2 text-slate-300 font-medium data-[state=active]:text-white data-[state=active]:bg-pink-600/60 data-[state=active]:shadow-lg hover:text-white hover:bg-slate-700/50 transition-all duration-200 px-4 py-2"
             >
               <Ticket className="w-4 h-4" />
               <span className="hidden sm:inline">Codes</span>
             </TabsTrigger>
             <TabsTrigger 
               value="access" 
-              className="flex items-center gap-2 text-slate-300 font-medium data-[state=active]:text-white data-[state=active]:bg-emerald-600/60 data-[state=active]:shadow-lg hover:text-white hover:bg-slate-700/50 transition-all duration-200"
+              className="flex-shrink-0 flex items-center gap-2 text-slate-300 font-medium data-[state=active]:text-white data-[state=active]:bg-emerald-600/60 data-[state=active]:shadow-lg hover:text-white hover:bg-slate-700/50 transition-all duration-200 px-4 py-2"
             >
               <Shield className="w-4 h-4" />
               <span className="hidden sm:inline">Access</span>
             </TabsTrigger>
             <TabsTrigger 
               value="analytics" 
-              className="flex items-center gap-2 text-slate-300 font-medium data-[state=active]:text-white data-[state=active]:bg-indigo-600/60 data-[state=active]:shadow-lg hover:text-white hover:bg-slate-700/50 transition-all duration-200"
+              className="flex-shrink-0 flex items-center gap-2 text-slate-300 font-medium data-[state=active]:text-white data-[state=active]:bg-indigo-600/60 data-[state=active]:shadow-lg hover:text-white hover:bg-slate-700/50 transition-all duration-200 px-4 py-2"
             >
               <Target className="w-4 h-4" />
               <span className="hidden sm:inline">Analytics</span>
             </TabsTrigger>
             <TabsTrigger 
               value="staking" 
-              className="flex items-center gap-2 text-slate-300 font-medium data-[state=active]:text-white data-[state=active]:bg-orange-600/60 data-[state=active]:shadow-lg hover:text-white hover:bg-slate-700/50 transition-all duration-200"
+              className="flex-shrink-0 flex items-center gap-2 text-slate-300 font-medium data-[state=active]:text-white data-[state=active]:bg-orange-600/60 data-[state=active]:shadow-lg hover:text-white hover:bg-slate-700/50 transition-all duration-200 px-4 py-2"
             >
               <Coins className="w-4 h-4" />
               <span className="hidden sm:inline">Staking</span>
             </TabsTrigger>
             <TabsTrigger 
               value="system" 
-              className="flex items-center gap-2 text-slate-300 font-medium data-[state=active]:text-white data-[state=active]:bg-red-600/60 data-[state=active]:shadow-lg hover:text-white hover:bg-slate-700/50 transition-all duration-200"
+              className="flex-shrink-0 flex items-center gap-2 text-slate-300 font-medium data-[state=active]:text-white data-[state=active]:bg-red-600/60 data-[state=active]:shadow-lg hover:text-white hover:bg-slate-700/50 transition-all duration-200 px-4 py-2"
             >
               <Database className="w-4 h-4" />
               <span className="hidden sm:inline">System</span>
             </TabsTrigger>
             <TabsTrigger 
               value="viral" 
-              className="flex items-center gap-2 text-slate-300 font-medium data-[state=active]:text-white data-[state=active]:bg-gradient-to-r data-[state=active]:from-red-600/60 data-[state=active]:to-orange-600/60 data-[state=active]:shadow-lg hover:text-white hover:bg-slate-700/50 transition-all duration-200"
+              className="flex-shrink-0 flex items-center gap-2 text-slate-300 font-medium data-[state=active]:text-white data-[state=active]:bg-gradient-to-r data-[state=active]:from-red-600/60 data-[state=active]:to-orange-600/60 data-[state=active]:shadow-lg hover:text-white hover:bg-slate-700/50 transition-all duration-200 px-4 py-2"
             >
               <Rocket className="w-4 h-4" />
               <span className="hidden sm:inline">Viral</span>
             </TabsTrigger>
             <TabsTrigger 
               value="realtime" 
-              className="flex items-center gap-2 text-slate-300 font-medium data-[state=active]:text-white data-[state=active]:bg-gradient-to-r data-[state=active]:from-green-600/60 data-[state=active]:to-blue-600/60 data-[state=active]:shadow-lg hover:text-white hover:bg-slate-700/50 transition-all duration-200"
+              className="flex-shrink-0 flex items-center gap-2 text-slate-300 font-medium data-[state=active]:text-white data-[state=active]:bg-gradient-to-r data-[state=active]:from-green-600/60 data-[state=active]:to-blue-600/60 data-[state=active]:shadow-lg hover:text-white hover:bg-slate-700/50 transition-all duration-200 px-4 py-2"
             >
               <Radio className="w-4 h-4" />
               <span className="hidden sm:inline">Live</span>
             </TabsTrigger>
             <TabsTrigger 
               value="revenue" 
-              className="flex items-center gap-2 text-slate-300 font-medium data-[state=active]:text-white data-[state=active]:bg-gradient-to-r data-[state=active]:from-emerald-600/60 data-[state=active]:to-teal-600/60 data-[state=active]:shadow-lg hover:text-white hover:bg-slate-700/50 transition-all duration-200"
+              className="flex-shrink-0 flex items-center gap-2 text-slate-300 font-medium data-[state=active]:text-white data-[state=active]:bg-gradient-to-r data-[state=active]:from-emerald-600/60 data-[state=active]:to-teal-600/60 data-[state=active]:shadow-lg hover:text-white hover:bg-slate-700/50 transition-all duration-200 px-4 py-2"
             >
               <DollarSign className="w-4 h-4" />
               <span className="hidden sm:inline">Revenue</span>
             </TabsTrigger>
             <TabsTrigger 
               value="security" 
-              className="flex items-center gap-2 text-slate-300 font-medium data-[state=active]:text-white data-[state=active]:bg-gradient-to-r data-[state=active]:from-red-600/60 data-[state=active]:to-pink-600/60 data-[state=active]:shadow-lg hover:text-white hover:bg-slate-700/50 transition-all duration-200"
+              className="flex-shrink-0 flex items-center gap-2 text-slate-300 font-medium data-[state=active]:text-white data-[state=active]:bg-gradient-to-r data-[state=active]:from-red-600/60 data-[state=active]:to-pink-600/60 data-[state=active]:shadow-lg hover:text-white hover:bg-slate-700/50 transition-all duration-200 px-4 py-2"
             >
               <Shield className="w-4 h-4" />
               <span className="hidden sm:inline">Security</span>
             </TabsTrigger>
             <TabsTrigger 
               value="performance" 
-              className="flex items-center gap-2 text-slate-300 font-medium data-[state=active]:text-white data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-600/60 data-[state=active]:to-violet-600/60 data-[state=active]:shadow-lg hover:text-white hover:bg-slate-700/50 transition-all duration-200"
+              className="flex-shrink-0 flex items-center gap-2 text-slate-300 font-medium data-[state=active]:text-white data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-600/60 data-[state=active]:to-violet-600/60 data-[state=active]:shadow-lg hover:text-white hover:bg-slate-700/50 transition-all duration-200 px-4 py-2"
             >
               <Zap className="w-4 h-4" />
               <span className="hidden sm:inline">Performance</span>
             </TabsTrigger>
             <TabsTrigger 
               value="behavior" 
-              className="flex items-center gap-2 text-slate-300 font-medium data-[state=active]:text-white data-[state=active]:bg-gradient-to-r data-[state=active]:from-amber-600/60 data-[state=active]:to-orange-600/60 data-[state=active]:shadow-lg hover:text-white hover:bg-slate-700/50 transition-all duration-200"
+              className="flex-shrink-0 flex items-center gap-2 text-slate-300 font-medium data-[state=active]:text-white data-[state=active]:bg-gradient-to-r data-[state=active]:from-amber-600/60 data-[state=active]:to-orange-600/60 data-[state=active]:shadow-lg hover:text-white hover:bg-slate-700/50 transition-all duration-200 px-4 py-2"
             >
               <Brain className="w-4 h-4" />
               <span className="hidden sm:inline">Behavior</span>
             </TabsTrigger>
             <TabsTrigger 
               value="competitive" 
-              className="flex items-center gap-2 text-slate-300 font-medium data-[state=active]:text-white data-[state=active]:bg-gradient-to-r data-[state=active]:from-cyan-600/60 data-[state=active]:to-blue-600/60 data-[state=active]:shadow-lg hover:text-white hover:bg-slate-700/50 transition-all duration-200"
+              className="flex-shrink-0 flex items-center gap-2 text-slate-300 font-medium data-[state=active]:text-white data-[state=active]:bg-gradient-to-r data-[state=active]:from-cyan-600/60 data-[state=active]:to-blue-600/60 data-[state=active]:shadow-lg hover:text-white hover:bg-slate-700/50 transition-all duration-200 px-4 py-2"
             >
               <Target className="w-4 h-4" />
               <span className="hidden sm:inline">Intelligence</span>
             </TabsTrigger>
             <TabsTrigger 
               value="api-monetization" 
-              className="flex items-center gap-2 text-slate-300 font-medium data-[state=active]:text-white data-[state=active]:bg-gradient-to-r data-[state=active]:from-green-600/60 data-[state=active]:to-emerald-600/60 data-[state=active]:shadow-lg hover:text-white hover:bg-slate-700/50 transition-all duration-200"
+              className="flex-shrink-0 flex items-center gap-2 text-slate-300 font-medium data-[state=active]:text-white data-[state=active]:bg-gradient-to-r data-[state=active]:from-green-600/60 data-[state=active]:to-emerald-600/60 data-[state=active]:shadow-lg hover:text-white hover:bg-slate-700/50 transition-all duration-200 px-4 py-2"
             >
               <DollarSign className="w-4 h-4" />
               <span className="hidden sm:inline">API $</span>
