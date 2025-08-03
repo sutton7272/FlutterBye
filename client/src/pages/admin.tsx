@@ -76,9 +76,16 @@ export default function Admin() {
     onSuccess: () => {
       toast({
         title: "Settings Updated",
-        description: "Platform settings have been successfully updated.",
+        description: "Admin settings have been successfully updated.",
       });
       queryClient.invalidateQueries({ queryKey: ["/api/admin/settings"] });
+    },
+    onError: (error) => {
+      toast({
+        title: "Update Failed",
+        description: "Failed to update admin settings. Please try again.",
+        variant: "destructive",
+      });
     },
   });
 
@@ -237,449 +244,90 @@ export default function Admin() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                {/* Pricing Sub-Tabs Navigation - Make them much more visible */}
-                <div className="mb-8">
-                  <Tabs defaultValue="flutterbye" className="space-y-6">
-                    <TabsList className="grid w-full grid-cols-2 md:grid-cols-4 gap-2 bg-black/40 p-3 rounded-xl border border-electric-blue/30">
-                      <TabsTrigger 
-                        value="flutterbye" 
-                        className="flex items-center gap-2 data-[state=active]:bg-electric-blue/30 data-[state=active]:text-white border border-electric-blue/50 hover:bg-electric-blue/20 text-white font-bold py-3 px-4"
-                      >
-                        <TrendingUp className="w-5 h-5" />
-                        Flutterbye
-                      </TabsTrigger>
-                      <TabsTrigger 
-                        value="flutterart" 
-                        className="flex items-center gap-2 data-[state=active]:bg-electric-green/30 data-[state=active]:text-white border border-electric-green/50 hover:bg-electric-green/20 text-white font-bold py-3 px-4"
-                      >
-                        <Edit className="w-5 h-5" />
-                        FlutterArt
-                      </TabsTrigger>
-                      <TabsTrigger 
-                        value="sms" 
-                        className="flex items-center gap-2 data-[state=active]:bg-circuit-teal/30 data-[state=active]:text-white border border-circuit-teal/50 hover:bg-circuit-teal/20 text-white font-bold py-3 px-4"
-                      >
-                        <Activity className="w-5 h-5" />
-                        SMS
-                      </TabsTrigger>
-                      <TabsTrigger 
-                        value="chat" 
-                        className="flex items-center gap-2 data-[state=active]:bg-electric-blue/30 data-[state=active]:text-white border border-electric-blue/50 hover:bg-electric-blue/20 text-white font-bold py-3 px-4"
-                      >
-                        <Users className="w-5 h-5" />
-                        Chat
-                      </TabsTrigger>
-                    </TabsList>
+                {/* Pricing Sub-Tabs Navigation */}
+                <Tabs defaultValue="flutterbye" className="space-y-6">
+                  <TabsList className="grid w-full grid-cols-2 md:grid-cols-4 gap-2 bg-black/40 p-3 rounded-xl border border-electric-blue/30">
+                    <TabsTrigger 
+                      value="flutterbye" 
+                      className="flex items-center gap-2 data-[state=active]:bg-electric-blue/30 data-[state=active]:text-white border border-electric-blue/50 hover:bg-electric-blue/20 text-white font-bold py-3 px-4"
+                    >
+                      <TrendingUp className="w-5 h-5" />
+                      Flutterbye
+                    </TabsTrigger>
+                    <TabsTrigger 
+                      value="flutterart" 
+                      className="flex items-center gap-2 data-[state=active]:bg-electric-green/30 data-[state=active]:text-white border border-electric-green/50 hover:bg-electric-green/20 text-white font-bold py-3 px-4"
+                    >
+                      <Edit className="w-5 h-5" />
+                      FlutterArt
+                    </TabsTrigger>
+                    <TabsTrigger 
+                      value="sms" 
+                      className="flex items-center gap-2 data-[state=active]:bg-circuit-teal/30 data-[state=active]:text-white border border-circuit-teal/50 hover:bg-circuit-teal/20 text-white font-bold py-3 px-4"
+                    >
+                      <Activity className="w-5 h-5" />
+                      SMS
+                    </TabsTrigger>
+                    <TabsTrigger 
+                      value="chat" 
+                      className="flex items-center gap-2 data-[state=active]:bg-electric-blue/30 data-[state=active]:text-white border border-electric-blue/50 hover:bg-electric-blue/20 text-white font-bold py-3 px-4"
+                    >
+                      <Users className="w-5 h-5" />
+                      Chat
+                    </TabsTrigger>
+                  </TabsList>
 
-                    {/* Flutterbye Core Pricing */}
-                    <TabsContent value="flutterbye" className="space-y-6 mt-6">
-                      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                        <Card className="glassmorphism border border-electric-blue/30">
-                          <CardHeader>
-                            <CardTitle className="text-electric-blue flex items-center gap-2">
-                              <TrendingUp className="w-5 h-5" />
-                              Core Token Operations
-                            </CardTitle>
-                            <CardDescription>Pricing for basic Flutterbye token creation and management</CardDescription>
-                          </CardHeader>
-                          <CardContent className="space-y-4">
-                            <div className="space-y-2">
-                              <Label htmlFor="baseMinting">Base Minting Fee (SOL)</Label>
-                              <Input
-                                id="baseMinting"
-                                type="number"
-                                step="0.001"
-                                defaultValue="0.005"
-                                className="border-electric-blue/30 bg-black/20"
-                              />
-                            </div>
-                            <div className="space-y-2">
-                              <Label htmlFor="valueAttachment">Value Attachment Fee (%)</Label>
-                              <Input
-                                id="valueAttachment"
-                                type="number"
-                                step="0.1"
-                                defaultValue="2.5"
-                                className="border-electric-blue/30 bg-black/20"
-                              />
-                            </div>
-                            <div className="space-y-2">
-                              <Label htmlFor="redemptionFee">Redemption Processing Fee (%)</Label>
-                              <Input
-                                id="redemptionFee"
-                                type="number"
-                                step="0.1"
-                                defaultValue="1.5"
-                                className="border-electric-blue/30 bg-black/20"
-                              />
-                            </div>
-                          </CardContent>
-                        </Card>
-
-                        <Card className="glassmorphism border border-electric-green/30">
-                          <CardHeader>
-                            <CardTitle className="text-electric-green flex items-center gap-2">
-                              <Target className="w-5 h-5" />
-                              Premium Features
-                            </CardTitle>
-                            <CardDescription>Advanced Flutterbye functionality pricing</CardDescription>
-                          </CardHeader>
-                          <CardContent className="space-y-4">
-                            <div className="space-y-2">
-                              <Label htmlFor="limitedEdition">Limited Edition Creation (SOL)</Label>
-                              <Input
-                                id="limitedEdition"
-                                type="number"
-                                step="0.01"
-                                defaultValue="0.1"
-                                className="border-electric-green/30 bg-black/20"
-                              />
-                            </div>
-                            <div className="space-y-2">
-                              <Label htmlFor="bulkMinting">Bulk Minting Discount (%)</Label>
-                              <Input
-                                id="bulkMinting"
-                                type="number"
-                                step="1"
-                                defaultValue="15"
-                                className="border-electric-green/30 bg-black/20"
-                              />
-                            </div>
-                            <div className="space-y-2">
-                              <Label htmlFor="priorityProcessing">Priority Processing Fee (SOL)</Label>
-                              <Input
-                                id="priorityProcessing"
-                                type="number"
-                                step="0.001"
-                                defaultValue="0.002"
-                                className="border-electric-green/30 bg-black/20"
-                              />
-                            </div>
-                          </CardContent>
-                        </Card>
-                      </div>
-                    </TabsContent>
-
-                    {/* FlutterArt NFT Pricing */}
-                    <TabsContent value="flutterart" className="space-y-6 mt-6">
-                      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                        <Card className="glassmorphism border border-electric-green/30">
-                          <CardHeader>
-                            <CardTitle className="text-electric-green flex items-center gap-2">
-                              <Edit className="w-5 h-5" />
-                              NFT Creation Pricing
-                            </CardTitle>
-                            <CardDescription>FlutterArt multimedia NFT creation costs</CardDescription>
-                          </CardHeader>
-                          <CardContent className="space-y-4">
-                            <div className="space-y-2">
-                              <Label htmlFor="nftBaseFee">Base NFT Creation (SOL)</Label>
-                              <Input
-                                id="nftBaseFee"
-                                type="number"
-                                step="0.01"
-                                defaultValue="0.05"
-                                className="border-electric-green/30 bg-black/20"
-                              />
-                            </div>
-                            <div className="space-y-2">
-                              <Label htmlFor="imageAttachment">Image Attachment Fee (SOL)</Label>
-                              <Input
-                                id="imageAttachment"
-                                type="number"
-                                step="0.001"
-                                defaultValue="0.01"
-                                className="border-electric-green/30 bg-black/20"
-                              />
-                            </div>
-                            <div className="space-y-2">
-                              <Label htmlFor="voiceAttachment">Voice Recording Fee (SOL)</Label>
-                              <Input
-                                id="voiceAttachment"
-                                type="number"
-                                step="0.001"
-                                defaultValue="0.02"
-                                className="border-electric-green/30 bg-black/20"
-                              />
-                            </div>
-                            <div className="space-y-2">
-                              <Label htmlFor="collectionFee">Collection Creation (SOL)</Label>
-                              <Input
-                                id="collectionFee"
-                                type="number"
-                                step="0.01"
-                                defaultValue="0.2"
-                                className="border-electric-green/30 bg-black/20"
-                              />
-                            </div>
-                          </CardContent>
-                        </Card>
-
-                        <Card className="glassmorphism border border-circuit-teal/30">
-                          <CardHeader>
-                            <CardTitle className="text-circuit-teal flex items-center gap-2">
-                              <BarChart3 className="w-5 h-5" />
-                              Marketplace & Trading
-                            </CardTitle>
-                            <CardDescription>FlutterArt marketplace fees and commissions</CardDescription>
-                          </CardHeader>
-                          <CardContent className="space-y-4">
-                            <div className="space-y-2">
-                              <Label htmlFor="listingFee">Marketplace Listing Fee (SOL)</Label>
-                              <Input
-                                id="listingFee"
-                                type="number"
-                                step="0.001"
-                                defaultValue="0.005"
-                                className="border-circuit-teal/30 bg-black/20"
-                              />
-                            </div>
-                            <div className="space-y-2">
-                              <Label htmlFor="salesCommission">Sales Commission (%)</Label>
-                              <Input
-                                id="salesCommission"
-                                type="number"
-                                step="0.5"
-                                defaultValue="5.0"
-                                className="border-circuit-teal/30 bg-black/20"
-                              />
-                            </div>
-                            <div className="space-y-2">
-                              <Label htmlFor="burnRedemption">Burn Redemption Fee (%)</Label>
-                              <Input
-                                id="burnRedemption"
-                                type="number"
-                                step="0.1"
-                                defaultValue="2.0"
-                                className="border-circuit-teal/30 bg-black/20"
-                              />
-                            </div>
-                            <div className="space-y-2">
-                              <Label htmlFor="royaltyFee">Creator Royalty (%)</Label>
-                              <Input
-                                id="royaltyFee"
-                                type="number"
-                                step="0.5"
-                                defaultValue="7.5"
-                                className="border-circuit-teal/30 bg-black/20"
-                              />
-                            </div>
-                          </CardContent>
-                        </Card>
-                      </div>
-                    </TabsContent>
-
-                    {/* SMS Integration Pricing */}
-                    <TabsContent value="sms" className="space-y-6 mt-6">
-                      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                        <Card className="glassmorphism border border-circuit-teal/30">
-                          <CardHeader>
-                            <CardTitle className="text-circuit-teal flex items-center gap-2">
-                              <Activity className="w-5 h-5" />
-                              SMS Services
-                            </CardTitle>
-                            <CardDescription>SMS-to-blockchain integration pricing</CardDescription>
-                          </CardHeader>
-                          <CardContent className="space-y-4">
-                            <div className="space-y-2">
-                              <Label htmlFor="smsProcessing">SMS Processing Fee (SOL)</Label>
-                              <Input
-                                id="smsProcessing"
-                                type="number"
-                                step="0.001"
-                                defaultValue="0.003"
-                                className="border-circuit-teal/30 bg-black/20"
-                              />
-                            </div>
-                            <div className="space-y-2">
-                              <Label htmlFor="emotionalAnalysis">AI Emotional Analysis (SOL)</Label>
-                              <Input
-                                id="emotionalAnalysis"
-                                type="number"
-                                step="0.001"
-                                defaultValue="0.002"
-                                className="border-circuit-teal/30 bg-black/20"
-                              />
-                            </div>
-                            <div className="space-y-2">
-                              <Label htmlFor="smsNotification">SMS Notification (SOL)</Label>
-                              <Input
-                                id="smsNotification"
-                                type="number"
-                                step="0.0001"
-                                defaultValue="0.001"
-                                className="border-circuit-teal/30 bg-black/20"
-                              />
-                            </div>
-                            <div className="space-y-2">
-                              <Label htmlFor="bulkSMS">Bulk SMS Discount (%)</Label>
-                              <Input
-                                id="bulkSMS"
-                                type="number"
-                                step="1"
-                                defaultValue="20"
-                                className="border-circuit-teal/30 bg-black/20"
-                              />
-                            </div>
-                          </CardContent>
-                        </Card>
-
-                        <Card className="glassmorphism border border-electric-blue/30">
-                          <CardHeader>
-                            <CardTitle className="text-electric-blue flex items-center gap-2">
-                              <Target className="w-5 h-5" />
-                              FlutterWave Features
-                            </CardTitle>
-                            <CardDescription>Advanced SMS emotional messaging features</CardDescription>
-                          </CardHeader>
-                          <CardContent className="space-y-4">
-                            <div className="space-y-2">
-                              <Label htmlFor="butterflyEffect">Butterfly Effect Tracking (SOL)</Label>
-                              <Input
-                                id="butterflyEffect"
-                                type="number"
-                                step="0.001"
-                                defaultValue="0.005"
-                                className="border-electric-blue/30 bg-black/20"
-                              />
-                            </div>
-                            <div className="space-y-2">
-                              <Label htmlFor="aiAvatar">AI Avatar Interaction (SOL)</Label>
-                              <Input
-                                id="aiAvatar"
-                                type="number"
-                                step="0.001"
-                                defaultValue="0.01"
-                                className="border-electric-blue/30 bg-black/20"
-                              />
-                            </div>
-                            <div className="space-y-2">
-                              <Label htmlFor="quantumThreads">Quantum Message Threads (SOL)</Label>
-                              <Input
-                                id="quantumThreads"
-                                type="number"
-                                step="0.001"
-                                defaultValue="0.007"
-                                className="border-electric-blue/30 bg-black/20"
-                              />
-                            </div>
-                          </CardContent>
-                        </Card>
-                      </div>
-                    </TabsContent>
-
-                    {/* Chat Subscription Pricing */}
-                    <TabsContent value="chat" className="space-y-6 mt-6">
-                      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                        <Card className="glassmorphism border border-electric-blue/30">
-                          <CardHeader>
-                            <CardTitle className="text-electric-blue flex items-center gap-2">
-                              <Users className="w-5 h-5" />
-                              Chat Subscriptions
-                            </CardTitle>
-                            <CardDescription>Real-time blockchain chat pricing tiers</CardDescription>
-                          </CardHeader>
-                          <CardContent className="space-y-4">
-                            <div className="space-y-2">
-                              <Label htmlFor="basicChat">Basic Chat (Monthly SOL)</Label>
-                              <Input
-                                id="basicChat"
-                                type="number"
-                                step="0.01"
-                                defaultValue="0.1"
-                                className="border-electric-blue/30 bg-black/20"
-                              />
-                            </div>
-                            <div className="space-y-2">
-                              <Label htmlFor="premiumChat">Premium Chat (Monthly SOL)</Label>
-                              <Input
-                                id="premiumChat"
-                                type="number"
-                                step="0.01"
-                                defaultValue="0.25"
-                                className="border-electric-blue/30 bg-black/20"
-                              />
-                            </div>
-                            <div className="space-y-2">
-                              <Label htmlFor="enterpriseChat">Enterprise Chat (Monthly SOL)</Label>
-                              <Input
-                                id="enterpriseChat"
-                                type="number"
-                                step="0.01"
-                                defaultValue="0.5"
-                                className="border-electric-blue/30 bg-black/20"
-                              />
-                            </div>
-                          </CardContent>
-                        </Card>
-
-                        <Card className="glassmorphism border border-electric-green/30">
-                          <CardHeader>
-                            <CardTitle className="text-electric-green flex items-center gap-2">
-                              <Settings className="w-5 h-5" />
-                              Chat Features
-                            </CardTitle>
-                            <CardDescription>Per-use chat feature pricing</CardDescription>
-                          </CardHeader>
-                          <CardContent className="space-y-4">
-                            <div className="space-y-2">
-                              <Label htmlFor="messageStorage">Message Storage (Per 1000)</Label>
-                              <Input
-                                id="messageStorage"
-                                type="number"
-                                step="0.0001"
-                                defaultValue="0.001"
-                                className="border-electric-green/30 bg-black/20"
-                              />
-                            </div>
-                            <div className="space-y-2">
-                              <Label htmlFor="fileSharing">File Sharing (Per MB)</Label>
-                              <Input
-                                id="fileSharing"
-                                type="number"
-                                step="0.0001"
-                                defaultValue="0.0005"
-                                className="border-electric-green/30 bg-black/20"
-                              />
-                            </div>
-                            <div className="space-y-2">
-                              <Label htmlFor="encryptedChat">Encrypted Chat Premium (%)</Label>
-                              <Input
-                                id="encryptedChat"
-                                type="number"
-                                step="1"
-                                defaultValue="50"
-                                className="border-electric-green/30 bg-black/20"
-                              />
-                            </div>
-                            <div className="space-y-2">
-                              <Label htmlFor="groupAdmin">Group Admin Fee (SOL)</Label>
-                              <Input
-                                id="groupAdmin"
-                                type="number"
-                                step="0.001"
-                                defaultValue="0.01"
-                                className="border-electric-green/30 bg-black/20"
-                              />
-                            </div>
-                          </CardContent>
-                        </Card>
-                      </div>
-                    </TabsContent>
-
-                    {/* Save Button */}
-                    <div className="flex justify-end pt-6 border-t border-electric-blue/20 mt-8">
-                      <Button className="bg-electric-green hover:bg-electric-green/80 text-black font-bold px-8 py-3">
-                        <Save className="w-5 h-5 mr-2" />
-                        Save All Pricing Changes
-                      </Button>
-                    </div>
-                  </Tabs>
-                </div>
-
-                      <Card className="premium-card">
+                  {/* Flutterbye Core Pricing */}
+                  <TabsContent value="flutterbye" className="space-y-6 mt-6">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                      <Card className="glassmorphism border border-electric-blue/30">
                         <CardHeader>
-                          <CardTitle className="text-electric-green">Premium Features</CardTitle>
+                          <CardTitle className="text-electric-blue flex items-center gap-2">
+                            <TrendingUp className="w-5 h-5" />
+                            Core Token Operations
+                          </CardTitle>
+                          <CardDescription>Pricing for basic Flutterbye token creation and management</CardDescription>
+                        </CardHeader>
+                        <CardContent className="space-y-4">
+                          <div className="space-y-2">
+                            <Label htmlFor="baseMinting">Base Minting Fee (SOL)</Label>
+                            <Input
+                              id="baseMinting"
+                              type="number"
+                              step="0.001"
+                              defaultValue="0.005"
+                              className="border-electric-blue/30 bg-black/20"
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <Label htmlFor="valueAttachment">Value Attachment Fee (%)</Label>
+                            <Input
+                              id="valueAttachment"
+                              type="number"
+                              step="0.1"
+                              defaultValue="2.5"
+                              className="border-electric-blue/30 bg-black/20"
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <Label htmlFor="redemptionFee">Redemption Processing Fee (%)</Label>
+                            <Input
+                              id="redemptionFee"
+                              type="number"
+                              step="0.1"
+                              defaultValue="1.5"
+                              className="border-electric-blue/30 bg-black/20"
+                            />
+                          </div>
+                        </CardContent>
+                      </Card>
+
+                      <Card className="glassmorphism border border-electric-green/30">
+                        <CardHeader>
+                          <CardTitle className="text-electric-green flex items-center gap-2">
+                            <Target className="w-5 h-5" />
+                            Premium Features
+                          </CardTitle>
                           <CardDescription>Advanced Flutterbye functionality pricing</CardDescription>
                         </CardHeader>
                         <CardContent className="space-y-4">
@@ -690,7 +338,7 @@ export default function Admin() {
                               type="number"
                               step="0.01"
                               defaultValue="0.1"
-                              className="border-electric-green/30"
+                              className="border-electric-green/30 bg-black/20"
                             />
                           </div>
                           <div className="space-y-2">
@@ -700,7 +348,7 @@ export default function Admin() {
                               type="number"
                               step="1"
                               defaultValue="15"
-                              className="border-electric-green/30"
+                              className="border-electric-green/30 bg-black/20"
                             />
                           </div>
                           <div className="space-y-2">
@@ -710,7 +358,7 @@ export default function Admin() {
                               type="number"
                               step="0.001"
                               defaultValue="0.002"
-                              className="border-electric-green/30"
+                              className="border-electric-green/30 bg-black/20"
                             />
                           </div>
                         </CardContent>
@@ -719,11 +367,14 @@ export default function Admin() {
                   </TabsContent>
 
                   {/* FlutterArt NFT Pricing */}
-                  <TabsContent value="flutterart" className="space-y-6">
+                  <TabsContent value="flutterart" className="space-y-6 mt-6">
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                      <Card className="premium-card">
+                      <Card className="glassmorphism border border-electric-green/30">
                         <CardHeader>
-                          <CardTitle className="text-electric-green">NFT Creation Pricing</CardTitle>
+                          <CardTitle className="text-electric-green flex items-center gap-2">
+                            <Edit className="w-5 h-5" />
+                            NFT Creation Pricing
+                          </CardTitle>
                           <CardDescription>FlutterArt multimedia NFT creation costs</CardDescription>
                         </CardHeader>
                         <CardContent className="space-y-4">
@@ -734,7 +385,7 @@ export default function Admin() {
                               type="number"
                               step="0.01"
                               defaultValue="0.05"
-                              className="border-electric-green/30"
+                              className="border-electric-green/30 bg-black/20"
                             />
                           </div>
                           <div className="space-y-2">
@@ -744,7 +395,7 @@ export default function Admin() {
                               type="number"
                               step="0.001"
                               defaultValue="0.01"
-                              className="border-electric-green/30"
+                              className="border-electric-green/30 bg-black/20"
                             />
                           </div>
                           <div className="space-y-2">
@@ -754,7 +405,7 @@ export default function Admin() {
                               type="number"
                               step="0.001"
                               defaultValue="0.02"
-                              className="border-electric-green/30"
+                              className="border-electric-green/30 bg-black/20"
                             />
                           </div>
                           <div className="space-y-2">
@@ -764,15 +415,18 @@ export default function Admin() {
                               type="number"
                               step="0.01"
                               defaultValue="0.2"
-                              className="border-electric-green/30"
+                              className="border-electric-green/30 bg-black/20"
                             />
                           </div>
                         </CardContent>
                       </Card>
 
-                      <Card className="premium-card">
+                      <Card className="glassmorphism border border-circuit-teal/30">
                         <CardHeader>
-                          <CardTitle className="text-circuit-teal">Marketplace & Trading</CardTitle>
+                          <CardTitle className="text-circuit-teal flex items-center gap-2">
+                            <BarChart3 className="w-5 h-5" />
+                            Marketplace & Trading
+                          </CardTitle>
                           <CardDescription>FlutterArt marketplace fees and commissions</CardDescription>
                         </CardHeader>
                         <CardContent className="space-y-4">
@@ -783,7 +437,7 @@ export default function Admin() {
                               type="number"
                               step="0.001"
                               defaultValue="0.005"
-                              className="border-circuit-teal/30"
+                              className="border-circuit-teal/30 bg-black/20"
                             />
                           </div>
                           <div className="space-y-2">
@@ -793,7 +447,7 @@ export default function Admin() {
                               type="number"
                               step="0.5"
                               defaultValue="5.0"
-                              className="border-circuit-teal/30"
+                              className="border-circuit-teal/30 bg-black/20"
                             />
                           </div>
                           <div className="space-y-2">
@@ -803,7 +457,7 @@ export default function Admin() {
                               type="number"
                               step="0.1"
                               defaultValue="2.0"
-                              className="border-circuit-teal/30"
+                              className="border-circuit-teal/30 bg-black/20"
                             />
                           </div>
                           <div className="space-y-2">
@@ -813,7 +467,7 @@ export default function Admin() {
                               type="number"
                               step="0.5"
                               defaultValue="7.5"
-                              className="border-circuit-teal/30"
+                              className="border-circuit-teal/30 bg-black/20"
                             />
                           </div>
                         </CardContent>
@@ -822,11 +476,14 @@ export default function Admin() {
                   </TabsContent>
 
                   {/* SMS Integration Pricing */}
-                  <TabsContent value="sms" className="space-y-6">
+                  <TabsContent value="sms" className="space-y-6 mt-6">
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                      <Card className="premium-card">
+                      <Card className="glassmorphism border border-circuit-teal/30">
                         <CardHeader>
-                          <CardTitle className="text-circuit-teal">SMS Services</CardTitle>
+                          <CardTitle className="text-circuit-teal flex items-center gap-2">
+                            <Activity className="w-5 h-5" />
+                            SMS Services
+                          </CardTitle>
                           <CardDescription>SMS-to-blockchain integration pricing</CardDescription>
                         </CardHeader>
                         <CardContent className="space-y-4">
@@ -837,7 +494,7 @@ export default function Admin() {
                               type="number"
                               step="0.001"
                               defaultValue="0.003"
-                              className="border-circuit-teal/30"
+                              className="border-circuit-teal/30 bg-black/20"
                             />
                           </div>
                           <div className="space-y-2">
@@ -847,7 +504,7 @@ export default function Admin() {
                               type="number"
                               step="0.001"
                               defaultValue="0.002"
-                              className="border-circuit-teal/30"
+                              className="border-circuit-teal/30 bg-black/20"
                             />
                           </div>
                           <div className="space-y-2">
@@ -857,7 +514,7 @@ export default function Admin() {
                               type="number"
                               step="0.0001"
                               defaultValue="0.001"
-                              className="border-circuit-teal/30"
+                              className="border-circuit-teal/30 bg-black/20"
                             />
                           </div>
                           <div className="space-y-2">
@@ -867,15 +524,18 @@ export default function Admin() {
                               type="number"
                               step="1"
                               defaultValue="20"
-                              className="border-circuit-teal/30"
+                              className="border-circuit-teal/30 bg-black/20"
                             />
                           </div>
                         </CardContent>
                       </Card>
 
-                      <Card className="premium-card">
+                      <Card className="glassmorphism border border-electric-blue/30">
                         <CardHeader>
-                          <CardTitle className="text-electric-blue">FlutterWave Features</CardTitle>
+                          <CardTitle className="text-electric-blue flex items-center gap-2">
+                            <Target className="w-5 h-5" />
+                            FlutterWave Features
+                          </CardTitle>
                           <CardDescription>Advanced SMS emotional messaging features</CardDescription>
                         </CardHeader>
                         <CardContent className="space-y-4">
@@ -886,7 +546,7 @@ export default function Admin() {
                               type="number"
                               step="0.001"
                               defaultValue="0.005"
-                              className="border-electric-blue/30"
+                              className="border-electric-blue/30 bg-black/20"
                             />
                           </div>
                           <div className="space-y-2">
@@ -896,7 +556,7 @@ export default function Admin() {
                               type="number"
                               step="0.001"
                               defaultValue="0.01"
-                              className="border-electric-blue/30"
+                              className="border-electric-blue/30 bg-black/20"
                             />
                           </div>
                           <div className="space-y-2">
@@ -906,7 +566,7 @@ export default function Admin() {
                               type="number"
                               step="0.001"
                               defaultValue="0.007"
-                              className="border-electric-blue/30"
+                              className="border-electric-blue/30 bg-black/20"
                             />
                           </div>
                         </CardContent>
@@ -915,11 +575,14 @@ export default function Admin() {
                   </TabsContent>
 
                   {/* Chat Subscription Pricing */}
-                  <TabsContent value="chat" className="space-y-6">
+                  <TabsContent value="chat" className="space-y-6 mt-6">
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                      <Card className="premium-card">
+                      <Card className="glassmorphism border border-electric-blue/30">
                         <CardHeader>
-                          <CardTitle className="text-electric-blue">Chat Subscriptions</CardTitle>
+                          <CardTitle className="text-electric-blue flex items-center gap-2">
+                            <Users className="w-5 h-5" />
+                            Chat Subscriptions
+                          </CardTitle>
                           <CardDescription>Real-time blockchain chat pricing tiers</CardDescription>
                         </CardHeader>
                         <CardContent className="space-y-4">
@@ -930,7 +593,7 @@ export default function Admin() {
                               type="number"
                               step="0.01"
                               defaultValue="0.1"
-                              className="border-electric-blue/30"
+                              className="border-electric-blue/30 bg-black/20"
                             />
                           </div>
                           <div className="space-y-2">
@@ -940,7 +603,7 @@ export default function Admin() {
                               type="number"
                               step="0.01"
                               defaultValue="0.25"
-                              className="border-electric-blue/30"
+                              className="border-electric-blue/30 bg-black/20"
                             />
                           </div>
                           <div className="space-y-2">
@@ -950,15 +613,18 @@ export default function Admin() {
                               type="number"
                               step="0.01"
                               defaultValue="0.5"
-                              className="border-electric-blue/30"
+                              className="border-electric-blue/30 bg-black/20"
                             />
                           </div>
                         </CardContent>
                       </Card>
 
-                      <Card className="premium-card">
+                      <Card className="glassmorphism border border-electric-green/30">
                         <CardHeader>
-                          <CardTitle className="text-electric-green">Chat Features</CardTitle>
+                          <CardTitle className="text-electric-green flex items-center gap-2">
+                            <Settings className="w-5 h-5" />
+                            Chat Features
+                          </CardTitle>
                           <CardDescription>Per-use chat feature pricing</CardDescription>
                         </CardHeader>
                         <CardContent className="space-y-4">
@@ -969,7 +635,7 @@ export default function Admin() {
                               type="number"
                               step="0.0001"
                               defaultValue="0.001"
-                              className="border-electric-green/30"
+                              className="border-electric-green/30 bg-black/20"
                             />
                           </div>
                           <div className="space-y-2">
@@ -979,7 +645,7 @@ export default function Admin() {
                               type="number"
                               step="0.0001"
                               defaultValue="0.0005"
-                              className="border-electric-green/30"
+                              className="border-electric-green/30 bg-black/20"
                             />
                           </div>
                           <div className="space-y-2">
@@ -989,7 +655,7 @@ export default function Admin() {
                               type="number"
                               step="1"
                               defaultValue="50"
-                              className="border-electric-green/30"
+                              className="border-electric-green/30 bg-black/20"
                             />
                           </div>
                           <div className="space-y-2">
@@ -999,37 +665,41 @@ export default function Admin() {
                               type="number"
                               step="0.001"
                               defaultValue="0.01"
-                              className="border-electric-green/30"
+                              className="border-electric-green/30 bg-black/20"
                             />
                           </div>
                         </CardContent>
                       </Card>
                     </div>
                   </TabsContent>
-                </Tabs>
 
-                <div className="flex justify-end pt-6 border-t border-electric-blue/20">
-                  <Button className="bg-electric-green hover:bg-electric-green/80 text-black font-bold px-8">
-                    <Save className="w-4 h-4 mr-2" />
-                    Save All Pricing Changes
-                  </Button>
-                </div>
+                  {/* Save Button */}
+                  <div className="flex justify-end pt-6 border-t border-electric-blue/20 mt-8">
+                    <Button className="bg-electric-green hover:bg-electric-green/80 text-black font-bold px-8 py-3">
+                      <Save className="w-5 h-5 mr-2" />
+                      Save All Pricing Changes
+                    </Button>
+                  </div>
+                </Tabs>
               </CardContent>
             </Card>
           </TabsContent>
 
           {/* Users Tab */}
           <TabsContent value="users" className="space-y-6">
-            <Card className="glassmorphism">
+            <Card className="glassmorphism electric-frame">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  <Users className="w-5 h-5" />
+                  <Users className="w-5 h-5 text-electric-blue" />
                   User Management
                 </CardTitle>
+                <CardDescription>
+                  Manage platform users and permissions
+                </CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="text-center py-8 text-gray-400">
-                  User management interface coming soon
+                <div className="text-center py-8">
+                  <p className="text-gray-400">User management features coming soon...</p>
                 </div>
               </CardContent>
             </Card>
@@ -1037,41 +707,24 @@ export default function Admin() {
 
           {/* Analytics Tab */}
           <TabsContent value="analytics" className="space-y-6">
-            <Card className="glassmorphism">
+            <Card className="glassmorphism electric-frame">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  <BarChart3 className="w-5 h-5" />
+                  <BarChart3 className="w-5 h-5 text-electric-green" />
                   Platform Analytics
                 </CardTitle>
+                <CardDescription>
+                  Monitor platform performance and user engagement
+                </CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="text-center py-8 text-gray-400">
-                  Analytics dashboard coming soon
+                <div className="text-center py-8">
+                  <p className="text-gray-400">Advanced analytics dashboard coming soon...</p>
                 </div>
               </CardContent>
             </Card>
           </TabsContent>
         </Tabs>
-        
-        {/* Footer with System Information */}
-        <div className="mt-12 text-center">
-          <div className="electric-frame p-4 glassmorphism inline-block">
-            <div className="flex items-center gap-4 text-sm text-gray-400">
-              <div className="flex items-center gap-2">
-                <Shield className="w-4 h-4 text-electric-green" />
-                <span>Admin Panel v2.0</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Activity className="w-4 h-4 text-electric-blue" />
-                <span>Real-time Management</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Database className="w-4 h-4 text-circuit-teal" />
-                <span>Secure Control</span>
-              </div>
-            </div>
-          </div>
-        </div>
       </div>
     </div>
   );
