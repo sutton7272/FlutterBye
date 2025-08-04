@@ -383,6 +383,12 @@ function Router() {
             <AIFeaturesTest />
           </>
         )} />
+        <Route path="/ai-features-test" component={() => (
+          <>
+            <Navbar />
+            <AIFeaturesTest />
+          </>
+        )} />
         <Route path="/all-opportunities" component={() => (
           <>
             <Navbar />
