@@ -65,17 +65,21 @@ export default function AIFeaturesTest() {
       console.log('📊 Response success:', response.success);
       console.log('📊 Results length:', response.results?.length);
       
-      // The API response is already properly structured
+      // Force success to true if we have results
+      const hasResults = response.results && Array.isArray(response.results) && response.results.length > 0;
+      
       setResults({ 
         type: 'viral', 
         data: {
-          success: response.success,
+          success: hasResults ? true : response.success, // Force true if results exist
           results: response.results || [],
           summary: response.summary,
           debugInfo: {
-            apiSuccess: response.success,
+            originalSuccess: response.success,
+            hasResults: hasResults,
             resultsCount: response.results?.length || 0,
-            rawKeys: Object.keys(response)
+            rawKeys: Object.keys(response),
+            resultsType: typeof response.results
           }
         }
       });
@@ -415,6 +419,9 @@ export default function AIFeaturesTest() {
                   <div className="text-yellow-300 text-xs bg-black/20 p-2 rounded border">
                     <div>Debug: {results.data?.results ? `${results.data.results.length} results found` : 'No results in data'}</div>
                     <div>Success: {results.data?.success ? 'true' : 'false'}</div>
+                    <div>Original Success: {results.data?.debugInfo?.originalSuccess ? 'true' : 'false'}</div>
+                    <div>Has Results: {results.data?.debugInfo?.hasResults ? 'true' : 'false'}</div>
+                    <div>Results Type: {results.data?.debugInfo?.resultsType}</div>
                     <div>Data keys: {JSON.stringify(Object.keys(results.data || {}))}</div>
                     {results.data?.error && <div className="text-red-300">Error: {results.data.error}</div>}
                     <details className="mt-2">
@@ -425,7 +432,7 @@ export default function AIFeaturesTest() {
                     </details>
                   </div>
                   
-                  {results.data?.results && results.data.results.length > 0 ? (
+                  {results.data?.results && Array.isArray(results.data.results) && results.data.results.length > 0 ? (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                       {results.data.results.map((result: any, index: number) => (
                       <Card key={index} className="bg-gray-900/50 border-gray-600">
