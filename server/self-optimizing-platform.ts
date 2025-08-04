@@ -2401,75 +2401,7 @@ const moderationConfig = {
     ];
   }
 
-  private async generateSolutionScripts(recommendations: any[]): Promise<OptimizationRecommendation[]> {
-    console.log('🔧 Enhancing AI recommendations with detailed solution scripts...');
-    
-    const enhancedRecommendations: OptimizationRecommendation[] = [];
-    
-    for (const rec of recommendations) {
-      try {
-        const prompt = `
-          Create a comprehensive implementation script for this optimization recommendation:
-          
-          Title: ${rec.title}
-          Description: ${rec.description}
-          Implementation: ${rec.implementation}
-          
-          Generate a detailed 400-500 word implementation script that includes:
-          1. Technical context and requirements
-          2. Step-by-step implementation plan with code examples
-          3. Configuration and setup instructions
-          4. Testing and validation procedures
-          5. Deployment and monitoring guidance
-          
-          Focus on practical, actionable steps for a blockchain communication platform.
-          Include specific code patterns and technical details.
-        `;
-
-        const response = await openai.chat.completions.create({
-          model: "gpt-4o",
-          messages: [{ role: "user", content: prompt }],
-          max_tokens: 1500,
-          temperature: 0.4
-        });
-
-        const enhancedRec: OptimizationRecommendation = {
-          category: rec.category as any,
-          priority: rec.priority as any,
-          title: rec.title,
-          description: rec.description,
-          implementation: rec.implementation,
-          expectedImpact: rec.expectedImpact,
-          confidence: rec.confidence,
-          timeToImplement: rec.timeToImplement,
-          potentialROI: rec.potentialROI,
-          solutionScript: response.choices[0].message.content || `# ${rec.title} Implementation Script\n\n${rec.implementation}`,
-          scriptInstructions: `Implement ${rec.title} following the detailed technical specifications and code examples provided.`
-        };
-
-        enhancedRecommendations.push(enhancedRec);
-      } catch (error) {
-        console.error(`Failed to enhance recommendation: ${rec.title}`, error);
-        // Fallback to basic recommendation
-        enhancedRecommendations.push({
-          category: rec.category as any,
-          priority: rec.priority as any,
-          title: rec.title,
-          description: rec.description,
-          implementation: rec.implementation,
-          expectedImpact: rec.expectedImpact,
-          confidence: rec.confidence,
-          timeToImplement: rec.timeToImplement,
-          potentialROI: rec.potentialROI,
-          solutionScript: `# ${rec.title} Implementation\n\n${rec.implementation}\n\nPlease refer to platform documentation for detailed implementation steps.`,
-          scriptInstructions: `Implement ${rec.title} according to the provided specifications.`
-        });
-      }
-    }
-    
-    console.log(`✅ Enhanced ${enhancedRecommendations.length} recommendations with solution scripts`);
-    return enhancedRecommendations;
-  }
+  // REMOVED: Duplicate generateSolutionScripts method - use the proper one at line 286
 
   // REMOVED: getFallbackRecommendations - FORCING REAL AI ANALYSIS ONLY  
   private removedFallbackMethod_2_DoNotUse(): never {
