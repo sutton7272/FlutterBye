@@ -1007,27 +1007,31 @@ export const measurePageLoad = () => {
                               </div>
                             </div>
                             
-                            <p className="text-gray-300 text-sm mb-3">{rec.description || rec.recommendation}</p>
+                            <p className="text-gray-300 text-sm mb-3">
+                              {typeof (rec.description || rec.recommendation) === 'string' 
+                                ? (rec.description || rec.recommendation) 
+                                : JSON.stringify(rec.description || rec.recommendation)}
+                            </p>
                             
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
                               {rec.expectedImpact && (
                                 <div className="text-green-400 text-sm">
-                                  <span className="font-medium">Impact:</span> {rec.expectedImpact}
+                                  <span className="font-medium">Impact:</span> {typeof rec.expectedImpact === 'string' ? rec.expectedImpact : JSON.stringify(rec.expectedImpact)}
                                 </div>
                               )}
                               {rec.timeToImplement && (
                                 <div className="text-blue-400 text-sm">
-                                  <span className="font-medium">Time:</span> {rec.timeToImplement}
+                                  <span className="font-medium">Time:</span> {typeof rec.timeToImplement === 'string' ? rec.timeToImplement : JSON.stringify(rec.timeToImplement)}
                                 </div>
                               )}
                               {rec.potentialROI && (
                                 <div className="text-purple-400 text-sm">
-                                  <span className="font-medium">ROI:</span> {rec.potentialROI}
+                                  <span className="font-medium">ROI:</span> {typeof rec.potentialROI === 'string' ? rec.potentialROI : JSON.stringify(rec.potentialROI)}
                                 </div>
                               )}
                               {rec.category && (
                                 <div className="text-cyan-400 text-sm">
-                                  <span className="font-medium">Category:</span> {rec.category}
+                                  <span className="font-medium">Category:</span> {typeof rec.category === 'string' ? rec.category : JSON.stringify(rec.category)}
                                 </div>
                               )}
                             </div>
@@ -1045,7 +1049,10 @@ export const measurePageLoad = () => {
                                     variant="outline"
                                     className="text-xs"
                                     onClick={() => {
-                                      navigator.clipboard.writeText(rec.solutionScript);
+                                      const scriptText = typeof rec.solutionScript === 'string' 
+                                        ? rec.solutionScript 
+                                        : JSON.stringify(rec.solutionScript, null, 2);
+                                      navigator.clipboard.writeText(scriptText);
                                       toast({ title: "Script Copied!", description: "Solution script copied to clipboard" });
                                     }}
                                   >
@@ -1057,7 +1064,7 @@ export const measurePageLoad = () => {
                                 {rec.scriptInstructions && (
                                   <div className="bg-blue-900/20 border border-blue-500/30 rounded p-3 mb-3">
                                     <p className="text-blue-300 text-sm">
-                                      <span className="font-medium">Instructions:</span> {rec.scriptInstructions}
+                                      <span className="font-medium">Instructions:</span> {typeof rec.scriptInstructions === 'string' ? rec.scriptInstructions : JSON.stringify(rec.scriptInstructions)}
                                     </p>
                                   </div>
                                 )}
