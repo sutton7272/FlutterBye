@@ -63,7 +63,26 @@ export default function AIFeaturesTest() {
       console.log('📊 Response results:', response.results);
       console.log('📊 Response structure:', Object.keys(response));
       
-      setResults({ type: 'viral', data: response });
+      // Handle the response structure properly
+      if (response.success && response.results) {
+        setResults({ 
+          type: 'viral', 
+          data: { 
+            success: true,
+            results: response.results,
+            summary: response.summary 
+          }
+        });
+      } else {
+        setResults({ 
+          type: 'viral', 
+          data: { 
+            success: false,
+            error: 'No results received',
+            rawResponse: response
+          }
+        });
+      }
       toast({
         title: "Viral Amplification AI Activated!",
         description: `Generated viral content for ${(response as any).results?.length || 3} platforms`,
@@ -397,12 +416,17 @@ export default function AIFeaturesTest() {
                   </div>
                   
                   {/* Debug info */}
-                  <div className="text-yellow-300 text-xs">
-                    Debug: {results.data?.results ? `${results.data.results.length} results found` : 'No results in data'}
-                    <br />
-                    Data keys: {JSON.stringify(Object.keys(results.data || {}), null, 2)}
-                    <br />
-                    Full data: {JSON.stringify(results.data, null, 2).substring(0, 200)}...
+                  <div className="text-yellow-300 text-xs bg-black/20 p-2 rounded border">
+                    <div>Debug: {results.data?.results ? `${results.data.results.length} results found` : 'No results in data'}</div>
+                    <div>Success: {results.data?.success ? 'true' : 'false'}</div>
+                    <div>Data keys: {JSON.stringify(Object.keys(results.data || {}))}</div>
+                    {results.data?.error && <div className="text-red-300">Error: {results.data.error}</div>}
+                    <details className="mt-2">
+                      <summary className="cursor-pointer">Full Response Data</summary>
+                      <pre className="text-xs mt-1 overflow-auto max-h-40">
+                        {JSON.stringify(results.data, null, 2)}
+                      </pre>
+                    </details>
                   </div>
                   
                   {results.data?.results && results.data.results.length > 0 ? (
