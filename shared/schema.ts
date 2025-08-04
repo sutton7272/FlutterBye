@@ -726,7 +726,7 @@ export const voiceMessages = pgTable("voice_messages", {
 
 export type VoiceMessage = typeof voiceMessages.$inferSelect;
 export type InsertVoiceMessage = typeof voiceMessages.$inferInsert;
-export type InsertCodeRedemption = typeof codeRedemptions.$inferInsert;
+// Removed duplicate - using the one with proper schema reference below
 export type PricingConfig = typeof pricingConfig.$inferSelect;
 export type InsertPricingConfig = typeof pricingConfig.$inferInsert;
 
