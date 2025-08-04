@@ -21,8 +21,8 @@ import {
   MessageSquare,
   Sparkles,
   Database,
-  Api,
-  Settings
+  Settings,
+  Server
 } from 'lucide-react';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { apiRequest, queryClient } from '@/lib/queryClient';
@@ -127,7 +127,7 @@ export default function FlutterAIDashboard() {
     mutationFn: async (address: string) => {
       return apiRequest('/api/flutterai/score-wallet', 'POST', { address });
     },
-    onSuccess: (data) => {
+    onSuccess: (data: any) => {
       setSearchedWallet(data.walletScore);
       toast({
         title: "Wallet Analysis Complete",
@@ -209,11 +209,11 @@ export default function FlutterAIDashboard() {
           </div>
           <div className="flex items-center gap-2 px-3 py-1 bg-blue-500/20 rounded-full">
             <Activity className="h-4 w-4 text-blue-400" />
-            <span className="text-blue-400 text-sm">AI Processing: {systemHealth?.processingLoad || 'Unknown'}%</span>
+            <span className="text-blue-400 text-sm">AI Processing: {(systemHealth as any)?.processingLoad || 'Unknown'}%</span>
           </div>
           <div className="flex items-center gap-2 px-3 py-1 bg-purple-500/20 rounded-full">
             <Database className="h-4 w-4 text-purple-400" />
-            <span className="text-purple-400 text-sm">Wallets Analyzed: {aiStats?.walletsAnalyzed?.toLocaleString() || '0'}</span>
+            <span className="text-purple-400 text-sm">Wallets Analyzed: {(aiStats as any)?.walletsAnalyzed?.toLocaleString() || '0'}</span>
           </div>
         </div>
       </div>
@@ -236,7 +236,7 @@ export default function FlutterAIDashboard() {
                 <Wallet className="h-4 w-4 text-blue-400" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold text-white">{aiStats?.scoresGenerated?.toLocaleString() || '0'}</div>
+                <div className="text-2xl font-bold text-white">{(aiStats as any)?.scoresGenerated?.toLocaleString() || '0'}</div>
                 <p className="text-xs text-blue-300">+12% from last week</p>
               </CardContent>
             </Card>
@@ -247,7 +247,7 @@ export default function FlutterAIDashboard() {
                 <MessageSquare className="h-4 w-4 text-purple-400" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold text-white">{aiStats?.conversationsProcessed?.toLocaleString() || '0'}</div>
+                <div className="text-2xl font-bold text-white">{(aiStats as any)?.conversationsProcessed?.toLocaleString() || '0'}</div>
                 <p className="text-xs text-purple-300">+23% from last week</p>
               </CardContent>
             </Card>
@@ -255,10 +255,10 @@ export default function FlutterAIDashboard() {
             <Card className="bg-slate-800/50 border-green-500/20">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium text-green-200">API Requests</CardTitle>
-                <Api className="h-4 w-4 text-green-400" />
+                <Server className="h-4 w-4 text-green-400" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold text-white">{aiStats?.apiRequests?.toLocaleString() || '0'}</div>
+                <div className="text-2xl font-bold text-white">{(aiStats as any)?.apiRequests?.toLocaleString() || '0'}</div>
                 <p className="text-xs text-green-300">+34% from last week</p>
               </CardContent>
             </Card>
@@ -269,7 +269,7 @@ export default function FlutterAIDashboard() {
                 <TrendingUp className="h-4 w-4 text-yellow-400" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold text-white">${aiStats?.revenueGenerated?.toLocaleString() || '0'}</div>
+                <div className="text-2xl font-bold text-white">${(aiStats as any)?.revenueGenerated?.toLocaleString() || '0'}</div>
                 <p className="text-xs text-yellow-300">+45% from last week</p>
               </CardContent>
             </Card>

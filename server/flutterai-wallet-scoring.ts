@@ -129,7 +129,7 @@ export class FlutterAIWalletScoringEngine {
         confidence: this.calculateConfidence(metrics.totalTransactions)
       };
       
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error scoring wallet:', error);
       throw new Error(`Failed to score wallet: ${error.message}`);
     }

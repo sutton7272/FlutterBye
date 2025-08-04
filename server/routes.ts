@@ -26,6 +26,7 @@ import { aiMonetizationService } from "./ai-monetization-service";
 import { aiPaymentService } from "./ai-payment-service";
 import { z } from "zod";
 import { registerNextGenAIRoutes } from "./next-gen-ai-routes";
+import { flutterAIRoutes } from "./flutterai-routes";
 import { Connection, Keypair, LAMPORTS_PER_SOL, PublicKey, Transaction, SystemProgram } from '@solana/web3.js';
 import bs58 from 'bs58';
 
@@ -4074,6 +4075,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: "Failed to generate insights" });
     }
   });
+  
+  // Register FlutterAI routes
+  app.use("/api/flutterai", flutterAIRoutes);
+  console.log("🧠 FlutterAI comprehensive wallet scoring and intelligence engine activated");
+  
   const httpServer = createServer(app);
   // WebSocket server for real-time heatmap data and chat
   const { WebSocketServer, WebSocket } = await import('ws');

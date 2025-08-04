@@ -53,6 +53,7 @@ import AdminDefaultImage from "@/pages/admin-default-image";
 import UnifiedAdminDashboard from "@/pages/admin-unified";
 import TokenHolderMapPage from "@/pages/token-holder-map";
 import CollaborativeCreation from "@/pages/collaborative-creation";
+import FlutterAIDashboard from "@/pages/flutterai-dashboard";
 import ViralDashboard from "@/pages/viral-dashboard";
 import MessageNFTCreator from "@/pages/message-nft-creator";
 import NFTClaim from "@/pages/nft-claim";
@@ -387,6 +388,12 @@ function Router() {
           <>
             <Navbar />
             <AIFeaturesTest />
+          </>
+        )} />
+        <Route path="/flutterai-dashboard" component={() => (
+          <>
+            <Navbar />
+            <FlutterAIDashboard />
           </>
         )} />
         <Route path="/all-opportunities" component={() => (

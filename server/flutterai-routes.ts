@@ -32,7 +32,7 @@ router.post('/score-wallet', async (req, res) => {
       walletScore,
       timestamp: new Date().toISOString()
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error('FlutterAI wallet scoring error:', error);
     res.status(500).json({ 
       error: 'Failed to score wallet',
@@ -70,7 +70,7 @@ router.post('/score-wallets-batch', async (req, res) => {
       results,
       timestamp: new Date().toISOString()
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error('FlutterAI batch scoring error:', error);
     res.status(500).json({ 
       error: 'Failed to score wallets',
@@ -132,7 +132,7 @@ router.get('/top-performers', async (req, res) => {
         lastUpdated: new Date().toISOString()
       }
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error('FlutterAI top performers error:', error);
     res.status(500).json({ 
       error: 'Failed to fetch top performers',
@@ -209,7 +209,7 @@ router.get('/capabilities', async (req, res) => {
       ...capabilities,
       timestamp: new Date().toISOString()
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error('FlutterAI capabilities error:', error);
     res.status(500).json({ 
       error: 'Failed to fetch capabilities',
@@ -250,7 +250,7 @@ router.get('/health', async (req, res) => {
       health,
       timestamp: new Date().toISOString()
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error('FlutterAI health check error:', error);
     res.status(500).json({ 
       error: 'Failed to check system health',
@@ -315,7 +315,7 @@ router.post('/analyze-behavior', async (req, res) => {
       behaviorAnalysis: analysis,
       timestamp: new Date().toISOString()
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error('FlutterAI behavior analysis error:', error);
     res.status(500).json({ 
       error: 'Failed to analyze behavior',
@@ -376,7 +376,7 @@ router.post('/predict-market', async (req, res) => {
       generatedBy: 'FlutterAI Predictive Engine v2.0',
       timestamp: new Date().toISOString()
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error('FlutterAI market prediction error:', error);
     res.status(500).json({ 
       error: 'Failed to generate predictions',
@@ -439,7 +439,7 @@ router.post('/social-intelligence', async (req, res) => {
       socialIntelligence,
       timestamp: new Date().toISOString()
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error('FlutterAI social intelligence error:', error);
     res.status(500).json({ 
       error: 'Failed to analyze social intelligence',
@@ -486,7 +486,7 @@ router.get('/api-stats', async (req, res) => {
       apiStats: stats,
       timestamp: new Date().toISOString()
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error('FlutterAI API stats error:', error);
     res.status(500).json({ 
       error: 'Failed to fetch API stats',
