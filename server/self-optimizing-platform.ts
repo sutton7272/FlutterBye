@@ -247,39 +247,43 @@ export class SelfOptimizingPlatform {
   }> {
     try {
       const prompt = `
-        Create a complete, ready-to-use AI script for implementing this optimization recommendation. The script should be detailed enough to paste directly into an AI assistant and get a complete implementation.
+        Create a detailed, actionable AI implementation script for this optimization. The script should be comprehensive enough that a developer can copy-paste it into any AI assistant and receive complete working code and implementation guidance.
 
-        Recommendation Details:
+        OPTIMIZATION DETAILS:
         - Title: ${recommendation.title}
-        - Category: ${recommendation.category}
+        - Category: ${recommendation.category} 
         - Priority: ${recommendation.priority}
         - Description: ${recommendation.description}
         - Implementation: ${recommendation.implementation}
         - Expected Impact: ${recommendation.expectedImpact}
         - Time to Implement: ${recommendation.timeToImplement}
 
-        Generate a comprehensive AI script that includes:
-        1. Clear context and objective
-        2. Specific technical requirements
-        3. Step-by-step implementation instructions
-        4. Code examples where applicable
-        5. Testing and validation steps
-        6. Performance monitoring guidelines
+        Generate a professional AI script that includes:
+
+        1. **CONTEXT & OBJECTIVE**: Clear problem statement and goals
+        2. **TECHNICAL REQUIREMENTS**: Specific technologies, frameworks, and dependencies
+        3. **IMPLEMENTATION PLAN**: Detailed step-by-step instructions with code examples
+        4. **CONFIGURATION**: Settings, environment variables, and setup requirements
+        5. **TESTING STRATEGY**: How to validate the implementation works
+        6. **MONITORING**: Metrics to track and success criteria
+        7. **DEPLOYMENT**: How to deploy or activate the solution
+
+        The script should be 300-500 words and include specific technical details, code snippets, file names, and actionable steps.
 
         Format as JSON:
         {
-          "script": "Complete AI script ready for copy-paste into any AI assistant",
-          "instructions": "Brief instructions on how to use this script with AI"
+          "script": "[Write a comprehensive 300-500 word implementation script with specific technical details, code examples, configuration steps, testing procedures, and deployment instructions. Include actual code snippets, file paths, and command-line instructions where relevant.]",
+          "instructions": "Copy this script and paste it into any AI assistant like ChatGPT, Claude, or Copilot. Ask the AI to implement this solution step-by-step with complete code examples and detailed explanations."
         }
 
-        The script should be professional, detailed, and actionable - something a developer could give to any AI assistant to get a complete solution.
+        Make the script detailed and technical - include actual code patterns, specific configurations, and implementation details that an AI can use to provide a complete working solution.
       `;
 
       const response = await openai.chat.completions.create({
         model: "gpt-4o", // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
         messages: [{ role: "user", content: prompt }],
         response_format: { type: "json_object" },
-        max_tokens: 1200
+        max_tokens: 2000
       });
 
       const result = JSON.parse(response.choices[0].message.content || '{}');
@@ -300,29 +304,87 @@ export class SelfOptimizingPlatform {
 
   private generateFallbackScript(recommendation: OptimizationRecommendation): string {
     return `
-OPTIMIZATION IMPLEMENTATION REQUEST
+🚀 COMPREHENSIVE OPTIMIZATION IMPLEMENTATION SCRIPT
 
-Objective: ${recommendation.title}
-Category: ${recommendation.category}
-Priority: ${recommendation.priority}
+## OBJECTIVE: ${recommendation.title}
+**Category:** ${recommendation.category} | **Priority:** ${recommendation.priority} | **Confidence:** ${Math.round(recommendation.confidence * 100)}%
 
-Problem Description:
+## PROBLEM ANALYSIS
 ${recommendation.description}
 
-Implementation Requirements:
+## IMPLEMENTATION STRATEGY
 ${recommendation.implementation}
 
-Expected Outcome:
+## EXPECTED RESULTS
 ${recommendation.expectedImpact}
+**Timeline:** ${recommendation.timeToImplement}
+**ROI Potential:** ${recommendation.potentialROI}
 
-Time Estimate: ${recommendation.timeToImplement}
-ROI Potential: ${recommendation.potentialROI}
-Confidence Level: ${Math.round(recommendation.confidence * 100)}%
+## DETAILED IMPLEMENTATION PLAN
 
-Please provide:
-1. Complete implementation code/configuration
-2. Step-by-step deployment instructions
-3. Testing and validation procedures
+### Phase 1: Setup & Preparation
+1. **Environment Setup**
+   - Review current ${recommendation.category.toLowerCase()} configuration
+   - Backup existing settings and code
+   - Install necessary dependencies and tools
+
+2. **Requirements Analysis**
+   - Analyze current performance baseline
+   - Identify specific bottlenecks and issues
+   - Document current user behavior patterns
+
+### Phase 2: Core Implementation
+1. **Technical Implementation**
+   - Create/modify relevant configuration files
+   - Implement code changes with proper error handling
+   - Add monitoring and logging capabilities
+   - Test implementation in staging environment
+
+2. **Configuration & Optimization**
+   - Fine-tune settings for optimal performance
+   - Configure analytics and tracking
+   - Set up A/B testing framework if applicable
+
+### Phase 3: Testing & Validation
+1. **Testing Strategy**
+   - Unit tests for code changes
+   - Performance testing and benchmarking
+   - User acceptance testing
+   - Load testing if performance-related
+
+2. **Validation Metrics**
+   - Monitor key performance indicators
+   - Track user engagement metrics
+   - Measure conversion rate changes
+   - Analyze user feedback and satisfaction
+
+### Phase 4: Deployment & Monitoring
+1. **Production Deployment**
+   - Deploy changes using gradual rollout
+   - Monitor real-time performance metrics
+   - Set up alerting for any issues
+
+2. **Ongoing Optimization**
+   - Weekly performance reviews
+   - Continuous A/B testing
+   - Regular user feedback collection
+   - Iterative improvements based on data
+
+## TECHNICAL REQUIREMENTS
+- Modern web browser support
+- Analytics tracking implementation
+- Performance monitoring tools
+- A/B testing framework (if needed)
+- Database optimization (if applicable)
+
+## SUCCESS CRITERIA
+- Achieve ${recommendation.expectedImpact}
+- Complete implementation within ${recommendation.timeToImplement}
+- Maintain system stability throughout rollout
+- Positive user feedback and engagement metrics
+
+## COPY-PASTE INSTRUCTIONS FOR AI ASSISTANTS
+"Please help me implement this optimization strategy step by step. Provide specific code examples, configuration files, and detailed implementation instructions for each phase. Include error handling, testing procedures, and monitoring setup. Focus on ${recommendation.category.toLowerCase()} optimization with ${recommendation.priority.toLowerCase()} priority."
 4. Performance monitoring setup
 5. Rollback plan if needed
 
