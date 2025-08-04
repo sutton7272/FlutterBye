@@ -389,19 +389,23 @@ export default function AIFeaturesTest() {
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              {results.type === 'viral' && results.data && (
+              {results.type === 'viral' && (
                 <div className="space-y-4">
                   <div className="flex items-center gap-2 text-green-400">
                     <Zap className="w-4 h-4" />
-                    <span className="font-semibold">Generated {results.data.results?.length || 0} Viral Content Pieces</span>
+                    <span className="font-semibold">Generated {results.data?.results?.length || 0} Viral Content Pieces</span>
                   </div>
                   
                   {/* Debug info */}
                   <div className="text-yellow-300 text-xs">
-                    Debug: {results.data.results ? `${results.data.results.length} results found` : 'No results in data'}
+                    Debug: {results.data?.results ? `${results.data.results.length} results found` : 'No results in data'}
+                    <br />
+                    Data keys: {JSON.stringify(Object.keys(results.data || {}), null, 2)}
+                    <br />
+                    Full data: {JSON.stringify(results.data, null, 2).substring(0, 200)}...
                   </div>
                   
-                  {results.data.results && results.data.results.length > 0 ? (
+                  {results.data?.results && results.data.results.length > 0 ? (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                       {results.data.results.map((result: any, index: number) => (
                       <Card key={index} className="bg-gray-900/50 border-gray-600">
@@ -441,7 +445,10 @@ export default function AIFeaturesTest() {
                     </div>
                   ) : (
                     <div className="text-red-400 p-4 border border-red-500/30 rounded">
-                      No viral content results found. Data structure: {JSON.stringify(Object.keys(results.data || {}), null, 2)}
+                      <div>No viral content results found.</div>
+                      <div>Data structure: {JSON.stringify(Object.keys(results.data || {}), null, 2)}</div>
+                      <div>Success: {results.data?.success ? 'true' : 'false'}</div>
+                      <div>Results array: {results.data?.results ? 'exists' : 'missing'}</div>
                     </div>
                   )}
                   
