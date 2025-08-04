@@ -22,6 +22,8 @@ interface OptimizationRecommendation {
   confidence: number;
   timeToImplement: string;
   potentialROI: string;
+  solutionScript?: string; // Complete AI script ready for execution
+  scriptInstructions?: string; // Instructions for using the script
 }
 
 interface A_BTestResult {
@@ -52,10 +54,13 @@ export class SelfOptimizingPlatform {
       const aiRecommendations = await this.getAIOptimizationRecommendations(currentMetrics, performanceGaps);
       const prioritizedRecommendations = this.prioritizeRecommendations(aiRecommendations);
       
-      // Store recommendations for tracking
-      this.optimizationHistory.push(...prioritizedRecommendations);
+      // Generate solution scripts for each recommendation
+      const recommendationsWithScripts = await this.generateSolutionScripts(prioritizedRecommendations);
       
-      return prioritizedRecommendations;
+      // Store recommendations for tracking
+      this.optimizationHistory.push(...recommendationsWithScripts);
+      
+      return recommendationsWithScripts;
     } catch (error) {
       console.error('Performance analysis error:', error);
       return this.getFallbackRecommendations(currentMetrics);
@@ -93,7 +98,7 @@ export class SelfOptimizingPlatform {
         - User Satisfaction: ${metrics.userSatisfaction} (${gaps.userSatisfaction > 0 ? '+' : ''}${gaps.userSatisfaction.toFixed(1)}% vs baseline)
         - Revenue Per User: $${metrics.revenuePerUser} (${gaps.revenuePerUser > 0 ? '+' : ''}${gaps.revenuePerUser.toFixed(1)}% vs baseline)
         
-        Provide 5 specific optimization recommendations as JSON object with recommendations array:
+        Provide 3-5 specific optimization recommendations as JSON object with recommendations array:
         {
           "recommendations": [
             {
@@ -209,6 +214,120 @@ export class SelfOptimizingPlatform {
     };
     
     return monitoringMap[recommendation.category] || ['General performance metrics'];
+  }
+
+  // Generate complete AI solution scripts for each recommendation
+  private async generateSolutionScripts(recommendations: OptimizationRecommendation[]): Promise<OptimizationRecommendation[]> {
+    const enhancedRecommendations = await Promise.all(
+      recommendations.map(async (recommendation) => {
+        try {
+          const script = await this.createAISolutionScript(recommendation);
+          return {
+            ...recommendation,
+            solutionScript: script.script,
+            scriptInstructions: script.instructions
+          };
+        } catch (error) {
+          console.error(`Error generating script for ${recommendation.title}:`, error);
+          return {
+            ...recommendation,
+            solutionScript: this.generateFallbackScript(recommendation),
+            scriptInstructions: "Copy and paste this script into any AI assistant to implement the solution"
+          };
+        }
+      })
+    );
+
+    return enhancedRecommendations;
+  }
+
+  private async createAISolutionScript(recommendation: OptimizationRecommendation): Promise<{
+    script: string;
+    instructions: string;
+  }> {
+    try {
+      const prompt = `
+        Create a complete, ready-to-use AI script for implementing this optimization recommendation. The script should be detailed enough to paste directly into an AI assistant and get a complete implementation.
+
+        Recommendation Details:
+        - Title: ${recommendation.title}
+        - Category: ${recommendation.category}
+        - Priority: ${recommendation.priority}
+        - Description: ${recommendation.description}
+        - Implementation: ${recommendation.implementation}
+        - Expected Impact: ${recommendation.expectedImpact}
+        - Time to Implement: ${recommendation.timeToImplement}
+
+        Generate a comprehensive AI script that includes:
+        1. Clear context and objective
+        2. Specific technical requirements
+        3. Step-by-step implementation instructions
+        4. Code examples where applicable
+        5. Testing and validation steps
+        6. Performance monitoring guidelines
+
+        Format as JSON:
+        {
+          "script": "Complete AI script ready for copy-paste into any AI assistant",
+          "instructions": "Brief instructions on how to use this script with AI"
+        }
+
+        The script should be professional, detailed, and actionable - something a developer could give to any AI assistant to get a complete solution.
+      `;
+
+      const response = await openai.chat.completions.create({
+        model: "gpt-4o", // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
+        messages: [{ role: "user", content: prompt }],
+        response_format: { type: "json_object" },
+        max_tokens: 1200
+      });
+
+      const result = JSON.parse(response.choices[0].message.content || '{}');
+      console.log(`✅ AI solution script generated for: ${recommendation.title}`);
+      
+      return {
+        script: result.script || this.generateFallbackScript(recommendation),
+        instructions: result.instructions || "Copy and paste this script into any AI assistant to implement the solution"
+      };
+    } catch (error) {
+      console.error(`Error creating AI script for ${recommendation.title}:`, error);
+      return {
+        script: this.generateFallbackScript(recommendation),
+        instructions: "Copy and paste this script into any AI assistant to implement the solution"
+      };
+    }
+  }
+
+  private generateFallbackScript(recommendation: OptimizationRecommendation): string {
+    return `
+OPTIMIZATION IMPLEMENTATION REQUEST
+
+Objective: ${recommendation.title}
+Category: ${recommendation.category}
+Priority: ${recommendation.priority}
+
+Problem Description:
+${recommendation.description}
+
+Implementation Requirements:
+${recommendation.implementation}
+
+Expected Outcome:
+${recommendation.expectedImpact}
+
+Time Estimate: ${recommendation.timeToImplement}
+ROI Potential: ${recommendation.potentialROI}
+Confidence Level: ${Math.round(recommendation.confidence * 100)}%
+
+Please provide:
+1. Complete implementation code/configuration
+2. Step-by-step deployment instructions
+3. Testing and validation procedures
+4. Performance monitoring setup
+5. Rollback plan if needed
+
+Platform Context: React/TypeScript frontend with Express.js backend, using Tailwind CSS for styling, Solana blockchain integration, and PostgreSQL database.
+    `.trim();
   }
 
   private async designA_BTest(recommendation: OptimizationRecommendation): Promise<string> {

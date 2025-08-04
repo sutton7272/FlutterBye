@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import { DollarSign, Zap, BarChart3, Brain, Loader2, Edit } from "lucide-react";
+import { DollarSign, Zap, BarChart3, Brain, Loader2, Edit, Terminal, Copy } from "lucide-react";
 
 export default function AIFeaturesTest() {
   const [loading, setLoading] = useState(false);
@@ -606,20 +606,88 @@ export default function AIFeaturesTest() {
                   </div>
                   
                   {results.data.recommendations && results.data.recommendations.length > 0 && (
-                    <div className="space-y-3">
+                    <div className="space-y-4">
                       {results.data.recommendations.map((rec: any, index: number) => (
                         <Card key={index} className="bg-gray-900/50 border-gray-600">
                           <CardContent className="p-4">
                             <div className="flex items-start justify-between mb-2">
-                              <h4 className="text-white font-medium">{rec.category || `Recommendation ${index + 1}`}</h4>
-                              <Badge variant={rec.priority === 'Critical' ? 'destructive' : rec.priority === 'High' ? 'default' : 'secondary'}>
-                                {rec.priority || 'Medium'}
-                              </Badge>
+                              <h4 className="text-white font-medium">{rec.title || rec.category || `Recommendation ${index + 1}`}</h4>
+                              <div className="flex gap-2">
+                                <Badge variant={rec.priority === 'Critical' ? 'destructive' : rec.priority === 'High' ? 'default' : 'secondary'}>
+                                  {rec.priority || 'Medium'}
+                                </Badge>
+                                {rec.confidence && (
+                                  <Badge variant="outline" className="text-blue-400">
+                                    {Math.round(rec.confidence * 100)}% confidence
+                                  </Badge>
+                                )}
+                              </div>
                             </div>
-                            <p className="text-gray-300 text-sm mb-2">{rec.description || rec.recommendation}</p>
-                            {rec.potentialROI && (
-                              <div className="text-green-400 text-sm font-medium">
-                                Expected Impact: {rec.potentialROI}
+                            
+                            <p className="text-gray-300 text-sm mb-3">{rec.description || rec.recommendation}</p>
+                            
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
+                              {rec.expectedImpact && (
+                                <div className="text-green-400 text-sm">
+                                  <span className="font-medium">Impact:</span> {rec.expectedImpact}
+                                </div>
+                              )}
+                              {rec.timeToImplement && (
+                                <div className="text-blue-400 text-sm">
+                                  <span className="font-medium">Time:</span> {rec.timeToImplement}
+                                </div>
+                              )}
+                              {rec.potentialROI && (
+                                <div className="text-purple-400 text-sm">
+                                  <span className="font-medium">ROI:</span> {rec.potentialROI}
+                                </div>
+                              )}
+                              {rec.category && (
+                                <div className="text-cyan-400 text-sm">
+                                  <span className="font-medium">Category:</span> {rec.category}
+                                </div>
+                              )}
+                            </div>
+
+                            {/* Solution Script Section */}
+                            {rec.solutionScript && (
+                              <div className="mt-4 border-t border-gray-600 pt-4">
+                                <div className="flex items-center justify-between mb-3">
+                                  <h5 className="text-orange-400 font-semibold flex items-center gap-2">
+                                    <Terminal className="w-4 h-4" />
+                                    Complete AI Solution Script
+                                  </h5>
+                                  <Button
+                                    size="sm"
+                                    variant="outline"
+                                    className="text-xs"
+                                    onClick={() => {
+                                      navigator.clipboard.writeText(rec.solutionScript);
+                                      toast({ title: "Script Copied!", description: "Solution script copied to clipboard" });
+                                    }}
+                                  >
+                                    <Copy className="w-3 h-3 mr-1" />
+                                    Copy Script
+                                  </Button>
+                                </div>
+                                
+                                {rec.scriptInstructions && (
+                                  <div className="bg-blue-900/20 border border-blue-500/30 rounded p-3 mb-3">
+                                    <p className="text-blue-300 text-sm">
+                                      <span className="font-medium">Instructions:</span> {rec.scriptInstructions}
+                                    </p>
+                                  </div>
+                                )}
+                                
+                                <div className="bg-black/50 border border-gray-600 rounded-lg p-4 max-h-80 overflow-auto">
+                                  <pre className="text-green-400 text-xs whitespace-pre-wrap font-mono">
+                                    {rec.solutionScript}
+                                  </pre>
+                                </div>
+                                
+                                <div className="mt-2 text-xs text-gray-400">
+                                  💡 This script contains everything needed to implement the solution. Copy and paste it into any AI assistant for complete implementation guidance.
+                                </div>
                               </div>
                             )}
                           </CardContent>
