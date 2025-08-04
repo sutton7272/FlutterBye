@@ -343,7 +343,7 @@ export default function FlutterAIDashboard() {
         </div>
 
         {/* Statistics Cards */}
-        {stats && (
+        {intelligenceStats && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             <Card className="bg-slate-800/50 border-purple-500/20">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -351,12 +351,12 @@ export default function FlutterAIDashboard() {
                 <Database className="h-4 w-4 text-purple-400" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold text-white">{stats.stats.totalWallets.toLocaleString()}</div>
+                <div className="text-2xl font-bold text-white">{intelligenceStats.stats.totalWallets.toLocaleString()}</div>
                 <div className="grid grid-cols-2 gap-2 mt-2 text-xs">
-                  <div className="text-green-400">FlutterBye: {stats.stats.bySource.flutterbye_connect}</div>
-                  <div className="text-blue-400">PerpeTrader: {stats.stats.bySource.perpetrader_connect}</div>
-                  <div className="text-yellow-400">Manual: {stats.stats.bySource.manual_entry}</div>
-                  <div className="text-purple-400">CSV: {stats.stats.bySource.csv_upload}</div>
+                  <div className="text-green-400">FlutterBye: {intelligenceStats.stats.bySource.flutterbye_connect}</div>
+                  <div className="text-blue-400">PerpeTrader: {intelligenceStats.stats.bySource.perpetrader_connect}</div>
+                  <div className="text-yellow-400">Manual: {intelligenceStats.stats.bySource.manual_entry}</div>
+                  <div className="text-purple-400">CSV: {intelligenceStats.stats.bySource.csv_upload}</div>
                 </div>
               </CardContent>
             </Card>
@@ -370,15 +370,15 @@ export default function FlutterAIDashboard() {
                 <div className="space-y-2">
                   <div className="flex justify-between items-center">
                     <span className="text-green-400 text-sm">Low</span>
-                    <Badge variant="default" className="bg-green-600">{stats.stats.byRiskLevel.low}</Badge>
+                    <Badge variant="default" className="bg-green-600">{intelligenceStats.stats.byRiskLevel.low}</Badge>
                   </div>
                   <div className="flex justify-between items-center">
                     <span className="text-yellow-400 text-sm">Medium</span>
-                    <Badge variant="secondary" className="bg-yellow-600">{stats.stats.byRiskLevel.medium}</Badge>
+                    <Badge variant="secondary" className="bg-yellow-600">{intelligenceStats.stats.byRiskLevel.medium}</Badge>
                   </div>
                   <div className="flex justify-between items-center">
                     <span className="text-red-400 text-sm">High+</span>
-                    <Badge variant="destructive">{stats.stats.byRiskLevel.high + stats.stats.byRiskLevel.critical}</Badge>
+                    <Badge variant="destructive">{intelligenceStats.stats.byRiskLevel.high + intelligenceStats.stats.byRiskLevel.critical}</Badge>
                   </div>
                 </div>
               </CardContent>
@@ -393,15 +393,15 @@ export default function FlutterAIDashboard() {
                 <div className="space-y-2">
                   <div className="flex justify-between">
                     <span className="text-blue-400 text-sm">Queued</span>
-                    <span className="text-white font-bold">{stats.stats.analysisStats.queued}</span>
+                    <span className="text-white font-bold">{intelligenceStats.stats.analysisStats.queued}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-yellow-400 text-sm">Processing</span>
-                    <span className="text-white font-bold">{stats.stats.analysisStats.processing}</span>
+                    <span className="text-white font-bold">{intelligenceStats.stats.analysisStats.processing}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-green-400 text-sm">Completed</span>
-                    <span className="text-white font-bold">{stats.stats.analysisStats.completed}</span>
+                    <span className="text-white font-bold">{intelligenceStats.stats.analysisStats.completed}</span>
                   </div>
                 </div>
               </CardContent>
