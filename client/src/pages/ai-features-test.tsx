@@ -321,15 +321,21 @@ export default function AIFeaturesTest() {
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              {results.type === 'viral' && results.data && (results.data.results || results.data.fallback?.results) && (
+              {results.type === 'viral' && results.data && (
                 <div className="space-y-4">
                   <div className="flex items-center gap-2 text-green-400">
                     <Zap className="w-4 h-4" />
-                    <span className="font-semibold">Generated {(results.data.results || results.data.fallback?.results || []).length} Viral Content Pieces</span>
+                    <span className="font-semibold">Generated {results.data.results?.length || 0} Viral Content Pieces</span>
                   </div>
                   
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {(results.data.results || results.data.fallback?.results || []).map((result: any, index: number) => (
+                  {/* Debug info */}
+                  <div className="text-yellow-300 text-xs">
+                    Debug: {results.data.results ? `${results.data.results.length} results found` : 'No results in data'}
+                  </div>
+                  
+                  {results.data.results && results.data.results.length > 0 ? (
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                      {results.data.results.map((result: any, index: number) => (
                       <Card key={index} className="bg-gray-900/50 border-gray-600">
                         <CardHeader className="pb-3">
                           <div className="flex items-center justify-between">
@@ -363,8 +369,13 @@ export default function AIFeaturesTest() {
                           )}
                         </CardContent>
                       </Card>
-                    ))}
-                  </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="text-red-400 p-4 border border-red-500/30 rounded">
+                      No viral content results found. Data structure: {JSON.stringify(Object.keys(results.data || {}), null, 2)}
+                    </div>
+                  )}
                   
                   {results.data.summary && (
                     <div className="mt-4 p-4 bg-green-900/20 rounded-lg border border-green-500/30">
