@@ -130,6 +130,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
           required: ['walletAddress', 'signature', 'message']
         });
       }
+      // Automatically collect wallet for FlutterAI intelligence (regardless of auth success)
+      try {
+        await flutterAIAutoCollection.collectWalletOnAuthentication(
+          walletAddress,
+          'flutterbye',
+          req.get('User-Agent'),
+          ipAddress
+        );
+        console.log(`✅ FlutterAI auto-collection success: ${walletAddress}`);
+      } catch (collectionError) {
+        // Don't fail authentication if collection fails
+        console.warn('FlutterAI auto-collection failed:', collectionError);
+      }
+
       const authResult = await productionAuth.authenticateUser(
         walletAddress,
         signature,
@@ -142,19 +156,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
           error: 'Authentication failed',
           message: 'Invalid wallet signature or expired message'
         });
-      }
-
-      // Automatically collect wallet for FlutterAI intelligence
-      try {
-        await flutterAIAutoCollection.collectWalletOnAuthentication(
-          walletAddress,
-          'flutterbye',
-          req.get('User-Agent'),
-          ipAddress
-        );
-      } catch (collectionError) {
-        // Don't fail authentication if collection fails
-        console.warn('FlutterAI auto-collection failed:', collectionError);
       }
 
       res.json({
@@ -173,6 +174,232 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     }
   });
+
+  // PerpeTrader authentication with FlutterAI auto-collection
+  app.post('/api/auth/perpetrader/login', productionAuth.rateLimiter(5, 15 * 60 * 1000), async (req, res) => {
+    try {
+      const { walletAddress, signature, message, deviceInfo, tradingProfile } = req.body;
+      const ipAddress = req.ip || req.connection.remoteAddress;
+      
+      if (!walletAddress || !signature || !message) {
+        return res.status(400).json({
+          error: 'Missing required fields',
+          required: ['walletAddress', 'signature', 'message']
+        });
+      }
+
+      // Automatically collect wallet for FlutterAI intelligence with PerpeTrader metadata (regardless of auth success)
+      try {
+        await flutterAIAutoCollection.collectWalletOnAuthentication(
+          walletAddress,
+          'perpetrader',
+          req.get('User-Agent'),
+          ipAddress,
+          {
+            tradingProfile,
+            platform: 'PerpeTrader',
+            authenticationTime: new Date().toISOString(),
+            deviceInfo
+          }
+        );
+        console.log(`✅ PerpeTrader FlutterAI auto-collection success: ${walletAddress}`);
+      } catch (collectionError) {
+        // Don't fail authentication if collection fails
+        console.warn('PerpeTrader FlutterAI auto-collection failed:', collectionError);
+      }
+
+      // Authenticate user with PerpeTrader-specific logic
+      const authResult = await productionAuth.authenticateUser(
+        walletAddress,
+        signature,
+        message,
+        deviceInfo,
+        ipAddress
+      );
+      
+      if (!authResult) {
+        return res.status(401).json({
+          error: 'Authentication failed',
+          message: 'Invalid wallet signature or expired message'
+        });
+      }
+
+      res.json({
+        success: true,
+        user: authResult.user,
+        accessToken: authResult.accessToken,
+        refreshToken: authResult.refreshToken,
+        expiresIn: '24h',
+        platform: 'PerpeTrader'
+      });
+      console.log(`✅ PerpeTrader user authenticated: ${walletAddress}`);
+    } catch (error) {
+      console.error('PerpeTrader login error:', error);
+      res.status(500).json({
+        error: 'PerpeTrader authentication service unavailable',
+        message: 'Please try again later'
+      });
+    }
+  });
+
+  // Universal FlutterAI API for any new sites/platforms
+  app.post('/api/flutterai/connect', apiRateLimitMiddleware, async (req, res) => {
+    try {
+      const { 
+        walletAddress, 
+        signature, 
+        message, 
+        platformName, 
+        platformApiKey, 
+        userMetadata,
+        deviceInfo,
+        sessionData 
+      } = req.body;
+      const ipAddress = req.ip || req.connection.remoteAddress;
+      
+      if (!walletAddress || !platformName) {
+        return res.status(400).json({
+          error: 'Missing required fields',
+          required: ['walletAddress', 'platformName']
+        });
+      }
+
+      // Verify platform API key (basic validation for now)
+      if (!platformApiKey || !platformApiKey.startsWith('flutterai_')) {
+        return res.status(401).json({
+          error: 'Invalid FlutterAI API key',
+          message: 'Contact FlutterAI to get your platform API key'
+        });
+      }
+
+      // Automatically collect wallet for FlutterAI intelligence with platform metadata
+      try {
+        await flutterAIAutoCollection.collectWalletOnAuthentication(
+          walletAddress,
+          platformName.toLowerCase().replace(/[^a-z0-9]/g, ''),
+          req.get('User-Agent'),
+          ipAddress,
+          {
+            platformName,
+            platformApiKey: platformApiKey.substring(0, 20) + '...', // Log only partial key
+            userMetadata,
+            deviceInfo,
+            sessionData,
+            integrationTime: new Date().toISOString(),
+            apiVersion: '1.0'
+          }
+        );
+
+        console.log(`🌐 FlutterAI API: Wallet collected from ${platformName}: ${walletAddress}`);
+        
+        res.json({
+          success: true,
+          message: 'Wallet successfully integrated with FlutterAI',
+          walletAddress,
+          platform: platformName,
+          timestamp: new Date().toISOString(),
+          intelligenceEnabled: true
+        });
+      } catch (collectionError) {
+        console.error('FlutterAI API collection failed:', collectionError);
+        res.status(500).json({
+          error: 'FlutterAI integration failed',
+          message: 'Could not add wallet to intelligence system'
+        });
+      }
+    } catch (error) {
+      console.error('FlutterAI API error:', error);
+      res.status(500).json({
+        error: 'FlutterAI API service unavailable',
+        message: 'Please try again later'
+      });
+    }
+  });
+
+  // Test endpoint for verifying auto-collection works
+  app.post('/api/flutterai/test-collection', async (req, res) => {
+    try {
+      const { walletAddress, source = 'test', metadata = {} } = req.body;
+      const ipAddress = req.ip || req.connection.remoteAddress;
+      
+      if (!walletAddress) {
+        return res.status(400).json({
+          error: 'Missing walletAddress'
+        });
+      }
+
+      // Test auto-collection directly
+      await flutterAIAutoCollection.collectWalletOnAuthentication(
+        walletAddress,
+        source,
+        req.get('User-Agent'),
+        ipAddress,
+        metadata
+      );
+
+      console.log(`✅ Test auto-collection success: ${walletAddress} from ${source}`);
+      
+      res.json({
+        success: true,
+        message: 'Wallet successfully collected for testing',
+        walletAddress,
+        source,
+        timestamp: new Date().toISOString()
+      });
+    } catch (error) {
+      console.error('Test collection error:', error);
+      res.status(500).json({
+        error: 'Test collection failed',
+        message: error.message
+      });
+    }
+  });
+
+  // FlutterAI API key generation endpoint for new platforms
+  app.post('/api/flutterai/register-platform', requireSuperAdmin, async (req, res) => {
+    try {
+      const { platformName, contactEmail, description, websiteUrl } = req.body;
+      
+      if (!platformName || !contactEmail) {
+        return res.status(400).json({
+          error: 'Missing required fields',
+          required: ['platformName', 'contactEmail']
+        });
+      }
+
+      // Generate API key
+      const apiKey = `flutterai_${Date.now()}_${Math.random().toString(36).substring(2, 15)}`;
+      
+      // Store platform registration (for now, just log - would store in DB in production)
+      console.log(`🔑 New FlutterAI API key generated for ${platformName}:`, {
+        apiKey,
+        platformName,
+        contactEmail,
+        description,
+        websiteUrl,
+        registeredAt: new Date().toISOString()
+      });
+
+      res.json({
+        success: true,
+        apiKey,
+        platformName,
+        message: 'FlutterAI API key generated successfully',
+        documentation: 'https://flutterai.docs/api-integration',
+        endpoints: {
+          connect: '/api/flutterai/connect',
+          rateLimit: '1000 requests/hour'
+        }
+      });
+    } catch (error) {
+      console.error('Platform registration error:', error);
+      res.status(500).json({
+        error: 'Platform registration failed',
+        message: 'Please try again later'
+      });
+    }
+  });
+
   app.post('/api/auth/refresh', async (req, res) => {
     try {
       const { refreshToken } = req.body;

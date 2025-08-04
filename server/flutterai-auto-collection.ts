@@ -16,9 +16,10 @@ export class FlutterAIAutoCollectionService {
    */
   async collectWalletOnAuthentication(
     walletAddress: string,
-    source: 'flutterbye' | 'perpetrader' = 'flutterbye',
+    source: string = 'flutterbye',
     userAgent?: string,
-    ipAddress?: string
+    ipAddress?: string,
+    additionalMetadata?: any
   ): Promise<void> {
     try {
       // Check if wallet already exists in FlutterAI intelligence
@@ -29,19 +30,26 @@ export class FlutterAIAutoCollectionService {
         return;
       }
 
+      // Determine source platform name  
+      let sourcePlatform = 'Unknown';
+      if (source === 'flutterbye') sourcePlatform = 'FlutterBye';
+      else if (source === 'perpetrader') sourcePlatform = 'PerpeTrader';
+      else sourcePlatform = additionalMetadata?.platformName || source;
+
       // Add to FlutterAI comprehensive intelligence database 
       const intelligenceData = {
         walletAddress,
         source: `automatic_collection_${source}`,
         collectedBy: 'FlutterAI Auto-Collection Service',
         collectionMethod: 'automatic',
-        sourcePlatform: source === 'flutterbye' ? 'FlutterBye' : 'PerpeTrader',
+        sourcePlatform,
         metadata: {
           connectionSource: source,
           firstConnection: new Date().toISOString(),
           userAgent,
           ipAddress,
-          connectionCount: 1
+          connectionCount: 1,
+          ...additionalMetadata // Include any additional metadata from API integrations
         }
       };
       
