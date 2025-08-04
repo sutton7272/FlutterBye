@@ -54,13 +54,10 @@ export class SelfOptimizingPlatform {
       const aiRecommendations = await this.getAIOptimizationRecommendations(currentMetrics, performanceGaps);
       const prioritizedRecommendations = this.prioritizeRecommendations(aiRecommendations);
       
-      // Generate solution scripts for each recommendation
-      const recommendationsWithScripts = await this.generateSolutionScripts(prioritizedRecommendations);
-      
       // Store recommendations for tracking
-      this.optimizationHistory.push(...recommendationsWithScripts);
+      this.optimizationHistory.push(...prioritizedRecommendations);
       
-      return recommendationsWithScripts;
+      return prioritizedRecommendations;
     } catch (error) {
       console.error('Performance analysis error:', error);
       return this.getFallbackRecommendations(currentMetrics);
@@ -156,6 +153,7 @@ export class SelfOptimizingPlatform {
         Make each recommendation specific to a blockchain communication platform with token creation, real-time chat, and AI features. Include actual technical details and code patterns that would work for this technology stack.
       `;
 
+      console.log('🤖 Making OpenAI API call for platform optimization...');
       const response = await openai.chat.completions.create({
         model: "gpt-4o", // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
         messages: [{ role: "user", content: prompt }],
@@ -163,6 +161,7 @@ export class SelfOptimizingPlatform {
         max_tokens: 4000,
         temperature: 0.7
       });
+      console.log('✅ OpenAI API call successful');
 
       const result = JSON.parse(response.choices[0].message.content || '{"recommendations":[]}');
       console.log(`✅ AI platform analysis complete: ${result.recommendations?.length || 0} recommendations generated`);
@@ -177,7 +176,13 @@ export class SelfOptimizingPlatform {
       
       return enhancedRecommendations;
     } catch (error) {
-      console.error('AI optimization analysis error:', error);
+      console.error('❌ AI optimization analysis error:', error);
+      console.error('Error details:', {
+        message: error.message,
+        code: error.code,
+        type: error.type,
+        status: error.status
+      });
       console.log('🔄 Using enhanced fallback recommendations with platform-specific analysis');
       return this.getEnhancedFallbackRecommendations(metrics, gaps);
     }
