@@ -3121,6 +3121,44 @@ function WalletManagementContent() {
     }
   };
 
+  // Refresh wallet balance from blockchain
+  const refreshWalletBalance = async (walletId: string) => {
+    try {
+      const response = await fetch(`/api/admin/platform-wallets/${walletId}/refresh-balance`, {
+        method: 'POST',
+      });
+      if (response.ok) {
+        await fetchPlatformWallets();
+        // Show success message could be added here
+      }
+    } catch (error) {
+      console.error('Error refreshing wallet balance:', error);
+    }
+  };
+
+  // Fund wallet with SOL (devnet only)
+  const fundWallet = async (walletId: string, amount: number = 1) => {
+    try {
+      const response = await fetch(`/api/admin/platform-wallets/${walletId}/fund`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ amount }),
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        await fetchPlatformWallets();
+        // Show success message with transaction hash
+        console.log('Wallet funded:', data.txHash);
+      } else {
+        const error = await response.json();
+        console.error('Error funding wallet:', error.message);
+      }
+    } catch (error) {
+      console.error('Error funding wallet:', error);
+    }
+  };
+
   const filteredWallets = selectedWalletType === 'all' 
     ? platformWallets 
     : platformWallets.filter(w => w.type === selectedWalletType);
@@ -3291,20 +3329,39 @@ function WalletManagementContent() {
                       <p className="text-xs text-slate-300">{wallet.description}</p>
                     )}
 
-                    <div className="flex gap-2">
+                    <div className="space-y-2">
+                      <div className="flex gap-2">
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => refreshWalletBalance(wallet.id)}
+                          className="text-xs flex-1"
+                        >
+                          <RefreshCw className="w-3 h-3 mr-1" />
+                          Refresh
+                        </Button>
+                        {wallet.network !== 'mainnet' && (
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => fundWallet(wallet.id, 1)}
+                            className="text-xs flex-1"
+                          >
+                            <Plus className="w-3 h-3 mr-1" />
+                            Fund
+                          </Button>
+                        )}
+                      </div>
                       {!wallet.isPrimary && (
                         <Button
                           size="sm"
                           variant="outline"
                           onClick={() => setPrimaryWallet(wallet.type, wallet.id)}
-                          className="text-xs flex-1"
+                          className="text-xs w-full"
                         >
                           Set Primary
                         </Button>
                       )}
-                      <Button size="sm" variant="outline" className="text-xs">
-                        View Details
-                      </Button>
                     </div>
                   </div>
                 </CardContent>

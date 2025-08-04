@@ -26,6 +26,8 @@ import { aiMonetizationService } from "./ai-monetization-service";
 import { aiPaymentService } from "./ai-payment-service";
 import { z } from "zod";
 import { registerNextGenAIRoutes } from "./next-gen-ai-routes";
+import { Connection, Keypair, LAMPORTS_PER_SOL, PublicKey, Transaction, SystemProgram } from '@solana/web3.js';
+import bs58 from 'bs58';
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Apply production-grade security middleware
@@ -6248,8 +6250,39 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/admin/platform-wallets", async (req, res) => {
     try {
-      const wallet = await storage.createPlatformWallet(req.body);
-      res.json(wallet);
+      // Generate real Solana keypair for the wallet
+      const keypair = Keypair.generate();
+      const address = keypair.publicKey.toString();
+      const privateKey = bs58.encode(keypair.secretKey);
+      
+      // Get initial balance from Solana network
+      let balance = "0";
+      try {
+        const connection = new Connection(
+          process.env.SOLANA_RPC_URL || 'https://api.devnet.solana.com',
+          'confirmed'
+        );
+        const balanceLamports = await connection.getBalance(keypair.publicKey);
+        balance = (balanceLamports / LAMPORTS_PER_SOL).toString();
+      } catch (balanceError) {
+        console.log("Could not fetch initial balance, defaulting to 0");
+      }
+
+      const walletData = {
+        ...req.body,
+        address,
+        privateKey, // This will be encrypted by storage layer
+        balance,
+        network: process.env.NODE_ENV === 'production' ? 'mainnet' : 'devnet'
+      };
+
+      const wallet = await storage.createPlatformWallet(walletData);
+      
+      // Remove private key from response for security
+      const safeWallet = { ...wallet };
+      delete safeWallet.privateKey;
+      
+      res.json(safeWallet);
     } catch (error) {
       console.error("Error creating platform wallet:", error);
       res.status(500).json({ message: "Failed to create platform wallet" });
@@ -6286,6 +6319,98 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error setting primary wallet:", error);
       res.status(500).json({ message: "Failed to set primary wallet" });
+    }
+  });
+
+  // Refresh wallet balance from Solana network
+  app.post("/api/admin/platform-wallets/:id/refresh-balance", async (req, res) => {
+    try {
+      const { id } = req.params;
+      const wallet = await storage.getPlatformWallet(id);
+      
+      if (!wallet || !wallet.address) {
+        return res.status(404).json({ message: "Wallet not found or has no address" });
+      }
+
+      const connection = new Connection(
+        process.env.SOLANA_RPC_URL || 'https://api.devnet.solana.com',
+        'confirmed'
+      );
+      
+      const publicKey = new PublicKey(wallet.address);
+      const balanceLamports = await connection.getBalance(publicKey);
+      const balance = (balanceLamports / LAMPORTS_PER_SOL).toString();
+      
+      const updatedWallet = await storage.updatePlatformWallet(id, { balance });
+      res.json({ success: true, balance, wallet: updatedWallet });
+    } catch (error) {
+      console.error("Error refreshing wallet balance:", error);
+      res.status(500).json({ message: "Failed to refresh wallet balance" });
+    }
+  });
+
+  // Fund wallet with SOL (devnet only - requests airdrop)
+  app.post("/api/admin/platform-wallets/:id/fund", async (req, res) => {
+    try {
+      const { id } = req.params;
+      const { amount = 1 } = req.body; // Default 1 SOL
+      
+      const wallet = await storage.getPlatformWallet(id);
+      if (!wallet || !wallet.address) {
+        return res.status(404).json({ message: "Wallet not found or has no address" });
+      }
+
+      // Only allow funding on devnet for safety
+      if (process.env.NODE_ENV === 'production') {
+        return res.status(400).json({ 
+          message: "Auto-funding not available in production. Transfer SOL manually." 
+        });
+      }
+
+      const connection = new Connection(
+        process.env.SOLANA_RPC_URL || 'https://api.devnet.solana.com',
+        'confirmed'
+      );
+      
+      const publicKey = new PublicKey(wallet.address);
+      
+      // Request airdrop (devnet only)
+      const airdropSignature = await connection.requestAirdrop(
+        publicKey,
+        amount * LAMPORTS_PER_SOL
+      );
+      
+      // Wait for confirmation
+      await connection.confirmTransaction(airdropSignature);
+      
+      // Get updated balance
+      const balanceLamports = await connection.getBalance(publicKey);
+      const balance = (balanceLamports / LAMPORTS_PER_SOL).toString();
+      
+      // Update wallet balance in database
+      const updatedWallet = await storage.updatePlatformWallet(id, { balance });
+      
+      // Record transaction
+      await storage.createWalletTransaction({
+        walletId: id,
+        transactionType: 'airdrop',
+        amount: amount.toString(),
+        currency: 'SOL',
+        txHash: airdropSignature,
+        status: 'confirmed',
+        metadata: { source: 'devnet_airdrop' }
+      });
+      
+      res.json({ 
+        success: true, 
+        balance, 
+        amount,
+        txHash: airdropSignature,
+        wallet: updatedWallet 
+      });
+    } catch (error) {
+      console.error("Error funding wallet:", error);
+      res.status(500).json({ message: "Failed to fund wallet: " + error.message });
     }
   });
 

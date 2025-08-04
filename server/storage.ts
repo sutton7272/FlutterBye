@@ -1361,6 +1361,10 @@ export class MemStorage implements IStorage {
     return Array.from(this.platformWallets.values());
   }
 
+  async getPlatformWallet(id: string): Promise<any> {
+    return this.platformWallets.get(id);
+  }
+
   async getPlatformWalletsByType(walletType: string): Promise<any[]> {
     return Array.from(this.platformWallets.values())
       .filter(wallet => wallet.walletType === walletType);
