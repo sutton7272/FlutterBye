@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -11,6 +11,7 @@ import { DollarSign, Zap, BarChart3, Brain, Loader2, Edit, Terminal, Copy } from
 export default function AIFeaturesTest() {
   const [loading, setLoading] = useState(false);
   const [results, setResults] = useState<any>(null);
+  const [error, setError] = useState<string | null>(null);
   const [testData, setTestData] = useState({
     productType: 'token_creation',
     currentPrice: 1.0,
@@ -18,6 +19,29 @@ export default function AIFeaturesTest() {
     metrics: { userCount: 100, revenue: 1000 }
   });
   const { toast } = useToast();
+
+  console.log('🔍 AIFeaturesTest component rendered, state:', { loading, results: !!results, error });
+
+  // Component error boundary effect
+  useEffect(() => {
+    const handleError = (event: ErrorEvent) => {
+      console.error('🚨 Global JavaScript error caught:', event.error);
+      setError(`JavaScript Error: ${event.error?.message || 'Unknown error'}`);
+    };
+
+    const handleUnhandledRejection = (event: PromiseRejectionEvent) => {
+      console.error('🚨 Unhandled promise rejection:', event.reason);
+      setError(`Promise Rejection: ${event.reason?.message || event.reason || 'Unknown error'}`);
+    };
+
+    window.addEventListener('error', handleError);
+    window.addEventListener('unhandledrejection', handleUnhandledRejection);
+
+    return () => {
+      window.removeEventListener('error', handleError);
+      window.removeEventListener('unhandledrejection', handleUnhandledRejection);
+    };
+  }, []);
 
   const testDynamicPricing = async () => {
     setLoading(true);
@@ -139,6 +163,7 @@ export default function AIFeaturesTest() {
 
   const testSelfOptimizing = async () => {
     console.log('🔧 Starting Self-Optimizing Platform test...');
+    setError(null);
     setLoading(true);
     
     try {
@@ -181,6 +206,11 @@ export default function AIFeaturesTest() {
         throw new Error('Invalid response format received');
       }
       
+      console.log('✅ Setting results for optimization:', { 
+        success: response.success, 
+        recommendationsCount: response.recommendations?.length 
+      });
+      
       setResults({ type: 'optimization', data: response });
       
       toast({
@@ -198,9 +228,12 @@ export default function AIFeaturesTest() {
         type: typeof error
       });
       
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      setError(`Optimization test failed: ${errorMessage}`);
+      
       toast({
         title: "Error", 
-        description: `Failed to analyze optimization: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        description: `Failed to analyze optimization: ${errorMessage}`,
         variant: "destructive",
       });
       
@@ -526,6 +559,31 @@ export const measurePageLoad = () => {
       setLoading(false);
     }
   };
+
+  // Error boundary check
+  if (error) {
+    console.error('🚨 Component error state:', error);
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 p-6">
+        <div className="max-w-4xl mx-auto text-center">
+          <div className="bg-red-900/20 border border-red-500/30 rounded-lg p-6">
+            <h2 className="text-red-400 text-xl font-bold mb-2">Component Error</h2>
+            <p className="text-red-300 mb-4">{error}</p>
+            <Button 
+              onClick={() => {
+                setError(null);
+                setResults(null);
+                setLoading(false);
+              }}
+              className="bg-red-600 hover:bg-red-700"
+            >
+              Reset Component
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 p-6">
