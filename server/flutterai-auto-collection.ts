@@ -22,11 +22,49 @@ export class FlutterAIAutoCollectionService {
     additionalMetadata?: any
   ): Promise<void> {
     try {
-      // Check if wallet already exists in FlutterAI intelligence
+      // Enhanced duplicate checking - check multiple ways to ensure no duplicates
       const existingWallet = await storage.getWalletIntelligence(walletAddress);
       
       if (existingWallet) {
-        console.log(`🔄 Wallet already exists in FlutterAI intelligence: ${walletAddress}`);
+        console.log(`🔄 Wallet already exists in FlutterAI intelligence: ${walletAddress} (skipping duplicate)`);
+        
+        // Update metadata for existing wallet to track additional connections
+        try {
+          const currentMetadata = existingWallet.metadata || {};
+          const updatedMetadata = {
+            ...currentMetadata,
+            lastConnection: new Date().toISOString(),
+            connectionCount: (currentMetadata.connectionCount || 0) + 1,
+            additionalSources: [
+              ...(currentMetadata.additionalSources || []),
+              {
+                source,
+                connectedAt: new Date().toISOString(),
+                userAgent,
+                ipAddress
+              }
+            ]
+          };
+          
+          await storage.updateWalletScore(walletAddress, { 
+            metadata: updatedMetadata,
+            updatedAt: new Date() 
+          });
+          console.log(`🔄 Updated connection metadata for existing wallet: ${walletAddress}`);
+        } catch (updateError) {
+          console.warn('Could not update existing wallet metadata:', updateError);
+        }
+        return;
+      }
+
+      // Double-check by searching all wallets to ensure absolute no duplicates
+      const allWallets = await storage.getAllWalletIntelligence();
+      const duplicateCheck = allWallets.find((w: any) => 
+        w.walletAddress?.toLowerCase() === walletAddress.toLowerCase()
+      );
+      
+      if (duplicateCheck) {
+        console.log(`🚫 DUPLICATE PREVENTED: Wallet ${walletAddress} already exists (found in search)`);
         return;
       }
 
@@ -36,28 +74,56 @@ export class FlutterAIAutoCollectionService {
       else if (source === 'perpetrader') sourcePlatform = 'PerpeTrader';
       else sourcePlatform = additionalMetadata?.platformName || source;
 
-      // Add to FlutterAI comprehensive intelligence database 
+      // Add to FlutterAI comprehensive intelligence database with unique ID generation
       const intelligenceData = {
-        walletAddress,
+        walletAddress: walletAddress.trim(), // Ensure no whitespace issues
         source: `automatic_collection_${source}`,
         collectedBy: 'FlutterAI Auto-Collection Service',
         collectionMethod: 'automatic',
         sourcePlatform,
+        socialCreditScore: 0,
+        riskLevel: 'unknown',
+        tradingBehaviorScore: 0,
+        portfolioQualityScore: 0,
+        liquidityScore: 0,
+        activityScore: 0,
+        defiEngagementScore: 0,
+        marketingSegment: 'pending_analysis',
+        communicationStyle: 'unknown',
+        preferredTokenTypes: [],
+        riskTolerance: 'moderate',
+        investmentProfile: '',
+        tradingFrequency: 'unknown',
+        portfolioSize: 'unknown',
+        influenceScore: 0,
+        socialConnections: 0,
+        marketingInsights: {
+          targetAudience: "pending analysis",
+          messagingStrategy: "pending analysis",
+          bestContactTimes: [],
+          preferredCommunicationChannels: [],
+          interests: [],
+          behaviorPatterns: [],
+          marketingRecommendations: []
+        },
+        analysisData: {},
         metadata: {
           connectionSource: source,
           firstConnection: new Date().toISOString(),
           userAgent,
           ipAddress,
           connectionCount: 1,
+          collectionId: `${Date.now()}_${Math.random().toString(36).substr(2, 9)}`, // Unique collection ID
           ...additionalMetadata // Include any additional metadata from API integrations
         }
       };
       
       const newWallet = await storage.createWalletIntelligence(intelligenceData);
-      console.log(`✅ Auto-collected new wallet for FlutterAI intelligence: ${walletAddress}`);
+      console.log(`✅ Auto-collected NEW wallet for FlutterAI intelligence: ${walletAddress} from ${sourcePlatform}`);
 
     } catch (error) {
       console.error('Error in automatic wallet collection:', error);
+      throw error; // Re-throw to help with debugging
     }
   }
 
