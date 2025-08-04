@@ -66,7 +66,7 @@ export function NextGenAIDashboard() {
       return response.json();
     },
     onSuccess: (data) => {
-      setResults(prev => ({ ...prev, pricing: data.pricing }));
+      setResults((prev: any) => ({ ...prev, pricing: data.pricing }));
       setActiveDemo(null);
     }
   });
@@ -78,7 +78,7 @@ export function NextGenAIDashboard() {
       return response.json();
     },
     onSuccess: (data) => {
-      setResults(prev => ({ ...prev, viral: data.content }));
+      setResults((prev: any) => ({ ...prev, viral: data.content }));
       setActiveDemo(null);
     }
   });
@@ -90,7 +90,7 @@ export function NextGenAIDashboard() {
       return response.json();
     },
     onSuccess: (data) => {
-      setResults(prev => ({ ...prev, optimization: data.recommendations?.slice(0, 3) }));
+      setResults((prev: any) => ({ ...prev, optimization: data.recommendations }));
       setActiveDemo(null);
     }
   });
@@ -102,7 +102,7 @@ export function NextGenAIDashboard() {
       return response.json();
     },
     onSuccess: (data) => {
-      setResults(prev => ({ ...prev, fullAnalysis: data }));
+      setResults((prev: any) => ({ ...prev, fullAnalysis: data }));
       setActiveDemo(null);
     }
   });
@@ -426,7 +426,7 @@ export function NextGenAIDashboard() {
                         </CardTitle>
                       </CardHeader>
                       <CardContent className="space-y-3">
-                        {results.optimization.slice(0, 2).map((rec: OptimizationRecommendation, index: number) => (
+                        {results.optimization.map((rec: OptimizationRecommendation, index: number) => (
                           <div key={index} className="bg-slate-800/50 p-3 rounded">
                             <div className="flex items-center justify-between mb-2">
                               <h4 className="font-semibold text-purple-300 text-sm">
