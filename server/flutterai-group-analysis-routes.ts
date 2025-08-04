@@ -51,7 +51,7 @@ router.post('/group-analysis/create', async (req, res) => {
     console.error('Error creating group analysis:', error);
     res.status(500).json({
       success: false,
-      error: error.message || 'Failed to create group analysis'
+      error: error instanceof Error ? error.message : 'Failed to create group analysis'
     });
   }
 });
@@ -87,7 +87,7 @@ router.post('/group-analysis/quick/:templateName', async (req, res) => {
     console.error('Error running quick group analysis:', error);
     res.status(500).json({
       success: false,
-      error: error.message || 'Failed to run quick group analysis'
+      error: error instanceof Error ? error.message : 'Failed to run quick group analysis'
     });
   }
 });
@@ -135,9 +135,9 @@ router.post('/group-analysis/preview', async (req, res) => {
     // Calculate basic stats
     const stats = {
       totalWallets: filteredWallets.length,
-      riskDistribution: {},
-      segmentDistribution: {},
-      platformDistribution: {},
+      riskDistribution: {} as Record<string, number>,
+      segmentDistribution: {} as Record<string, number>,
+      platformDistribution: {} as Record<string, number>,
       averageScores: {
         socialCreditScore: 0,
         tradingBehaviorScore: 0,
@@ -166,7 +166,7 @@ router.post('/group-analysis/preview', async (req, res) => {
 
     // Calculate averages
     if (filteredWallets.length > 0) {
-      Object.keys(stats.averageScores).forEach(key => {
+      (Object.keys(stats.averageScores) as Array<keyof typeof stats.averageScores>).forEach(key => {
         stats.averageScores[key] = Math.round(stats.averageScores[key] / filteredWallets.length);
       });
     }
@@ -190,6 +190,64 @@ router.post('/group-analysis/preview', async (req, res) => {
     res.status(500).json({
       success: false,
       error: 'Failed to preview group analysis'
+    });
+  }
+});
+
+// Collect wallets from token analysis
+router.post('/collect-wallets', async (req, res) => {
+  try {
+    const { walletAddresses, source, metadata } = req.body;
+    
+    if (!walletAddresses || !Array.isArray(walletAddresses)) {
+      return res.status(400).json({
+        success: false,
+        error: 'Missing or invalid walletAddresses array'
+      });
+    }
+
+    // Import storage and wallet collection service
+    const { storage } = await import('./storage');
+    const { WalletCollectionService } = await import('./wallet-collection-service');
+    const walletService = new WalletCollectionService();
+    
+    let totalCollected = 0;
+    let newWallets = 0;
+    let duplicatesSkipped = 0;
+    let aiScoringQueued = 0;
+
+    for (const address of walletAddresses) {
+      try {
+        // Check if wallet already exists
+        const existingWallet = await storage.getWalletIntelligence(address);
+        
+        if (existingWallet) {
+          duplicatesSkipped++;
+        } else {
+          // Collect new wallet using the wallet collection service
+          await walletService.collectWalletFromTokenAnalysis(address, source, metadata);
+          newWallets++;
+          aiScoringQueued++;
+        }
+        totalCollected++;
+      } catch (error) {
+        console.error(`Error processing wallet ${address}:`, error);
+        // Continue with other wallets even if one fails
+      }
+    }
+
+    res.json({
+      success: true,
+      totalCollected,
+      newWallets,
+      duplicatesSkipped,
+      aiScoringQueued
+    });
+  } catch (error) {
+    console.error('Error collecting wallets:', error);
+    res.status(500).json({
+      success: false,
+      error: error instanceof Error ? error.message : 'Failed to collect wallets'
     });
   }
 });

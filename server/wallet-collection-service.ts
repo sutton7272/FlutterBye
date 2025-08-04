@@ -257,6 +257,42 @@ export class WalletCollectionService {
   }
 
   /**
+   * Collect wallet from token analysis
+   */
+  async collectWalletFromTokenAnalysis(
+    walletAddress: string, 
+    source: string, 
+    metadata: any
+  ): Promise<void> {
+    try {
+      console.log(`🔍 Collecting wallet from token analysis: ${walletAddress}`);
+      
+      // Collect new wallet
+      const walletIntelligence = await storage.collectWalletAddress(
+        walletAddress,
+        'token_analysis'
+      );
+
+      // Update with metadata
+      await storage.updateWalletScore(walletAddress, {
+        metadata: {
+          tokenAnalysisSource: source,
+          collectionDate: new Date().toISOString(),
+          ...metadata
+        }
+      });
+
+      // Queue for AI analysis
+      await storage.addToAnalysisQueue(walletAddress, 2); // Medium priority
+
+      console.log(`✅ Collected token analysis wallet: ${walletAddress}`);
+    } catch (error) {
+      console.error(`❌ Error collecting token analysis wallet ${walletAddress}:`, error);
+      throw error;
+    }
+  }
+
+  /**
    * Get comprehensive collection statistics
    */
   async getCollectionStats(): Promise<{

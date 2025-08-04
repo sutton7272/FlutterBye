@@ -11,6 +11,7 @@ import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import FlutterAIGroupAnalysis from './flutterai-group-analysis';
+import FlutterAITokenCollector from '@/components/flutterai-token-collector';
 import { 
   Brain, 
   Wallet, 
@@ -1218,6 +1219,9 @@ export default function FlutterAIDashboard() {
                 </CardContent>
               </Card>
             </div>
+
+            {/* Token Holder Collection */}
+            <FlutterAITokenCollector />
 
             {/* Automatic Collection Status */}
             <Card className="bg-slate-800/50 border-purple-500/20">
