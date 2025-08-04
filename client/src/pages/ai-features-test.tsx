@@ -22,7 +22,7 @@ export default function AIFeaturesTest() {
   const testDynamicPricing = async () => {
     setLoading(true);
     try {
-      const response = await apiRequest("POST", "/api/ai/dynamic-pricing/calculate", {
+      const rawResponse = await apiRequest("POST", "/api/ai/dynamic-pricing/calculate", {
         userId: "demo-user",
         productType: testData.productType,
         currentPrice: testData.currentPrice,
@@ -31,12 +31,15 @@ export default function AIFeaturesTest() {
         demandLevel: 'high'
       });
       
+      const response = await rawResponse.json();
+      
       setResults({ type: 'pricing', data: response });
       toast({
         title: "Dynamic Pricing AI Activated!",
         description: `Suggested price: $${response.pricing?.suggestedPrice || testData.currentPrice} (${Math.round(((response.pricing?.priceMultiplier || 1) - 1) * 100)}% adjustment)`,
       });
     } catch (error) {
+      console.error('❌ Dynamic pricing test error:', error);
       toast({
         title: "Error",
         description: "Failed to calculate dynamic pricing",
