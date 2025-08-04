@@ -1,660 +1,828 @@
-import { useState, useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Progress } from '@/components/ui/progress';
+import React, { useState, useEffect } from 'react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Progress } from "@/components/ui/progress";
+import { useToast } from "@/hooks/use-toast";
+import { apiRequest } from "@/lib/queryClient";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { 
   Brain, 
-  Activity, 
+  Wallet, 
+  Upload, 
+  Search, 
+  AlertTriangle, 
   TrendingUp, 
   Shield, 
-  Zap, 
-  Target, 
-  BarChart3, 
-  Wallet,
-  Search,
-  Crown,
-  Award,
-  Users,
-  MessageSquare,
-  Sparkles,
+  Activity,
   Database,
-  Settings,
-  Server
-} from 'lucide-react';
-import { useQuery, useMutation } from '@tanstack/react-query';
-import { apiRequest, queryClient } from '@/lib/queryClient';
-import { useToast } from '@/hooks/use-toast';
+  FileText,
+  Download,
+  RefreshCw,
+  Zap,
+  BarChart3,
+  Globe,
+  Lock,
+  Users
+} from "lucide-react";
 
-interface WalletScore {
-  address: string;
-  flutterScore: number;
-  tier: 'Legend' | 'Elite' | 'Pro' | 'Neutral' | 'High Risk';
-  labels: string[];
-  performance: {
-    winRate: number;
-    totalTrades: number;
-    avgHoldingPeriod: number;
-    riskScore: number;
-    profitabilityScore: number;
-  };
-  analysis: {
-    tradingStyle: string;
-    riskProfile: string;
-    strengths: string[];
-    recommendations: string[];
-  };
-}
-
-interface AICapability {
-  id: string;
-  name: string;
-  description: string;
-  category: string;
-  status: 'active' | 'developing' | 'planned';
-  usage: number;
-  icon: any;
-}
-
+/**
+ * FlutterAI Intelligence Dashboard
+ * 
+ * Comprehensive wallet intelligence and social credit scoring system
+ * Features automatic collection, manual entry, CSV uploads, and AI analysis
+ */
 export default function FlutterAIDashboard() {
-  const [selectedTab, setSelectedTab] = useState('overview');
-  const [walletAddress, setWalletAddress] = useState('');
-  const [searchedWallet, setSearchedWallet] = useState<WalletScore | null>(null);
   const { toast } = useToast();
+  const queryClient = useQueryClient();
+  
+  // State management
+  const [manualWallet, setManualWallet] = useState('');
+  const [manualTags, setManualTags] = useState('');
+  const [manualNotes, setManualNotes] = useState('');
+  const [csvFile, setCsvFile] = useState<File | null>(null);
+  const [batchName, setBatchName] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedRiskLevel, setSelectedRiskLevel] = useState<string>('');
 
-  // FlutterAI capabilities data
-  const aiCapabilities: AICapability[] = [
-    {
-      id: 'wallet-scoring',
-      name: 'Wallet Scoring Engine',
-      description: 'Advanced blockchain credit scoring with 127-factor analysis',
-      category: 'Trading Intelligence',
-      status: 'active',
-      usage: 94,
-      icon: Wallet
-    },
-    {
-      id: 'aria-personality',
-      name: 'ARIA Conversational AI',
-      description: 'Advanced responsive intelligence with emotional understanding',
-      category: 'Conversational AI',
-      status: 'active',
-      usage: 98,
-      icon: MessageSquare
-    },
-    {
-      id: 'predictive-analytics',
-      name: 'Predictive Analytics',
-      description: 'Market trend prediction and viral content optimization',
-      category: 'Market Intelligence',
-      status: 'active',
-      usage: 87,
-      icon: TrendingUp
-    },
-    {
-      id: 'behavioral-labeling',
-      name: 'Behavioral Labeling',
-      description: 'AI-powered wallet classification and risk assessment',
-      category: 'Trading Intelligence',
-      status: 'active',
-      usage: 91,
-      icon: Target
-    },
-    {
-      id: 'emotion-analysis',
-      name: 'Emotion Analysis Engine',
-      description: '127-emotion detection with quantum-inspired processing',
-      category: 'Content Intelligence',
-      status: 'active',
-      usage: 96,
-      icon: Brain
-    },
-    {
-      id: 'viral-optimization',
-      name: 'Viral Optimization',
-      description: 'Content optimization for maximum engagement and reach',
-      category: 'Content Intelligence',
-      status: 'active',
-      usage: 89,
-      icon: Sparkles
-    }
-  ];
+  // Data queries
+  const { data: stats } = useQuery({
+    queryKey: ['/api/flutterai/stats'],
+    refetchInterval: 30000, // Refresh every 30 seconds
+  });
 
-  // Wallet scoring mutation
-  const walletScoringMutation = useMutation({
-    mutationFn: async (address: string) => {
-      return apiRequest('/api/flutterai/score-wallet', 'POST', { address });
+  const { data: wallets, isLoading: walletsLoading } = useQuery({
+    queryKey: ['/api/flutterai/wallets', selectedRiskLevel],
+    queryFn: async () => {
+      const url = selectedRiskLevel 
+        ? `/api/flutterai/wallets?riskLevel=${selectedRiskLevel}`
+        : '/api/flutterai/wallets';
+      return await apiRequest('GET', url);
     },
-    onSuccess: (data: any) => {
-      setSearchedWallet(data.walletScore);
+  });
+
+  const { data: batches } = useQuery({
+    queryKey: ['/api/flutterai/batches'],
+  });
+
+  const { data: queueStatus } = useQuery({
+    queryKey: ['/api/flutterai/queue-status'],
+    refetchInterval: 15000, // Refresh every 15 seconds
+  });
+
+  // Mutations
+  const manualEntryMutation = useMutation({
+    mutationFn: async (data: { walletAddress: string; tags?: string[]; notes?: string }) => {
+      return await apiRequest('POST', '/api/flutterai/collect/manual', data);
+    },
+    onSuccess: () => {
       toast({
-        title: "Wallet Analysis Complete",
-        description: `FlutterScore: ${data.walletScore.flutterScore}/1000`,
+        title: "Wallet Collected",
+        description: "Wallet address added and queued for analysis",
       });
+      setManualWallet('');
+      setManualTags('');
+      setManualNotes('');
+      queryClient.invalidateQueries({ queryKey: ['/api/flutterai/stats'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/flutterai/wallets'] });
     },
-    onError: (error) => {
+    onError: (error: any) => {
       toast({
-        title: "Analysis Failed",
-        description: "Unable to analyze wallet. Please check the address and try again.",
+        title: "Collection Failed",
+        description: error.message || "Failed to collect wallet address",
         variant: "destructive",
       });
-    }
+    },
   });
 
-  // AI capabilities query
-  const { data: aiStats } = useQuery({
-    queryKey: ['/api/flutterai/capabilities'],
-    refetchInterval: 30000
-  });
-
-  // System health query
-  const { data: systemHealth } = useQuery({
-    queryKey: ['/api/flutterai/health'],
-    refetchInterval: 10000
-  });
-
-  const handleWalletAnalysis = () => {
-    if (!walletAddress.trim()) {
+  const csvUploadMutation = useMutation({
+    mutationFn: async (formData: FormData) => {
+      const response = await fetch('/api/flutterai/collect/csv-upload', {
+        method: 'POST',
+        body: formData,
+      });
+      if (!response.ok) {
+        throw new Error('CSV upload failed');
+      }
+      return await response.json();
+    },
+    onSuccess: (data) => {
       toast({
-        title: "Address Required",
-        description: "Please enter a valid Solana wallet address",
+        title: "CSV Upload Complete",
+        description: `Processed ${data.validWallets}/${data.totalWallets} wallets successfully`,
+      });
+      setCsvFile(null);
+      setBatchName('');
+      queryClient.invalidateQueries({ queryKey: ['/api/flutterai/stats'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/flutterai/batches'] });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Upload Failed",
+        description: error.message || "Failed to process CSV file",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const processQueueMutation = useMutation({
+    mutationFn: async () => {
+      return await apiRequest('POST', '/api/flutterai/process-queue', { batchSize: 10 });
+    },
+    onSuccess: () => {
+      toast({
+        title: "Queue Processing",
+        description: "Analysis queue processing initiated",
+      });
+      queryClient.invalidateQueries({ queryKey: ['/api/flutterai/queue-status'] });
+    },
+  });
+
+  // Event handlers
+  const handleManualEntry = async () => {
+    if (!manualWallet.trim()) {
+      toast({
+        title: "Invalid Input",
+        description: "Please enter a wallet address",
         variant: "destructive",
       });
       return;
     }
-    walletScoringMutation.mutate(walletAddress);
+
+    const tags = manualTags.split(',').map(tag => tag.trim()).filter(tag => tag);
+    
+    manualEntryMutation.mutate({
+      walletAddress: manualWallet.trim(),
+      tags: tags.length > 0 ? tags : undefined,
+      notes: manualNotes.trim() || undefined,
+    });
   };
 
-  const getTierColor = (tier: string) => {
-    switch (tier) {
-      case 'Legend': return 'bg-yellow-500 text-yellow-900';
-      case 'Elite': return 'bg-purple-500 text-purple-900';
-      case 'Pro': return 'bg-blue-500 text-blue-900';
-      case 'Neutral': return 'bg-gray-500 text-gray-900';
-      case 'High Risk': return 'bg-red-500 text-red-900';
-      default: return 'bg-gray-500 text-gray-900';
+  const handleCsvUpload = async () => {
+    if (!csvFile || !batchName.trim()) {
+      toast({
+        title: "Invalid Input",
+        description: "Please select a CSV file and enter a batch name",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append('csvFile', csvFile);
+    formData.append('batchName', batchName.trim());
+
+    csvUploadMutation.mutate(formData);
+  };
+
+  const handleExport = async (format: 'json' | 'csv' = 'csv') => {
+    try {
+      let url = `/api/flutterai/export?format=${format}`;
+      if (selectedRiskLevel) {
+        url += `&riskLevel=${selectedRiskLevel}`;
+      }
+      
+      const response = await fetch(url);
+      const blob = await response.blob();
+      
+      const downloadUrl = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = downloadUrl;
+      link.download = `flutterai-wallets.${format}`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(downloadUrl);
+      
+      toast({
+        title: "Export Complete",
+        description: `Wallet data exported as ${format.toUpperCase()}`,
+      });
+    } catch (error) {
+      toast({
+        title: "Export Failed",
+        description: "Failed to export wallet data",
+        variant: "destructive",
+      });
     }
   };
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'active': return 'bg-green-500';
-      case 'developing': return 'bg-yellow-500';
-      case 'planned': return 'bg-gray-500';
+  const getRiskColor = (level: string) => {
+    switch (level) {
+      case 'low': return 'bg-green-500';
+      case 'medium': return 'bg-yellow-500';
+      case 'high': return 'bg-orange-500';
+      case 'critical': return 'bg-red-500';
       default: return 'bg-gray-500';
     }
   };
 
+  const getRiskVariant = (level: string) => {
+    switch (level) {
+      case 'low': return 'default';
+      case 'medium': return 'secondary';
+      case 'high': return 'destructive';
+      case 'critical': return 'destructive';
+      default: return 'outline';
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 p-6">
-      {/* Header */}
-      <div className="mb-8">
-        <div className="flex items-center gap-3 mb-4">
-          <div className="p-3 bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl">
-            <Brain className="h-8 w-8 text-white" />
-          </div>
-          <div>
-            <h1 className="text-4xl font-bold text-white">FlutterAI Dashboard</h1>
-            <p className="text-blue-200">Comprehensive AI Intelligence & Blockchain Analytics</p>
-          </div>
-        </div>
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 p-6">
+      <div className="max-w-7xl mx-auto space-y-6">
         
-        {/* System Health Indicators */}
-        <div className="flex gap-4 mt-4">
-          <div className="flex items-center gap-2 px-3 py-1 bg-green-500/20 rounded-full">
-            <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-            <span className="text-green-400 text-sm">All Systems Operational</span>
+        {/* Header */}
+        <div className="text-center space-y-4">
+          <div className="flex items-center justify-center gap-3">
+            <div className="p-3 bg-purple-600 rounded-xl">
+              <Brain className="h-8 w-8 text-white" />
+            </div>
+            <h1 className="text-4xl font-bold text-white">
+              FlutterAI Intelligence Dashboard
+            </h1>
           </div>
-          <div className="flex items-center gap-2 px-3 py-1 bg-blue-500/20 rounded-full">
-            <Activity className="h-4 w-4 text-blue-400" />
-            <span className="text-blue-400 text-sm">AI Processing: {(systemHealth as any)?.processingLoad || 'Unknown'}%</span>
-          </div>
-          <div className="flex items-center gap-2 px-3 py-1 bg-purple-500/20 rounded-full">
-            <Database className="h-4 w-4 text-purple-400" />
-            <span className="text-purple-400 text-sm">Wallets Analyzed: {(aiStats as any)?.walletsAnalyzed?.toLocaleString() || '0'}</span>
-          </div>
+          <p className="text-purple-200 text-lg max-w-3xl mx-auto">
+            World's first Social Credit Score system for Solana wallets. 
+            Automatically collect, analyze, and score wallet addresses with advanced AI intelligence.
+          </p>
         </div>
-      </div>
 
-      <Tabs value={selectedTab} onValueChange={setSelectedTab} className="space-y-6">
-        <TabsList className="grid w-full grid-cols-5 bg-slate-800/50 border border-blue-500/20">
-          <TabsTrigger value="overview" className="data-[state=active]:bg-blue-600">Overview</TabsTrigger>
-          <TabsTrigger value="wallet-scoring" className="data-[state=active]:bg-blue-600">Wallet Scoring</TabsTrigger>
-          <TabsTrigger value="ai-capabilities" className="data-[state=active]:bg-blue-600">AI Capabilities</TabsTrigger>
-          <TabsTrigger value="analytics" className="data-[state=active]:bg-blue-600">Analytics</TabsTrigger>
-          <TabsTrigger value="api-management" className="data-[state=active]:bg-blue-600">API Management</TabsTrigger>
-        </TabsList>
-
-        {/* Overview Tab */}
-        <TabsContent value="overview" className="space-y-6">
+        {/* Statistics Cards */}
+        {stats && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <Card className="bg-slate-800/50 border-blue-500/20">
+            <Card className="bg-slate-800/50 border-purple-500/20">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium text-blue-200">FlutterScores Generated</CardTitle>
-                <Wallet className="h-4 w-4 text-blue-400" />
+                <CardTitle className="text-sm font-medium text-purple-200">Total Wallets</CardTitle>
+                <Database className="h-4 w-4 text-purple-400" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold text-white">{(aiStats as any)?.scoresGenerated?.toLocaleString() || '0'}</div>
-                <p className="text-xs text-blue-300">+12% from last week</p>
+                <div className="text-2xl font-bold text-white">{stats.stats.totalWallets.toLocaleString()}</div>
+                <div className="grid grid-cols-2 gap-2 mt-2 text-xs">
+                  <div className="text-green-400">FlutterBye: {stats.stats.bySource.flutterbye_connect}</div>
+                  <div className="text-blue-400">PerpeTrader: {stats.stats.bySource.perpetrader_connect}</div>
+                  <div className="text-yellow-400">Manual: {stats.stats.bySource.manual_entry}</div>
+                  <div className="text-purple-400">CSV: {stats.stats.bySource.csv_upload}</div>
+                </div>
               </CardContent>
             </Card>
 
             <Card className="bg-slate-800/50 border-purple-500/20">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium text-purple-200">AI Conversations</CardTitle>
-                <MessageSquare className="h-4 w-4 text-purple-400" />
+                <CardTitle className="text-sm font-medium text-purple-200">Risk Distribution</CardTitle>
+                <Shield className="h-4 w-4 text-purple-400" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold text-white">{(aiStats as any)?.conversationsProcessed?.toLocaleString() || '0'}</div>
-                <p className="text-xs text-purple-300">+23% from last week</p>
+                <div className="space-y-2">
+                  <div className="flex justify-between items-center">
+                    <span className="text-green-400 text-sm">Low</span>
+                    <Badge variant="default" className="bg-green-600">{stats.stats.byRiskLevel.low}</Badge>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-yellow-400 text-sm">Medium</span>
+                    <Badge variant="secondary" className="bg-yellow-600">{stats.stats.byRiskLevel.medium}</Badge>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-red-400 text-sm">High+</span>
+                    <Badge variant="destructive">{stats.stats.byRiskLevel.high + stats.stats.byRiskLevel.critical}</Badge>
+                  </div>
+                </div>
               </CardContent>
             </Card>
 
-            <Card className="bg-slate-800/50 border-green-500/20">
+            <Card className="bg-slate-800/50 border-purple-500/20">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium text-green-200">API Requests</CardTitle>
-                <Server className="h-4 w-4 text-green-400" />
+                <CardTitle className="text-sm font-medium text-purple-200">Analysis Queue</CardTitle>
+                <Activity className="h-4 w-4 text-purple-400" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold text-white">{(aiStats as any)?.apiRequests?.toLocaleString() || '0'}</div>
-                <p className="text-xs text-green-300">+34% from last week</p>
+                <div className="space-y-2">
+                  <div className="flex justify-between">
+                    <span className="text-blue-400 text-sm">Queued</span>
+                    <span className="text-white font-bold">{stats.stats.analysisStats.queued}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-yellow-400 text-sm">Processing</span>
+                    <span className="text-white font-bold">{stats.stats.analysisStats.processing}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-green-400 text-sm">Completed</span>
+                    <span className="text-white font-bold">{stats.stats.analysisStats.completed}</span>
+                  </div>
+                </div>
               </CardContent>
             </Card>
 
-            <Card className="bg-slate-800/50 border-yellow-500/20">
+            <Card className="bg-slate-800/50 border-purple-500/20">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium text-yellow-200">Revenue Generated</CardTitle>
-                <TrendingUp className="h-4 w-4 text-yellow-400" />
+                <CardTitle className="text-sm font-medium text-purple-200">System Status</CardTitle>
+                <Zap className="h-4 w-4 text-purple-400" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold text-white">${(aiStats as any)?.revenueGenerated?.toLocaleString() || '0'}</div>
-                <p className="text-xs text-yellow-300">+45% from last week</p>
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2">
+                    <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                    <span className="text-green-400 text-sm">AI Analysis Active</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
+                    <span className="text-blue-400 text-sm">Auto Collection ON</span>
+                  </div>
+                  <Button
+                    onClick={() => processQueueMutation.mutate()}
+                    disabled={processQueueMutation.isPending}
+                    size="sm"
+                    className="w-full mt-2 bg-purple-600 hover:bg-purple-700"
+                  >
+                    {processQueueMutation.isPending ? (
+                      <RefreshCw className="h-3 w-3 animate-spin" />
+                    ) : (
+                      'Process Queue'
+                    )}
+                  </Button>
+                </div>
               </CardContent>
             </Card>
           </div>
+        )}
 
-          {/* AI Capabilities Overview */}
-          <Card className="bg-slate-800/50 border-blue-500/20">
-            <CardHeader>
-              <CardTitle className="text-white flex items-center gap-2">
-                <Sparkles className="h-5 w-5 text-blue-400" />
-                Active AI Capabilities
-              </CardTitle>
-              <CardDescription className="text-blue-200">
-                Real-time status of all FlutterAI systems
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {aiCapabilities.map((capability) => {
-                  const IconComponent = capability.icon;
-                  return (
-                    <div key={capability.id} className="p-4 bg-slate-700/50 rounded-lg border border-slate-600/50">
-                      <div className="flex items-center justify-between mb-2">
-                        <IconComponent className="h-5 w-5 text-blue-400" />
-                        <Badge className={`${getStatusColor(capability.status)} text-white`}>
-                          {capability.status}
-                        </Badge>
-                      </div>
-                      <h3 className="font-semibold text-white mb-1">{capability.name}</h3>
-                      <p className="text-sm text-slate-300 mb-3">{capability.description}</p>
-                      <div className="space-y-2">
-                        <div className="flex justify-between text-sm">
-                          <span className="text-slate-400">Usage</span>
-                          <span className="text-white">{capability.usage}%</span>
-                        </div>
-                        <Progress value={capability.usage} className="h-2" />
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
+        {/* Main Dashboard Tabs */}
+        <Tabs defaultValue="collection" className="space-y-6">
+          <TabsList className="grid w-full grid-cols-5 bg-slate-800/50">
+            <TabsTrigger value="collection" className="data-[state=active]:bg-purple-600">
+              <Upload className="h-4 w-4 mr-2" />
+              Collection
+            </TabsTrigger>
+            <TabsTrigger value="analysis" className="data-[state=active]:bg-purple-600">
+              <Brain className="h-4 w-4 mr-2" />
+              Analysis
+            </TabsTrigger>
+            <TabsTrigger value="wallets" className="data-[state=active]:bg-purple-600">
+              <Wallet className="h-4 w-4 mr-2" />
+              Wallets
+            </TabsTrigger>
+            <TabsTrigger value="batches" className="data-[state=active]:bg-purple-600">
+              <FileText className="h-4 w-4 mr-2" />
+              Batches
+            </TabsTrigger>
+            <TabsTrigger value="reports" className="data-[state=active]:bg-purple-600">
+              <BarChart3 className="h-4 w-4 mr-2" />
+              Reports
+            </TabsTrigger>
+          </TabsList>
 
-        {/* Wallet Scoring Tab */}
-        <TabsContent value="wallet-scoring" className="space-y-6">
-          {/* Wallet Analysis Input */}
-          <Card className="bg-slate-800/50 border-blue-500/20">
-            <CardHeader>
-              <CardTitle className="text-white flex items-center gap-2">
-                <Search className="h-5 w-5 text-blue-400" />
-                Wallet Scoring Engine
-              </CardTitle>
-              <CardDescription className="text-blue-200">
-                Analyze any Solana wallet with advanced AI-powered credit scoring
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="flex gap-4">
-                <Input
-                  placeholder="Enter Solana wallet address..."
-                  value={walletAddress}
-                  onChange={(e) => setWalletAddress(e.target.value)}
-                  className="flex-1 bg-slate-700 border-slate-600 text-white placeholder-slate-400"
-                />
-                <Button
-                  onClick={handleWalletAnalysis}
-                  disabled={walletScoringMutation.isPending}
-                  className="bg-blue-600 hover:bg-blue-700"
-                >
-                  {walletScoringMutation.isPending ? (
-                    <div className="flex items-center gap-2">
-                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                      Analyzing...
-                    </div>
-                  ) : (
-                    'Analyze Wallet'
-                  )}
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Wallet Analysis Results */}
-          {searchedWallet && (
+          {/* Collection Tab */}
+          <TabsContent value="collection" className="space-y-6">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {/* FlutterScore Overview */}
-              <Card className="bg-slate-800/50 border-blue-500/20">
-                <CardHeader>
-                  <CardTitle className="text-white flex items-center gap-2">
-                    <Crown className="h-5 w-5 text-yellow-400" />
-                    FlutterScore Analysis
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="text-center">
-                    <div className="text-4xl font-bold text-white mb-2">{searchedWallet.flutterScore}/1000</div>
-                    <Badge className={`${getTierColor(searchedWallet.tier)} text-lg px-4 py-1`}>
-                      {searchedWallet.tier}
-                    </Badge>
-                  </div>
-                  
-                  <div className="space-y-3">
-                    <div className="flex justify-between">
-                      <span className="text-slate-400">Win Rate</span>
-                      <span className="text-white">{searchedWallet.performance.winRate}%</span>
-                    </div>
-                    <Progress value={searchedWallet.performance.winRate} className="h-2" />
-                    
-                    <div className="flex justify-between">
-                      <span className="text-slate-400">Risk Score</span>
-                      <span className="text-white">{searchedWallet.performance.riskScore}/10</span>
-                    </div>
-                    <Progress value={searchedWallet.performance.riskScore * 10} className="h-2" />
-                    
-                    <div className="flex justify-between">
-                      <span className="text-slate-400">Profitability</span>
-                      <span className="text-white">{searchedWallet.performance.profitabilityScore}/10</span>
-                    </div>
-                    <Progress value={searchedWallet.performance.profitabilityScore * 10} className="h-2" />
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* AI Analysis */}
+              
+              {/* Manual Entry */}
               <Card className="bg-slate-800/50 border-purple-500/20">
                 <CardHeader>
                   <CardTitle className="text-white flex items-center gap-2">
-                    <Brain className="h-5 w-5 text-purple-400" />
-                    AI Behavioral Analysis
+                    <Wallet className="h-5 w-5 text-purple-400" />
+                    Manual Wallet Entry
                   </CardTitle>
+                  <CardDescription className="text-purple-200">
+                    Add individual wallet addresses for analysis
+                  </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div>
-                    <h4 className="text-white font-semibold mb-2">Trading Style</h4>
-                    <p className="text-slate-300">{searchedWallet.analysis.tradingStyle}</p>
+                    <Label htmlFor="manual-wallet" className="text-purple-200">Wallet Address</Label>
+                    <Input
+                      id="manual-wallet"
+                      value={manualWallet}
+                      onChange={(e) => setManualWallet(e.target.value)}
+                      placeholder="Enter Solana wallet address..."
+                      className="bg-slate-700 border-purple-500/20 text-white"
+                    />
                   </div>
-                  
                   <div>
-                    <h4 className="text-white font-semibold mb-2">Risk Profile</h4>
-                    <p className="text-slate-300">{searchedWallet.analysis.riskProfile}</p>
+                    <Label htmlFor="manual-tags" className="text-purple-200">Tags (comma-separated)</Label>
+                    <Input
+                      id="manual-tags"
+                      value={manualTags}
+                      onChange={(e) => setManualTags(e.target.value)}
+                      placeholder="e.g., high-value, suspicious, whale"
+                      className="bg-slate-700 border-purple-500/20 text-white"
+                    />
                   </div>
-                  
                   <div>
-                    <h4 className="text-white font-semibold mb-2">Behavioral Labels</h4>
-                    <div className="flex flex-wrap gap-2">
-                      {searchedWallet.labels.map((label, index) => (
-                        <Badge key={index} variant="outline" className="border-blue-500 text-blue-400">
-                          {label}
-                        </Badge>
-                      ))}
-                    </div>
+                    <Label htmlFor="manual-notes" className="text-purple-200">Notes</Label>
+                    <Input
+                      id="manual-notes"
+                      value={manualNotes}
+                      onChange={(e) => setManualNotes(e.target.value)}
+                      placeholder="Additional notes about this wallet..."
+                      className="bg-slate-700 border-purple-500/20 text-white"
+                    />
                   </div>
-                  
+                  <Button
+                    onClick={handleManualEntry}
+                    disabled={manualEntryMutation.isPending}
+                    className="w-full bg-purple-600 hover:bg-purple-700"
+                  >
+                    {manualEntryMutation.isPending ? (
+                      <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+                    ) : (
+                      <Wallet className="h-4 w-4 mr-2" />
+                    )}
+                    Add Wallet
+                  </Button>
+                </CardContent>
+              </Card>
+
+              {/* CSV Upload */}
+              <Card className="bg-slate-800/50 border-purple-500/20">
+                <CardHeader>
+                  <CardTitle className="text-white flex items-center gap-2">
+                    <Upload className="h-5 w-5 text-purple-400" />
+                    Bulk CSV Upload
+                  </CardTitle>
+                  <CardDescription className="text-purple-200">
+                    Upload multiple wallet addresses from CSV file
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
                   <div>
-                    <h4 className="text-white font-semibold mb-2">Strengths</h4>
-                    <ul className="text-slate-300 space-y-1">
-                      {searchedWallet.analysis.strengths.map((strength, index) => (
-                        <li key={index} className="flex items-center gap-2">
-                          <div className="w-1.5 h-1.5 bg-green-400 rounded-full"></div>
-                          {strength}
-                        </li>
-                      ))}
-                    </ul>
+                    <Label htmlFor="batch-name" className="text-purple-200">Batch Name</Label>
+                    <Input
+                      id="batch-name"
+                      value={batchName}
+                      onChange={(e) => setBatchName(e.target.value)}
+                      placeholder="Enter batch name..."
+                      className="bg-slate-700 border-purple-500/20 text-white"
+                    />
                   </div>
+                  <div>
+                    <Label htmlFor="csv-file" className="text-purple-200">CSV File</Label>
+                    <Input
+                      id="csv-file"
+                      type="file"
+                      accept=".csv"
+                      onChange={(e) => setCsvFile(e.target.files?.[0] || null)}
+                      className="bg-slate-700 border-purple-500/20 text-white"
+                    />
+                  </div>
+                  <Alert className="bg-slate-700/50 border-purple-500/20">
+                    <AlertTriangle className="h-4 w-4 text-yellow-400" />
+                    <AlertDescription className="text-purple-200">
+                      CSV format: First column should contain wallet addresses. Headers will be automatically detected.
+                    </AlertDescription>
+                  </Alert>
+                  <Button
+                    onClick={handleCsvUpload}
+                    disabled={csvUploadMutation.isPending || !csvFile || !batchName}
+                    className="w-full bg-purple-600 hover:bg-purple-700"
+                  >
+                    {csvUploadMutation.isPending ? (
+                      <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+                    ) : (
+                      <Upload className="h-4 w-4 mr-2" />
+                    )}
+                    Upload CSV
+                  </Button>
                 </CardContent>
               </Card>
             </div>
-          )}
 
-          {/* Top Performers */}
-          <Card className="bg-slate-800/50 border-green-500/20">
-            <CardHeader>
-              <CardTitle className="text-white flex items-center gap-2">
-                <Award className="h-5 w-5 text-green-400" />
-                Top Performing Wallets
-              </CardTitle>
-              <CardDescription className="text-green-200">
-                Highest FlutterScore wallets in the past 30 days
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                {[
-                  { rank: 1, address: '7K8...x9Z', score: 987, tier: 'Legend', gain: '+12%' },
-                  { rank: 2, address: '3R9...m4L', score: 974, tier: 'Legend', gain: '+8%' },
-                  { rank: 3, address: '9P2...k7N', score: 961, tier: 'Elite', gain: '+15%' },
-                  { rank: 4, address: '5M8...w3Q', score: 955, tier: 'Elite', gain: '+22%' },
-                  { rank: 5, address: '8L5...v6R', score: 943, tier: 'Elite', gain: '+18%' }
-                ].map((wallet) => (
-                  <div key={wallet.rank} className="flex items-center justify-between p-3 bg-slate-700/50 rounded-lg">
-                    <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 bg-gradient-to-r from-yellow-400 to-yellow-600 rounded-full flex items-center justify-center text-white font-bold">
-                        {wallet.rank}
-                      </div>
-                      <div>
-                        <div className="text-white font-semibold">{wallet.address}</div>
-                        <Badge className={`${getTierColor(wallet.tier)} text-xs`}>
-                          {wallet.tier}
-                        </Badge>
-                      </div>
-                    </div>
-                    <div className="text-right">
-                      <div className="text-white font-bold">{wallet.score}/1000</div>
-                      <div className="text-green-400 text-sm">{wallet.gain}</div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        {/* AI Capabilities Tab */}
-        <TabsContent value="ai-capabilities" className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {aiCapabilities.map((capability) => {
-              const IconComponent = capability.icon;
-              return (
-                <Card key={capability.id} className="bg-slate-800/50 border-blue-500/20">
-                  <CardHeader>
-                    <div className="flex items-center justify-between">
-                      <IconComponent className="h-8 w-8 text-blue-400" />
-                      <Badge className={`${getStatusColor(capability.status)} text-white`}>
-                        {capability.status}
-                      </Badge>
-                    </div>
-                    <CardTitle className="text-white">{capability.name}</CardTitle>
-                    <CardDescription className="text-slate-300">
-                      {capability.description}
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-3">
-                      <div className="flex justify-between text-sm">
-                        <span className="text-slate-400">Category</span>
-                        <span className="text-white">{capability.category}</span>
-                      </div>
-                      <div className="flex justify-between text-sm">
-                        <span className="text-slate-400">Usage</span>
-                        <span className="text-white">{capability.usage}%</span>
-                      </div>
-                      <Progress value={capability.usage} className="h-2" />
-                      <Button variant="outline" className="w-full border-blue-500 text-blue-400 hover:bg-blue-500 hover:text-white">
-                        Manage Capability
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              );
-            })}
-          </div>
-        </TabsContent>
-
-        {/* Analytics Tab */}
-        <TabsContent value="analytics" className="space-y-6">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <Card className="bg-slate-800/50 border-blue-500/20">
-              <CardHeader>
-                <CardTitle className="text-white flex items-center gap-2">
-                  <BarChart3 className="h-5 w-5 text-blue-400" />
-                  Usage Analytics
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <div className="flex justify-between items-center">
-                    <span className="text-slate-400">Daily Active Users</span>
-                    <span className="text-white font-bold">2,847</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-slate-400">API Calls Today</span>
-                    <span className="text-white font-bold">45,623</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-slate-400">Average Response Time</span>
-                    <span className="text-white font-bold">127ms</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-slate-400">Success Rate</span>
-                    <span className="text-green-400 font-bold">99.8%</span>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
+            {/* Automatic Collection Status */}
             <Card className="bg-slate-800/50 border-purple-500/20">
               <CardHeader>
                 <CardTitle className="text-white flex items-center gap-2">
-                  <Users className="h-5 w-5 text-purple-400" />
-                  User Engagement
+                  <Globe className="h-5 w-5 text-purple-400" />
+                  Automatic Collection Status
                 </CardTitle>
+                <CardDescription className="text-purple-200">
+                  Real-time wallet collection from FlutterBye and PerpeTrader connections
+                </CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="space-y-4">
-                  <div className="flex justify-between items-center">
-                    <span className="text-slate-400">Wallet Analyses</span>
-                    <span className="text-white font-bold">1,234</span>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="flex items-center justify-between p-4 bg-slate-700/50 rounded-lg">
+                    <div className="flex items-center gap-3">
+                      <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
+                      <span className="text-white font-medium">FlutterBye Webhook</span>
+                    </div>
+                    <Badge variant="default" className="bg-green-600">Active</Badge>
                   </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-slate-400">AI Conversations</span>
-                    <span className="text-white font-bold">8,901</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-slate-400">Feature Adoption</span>
-                    <span className="text-white font-bold">78%</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-slate-400">User Retention</span>
-                    <span className="text-green-400 font-bold">85%</span>
+                  <div className="flex items-center justify-between p-4 bg-slate-700/50 rounded-lg">
+                    <div className="flex items-center gap-3">
+                      <div className="w-3 h-3 bg-blue-500 rounded-full animate-pulse"></div>
+                      <span className="text-white font-medium">PerpeTrader Webhook</span>
+                    </div>
+                    <Badge variant="default" className="bg-blue-600">Active</Badge>
                   </div>
                 </div>
               </CardContent>
             </Card>
-          </div>
-        </TabsContent>
+          </TabsContent>
 
-        {/* API Management Tab */}
-        <TabsContent value="api-management" className="space-y-6">
-          <Card className="bg-slate-800/50 border-blue-500/20">
-            <CardHeader>
-              <CardTitle className="text-white flex items-center gap-2">
-                <Server className="h-5 w-5 text-blue-400" />
-                FlutterAI API Management
-              </CardTitle>
-              <CardDescription className="text-blue-200">
-                Manage API access, monitor usage, and configure endpoints
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-4">
-                  <h3 className="text-white font-semibold">Available Endpoints</h3>
-                  <div className="space-y-2">
-                    {[
-                      { endpoint: '/api/flutterai/score-wallet', method: 'POST', status: 'Active' },
-                      { endpoint: '/api/flutterai/analyze-behavior', method: 'POST', status: 'Active' },
-                      { endpoint: '/api/flutterai/conversation', method: 'POST', status: 'Active' },
-                      { endpoint: '/api/flutterai/predict-viral', method: 'POST', status: 'Active' },
-                      { endpoint: '/api/flutterai/optimize-content', method: 'POST', status: 'Active' }
-                    ].map((api, index) => (
-                      <div key={index} className="flex items-center justify-between p-3 bg-slate-700/50 rounded-lg">
-                        <div>
-                          <span className="text-white font-mono text-sm">{api.endpoint}</span>
-                          <Badge variant="outline" className="ml-2 border-blue-500 text-blue-400">
-                            {api.method}
-                          </Badge>
+          {/* Analysis Tab */}
+          <TabsContent value="analysis">
+            <Card className="bg-slate-800/50 border-purple-500/20">
+              <CardHeader>
+                <CardTitle className="text-white flex items-center gap-2">
+                  <Brain className="h-5 w-5 text-purple-400" />
+                  AI Analysis Engine
+                </CardTitle>
+                <CardDescription className="text-purple-200">
+                  Advanced AI-powered wallet intelligence and social credit scoring
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <div className="text-center p-6 bg-slate-700/50 rounded-lg">
+                    <Brain className="h-12 w-12 text-purple-400 mx-auto mb-4" />
+                    <h3 className="text-lg font-bold text-white mb-2">Social Credit Scoring</h3>
+                    <p className="text-purple-200 text-sm">
+                      0-1000 point scoring system based on trading behavior, portfolio quality, and activity patterns
+                    </p>
+                  </div>
+                  <div className="text-center p-6 bg-slate-700/50 rounded-lg">
+                    <Shield className="h-12 w-12 text-yellow-400 mx-auto mb-4" />
+                    <h3 className="text-lg font-bold text-white mb-2">Risk Assessment</h3>
+                    <p className="text-purple-200 text-sm">
+                      Multi-level risk classification from low to critical based on behavioral analysis
+                    </p>
+                  </div>
+                  <div className="text-center p-6 bg-slate-700/50 rounded-lg">
+                    <TrendingUp className="h-12 w-12 text-green-400 mx-auto mb-4" />
+                    <h3 className="text-lg font-bold text-white mb-2">Behavioral Patterns</h3>
+                    <p className="text-purple-200 text-sm">
+                      Trading volume, DeFi engagement, liquidity management, and portfolio diversity analysis
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Wallets Tab */}
+          <TabsContent value="wallets" className="space-y-6">
+            <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
+              <div className="flex gap-2">
+                <Button
+                  variant={selectedRiskLevel === '' ? 'default' : 'outline'}
+                  onClick={() => setSelectedRiskLevel('')}
+                  className="bg-purple-600 hover:bg-purple-700"
+                >
+                  All Risks
+                </Button>
+                <Button
+                  variant={selectedRiskLevel === 'low' ? 'default' : 'outline'}
+                  onClick={() => setSelectedRiskLevel('low')}
+                  className="bg-green-600 hover:bg-green-700"
+                >
+                  Low Risk
+                </Button>
+                <Button
+                  variant={selectedRiskLevel === 'medium' ? 'default' : 'outline'}
+                  onClick={() => setSelectedRiskLevel('medium')}
+                  className="bg-yellow-600 hover:bg-yellow-700"
+                >
+                  Medium Risk
+                </Button>
+                <Button
+                  variant={selectedRiskLevel === 'high' ? 'default' : 'outline'}
+                  onClick={() => setSelectedRiskLevel('high')}
+                  className="bg-red-600 hover:bg-red-700"
+                >
+                  High Risk
+                </Button>
+              </div>
+              <Button
+                onClick={() => handleExport('csv')}
+                variant="outline"
+                className="border-purple-500 text-purple-300 hover:bg-purple-600"
+              >
+                <Download className="h-4 w-4 mr-2" />
+                Export CSV
+              </Button>
+            </div>
+
+            <Card className="bg-slate-800/50 border-purple-500/20">
+              <CardHeader>
+                <CardTitle className="text-white">Wallet Intelligence Database</CardTitle>
+                <CardDescription className="text-purple-200">
+                  {walletsLoading ? 'Loading...' : `${wallets?.wallets?.length || 0} wallets found`}
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                {walletsLoading ? (
+                  <div className="flex items-center justify-center py-8">
+                    <RefreshCw className="h-8 w-8 animate-spin text-purple-400" />
+                  </div>
+                ) : (
+                  <div className="space-y-4 max-h-96 overflow-y-auto">
+                    {wallets?.wallets?.map((wallet: any) => (
+                      <div
+                        key={wallet.walletAddress}
+                        className="p-4 bg-slate-700/50 rounded-lg border border-purple-500/10"
+                      >
+                        <div className="flex items-center justify-between mb-2">
+                          <div className="flex items-center gap-2">
+                            <code className="text-purple-300 text-sm font-mono">
+                              {wallet.walletAddress.slice(0, 8)}...{wallet.walletAddress.slice(-8)}
+                            </code>
+                            <Badge 
+                              variant={getRiskVariant(wallet.riskLevel)}
+                              className={`${getRiskColor(wallet.riskLevel)} text-white`}
+                            >
+                              {wallet.riskLevel.toUpperCase()}
+                            </Badge>
+                          </div>
+                          <div className="text-right">
+                            <div className="text-2xl font-bold text-white">
+                              {wallet.socialCreditScore}
+                            </div>
+                            <div className="text-xs text-purple-300">Credit Score</div>
+                          </div>
                         </div>
-                        <Badge className="bg-green-500 text-white">
-                          {api.status}
-                        </Badge>
+                        
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                          <div>
+                            <div className="text-purple-200">Trading</div>
+                            <div className="text-white font-medium">{wallet.tradingBehaviorScore}/100</div>
+                          </div>
+                          <div>
+                            <div className="text-purple-200">Portfolio</div>
+                            <div className="text-white font-medium">{wallet.portfolioQualityScore}/100</div>
+                          </div>
+                          <div>
+                            <div className="text-purple-200">Liquidity</div>
+                            <div className="text-white font-medium">{wallet.liquidityScore}/100</div>
+                          </div>
+                          <div>
+                            <div className="text-purple-200">Activity</div>
+                            <div className="text-white font-medium">{wallet.activityScore}/100</div>
+                          </div>
+                        </div>
+                        
+                        <div className="mt-3 flex items-center justify-between text-xs text-purple-300">
+                          <span>Source: {wallet.collectionSource.replace('_', ' ')}</span>
+                          <span>
+                            {wallet.lastAnalyzed 
+                              ? `Analyzed ${new Date(wallet.lastAnalyzed).toLocaleDateString()}`
+                              : 'Analysis pending'
+                            }
+                          </span>
+                        </div>
                       </div>
                     ))}
                   </div>
-                </div>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
 
+          {/* Batches Tab */}
+          <TabsContent value="batches">
+            <Card className="bg-slate-800/50 border-purple-500/20">
+              <CardHeader>
+                <CardTitle className="text-white flex items-center gap-2">
+                  <FileText className="h-5 w-5 text-purple-400" />
+                  Upload Batches
+                </CardTitle>
+                <CardDescription className="text-purple-200">
+                  Track and manage CSV upload batches
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
                 <div className="space-y-4">
-                  <h3 className="text-white font-semibold">API Usage Limits</h3>
-                  <div className="space-y-3">
-                    <div>
-                      <div className="flex justify-between text-sm mb-1">
-                        <span className="text-slate-400">Daily Requests</span>
-                        <span className="text-white">8,234 / 10,000</span>
+                  {batches?.batches?.map((batch: any) => (
+                    <div
+                      key={batch.id}
+                      className="p-4 bg-slate-700/50 rounded-lg border border-purple-500/10"
+                    >
+                      <div className="flex items-center justify-between mb-2">
+                        <h3 className="text-lg font-semibold text-white">{batch.batchName}</h3>
+                        <Badge variant="outline" className="border-purple-500 text-purple-300">
+                          {batch.fileName}
+                        </Badge>
                       </div>
-                      <Progress value={82.34} className="h-2" />
-                    </div>
-                    <div>
-                      <div className="flex justify-between text-sm mb-1">
-                        <span className="text-slate-400">Rate Limit</span>
-                        <span className="text-white">45 / 100 req/min</span>
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                        <div>
+                          <div className="text-purple-200">Total Wallets</div>
+                          <div className="text-white font-medium">{batch.totalWallets}</div>
+                        </div>
+                        <div>
+                          <div className="text-purple-200">Processed</div>
+                          <div className="text-white font-medium">{batch.processedWallets || 0}</div>
+                        </div>
+                        <div>
+                          <div className="text-purple-200">Uploaded By</div>
+                          <div className="text-white font-medium">{batch.uploadedBy}</div>
+                        </div>
+                        <div>
+                          <div className="text-purple-200">Date</div>
+                          <div className="text-white font-medium">
+                            {new Date(batch.createdAt).toLocaleDateString()}
+                          </div>
+                        </div>
                       </div>
-                      <Progress value={45} className="h-2" />
+                      <Progress 
+                        value={(batch.processedWallets / batch.totalWallets) * 100} 
+                        className="mt-3"
+                      />
                     </div>
-                  </div>
-
-                  <Button className="w-full bg-blue-600 hover:bg-blue-700">
-                    Generate API Key
-                  </Button>
+                  ))}
                 </div>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Reports Tab */}
+          <TabsContent value="reports">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <Card className="bg-slate-800/50 border-purple-500/20">
+                <CardHeader>
+                  <CardTitle className="text-white flex items-center gap-2">
+                    <BarChart3 className="h-5 w-5 text-purple-400" />
+                    System Analytics
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  {stats && (
+                    <div className="space-y-6">
+                      <div>
+                        <h4 className="text-purple-200 mb-3">Collection Sources</h4>
+                        <div className="space-y-2">
+                          {Object.entries(stats.stats.bySource).map(([source, count]) => (
+                            <div key={source} className="flex justify-between items-center">
+                              <span className="text-white capitalize">{source.replace('_', ' ')}</span>
+                              <Badge variant="outline" className="border-purple-500 text-purple-300">
+                                {count}
+                              </Badge>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                      
+                      <div>
+                        <h4 className="text-purple-200 mb-3">Risk Distribution</h4>
+                        <div className="space-y-2">
+                          {Object.entries(stats.stats.byRiskLevel).map(([level, count]) => (
+                            <div key={level} className="flex justify-between items-center">
+                              <span className="text-white capitalize">{level}</span>
+                              <Badge 
+                                variant={getRiskVariant(level)}
+                                className={`${getRiskColor(level)} text-white`}
+                              >
+                                {count}
+                              </Badge>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+              
+              <Card className="bg-slate-800/50 border-purple-500/20">
+                <CardHeader>
+                  <CardTitle className="text-white flex items-center gap-2">
+                    <Download className="h-5 w-5 text-purple-400" />
+                    Data Export
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="grid grid-cols-2 gap-3">
+                    <Button
+                      onClick={() => handleExport('csv')}
+                      variant="outline"
+                      className="border-purple-500 text-purple-300 hover:bg-purple-600"
+                    >
+                      <FileText className="h-4 w-4 mr-2" />
+                      Export CSV
+                    </Button>
+                    <Button
+                      onClick={() => handleExport('json')}
+                      variant="outline"
+                      className="border-purple-500 text-purple-300 hover:bg-purple-600"
+                    >
+                      <Database className="h-4 w-4 mr-2" />
+                      Export JSON
+                    </Button>
+                  </div>
+                  
+                  <Alert className="bg-slate-700/50 border-purple-500/20">
+                    <Lock className="h-4 w-4 text-purple-400" />
+                    <AlertDescription className="text-purple-200">
+                      Exported data includes wallet addresses, scores, risk levels, and analysis metadata.
+                      Handle with appropriate security measures.
+                    </AlertDescription>
+                  </Alert>
+                </CardContent>
+              </Card>
+            </div>
+          </TabsContent>
+        </Tabs>
+      </div>
     </div>
   );
 }

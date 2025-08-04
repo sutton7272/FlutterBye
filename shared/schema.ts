@@ -507,6 +507,89 @@ export const systemSettings = pgTable("system_settings", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
+// FlutterAI Wallet Intelligence System
+export const walletIntelligence = pgTable("wallet_intelligence", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  walletAddress: text("wallet_address").notNull().unique(),
+  
+  // Collection Source Tracking
+  collectionSource: text("collection_source").notNull(), // 'flutterbye_connect', 'perpetrader_connect', 'manual_entry', 'csv_upload'
+  collectedAt: timestamp("collected_at").defaultNow(),
+  collectedBy: varchar("collected_by").references(() => users.id), // Admin who added manually
+  
+  // FlutterAI Scoring System
+  socialCreditScore: integer("social_credit_score").default(0), // 0-1000 scale
+  riskLevel: text("risk_level").default("unknown"), // 'low', 'medium', 'high', 'critical', 'unknown'
+  tradingBehaviorScore: integer("trading_behavior_score").default(0), // 0-100
+  portfolioQualityScore: integer("portfolio_quality_score").default(0), // 0-100
+  liquidityScore: integer("liquidity_score").default(0), // 0-100
+  activityScore: integer("activity_score").default(0), // 0-100
+  
+  // Analysis Results
+  analysisData: jsonb("analysis_data").$type<{
+    totalBalance: number;
+    tokenCount: number;
+    nftCount: number;
+    transactionHistory: any;
+    topTokens: any[];
+    riskFactors: string[];
+    behaviorPatterns: any;
+    portfolioAnalysis: any;
+  }>(),
+  
+  // Analysis Status
+  analysisStatus: text("analysis_status").default("pending"), // 'pending', 'analyzing', 'completed', 'failed'
+  lastAnalyzed: timestamp("last_analyzed"),
+  analysisError: text("analysis_error"),
+  
+  // Bulk Upload Tracking
+  batchId: varchar("batch_id"), // For CSV uploads
+  batchName: text("batch_name"),
+  
+  // User Association (if wallet connects)
+  associatedUserId: varchar("associated_user_id").references(() => users.id),
+  
+  // Additional Intelligence
+  tags: json("tags").$type<string[]>(), // Custom tags for categorization
+  notes: text("notes"), // Admin notes
+  isBlacklisted: boolean("is_blacklisted").default(false),
+  blacklistReason: text("blacklist_reason"),
+  
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Batch Upload Tracking
+export const walletBatches = pgTable("wallet_batches", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  batchName: text("batch_name").notNull(),
+  uploadedBy: varchar("uploaded_by").references(() => users.id).notNull(),
+  fileName: text("file_name"),
+  totalWallets: integer("total_wallets").default(0),
+  processedWallets: integer("processed_wallets").default(0),
+  successfulAnalyses: integer("successful_analyses").default(0),
+  failedAnalyses: integer("failed_analyses").default(0),
+  status: text("status").default("processing"), // 'processing', 'completed', 'failed'
+  processingStarted: timestamp("processing_started").defaultNow(),
+  processingCompleted: timestamp("processing_completed"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Analysis Queue for Background Processing
+export const analysisQueue = pgTable("analysis_queue", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  walletAddress: text("wallet_address").notNull(),
+  priority: integer("priority").default(1), // 1=low, 2=medium, 3=high, 4=critical
+  status: text("status").default("queued"), // 'queued', 'processing', 'completed', 'failed'
+  attempts: integer("attempts").default(0),
+  maxAttempts: integer("max_attempts").default(3),
+  batchId: varchar("batch_id").references(() => walletBatches.id),
+  requestedBy: varchar("requested_by").references(() => users.id),
+  createdAt: timestamp("created_at").defaultNow(),
+  startedAt: timestamp("started_at"),
+  completedAt: timestamp("completed_at"),
+});
+
 // Insert schemas
 export const insertUserSchema = createInsertSchema(users).omit({
   id: true,
@@ -706,6 +789,31 @@ export const insertSystemSettingSchema = createInsertSchema(systemSettings).omit
   updatedAt: true,
 });
 export type InsertAnalytics = z.infer<typeof insertAnalyticsSchema>;
+
+// Wallet Intelligence Types
+export const insertWalletIntelligenceSchema = createInsertSchema(walletIntelligence).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertWalletBatchSchema = createInsertSchema(walletBatches).omit({
+  id: true,
+  createdAt: true,
+  processingStarted: true,
+});
+
+export const insertAnalysisQueueSchema = createInsertSchema(analysisQueue).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type InsertWalletIntelligence = z.infer<typeof insertWalletIntelligenceSchema>;
+export type WalletIntelligence = typeof walletIntelligence.$inferSelect;
+export type InsertWalletBatch = z.infer<typeof insertWalletBatchSchema>;
+export type WalletBatch = typeof walletBatches.$inferSelect;
+export type InsertAnalysisQueue = z.infer<typeof insertAnalysisQueueSchema>;
+export type AnalysisQueue = typeof analysisQueue.$inferSelect;
 
 export type RedeemableCode = typeof redeemableCodes.$inferSelect;
 export type InsertRedeemableCode = z.infer<typeof insertRedeemableCodeSchema>;

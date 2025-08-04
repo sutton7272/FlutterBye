@@ -43,7 +43,16 @@ import {
   type InsertPricingTier,
   type SystemSetting,
   type InsertSystemSetting,
+  type WalletIntelligence,
+  type InsertWalletIntelligence,
+  type WalletBatch,
+  type InsertWalletBatch,
+  type AnalysisQueue,
+  type InsertAnalysisQueue,
   pricingTiers,
+  walletIntelligence,
+  walletBatches,
+  analysisQueue,
 } from "@shared/schema";
 
 // Storage interface for both in-memory and database implementations
@@ -194,6 +203,26 @@ export interface IStorage {
   // Wallet Alerts
   createWalletAlert(alert: any): Promise<any>;
   getWalletAlerts(resolved?: boolean): Promise<any[]>;
+
+  // Wallet Intelligence Operations
+  collectWalletAddress(walletAddress: string, source: string, collectedBy?: string): Promise<WalletIntelligence>;
+  getWalletIntelligence(walletAddress: string): Promise<WalletIntelligence | undefined>;
+  updateWalletScore(walletAddress: string, scoreData: Partial<WalletIntelligence>): Promise<WalletIntelligence>;
+  getAllWalletIntelligence(limit?: number, offset?: number): Promise<WalletIntelligence[]>;
+  searchWalletIntelligence(query: string): Promise<WalletIntelligence[]>;
+  getWalletsByRiskLevel(riskLevel: string): Promise<WalletIntelligence[]>;
+  
+  // Batch Processing Operations
+  createWalletBatch(batch: InsertWalletBatch): Promise<WalletBatch>;
+  getWalletBatch(id: string): Promise<WalletBatch | undefined>;
+  updateWalletBatch(id: string, updates: Partial<WalletBatch>): Promise<WalletBatch>;
+  getAllWalletBatches(limit?: number, offset?: number): Promise<WalletBatch[]>;
+  
+  // Analysis Queue Operations
+  addToAnalysisQueue(walletAddress: string, priority?: number, batchId?: string, requestedBy?: string): Promise<AnalysisQueue>;
+  getNextQueuedAnalysis(): Promise<AnalysisQueue | undefined>;
+  updateAnalysisQueueStatus(id: string, status: string, attempts?: number): Promise<AnalysisQueue>;
+  getAnalysisQueueStats(): Promise<{queued: number, processing: number, completed: number, failed: number}>;
   resolveWalletAlert(alertId: string, resolvedBy: string, actionTaken?: string): Promise<any>;
 }
 

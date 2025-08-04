@@ -27,6 +27,7 @@ import { aiPaymentService } from "./ai-payment-service";
 import { z } from "zod";
 import { registerNextGenAIRoutes } from "./next-gen-ai-routes";
 import { flutterAIRoutes } from "./flutterai-routes";
+import { registerFlutterAIWalletRoutes } from "./flutterai-wallet-routes";
 import { Connection, Keypair, LAMPORTS_PER_SOL, PublicKey, Transaction, SystemProgram } from '@solana/web3.js';
 import bs58 from 'bs58';
 
@@ -4078,6 +4079,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // Register FlutterAI routes
   app.use("/api/flutterai", flutterAIRoutes);
+  registerFlutterAIWalletRoutes(app);
   console.log("🧠 FlutterAI comprehensive wallet scoring and intelligence engine activated");
   
   const httpServer = createServer(app);
