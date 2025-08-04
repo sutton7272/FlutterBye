@@ -174,7 +174,38 @@ export async function getAllWalletIntelligence(req: Request, res: Response) {
  */
 export async function getWalletIntelligenceStats(req: Request, res: Response) {
   try {
-    const stats = await storage.getWalletIntelligenceStats();
+    const rawStats = await storage.getWalletIntelligenceStats();
+    
+    // Structure the response to match dashboard expectations
+    const stats = {
+      stats: {
+        totalWallets: rawStats.totalWallets || 0,
+        avgSocialCreditScore: rawStats.avgSocialCreditScore || 0,
+        bySource: {
+          flutterbye_connect: 0,
+          perpetrader_connect: 0,
+          manual_entry: 0,
+          csv_upload: 0
+        },
+        byRiskLevel: {
+          low: 0,
+          medium: 0,
+          high: 0,
+          critical: 0
+        },
+        analysisStats: {
+          queued: 0,
+          processing: 0,
+          completed: rawStats.totalWallets || 0
+        }
+      },
+      topPerformers: rawStats.topPerformers || [],
+      highRiskWallets: rawStats.highRiskWallets || [],
+      marketingSegmentDistribution: rawStats.marketingSegmentDistribution || {},
+      portfolioSizeDistribution: rawStats.portfolioSizeDistribution || {},
+      riskDistribution: rawStats.riskDistribution || {}
+    };
+    
     res.json(stats);
   } catch (error) {
     console.error('Error getting wallet intelligence stats:', error);
