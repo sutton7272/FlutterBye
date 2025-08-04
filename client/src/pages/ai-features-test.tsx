@@ -62,11 +62,22 @@ export default function AIFeaturesTest() {
       console.log('📊 Viral API Response:', response);
       console.log('📊 Response results:', response.results);
       console.log('📊 Response structure:', Object.keys(response));
+      console.log('📊 Response success:', response.success);
+      console.log('📊 Results length:', response.results?.length);
       
       // The API response is already properly structured
       setResults({ 
         type: 'viral', 
-        data: response  // Use the response directly since it has success, results, summary
+        data: {
+          success: response.success,
+          results: response.results || [],
+          summary: response.summary,
+          debugInfo: {
+            apiSuccess: response.success,
+            resultsCount: response.results?.length || 0,
+            rawKeys: Object.keys(response)
+          }
+        }
       });
       toast({
         title: "Viral Amplification AI Activated!",
