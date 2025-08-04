@@ -593,7 +593,7 @@ export default function FlutterAIDashboard() {
           <Card className="bg-slate-800/50 border-blue-500/20">
             <CardHeader>
               <CardTitle className="text-white flex items-center gap-2">
-                <Api className="h-5 w-5 text-blue-400" />
+                <Server className="h-5 w-5 text-blue-400" />
                 FlutterAI API Management
               </CardTitle>
               <CardDescription className="text-blue-200">
