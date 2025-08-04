@@ -59,7 +59,7 @@ export default function FlutterAIDashboard() {
   const { data: intelligenceStats } = useQuery({
     queryKey: ['/api/flutterai/intelligence-stats'],
     refetchInterval: 30000, // Refresh every 30 seconds
-  });
+  }) as { data: any };
 
   const { data: walletIntelligence, isLoading: walletsLoading } = useQuery({
     queryKey: ['/api/flutterai/intelligence', selectedRiskLevel],
@@ -69,31 +69,31 @@ export default function FlutterAIDashboard() {
         : '/api/flutterai/intelligence';
       return await apiRequest('GET', url);
     },
-  });
+  }) as { data: any; isLoading: boolean };
 
   // Pricing and Monetization Data Queries
   const { data: pricingTiers } = useQuery({
     queryKey: ['/api/flutterai/pricing/tiers'],
-  });
+  }) as { data: any };
 
   const { data: userSubscription } = useQuery({
     queryKey: ['/api/flutterai/pricing/subscription/demo-user'],
     refetchInterval: 60000, // Refresh every minute
-  });
+  }) as { data: any };
 
   const { data: pricingAnalytics } = useQuery({
     queryKey: ['/api/flutterai/pricing/analytics'],
     refetchInterval: 30000, // Refresh every 30 seconds
-  });
+  }) as { data: any };
 
   const { data: batches } = useQuery({
     queryKey: ['/api/flutterai/batches'],
-  });
+  }) as { data: any };
 
   const { data: queueStatus } = useQuery({
     queryKey: ['/api/flutterai/queue-status'],
     refetchInterval: 15000, // Refresh every 15 seconds
-  });
+  }) as { data: any };
 
   // Mutations
   const manualEntryMutation = useMutation({
@@ -1140,7 +1140,7 @@ export default function FlutterAIDashboard() {
               <CardHeader>
                 <CardTitle className="text-white">Wallet Intelligence Database</CardTitle>
                 <CardDescription className="text-purple-200">
-                  {walletsLoading ? 'Loading...' : `${wallets?.wallets?.length || 0} wallets found`}
+                  {walletsLoading ? 'Loading...' : `${walletIntelligence?.data?.length || 0} wallets found`}
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -1150,7 +1150,7 @@ export default function FlutterAIDashboard() {
                   </div>
                 ) : (
                   <div className="space-y-4 max-h-96 overflow-y-auto">
-                    {wallets?.wallets?.map((wallet: any) => (
+                    {walletIntelligence?.data?.map((wallet: any) => (
                       <div
                         key={wallet.walletAddress}
                         className="p-4 bg-slate-700/50 rounded-lg border border-purple-500/10"
@@ -1278,16 +1278,16 @@ export default function FlutterAIDashboard() {
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  {stats && (
+                  {intelligenceStats && (
                     <div className="space-y-6">
                       <div>
                         <h4 className="text-purple-200 mb-3">Collection Sources</h4>
                         <div className="space-y-2">
-                          {Object.entries(stats.stats.bySource).map(([source, count]) => (
+                          {Object.entries(intelligenceStats.stats.bySource).map(([source, count]) => (
                             <div key={source} className="flex justify-between items-center">
                               <span className="text-white capitalize">{source.replace('_', ' ')}</span>
                               <Badge variant="outline" className="border-purple-500 text-purple-300">
-                                {count}
+                                {count as any}
                               </Badge>
                             </div>
                           ))}
@@ -1297,14 +1297,14 @@ export default function FlutterAIDashboard() {
                       <div>
                         <h4 className="text-purple-200 mb-3">Risk Distribution</h4>
                         <div className="space-y-2">
-                          {Object.entries(stats.stats.byRiskLevel).map(([level, count]) => (
+                          {Object.entries(intelligenceStats.stats.byRiskLevel).map(([level, count]) => (
                             <div key={level} className="flex justify-between items-center">
                               <span className="text-white capitalize">{level}</span>
                               <Badge 
-                                variant={getRiskVariant(level)}
+                                variant={getRiskVariant(level) as any}
                                 className={`${getRiskColor(level)} text-white`}
                               >
-                                {count}
+                                {count as any}
                               </Badge>
                             </div>
                           ))}
