@@ -178,6 +178,23 @@ export interface IStorage {
   getNFTPricingSettings(): Promise<any>;
   updateNFTPricingSettings(settings: any): Promise<any>;
   getNFTMarketingData(): Promise<any>;
+
+  // Platform Wallet Management
+  createPlatformWallet(wallet: any): Promise<any>;
+  getPlatformWallets(): Promise<any[]>;
+  getPlatformWalletsByType(walletType: string): Promise<any[]>;
+  updatePlatformWallet(id: string, updates: any): Promise<any>;
+  deletePlatformWallet(id: string): Promise<void>;
+  setPrimaryWallet(walletType: string, walletId: string): Promise<void>;
+  
+  // Wallet Transactions
+  createWalletTransaction(transaction: any): Promise<any>;
+  getWalletTransactions(walletId?: string): Promise<any[]>;
+  
+  // Wallet Alerts
+  createWalletAlert(alert: any): Promise<any>;
+  getWalletAlerts(resolved?: boolean): Promise<any[]>;
+  resolveWalletAlert(alertId: string, resolvedBy: string, actionTaken?: string): Promise<any>;
 }
 
 // In-memory storage implementation
@@ -202,6 +219,9 @@ export class MemStorage implements IStorage {
   private redemptionCodes: Map<string, RedemptionCode> = new Map();
   private pricingTiers: Map<string, PricingTier> = new Map();
   private systemSettings: Map<string, SystemSetting> = new Map();
+  private platformWallets: Map<string, any> = new Map();
+  private walletTransactions: Map<string, any> = new Map();
+  private walletAlerts: Map<string, any> = new Map();
 
   constructor() {
     this.initializeTestData();
@@ -1322,6 +1342,113 @@ export class MemStorage implements IStorage {
         legendary: 1
       }
     };
+  }
+
+  // Platform Wallet Management implementation
+  async createPlatformWallet(walletData: any): Promise<any> {
+    const id = randomUUID();
+    const wallet = {
+      id,
+      ...walletData,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
+    this.platformWallets.set(id, wallet);
+    return wallet;
+  }
+
+  async getPlatformWallets(): Promise<any[]> {
+    return Array.from(this.platformWallets.values());
+  }
+
+  async getPlatformWalletsByType(walletType: string): Promise<any[]> {
+    return Array.from(this.platformWallets.values())
+      .filter(wallet => wallet.walletType === walletType);
+  }
+
+  async updatePlatformWallet(id: string, updates: any): Promise<any> {
+    const wallet = this.platformWallets.get(id);
+    if (!wallet) {
+      throw new Error("Platform wallet not found");
+    }
+    const updatedWallet = { ...wallet, ...updates, updatedAt: new Date() };
+    this.platformWallets.set(id, updatedWallet);
+    return updatedWallet;
+  }
+
+  async deletePlatformWallet(id: string): Promise<void> {
+    this.platformWallets.delete(id);
+  }
+
+  async setPrimaryWallet(walletType: string, walletId: string): Promise<void> {
+    // Unset all primary wallets of this type
+    for (const [id, wallet] of this.platformWallets.entries()) {
+      if (wallet.walletType === walletType && wallet.isPrimary) {
+        this.platformWallets.set(id, { ...wallet, isPrimary: false, updatedAt: new Date() });
+      }
+    }
+    
+    // Set the specified wallet as primary
+    const targetWallet = this.platformWallets.get(walletId);
+    if (targetWallet) {
+      this.platformWallets.set(walletId, { ...targetWallet, isPrimary: true, updatedAt: new Date() });
+    }
+  }
+
+  // Wallet Transactions implementation
+  async createWalletTransaction(transactionData: any): Promise<any> {
+    const id = randomUUID();
+    const transaction = {
+      id,
+      ...transactionData,
+      createdAt: new Date()
+    };
+    this.walletTransactions.set(id, transaction);
+    return transaction;
+  }
+
+  async getWalletTransactions(walletId?: string): Promise<any[]> {
+    const transactions = Array.from(this.walletTransactions.values());
+    if (walletId) {
+      return transactions.filter(tx => tx.walletId === walletId);
+    }
+    return transactions;
+  }
+
+  // Wallet Alerts implementation
+  async createWalletAlert(alertData: any): Promise<any> {
+    const id = randomUUID();
+    const alert = {
+      id,
+      ...alertData,
+      createdAt: new Date()
+    };
+    this.walletAlerts.set(id, alert);
+    return alert;
+  }
+
+  async getWalletAlerts(resolved?: boolean): Promise<any[]> {
+    const alerts = Array.from(this.walletAlerts.values());
+    if (resolved !== undefined) {
+      return alerts.filter(alert => alert.isResolved === resolved);
+    }
+    return alerts;
+  }
+
+  async resolveWalletAlert(alertId: string, resolvedBy: string, actionTaken?: string): Promise<any> {
+    const alert = this.walletAlerts.get(alertId);
+    if (!alert) {
+      throw new Error("Wallet alert not found");
+    }
+    const updatedAlert = {
+      ...alert,
+      isResolved: true,
+      resolvedAt: new Date(),
+      resolvedBy,
+      actionTaken
+    };
+    this.walletAlerts.set(alertId, updatedAlert);
+    return updatedAlert;
   }
 }
 

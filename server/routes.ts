@@ -6224,11 +6224,135 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Platform Wallet Management API Routes
+  app.get("/api/admin/platform-wallets", async (req, res) => {
+    try {
+      const wallets = await storage.getPlatformWallets();
+      res.json(wallets);
+    } catch (error) {
+      console.error("Error fetching platform wallets:", error);
+      res.status(500).json({ message: "Failed to fetch platform wallets" });
+    }
+  });
+
+  app.get("/api/admin/platform-wallets/type/:type", async (req, res) => {
+    try {
+      const { type } = req.params;
+      const wallets = await storage.getPlatformWalletsByType(type);
+      res.json(wallets);
+    } catch (error) {
+      console.error("Error fetching platform wallets by type:", error);
+      res.status(500).json({ message: "Failed to fetch platform wallets" });
+    }
+  });
+
+  app.post("/api/admin/platform-wallets", async (req, res) => {
+    try {
+      const wallet = await storage.createPlatformWallet(req.body);
+      res.json(wallet);
+    } catch (error) {
+      console.error("Error creating platform wallet:", error);
+      res.status(500).json({ message: "Failed to create platform wallet" });
+    }
+  });
+
+  app.put("/api/admin/platform-wallets/:id", async (req, res) => {
+    try {
+      const { id } = req.params;
+      const wallet = await storage.updatePlatformWallet(id, req.body);
+      res.json(wallet);
+    } catch (error) {
+      console.error("Error updating platform wallet:", error);
+      res.status(500).json({ message: "Failed to update platform wallet" });
+    }
+  });
+
+  app.delete("/api/admin/platform-wallets/:id", async (req, res) => {
+    try {
+      const { id } = req.params;
+      await storage.deletePlatformWallet(id);
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error deleting platform wallet:", error);
+      res.status(500).json({ message: "Failed to delete platform wallet" });
+    }
+  });
+
+  app.post("/api/admin/platform-wallets/:type/set-primary/:id", async (req, res) => {
+    try {
+      const { type, id } = req.params;
+      await storage.setPrimaryWallet(type, id);
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error setting primary wallet:", error);
+      res.status(500).json({ message: "Failed to set primary wallet" });
+    }
+  });
+
+  // Wallet Transactions API Routes
+  app.get("/api/admin/wallet-transactions", async (req, res) => {
+    try {
+      const { walletId } = req.query;
+      const transactions = await storage.getWalletTransactions(walletId as string);
+      res.json(transactions);
+    } catch (error) {
+      console.error("Error fetching wallet transactions:", error);
+      res.status(500).json({ message: "Failed to fetch wallet transactions" });
+    }
+  });
+
+  app.post("/api/admin/wallet-transactions", async (req, res) => {
+    try {
+      const transaction = await storage.createWalletTransaction(req.body);
+      res.json(transaction);
+    } catch (error) {
+      console.error("Error creating wallet transaction:", error);
+      res.status(500).json({ message: "Failed to create wallet transaction" });
+    }
+  });
+
+  // Wallet Alerts API Routes
+  app.get("/api/admin/wallet-alerts", async (req, res) => {
+    try {
+      const { resolved } = req.query;
+      const alerts = await storage.getWalletAlerts(
+        resolved === 'true' ? true : resolved === 'false' ? false : undefined
+      );
+      res.json(alerts);
+    } catch (error) {
+      console.error("Error fetching wallet alerts:", error);
+      res.status(500).json({ message: "Failed to fetch wallet alerts" });
+    }
+  });
+
+  app.post("/api/admin/wallet-alerts", async (req, res) => {
+    try {
+      const alert = await storage.createWalletAlert(req.body);
+      res.json(alert);
+    } catch (error) {
+      console.error("Error creating wallet alert:", error);
+      res.status(500).json({ message: "Failed to create wallet alert" });
+    }
+  });
+
+  app.post("/api/admin/wallet-alerts/:id/resolve", async (req, res) => {
+    try {
+      const { id } = req.params;
+      const { resolvedBy, actionTaken } = req.body;
+      const alert = await storage.resolveWalletAlert(id, resolvedBy, actionTaken);
+      res.json(alert);
+    } catch (error) {
+      console.error("Error resolving wallet alert:", error);
+      res.status(500).json({ message: "Failed to resolve wallet alert" });
+    }
+  });
+
   console.log('🚀 Production-grade server with real-time monitoring initialized');
   console.log('🤖 Living AI personality system activated');
   console.log('🌟 Immersive AI experience system launched');
   console.log('🧠 AI admin intelligence and content enhancement activated');
   console.log('⚡ Revolutionary AI enhancement routes activated - AI EVERYWHERE!');
+  console.log('💰 Platform Wallet Management System activated!');
   
   return httpServer;
 }

@@ -1192,6 +1192,7 @@ export default function UnifiedAdminDashboard() {
                   <SelectItem value="analytics">📈 Analytics</SelectItem>
                   <SelectItem value="staking">🪙 Staking</SelectItem>
                   <SelectItem value="system">🖥️ System</SelectItem>
+                  <SelectItem value="wallets">👛 Wallets</SelectItem>
                   <SelectItem value="viral">🚀 Viral</SelectItem>
                   <SelectItem value="realtime">📡 Live</SelectItem>
                   <SelectItem value="api-monetization">💰 API $</SelectItem>
@@ -1332,6 +1333,13 @@ export default function UnifiedAdminDashboard() {
             >
               <Target className="w-4 h-4" />
               <span className="hidden sm:inline">Intelligence</span>
+            </TabsTrigger>
+            <TabsTrigger 
+              value="wallets" 
+              className="flex-shrink-0 flex items-center gap-2 text-slate-300 font-medium data-[state=active]:text-white data-[state=active]:bg-gradient-to-r data-[state=active]:from-amber-600/60 data-[state=active]:to-yellow-600/60 data-[state=active]:shadow-lg hover:text-white hover:bg-slate-700/50 transition-all duration-200 px-4 py-2"
+            >
+              <Coins className="w-4 h-4" />
+              <span className="hidden sm:inline">Wallets</span>
             </TabsTrigger>
             <TabsTrigger 
               value="api-monetization" 
@@ -2982,6 +2990,11 @@ export default function UnifiedAdminDashboard() {
             </div>
           </TabsContent>
 
+          {/* Wallet Management Tab */}
+          <TabsContent value="wallets" className="space-y-6">
+            <WalletManagementContent />
+          </TabsContent>
+
         </Tabs>
 
         {/* Image Preview Modal */}
@@ -3015,6 +3028,404 @@ export default function UnifiedAdminDashboard() {
           </div>
         )}
       </div>
+    </div>
+  );
+}
+
+// Wallet Management Content Component
+function WalletManagementContent() {
+  const [platformWallets, setPlatformWallets] = useState<any[]>([]);
+  const [walletTransactions, setWalletTransactions] = useState<any[]>([]);
+  const [walletAlerts, setWalletAlerts] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [selectedWalletType, setSelectedWalletType] = useState<string>('all');
+  const [showCreateWallet, setShowCreateWallet] = useState(false);
+
+  // Fetch platform wallets
+  const fetchPlatformWallets = async () => {
+    try {
+      const response = await fetch('/api/admin/platform-wallets');
+      const data = await response.json();
+      setPlatformWallets(data || []);
+    } catch (error) {
+      console.error('Error fetching platform wallets:', error);
+      setPlatformWallets([]);
+    }
+  };
+
+  // Fetch wallet transactions
+  const fetchWalletTransactions = async () => {
+    try {
+      const response = await fetch('/api/admin/wallet-transactions');
+      const data = await response.json();
+      setWalletTransactions(data || []);
+    } catch (error) {
+      console.error('Error fetching wallet transactions:', error);
+      setWalletTransactions([]);
+    }
+  };
+
+  // Fetch wallet alerts
+  const fetchWalletAlerts = async () => {
+    try {
+      const response = await fetch('/api/admin/wallet-alerts');
+      const data = await response.json();
+      setWalletAlerts(data || []);
+    } catch (error) {
+      console.error('Error fetching wallet alerts:', error);
+      setWalletAlerts([]);
+    }
+  };
+
+  useEffect(() => {
+    const loadData = async () => {
+      setLoading(true);
+      await Promise.all([
+        fetchPlatformWallets(),
+        fetchWalletTransactions(),
+        fetchWalletAlerts()
+      ]);
+      setLoading(false);
+    };
+    loadData();
+  }, []);
+
+  // Create new platform wallet
+  const createPlatformWallet = async (walletData: any) => {
+    try {
+      const response = await fetch('/api/admin/platform-wallets', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(walletData),
+      });
+      if (response.ok) {
+        await fetchPlatformWallets();
+        setShowCreateWallet(false);
+      }
+    } catch (error) {
+      console.error('Error creating wallet:', error);
+    }
+  };
+
+  // Set primary wallet
+  const setPrimaryWallet = async (type: string, id: string) => {
+    try {
+      const response = await fetch(`/api/admin/platform-wallets/${type}/set-primary/${id}`, {
+        method: 'POST',
+      });
+      if (response.ok) {
+        await fetchPlatformWallets();
+      }
+    } catch (error) {
+      console.error('Error setting primary wallet:', error);
+    }
+  };
+
+  const filteredWallets = selectedWalletType === 'all' 
+    ? platformWallets 
+    : platformWallets.filter(w => w.type === selectedWalletType);
+
+  const activeAlerts = walletAlerts.filter(alert => !alert.isResolved);
+  const walletTypeStats = platformWallets.reduce((acc, wallet) => {
+    acc[wallet.type] = (acc[wallet.type] || 0) + 1;
+    return acc;
+  }, {} as Record<string, number>);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white"></div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-6">
+      {/* Wallet Overview Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <Card className="bg-gradient-to-r from-amber-900/50 to-yellow-900/50 border-amber-500/30">
+          <CardContent className="p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-xs font-medium text-amber-200 uppercase tracking-wide">Total Wallets</p>
+                <p className="text-2xl font-bold text-white">{platformWallets.length}</p>
+              </div>
+              <Coins className="w-8 h-8 text-amber-400" />
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-gradient-to-r from-green-900/50 to-emerald-900/50 border-green-500/30">
+          <CardContent className="p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-xs font-medium text-green-200 uppercase tracking-wide">Active Wallets</p>
+                <p className="text-2xl font-bold text-white">
+                  {platformWallets.filter(w => w.isActive).length}
+                </p>
+              </div>
+              <Activity className="w-8 h-8 text-green-400" />
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-gradient-to-r from-red-900/50 to-pink-900/50 border-red-500/30">
+          <CardContent className="p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-xs font-medium text-red-200 uppercase tracking-wide">Active Alerts</p>
+                <p className="text-2xl font-bold text-white">{activeAlerts.length}</p>
+              </div>
+              <AlertTriangle className="w-8 h-8 text-red-400" />
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-gradient-to-r from-blue-900/50 to-cyan-900/50 border-blue-500/30">
+          <CardContent className="p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-xs font-medium text-blue-200 uppercase tracking-wide">Transactions (24h)</p>
+                <p className="text-2xl font-bold text-white">
+                  {walletTransactions.filter(t => {
+                    const dayAgo = new Date();
+                    dayAgo.setDate(dayAgo.getDate() - 1);
+                    return new Date(t.createdAt) > dayAgo;
+                  }).length}
+                </p>
+              </div>
+              <TrendingUp className="w-8 h-8 text-blue-400" />
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Wallet Management Controls */}
+      <Card className="bg-slate-800/50 border-slate-600">
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle className="text-white flex items-center gap-2">
+                <Settings className="w-5 h-5 text-amber-400" />
+                Platform Wallet Management
+              </CardTitle>
+              <CardDescription>Manage gas funding, fee collection, escrow, and admin wallets</CardDescription>
+            </div>
+            <Button 
+              onClick={() => setShowCreateWallet(true)}
+              className="bg-amber-600 hover:bg-amber-700 text-white"
+            >
+              <Plus className="w-4 h-4 mr-2" />
+              Add Wallet
+            </Button>
+          </div>
+        </CardHeader>
+        <CardContent>
+          {/* Wallet Type Filter */}
+          <div className="flex gap-2 mb-6">
+            <Button
+              variant={selectedWalletType === 'all' ? 'default' : 'outline'}
+              onClick={() => setSelectedWalletType('all')}
+              size="sm"
+            >
+              All ({platformWallets.length})
+            </Button>
+            {['gas_funding', 'fee_collection', 'escrow', 'admin'].map(type => (
+              <Button
+                key={type}
+                variant={selectedWalletType === type ? 'default' : 'outline'}
+                onClick={() => setSelectedWalletType(type)}
+                size="sm"
+              >
+                {type.replace('_', ' ')} ({walletTypeStats[type] || 0})
+              </Button>
+            ))}
+          </div>
+
+          {/* Wallets Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {filteredWallets.length > 0 ? filteredWallets.map(wallet => (
+              <Card key={wallet.id} className="bg-slate-700/50 border-slate-600">
+                <CardContent className="p-4">
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <Badge 
+                        className={`${
+                          wallet.type === 'gas_funding' ? 'bg-blue-500/20 text-blue-400' :
+                          wallet.type === 'fee_collection' ? 'bg-green-500/20 text-green-400' :
+                          wallet.type === 'escrow' ? 'bg-purple-500/20 text-purple-400' :
+                          'bg-amber-500/20 text-amber-400'
+                        }`}
+                      >
+                        {wallet.type.replace('_', ' ')}
+                      </Badge>
+                      <div className="flex items-center gap-1">
+                        {wallet.isPrimary && (
+                          <Badge className="bg-yellow-500/20 text-yellow-400 text-xs">
+                            Primary
+                          </Badge>
+                        )}
+                        <div className={`w-2 h-2 rounded-full ${wallet.isActive ? 'bg-green-500' : 'bg-red-500'}`} />
+                      </div>
+                    </div>
+                    
+                    <div>
+                      <p className="text-sm font-medium text-white">{wallet.name}</p>
+                      <p className="text-xs text-slate-400 font-mono">
+                        {wallet.address ? `${wallet.address.slice(0, 8)}...${wallet.address.slice(-8)}` : 'No address'}
+                      </p>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-2 text-xs">
+                      <div>
+                        <span className="text-slate-400">Balance:</span>
+                        <p className="text-white font-mono">{wallet.balance || '0'} SOL</p>
+                      </div>
+                      <div>
+                        <span className="text-slate-400">Network:</span>
+                        <p className="text-white">{wallet.network || 'devnet'}</p>
+                      </div>
+                    </div>
+
+                    {wallet.description && (
+                      <p className="text-xs text-slate-300">{wallet.description}</p>
+                    )}
+
+                    <div className="flex gap-2">
+                      {!wallet.isPrimary && (
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => setPrimaryWallet(wallet.type, wallet.id)}
+                          className="text-xs flex-1"
+                        >
+                          Set Primary
+                        </Button>
+                      )}
+                      <Button size="sm" variant="outline" className="text-xs">
+                        View Details
+                      </Button>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            )) : (
+              <div className="col-span-full text-center py-8">
+                <Coins className="w-12 h-12 text-slate-400 mx-auto mb-3" />
+                <p className="text-slate-400">No wallets found for selected type</p>
+                <Button 
+                  onClick={() => setShowCreateWallet(true)}
+                  className="mt-3 bg-amber-600 hover:bg-amber-700"
+                >
+                  Create First Wallet
+                </Button>
+              </div>
+            )}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Active Alerts */}
+      {activeAlerts.length > 0 && (
+        <Card className="bg-slate-800/50 border-red-500/30">
+          <CardHeader>
+            <CardTitle className="text-white flex items-center gap-2">
+              <AlertTriangle className="w-5 h-5 text-red-400" />
+              Active Wallet Alerts
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3">
+              {activeAlerts.slice(0, 5).map(alert => (
+                <Alert key={alert.id} className="bg-slate-700/30 border-slate-600">
+                  <AlertTriangle className={`h-4 w-4 ${
+                    alert.severity === 'critical' ? 'text-red-500' :
+                    alert.severity === 'high' ? 'text-orange-500' :
+                    alert.severity === 'medium' ? 'text-yellow-500' :
+                    'text-blue-500'
+                  }`} />
+                  <AlertDescription className="text-slate-200 ml-2">
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <p className="font-medium">{alert.title}</p>
+                        <p className="text-sm text-slate-400">{alert.message}</p>
+                      </div>
+                      <Badge className={`${
+                        alert.severity === 'critical' ? 'bg-red-500/20 text-red-400' :
+                        alert.severity === 'high' ? 'bg-orange-500/20 text-orange-400' :
+                        alert.severity === 'medium' ? 'bg-yellow-500/20 text-yellow-400' :
+                        'bg-blue-500/20 text-blue-400'
+                      }`}>
+                        {alert.severity}
+                      </Badge>
+                    </div>
+                  </AlertDescription>
+                </Alert>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Recent Transactions */}
+      <Card className="bg-slate-800/50 border-slate-600">
+        <CardHeader>
+          <CardTitle className="text-white flex items-center gap-2">
+            <Activity className="w-5 h-5 text-blue-400" />
+            Recent Wallet Transactions
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          {walletTransactions.length > 0 ? (
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b border-slate-600">
+                    <th className="text-left py-2 text-slate-400">Wallet</th>
+                    <th className="text-left py-2 text-slate-400">Type</th>
+                    <th className="text-left py-2 text-slate-400">Amount</th>
+                    <th className="text-left py-2 text-slate-400">Status</th>
+                    <th className="text-left py-2 text-slate-400">Date</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {walletTransactions.slice(0, 10).map(tx => {
+                    const wallet = platformWallets.find(w => w.id === tx.walletId);
+                    return (
+                      <tr key={tx.id} className="border-b border-slate-700/50">
+                        <td className="py-2 text-white">
+                          {wallet?.name || 'Unknown Wallet'}
+                        </td>
+                        <td className="py-2 text-slate-300">{tx.transactionType}</td>
+                        <td className="py-2 text-white font-mono">
+                          {tx.amount} {tx.currency}
+                        </td>
+                        <td className="py-2">
+                          <Badge className={`${
+                            tx.status === 'confirmed' ? 'bg-green-500/20 text-green-400' :
+                            tx.status === 'pending' ? 'bg-yellow-500/20 text-yellow-400' :
+                            'bg-red-500/20 text-red-400'
+                          }`}>
+                            {tx.status}
+                          </Badge>
+                        </td>
+                        <td className="py-2 text-slate-400">
+                          {new Date(tx.createdAt).toLocaleDateString()}
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          ) : (
+            <div className="text-center py-8">
+              <Activity className="w-12 h-12 text-slate-400 mx-auto mb-3" />
+              <p className="text-slate-400">No recent transactions</p>
+            </div>
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 }

@@ -724,6 +724,73 @@ export const voiceMessages = pgTable("voice_messages", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
+// Platform Wallet Management System
+export const platformWallets = pgTable("platform_wallets", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  walletType: text("wallet_type").notNull(), // 'gas_funding', 'fee_collection', 'treasury', 'escrow_master', 'emergency_backup'
+  walletAddress: text("wallet_address").notNull().unique(),
+  privateKey: text("private_key"), // Encrypted, only for gas funding wallet
+  publicKey: text("public_key").notNull(),
+  network: text("network").notNull().default("devnet"), // 'devnet' | 'mainnet-beta'
+  balance: decimal("balance", { precision: 18, scale: 9 }).default("0"),
+  currency: text("currency").notNull().default("SOL"), // SOL, USDC, FLBY
+  isActive: boolean("is_active").default(true),
+  isPrimary: boolean("is_primary").default(false), // Only one primary per type
+  description: text("description"),
+  lastBalanceCheck: timestamp("last_balance_check"),
+  minimumBalance: decimal("minimum_balance", { precision: 18, scale: 9 }).default("0.1"), // Alert threshold
+  alertsEnabled: boolean("alerts_enabled").default(true),
+  metadata: json("metadata").$type<{
+    createdBy?: string;
+    purpose?: string;
+    gasEstimate?: number;
+    feeCollectionRate?: number;
+    backupOf?: string;
+  }>(),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+  createdBy: varchar("created_by").references(() => users.id),
+});
+
+// Wallet transaction logs for audit and monitoring
+export const walletTransactions = pgTable("wallet_transactions", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  walletId: varchar("wallet_id").references(() => platformWallets.id).notNull(),
+  transactionType: text("transaction_type").notNull(), // 'fee_collection', 'gas_payment', 'transfer_in', 'transfer_out'
+  amount: decimal("amount", { precision: 18, scale: 9 }).notNull(),
+  currency: text("currency").notNull().default("SOL"),
+  fromAddress: text("from_address"),
+  toAddress: text("to_address"),
+  transactionSignature: text("transaction_signature"),
+  blockchainNetwork: text("blockchain_network").default("solana"),
+  status: text("status").notNull().default("pending"), // 'pending', 'confirmed', 'failed'
+  purpose: text("purpose"), // Description of transaction purpose
+  relatedTokenId: varchar("related_token_id").references(() => tokens.id),
+  relatedUserId: varchar("related_user_id").references(() => users.id),
+  gasUsed: decimal("gas_used", { precision: 18, scale: 9 }),
+  fees: decimal("fees", { precision: 18, scale: 9 }),
+  metadata: json("metadata").$type<Record<string, any>>(),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Wallet health monitoring and alerts
+export const walletAlerts = pgTable("wallet_alerts", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  walletId: varchar("wallet_id").references(() => platformWallets.id).notNull(),
+  alertType: text("alert_type").notNull(), // 'low_balance', 'transaction_failed', 'suspicious_activity', 'maintenance_required'
+  severity: text("severity").notNull().default("medium"), // 'low', 'medium', 'high', 'critical'
+  title: text("title").notNull(),
+  message: text("message").notNull(),
+  currentBalance: decimal("current_balance", { precision: 18, scale: 9 }),
+  thresholdBalance: decimal("threshold_balance", { precision: 18, scale: 9 }),
+  isResolved: boolean("is_resolved").default(false),
+  resolvedAt: timestamp("resolved_at"),
+  resolvedBy: varchar("resolved_by").references(() => users.id),
+  actionTaken: text("action_taken"),
+  metadata: json("metadata").$type<Record<string, any>>(),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
 export type VoiceMessage = typeof voiceMessages.$inferSelect;
 export type InsertVoiceMessage = typeof voiceMessages.$inferInsert;
 // Removed duplicate - using the one with proper schema reference below
@@ -941,3 +1008,27 @@ export type InsertCustomBadgeTemplate = z.infer<typeof insertCustomBadgeTemplate
 
 // Re-export content management schemas
 export * from "./content-schema";
+
+// Wallet management types - added at end to avoid initialization issues
+export type PlatformWallet = typeof platformWallets.$inferSelect;
+export type InsertPlatformWallet = typeof platformWallets.$inferInsert;
+export type WalletTransaction = typeof walletTransactions.$inferSelect;
+export type InsertWalletTransaction = typeof walletTransactions.$inferInsert;
+export type WalletAlert = typeof walletAlerts.$inferSelect;
+export type InsertWalletAlert = typeof walletAlerts.$inferInsert;
+
+export const insertPlatformWalletSchema = createInsertSchema(platformWallets).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertWalletTransactionSchema = createInsertSchema(walletTransactions).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertWalletAlertSchema = createInsertSchema(walletAlerts).omit({
+  id: true,
+  createdAt: true,
+});
