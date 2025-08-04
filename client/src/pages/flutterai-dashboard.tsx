@@ -12,6 +12,9 @@ import { apiRequest } from "@/lib/queryClient";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import FlutterAIGroupAnalysis from './flutterai-group-analysis';
 import FlutterAITokenCollector from '@/components/flutterai-token-collector';
+import AdvancedAnalyticsDashboard from '@/components/advanced-analytics-dashboard';
+import EnterpriseDashboard from '@/components/enterprise-dashboard';
+import RealTimeIntelligenceDashboard from '@/components/real-time-intelligence-dashboard';
 import { 
   Brain, 
   Wallet, 
@@ -633,10 +636,22 @@ export default function FlutterAIDashboard() {
 
         {/* Main Dashboard Tabs */}
         <Tabs defaultValue="intelligence" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-9 bg-slate-800/50">
+          <TabsList className="grid w-full grid-cols-12 bg-slate-800/50">
             <TabsTrigger value="intelligence" className="data-[state=active]:bg-purple-600">
               <Star className="h-4 w-4 mr-2" />
               Intelligence
+            </TabsTrigger>
+            <TabsTrigger value="advanced-analytics" className="data-[state=active]:bg-purple-600">
+              <BarChart3 className="h-4 w-4 mr-2" />
+              Advanced Analytics
+            </TabsTrigger>
+            <TabsTrigger value="real-time" className="data-[state=active]:bg-purple-600">
+              <Activity className="h-4 w-4 mr-2" />
+              Real-time
+            </TabsTrigger>
+            <TabsTrigger value="enterprise" className="data-[state=active]:bg-purple-600">
+              <Globe className="h-4 w-4 mr-2" />
+              Enterprise
             </TabsTrigger>
             <TabsTrigger value="pricing" className="data-[state=active]:bg-purple-600">
               <DollarSign className="h-4 w-4 mr-2" />
@@ -1554,6 +1569,21 @@ export default function FlutterAIDashboard() {
                 </CardContent>
               </Card>
             </div>
+          </TabsContent>
+
+          {/* Advanced Analytics Tab */}
+          <TabsContent value="advanced-analytics" className="space-y-6">
+            <AdvancedAnalyticsDashboard />
+          </TabsContent>
+
+          {/* Real-time Intelligence Tab */}
+          <TabsContent value="real-time" className="space-y-6">
+            <RealTimeIntelligenceDashboard />
+          </TabsContent>
+
+          {/* Enterprise Features Tab */}
+          <TabsContent value="enterprise" className="space-y-6">
+            <EnterpriseDashboard />
           </TabsContent>
 
           {/* Group Analysis Tab */}

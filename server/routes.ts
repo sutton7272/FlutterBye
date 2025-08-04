@@ -4335,6 +4335,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.use("/api/flutterai", flutterAIRoutes);
   registerFlutterAIWalletRoutes(app);
   
+  // Enterprise FlutterAI Routes
+  const enterpriseRoutes = await import('./enterprise-routes');
+  app.use('/api/flutterai/enterprise', enterpriseRoutes.default);
+  
   // === FLUTTERAI COMPREHENSIVE INTELLIGENCE ROUTES ===
   // Revolutionary Social Credit Score System
   
@@ -4375,6 +4379,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
   console.log("🔄 Real-time pricing updates activated");
   
   const httpServer = createServer(app);
+  
+  // Setup Real-time Intelligence WebSocket Engine
+  try {
+    const { realTimeIntelligenceEngine } = await import('./real-time-intelligence-engine');
+    realTimeIntelligenceEngine.setupWebSocketServer(httpServer);
+    realTimeIntelligenceEngine.startContinuousProcessing();
+    console.log("🚀 Real-time Intelligence Engine with WebSocket streaming activated");
+  } catch (error) {
+    console.warn("⚠️ Real-time Intelligence Engine not available:", error.message);
+  }
+  
   // WebSocket server for real-time heatmap data and chat
   const { WebSocketServer, WebSocket } = await import('ws');
   const wss = new WebSocketServer({ server: httpServer, path: '/ws' });
