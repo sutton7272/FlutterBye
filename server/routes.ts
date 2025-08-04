@@ -6811,12 +6811,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // FlutterAI Group Analysis routes
+  const groupAnalysisRoutes = await import('./flutterai-group-analysis-routes');
+  app.use('/api/flutterai', groupAnalysisRoutes.default);
+
   console.log('🚀 Production-grade server with real-time monitoring initialized');
   console.log('🤖 Living AI personality system activated');
   console.log('🌟 Immersive AI experience system launched');
   console.log('🧠 AI admin intelligence and content enhancement activated');
   console.log('⚡ Revolutionary AI enhancement routes activated - AI EVERYWHERE!');
   console.log('💰 Platform Wallet Management System activated!');
+  console.log('📊 AI Group Wallet Analysis System activated!');
   
   return httpServer;
 }

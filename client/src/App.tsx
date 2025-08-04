@@ -390,6 +390,12 @@ function Router() {
             <AIFeaturesTest />
           </>
         )} />
+        <Route path="/flutterai" component={() => (
+          <>
+            <Navbar />
+            <FlutterAIDashboard />
+          </>
+        )} />
         <Route path="/flutterai-dashboard" component={() => (
           <>
             <Navbar />

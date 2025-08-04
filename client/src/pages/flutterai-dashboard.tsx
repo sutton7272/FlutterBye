@@ -10,6 +10,7 @@ import { Progress } from "@/components/ui/progress";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import FlutterAIGroupAnalysis from './flutterai-group-analysis';
 import { 
   Brain, 
   Wallet, 
@@ -631,7 +632,7 @@ export default function FlutterAIDashboard() {
 
         {/* Main Dashboard Tabs */}
         <Tabs defaultValue="intelligence" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-8 bg-slate-800/50">
+          <TabsList className="grid w-full grid-cols-9 bg-slate-800/50">
             <TabsTrigger value="intelligence" className="data-[state=active]:bg-purple-600">
               <Star className="h-4 w-4 mr-2" />
               Intelligence
@@ -647,6 +648,10 @@ export default function FlutterAIDashboard() {
             <TabsTrigger value="analysis" className="data-[state=active]:bg-purple-600">
               <Brain className="h-4 w-4 mr-2" />
               Analysis
+            </TabsTrigger>
+            <TabsTrigger value="group-analysis" className="data-[state=active]:bg-purple-600">
+              <Users className="h-4 w-4 mr-2" />
+              Group Analysis
             </TabsTrigger>
             <TabsTrigger value="wallets" className="data-[state=active]:bg-purple-600">
               <Wallet className="h-4 w-4 mr-2" />
@@ -1545,6 +1550,11 @@ export default function FlutterAIDashboard() {
                 </CardContent>
               </Card>
             </div>
+          </TabsContent>
+
+          {/* Group Analysis Tab */}
+          <TabsContent value="group-analysis" className="space-y-6">
+            <FlutterAIGroupAnalysis />
           </TabsContent>
 
           {/* Admin Controls Tab */}
