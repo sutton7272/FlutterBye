@@ -85,6 +85,11 @@ export class SelfOptimizingPlatform {
   ): Promise<OptimizationRecommendation[]> {
     try {
       console.log('🔍 Starting comprehensive AI platform analysis...');
+      console.log('🚫 Bypassing cache - forcing fresh AI analysis');
+      
+      // Add timestamp to ensure no caching
+      const timestamp = Date.now();
+      console.log(`📊 Analysis timestamp: ${timestamp}`);
       
       // Simulate thorough analysis time
       await new Promise(resolve => setTimeout(resolve, 3000));
@@ -151,6 +156,8 @@ export class SelfOptimizingPlatform {
         }
 
         Make each recommendation specific to a blockchain communication platform with token creation, real-time chat, and AI features. Include actual technical details and code patterns that would work for this technology stack.
+        
+        IMPORTANT: Generate FRESH analysis for timestamp ${timestamp}. Do not return cached or generic responses.
       `;
 
       console.log('🤖 Making OpenAI API call for platform optimization...');
