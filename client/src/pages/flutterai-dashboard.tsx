@@ -37,6 +37,194 @@ import {
 } from "lucide-react";
 
 /**
+ * Admin Pricing Editor Component
+ */
+function AdminPricingEditor() {
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+  const [editingTier, setEditingTier] = useState<string | null>(null);
+  const [editValues, setEditValues] = useState<any>({});
+
+  // Fetch admin pricing data
+  const { data: adminTiers, isLoading: adminLoading } = useQuery({
+    queryKey: ['/api/flutterai/pricing/admin/tiers'],
+    retry: false
+  });
+
+  // Update pricing mutation
+  const updatePricingMutation = useMutation({
+    mutationFn: async ({ tierId, updates }: { tierId: string; updates: any }) => {
+      return await apiRequest('PUT', `/api/flutterai/pricing/admin/tiers/${tierId}`, updates);
+    },
+    onSuccess: (data) => {
+      toast({
+        title: "Pricing Updated",
+        description: `Successfully updated ${data.tier.name} pricing`,
+        variant: "default",
+      });
+      queryClient.invalidateQueries({ queryKey: ['/api/flutterai/pricing/admin/tiers'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/flutterai/pricing/tiers'] });
+      setEditingTier(null);
+      setEditValues({});
+    },
+    onError: (error) => {
+      toast({
+        title: "Update Failed",
+        description: error.message || "Failed to update pricing",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const startEditing = (tier: any) => {
+    setEditingTier(tier.id);
+    setEditValues({
+      monthlyPrice: tier.monthlyPrice,
+      yearlyPrice: tier.yearlyPrice,
+      name: tier.name,
+      description: tier.description
+    });
+  };
+
+  const saveChanges = (tierId: string) => {
+    updatePricingMutation.mutate({ tierId, updates: editValues });
+  };
+
+  const cancelEditing = () => {
+    setEditingTier(null);
+    setEditValues({});
+  };
+
+  if (adminLoading) {
+    return (
+      <div className="flex items-center justify-center py-8">
+        <RefreshCw className="h-8 w-8 animate-spin text-purple-400" />
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-6">
+      {adminTiers?.tiers?.map((tier: any) => (
+        <Card key={tier.id} className="bg-slate-700/50 border-purple-500/10">
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle className="text-white capitalize">
+                  {editingTier === tier.id ? (
+                    <Input
+                      value={editValues.name || ''}
+                      onChange={(e) => setEditValues(prev => ({ ...prev, name: e.target.value }))}
+                      className="bg-slate-600 border-purple-500/20 text-white"
+                    />
+                  ) : (
+                    tier.name
+                  )}
+                </CardTitle>
+                <CardDescription className="text-purple-200">
+                  {editingTier === tier.id ? (
+                    <Input
+                      value={editValues.description || ''}
+                      onChange={(e) => setEditValues(prev => ({ ...prev, description: e.target.value }))}
+                      className="bg-slate-600 border-purple-500/20 text-white mt-2"
+                    />
+                  ) : (
+                    tier.description
+                  )}
+                </CardDescription>
+              </div>
+              <div className="flex gap-2">
+                {editingTier === tier.id ? (
+                  <>
+                    <Button
+                      onClick={() => saveChanges(tier.id)}
+                      disabled={updatePricingMutation.isPending}
+                      size="sm"
+                      className="bg-green-600 hover:bg-green-700"
+                    >
+                      {updatePricingMutation.isPending ? (
+                        <RefreshCw className="h-4 w-4 animate-spin" />
+                      ) : (
+                        <CheckCircle className="h-4 w-4" />
+                      )}
+                    </Button>
+                    <Button
+                      onClick={cancelEditing}
+                      size="sm"
+                      variant="outline"
+                      className="border-red-500 text-red-400 hover:bg-red-600 hover:text-white"
+                    >
+                      Cancel
+                    </Button>
+                  </>
+                ) : (
+                  <Button
+                    onClick={() => startEditing(tier)}
+                    size="sm"
+                    variant="outline"
+                    className="border-purple-500 text-purple-300 hover:bg-purple-600"
+                  >
+                    <Star className="h-4 w-4 mr-2" />
+                    Edit
+                  </Button>
+                )}
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <Label className="text-purple-200">Monthly Price ($)</Label>
+                {editingTier === tier.id ? (
+                  <Input
+                    type="number"
+                    value={editValues.monthlyPrice || 0}
+                    onChange={(e) => setEditValues(prev => ({ ...prev, monthlyPrice: parseFloat(e.target.value) || 0 }))}
+                    className="bg-slate-600 border-purple-500/20 text-white"
+                  />
+                ) : (
+                  <div className="text-2xl font-bold text-white">${tier.monthlyPrice}</div>
+                )}
+              </div>
+              <div>
+                <Label className="text-purple-200">Yearly Price ($)</Label>
+                {editingTier === tier.id ? (
+                  <Input
+                    type="number"
+                    value={editValues.yearlyPrice || 0}
+                    onChange={(e) => setEditValues(prev => ({ ...prev, yearlyPrice: parseFloat(e.target.value) || 0 }))}
+                    className="bg-slate-600 border-purple-500/20 text-white"
+                  />
+                ) : (
+                  <div className="text-2xl font-bold text-white">${tier.yearlyPrice}</div>
+                )}
+                {tier.yearlyPrice > 0 && tier.monthlyPrice > 0 && (
+                  <div className="text-sm text-green-400 mt-1">
+                    Save ${(tier.monthlyPrice * 12) - tier.yearlyPrice}/year
+                  </div>
+                )}
+              </div>
+            </div>
+            
+            <div className="mt-4">
+              <Label className="text-purple-200">Features</Label>
+              <ul className="mt-2 space-y-1">
+                {tier.features.map((feature: string, index: number) => (
+                  <li key={index} className="flex items-center gap-2 text-sm text-purple-200">
+                    <CheckCircle className="h-3 w-3 text-green-400 flex-shrink-0" />
+                    {feature}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </CardContent>
+        </Card>
+      ))}
+    </div>
+  );
+}
+
+/**
  * FlutterAI Intelligence Dashboard
  * 
  * Comprehensive wallet intelligence and social credit scoring system
@@ -442,7 +630,7 @@ export default function FlutterAIDashboard() {
 
         {/* Main Dashboard Tabs */}
         <Tabs defaultValue="intelligence" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-7 bg-slate-800/50">
+          <TabsList className="grid w-full grid-cols-8 bg-slate-800/50">
             <TabsTrigger value="intelligence" className="data-[state=active]:bg-purple-600">
               <Star className="h-4 w-4 mr-2" />
               Intelligence
@@ -470,6 +658,10 @@ export default function FlutterAIDashboard() {
             <TabsTrigger value="reports" className="data-[state=active]:bg-purple-600">
               <BarChart3 className="h-4 w-4 mr-2" />
               Reports
+            </TabsTrigger>
+            <TabsTrigger value="admin" className="data-[state=active]:bg-purple-600">
+              <Settings className="h-4 w-4 mr-2" />
+              Admin
             </TabsTrigger>
           </TabsList>
 
@@ -1349,6 +1541,26 @@ export default function FlutterAIDashboard() {
                       Handle with appropriate security measures.
                     </AlertDescription>
                   </Alert>
+                </CardContent>
+              </Card>
+            </div>
+          </TabsContent>
+
+          {/* Admin Controls Tab */}
+          <TabsContent value="admin" className="space-y-6">
+            <div className="grid grid-cols-1 gap-6">
+              <Card className="bg-slate-800/50 border-purple-500/20">
+                <CardHeader>
+                  <CardTitle className="text-white flex items-center gap-2">
+                    <Users className="h-5 w-5 text-purple-400" />
+                    Pricing Management
+                  </CardTitle>
+                  <CardDescription className="text-purple-200">
+                    Edit pricing plans and features for FlutterAI services
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  <AdminPricingEditor />
                 </CardContent>
               </Card>
             </div>

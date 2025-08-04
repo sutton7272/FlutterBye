@@ -50,7 +50,7 @@ export interface FlutterAISubscription {
  */
 export class FlutterAIPricingService {
   
-  // Pricing tiers configuration
+  // Pricing tiers configuration (can be updated via admin)
   private pricingTiers: FlutterAIPricingTier[] = [
     {
       id: 'free',
@@ -363,6 +363,38 @@ export class FlutterAIPricingService {
       console.error('Error getting pricing analytics:', error);
       throw error;
     }
+  }
+
+  /**
+   * Admin method to update pricing tier
+   */
+  async updatePricingTier(tierId: string, updates: Partial<FlutterAIPricingTier>): Promise<FlutterAIPricingTier> {
+    try {
+      const tierIndex = this.pricingTiers.findIndex(tier => tier.id === tierId);
+      if (tierIndex === -1) {
+        throw new Error('Pricing tier not found');
+      }
+
+      // Update the pricing tier with new values
+      this.pricingTiers[tierIndex] = {
+        ...this.pricingTiers[tierIndex],
+        ...updates,
+        id: tierId // Ensure ID cannot be changed
+      };
+
+      console.log(`Updated pricing tier ${tierId}:`, updates);
+      return this.pricingTiers[tierIndex];
+    } catch (error) {
+      console.error('Error updating pricing tier:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Admin method to get all pricing tiers for editing
+   */
+  getPricingTiersForAdmin(): FlutterAIPricingTier[] {
+    return [...this.pricingTiers]; // Return a copy to prevent direct mutation
   }
 }
 

@@ -179,6 +179,56 @@ router.get('/pricing/analytics', async (req, res) => {
   }
 });
 
+// Get pricing tiers for admin editing
+router.get('/pricing/admin/tiers', async (req, res) => {
+  try {
+    // In a real app, you would check admin permissions here
+    const tiers = flutterAIPricingService.getPricingTiersForAdmin();
+    
+    res.json({
+      success: true,
+      tiers
+    });
+  } catch (error) {
+    console.error('Error getting pricing tiers for admin:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to get pricing tiers'
+    });
+  }
+});
+
+// Update pricing tier (admin only)
+router.put('/pricing/admin/tiers/:tierId', async (req, res) => {
+  try {
+    const { tierId } = req.params;
+    const updates = req.body;
+
+    // Validate input
+    if (!updates || typeof updates !== 'object') {
+      return res.status(400).json({
+        success: false,
+        error: 'Invalid update data'
+      });
+    }
+
+    // Update the pricing tier
+    const updatedTier = await flutterAIPricingService.updatePricingTier(tierId, updates);
+    
+    res.json({
+      success: true,
+      tier: updatedTier,
+      message: 'Pricing tier updated successfully'
+    });
+  } catch (error) {
+    console.error('Error updating pricing tier:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message || 'Failed to update pricing tier'
+    });
+  }
+});
+
 // Webhook endpoint for Stripe events
 router.post('/pricing/webhook', async (req, res) => {
   try {
