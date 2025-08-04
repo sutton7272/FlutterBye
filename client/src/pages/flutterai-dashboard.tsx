@@ -27,7 +27,13 @@ import {
   BarChart3,
   Globe,
   Lock,
-  Users
+  Users,
+  DollarSign,
+  CheckCircle,
+  Star,
+  Target,
+  MessageSquare,
+  Trash2
 } from "lucide-react";
 
 /**
@@ -63,6 +69,21 @@ export default function FlutterAIDashboard() {
         : '/api/flutterai/intelligence';
       return await apiRequest('GET', url);
     },
+  });
+
+  // Pricing and Monetization Data Queries
+  const { data: pricingTiers } = useQuery({
+    queryKey: ['/api/flutterai/pricing/tiers'],
+  });
+
+  const { data: userSubscription } = useQuery({
+    queryKey: ['/api/flutterai/pricing/subscription/demo-user'],
+    refetchInterval: 60000, // Refresh every minute
+  });
+
+  const { data: pricingAnalytics } = useQuery({
+    queryKey: ['/api/flutterai/pricing/analytics'],
+    refetchInterval: 30000, // Refresh every 30 seconds
   });
 
   const { data: batches } = useQuery({
@@ -181,6 +202,32 @@ export default function FlutterAIDashboard() {
       toast({
         title: "Batch Analysis Failed",
         description: error.message || "Failed to analyze wallets",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Pricing and Subscription Mutations
+  const upgradeSubscriptionMutation = useMutation({
+    mutationFn: async ({ tierId, billingPeriod }: { tierId: string; billingPeriod: 'monthly' | 'yearly' }) => {
+      return await apiRequest('POST', '/api/flutterai/pricing/checkout', {
+        userId: 'demo-user',
+        tierId,
+        billingPeriod
+      });
+    },
+    onSuccess: (data) => {
+      toast({
+        title: "Redirecting to Checkout",
+        description: "Opening secure payment portal...",
+      });
+      // In a real app, redirect to Stripe checkout
+      window.open(data.checkoutUrl, '_blank');
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Upgrade Failed",
+        description: error.message || "Failed to create checkout session",
         variant: "destructive",
       });
     },
@@ -395,10 +442,14 @@ export default function FlutterAIDashboard() {
 
         {/* Main Dashboard Tabs */}
         <Tabs defaultValue="intelligence" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-6 bg-slate-800/50">
+          <TabsList className="grid w-full grid-cols-7 bg-slate-800/50">
             <TabsTrigger value="intelligence" className="data-[state=active]:bg-purple-600">
               <Star className="h-4 w-4 mr-2" />
               Intelligence
+            </TabsTrigger>
+            <TabsTrigger value="pricing" className="data-[state=active]:bg-purple-600">
+              <DollarSign className="h-4 w-4 mr-2" />
+              Pricing
             </TabsTrigger>
             <TabsTrigger value="collection" className="data-[state=active]:bg-purple-600">
               <Upload className="h-4 w-4 mr-2" />
@@ -591,6 +642,268 @@ export default function FlutterAIDashboard() {
                 </CardContent>
               </Card>
             )}
+          </TabsContent>
+
+          {/* Comprehensive Pricing and Monetization Tab */}
+          <TabsContent value="pricing" className="space-y-6">
+            <div className="grid grid-cols-1 xl:grid-cols-4 gap-6">
+              
+              {/* Current Subscription Status */}
+              <Card className="bg-slate-800/50 border-purple-500/20">
+                <CardHeader>
+                  <CardTitle className="text-white flex items-center gap-2">
+                    <Users className="h-5 w-5 text-purple-400" />
+                    Current Plan
+                  </CardTitle>
+                  <CardDescription className="text-purple-200">
+                    Your subscription and usage details
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  {userSubscription && (
+                    <>
+                      <div className="bg-slate-700/50 p-4 rounded-lg">
+                        <div className="text-green-400 text-sm font-medium mb-1">Active Plan</div>
+                        <div className="text-xl font-bold text-white capitalize">
+                          {userSubscription.subscription?.tierId || 'Free Explorer'}
+                        </div>
+                        <div className="text-xs text-purple-300 mt-1">
+                          Status: {userSubscription.subscription?.status || 'Active'}
+                        </div>
+                      </div>
+                      
+                      {userSubscription.usage && (
+                        <div className="space-y-3">
+                          <div>
+                            <div className="flex justify-between text-sm mb-1">
+                              <span className="text-purple-300">Wallets Analyzed</span>
+                              <span className="text-white">{userSubscription.usage.walletsAnalyzed}/10</span>
+                            </div>
+                            <Progress value={(userSubscription.usage.walletsAnalyzed / 10) * 100} className="h-2" />
+                          </div>
+                          <div>
+                            <div className="flex justify-between text-sm mb-1">
+                              <span className="text-purple-300">API Calls</span>
+                              <span className="text-white">{userSubscription.usage.apiCallsMade}/100</span>
+                            </div>
+                            <Progress value={(userSubscription.usage.apiCallsMade / 100) * 100} className="h-2" />
+                          </div>
+                          <div>
+                            <div className="flex justify-between text-sm mb-1">
+                              <span className="text-purple-300">Batch Analysis</span>
+                              <span className="text-white">{userSubscription.usage.batchAnalysisUsed}/2</span>
+                            </div>
+                            <Progress value={(userSubscription.usage.batchAnalysisUsed / 2) * 100} className="h-2" />
+                          </div>
+                        </div>
+                      )}
+                    </>
+                  )}
+                </CardContent>
+              </Card>
+
+              {/* Pricing Tiers */}
+              <div className="xl:col-span-3">
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                  {pricingTiers?.tiers?.map((tier: any) => (
+                    <Card 
+                      key={tier.id} 
+                      className={`bg-slate-800/50 border-purple-500/20 ${
+                        tier.id === 'professional' ? 'ring-2 ring-purple-500 relative' : ''
+                      }`}
+                    >
+                      {tier.id === 'professional' && (
+                        <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
+                          <Badge className="bg-purple-600 text-white">Most Popular</Badge>
+                        </div>
+                      )}
+                      <CardHeader>
+                        <CardTitle className="text-white text-xl">{tier.name}</CardTitle>
+                        <CardDescription className="text-purple-200">
+                          {tier.description}
+                        </CardDescription>
+                        <div className="flex items-baseline gap-2">
+                          <span className="text-3xl font-bold text-white">${tier.monthlyPrice}</span>
+                          <span className="text-purple-300">/month</span>
+                        </div>
+                        {tier.yearlyPrice > 0 && (
+                          <div className="text-sm text-green-400">
+                            Save ${(tier.monthlyPrice * 12) - tier.yearlyPrice}/year with yearly
+                          </div>
+                        )}
+                      </CardHeader>
+                      <CardContent className="space-y-4">
+                        <ul className="space-y-2">
+                          {tier.features.map((feature: string, index: number) => (
+                            <li key={index} className="flex items-center gap-2 text-sm text-purple-200">
+                              <CheckCircle className="h-4 w-4 text-green-400 flex-shrink-0" />
+                              {feature}
+                            </li>
+                          ))}
+                        </ul>
+                        
+                        <div className="space-y-2">
+                          {tier.id !== 'free' && (
+                            <>
+                              <Button
+                                onClick={() => upgradeSubscriptionMutation.mutate({ 
+                                  tierId: tier.id, 
+                                  billingPeriod: 'monthly' 
+                                })}
+                                disabled={upgradeSubscriptionMutation.isPending}
+                                className="w-full bg-purple-600 hover:bg-purple-700"
+                              >
+                                {upgradeSubscriptionMutation.isPending ? (
+                                  <RefreshCw className="h-4 w-4 animate-spin mr-2" />
+                                ) : (
+                                  "Upgrade Monthly"
+                                )}
+                              </Button>
+                              {tier.yearlyPrice > 0 && (
+                                <Button
+                                  onClick={() => upgradeSubscriptionMutation.mutate({ 
+                                    tierId: tier.id, 
+                                    billingPeriod: 'yearly' 
+                                  })}
+                                  disabled={upgradeSubscriptionMutation.isPending}
+                                  variant="outline"
+                                  className="w-full border-purple-500 text-purple-300 hover:bg-purple-600 hover:text-white"
+                                >
+                                  Upgrade Yearly (Save ${(tier.monthlyPrice * 12) - tier.yearlyPrice})
+                                </Button>
+                              )}
+                            </>
+                          )}
+                          {tier.id === 'free' && (
+                            <Button disabled className="w-full bg-slate-600 text-slate-300">
+                              Current Plan
+                            </Button>
+                          )}
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* Revenue Analytics */}
+            {pricingAnalytics && (
+              <Card className="bg-slate-800/50 border-purple-500/20">
+                <CardHeader>
+                  <CardTitle className="text-white flex items-center gap-2">
+                    <BarChart3 className="h-5 w-5 text-green-400" />
+                    Revenue Analytics
+                  </CardTitle>
+                  <CardDescription className="text-purple-200">
+                    FlutterAI monetization performance and customer insights
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <div className="bg-slate-700/50 p-4 rounded-lg">
+                      <div className="text-green-400 text-sm font-medium">Total Revenue</div>
+                      <div className="text-2xl font-bold text-white">
+                        ${pricingAnalytics.analytics.totalRevenue.toLocaleString()}
+                      </div>
+                      <div className="text-xs text-green-300 mt-1">All-time earnings</div>
+                    </div>
+                    <div className="bg-slate-700/50 p-4 rounded-lg">
+                      <div className="text-blue-400 text-sm font-medium">Monthly Recurring</div>
+                      <div className="text-2xl font-bold text-white">
+                        ${pricingAnalytics.analytics.monthlyRecurringRevenue.toLocaleString()}
+                      </div>
+                      <div className="text-xs text-blue-300 mt-1">MRR growth</div>
+                    </div>
+                    <div className="bg-slate-700/50 p-4 rounded-lg">
+                      <div className="text-purple-400 text-sm font-medium">Total Customers</div>
+                      <div className="text-2xl font-bold text-white">
+                        {Object.values(pricingAnalytics.analytics.customersByTier).reduce((a: number, b: number) => a + b, 0).toLocaleString()}
+                      </div>
+                      <div className="text-xs text-purple-300 mt-1">Active subscribers</div>
+                    </div>
+                    <div className="bg-slate-700/50 p-4 rounded-lg">
+                      <div className="text-orange-400 text-sm font-medium">API Usage</div>
+                      <div className="text-2xl font-bold text-white">
+                        {pricingAnalytics.analytics.usageStats.totalApiCalls.toLocaleString()}
+                      </div>
+                      <div className="text-xs text-orange-300 mt-1">Total API calls</div>
+                    </div>
+                  </div>
+                  
+                  {/* Customer Distribution */}
+                  <div className="mt-6">
+                    <h4 className="text-white font-medium mb-4">Customer Distribution by Tier</h4>
+                    <div className="grid grid-cols-3 gap-4">
+                      {Object.entries(pricingAnalytics.analytics.customersByTier).map(([tier, count]) => (
+                        <div key={tier} className="bg-slate-700/50 p-3 rounded-lg">
+                          <div className="text-sm text-purple-300 capitalize">{tier}</div>
+                          <div className="text-xl font-bold text-white">{count}</div>
+                          <div className="text-xs text-purple-400">
+                            {(count / Object.values(pricingAnalytics.analytics.customersByTier).reduce((a: number, b: number) => a + b, 0) * 100).toFixed(1)}%
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* API Access and Integration */}
+            <Card className="bg-slate-800/50 border-purple-500/20">
+              <CardHeader>
+                <CardTitle className="text-white flex items-center gap-2">
+                  <Zap className="h-5 w-5 text-yellow-400" />
+                  API Access & Integration
+                </CardTitle>
+                <CardDescription className="text-purple-200">
+                  Monetize FlutterAI intelligence through API access
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  <div className="space-y-4">
+                    <h4 className="text-white font-medium">Available API Endpoints</h4>
+                    <div className="space-y-2">
+                      {[
+                        { endpoint: '/api/flutterai/intelligence/analyze/:wallet', description: 'Analyze wallet social credit score' },
+                        { endpoint: '/api/flutterai/intelligence/:wallet', description: 'Get wallet intelligence data' },
+                        { endpoint: '/api/flutterai/intelligence', description: 'List all wallet intelligence' },
+                        { endpoint: '/api/flutterai/intelligence/batch-analyze', description: 'Batch analyze multiple wallets' },
+                        { endpoint: '/api/flutterai/intelligence/:wallet/marketing', description: 'Get marketing recommendations' }
+                      ].map((api, index) => (
+                        <div key={index} className="bg-slate-700/50 p-3 rounded-lg">
+                          <div className="text-green-400 font-mono text-sm">{api.endpoint}</div>
+                          <div className="text-purple-200 text-sm mt-1">{api.description}</div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                  
+                  <div className="space-y-4">
+                    <h4 className="text-white font-medium">Integration Benefits</h4>
+                    <ul className="space-y-2">
+                      {[
+                        'Real-time wallet intelligence scoring',
+                        'Advanced marketing segmentation',
+                        'Behavioral analysis and insights',
+                        'Risk assessment capabilities',
+                        'Batch processing for scale',
+                        'RESTful API design',
+                        'Comprehensive documentation',
+                        'Rate limiting and usage tracking'
+                      ].map((benefit, index) => (
+                        <li key={index} className="flex items-center gap-2 text-sm text-purple-200">
+                          <CheckCircle className="h-4 w-4 text-green-400 flex-shrink-0" />
+                          {benefit}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
           </TabsContent>
 
           {/* Collection Tab */}

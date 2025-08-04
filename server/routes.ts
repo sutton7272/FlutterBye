@@ -37,6 +37,7 @@ import {
   getMarketingRecommendations,
   deleteWalletIntelligence
 } from "./flutterai-intelligence-routes";
+import flutterAIPricingRoutes, { apiRateLimitMiddleware } from "./flutterai-pricing-routes";
 import { Connection, Keypair, LAMPORTS_PER_SOL, PublicKey, Transaction, SystemProgram } from '@solana/web3.js';
 import bs58 from 'bs58';
 
@@ -4114,8 +4115,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Delete wallet intelligence data
   app.delete("/api/flutterai/intelligence/:walletAddress", deleteWalletIntelligence);
   
+  // Register FlutterAI Pricing and Monetization routes
+  app.use("/api/flutterai", flutterAIPricingRoutes);
+  
   console.log("🧠 FlutterAI comprehensive wallet scoring and intelligence engine activated");
   console.log("🧠 FlutterAI Wallet Intelligence routes registered");
+  console.log("💰 FlutterAI Pricing and Monetization system activated");
+  console.log("🎯 AI Pricing Engine initialized with 6 products");
+  console.log("🔄 Real-time pricing updates activated");
   
   const httpServer = createServer(app);
   // WebSocket server for real-time heatmap data and chat
