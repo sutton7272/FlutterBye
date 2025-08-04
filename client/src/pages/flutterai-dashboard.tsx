@@ -33,7 +33,8 @@ import {
   Star,
   Target,
   MessageSquare,
-  Trash2
+  Trash2,
+  Settings
 } from "lucide-react";
 
 /**
