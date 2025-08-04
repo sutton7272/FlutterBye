@@ -83,8 +83,11 @@ function SelfOptimizationAdminContent() {
     setLoading(true);
     
     try {
-      const rawResponse = await apiRequest("POST", "/api/ai/optimization/analyze", {
+      // Add cache-busting timestamp
+      const timestamp = Date.now();
+      const requestData = {
         userId: "admin-dashboard",
+        timestamp: timestamp,
         currentMetrics: {
           conversionRate: 0.12,
           userEngagement: 0.68,
@@ -95,20 +98,34 @@ function SelfOptimizationAdminContent() {
         },
         platformType: "blockchain_communication",
         businessGoals: ["increase_conversion", "improve_engagement", "reduce_churn"]
-      });
+      };
+      
+      console.log('📤 Sending optimization request:', requestData);
+      
+      const rawResponse = await apiRequest("POST", "/api/ai/optimization/analyze", requestData);
+      
+      console.log('🌐 Raw response status:', rawResponse.status);
+      console.log('🌐 Raw response headers:', Object.fromEntries(rawResponse.headers.entries()));
       
       const response = await rawResponse.json();
-      console.log('📊 Optimization API Response:', response);
+      console.log('📊 Full Optimization API Response:', response);
+      console.log('📋 Recommendations count in response:', response.recommendations?.length);
+      console.log('📝 Recommendation titles:', response.recommendations?.map((r: any) => r.title) || []);
       
       if (!response || typeof response !== 'object') {
         throw new Error('Invalid response format received');
       }
       
+      if (!response.recommendations || response.recommendations.length === 0) {
+        throw new Error('No recommendations received in response');
+      }
+      
+      console.log('✅ Setting results with', response.recommendations.length, 'recommendations');
       setResults({ type: 'optimization', data: response });
       
       toast({
         title: "Self-Optimizing Platform Analysis Complete!",
-        description: `Generated ${response.recommendations?.length || 'multiple'} optimization recommendations with implementation scripts`,
+        description: `Generated ${response.recommendations?.length} optimization recommendations with implementation scripts`,
       });
       
     } catch (error) {
@@ -522,6 +539,16 @@ const abTestConfig = {
               <div className="space-y-6">
                 <div className="text-green-400 font-medium">
                   Generated {results.data.recommendations.length} optimization recommendations with complete implementation scripts
+                </div>
+                
+                {/* Debug Information */}
+                <div className="bg-blue-900/20 border border-blue-500/30 rounded p-3 text-xs">
+                  <div className="text-blue-300 font-medium mb-1">🔍 Debug Info:</div>
+                  <div className="text-blue-200">
+                    • Total recommendations: {results.data.recommendations.length}<br/>
+                    • Response timestamp: {new Date().toISOString()}<br/>
+                    • All titles: {results.data.recommendations.map((r: any) => r.title).join(', ')}
+                  </div>
                 </div>
                 
                 <div className="grid gap-4">

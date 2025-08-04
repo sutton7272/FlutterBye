@@ -1,11 +1,11 @@
 import type { Express } from "express";
 import { DynamicPricingAI } from "./dynamic-pricing-ai";
 import { ViralAmplificationAI } from "./viral-amplification-ai";
-import { SelfOptimizingPlatform } from "./self-optimizing-platform";
+import { SelfOptimizingPlatformService } from "./self-optimizing-platform";
 
 const dynamicPricing = new DynamicPricingAI();
 const viralAmplification = new ViralAmplificationAI();
-const selfOptimizing = new SelfOptimizingPlatform();
+const selfOptimizing = new SelfOptimizingPlatformService();
 
 export function registerNextGenAIRoutes(app: Express) {
   
@@ -241,7 +241,8 @@ export function registerNextGenAIRoutes(app: Express) {
       console.log(`📊 [${requestId}] Processing metrics:`, Object.keys(metrics));
       
       // Ensure this waits for the FULL AI analysis - no timeouts or race conditions
-      const recommendations = await selfOptimizing.analyzePerformance(metrics);
+      const response = await selfOptimizing.analyzeAndOptimize({ currentMetrics: metrics, timestamp: Date.now() });
+      const recommendations = response.recommendations;
       
       const processingTime = Date.now() - startTime;
       console.log(`✅ [${requestId}] Analysis completed in ${processingTime}ms`);
@@ -348,20 +349,24 @@ export function registerNextGenAIRoutes(app: Express) {
           dayOfWeek: new Date().getDay()
         }),
         viralAmplification.generateViralContent(topic || productType, platform || 'twitter'),
-        selfOptimizing.analyzePerformance(metrics || {
-          conversionRate: 0.15,
-          userEngagement: 0.65,
-          pageLoadTime: 2.5,
-          bounceRate: 0.45,
-          userSatisfaction: 0.75,
-          revenuePerUser: 25.0
+        selfOptimizing.analyzeAndOptimize({ 
+          currentMetrics: metrics || {
+            conversionRate: 0.15,
+            userEngagement: 0.65,
+            pageLoadTime: 2.5,
+            bounceRate: 0.45,
+            userSatisfaction: 0.75,
+            revenuePerUser: 25.0
+          },
+          timestamp: Date.now()
         })
       ]);
       
+      const optimizationRecs = optimizationRecommendations.recommendations || optimizationRecommendations;
       const combinedROI = 
         parseInt(pricingResult.revenueImpact.match(/\d+/)?.[0] || '25') +
         (viralContent.viralScore > 75 ? 100 : 50) +
-        optimizationRecommendations.reduce((sum, r) => {
+        optimizationRecs.reduce((sum, r) => {
           return sum + parseInt(r.potentialROI.match(/\d+/)?.[0] || '0');
         }, 0);
       
@@ -370,7 +375,7 @@ export function registerNextGenAIRoutes(app: Express) {
         analysis: {
           pricing: pricingResult,
           viral: viralContent,
-          optimization: optimizationRecommendations.slice(0, 3)
+          optimization: optimizationRecs.slice(0, 3)
         },
         summary: {
           combinedROI: `${combinedROI}%`,
