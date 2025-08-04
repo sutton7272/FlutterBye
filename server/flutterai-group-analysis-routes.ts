@@ -222,6 +222,27 @@ router.post('/collect-wallets', async (req, res) => {
         const existingWallet = await storage.getWalletIntelligence(address);
         
         if (existingWallet) {
+          // Update existing wallet with new token analysis source if different
+          if (existingWallet.analysisData?.tokenAnalysisSource !== source) {
+            await storage.updateWalletScore(address, {
+              analysisData: {
+                ...existingWallet.analysisData,
+                additionalTokenSources: [
+                  ...(existingWallet.analysisData?.additionalTokenSources || []),
+                  {
+                    source,
+                    collectionDate: new Date().toISOString(),
+                    metadata
+                  }
+                ],
+                lastTokenAnalysisUpdate: new Date().toISOString()
+              },
+              lastAnalyzed: new Date()
+            });
+            // Re-queue for analysis to update score based on new token data
+            await storage.addToAnalysisQueue(address, 2);
+            aiScoringQueued++;
+          }
           duplicatesSkipped++;
         } else {
           // Collect new wallet using the wallet collection service
@@ -248,6 +269,30 @@ router.post('/collect-wallets', async (req, res) => {
     res.status(500).json({
       success: false,
       error: error instanceof Error ? error.message : 'Failed to collect wallets'
+    });
+  }
+});
+
+// Endpoint for periodic wallet re-analysis
+router.post('/schedule-reanalysis', async (req, res) => {
+  try {
+    console.log('🔄 Scheduling periodic wallet re-analysis');
+    
+    const { WalletCollectionService } = await import('./wallet-collection-service');
+    const walletService = new WalletCollectionService();
+    
+    const result = await walletService.schedulePeriodicReanalysis();
+    
+    res.json({
+      success: true,
+      message: 'Periodic re-analysis scheduled successfully',
+      ...result
+    });
+  } catch (error) {
+    console.error('Error scheduling periodic re-analysis:', error);
+    res.status(500).json({
+      success: false,
+      error: error instanceof Error ? error.message : 'Failed to schedule re-analysis'
     });
   }
 });

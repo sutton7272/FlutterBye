@@ -257,7 +257,7 @@ export class WalletCollectionService {
   }
 
   /**
-   * Collect wallet from token analysis
+   * Collect wallet from token analysis with comprehensive source tracking
    */
   async collectWalletFromTokenAnalysis(
     walletAddress: string, 
@@ -265,29 +265,83 @@ export class WalletCollectionService {
     metadata: any
   ): Promise<void> {
     try {
-      console.log(`🔍 Collecting wallet from token analysis: ${walletAddress}`);
+      console.log(`🔍 Collecting wallet from token analysis: ${walletAddress} from source: ${source}`);
       
-      // Collect new wallet
+      // Collect new wallet with source tracking
       const walletIntelligence = await storage.collectWalletAddress(
         walletAddress,
         'token_analysis'
       );
 
-      // Update with metadata
+      // Update with comprehensive metadata and source tracking
       await storage.updateWalletScore(walletAddress, {
-        metadata: {
+        sourcePlatform: 'FlutterAI',
+        collectionMethod: 'token_analysis',
+        analysisData: {
           tokenAnalysisSource: source,
           collectionDate: new Date().toISOString(),
-          ...metadata
+          tokenMetadata: metadata,
+          initialAnalysisTriggered: true,
+          blockchainData: {},
+          aiAnalysis: {},
+          calculatedAt: new Date().toISOString(),
+          riskFactors: [],
+          behaviorPatterns: {},
+          portfolioAnalysis: {}
+        },
+        marketingInsights: {
+          targetAudience: "token holders",
+          messagingStrategy: "token-focused engagement",
+          bestContactTimes: [],
+          preferredCommunicationChannels: ["blockchain", "social"],
+          interests: [source || "cryptocurrency"],
+          behaviorPatterns: ["token_holder"],
+          marketingRecommendations: [`Engage with ${source} token content`]
         }
       });
 
-      // Queue for AI analysis
-      await storage.addToAnalysisQueue(walletAddress, 2); // Medium priority
+      // Queue for AI analysis with high priority for token analysis
+      await storage.addToAnalysisQueue(walletAddress, 3); // High priority for token analysis
 
-      console.log(`✅ Collected token analysis wallet: ${walletAddress}`);
+      console.log(`✅ Collected token analysis wallet: ${walletAddress} with source tracking`);
     } catch (error) {
       console.error(`❌ Error collecting token analysis wallet ${walletAddress}:`, error);
+      throw error;
+    }
+  }
+
+  /**
+   * Schedule periodic re-analysis of wallets for score updates
+   */
+  async schedulePeriodicReanalysis(): Promise<{
+    walletsScheduled: number;
+    totalWallets: number;
+  }> {
+    try {
+      console.log(`🔄 Scheduling periodic re-analysis of wallets`);
+      
+      const allWallets = await storage.getAllWalletIntelligence();
+      const now = new Date();
+      const twentyFourHoursAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+      
+      let walletsScheduled = 0;
+      
+      for (const wallet of allWallets) {
+        // Re-analyze wallets that haven't been analyzed in 24 hours
+        if (!wallet.lastAnalyzed || new Date(wallet.lastAnalyzed) < twentyFourHoursAgo) {
+          await storage.addToAnalysisQueue(wallet.walletAddress, 1); // Low priority for re-analysis
+          walletsScheduled++;
+        }
+      }
+      
+      console.log(`✅ Scheduled ${walletsScheduled} wallets for re-analysis`);
+      
+      return {
+        walletsScheduled,
+        totalWallets: allWallets.length
+      };
+    } catch (error) {
+      console.error(`❌ Error scheduling periodic re-analysis:`, error);
       throw error;
     }
   }
