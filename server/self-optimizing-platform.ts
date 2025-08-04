@@ -49,19 +49,22 @@ export class SelfOptimizingPlatform {
   };
 
   async analyzePerformance(currentMetrics: OptimizationMetrics): Promise<OptimizationRecommendation[]> {
-    try {
-      const performanceGaps = this.identifyPerformanceGaps(currentMetrics);
-      const aiRecommendations = await this.getAIOptimizationRecommendations(currentMetrics, performanceGaps);
-      const prioritizedRecommendations = this.prioritizeRecommendations(aiRecommendations);
-      
-      // Store recommendations for tracking
-      this.optimizationHistory.push(...prioritizedRecommendations);
-      
-      return prioritizedRecommendations;
-    } catch (error) {
-      console.error('Performance analysis error:', error);
-      return this.getFallbackRecommendations(currentMetrics);
-    }
+    console.log('🚀 FORCING REAL AI ANALYSIS - NO FALLBACKS ALLOWED');
+    
+    const performanceGaps = this.identifyPerformanceGaps(currentMetrics);
+    console.log('📊 Performance gaps calculated:', Object.keys(performanceGaps));
+    
+    // NO TRY/CATCH - Let errors bubble up to force real AI processing
+    const aiRecommendations = await this.getAIOptimizationRecommendations(currentMetrics, performanceGaps);
+    console.log('🤖 AI recommendations received:', aiRecommendations.length);
+    
+    const prioritizedRecommendations = this.prioritizeRecommendations(aiRecommendations);
+    console.log('📋 Recommendations prioritized:', prioritizedRecommendations.length);
+    
+    // Store recommendations for tracking
+    this.optimizationHistory.push(...prioritizedRecommendations);
+    
+    return prioritizedRecommendations;
   }
 
   private identifyPerformanceGaps(current: OptimizationMetrics): Record<string, number> {
@@ -174,8 +177,8 @@ export class SelfOptimizingPlatform {
       console.log(`✅ AI platform analysis complete: ${result.recommendations?.length || 0} recommendations generated`);
       
       if (!result.recommendations || result.recommendations.length === 0) {
-        console.log('⚠️ AI returned no recommendations, using enhanced fallback');
-        return this.getEnhancedFallbackRecommendations(metrics, gaps);
+        console.error('❌ CRITICAL: AI returned no recommendations - this should never happen');
+        throw new Error('OpenAI returned empty recommendations - system malfunction');
       }
 
       // Enhance AI recommendations with detailed solution scripts
@@ -183,15 +186,15 @@ export class SelfOptimizingPlatform {
       
       return enhancedRecommendations;
     } catch (error) {
-      console.error('❌ AI optimization analysis error:', error);
+      console.error('❌ CRITICAL AI FAILURE - NO FALLBACKS:', error);
       console.error('Error details:', {
-        message: error.message,
-        code: error.code,
-        type: error.type,
-        status: error.status
+        message: error?.message,
+        code: error?.code,
+        type: error?.type,
+        status: error?.status
       });
-      console.log('🔄 Using enhanced fallback recommendations with platform-specific analysis');
-      return this.getEnhancedFallbackRecommendations(metrics, gaps);
+      // RE-THROW ERROR - NO FALLBACK ALLOWED
+      throw new Error(`AI analysis failed: ${error?.message || 'Unknown error'}`);
     }
   }
 
