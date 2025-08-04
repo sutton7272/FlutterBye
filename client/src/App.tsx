@@ -64,6 +64,7 @@ import { LivingAIPage } from "@/pages/living-ai";
 import AIComprehensiveOverview from "@/pages/ai-comprehensive-overview";
 import RevolutionaryAIShowcase from "@/pages/revolutionary-ai-showcase";
 import AIFeaturesTest from "@/pages/ai-features-test";
+import DynamicPricingDashboard from "@/pages/dynamic-pricing-dashboard";
 import Navbar from "@/components/navbar";
 import { PersonalizedDashboard } from "@/components/PersonalizedDashboard";
 
@@ -430,6 +431,12 @@ function Router() {
         }} />
         <Route path="/claim/:collectionId" component={NFTClaim} />
         <Route path="/claim/:collectionId/:tokenNumber" component={NFTClaim} />
+        <Route path="/dynamic-pricing" component={() => (
+          <>
+            <Navbar />
+            <DynamicPricingDashboard />
+          </>
+        )} />
         <Route component={NotFound} />
       </Switch>
     </div>
