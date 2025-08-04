@@ -86,18 +86,14 @@ function SelfOptimizationAdminContent() {
       // Add cache-busting timestamp
       const timestamp = Date.now();
       const requestData = {
-        userId: "admin-dashboard",
-        timestamp: timestamp,
-        currentMetrics: {
+        metrics: {
           conversionRate: 0.12,
           userEngagement: 0.68,
           pageLoadTime: 2.1,
           bounceRate: 0.42,
           userSatisfaction: 0.78,
           revenuePerUser: testData.metrics.revenue / testData.metrics.userCount
-        },
-        platformType: "blockchain_communication",
-        businessGoals: ["increase_conversion", "improve_engagement", "reduce_churn"]
+        }
       };
       
       console.log('📤 Sending optimization request:', requestData);
