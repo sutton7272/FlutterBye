@@ -64,7 +64,287 @@ import {
   Gauge
 } from "lucide-react";
 
-// Dynamic Pricing Admin Component
+// Self-Optimization Platform Admin Component
+function SelfOptimizationAdminContent() {
+  const [loading, setLoading] = useState(false);
+  const [results, setResults] = useState<any>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [testData, setTestData] = useState({
+    productType: 'token_creation',
+    currentPrice: 1.0,
+    content: 'Check out this amazing token! 🚀',
+    metrics: { userCount: 100, revenue: 1000 }
+  });
+  const { toast } = useToast();
+
+  const testSelfOptimizing = async () => {
+    console.log('🔧 Starting Self-Optimizing Platform analysis...');
+    setError(null);
+    setLoading(true);
+    
+    try {
+      const rawResponse = await apiRequest("POST", "/api/ai/optimization/analyze", {
+        userId: "admin-dashboard",
+        currentMetrics: {
+          conversionRate: 0.12,
+          userEngagement: 0.68,
+          pageLoadTime: 2.1,
+          bounceRate: 0.42,
+          userSatisfaction: 0.78,
+          revenuePerUser: testData.metrics.revenue / testData.metrics.userCount
+        },
+        platformType: "blockchain_communication",
+        businessGoals: ["increase_conversion", "improve_engagement", "reduce_churn"]
+      });
+      
+      const response = await rawResponse.json();
+      console.log('📊 Optimization API Response:', response);
+      
+      if (!response || typeof response !== 'object') {
+        throw new Error('Invalid response format received');
+      }
+      
+      setResults({ type: 'optimization', data: response });
+      
+      toast({
+        title: "Self-Optimizing Platform Analysis Complete!",
+        description: `Generated ${response.recommendations?.length || 'multiple'} optimization recommendations with implementation scripts`,
+      });
+      
+    } catch (error) {
+      console.error('❌ Optimization analysis error:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      setError(`Optimization analysis failed: ${errorMessage}`);
+      
+      toast({
+        title: "Error", 
+        description: `Failed to analyze optimization: ${errorMessage}`,
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (error) {
+    return (
+      <div className="space-y-6">
+        <div className="bg-red-900/20 border border-red-500/30 rounded-lg p-6">
+          <h2 className="text-red-400 text-xl font-bold mb-2">Analysis Error</h2>
+          <p className="text-red-300 mb-4">{error}</p>
+          <Button 
+            onClick={() => {
+              setError(null);
+              setResults(null);
+              setLoading(false);
+            }}
+            className="bg-red-600 hover:bg-red-700"
+          >
+            Reset Analysis
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-6">
+      <div className="flex justify-between items-center">
+        <div>
+          <h2 className="text-2xl font-bold text-white flex items-center gap-2">
+            <Gauge className="w-6 h-6 text-purple-400" />
+            Self-Optimizing Platform
+          </h2>
+          <p className="text-slate-400">AI-powered platform optimization with complete implementation scripts</p>
+        </div>
+        <Badge variant="outline" className="text-purple-400 border-purple-400">
+          400% ROI • Complete AI Solutions
+        </Badge>
+      </div>
+
+      {/* Configuration Panel */}
+      <Card className="bg-slate-800/50 border-purple-500/30">
+        <CardHeader>
+          <CardTitle className="text-white flex items-center gap-2">
+            <Settings className="w-5 h-5" />
+            Platform Metrics Configuration
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="text-white text-sm font-medium">User Count</label>
+              <Input
+                type="number"
+                value={testData.metrics.userCount}
+                onChange={(e) => setTestData(prev => ({ 
+                  ...prev, 
+                  metrics: { ...prev.metrics, userCount: parseInt(e.target.value) || 0 }
+                }))}
+                className="bg-black/40 border-gray-600 text-white"
+              />
+            </div>
+            <div>
+              <label className="text-white text-sm font-medium">Total Revenue ($)</label>
+              <Input
+                type="number"
+                step="0.01"
+                value={testData.metrics.revenue}
+                onChange={(e) => setTestData(prev => ({ 
+                  ...prev, 
+                  metrics: { ...prev.metrics, revenue: parseFloat(e.target.value) || 0 }
+                }))}
+                className="bg-black/40 border-gray-600 text-white"
+              />
+            </div>
+          </div>
+          
+          <div className="flex justify-center">
+            <Button
+              onClick={testSelfOptimizing}
+              disabled={loading}
+              className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white px-8 py-3"
+            >
+              {loading ? (
+                <>
+                  <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
+                  Analyzing Platform...
+                </>
+              ) : (
+                <>
+                  <Gauge className="w-4 h-4 mr-2" />
+                  Run Complete Optimization Analysis
+                </>
+              )}
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Results Display */}
+      {results && results.type === 'optimization' && results.data && (
+        <Card className="bg-slate-800/50 border-green-500/30">
+          <CardHeader>
+            <CardTitle className="text-white flex items-center gap-2">
+              <CheckCircle className="w-5 h-5 text-green-400" />
+              AI Optimization Results
+              <Badge className="bg-green-500/20 text-green-400 ml-2">
+                Analysis Complete
+              </Badge>
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {results.data.recommendations && results.data.recommendations.length > 0 ? (
+              <div className="space-y-6">
+                <div className="text-green-400 font-medium">
+                  Generated {results.data.recommendations.length} optimization recommendations with complete implementation scripts
+                </div>
+                
+                <div className="grid gap-4">
+                  {results.data.recommendations.map((rec: any, index: number) => (
+                    <Card key={index} className="bg-black/30 border-blue-500/20">
+                      <CardContent className="p-4">
+                        <div className="flex justify-between items-start mb-3">
+                          <div className="flex items-center gap-2">
+                            <Badge variant="outline" className={`
+                              ${rec.priority === 'Critical' ? 'text-red-400 border-red-400' : 
+                                rec.priority === 'High' ? 'text-orange-400 border-orange-400' : 
+                                rec.priority === 'Medium' ? 'text-yellow-400 border-yellow-400' : 
+                                'text-blue-400 border-blue-400'}
+                            `}>
+                              {rec.priority}
+                            </Badge>
+                            <Badge variant="outline" className="text-cyan-400 border-cyan-400">
+                              {Math.round((rec.confidence || 0) * 100)}% confidence
+                            </Badge>
+                          </div>
+                        </div>
+                        
+                        <h4 className="text-white font-bold text-lg mb-2">{rec.title}</h4>
+                        <p className="text-gray-300 text-sm mb-3">
+                          {typeof (rec.description || rec.recommendation) === 'string' 
+                            ? (rec.description || rec.recommendation) 
+                            : JSON.stringify(rec.description || rec.recommendation)}
+                        </p>
+                        
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
+                          {rec.expectedImpact && (
+                            <div className="text-green-400 text-sm">
+                              <span className="font-medium">Impact:</span> {typeof rec.expectedImpact === 'string' ? rec.expectedImpact : JSON.stringify(rec.expectedImpact)}
+                            </div>
+                          )}
+                          {rec.timeToImplement && (
+                            <div className="text-blue-400 text-sm">
+                              <span className="font-medium">Time:</span> {typeof rec.timeToImplement === 'string' ? rec.timeToImplement : JSON.stringify(rec.timeToImplement)}
+                            </div>
+                          )}
+                          {rec.potentialROI && (
+                            <div className="text-purple-400 text-sm">
+                              <span className="font-medium">ROI:</span> {typeof rec.potentialROI === 'string' ? rec.potentialROI : JSON.stringify(rec.potentialROI)}
+                            </div>
+                          )}
+                          {rec.category && (
+                            <div className="text-cyan-400 text-sm">
+                              <span className="font-medium">Category:</span> {typeof rec.category === 'string' ? rec.category : JSON.stringify(rec.category)}
+                            </div>
+                          )}
+                        </div>
+
+                        {rec.solutionScript && (
+                          <div className="mt-4 space-y-3">
+                            <div className="flex justify-between items-center">
+                              <h5 className="text-orange-400 font-semibold flex items-center gap-2">
+                                <Brain className="w-4 h-4" />
+                                Complete Implementation Script
+                              </h5>
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                className="text-xs"
+                                onClick={() => {
+                                  const scriptText = typeof rec.solutionScript === 'string' 
+                                    ? rec.solutionScript 
+                                    : JSON.stringify(rec.solutionScript, null, 2);
+                                  navigator.clipboard.writeText(scriptText);
+                                  toast({ title: "Script Copied!", description: "Implementation script copied to clipboard" });
+                                }}
+                              >
+                                <Copy className="w-3 h-3 mr-1" />
+                                Copy Script
+                              </Button>
+                            </div>
+                            
+                            {rec.scriptInstructions && (
+                              <div className="bg-blue-900/20 border border-blue-500/30 rounded p-3 mb-3">
+                                <p className="text-blue-300 text-sm">
+                                  <span className="font-medium">Instructions:</span> {typeof rec.scriptInstructions === 'string' ? rec.scriptInstructions : JSON.stringify(rec.scriptInstructions)}
+                                </p>
+                              </div>
+                            )}
+                            
+                            <div className="bg-black/50 border border-gray-600 rounded-lg p-4 max-h-80 overflow-auto">
+                              <pre className="text-green-400 text-xs whitespace-pre-wrap font-mono">
+                                {typeof rec.solutionScript === 'string' ? rec.solutionScript : JSON.stringify(rec.solutionScript, null, 2)}
+                              </pre>
+                            </div>
+                          </div>
+                        )}
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              </div>
+            ) : (
+              <div className="text-gray-400">No optimization recommendations available</div>
+            )}
+          </CardContent>
+        </Card>
+      )}
+    </div>
+  );
+}
+
+// Dynamic Pricing Admin Component  
 function DynamicPricingAdminContent() {
   const [selectedProduct, setSelectedProduct] = useState('token_creation');
   const [demandLevel, setDemandLevel] = useState<'low' | 'medium' | 'high'>('medium');
@@ -591,6 +871,7 @@ export default function UnifiedAdminDashboard() {
                   <SelectItem value="overview">📊 Overview</SelectItem>
                   <SelectItem value="pricing">💰 Pricing</SelectItem>
                   <SelectItem value="dynamic-pricing">🧠 Dynamic AI</SelectItem>
+                  <SelectItem value="self-optimization">🔧 Self-Optimization</SelectItem>
                   <SelectItem value="users">👥 Users</SelectItem>
                   <SelectItem value="security">🛡️ Security</SelectItem>
                   <SelectItem value="revenue">💵 Revenue</SelectItem>
@@ -653,6 +934,13 @@ export default function UnifiedAdminDashboard() {
             >
               <Brain className="w-4 h-4" />
               <span className="hidden sm:inline">Dynamic AI</span>
+            </TabsTrigger>
+            <TabsTrigger 
+              value="self-optimization" 
+              className="flex-shrink-0 flex items-center gap-2 text-slate-300 font-medium data-[state=active]:text-white data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-600/60 data-[state=active]:to-blue-600/60 data-[state=active]:shadow-lg hover:text-white hover:bg-slate-700/50 transition-all duration-200 px-4 py-2"
+            >
+              <Gauge className="w-4 h-4" />
+              <span className="hidden sm:inline">Self-Optimization</span>
             </TabsTrigger>
             <TabsTrigger 
               value="codes" 
@@ -1519,6 +1807,10 @@ export default function UnifiedAdminDashboard() {
           {/* Dynamic Pricing AI Tab */}
           <TabsContent value="dynamic-pricing" className="space-y-6">
             <DynamicPricingAdminContent />
+          </TabsContent>
+
+          <TabsContent value="self-optimization" className="space-y-6">
+            <SelfOptimizationAdminContent />
           </TabsContent>
 
           {/* Codes Tab - Redemption Code Management */}
