@@ -135,8 +135,20 @@ export default function AIFeaturesTest() {
   };
 
   const testSelfOptimizing = async () => {
+    console.log('🔧 Starting Self-Optimizing Platform test...');
     setLoading(true);
+    
     try {
+      console.log('📊 Sending optimization request with metrics:', {
+        userEngagement: testData.metrics.userCount / 1000,
+        revenue: testData.metrics.revenue,
+        conversionRate: 0.15,
+        userSatisfaction: 0.85,
+        pageLoadTime: 2.1,
+        bounceRate: 0.35,
+        revenuePerUser: testData.metrics.revenue / Math.max(testData.metrics.userCount, 1)
+      });
+
       const rawResponse = await apiRequest("POST", "/api/ai/optimization/analyze", {
         metrics: {
           userEngagement: testData.metrics.userCount / 1000, // Convert to ratio
@@ -149,24 +161,47 @@ export default function AIFeaturesTest() {
         }
       });
       
+      console.log('✅ Raw response received:', rawResponse.status, rawResponse.statusText);
+      
+      if (!rawResponse.ok) {
+        throw new Error(`API request failed: ${rawResponse.status} ${rawResponse.statusText}`);
+      }
+      
       const response = await rawResponse.json(); // Parse JSON response
       
       console.log('📊 Optimization API Response:', response);
+      console.log('📊 Response success:', response.success);
+      console.log('📊 Recommendations count:', response.recommendations?.length);
+      
+      // Validate response structure
+      if (!response || typeof response !== 'object') {
+        throw new Error('Invalid response format received');
+      }
       
       setResults({ type: 'optimization', data: response });
+      
       toast({
         title: "Self-Optimizing Platform AI Activated!",
-        description: `Generated ${response.recommendations?.length || 5} optimization recommendations`,
+        description: `Generated ${response.recommendations?.length || 'multiple'} optimization recommendations with solution scripts`,
       });
+      
     } catch (error) {
       console.error('❌ Optimization test error:', error);
+      
+      // Detailed error logging
+      console.error('Error details:', {
+        message: error instanceof Error ? error.message : 'Unknown error',
+        stack: error instanceof Error ? error.stack : undefined,
+        type: typeof error
+      });
+      
       toast({
         title: "Error", 
-        description: "Failed to analyze optimization opportunities",
+        description: `Failed to analyze optimization: ${error instanceof Error ? error.message : 'Unknown error'}`,
         variant: "destructive",
       });
       
-      // Show fallback results for demo purposes
+      // Show fallback results with solution scripts for demo purposes
       setResults({
         type: 'optimization',
         data: {
@@ -181,23 +216,310 @@ export default function AIFeaturesTest() {
               expectedImpact: '25% increase in conversion rate',
               confidence: 0.92,
               timeToImplement: '2-3 weeks',
-              potentialROI: '400%'
+              potentialROI: '400%',
+              solutionScript: `# Complete AI Solution Script: Optimize Checkout Flow
+
+## Objective
+Implement a streamlined single-page checkout to reduce cart abandonment and increase conversion rates by 25%.
+
+## Technical Requirements
+- React/TypeScript frontend
+- Form validation with React Hook Form + Zod
+- Payment processing integration
+- Progress indicator component
+- Mobile-responsive design
+
+## Implementation Steps
+
+### 1. Create Checkout Components
+\`\`\`typescript
+// components/checkout/SinglePageCheckout.tsx
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import * as z from 'zod';
+
+const checkoutSchema = z.object({
+  email: z.string().email(),
+  address: z.object({
+    street: z.string().min(1),
+    city: z.string().min(1),
+    zip: z.string().min(1),
+    country: z.string().min(1)
+  }),
+  payment: z.object({
+    cardNumber: z.string().min(16),
+    expiryDate: z.string().regex(/^(0[1-9]|1[0-2])\\/([0-9]{2})$/),
+    cvv: z.string().min(3)
+  })
+});
+
+export function SinglePageCheckout() {
+  const [currentStep, setCurrentStep] = useState(1);
+  const form = useForm({
+    resolver: zodResolver(checkoutSchema)
+  });
+
+  // Implementation details...
+}
+\`\`\`
+
+### 2. Add Progress Indicator
+\`\`\`typescript
+// components/checkout/ProgressIndicator.tsx
+export function ProgressIndicator({ currentStep, totalSteps }: {
+  currentStep: number;
+  totalSteps: number;
+}) {
+  return (
+    <div className="flex items-center justify-between mb-6">
+      {Array.from({ length: totalSteps }, (_, i) => (
+        <div key={i} className={classNames(
+          "flex items-center",
+          i < totalSteps - 1 && "flex-1"
+        )}>
+          <div className={classNames(
+            "w-8 h-8 rounded-full flex items-center justify-center",
+            i + 1 <= currentStep ? "bg-blue-600 text-white" : "bg-gray-300"
+          )}>
+            {i + 1}
+          </div>
+          {i < totalSteps - 1 && (
+            <div className={classNames(
+              "flex-1 h-1 mx-2",
+              i + 1 < currentStep ? "bg-blue-600" : "bg-gray-300"
+            )} />
+          )}
+        </div>
+      ))}
+    </div>
+  );
+}
+\`\`\`
+
+### 3. Validation & Error Handling
+- Implement real-time validation
+- Add clear error messages
+- Include field-level validation feedback
+- Add loading states for payment processing
+
+### 4. Mobile Optimization
+- Responsive design for all screen sizes
+- Touch-friendly input fields
+- Optimized keyboard types for mobile
+- Fast loading and minimal network requests
+
+## Testing Checklist
+- [ ] Form validation works correctly
+- [ ] Progress indicator updates properly
+- [ ] Payment processing completes successfully
+- [ ] Mobile experience is smooth
+- [ ] Error handling is comprehensive
+- [ ] Loading states are implemented
+
+## Expected Results
+- 25% reduction in cart abandonment
+- Improved user experience
+- Faster checkout completion
+- Higher conversion rates
+
+## Timeline: 2-3 weeks
+## ROI: 400%`,
+              scriptInstructions: "Copy this complete script and paste it into any AI assistant (ChatGPT, Claude, etc.) to get detailed implementation guidance with code examples, component structures, and step-by-step instructions."
             },
             {
               category: 'Performance',
               priority: 'High',
               title: 'Improve Page Load Speed',
-              description: 'Optimize images and implement lazy loading',
+              description: 'Optimize images and implement lazy loading to improve page load time by 1.2 seconds',
               implementation: 'Compress images, use WebP format, implement lazy loading',
               expectedImpact: '1.2s faster load time',
               confidence: 0.88,
               timeToImplement: '1 week',
-              potentialROI: '150%'
+              potentialROI: '150%',
+              solutionScript: `# Complete AI Solution Script: Improve Page Load Speed
+
+## Objective
+Optimize images and implement lazy loading to reduce page load time by 1.2 seconds and improve user experience.
+
+## Technical Requirements
+- Image optimization pipeline
+- WebP format conversion
+- Lazy loading implementation
+- Performance monitoring
+- CDN integration (optional)
+
+## Implementation Steps
+
+### 1. Image Optimization Setup
+\`\`\`typescript
+// utils/imageOptimization.ts
+export const optimizeImage = async (file: File): Promise<string> => {
+  return new Promise((resolve) => {
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    const img = new Image();
+    
+    img.onload = () => {
+      // Calculate optimal dimensions
+      const maxWidth = 1200;
+      const maxHeight = 800;
+      let { width, height } = img;
+      
+      if (width > maxWidth) {
+        height = (height * maxWidth) / width;
+        width = maxWidth;
+      }
+      
+      if (height > maxHeight) {
+        width = (width * maxHeight) / height;
+        height = maxHeight;
+      }
+      
+      canvas.width = width;
+      canvas.height = height;
+      
+      ctx?.drawImage(img, 0, 0, width, height);
+      
+      // Convert to WebP with 80% quality
+      const webpDataUrl = canvas.toDataURL('image/webp', 0.8);
+      resolve(webpDataUrl);
+    };
+    
+    img.src = URL.createObjectURL(file);
+  });
+};
+\`\`\`
+
+### 2. Lazy Loading Component
+\`\`\`typescript
+// components/LazyImage.tsx
+import { useState, useRef, useEffect } from 'react';
+
+interface LazyImageProps {
+  src: string;
+  alt: string;
+  className?: string;
+  placeholder?: string;
+}
+
+export function LazyImage({ src, alt, className, placeholder }: LazyImageProps) {
+  const [isLoaded, setIsLoaded] = useState(false);
+  const [isInView, setIsInView] = useState(false);
+  const imgRef = useRef<HTMLImageElement>(null);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsInView(true);
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    if (imgRef.current) {
+      observer.observe(imgRef.current);
+    }
+
+    return () => observer.disconnect();
+  }, []);
+
+  return (
+    <div className={className} ref={imgRef}>
+      {isInView && (
+        <img
+          src={src}
+          alt={alt}
+          onLoad={() => setIsLoaded(true)}
+          className={classNames(
+            "transition-opacity duration-300",
+            isLoaded ? "opacity-100" : "opacity-0"
+          )}
+        />
+      )}
+      {!isLoaded && placeholder && (
+        <div className="bg-gray-200 animate-pulse">
+          <img src={placeholder} alt="" className="opacity-50" />
+        </div>
+      )}
+    </div>
+  );
+}
+\`\`\`
+
+### 3. Vite Configuration for Image Optimization
+\`\`\`typescript
+// vite.config.ts additions
+import { defineConfig } from 'vite';
+
+export default defineConfig({
+  build: {
+    rollupOptions: {
+      output: {
+        assetFileNames: (assetInfo) => {
+          const info = assetInfo.name.split('.');
+          const ext = info[info.length - 1];
+          if (/png|jpe?g|svg|gif|tiff|bmp|ico/i.test(ext)) {
+            return \`images/[name]-[hash].[ext]\`;
+          }
+          return \`[name]-[hash].[ext]\`;
+        },
+      },
+    },
+  },
+  plugins: [
+    // Add image optimization plugin
+  ],
+});
+\`\`\`
+
+### 4. Performance Monitoring
+\`\`\`typescript
+// utils/performanceMonitor.ts
+export const measurePageLoad = () => {
+  if ('performance' in window) {
+    const navigation = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming;
+    const loadTime = navigation.loadEventEnd - navigation.loadEventStart;
+    
+    console.log(\`Page load time: \${loadTime}ms\`);
+    
+    // Send to analytics
+    if (window.gtag) {
+      window.gtag('event', 'page_load_time', {
+        value: Math.round(loadTime),
+        custom_parameter: 'performance_optimization'
+      });
+    }
+  }
+};
+\`\`\`
+
+## Implementation Checklist
+- [ ] Set up image optimization pipeline
+- [ ] Implement lazy loading for all images
+- [ ] Convert existing images to WebP format
+- [ ] Add performance monitoring
+- [ ] Test on various device types
+- [ ] Measure before/after performance metrics
+
+## Expected Results
+- 1.2 second reduction in page load time
+- Improved Core Web Vitals scores
+- Better user experience
+- Reduced bandwidth usage
+- Higher search engine rankings
+
+## Timeline: 1 week
+## ROI: 150%`,
+              scriptInstructions: "Copy this complete script and paste it into any AI assistant to get detailed implementation guidance with code examples, optimization techniques, and performance monitoring setup."
             }
           ]
         }
       });
     } finally {
+      console.log('🏁 Self-optimization test completed, setting loading to false');
       setLoading(false);
     }
   };
