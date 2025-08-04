@@ -225,14 +225,33 @@ export function registerNextGenAIRoutes(app: Express) {
 
   // SELF-OPTIMIZING PLATFORM ROUTES
   app.post("/api/ai/optimization/analyze", async (req, res) => {
+    const startTime = Date.now();
+    const requestId = Math.random().toString(36).substring(7);
+    
+    console.log(`🎯 [${requestId}] Starting optimization analysis request`);
+    
     try {
       const { metrics } = req.body;
       
+      if (!metrics) {
+        console.log(`❌ [${requestId}] No metrics provided`);
+        return res.status(400).json({ success: false, error: "Metrics required" });
+      }
+      
+      console.log(`📊 [${requestId}] Processing metrics:`, Object.keys(metrics));
+      
+      // Ensure this waits for the FULL AI analysis - no timeouts or race conditions
       const recommendations = await selfOptimizing.analyzePerformance(metrics);
+      
+      const processingTime = Date.now() - startTime;
+      console.log(`✅ [${requestId}] Analysis completed in ${processingTime}ms`);
+      console.log(`📋 [${requestId}] Generated ${recommendations.length} recommendations`);
       
       res.json({
         success: true,
         recommendations,
+        processingTime,
+        requestId,
         summary: {
           totalRecommendations: recommendations.length,
           criticalIssues: recommendations.filter(r => r.priority === 'Critical').length,
@@ -244,8 +263,14 @@ export function registerNextGenAIRoutes(app: Express) {
         }
       });
     } catch (error) {
-      console.error("Performance analysis error:", error);
-      res.status(500).json({ success: false, error: "Failed to analyze performance" });
+      const processingTime = Date.now() - startTime;
+      console.error(`❌ [${requestId}] Performance analysis error after ${processingTime}ms:`, error);
+      res.status(500).json({ 
+        success: false, 
+        error: "Failed to analyze performance",
+        processingTime,
+        requestId 
+      });
     }
   });
 
