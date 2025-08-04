@@ -49,18 +49,18 @@ export default function FlutterAIDashboard() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedRiskLevel, setSelectedRiskLevel] = useState<string>('');
 
-  // Data queries
-  const { data: stats } = useQuery({
-    queryKey: ['/api/flutterai/stats'],
+  // Comprehensive Intelligence Data Queries
+  const { data: intelligenceStats } = useQuery({
+    queryKey: ['/api/flutterai/intelligence-stats'],
     refetchInterval: 30000, // Refresh every 30 seconds
   });
 
-  const { data: wallets, isLoading: walletsLoading } = useQuery({
-    queryKey: ['/api/flutterai/wallets', selectedRiskLevel],
+  const { data: walletIntelligence, isLoading: walletsLoading } = useQuery({
+    queryKey: ['/api/flutterai/intelligence', selectedRiskLevel],
     queryFn: async () => {
       const url = selectedRiskLevel 
-        ? `/api/flutterai/wallets?riskLevel=${selectedRiskLevel}`
-        : '/api/flutterai/wallets';
+        ? `/api/flutterai/intelligence?riskLevel=${selectedRiskLevel}`
+        : '/api/flutterai/intelligence';
       return await apiRequest('GET', url);
     },
   });
@@ -139,6 +139,50 @@ export default function FlutterAIDashboard() {
         description: "Analysis queue processing initiated",
       });
       queryClient.invalidateQueries({ queryKey: ['/api/flutterai/queue-status'] });
+    },
+  });
+
+  // Comprehensive Wallet Intelligence Analysis
+  const analyzeWalletMutation = useMutation({
+    mutationFn: async (walletAddress: string) => {
+      return await apiRequest('POST', `/api/flutterai/intelligence/analyze/${walletAddress}`);
+    },
+    onSuccess: (data) => {
+      toast({
+        title: "Analysis Complete",
+        description: `Wallet scored: ${data.socialCreditScore}/1000 (${data.riskLevel} risk)`,
+      });
+      queryClient.invalidateQueries({ queryKey: ['/api/flutterai/intelligence'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/flutterai/intelligence-stats'] });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Analysis Failed",
+        description: error.message || "Failed to analyze wallet",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Batch Intelligence Analysis
+  const batchAnalyzeMutation = useMutation({
+    mutationFn: async (walletAddresses: string[]) => {
+      return await apiRequest('POST', '/api/flutterai/intelligence/batch-analyze', { walletAddresses });
+    },
+    onSuccess: (data) => {
+      toast({
+        title: "Batch Analysis Complete",
+        description: `Analyzed ${data.storedIntelligence}/${data.totalProcessed} wallets successfully`,
+      });
+      queryClient.invalidateQueries({ queryKey: ['/api/flutterai/intelligence'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/flutterai/intelligence-stats'] });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Batch Analysis Failed",
+        description: error.message || "Failed to analyze wallets",
+        variant: "destructive",
+      });
     },
   });
 
@@ -350,8 +394,12 @@ export default function FlutterAIDashboard() {
         )}
 
         {/* Main Dashboard Tabs */}
-        <Tabs defaultValue="collection" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-5 bg-slate-800/50">
+        <Tabs defaultValue="intelligence" className="space-y-6">
+          <TabsList className="grid w-full grid-cols-6 bg-slate-800/50">
+            <TabsTrigger value="intelligence" className="data-[state=active]:bg-purple-600">
+              <Star className="h-4 w-4 mr-2" />
+              Intelligence
+            </TabsTrigger>
             <TabsTrigger value="collection" className="data-[state=active]:bg-purple-600">
               <Upload className="h-4 w-4 mr-2" />
               Collection
@@ -373,6 +421,177 @@ export default function FlutterAIDashboard() {
               Reports
             </TabsTrigger>
           </TabsList>
+
+          {/* Revolutionary Social Credit Intelligence Tab */}
+          <TabsContent value="intelligence" className="space-y-6">
+            <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+              
+              {/* Intelligence Analytics */}
+              <Card className="bg-slate-800/50 border-purple-500/20 xl:col-span-2">
+                <CardHeader>
+                  <CardTitle className="text-white flex items-center gap-2">
+                    <Star className="h-5 w-5 text-purple-400" />
+                    Social Credit Analytics
+                  </CardTitle>
+                  <CardDescription className="text-purple-200">
+                    Revolutionary wallet intelligence with comprehensive marketing insights
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  {intelligenceStats && (
+                    <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                      <div className="bg-slate-700/50 p-4 rounded-lg">
+                        <div className="text-blue-400 text-sm font-medium">Avg Social Score</div>
+                        <div className="text-2xl font-bold text-white">
+                          {Math.round(intelligenceStats.avgSocialCreditScore || 0)}/1000
+                        </div>
+                        <Progress 
+                          value={(intelligenceStats.avgSocialCreditScore || 0) / 10} 
+                          className="mt-2 h-2" 
+                        />
+                      </div>
+                      <div className="bg-slate-700/50 p-4 rounded-lg">
+                        <div className="text-green-400 text-sm font-medium">High Value</div>
+                        <div className="text-2xl font-bold text-white">
+                          {intelligenceStats.topPerformers?.length || 0}
+                        </div>
+                        <div className="text-xs text-green-300 mt-1">750+ Score</div>
+                      </div>
+                      <div className="bg-slate-700/50 p-4 rounded-lg">
+                        <div className="text-orange-400 text-sm font-medium">Marketing Segments</div>
+                        <div className="text-2xl font-bold text-white">
+                          {Object.keys(intelligenceStats.marketingSegmentDistribution || {}).length}
+                        </div>
+                        <div className="text-xs text-orange-300 mt-1">Active</div>
+                      </div>
+                      <div className="bg-slate-700/50 p-4 rounded-lg">
+                        <div className="text-red-400 text-sm font-medium">Risk Flagged</div>
+                        <div className="text-2xl font-bold text-white">
+                          {intelligenceStats.highRiskWallets?.length || 0}
+                        </div>
+                        <div className="text-xs text-red-300 mt-1">High Risk</div>
+                      </div>
+                    </div>
+                  )}
+                  
+                  {/* Marketing Segment Distribution */}
+                  {intelligenceStats?.marketingSegmentDistribution && (
+                    <div className="space-y-3">
+                      <h4 className="text-white font-medium">Marketing Segment Distribution</h4>
+                      <div className="space-y-2">
+                        {Object.entries(intelligenceStats.marketingSegmentDistribution).map(([segment, count]) => (
+                          <div key={segment} className="flex justify-between items-center">
+                            <span className="text-purple-200 capitalize">{segment}</span>
+                            <Badge variant="secondary" className="bg-purple-600">{count}</Badge>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+
+              {/* Wallet Intelligence Analysis */}
+              <Card className="bg-slate-800/50 border-purple-500/20">
+                <CardHeader>
+                  <CardTitle className="text-white flex items-center gap-2">
+                    <Brain className="h-5 w-5 text-purple-400" />
+                    Analyze Wallet
+                  </CardTitle>
+                  <CardDescription className="text-purple-200">
+                    Get comprehensive intelligence on any wallet
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="flex gap-2">
+                    <Input
+                      value={manualWallet}
+                      onChange={(e) => setManualWallet(e.target.value)}
+                      placeholder="Enter wallet address..."
+                      className="bg-slate-700 border-purple-500/20 text-white flex-1"
+                    />
+                    <Button
+                      onClick={() => analyzeWalletMutation.mutate(manualWallet)}
+                      disabled={!manualWallet || analyzeWalletMutation.isPending}
+                      size="sm"
+                      className="bg-purple-600 hover:bg-purple-700"
+                    >
+                      {analyzeWalletMutation.isPending ? (
+                        <RefreshCw className="h-4 w-4 animate-spin" />
+                      ) : (
+                        "Analyze"
+                      )}
+                    </Button>
+                  </div>
+                  
+                  {/* Batch Analysis */}
+                  <div className="border-t border-purple-500/20 pt-4">
+                    <h4 className="text-white font-medium mb-2">Batch Analysis</h4>
+                    <Button
+                      onClick={() => {
+                        if (walletIntelligence?.length) {
+                          const addresses = walletIntelligence.slice(0, 5).map((w: any) => w.walletAddress);
+                          batchAnalyzeMutation.mutate(addresses);
+                        }
+                      }}
+                      disabled={!walletIntelligence?.length || batchAnalyzeMutation.isPending}
+                      className="w-full bg-orange-600 hover:bg-orange-700"
+                    >
+                      {batchAnalyzeMutation.isPending ? (
+                        <RefreshCw className="h-4 w-4 animate-spin mr-2" />
+                      ) : (
+                        <Users className="h-4 w-4 mr-2" />
+                      )}
+                      Batch Analyze ({Math.min(walletIntelligence?.length || 0, 5)})
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Top Performing Wallets */}
+            {intelligenceStats?.topPerformers?.length > 0 && (
+              <Card className="bg-slate-800/50 border-purple-500/20">
+                <CardHeader>
+                  <CardTitle className="text-white flex items-center gap-2">
+                    <TrendingUp className="h-5 w-5 text-green-400" />
+                    Top Performing Wallets
+                  </CardTitle>
+                  <CardDescription className="text-purple-200">
+                    Highest social credit scores with premium marketing potential
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
+                    {intelligenceStats.topPerformers.slice(0, 6).map((wallet: any, index: number) => (
+                      <div key={wallet.walletAddress} className="bg-slate-700/50 p-4 rounded-lg">
+                        <div className="flex justify-between items-start mb-2">
+                          <div className="text-white font-mono text-sm">
+                            {wallet.walletAddress.slice(0, 8)}...{wallet.walletAddress.slice(-8)}
+                          </div>
+                          <Badge className="bg-green-600">{wallet.socialCreditScore}/1000</Badge>
+                        </div>
+                        <div className="grid grid-cols-2 gap-2 text-xs">
+                          <div className="text-purple-300">
+                            Segment: <span className="text-white">{wallet.marketingSegment}</span>
+                          </div>
+                          <div className="text-purple-300">
+                            Risk: <span className="text-white">{wallet.riskLevel}</span>
+                          </div>
+                          <div className="text-purple-300">
+                            DeFi: <span className="text-white">{wallet.defiEngagementScore}/100</span>
+                          </div>
+                          <div className="text-purple-300">
+                            Influence: <span className="text-white">{wallet.influenceScore}/100</span>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+          </TabsContent>
 
           {/* Collection Tab */}
           <TabsContent value="collection" className="space-y-6">

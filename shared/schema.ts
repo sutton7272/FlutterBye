@@ -507,57 +507,7 @@ export const systemSettings = pgTable("system_settings", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
-// FlutterAI Wallet Intelligence System
-export const walletIntelligence = pgTable("wallet_intelligence", {
-  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  walletAddress: text("wallet_address").notNull().unique(),
-  
-  // Collection Source Tracking
-  collectionSource: text("collection_source").notNull(), // 'flutterbye_connect', 'perpetrader_connect', 'manual_entry', 'csv_upload'
-  collectedAt: timestamp("collected_at").defaultNow(),
-  collectedBy: varchar("collected_by").references(() => users.id), // Admin who added manually
-  
-  // FlutterAI Scoring System
-  socialCreditScore: integer("social_credit_score").default(0), // 0-1000 scale
-  riskLevel: text("risk_level").default("unknown"), // 'low', 'medium', 'high', 'critical', 'unknown'
-  tradingBehaviorScore: integer("trading_behavior_score").default(0), // 0-100
-  portfolioQualityScore: integer("portfolio_quality_score").default(0), // 0-100
-  liquidityScore: integer("liquidity_score").default(0), // 0-100
-  activityScore: integer("activity_score").default(0), // 0-100
-  
-  // Analysis Results
-  analysisData: jsonb("analysis_data").$type<{
-    totalBalance: number;
-    tokenCount: number;
-    nftCount: number;
-    transactionHistory: any;
-    topTokens: any[];
-    riskFactors: string[];
-    behaviorPatterns: any;
-    portfolioAnalysis: any;
-  }>(),
-  
-  // Analysis Status
-  analysisStatus: text("analysis_status").default("pending"), // 'pending', 'analyzing', 'completed', 'failed'
-  lastAnalyzed: timestamp("last_analyzed"),
-  analysisError: text("analysis_error"),
-  
-  // Bulk Upload Tracking
-  batchId: varchar("batch_id"), // For CSV uploads
-  batchName: text("batch_name"),
-  
-  // User Association (if wallet connects)
-  associatedUserId: varchar("associated_user_id").references(() => users.id),
-  
-  // Additional Intelligence
-  tags: json("tags").$type<string[]>(), // Custom tags for categorization
-  notes: text("notes"), // Admin notes
-  isBlacklisted: boolean("is_blacklisted").default(false),
-  blacklistReason: text("blacklist_reason"),
-  
-  createdAt: timestamp("created_at").defaultNow(),
-  updatedAt: timestamp("updated_at").defaultNow(),
-});
+// NOTE: walletIntelligence schema moved to comprehensive version below to avoid duplicates
 
 // Batch Upload Tracking
 export const walletBatches = pgTable("wallet_batches", {
@@ -790,12 +740,7 @@ export const insertSystemSettingSchema = createInsertSchema(systemSettings).omit
 });
 export type InsertAnalytics = z.infer<typeof insertAnalyticsSchema>;
 
-// Wallet Intelligence Types
-export const insertWalletIntelligenceSchema = createInsertSchema(walletIntelligence).omit({
-  id: true,
-  createdAt: true,
-  updatedAt: true,
-});
+// NOTE: Wallet Intelligence schemas moved to comprehensive version below to avoid duplicates
 
 export const insertWalletBatchSchema = createInsertSchema(walletBatches).omit({
   id: true,
@@ -808,8 +753,6 @@ export const insertAnalysisQueueSchema = createInsertSchema(analysisQueue).omit(
   createdAt: true,
 });
 
-export type InsertWalletIntelligence = z.infer<typeof insertWalletIntelligenceSchema>;
-export type WalletIntelligence = typeof walletIntelligence.$inferSelect;
 export type InsertWalletBatch = z.infer<typeof insertWalletBatchSchema>;
 export type WalletBatch = typeof walletBatches.$inferSelect;
 export type InsertAnalysisQueue = z.infer<typeof insertAnalysisQueueSchema>;
@@ -1140,3 +1083,72 @@ export const insertWalletAlertSchema = createInsertSchema(walletAlerts).omit({
   id: true,
   createdAt: true,
 });
+
+// Wallet Intelligence Schema - Revolutionary Social Credit Score System
+export const walletIntelligence = pgTable("wallet_intelligence", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  walletAddress: varchar("wallet_address").notNull().unique(),
+  socialCreditScore: integer("social_credit_score").default(0),
+  riskLevel: varchar("risk_level", { length: 20 }).default("unknown"), // low, medium, high, critical, unknown
+  tradingBehaviorScore: integer("trading_behavior_score").default(0),
+  portfolioQualityScore: integer("portfolio_quality_score").default(0),
+  liquidityScore: integer("liquidity_score").default(0),
+  activityScore: integer("activity_score").default(0),
+  defiEngagementScore: integer("defi_engagement_score").default(0),
+  
+  // Marketing Intelligence Data
+  marketingSegment: varchar("marketing_segment", { length: 50 }).default("unknown"), // whale, retail, degen, institutional
+  communicationStyle: varchar("communication_style", { length: 50 }).default("casual"), // technical, casual, formal
+  preferredTokenTypes: text("preferred_token_types").array().default(sql`ARRAY[]::text[]`),
+  riskTolerance: varchar("risk_tolerance", { length: 30 }).default("moderate"), // conservative, moderate, aggressive, extreme
+  investmentProfile: text("investment_profile"),
+  tradingFrequency: varchar("trading_frequency", { length: 30 }).default("unknown"),
+  portfolioSize: varchar("portfolio_size", { length: 20 }).default("unknown"), // small, medium, large, whale
+  influenceScore: integer("influence_score").default(0),
+  socialConnections: integer("social_connections").default(0),
+  
+  // Comprehensive Marketing Insights (JSON field)
+  marketingInsights: json("marketing_insights").$type<{
+    targetAudience: string;
+    messagingStrategy: string;
+    bestContactTimes: string[];
+    preferredCommunicationChannels: string[];
+    interests: string[];
+    behaviorPatterns: string[];
+    marketingRecommendations: string[];
+  }>().default({
+    targetAudience: "general audience",
+    messagingStrategy: "educational",
+    bestContactTimes: [],
+    preferredCommunicationChannels: [],
+    interests: [],
+    behaviorPatterns: [],
+    marketingRecommendations: []
+  }),
+  
+  // Comprehensive Analysis Data (JSON field)
+  analysisData: json("analysis_data").$type<{
+    blockchainData: any;
+    aiAnalysis: any;
+    calculatedAt: string;
+    riskFactors: string[];
+    behaviorPatterns: any;
+    portfolioAnalysis: any;
+  }>(),
+  
+  // Collection metadata
+  sourcePlatform: varchar("source_platform", { length: 50 }), // FlutterBye, PerpeTrader, Manual
+  collectionMethod: varchar("collection_method", { length: 50 }), // automatic, manual, imported
+  lastAnalyzed: timestamp("last_analyzed").defaultNow(),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const insertWalletIntelligenceSchema = createInsertSchema(walletIntelligence).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type WalletIntelligence = typeof walletIntelligence.$inferSelect;
+export type InsertWalletIntelligence = z.infer<typeof insertWalletIntelligenceSchema>;

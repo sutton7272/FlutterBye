@@ -251,6 +251,10 @@ export class MemStorage implements IStorage {
   private platformWallets: Map<string, any> = new Map();
   private walletTransactions: Map<string, any> = new Map();
   private walletAlerts: Map<string, any> = new Map();
+  private walletIntelligence: Map<string, WalletIntelligence> = new Map();
+  private walletIntelligenceData = new Map<string, any>(); // Comprehensive intelligence storage
+  private walletBatches: Map<string, WalletBatch> = new Map();
+  private analysisQueue: Map<string, AnalysisQueue> = new Map();
 
   constructor() {
     this.initializeTestData();
@@ -1482,6 +1486,336 @@ export class MemStorage implements IStorage {
     };
     this.walletAlerts.set(alertId, updatedAlert);
     return updatedAlert;
+  }
+
+  // Wallet Intelligence Operations Implementation
+  async collectWalletAddress(walletAddress: string, source: string, collectedBy?: string): Promise<WalletIntelligence> {
+    const existing = this.walletIntelligence.get(walletAddress);
+    if (existing) {
+      return existing;
+    }
+
+    const walletIntel: WalletIntelligence = {
+      id: randomUUID(),
+      walletAddress,
+      collectionSource: source as any,
+      collectedBy,
+      socialCreditScore: 500, // Default starting score
+      riskLevel: 'medium',
+      tradingBehaviorScore: 50,
+      portfolioQualityScore: 50,
+      liquidityScore: 50,
+      activityScore: 50,
+      defiEngagementScore: 50,
+      analysisStatus: 'queued',
+      tags: [],
+      notes: '',
+      firstSeen: new Date(),
+      lastAnalyzed: null,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
+
+    this.walletIntelligence.set(walletAddress, walletIntel);
+    
+    // Add to analysis queue
+    await this.addToAnalysisQueue(walletAddress, 1, undefined, collectedBy);
+    
+    return walletIntel;
+  }
+
+  async getWalletIntelligence(walletAddress: string): Promise<WalletIntelligence | undefined> {
+    return this.walletIntelligence.get(walletAddress);
+  }
+
+  async updateWalletScore(walletAddress: string, scoreData: Partial<WalletIntelligence>): Promise<WalletIntelligence> {
+    const wallet = this.walletIntelligence.get(walletAddress);
+    if (!wallet) {
+      throw new Error("Wallet intelligence record not found");
+    }
+
+    const updatedWallet = {
+      ...wallet,
+      ...scoreData,
+      updatedAt: new Date()
+    };
+
+    this.walletIntelligence.set(walletAddress, updatedWallet);
+    return updatedWallet;
+  }
+
+  async getAllWalletIntelligence(limit?: number, offset?: number): Promise<WalletIntelligence[]> {
+    const wallets = Array.from(this.walletIntelligence.values());
+    const start = offset || 0;
+    const end = limit ? start + limit : undefined;
+    return wallets.slice(start, end);
+  }
+
+  async searchWalletIntelligence(query: string): Promise<WalletIntelligence[]> {
+    const wallets = Array.from(this.walletIntelligence.values());
+    const searchTerm = query.toLowerCase();
+    
+    return wallets.filter(wallet => 
+      wallet.walletAddress.toLowerCase().includes(searchTerm) ||
+      wallet.tags.some(tag => tag.toLowerCase().includes(searchTerm)) ||
+      (wallet.notes && wallet.notes.toLowerCase().includes(searchTerm))
+    );
+  }
+
+  async getWalletsByRiskLevel(riskLevel: string): Promise<WalletIntelligence[]> {
+    const wallets = Array.from(this.walletIntelligence.values());
+    return wallets.filter(wallet => wallet.riskLevel === riskLevel);
+  }
+
+  // Batch Processing Operations Implementation
+  async createWalletBatch(batch: InsertWalletBatch): Promise<WalletBatch> {
+    const id = randomUUID();
+    const walletBatch: WalletBatch = {
+      id,
+      ...batch,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
+
+    this.walletBatches.set(id, walletBatch);
+    return walletBatch;
+  }
+
+  async getWalletBatch(id: string): Promise<WalletBatch | undefined> {
+    return this.walletBatches.get(id);
+  }
+
+  async updateWalletBatch(id: string, updates: Partial<WalletBatch>): Promise<WalletBatch> {
+    const batch = this.walletBatches.get(id);
+    if (!batch) {
+      throw new Error("Wallet batch not found");
+    }
+
+    const updatedBatch = {
+      ...batch,
+      ...updates,
+      updatedAt: new Date()
+    };
+
+    this.walletBatches.set(id, updatedBatch);
+    return updatedBatch;
+  }
+
+  async getAllWalletBatches(limit?: number, offset?: number): Promise<WalletBatch[]> {
+    const batches = Array.from(this.walletBatches.values());
+    const start = offset || 0;
+    const end = limit ? start + limit : undefined;
+    return batches.slice(start, end);
+  }
+
+  // Analysis Queue Operations Implementation
+  async addToAnalysisQueue(walletAddress: string, priority?: number, batchId?: string, requestedBy?: string): Promise<AnalysisQueue> {
+    const id = randomUUID();
+    const queueItem: AnalysisQueue = {
+      id,
+      walletAddress,
+      status: 'queued',
+      priority: priority || 1,
+      batchId,
+      requestedBy,
+      attempts: 0,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
+
+    this.analysisQueue.set(id, queueItem);
+    return queueItem;
+  }
+
+  async getNextQueuedAnalysis(): Promise<AnalysisQueue | undefined> {
+    const queueItems = Array.from(this.analysisQueue.values())
+      .filter(item => item.status === 'queued')
+      .sort((a, b) => (b.priority || 0) - (a.priority || 0));
+    
+    return queueItems[0];
+  }
+
+  async updateAnalysisQueueStatus(id: string, status: string, attempts?: number): Promise<AnalysisQueue> {
+    const queueItem = this.analysisQueue.get(id);
+    if (!queueItem) {
+      throw new Error("Analysis queue item not found");
+    }
+
+    const updatedItem = {
+      ...queueItem,
+      status,
+      attempts: attempts !== undefined ? attempts : queueItem.attempts,
+      updatedAt: new Date()
+    };
+
+    this.analysisQueue.set(id, updatedItem);
+    return updatedItem;
+  }
+
+  async getAnalysisQueueStats(): Promise<{queued: number, processing: number, completed: number, failed: number}> {
+    const items = Array.from(this.analysisQueue.values());
+    
+    return {
+      queued: items.filter(item => item.status === 'queued').length,
+      processing: items.filter(item => item.status === 'processing').length,
+      completed: items.filter(item => item.status === 'completed').length,
+      failed: items.filter(item => item.status === 'failed').length
+    };
+  }
+
+  // Revolutionary Wallet Intelligence Operations - Social Credit Score System
+  async createWalletIntelligence(data: any): Promise<any> {
+    const id = randomUUID();
+    const intelligence = {
+      id,
+      walletAddress: data.walletAddress,
+      socialCreditScore: data.socialCreditScore || 0,
+      riskLevel: data.riskLevel || 'unknown',
+      tradingBehaviorScore: data.tradingBehaviorScore || 0,
+      portfolioQualityScore: data.portfolioQualityScore || 0,
+      liquidityScore: data.liquidityScore || 0,
+      activityScore: data.activityScore || 0,
+      defiEngagementScore: data.defiEngagementScore || 0,
+      marketingSegment: data.marketingSegment || 'unknown',
+      communicationStyle: data.communicationStyle || 'casual',
+      preferredTokenTypes: data.preferredTokenTypes || [],
+      riskTolerance: data.riskTolerance || 'moderate',
+      investmentProfile: data.investmentProfile || '',
+      tradingFrequency: data.tradingFrequency || 'unknown',
+      portfolioSize: data.portfolioSize || 'unknown',
+      influenceScore: data.influenceScore || 0,
+      socialConnections: data.socialConnections || 0,
+      marketingInsights: data.marketingInsights || {
+        targetAudience: "general audience",
+        messagingStrategy: "educational",
+        bestContactTimes: [],
+        preferredCommunicationChannels: [],
+        interests: [],
+        behaviorPatterns: [],
+        marketingRecommendations: []
+      },
+      analysisData: data.analysisData || {},
+      sourcePlatform: data.sourcePlatform || 'FlutterBye',
+      collectionMethod: data.collectionMethod || 'automatic',
+      lastAnalyzed: new Date(),
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
+
+    this.walletIntelligenceData.set(id, intelligence);
+    return intelligence;
+  }
+
+  async getWalletIntelligence(walletAddress: string): Promise<any> {
+    const items = Array.from(this.walletIntelligenceData.values());
+    return items.find(item => item.walletAddress === walletAddress);
+  }
+
+  async updateWalletIntelligence(walletAddress: string, updates: any): Promise<any> {
+    const items = Array.from(this.walletIntelligenceData.entries());
+    const existingEntry = items.find(([_, item]) => item.walletAddress === walletAddress);
+    
+    if (!existingEntry) {
+      throw new Error("Wallet intelligence record not found");
+    }
+
+    const [id, existing] = existingEntry;
+    const updated = {
+      ...existing,
+      ...updates,
+      updatedAt: new Date(),
+      lastAnalyzed: new Date()
+    };
+
+    this.walletIntelligenceData.set(id, updated);
+    return updated;
+  }
+
+  async deleteWalletIntelligence(walletAddress: string): Promise<boolean> {
+    const items = Array.from(this.walletIntelligenceData.entries());
+    const existingEntry = items.find(([_, item]) => item.walletAddress === walletAddress);
+    
+    if (existingEntry) {
+      this.walletIntelligenceData.delete(existingEntry[0]);
+      return true;
+    }
+    return false;
+  }
+
+  async getAllWalletIntelligence(filters?: {
+    minSocialCreditScore?: number;
+    maxSocialCreditScore?: number;
+    riskLevel?: string;
+    marketingSegment?: string;
+    portfolioSize?: string;
+  }): Promise<any[]> {
+    let items = Array.from(this.walletIntelligenceData.values());
+    
+    if (filters) {
+      items = items.filter(item => {
+        if (filters.minSocialCreditScore && item.socialCreditScore < filters.minSocialCreditScore) return false;
+        if (filters.maxSocialCreditScore && item.socialCreditScore > filters.maxSocialCreditScore) return false;
+        if (filters.riskLevel && item.riskLevel !== filters.riskLevel) return false;
+        if (filters.marketingSegment && item.marketingSegment !== filters.marketingSegment) return false;
+        if (filters.portfolioSize && item.portfolioSize !== filters.portfolioSize) return false;
+        return true;
+      });
+    }
+    
+    return items.sort((a, b) => b.socialCreditScore - a.socialCreditScore);
+  }
+
+  async getWalletIntelligenceStats(): Promise<{
+    totalWallets: number;
+    avgSocialCreditScore: number;
+    riskDistribution: Record<string, number>;
+    marketingSegmentDistribution: Record<string, number>;
+    portfolioSizeDistribution: Record<string, number>;
+    topPerformers: any[];
+    highRiskWallets: any[];
+  }> {
+    const items = Array.from(this.walletIntelligenceData.values());
+    
+    const stats = {
+      totalWallets: items.length,
+      avgSocialCreditScore: 0,
+      riskDistribution: {} as Record<string, number>,
+      marketingSegmentDistribution: {} as Record<string, number>,
+      portfolioSizeDistribution: {} as Record<string, number>,
+      topPerformers: [] as any[],
+      highRiskWallets: [] as any[]
+    };
+
+    if (items.length === 0) return stats;
+
+    // Calculate averages and distributions
+    let totalScore = 0;
+    items.forEach(item => {
+      totalScore += item.socialCreditScore;
+      
+      // Risk distribution
+      stats.riskDistribution[item.riskLevel] = (stats.riskDistribution[item.riskLevel] || 0) + 1;
+      
+      // Marketing segment distribution
+      stats.marketingSegmentDistribution[item.marketingSegment] = (stats.marketingSegmentDistribution[item.marketingSegment] || 0) + 1;
+      
+      // Portfolio size distribution
+      stats.portfolioSizeDistribution[item.portfolioSize] = (stats.portfolioSizeDistribution[item.portfolioSize] || 0) + 1;
+      
+      // High risk wallets
+      if (item.riskLevel === 'high' || item.riskLevel === 'critical') {
+        stats.highRiskWallets.push(item);
+      }
+    });
+
+    stats.avgSocialCreditScore = Math.round(totalScore / items.length);
+    
+    // Top performers (top 10%)
+    const sortedByScore = items.sort((a, b) => b.socialCreditScore - a.socialCreditScore);
+    const topCount = Math.max(1, Math.floor(items.length * 0.1));
+    stats.topPerformers = sortedByScore.slice(0, topCount);
+
+    return stats;
   }
 }
 

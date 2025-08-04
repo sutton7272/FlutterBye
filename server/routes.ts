@@ -28,6 +28,15 @@ import { z } from "zod";
 import { registerNextGenAIRoutes } from "./next-gen-ai-routes";
 import { flutterAIRoutes } from "./flutterai-routes";
 import { registerFlutterAIWalletRoutes } from "./flutterai-wallet-routes";
+import { 
+  analyzeWallet,
+  getWalletIntelligence,
+  getAllWalletIntelligence,
+  getWalletIntelligenceStats,
+  batchAnalyzeWallets,
+  getMarketingRecommendations,
+  deleteWalletIntelligence
+} from "./flutterai-intelligence-routes";
 import { Connection, Keypair, LAMPORTS_PER_SOL, PublicKey, Transaction, SystemProgram } from '@solana/web3.js';
 import bs58 from 'bs58';
 
@@ -4080,7 +4089,33 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Register FlutterAI routes
   app.use("/api/flutterai", flutterAIRoutes);
   registerFlutterAIWalletRoutes(app);
+  
+  // === FLUTTERAI COMPREHENSIVE INTELLIGENCE ROUTES ===
+  // Revolutionary Social Credit Score System
+  
+  // Analyze a single wallet with comprehensive intelligence scoring
+  app.post("/api/flutterai/intelligence/analyze/:walletAddress", analyzeWallet);
+  
+  // Get wallet intelligence data for targeted marketing
+  app.get("/api/flutterai/intelligence/:walletAddress", getWalletIntelligence);
+  
+  // Get all wallet intelligence with comprehensive filtering for marketing campaigns
+  app.get("/api/flutterai/intelligence", getAllWalletIntelligence);
+  
+  // Comprehensive wallet intelligence statistics for marketing insights
+  app.get("/api/flutterai/intelligence-stats", getWalletIntelligenceStats);
+  
+  // Batch analyze multiple wallets for comprehensive marketing campaigns
+  app.post("/api/flutterai/intelligence/batch-analyze", batchAnalyzeWallets);
+  
+  // Get marketing recommendations for a specific wallet
+  app.get("/api/flutterai/intelligence/:walletAddress/marketing", getMarketingRecommendations);
+  
+  // Delete wallet intelligence data
+  app.delete("/api/flutterai/intelligence/:walletAddress", deleteWalletIntelligence);
+  
   console.log("🧠 FlutterAI comprehensive wallet scoring and intelligence engine activated");
+  console.log("🧠 FlutterAI Wallet Intelligence routes registered");
   
   const httpServer = createServer(app);
   // WebSocket server for real-time heatmap data and chat
