@@ -580,12 +580,12 @@ export default function FlutterAIDashboard() {
                     <h4 className="text-white font-medium mb-2">Batch Analysis</h4>
                     <Button
                       onClick={() => {
-                        if (walletIntelligence?.length) {
-                          const addresses = walletIntelligence.slice(0, 5).map((w: any) => w.walletAddress);
+                        if (walletIntelligence?.data?.length) {
+                          const addresses = walletIntelligence.data.slice(0, 5).map((w: any) => w.walletAddress);
                           batchAnalyzeMutation.mutate(addresses);
                         }
                       }}
-                      disabled={!walletIntelligence?.length || batchAnalyzeMutation.isPending}
+                      disabled={!walletIntelligence?.data?.length || batchAnalyzeMutation.isPending}
                       className="w-full bg-orange-600 hover:bg-orange-700"
                     >
                       {batchAnalyzeMutation.isPending ? (
@@ -593,7 +593,7 @@ export default function FlutterAIDashboard() {
                       ) : (
                         <Users className="h-4 w-4 mr-2" />
                       )}
-                      Batch Analyze ({Math.min(walletIntelligence?.length || 0, 5)})
+                      Batch Analyze ({Math.min(walletIntelligence?.data?.length || 0, 5)})
                     </Button>
                   </div>
                 </CardContent>
