@@ -207,17 +207,27 @@ export default function AIFeaturesTest() {
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="text-white font-medium mb-2 block">Viral Content Topic</label>
+              <div className="bg-gradient-to-r from-blue-900/30 to-purple-900/30 p-4 rounded-lg border border-blue-400/50">
+                <label className="text-blue-300 font-bold mb-3 block text-lg flex items-center gap-2">
+                  <Zap className="w-5 h-5" />
+                  🎯 YOUR VIRAL CONTENT TOPIC
+                </label>
                 <Input
                   value={testData.content}
                   onChange={(e) => setTestData({...testData, content: e.target.value})}
-                  placeholder="Enter any topic for viral content generation..."
-                  className="bg-gray-900/50 border-gray-600 text-white"
+                  placeholder="Type anything here: your product, idea, message, or story..."
+                  className="bg-gray-900/70 border-blue-400/50 text-white text-lg py-3 focus:border-blue-300 focus:ring-2 focus:ring-blue-400/20"
                 />
-                <p className="text-gray-400 text-xs mt-1">
-                  AI will create viral content for Twitter, Instagram, and TikTok based on this topic
-                </p>
+                <div className="mt-3 p-3 bg-blue-900/20 rounded border border-blue-500/30">
+                  <p className="text-blue-300 text-sm font-medium mb-1">
+                    ✨ AI will instantly create platform-optimized content:
+                  </p>
+                  <div className="grid grid-cols-3 gap-2 text-xs">
+                    <div className="text-blue-200">🐦 Twitter: Trending hashtags + engagement hooks</div>
+                    <div className="text-blue-200">📸 Instagram: Visual storytelling + story-worthy content</div>
+                    <div className="text-blue-200">🎵 TikTok: Hook-based + trend-leveraging content</div>
+                  </div>
+                </div>
               </div>
               <div>
                 <label className="text-white font-medium mb-2 block">Product Type (for pricing)</label>
@@ -349,20 +359,23 @@ export default function AIFeaturesTest() {
               <Button 
                 onClick={testViralAmplification}
                 disabled={loading}
-                className="w-full bg-blue-600 hover:bg-blue-700 relative"
+                className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 relative font-bold py-3 text-lg shadow-lg hover:shadow-xl transition-all duration-300"
               >
                 {loading ? (
                   <>
-                    <Loader2 className="w-4 h-4 animate-spin mr-2" />
-                    Generating Viral Content...
+                    <Loader2 className="w-5 h-5 animate-spin mr-2" />
+                    🤖 Generating Viral Content...
                   </>
                 ) : (
                   <>
-                    <Zap className="w-4 h-4 mr-2" />
-                    Test Viral Amplification
+                    <Zap className="w-5 h-5 mr-2" />
+                    🚀 Generate Viral Content
                   </>
                 )}
               </Button>
+              <p className="text-blue-300 text-xs text-center mt-2">
+                Enter your topic above, then click to generate optimized content for Twitter, Instagram & TikTok
+              </p>
               {results?.type === 'viral' && (
                 <div className="mt-2 text-center">
                   <Badge variant="outline" className="text-green-400 border-green-400">
