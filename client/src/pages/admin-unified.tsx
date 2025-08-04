@@ -83,6 +83,27 @@ function SelfOptimizationAdminContent() {
     metrics: { userCount: 100, revenue: 1000 }
   });
   const { toast } = useToast();
+  
+  // Modal state for wallet keys
+  const [showPrivateKey, setShowPrivateKey] = useState<string | null>(null);
+  const [walletKeys, setWalletKeys] = useState<any>(null);
+
+  // Function to fetch and display wallet keys
+  const viewWalletKeys = async (walletId: string) => {
+    try {
+      const response = await apiRequest("GET", `/api/admin/platform-wallets/${walletId}/keys`);
+      const keys = await response.json();
+      setWalletKeys(keys);
+      setShowPrivateKey(walletId);
+    } catch (error) {
+      console.error("Error fetching wallet keys:", error);
+      toast({
+        title: "Error",
+        description: "Failed to fetch wallet keys",
+        variant: "destructive",
+      });
+    }
+  };
 
   const testSelfOptimizing = async () => {
     console.log('🔧 Starting Self-Optimizing Platform analysis...');
@@ -4268,7 +4289,14 @@ function RealtimeDashboard({ liveMetrics, realtimeConnections, aiInsights, predi
             </DialogDescription>
           </DialogHeader>
           
-          {walletKeys && (
+          {!walletKeys ? (
+            <div className="flex items-center justify-center py-8">
+              <div className="flex items-center gap-2 text-slate-400">
+                <RefreshCw className="w-4 h-4 animate-spin" />
+                Loading wallet keys...
+              </div>
+            </div>
+          ) : (
             <div className="space-y-4">
               <Alert className="bg-red-500/20 border-red-500/50">
                 <AlertTriangle className="h-4 w-4 text-red-400" />
@@ -4278,6 +4306,30 @@ function RealtimeDashboard({ liveMetrics, realtimeConnections, aiInsights, predi
               </Alert>
 
               <div className="space-y-3">
+                <div>
+                  <Label className="text-white text-sm font-medium">Public Address</Label>
+                  <div className="flex items-center gap-2 mt-1">
+                    <Input
+                      value={walletKeys.publicKey || ''}
+                      readOnly
+                      className="bg-slate-700 border-slate-600 text-white font-mono text-xs"
+                    />
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => {
+                        navigator.clipboard.writeText(walletKeys.publicKey || '');
+                        toast({
+                          title: "Copied!",
+                          description: "Public address copied to clipboard",
+                        });
+                      }}
+                    >
+                      <Copy className="w-3 h-3" />
+                    </Button>
+                  </div>
+                </div>
+
                 <div>
                   <Label className="text-white text-sm font-medium">Private Key (Base58)</Label>
                   <div className="flex items-center gap-2 mt-1">
@@ -4327,26 +4379,11 @@ function RealtimeDashboard({ liveMetrics, realtimeConnections, aiInsights, predi
                 </div>
 
                 <div>
-                  <Label className="text-white text-sm font-medium">Public Address</Label>
-                  <div className="flex items-center gap-2 mt-1">
-                    <Input
-                      value={walletKeys.publicKey || ''}
-                      readOnly
-                      className="bg-slate-700 border-slate-600 text-white font-mono text-xs"
-                    />
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => {
-                        navigator.clipboard.writeText(walletKeys.publicKey || '');
-                        toast({
-                          title: "Copied!",
-                          description: "Public address copied to clipboard",
-                        });
-                      }}
-                    >
-                      <Copy className="w-3 h-3" />
-                    </Button>
+                  <Label className="text-white text-sm font-medium">Network</Label>
+                  <div className="mt-1">
+                    <Badge variant={walletKeys.network === 'mainnet' ? 'default' : 'secondary'}>
+                      {walletKeys.network || 'devnet'}
+                    </Badge>
                   </div>
                 </div>
               </div>
