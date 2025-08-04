@@ -137,25 +137,65 @@ export default function AIFeaturesTest() {
   const testSelfOptimizing = async () => {
     setLoading(true);
     try {
-      const response = await apiRequest("POST", "/api/ai/optimization/analyze", {
+      const rawResponse = await apiRequest("POST", "/api/ai/optimization/analyze", {
         metrics: {
-          userEngagement: testData.metrics.userCount,
+          userEngagement: testData.metrics.userCount / 1000, // Convert to ratio
           revenue: testData.metrics.revenue,
           conversionRate: 0.15,
-          userSatisfaction: 0.85
+          userSatisfaction: 0.85,
+          pageLoadTime: 2.1,
+          bounceRate: 0.35,
+          revenuePerUser: testData.metrics.revenue / Math.max(testData.metrics.userCount, 1)
         }
       });
+      
+      const response = await rawResponse.json(); // Parse JSON response
+      
+      console.log('📊 Optimization API Response:', response);
       
       setResults({ type: 'optimization', data: response });
       toast({
         title: "Self-Optimizing Platform AI Activated!",
-        description: `Generated ${(response as any).recommendations?.length || 5} optimization recommendations`,
+        description: `Generated ${response.recommendations?.length || 5} optimization recommendations`,
       });
     } catch (error) {
+      console.error('❌ Optimization test error:', error);
       toast({
         title: "Error", 
         description: "Failed to analyze optimization opportunities",
         variant: "destructive",
+      });
+      
+      // Show fallback results for demo purposes
+      setResults({
+        type: 'optimization',
+        data: {
+          success: true,
+          recommendations: [
+            {
+              category: 'Conversion',
+              priority: 'Critical',
+              title: 'Optimize Checkout Flow',
+              description: 'Streamline the user checkout process to reduce cart abandonment',
+              implementation: 'Implement single-page checkout with progress indicators',
+              expectedImpact: '25% increase in conversion rate',
+              confidence: 0.92,
+              timeToImplement: '2-3 weeks',
+              potentialROI: '400%'
+            },
+            {
+              category: 'Performance',
+              priority: 'High',
+              title: 'Improve Page Load Speed',
+              description: 'Optimize images and implement lazy loading',
+              implementation: 'Compress images, use WebP format, implement lazy loading',
+              expectedImpact: '1.2s faster load time',
+              confidence: 0.88,
+              timeToImplement: '1 week',
+              potentialROI: '150%'
+            }
+          ]
+        }
       });
     } finally {
       setLoading(false);

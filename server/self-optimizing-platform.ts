@@ -93,20 +93,22 @@ export class SelfOptimizingPlatform {
         - User Satisfaction: ${metrics.userSatisfaction} (${gaps.userSatisfaction > 0 ? '+' : ''}${gaps.userSatisfaction.toFixed(1)}% vs baseline)
         - Revenue Per User: $${metrics.revenuePerUser} (${gaps.revenuePerUser > 0 ? '+' : ''}${gaps.revenuePerUser.toFixed(1)}% vs baseline)
         
-        Provide 5 specific optimization recommendations as JSON array:
-        [
-          {
-            "category": "UX|Performance|Content|Conversion|Engagement",
-            "priority": "Critical|High|Medium|Low",
-            "title": "specific optimization title",
-            "description": "detailed description of the issue and solution",
-            "implementation": "step-by-step implementation guide",
-            "expectedImpact": "specific expected improvement",
-            "confidence": number (0-1),
-            "timeToImplement": "time estimate",
-            "potentialROI": "ROI estimate"
-          }
-        ]
+        Provide 5 specific optimization recommendations as JSON object with recommendations array:
+        {
+          "recommendations": [
+            {
+              "category": "UX|Performance|Content|Conversion|Engagement",
+              "priority": "Critical|High|Medium|Low",
+              "title": "specific optimization title",
+              "description": "detailed description of the issue and solution",
+              "implementation": "step-by-step implementation guide",
+              "expectedImpact": "specific expected improvement",
+              "confidence": number (0-1),
+              "timeToImplement": "time estimate",
+              "potentialROI": "ROI estimate"
+            }
+          ]
+        }
       `;
 
       const response = await openai.chat.completions.create({
@@ -116,8 +118,9 @@ export class SelfOptimizingPlatform {
         max_tokens: 1000
       });
 
-      const result = JSON.parse(response.choices[0].message.content || '[]');
-      return Array.isArray(result) ? result : result.recommendations || [];
+      const result = JSON.parse(response.choices[0].message.content || '{"recommendations":[]}');
+      console.log('✅ AI optimization recommendations generated:', result.recommendations?.length || 0);
+      return result.recommendations || [];
     } catch (error) {
       console.error('AI optimization recommendations error:', error);
       return [];
