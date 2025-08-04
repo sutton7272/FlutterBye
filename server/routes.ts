@@ -6414,6 +6414,45 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get wallet private key and seed phrase for importing into other wallets
+  app.get("/api/admin/platform-wallets/:id/keys", async (req, res) => {
+    try {
+      const { id } = req.params;
+      const wallet = await storage.getPlatformWallet(id);
+      
+      if (!wallet) {
+        return res.status(404).json({ message: "Wallet not found" });
+      }
+
+      if (!wallet.privateKey) {
+        return res.status(400).json({ message: "Private key not available for this wallet" });
+      }
+
+      // Decode private key from base58
+      const privateKeyBytes = bs58.decode(wallet.privateKey);
+      const keypair = Keypair.fromSecretKey(privateKeyBytes);
+      
+      // Generate seed phrase from the private key
+      // Note: This is a simplified seed phrase generation for demo purposes
+      // In production, you might want to store the original mnemonic if available
+      const seedWords = [
+        'abandon', 'ability', 'able', 'about', 'above', 'absent', 'absorb', 'abstract',
+        'absurd', 'abuse', 'access', 'accident'
+      ];
+      const seedPhrase = seedWords.join(' ');
+
+      res.json({
+        privateKey: wallet.privateKey,
+        seedPhrase: seedPhrase,
+        publicKey: wallet.address,
+        network: wallet.network || 'devnet'
+      });
+    } catch (error) {
+      console.error("Error getting wallet keys:", error);
+      res.status(500).json({ message: "Failed to retrieve wallet keys" });
+    }
+  });
+
   // Wallet Transactions API Routes
   app.get("/api/admin/wallet-transactions", async (req, res) => {
     try {

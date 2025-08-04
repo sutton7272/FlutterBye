@@ -3047,6 +3047,8 @@ function WalletManagementContent() {
   const [loading, setLoading] = useState(true);
   const [selectedWalletType, setSelectedWalletType] = useState<string>('all');
   const [showCreateWallet, setShowCreateWallet] = useState(false);
+  const [showPrivateKey, setShowPrivateKey] = useState<string | null>(null);
+  const [walletKeys, setWalletKeys] = useState<any>(null);
 
   // Fetch platform wallets
   const fetchPlatformWallets = async () => {
@@ -3143,7 +3145,7 @@ function WalletManagementContent() {
     }
   };
 
-  // Fund wallet with SOL (devnet only)
+  // Fund wallet with SOL (devnet only) with better error handling
   const fundWallet = async (walletId: string, amount: number = 1) => {
     try {
       const response = await fetch(`/api/admin/platform-wallets/${walletId}/fund`, {
@@ -3155,14 +3157,54 @@ function WalletManagementContent() {
       if (response.ok) {
         const data = await response.json();
         await fetchPlatformWallets();
-        // Show success message with transaction hash
-        console.log('Wallet funded:', data.txHash);
+        toast({
+          title: "Wallet Funded",
+          description: `Successfully funded wallet with ${amount} SOL`,
+        });
       } else {
         const error = await response.json();
-        console.error('Error funding wallet:', error.message);
+        if (error.error?.includes('Rate limit exceeded')) {
+          toast({
+            title: "Daily Faucet Limit Reached",
+            description: "Devnet faucet has daily limits. Use 'View Keys' to import wallet elsewhere or try again tomorrow.",
+            variant: "destructive",
+          });
+        } else {
+          toast({
+            title: "Funding Failed",
+            description: error.error || "Failed to fund wallet",
+            variant: "destructive",
+          });
+        }
       }
     } catch (error) {
       console.error('Error funding wallet:', error);
+      toast({
+        title: "Funding Failed",
+        description: "Network error while funding wallet",
+        variant: "destructive",
+      });
+    }
+  };
+
+  // View wallet private key and seed phrase
+  const viewWalletKeys = async (walletId: string) => {
+    try {
+      const response = await fetch(`/api/admin/platform-wallets/${walletId}/keys`);
+      
+      if (!response.ok) {
+        throw new Error('Failed to fetch wallet keys');
+      }
+
+      const keys = await response.json();
+      setWalletKeys(keys);
+      setShowPrivateKey(walletId);
+    } catch (error: any) {
+      toast({
+        title: "Failed to Get Keys",
+        description: error.message || "Could not retrieve wallet keys",
+        variant: "destructive",
+      });
     }
   };
 
@@ -3392,16 +3434,28 @@ function WalletManagementContent() {
                           </Button>
                         )}
                       </div>
-                      {!wallet.isPrimary && (
+                      
+                      <div className="flex gap-2">
                         <Button
                           size="sm"
                           variant="outline"
-                          onClick={() => setPrimaryWallet(wallet.type, wallet.id)}
-                          className="text-xs w-full"
+                          onClick={() => viewWalletKeys(wallet.id)}
+                          className="text-xs flex-1"
                         >
-                          Set Primary
+                          <Eye className="w-3 h-3 mr-1" />
+                          View Keys
                         </Button>
-                      )}
+                        {!wallet.isPrimary && (
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => setPrimaryWallet(wallet.type, wallet.id)}
+                            className="text-xs flex-1"
+                          >
+                            Set Primary
+                          </Button>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </CardContent>
@@ -4200,6 +4254,116 @@ function RealtimeDashboard({ liveMetrics, realtimeConnections, aiInsights, predi
           </div>
         </CardContent>
       </Card>
+
+      {/* Private Key Modal */}
+      <Dialog open={!!showPrivateKey} onOpenChange={() => {setShowPrivateKey(null); setWalletKeys(null);}}>
+        <DialogContent className="bg-slate-800 border-slate-600 max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-white flex items-center gap-2">
+              <Eye className="w-5 h-5 text-amber-400" />
+              Wallet Private Keys
+            </DialogTitle>
+            <DialogDescription className="text-slate-300">
+              Use these keys to import your wallet into other applications like Phantom or Solflare.
+            </DialogDescription>
+          </DialogHeader>
+          
+          {walletKeys && (
+            <div className="space-y-4">
+              <Alert className="bg-red-500/20 border-red-500/50">
+                <AlertTriangle className="h-4 w-4 text-red-400" />
+                <AlertDescription className="text-red-200">
+                  <strong>Security Warning:</strong> Never share these keys with anyone. They give full access to your wallet.
+                </AlertDescription>
+              </Alert>
+
+              <div className="space-y-3">
+                <div>
+                  <Label className="text-white text-sm font-medium">Private Key (Base58)</Label>
+                  <div className="flex items-center gap-2 mt-1">
+                    <Input
+                      value={walletKeys.privateKey || ''}
+                      readOnly
+                      className="bg-slate-700 border-slate-600 text-white font-mono text-xs"
+                    />
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => {
+                        navigator.clipboard.writeText(walletKeys.privateKey || '');
+                        toast({
+                          title: "Copied!",
+                          description: "Private key copied to clipboard",
+                        });
+                      }}
+                    >
+                      <Copy className="w-3 h-3" />
+                    </Button>
+                  </div>
+                </div>
+
+                <div>
+                  <Label className="text-white text-sm font-medium">Seed Phrase (12 words)</Label>
+                  <div className="flex items-center gap-2 mt-1">
+                    <Input
+                      value={walletKeys.seedPhrase || ''}
+                      readOnly
+                      className="bg-slate-700 border-slate-600 text-white font-mono text-xs"
+                    />
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => {
+                        navigator.clipboard.writeText(walletKeys.seedPhrase || '');
+                        toast({
+                          title: "Copied!",
+                          description: "Seed phrase copied to clipboard",
+                        });
+                      }}
+                    >
+                      <Copy className="w-3 h-3" />
+                    </Button>
+                  </div>
+                </div>
+
+                <div>
+                  <Label className="text-white text-sm font-medium">Public Address</Label>
+                  <div className="flex items-center gap-2 mt-1">
+                    <Input
+                      value={walletKeys.publicKey || ''}
+                      readOnly
+                      className="bg-slate-700 border-slate-600 text-white font-mono text-xs"
+                    />
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => {
+                        navigator.clipboard.writeText(walletKeys.publicKey || '');
+                        toast({
+                          title: "Copied!",
+                          description: "Public address copied to clipboard",
+                        });
+                      }}
+                    >
+                      <Copy className="w-3 h-3" />
+                    </Button>
+                  </div>
+                </div>
+              </div>
+
+              <Alert className="bg-blue-500/20 border-blue-500/50">
+                <Info className="h-4 w-4 text-blue-400" />
+                <AlertDescription className="text-blue-200">
+                  <strong>Import Instructions:</strong>
+                  <br />• Phantom: Settings → Import Private Key → Paste private key
+                  <br />• Solflare: Import → Private Key → Paste private key  
+                  <br />• For devnet wallets, switch network to Devnet in wallet settings
+                </AlertDescription>
+              </Alert>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
