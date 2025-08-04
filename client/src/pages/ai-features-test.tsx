@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import { DollarSign, Zap, BarChart3, Brain, Loader2 } from "lucide-react";
+import { DollarSign, Zap, BarChart3, Brain, Loader2, Edit } from "lucide-react";
 
 export default function AIFeaturesTest() {
   const [loading, setLoading] = useState(false);
@@ -60,6 +60,8 @@ export default function AIFeaturesTest() {
       });
       
       console.log('📊 Viral API Response:', response);
+      console.log('📊 Response results:', response.results);
+      console.log('📊 Response structure:', Object.keys(response));
       
       setResults({ type: 'viral', data: response });
       toast({
@@ -173,6 +175,72 @@ export default function AIFeaturesTest() {
             </p>
           </div>
         </div>
+
+        {/* Interactive Test Controls */}
+        <Card className="bg-black/20 border-blue-500/30">
+          <CardHeader>
+            <CardTitle className="text-white flex items-center gap-2">
+              <Edit className="w-5 h-5 text-blue-400" />
+              Customize Your AI Test Content
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="text-white font-medium mb-2 block">Viral Content Topic</label>
+                <Input
+                  value={testData.content}
+                  onChange={(e) => setTestData({...testData, content: e.target.value})}
+                  placeholder="Enter any topic for viral content generation..."
+                  className="bg-gray-900/50 border-gray-600 text-white"
+                />
+                <p className="text-gray-400 text-xs mt-1">
+                  AI will create viral content for Twitter, Instagram, and TikTok based on this topic
+                </p>
+              </div>
+              <div>
+                <label className="text-white font-medium mb-2 block">Product Type (for pricing)</label>
+                <Input
+                  value={testData.productType}
+                  onChange={(e) => setTestData({...testData, productType: e.target.value})}
+                  placeholder="e.g., Premium Token, NFT Collection, Service..."
+                  className="bg-gray-900/50 border-gray-600 text-white"
+                />
+              </div>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="text-white font-medium mb-2 block">Current Price ($)</label>
+                <Input
+                  type="number"
+                  value={testData.currentPrice}
+                  onChange={(e) => setTestData({...testData, currentPrice: parseFloat(e.target.value) || 0})}
+                  placeholder="0.00"
+                  className="bg-gray-900/50 border-gray-600 text-white"
+                />
+              </div>
+              <div>
+                <label className="text-white font-medium mb-2 block">Platform Metrics</label>
+                <div className="flex gap-2">
+                  <Input
+                    type="number"
+                    value={testData.metrics.userCount}
+                    onChange={(e) => setTestData({...testData, metrics: {...testData.metrics, userCount: parseInt(e.target.value) || 0}})}
+                    placeholder="Users"
+                    className="bg-gray-900/50 border-gray-600 text-white text-sm"
+                  />
+                  <Input
+                    type="number"
+                    value={testData.metrics.revenue}
+                    onChange={(e) => setTestData({...testData, metrics: {...testData.metrics, revenue: parseFloat(e.target.value) || 0}})}
+                    placeholder="Revenue"
+                    className="bg-gray-900/50 border-gray-600 text-white text-sm"
+                  />
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
 
         {/* Test Input Controls */}
         <Card className="bg-black/20 border-purple-500/30">
