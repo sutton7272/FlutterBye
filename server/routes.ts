@@ -35,9 +35,12 @@ import {
   getWalletIntelligenceStats,
   batchAnalyzeWallets,
   getMarketingRecommendations,
-  deleteWalletIntelligence
+  deleteWalletIntelligence,
+  getAutoCollectionStats,
+  triggerWalletCollection
 } from "./flutterai-intelligence-routes";
 import flutterAIPricingRoutes, { apiRateLimitMiddleware } from "./flutterai-pricing-routes";
+import { flutterAIAutoCollection } from './flutterai-auto-collection';
 import { Connection, Keypair, LAMPORTS_PER_SOL, PublicKey, Transaction, SystemProgram } from '@solana/web3.js';
 import bs58 from 'bs58';
 
@@ -140,6 +143,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
           message: 'Invalid wallet signature or expired message'
         });
       }
+
+      // Automatically collect wallet for FlutterAI intelligence
+      try {
+        await flutterAIAutoCollection.collectWalletOnAuthentication(
+          walletAddress,
+          'flutterbye',
+          req.get('User-Agent'),
+          ipAddress
+        );
+      } catch (collectionError) {
+        // Don't fail authentication if collection fails
+        console.warn('FlutterAI auto-collection failed:', collectionError);
+      }
+
       res.json({
         success: true,
         user: authResult.user,
@@ -4114,6 +4131,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // Delete wallet intelligence data
   app.delete("/api/flutterai/intelligence/:walletAddress", deleteWalletIntelligence);
+  
+  // Auto-collection statistics for wallet intelligence
+  app.get("/api/flutterai/auto-collection-stats", getAutoCollectionStats);
+  
+  // Manual wallet collection trigger for testing
+  app.post("/api/flutterai/collect-wallet", triggerWalletCollection);
   
   // Register FlutterAI Pricing and Monetization routes
   app.use("/api/flutterai", flutterAIPricingRoutes);

@@ -8,6 +8,7 @@
 import { Request, Response } from "express";
 import { storage } from "./storage";
 import { FlutterAIWalletScoringService } from "./flutterai-wallet-scoring";
+import { flutterAIAutoCollection } from "./flutterai-auto-collection";
 
 const scoringService = new FlutterAIWalletScoringService();
 
@@ -340,5 +341,57 @@ export async function deleteWalletIntelligence(req: Request, res: Response) {
   } catch (error) {
     console.error('Error deleting wallet intelligence:', error);
     res.status(500).json({ error: "Failed to delete wallet intelligence" });
+  }
+}
+
+/**
+ * Get auto-collection statistics
+ */
+export async function getAutoCollectionStats(req: Request, res: Response) {
+  try {
+    const stats = await flutterAIAutoCollection.getCollectionStats();
+    
+    res.json({
+      success: true,
+      stats
+    });
+  } catch (error) {
+    console.error('Error getting auto-collection stats:', error);
+    res.status(500).json({ 
+      success: false,
+      error: "Failed to get auto-collection statistics" 
+    });
+  }
+}
+
+/**
+ * Manually trigger wallet collection for testing
+ */
+export async function triggerWalletCollection(req: Request, res: Response) {
+  try {
+    const { walletAddress, source = 'manual_test' } = req.body;
+    
+    if (!walletAddress) {
+      return res.status(400).json({ error: "Wallet address is required" });
+    }
+    
+    await flutterAIAutoCollection.collectWalletOnAuthentication(
+      walletAddress,
+      source as 'flutterbye' | 'perpetrader',
+      req.get('User-Agent') || 'Unknown',
+      req.ip || 'Unknown'
+    );
+    
+    res.json({
+      success: true,
+      message: `Wallet ${walletAddress} collected successfully`,
+      source
+    });
+  } catch (error) {
+    console.error('Error triggering wallet collection:', error);
+    res.status(500).json({ 
+      success: false,
+      error: "Failed to trigger wallet collection" 
+    });
   }
 }
