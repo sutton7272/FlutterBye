@@ -1,4 +1,7 @@
 import { useState, useEffect } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 import { Slider } from "@/components/ui/slider";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -9,6 +12,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -48,6 +54,7 @@ import {
   Info,
   RotateCcw,
   Mail,
+  X,
   Clock,
   Zap,
   Rocket,
@@ -3238,6 +3245,25 @@ function WalletManagementContent() {
         </Card>
       </div>
 
+      {/* Quick Help for Dev Wallets */}
+      <Alert className="bg-blue-500/20 border-blue-500/50">
+        <Info className="h-4 w-4 text-blue-400" />
+        <AlertDescription className="text-blue-200">
+          <div className="flex items-center justify-between">
+            <div>
+              <strong>💡 Dev Mode Tips:</strong> Create dev wallets for safe testing • Use "Get Free SOL" button for instant devnet funding • Refresh balance anytime to see real blockchain updates
+            </div>
+            <Button 
+              onClick={() => setShowCreateWallet(true)}
+              className="bg-blue-600 hover:bg-blue-700 text-white ml-4"
+            >
+              <Plus className="w-4 h-4 mr-2" />
+              Create Wallet
+            </Button>
+          </div>
+        </AlertDescription>
+      </Alert>
+
       {/* Wallet Management Controls */}
       <Card className="bg-slate-800/50 border-slate-600">
         <CardHeader>
@@ -3303,6 +3329,11 @@ function WalletManagementContent() {
                             Primary
                           </Badge>
                         )}
+                        {wallet.network === 'devnet' && (
+                          <Badge className="bg-blue-500/20 text-blue-400 text-xs">
+                            🧪 Dev
+                          </Badge>
+                        )}
                         <div className={`w-2 h-2 rounded-full ${wallet.isActive ? 'bg-green-500' : 'bg-red-500'}`} />
                       </div>
                     </div>
@@ -3340,7 +3371,16 @@ function WalletManagementContent() {
                           <RefreshCw className="w-3 h-3 mr-1" />
                           Refresh
                         </Button>
-                        {wallet.network !== 'mainnet' && (
+                        {wallet.network === 'devnet' ? (
+                          <Button
+                            size="sm"
+                            onClick={() => fundWallet(wallet.id, 1)}
+                            className="text-xs flex-1 bg-blue-600 hover:bg-blue-700 text-white"
+                          >
+                            <Download className="w-3 h-3 mr-1" />
+                            Get Free SOL
+                          </Button>
+                        ) : wallet.network !== 'mainnet' && (
                           <Button
                             size="sm"
                             variant="outline"
@@ -3483,7 +3523,240 @@ function WalletManagementContent() {
           )}
         </CardContent>
       </Card>
+
+      {/* Simplified Wallet Creation Modal */}
+      <WalletCreationModal 
+        open={showCreateWallet} 
+        onOpenChange={setShowCreateWallet}
+        onWalletCreated={createPlatformWallet}
+      />
     </div>
+  );
+}
+
+// Simplified Wallet Creation Modal Component
+const walletFormSchema = z.object({
+  mode: z.enum(["dev", "production"]),
+  name: z.string().min(1, "Wallet name is required"),
+  type: z.enum(["gas_funding", "fee_collection", "escrow", "admin"]),
+});
+
+type WalletFormData = z.infer<typeof walletFormSchema>;
+
+function WalletCreationModal({ 
+  open, 
+  onOpenChange, 
+  onWalletCreated 
+}: { 
+  open: boolean; 
+  onOpenChange: (open: boolean) => void;
+  onWalletCreated: (data: any) => void;
+}) {
+  const { toast } = useToast();
+  const [isCreating, setIsCreating] = useState(false);
+  const [createdWallet, setCreatedWallet] = useState<any>(null);
+
+  const form = useForm<WalletFormData>({
+    resolver: zodResolver(walletFormSchema),
+    defaultValues: {
+      mode: "dev",
+      name: "",
+      type: "gas_funding",
+    },
+  });
+
+  const onSubmit = async (data: WalletFormData) => {
+    setIsCreating(true);
+    try {
+      const walletData = {
+        name: data.name,
+        type: data.type,
+        network: data.mode === "dev" ? "devnet" : "mainnet",
+      };
+
+      await onWalletCreated(walletData);
+      setCreatedWallet({ ...walletData, mode: data.mode });
+      
+      toast({
+        title: "Wallet Created Successfully!",
+        description: `${data.mode === "dev" ? "Development" : "Production"} wallet is ready to use`,
+      });
+    } catch (error) {
+      toast({
+        title: "Error Creating Wallet",
+        description: "Please try again",
+        variant: "destructive",
+      });
+    } finally {
+      setIsCreating(false);
+    }
+  };
+
+  const handleClose = () => {
+    setCreatedWallet(null);
+    form.reset();
+    onOpenChange(false);
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={handleClose}>
+      <DialogContent className="bg-slate-800 border-slate-600 text-white max-w-md">
+        <DialogHeader>
+          <DialogTitle className="text-xl font-bold text-white flex items-center gap-2">
+            <Plus className="w-5 h-5 text-blue-400" />
+            Create New Wallet
+          </DialogTitle>
+          <DialogDescription className="text-slate-300">
+            Choose between dev testing or production wallet
+          </DialogDescription>
+        </DialogHeader>
+
+        {createdWallet ? (
+          <div className="space-y-4">
+            <div className="text-center py-6">
+              <CheckCircle className="w-16 h-16 text-green-400 mx-auto mb-4" />
+              <h3 className="text-lg font-bold text-white mb-2">Wallet Created!</h3>
+              <p className="text-slate-300 mb-4">
+                Your {createdWallet.mode === "dev" ? "development" : "production"} wallet is ready
+              </p>
+            </div>
+
+            {createdWallet.mode === "dev" && (
+              <Alert className="bg-blue-500/20 border-blue-500/50">
+                <Info className="h-4 w-4 text-blue-400" />
+                <AlertDescription className="text-blue-200">
+                  <div className="space-y-2">
+                    <p><strong>Development Mode:</strong> Use the "Fund" button to get free devnet SOL for testing</p>
+                    <p><strong>Easy Testing:</strong> Refresh balance anytime to see real blockchain updates</p>
+                  </div>
+                </AlertDescription>
+              </Alert>
+            )}
+
+            <Button onClick={handleClose} className="w-full bg-blue-600 hover:bg-blue-700">
+              Done
+            </Button>
+          </div>
+        ) : (
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+              <FormField
+                control={form.control}
+                name="mode"
+                render={({ field }) => (
+                  <FormItem className="space-y-3">
+                    <FormLabel className="text-white font-medium">Wallet Mode</FormLabel>
+                    <FormControl>
+                      <RadioGroup
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                        className="grid grid-cols-1 gap-4"
+                      >
+                        <div className="flex items-center space-x-3 p-4 rounded-lg border border-blue-500/30 bg-blue-500/10">
+                          <RadioGroupItem value="dev" id="dev" className="text-blue-400" />
+                          <div className="flex-1">
+                            <Label htmlFor="dev" className="text-white font-medium cursor-pointer">
+                              🧪 Development Wallet
+                            </Label>
+                            <p className="text-sm text-blue-300">Safe testing with free devnet SOL</p>
+                          </div>
+                        </div>
+                        <div className="flex items-center space-x-3 p-4 rounded-lg border border-amber-500/30 bg-amber-500/10">
+                          <RadioGroupItem value="production" id="production" className="text-amber-400" />
+                          <div className="flex-1">
+                            <Label htmlFor="production" className="text-white font-medium cursor-pointer">
+                              🚀 Production Wallet
+                            </Label>
+                            <p className="text-sm text-amber-300">Real mainnet for live transactions</p>
+                          </div>
+                        </div>
+                      </RadioGroup>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-white">Wallet Name</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="e.g., Main Gas Wallet"
+                        {...field}
+                        className="bg-slate-700 border-slate-600 text-white"
+                      />
+                    </FormControl>
+                    <FormDescription className="text-slate-400">
+                      Give your wallet a descriptive name
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="type"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-white">Wallet Type</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormControl>
+                        <SelectTrigger className="bg-slate-700 border-slate-600 text-white">
+                          <SelectValue placeholder="Select wallet type" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent className="bg-slate-700 border-slate-600">
+                        <SelectItem value="gas_funding">Gas Funding</SelectItem>
+                        <SelectItem value="fee_collection">Fee Collection</SelectItem>
+                        <SelectItem value="escrow">Escrow</SelectItem>
+                        <SelectItem value="admin">Admin</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormDescription className="text-slate-400">
+                      Choose the wallet's primary purpose
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <div className="flex gap-3">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={handleClose}
+                  className="flex-1 border-slate-600 text-slate-300 hover:text-white"
+                >
+                  Cancel
+                </Button>
+                <Button
+                  type="submit"
+                  disabled={isCreating}
+                  className="flex-1 bg-blue-600 hover:bg-blue-700"
+                >
+                  {isCreating ? (
+                    <>
+                      <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
+                      Creating...
+                    </>
+                  ) : (
+                    <>
+                      <Plus className="w-4 h-4 mr-2" />
+                      Create Wallet
+                    </>
+                  )}
+                </Button>
+              </div>
+            </form>
+          </Form>
+        )}
+      </DialogContent>
+    </Dialog>
   );
 }
 
