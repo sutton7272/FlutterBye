@@ -52,12 +52,14 @@ export default function AIFeaturesTest() {
     console.log('🚀 Starting viral amplification test with topic:', testData.content);
     
     try {
-      const response = await apiRequest("POST", "/api/ai/viral/generate", {
+      const rawResponse = await apiRequest("POST", "/api/ai/viral/generate", {
         topic: testData.content,
         platforms: ['twitter', 'instagram', 'tiktok'],
         targetAudience: 'crypto enthusiasts',
         tone: 'exciting'
       });
+      
+      const response = await rawResponse.json(); // Parse the JSON response
       
       console.log('📊 Viral API Response:', response);
       console.log('📊 Response results:', response.results);
