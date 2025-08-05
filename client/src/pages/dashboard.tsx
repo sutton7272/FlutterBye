@@ -1,0 +1,285 @@
+import { useState, useEffect } from "react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Link } from "wouter";
+import { 
+  ArrowRight, 
+  TrendingUp, 
+  Coins, 
+  Users, 
+  Zap, 
+  Eye,
+  Wallet,
+  Activity,
+  Star,
+  BarChart3,
+  MessageSquare,
+  Heart,
+  Gift,
+  Target,
+  Sparkles
+} from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { InteractiveStatsDashboard } from "@/components/interactive-stats-dashboard";
+import { QuickActionPanel } from "@/components/quick-action-panel";
+import { EngagementBooster } from "@/components/engagement-booster";
+import { NFTPortfolioQuickView } from "@/components/dashboard/NFTPortfolioQuickView";
+import { ViralSharingAssistant } from "@/components/viral-sharing-assistant";
+import { VoiceMessageRecorder } from "@/components/voice-message-recorder";
+import { ViralGrowthAccelerator } from "@/components/viral-growth-accelerator";
+import { MobileOnboardingWizard } from "@/components/mobile-onboarding-wizard";
+import { PersonalizedDashboard } from "@/components/PersonalizedDashboard";
+
+interface DashboardStats {
+  totalTokens: number;
+  totalValue: string;
+  activeChats: number;
+  viralScore: number;
+  recentActivity: Array<{
+    id: string;
+    type: string;
+    message: string;
+    timestamp: string;
+    amount?: number;
+  }>;
+}
+
+export default function Dashboard() {
+  const [activeTab, setActiveTab] = useState("overview");
+  const [showOnboarding, setShowOnboarding] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+  
+  // Detect mobile device and first-time user
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    
+    // Check if user is new (simplified check)
+    const isFirstTime = !localStorage.getItem('flutterbye_visited');
+    if (isFirstTime && window.innerWidth < 768) {
+      setShowOnboarding(true);
+      localStorage.setItem('flutterbye_visited', 'true');
+    }
+    
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  // Fetch dashboard data
+  const { data: stats, isLoading } = useQuery<DashboardStats>({
+    queryKey: ["/api/dashboard/stats"],
+    refetchInterval: 30000,
+  });
+
+  // Quick actions data
+  const quickActions = [
+    {
+      title: "Create Token",
+      description: "Turn your message into money",
+      icon: Coins,
+      href: "/create",
+      color: "electric-blue",
+      featured: true
+    },
+    {
+      title: "Trade Assets",
+      description: "Buy, sell, and discover tokens",
+      icon: Users,
+      href: "/trade",
+      color: "electric-green"
+    },
+    {
+      title: "AI Analysis",
+      description: "Get intelligent insights",
+      icon: Sparkles,
+      href: "/intelligence",
+      color: "purple"
+    },
+    {
+      title: "Chat & Connect",
+      description: "Join blockchain conversations",
+      icon: MessageSquare,
+      href: "/chat",
+      color: "teal"
+    }
+  ];
+
+  if (showOnboarding) {
+    return <MobileOnboardingWizard onComplete={() => setShowOnboarding(false)} />;
+  }
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20">
+      <div className="container mx-auto px-4 py-6 space-y-8">
+        
+        {/* Welcome Header */}
+        <div className="text-center space-y-4">
+          <h1 className="text-4xl font-bold bg-gradient-to-r from-electric-blue to-electric-green bg-clip-text text-transparent">
+            Welcome to Flutterbye
+          </h1>
+          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+            Your unified platform for tokenized messaging, AI-powered trading, and blockchain intelligence
+          </p>
+        </div>
+
+        {/* Quick Actions */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          {quickActions.map((action) => (
+            <Link key={action.href} href={action.href}>
+              <Card className="group hover:shadow-lg transition-all duration-300 cursor-pointer h-full border-electric-blue/20 hover:border-electric-blue/40">
+                <CardHeader className="pb-3">
+                  <div className="flex items-center justify-between">
+                    <action.icon className={`h-8 w-8 text-${action.color} group-hover:scale-110 transition-transform`} />
+                    {action.featured && (
+                      <Badge className="bg-gradient-to-r from-yellow-400 to-orange-400 text-black font-bold">
+                        HOT
+                      </Badge>
+                    )}
+                  </div>
+                  <CardTitle className="text-lg group-hover:text-electric-blue transition-colors">
+                    {action.title}
+                  </CardTitle>
+                  <CardDescription className="text-sm">
+                    {action.description}
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <Button variant="ghost" size="sm" className="w-full group-hover:bg-electric-blue/10">
+                    Get Started <ArrowRight className="ml-2 h-4 w-4" />
+                  </Button>
+                </CardContent>
+              </Card>
+            </Link>
+          ))}
+        </div>
+
+        {/* Main Dashboard Content */}
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+          <TabsList className="grid w-full grid-cols-4">
+            <TabsTrigger value="overview">Overview</TabsTrigger>
+            <TabsTrigger value="portfolio">Portfolio</TabsTrigger>
+            <TabsTrigger value="activity">Activity</TabsTrigger>
+            <TabsTrigger value="insights">AI Insights</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="overview" className="space-y-6">
+            {/* Stats Overview */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">Total Tokens</CardTitle>
+                  <Coins className="h-4 w-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">{stats?.totalTokens || 0}</div>
+                  <p className="text-xs text-muted-foreground">Created by you</p>
+                </CardContent>
+              </Card>
+              
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">Portfolio Value</CardTitle>
+                  <TrendingUp className="h-4 w-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">{stats?.totalValue || '$0.00'}</div>
+                  <p className="text-xs text-muted-foreground">Total holdings</p>
+                </CardContent>
+              </Card>
+              
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">Active Chats</CardTitle>
+                  <MessageSquare className="h-4 w-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">{stats?.activeChats || 0}</div>
+                  <p className="text-xs text-muted-foreground">Conversations</p>
+                </CardContent>
+              </Card>
+              
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">Viral Score</CardTitle>
+                  <Zap className="h-4 w-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">{stats?.viralScore || 0}</div>
+                  <p className="text-xs text-muted-foreground">Growth potential</p>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Interactive Stats */}
+            <InteractiveStatsDashboard />
+            
+            {/* Quick Action Panel */}
+            <QuickActionPanel />
+          </TabsContent>
+
+          <TabsContent value="portfolio" className="space-y-6">
+            <NFTPortfolioQuickView />
+            <PersonalizedDashboard />
+          </TabsContent>
+
+          <TabsContent value="activity" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Activity className="h-5 w-5" />
+                  Recent Activity
+                </CardTitle>
+                <CardDescription>
+                  Your latest transactions and interactions
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                {stats?.recentActivity?.length > 0 ? (
+                  <div className="space-y-4">
+                    {stats.recentActivity.map((activity) => (
+                      <div key={activity.id} className="flex items-center justify-between p-3 rounded-lg bg-muted/50">
+                        <div className="flex items-center gap-3">
+                          <div className="w-2 h-2 bg-electric-blue rounded-full"></div>
+                          <div>
+                            <p className="font-medium">{activity.message}</p>
+                            <p className="text-sm text-muted-foreground">{activity.timestamp}</p>
+                          </div>
+                        </div>
+                        {activity.amount && (
+                          <Badge variant="outline">+{activity.amount} SOL</Badge>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-8">
+                    <Activity className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                    <p className="text-muted-foreground">No recent activity</p>
+                    <Button asChild className="mt-4">
+                      <Link href="/create">Create your first token</Link>
+                    </Button>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="insights" className="space-y-6">
+            <EngagementBooster />
+            <ViralGrowthAccelerator />
+            <ViralSharingAssistant />
+          </TabsContent>
+        </Tabs>
+
+        {/* Voice Recording Component */}
+        <VoiceMessageRecorder />
+        
+      </div>
+    </div>
+  );
+}

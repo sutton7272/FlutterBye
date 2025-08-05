@@ -12,28 +12,23 @@ export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const { isFeatureEnabled, isLoading: featuresLoading } = useFeatureToggles();
 
-  // All possible navigation items with their feature mapping
+  // Simplified navigation - 5 core sections based on user workflows
   const allNavItems = [
-    { href: "/home", label: "Home", icon: Home, featureId: "home" },
-    { href: "/mint", label: "Mint", icon: Coins, featureId: "mint" },
-    { href: "/payments", label: "Payments", icon: CreditCard, featured: true, featureId: "payments" },
-    { href: "/celestial", label: "Cosmic", icon: Stars, special: true, featureId: "celestial_wallet" },
-    { href: "/redeem", label: "Dashboard", icon: LayoutDashboard, featureId: "portfolio" },
-    { href: "/chat", label: "Chat", icon: MessageSquare, featureId: "chat" },
-    { href: "/sms-nexus", label: "FlutterWave", icon: Zap, special: true, featureId: "flutterwave" },
-    { href: "/message-nfts", label: "FlutterArt", icon: Sparkles, featured: true, featureId: "message_nfts" },
-    { href: "/marketplace", label: "Marketplace", icon: Users, featureId: "marketplace" },
-    { href: "/ai-overview", label: "AI Hub", icon: Brain, featured: true, featureId: "ai_hub" },
-    { href: "/flutterai-dashboard", label: "FlutterAI", icon: Brain, special: true, featureId: "flutterai" },
-    { href: "/greeting-cards", label: "Cards", icon: Heart, featureId: "greeting_cards" },
-    { href: "/enterprise", label: "Marketing", icon: Building2, featureId: "enterprise_intelligence" },
-    { href: "/info", label: "Info", icon: HelpCircle }, // No feature toggle, always shown
+    { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard, description: "Your unified home", featureId: "home" },
+    { href: "/create", label: "Create", icon: Coins, description: "Token minting & AI tools", featureId: "mint" },
+    { href: "/trade", label: "Trade", icon: Users, description: "Marketplace & wallet", featureId: "marketplace" },
+    { href: "/intelligence", label: "Intelligence", icon: Brain, description: "FlutterAI analytics", special: true, featureId: "flutterai" },
+    { href: "/admin", label: "Admin", icon: Settings, description: "Platform management", featureId: "admin_panel" },
   ];
 
   // Filter navigation items based on feature toggles
   const primaryNavItems = featuresLoading 
-    ? allNavItems // Show all items while loading
+    ? allNavItems.slice(0, 4) // Show main items while loading, hide admin
     : allNavItems.filter(item => {
+        // Admin panel only shows when feature is enabled
+        if (item.featureId === "admin_panel") {
+          return isFeatureEnabled("admin_panel") || isFeatureEnabled("admin");
+        }
         // If no featureId is specified, show the item by default
         if (!item.featureId) return true;
         // Otherwise, check if the feature is enabled
@@ -60,26 +55,30 @@ export default function Navbar() {
         </div>
 
         {/* Primary Navigation - Desktop */}
-        <nav className="hidden md:flex items-center space-x-1">
+        <nav className="hidden md:flex items-center space-x-2">
           {primaryNavItems.map((item) => (
             <Link key={item.href} href={item.href}>
               <Button
                 variant={isActive(item.href) ? "default" : "ghost"}
                 size="sm"
-                className={`flex items-center gap-2 h-9 px-4 ${
+                className={`flex items-center gap-2 h-10 px-4 relative group ${
                   isActive(item.href) 
                     ? "modern-gradient text-white shadow-lg" 
                     : item.special
                     ? "bg-gradient-to-r from-purple-600/20 to-blue-600/20 text-purple-200 border border-purple-500/30 hover:from-purple-600/30 hover:to-blue-600/30 hover:text-white transition-all duration-300"
-                    : item.featured
-                    ? "bg-gradient-to-r from-yellow-600/20 to-orange-600/20 text-yellow-200 border border-yellow-500/30 hover:from-yellow-600/30 hover:to-orange-600/30 hover:text-white transition-all duration-300"
-                    : "text-text-secondary hover:text-text-primary hover:bg-muted"
+                    : "text-text-secondary hover:text-text-primary hover:bg-muted/50 transition-all duration-200"
                 }`}
               >
                 <item.icon className="h-4 w-4" />
-                {item.label}
-                {item.special && <span className="text-xs bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent font-bold">NEW</span>}
-                {item.featured && <span className="text-xs bg-gradient-to-r from-yellow-400 to-orange-400 bg-clip-text text-transparent font-bold">💎</span>}
+                <span className="font-medium">{item.label}</span>
+                {item.special && <span className="text-xs bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent font-bold">AI</span>}
+                
+                {/* Tooltip */}
+                <div className="absolute bottom-full mb-2 left-1/2 transform -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none">
+                  <div className="bg-black/90 text-white text-xs rounded px-2 py-1 whitespace-nowrap">
+                    {item.description}
+                  </div>
+                </div>
               </Button>
             </Link>
           ))}
@@ -122,26 +121,26 @@ export default function Navbar() {
                 Flutterbye
               </span>
             </Link>
-            <nav className="flex flex-col space-y-1">
-              {/* Primary Items */}
+            <nav className="flex flex-col space-y-2">
               {primaryNavItems.map((item) => (
                 <Link key={item.href} href={item.href}>
                   <Button
                     variant={isActive(item.href) ? "default" : "ghost"}
-                    className={`w-full justify-start h-11 ${
+                    className={`w-full justify-start h-12 ${
                       isActive(item.href) 
                         ? "modern-gradient text-white" 
                         : "text-text-secondary hover:text-text-primary hover:bg-muted"
                     }`}
                     onClick={() => setIsOpen(false)}
                   >
-                    <item.icon className="h-4 w-4 mr-3" />
-                    {item.label}
+                    <item.icon className="h-5 w-5 mr-3" />
+                    <div className="flex flex-col items-start">
+                      <span className="font-medium">{item.label}</span>
+                      <span className="text-xs opacity-70">{item.description}</span>
+                    </div>
                   </Button>
                 </Link>
               ))}
-              
-              {/* All features now consolidated into main pages */}
             </nav>
           </SheetContent>
         </Sheet>

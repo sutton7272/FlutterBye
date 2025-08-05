@@ -6,6 +6,12 @@ import { EarlyAccessGate } from "@/components/early-access-gate";
 import { useState, useEffect, lazy, Suspense } from "react";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/not-found";
+
+// New Simplified Pages
+import Dashboard from "@/pages/dashboard";
+import Create from "@/pages/create";
+import Trade from "@/pages/trade";
+import Intelligence from "@/pages/intelligence";
 import Home from "@/pages/home";
 import Marketplace from "@/pages/marketplace";
 import Portfolio from "@/pages/portfolio";
@@ -82,23 +88,49 @@ function Router() {
         <Route path="/" component={LaunchCountdown} />
         <Route path="/launch" component={LaunchCountdown} />
         
-        {/* Routes with navbar - only accessible when authenticated */}
+        {/* Simplified Routes with navbar - unified navigation structure */}
+        <Route path="/dashboard" component={() => (
+          <>
+            <Navbar />
+            <Dashboard />
+          </>
+        )} />
+        <Route path="/create" component={() => (
+          <>
+            <Navbar />
+            <Create />
+          </>
+        )} />
+        <Route path="/trade" component={() => (
+          <>
+            <Navbar />
+            <Trade />
+          </>
+        )} />
+        <Route path="/intelligence" component={() => (
+          <>
+            <Navbar />
+            <Intelligence />
+          </>
+        )} />
+        
+        {/* Legacy routes for backward compatibility */}
         <Route path="/home" component={() => (
           <>
             <Navbar />
-            <Home />
+            <Dashboard />
           </>
         )} />
         <Route path="/marketplace" component={() => (
           <>
             <Navbar />
-            <Marketplace />
+            <Trade />
           </>
         )} />
         <Route path="/portfolio" component={() => (
           <>
             <Navbar />
-            <Portfolio />
+            <Trade />
           </>
         )} />
         <Route path="/mint" component={() => (
@@ -149,6 +181,8 @@ function Router() {
             <UnifiedAdminDashboard />
           </>
         )} />
+        
+        {/* Admin routes should use the new admin page structure */}
         <Route path="/admin-unified" component={() => (
           <>
             <Navbar />
