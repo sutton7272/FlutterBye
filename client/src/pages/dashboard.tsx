@@ -30,6 +30,8 @@ import { ViralSharingAssistant } from "@/components/viral-sharing-assistant";
 import { VoiceMessageRecorder } from "@/components/voice-message-recorder";
 import { ViralGrowthAccelerator } from "@/components/viral-growth-accelerator";
 import { MobileOnboardingWizard } from "@/components/mobile-onboarding-wizard";
+import { WalletConnectionWizard } from "@/components/wallet-connection-wizard";
+import { QuickAccessFAB } from "@/components/quick-access-fab";
 import { PersonalizedDashboard } from "@/components/PersonalizedDashboard";
 
 interface DashboardStats {
@@ -49,7 +51,27 @@ interface DashboardStats {
 export default function Dashboard() {
   const [activeTab, setActiveTab] = useState("overview");
   const [showOnboarding, setShowOnboarding] = useState(false);
-  const [isMobile, setIsMobile] = useState(false);
+  const [showWalletWizard, setShowWalletWizard] = useState(false);
+  
+  // Check if user is new (mobile)
+  useEffect(() => {
+    const isMobile = window.innerWidth < 768;
+    const isFirstVisit = !localStorage.getItem("flutter_onboarding_complete");
+    
+    if (isMobile && isFirstVisit) {
+      setShowOnboarding(true);
+    }
+  }, []);
+
+  const handleOnboardingComplete = () => {
+    localStorage.setItem("flutter_onboarding_complete", "true");
+    setShowOnboarding(false);
+  };
+
+  const handleWalletConnect = (walletId: string) => {
+    console.log("Connecting to wallet:", walletId);
+    setShowWalletWizard(false);
+  };
   
   // Detect mobile device and first-time user
   useEffect(() => {
@@ -277,9 +299,27 @@ export default function Dashboard() {
         </Tabs>
 
         {/* Voice Recording Component */}
-        <VoiceMessageRecorder />
+        <VoiceMessageRecorder onVoiceAttached={(voiceData) => {
+          console.log("Voice attached:", voiceData);
+        }} />
         
       </div>
+      
+      {/* Mobile Onboarding Wizard */}
+      {showOnboarding && (
+        <MobileOnboardingWizard onComplete={handleOnboardingComplete} />
+      )}
+      
+      {/* Wallet Connection Wizard */}
+      {showWalletWizard && (
+        <WalletConnectionWizard 
+          onConnect={handleWalletConnect}
+          onClose={() => setShowWalletWizard(false)}
+        />
+      )}
+      
+      {/* Quick Access FAB for mobile */}
+      <QuickAccessFAB />
     </div>
   );
 }

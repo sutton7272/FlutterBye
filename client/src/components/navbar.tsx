@@ -6,6 +6,7 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Menu, Home, Coins, Trophy, Users, MessageSquare, Settings, Sparkles, Zap, Heart, Building2, MapPin, Activity, Gift, Award, Star, Ticket, HelpCircle, LayoutDashboard, Brain, CreditCard, Stars } from "lucide-react";
 import solviturLogo from "@assets/65d9f126-64e6-4e25-9a10-d3d64807b991_1754352528946.png";
 import { useFeatureToggles } from "@/hooks/useFeatureToggles";
+import { MobileNavigation } from "@/components/mobile-navigation";
 
 export default function Navbar() {
   const [location] = useLocation();
@@ -40,6 +41,7 @@ export default function Navbar() {
   const isActive = (href: string) => location === href;
 
   return (
+    <>
     <nav className="glassmorphism border-b border-border sticky top-0 z-50 electric-frame">
       <div className="container flex h-16 items-center">
         {/* Logo */}
@@ -146,5 +148,9 @@ export default function Navbar() {
         </Sheet>
       </div>
     </nav>
+    
+    {/* Mobile Bottom Navigation */}
+    <MobileNavigation />
+  </>
   );
 }
