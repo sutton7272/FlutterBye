@@ -96,7 +96,12 @@ function Router() {
       <div className="dark min-h-screen flex flex-col bg-transparent">
         <div className="flex-1 bg-transparent">
           <Switch>
-        <Route path="/" component={LaunchCountdown} />
+        <Route path="/" component={() => (
+          <>
+            <Navbar />
+            <Dashboard />
+          </>
+        )} />
         <Route path="/launch" component={LaunchCountdown} />
         
         {/* Simplified Routes with navbar - unified navigation structure */}
