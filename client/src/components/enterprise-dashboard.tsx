@@ -25,7 +25,15 @@ import {
   CheckCircle,
   AlertTriangle,
   Copy,
-  Download
+  Download,
+  Search,
+  Eye,
+  FileSearch,
+  Network,
+  Bitcoin,
+  Gavel,
+  Target,
+  Brain
 } from "lucide-react";
 
 export default function EnterpriseDashboard() {
@@ -222,7 +230,26 @@ export default function EnterpriseDashboard() {
 
       {/* Enterprise Features Tabs */}
       <Tabs defaultValue="white-label" className="space-y-6">
-        <TabsList className="grid grid-cols-5 bg-slate-700/50 border border-purple-500/20">
+        <TabsList className="grid grid-cols-4 bg-slate-700/50 border border-purple-500/20 mb-4">
+          <TabsTrigger value="cross-chain" className="data-[state=active]:bg-green-500/20">
+            <Network className="h-4 w-4 mr-2" />
+            Cross-Chain
+          </TabsTrigger>
+          <TabsTrigger value="government" className="data-[state=active]:bg-red-500/20">
+            <Gavel className="h-4 w-4 mr-2" />
+            Government
+          </TabsTrigger>
+          <TabsTrigger value="investigation" className="data-[state=active]:bg-orange-500/20">
+            <FileSearch className="h-4 w-4 mr-2" />
+            Investigation
+          </TabsTrigger>
+          <TabsTrigger value="compliance" className="data-[state=active]:bg-blue-500/20">
+            <Shield className="h-4 w-4 mr-2" />
+            Compliance
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsList className="grid grid-cols-4 bg-slate-700/30 border border-purple-500/10">
           <TabsTrigger value="white-label" className="data-[state=active]:bg-purple-500/20">
             <Palette className="h-4 w-4 mr-2" />
             White-label
@@ -230,10 +257,6 @@ export default function EnterpriseDashboard() {
           <TabsTrigger value="permissions" className="data-[state=active]:bg-purple-500/20">
             <Users className="h-4 w-4 mr-2" />
             Permissions
-          </TabsTrigger>
-          <TabsTrigger value="compliance" className="data-[state=active]:bg-purple-500/20">
-            <Shield className="h-4 w-4 mr-2" />
-            Compliance
           </TabsTrigger>
           <TabsTrigger value="api" className="data-[state=active]:bg-purple-500/20">
             <Key className="h-4 w-4 mr-2" />
@@ -244,6 +267,389 @@ export default function EnterpriseDashboard() {
             Analytics
           </TabsTrigger>
         </TabsList>
+
+        {/* Cross-Chain Intelligence Tab */}
+        <TabsContent value="cross-chain" className="space-y-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <Card className="bg-slate-700/50 border-green-500/20">
+              <CardHeader>
+                <CardTitle className="text-white flex items-center gap-2">
+                  <Network className="h-5 w-5 text-green-400" />
+                  Cross-Chain Analysis Engine
+                </CardTitle>
+                <CardDescription className="text-slate-400">
+                  Analyze wallet activities across Ethereum, Bitcoin, and Solana blockchains
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-3 gap-4">
+                  <div className="bg-slate-800/50 p-4 rounded-lg text-center">
+                    <div className="flex items-center justify-center mb-2">
+                      <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
+                        <span className="text-white text-sm font-bold">ETH</span>
+                      </div>
+                    </div>
+                    <div className="text-white font-semibold">Ethereum</div>
+                    <div className="text-green-400 text-sm">Active</div>
+                  </div>
+                  <div className="bg-slate-800/50 p-4 rounded-lg text-center">
+                    <div className="flex items-center justify-center mb-2">
+                      <Bitcoin className="h-8 w-8 text-orange-400" />
+                    </div>
+                    <div className="text-white font-semibold">Bitcoin</div>
+                    <div className="text-green-400 text-sm">Active</div>
+                  </div>
+                  <div className="bg-slate-800/50 p-4 rounded-lg text-center">
+                    <div className="flex items-center justify-center mb-2">
+                      <div className="w-8 h-8 bg-purple-500 rounded-full flex items-center justify-center">
+                        <span className="text-white text-sm font-bold">SOL</span>
+                      </div>
+                    </div>
+                    <div className="text-white font-semibold">Solana</div>
+                    <div className="text-green-400 text-sm">Active</div>
+                  </div>
+                </div>
+                
+                <div className="space-y-3">
+                  <Label className="text-white">Cross-Chain Wallet Address</Label>
+                  <div className="flex gap-2">
+                    <Input 
+                      placeholder="Enter wallet address for cross-chain analysis..."
+                      className="bg-slate-800 border-green-500/20 text-white"
+                    />
+                    <Button className="bg-green-600 hover:bg-green-700">
+                      <Search className="h-4 w-4 mr-2" />
+                      Analyze
+                    </Button>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4 mt-4">
+                  <div className="bg-slate-800/30 p-3 rounded">
+                    <div className="text-green-400 text-sm">Total Transactions</div>
+                    <div className="text-white text-xl font-bold">847,329</div>
+                  </div>
+                  <div className="bg-slate-800/30 p-3 rounded">
+                    <div className="text-green-400 text-sm">Cross-Chain Volume</div>
+                    <div className="text-white text-xl font-bold">$12.4M</div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-slate-700/50 border-green-500/20">
+              <CardHeader>
+                <CardTitle className="text-white flex items-center gap-2">
+                  <Target className="h-5 w-5 text-green-400" />
+                  Enterprise Analytics
+                </CardTitle>
+                <CardDescription className="text-slate-400">
+                  Advanced cross-chain intelligence for enterprise clients
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-3">
+                  {[
+                    { feature: 'Multi-chain Transaction Tracking', status: 'Active', price: '$50K/year' },
+                    { feature: 'Cross-chain Risk Assessment', status: 'Active', price: '$75K/year' },
+                    { feature: 'Enterprise API Access', status: 'Active', price: '$100K/year' },
+                    { feature: 'Custom Analytics Dashboard', status: 'Active', price: '$150K/year' }
+                  ].map((item, index) => (
+                    <div key={index} className="flex justify-between items-center p-3 bg-slate-800/30 rounded-lg">
+                      <div>
+                        <div className="text-white font-medium">{item.feature}</div>
+                        <div className="text-green-400 text-sm">{item.status}</div>
+                      </div>
+                      <Badge className="bg-green-600/20 text-green-300 border-green-500/20">
+                        {item.price}
+                      </Badge>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </TabsContent>
+
+        {/* Government & Law Enforcement Tab */}
+        <TabsContent value="government" className="space-y-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <Card className="bg-slate-700/50 border-red-500/20">
+              <CardHeader>
+                <CardTitle className="text-white flex items-center gap-2">
+                  <Gavel className="h-5 w-5 text-red-400" />
+                  Government Intelligence Tools
+                </CardTitle>
+                <CardDescription className="text-slate-400">
+                  Specialized tools for law enforcement and regulatory compliance
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-3">
+                  <div className="bg-red-900/20 border border-red-500/20 p-4 rounded-lg">
+                    <div className="flex items-center gap-2 mb-2">
+                      <Shield className="h-5 w-5 text-red-400" />
+                      <span className="text-white font-semibold">OFAC Compliance Scanner</span>
+                    </div>
+                    <p className="text-slate-400 text-sm mb-3">
+                      Real-time screening against OFAC sanctions lists
+                    </p>
+                    <Button className="w-full bg-red-600 hover:bg-red-700">
+                      <Search className="h-4 w-4 mr-2" />
+                      Run OFAC Scan
+                    </Button>
+                  </div>
+
+                  <div className="bg-red-900/20 border border-red-500/20 p-4 rounded-lg">
+                    <div className="flex items-center gap-2 mb-2">
+                      <Eye className="h-5 w-5 text-red-400" />
+                      <span className="text-white font-semibold">AML Investigation Suite</span>
+                    </div>
+                    <p className="text-slate-400 text-sm mb-3">
+                      Advanced anti-money laundering detection and reporting
+                    </p>
+                    <Button className="w-full bg-red-600 hover:bg-red-700">
+                      <FileSearch className="h-4 w-4 mr-2" />
+                      Start Investigation
+                    </Button>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="bg-slate-800/30 p-3 rounded text-center">
+                    <div className="text-red-400 text-sm">High Risk Wallets</div>
+                    <div className="text-white text-xl font-bold">2,847</div>
+                  </div>
+                  <div className="bg-slate-800/30 p-3 rounded text-center">
+                    <div className="text-red-400 text-sm">OFAC Matches</div>
+                    <div className="text-white text-xl font-bold">143</div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-slate-700/50 border-red-500/20">
+              <CardHeader>
+                <CardTitle className="text-white flex items-center gap-2">
+                  <Globe className="h-5 w-5 text-red-400" />
+                  Enterprise Government Contracts
+                </CardTitle>
+                <CardDescription className="text-slate-400">
+                  Premium government and law enforcement packages
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-3">
+                  {[
+                    { package: 'Law Enforcement Basic', agencies: '15 Agencies', price: '$200K/year' },
+                    { package: 'Federal Investigation Suite', agencies: '8 Federal Agencies', price: '$500K/year' },
+                    { package: 'International Compliance', agencies: '25 Countries', price: '$1M/year' },
+                    { package: 'Custom Government Solution', agencies: 'Unlimited', price: '$2M+/year' }
+                  ].map((item, index) => (
+                    <div key={index} className="p-4 bg-red-900/10 border border-red-500/20 rounded-lg">
+                      <div className="flex justify-between items-start mb-2">
+                        <div>
+                          <div className="text-white font-semibold">{item.package}</div>
+                          <div className="text-red-300 text-sm">{item.agencies}</div>
+                        </div>
+                        <Badge className="bg-red-600/20 text-red-300 border-red-500/20">
+                          {item.price}
+                        </Badge>
+                      </div>
+                      <Button size="sm" className="w-full bg-red-600 hover:bg-red-700 mt-2">
+                        Request Access
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </TabsContent>
+
+        {/* Investigation Tools Tab */}
+        <TabsContent value="investigation" className="space-y-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <Card className="bg-slate-700/50 border-orange-500/20">
+              <CardHeader>
+                <CardTitle className="text-white flex items-center gap-2">
+                  <FileSearch className="h-5 w-5 text-orange-400" />
+                  Advanced Investigation Platform
+                </CardTitle>
+                <CardDescription className="text-slate-400">
+                  Comprehensive blockchain forensics and investigation tools
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-3">
+                  <div>
+                    <Label className="text-white">Investigation Target</Label>
+                    <div className="flex gap-2 mt-1">
+                      <Input 
+                        placeholder="Wallet address, transaction hash, or entity..."
+                        className="bg-slate-800 border-orange-500/20 text-white"
+                      />
+                      <Button className="bg-orange-600 hover:bg-orange-700">
+                        <Search className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </div>
+
+                  <div className="bg-orange-900/20 border border-orange-500/20 p-4 rounded-lg">
+                    <div className="text-white font-semibold mb-2">Investigation Features</div>
+                    <div className="space-y-2">
+                      {[
+                        'Transaction Path Analysis',
+                        'Entity Clustering',
+                        'Risk Scoring & Profiling',
+                        'Cross-chain Transaction Tracing',
+                        'Automated Report Generation'
+                      ].map((feature, index) => (
+                        <div key={index} className="flex items-center gap-2">
+                          <CheckCircle className="h-4 w-4 text-orange-400" />
+                          <span className="text-slate-300 text-sm">{feature}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-slate-700/50 border-orange-500/20">
+              <CardHeader>
+                <CardTitle className="text-white flex items-center gap-2">
+                  <Brain className="h-5 w-5 text-orange-400" />
+                  AI-Powered Analysis
+                </CardTitle>
+                <CardDescription className="text-slate-400">
+                  Machine learning enhanced investigation capabilities
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-3">
+                  <div className="bg-orange-900/20 border border-orange-500/20 p-4 rounded-lg">
+                    <div className="text-white font-semibold mb-2">AI Investigation Tools</div>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="text-center">
+                        <div className="text-orange-400 text-2xl font-bold">97.3%</div>
+                        <div className="text-slate-400 text-xs">Detection Accuracy</div>
+                      </div>
+                      <div className="text-center">
+                        <div className="text-orange-400 text-2xl font-bold">45ms</div>
+                        <div className="text-slate-400 text-xs">Analysis Speed</div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    {[
+                      { tool: 'Pattern Recognition Engine', price: '$300K/year' },
+                      { tool: 'Behavioral Analysis Suite', price: '$250K/year' },
+                      { tool: 'Predictive Risk Modeling', price: '$400K/year' },
+                      { tool: 'Custom AI Training', price: '$500K/year' }
+                    ].map((item, index) => (
+                      <div key={index} className="flex justify-between items-center p-2 bg-slate-800/30 rounded">
+                        <span className="text-white text-sm">{item.tool}</span>
+                        <Badge className="bg-orange-600/20 text-orange-300 border-orange-500/20 text-xs">
+                          {item.price}
+                        </Badge>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </TabsContent>
+
+        {/* Compliance Tab */}
+        <TabsContent value="compliance" className="space-y-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <Card className="bg-slate-700/50 border-blue-500/20">
+              <CardHeader>
+                <CardTitle className="text-white flex items-center gap-2">
+                  <Shield className="h-5 w-5 text-blue-400" />
+                  Enterprise Compliance Suite
+                </CardTitle>
+                <CardDescription className="text-slate-400">
+                  SOC2, GDPR, and regulatory compliance frameworks
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-3 gap-3">
+                  <div className="bg-blue-900/20 border border-blue-500/20 p-3 rounded text-center">
+                    <div className="text-blue-400 font-semibold">SOC2</div>
+                    <div className="text-green-400 text-sm">Certified</div>
+                  </div>
+                  <div className="bg-blue-900/20 border border-blue-500/20 p-3 rounded text-center">
+                    <div className="text-blue-400 font-semibold">GDPR</div>
+                    <div className="text-green-400 text-sm">Compliant</div>
+                  </div>
+                  <div className="bg-blue-900/20 border border-blue-500/20 p-3 rounded text-center">
+                    <div className="text-blue-400 font-semibold">ISO 27001</div>
+                    <div className="text-green-400 text-sm">Certified</div>
+                  </div>
+                </div>
+
+                <div className="space-y-3">
+                  <div>
+                    <Label className="text-white">Client Compliance Setup</Label>
+                    <Select>
+                      <SelectTrigger className="bg-slate-800 border-blue-500/20 text-white">
+                        <SelectValue placeholder="Select compliance framework" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="soc2">SOC2 Type II</SelectItem>
+                        <SelectItem value="gdpr">GDPR Compliance</SelectItem>
+                        <SelectItem value="iso27001">ISO 27001</SelectItem>
+                        <SelectItem value="custom">Custom Framework</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <Button className="w-full bg-blue-600 hover:bg-blue-700">
+                    <Shield className="h-4 w-4 mr-2" />
+                    Setup Compliance Framework
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-slate-700/50 border-blue-500/20">
+              <CardHeader>
+                <CardTitle className="text-white flex items-center gap-2">
+                  <Lock className="h-5 w-5 text-blue-400" />
+                  Data Security & Privacy
+                </CardTitle>
+                <CardDescription className="text-slate-400">
+                  Enterprise-grade security and privacy controls
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-3">
+                  {[
+                    { feature: 'End-to-End Encryption', status: 'Active' },
+                    { feature: 'Zero-Knowledge Architecture', status: 'Active' },
+                    { feature: 'Multi-Factor Authentication', status: 'Active' },
+                    { feature: 'Audit Trail Logging', status: 'Active' },
+                    { feature: 'Data Residency Controls', status: 'Active' }
+                  ].map((item, index) => (
+                    <div key={index} className="flex justify-between items-center p-3 bg-blue-900/10 rounded-lg">
+                      <div className="flex items-center gap-2">
+                        <CheckCircle className="h-4 w-4 text-blue-400" />
+                        <span className="text-white">{item.feature}</span>
+                      </div>
+                      <Badge className="bg-green-600/20 text-green-300 border-green-500/20">
+                        {item.status}
+                      </Badge>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </TabsContent>
 
         {/* White-label Solution Tab */}
         <TabsContent value="white-label" className="space-y-6">
