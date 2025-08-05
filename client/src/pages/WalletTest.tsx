@@ -801,10 +801,10 @@ export default function WalletTest() {
         {/* Header */}
         <div className="text-center space-y-4">
           <h1 className="text-4xl font-bold text-white">
-            🔐 Wallet Integration Test Suite
+            🧪 FlutterAI Platform Diagnostics Center
           </h1>
           <p className="text-xl text-white/70">
-            Test secure wallet connection and burn-to-redeem functionality
+            Comprehensive testing suite for blockchain, AI, security, and infrastructure systems
           </p>
         </div>
 
@@ -844,10 +844,10 @@ export default function WalletTest() {
           <CardHeader>
             <CardTitle className="text-white flex items-center gap-2">
               <Zap className="w-5 h-5" />
-              Comprehensive Test Suite
+              Platform Diagnostics Suite
             </CardTitle>
             <CardDescription className="text-white/70">
-              Test all platform components including blockchain, AI, and infrastructure
+              Enterprise-grade testing for blockchain, AI, security, performance, and system integration
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
