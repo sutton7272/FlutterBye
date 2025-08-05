@@ -439,6 +439,119 @@ router.get('/ai/addresses/segment/:segment', authenticateToken, async (req: any,
   }
 });
 
+// ========== DATA PROTECTION & BACKUP ROUTES ==========
+
+// Storage Capacity Analysis
+router.get('/data/capacity/analysis', authenticateToken, async (req: any, res) => {
+  try {
+    const { dataProtectionService } = await import('./data-protection-service');
+    const analysis = await dataProtectionService.analyzeStorageCapacity();
+    
+    res.json({
+      success: true,
+      data: analysis,
+      message: "Storage capacity analysis completed"
+    });
+  } catch (error) {
+    console.error('Storage analysis error:', error);
+    res.status(500).json({ error: 'Failed to analyze storage capacity' });
+  }
+});
+
+// Create Backup
+router.post('/data/backup/create', authenticateToken, async (req: any, res) => {
+  try {
+    const { dataTypes = ['all'] } = req.body;
+    const { dataProtectionService } = await import('./data-protection-service');
+    
+    const manifest = await dataProtectionService.createBackup(dataTypes);
+    
+    res.json({
+      success: true,
+      data: manifest,
+      message: `Backup created successfully: ${manifest.backupId}`
+    });
+  } catch (error) {
+    console.error('Backup creation error:', error);
+    res.status(500).json({ error: 'Failed to create backup' });
+  }
+});
+
+// Restore from Backup
+router.post('/data/backup/restore', authenticateToken, async (req: any, res) => {
+  try {
+    const { backupId } = req.body;
+    const { dataProtectionService } = await import('./data-protection-service');
+    
+    if (!backupId) {
+      return res.status(400).json({ error: 'Backup ID is required' });
+    }
+    
+    const result = await dataProtectionService.restoreFromBackup(backupId);
+    
+    res.json({
+      success: result.success,
+      data: result,
+      message: result.success ? 
+        `Restored ${result.recordsRestored} records successfully` : 
+        'Restore failed'
+    });
+  } catch (error) {
+    console.error('Backup restore error:', error);
+    res.status(500).json({ error: 'Failed to restore backup' });
+  }
+});
+
+// Data Health Report
+router.get('/data/health/report', authenticateToken, async (req: any, res) => {
+  try {
+    const { dataProtectionService } = await import('./data-protection-service');
+    const healthReport = await dataProtectionService.generateDataHealthReport();
+    
+    res.json({
+      success: true,
+      data: healthReport,
+      message: "Data health report generated successfully"
+    });
+  } catch (error) {
+    console.error('Health report error:', error);
+    res.status(500).json({ error: 'Failed to generate health report' });
+  }
+});
+
+// Data Protection Audit
+router.get('/data/protection/audit', authenticateToken, async (req: any, res) => {
+  try {
+    const { dataProtectionService } = await import('./data-protection-service');
+    const audit = await dataProtectionService.auditDataProtection();
+    
+    res.json({
+      success: true,
+      data: audit,
+      message: "Data protection audit completed"
+    });
+  } catch (error) {
+    console.error('Protection audit error:', error);
+    res.status(500).json({ error: 'Failed to complete protection audit' });
+  }
+});
+
+// Setup Automated Protection
+router.post('/data/protection/setup', authenticateToken, async (req: any, res) => {
+  try {
+    const { dataProtectionService } = await import('./data-protection-service');
+    await dataProtectionService.setupAutomatedProtection();
+    
+    res.json({
+      success: true,
+      message: "Automated data protection configured successfully"
+    });
+  } catch (error) {
+    console.error('Protection setup error:', error);
+    res.status(500).json({ error: 'Failed to setup automated protection' });
+  }
+});
+
 // ========== JOB ROUTES ==========
 
 // Create new job
@@ -593,7 +706,7 @@ router.put('/jobs/:id/status', authenticateToken, async (req: any, res) => {
       if (cleaner && job.cleanerId) {
         flutterboyeService.sendRewards({
           userId: cleaner.id.toString(),
-          amount: Math.floor(job.budget * 0.1), // 10% bonus
+          amount: 25, // $25 completion bonus
           reason: 'Job completion bonus',
           jobId: job.id
         });

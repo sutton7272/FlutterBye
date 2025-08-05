@@ -93,6 +93,28 @@ export default function Navigation() {
                     </div>
                   </Link>
                 )}
+
+                <Link href="/intelligence">
+                  <div className={`flex items-center space-x-1 px-3 py-2 rounded-lg transition-colors cursor-pointer ${
+                    isActive('/intelligence') 
+                      ? 'bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300' 
+                      : 'text-gray-600 hover:text-blue-600 dark:text-gray-300 dark:hover:text-blue-400'
+                  }`}>
+                    <Briefcase size={18} />
+                    <span>Intelligence</span>
+                  </div>
+                </Link>
+
+                <Link href="/data-protection">
+                  <div className={`flex items-center space-x-1 px-3 py-2 rounded-lg transition-colors cursor-pointer ${
+                    isActive('/data-protection') 
+                      ? 'bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300' 
+                      : 'text-gray-600 hover:text-blue-600 dark:text-gray-300 dark:hover:text-blue-400'
+                  }`}>
+                    <Briefcase size={18} />
+                    <span>Data Protection</span>
+                  </div>
+                </Link>
               </>
             )}
           </div>
