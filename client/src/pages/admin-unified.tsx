@@ -1189,9 +1189,54 @@ export default function UnifiedAdminDashboard() {
         <div className="mb-4">
           <div className="text-sm text-slate-400 mb-2">Dashboard Categories:</div>
           <div className="flex flex-wrap gap-2">
-            <Badge className="bg-blue-500/20 text-blue-400">Core Management</Badge>
-            <Badge className="bg-emerald-500/20 text-emerald-400">Business Intelligence</Badge>
-            <Badge className="bg-purple-500/20 text-purple-400">Analytics & Monitoring</Badge>
+            <Button 
+              onClick={() => {
+                // Cycle through Core Management tabs
+                const coreManagementTabs = ['overview', 'settings', 'users', 'tokens', 'pricing', 'codes', 'access'];
+                const currentIndex = coreManagementTabs.indexOf(activeTab);
+                const nextTab = coreManagementTabs[(currentIndex + 1) % coreManagementTabs.length];
+                setActiveTab(nextTab);
+              }}
+              className="bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 border border-blue-500/30 h-auto py-1 px-3 text-xs"
+            >
+              Core Management
+            </Button>
+            <Button 
+              onClick={() => {
+                // Cycle through Business Intelligence tabs
+                const businessIntelTabs = ['competitive', 'wallets', 'behavior', 'api-monetization', 'features'];
+                const currentIndex = businessIntelTabs.indexOf(activeTab);
+                const nextTab = businessIntelTabs[(currentIndex + 1) % businessIntelTabs.length];
+                setActiveTab(nextTab);
+              }}
+              className="bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-400 border border-emerald-500/30 h-auto py-1 px-3 text-xs"
+            >
+              Business Intelligence
+            </Button>
+            <Button 
+              onClick={() => {
+                // Cycle through Analytics & Monitoring tabs
+                const analyticsMonitoringTabs = ['analytics', 'performance', 'security', 'system', 'realtime', 'revenue', 'viral'];
+                const currentIndex = analyticsMonitoringTabs.indexOf(activeTab);
+                const nextTab = analyticsMonitoringTabs[(currentIndex + 1) % analyticsMonitoringTabs.length];
+                setActiveTab(nextTab);
+              }}
+              className="bg-purple-500/20 hover:bg-purple-500/30 text-purple-400 border border-purple-500/30 h-auto py-1 px-3 text-xs"
+            >
+              Analytics & Monitoring
+            </Button>
+            <Button 
+              onClick={() => {
+                // Cycle through AI & Optimization tabs
+                const aiOptimizationTabs = ['dynamic-pricing', 'self-optimization', 'staking'];
+                const currentIndex = aiOptimizationTabs.indexOf(activeTab);
+                const nextTab = aiOptimizationTabs[(currentIndex + 1) % aiOptimizationTabs.length];
+                setActiveTab(nextTab);
+              }}
+              className="bg-orange-500/20 hover:bg-orange-500/30 text-orange-400 border border-orange-500/30 h-auto py-1 px-3 text-xs"
+            >
+              AI & Optimization
+            </Button>
           </div>
         </div>
 
