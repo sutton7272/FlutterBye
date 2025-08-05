@@ -27,7 +27,7 @@ const authenticateToken = (req: any, res: any, next: any) => {
 
 // ========== AUTH ROUTES ==========
 
-// Register user
+// Register user with comprehensive marketing data collection
 router.post('/auth/register', async (req, res) => {
   try {
     const userData = insertUserSchema.parse(req.body);
@@ -46,6 +46,81 @@ router.post('/auth/register', async (req, res) => {
       password: hashedPassword,
     });
 
+    // Log comprehensive user registration activity
+    await storage.updateUserEngagement(user.id, 'user_registered', {
+      registrationMethod: 'enhanced_web_form',
+      poolInformation: {
+        type: userData.poolType,
+        size: userData.poolSize,
+        age: userData.poolAge,
+        equipment: userData.poolEquipment
+      },
+      propertyDetails: {
+        type: userData.propertyType,
+        location: {
+          city: userData.city,
+          state: userData.state,
+          zipCode: userData.zipCode
+        }
+      },
+      servicePreferences: {
+        frequency: userData.serviceFrequency,
+        budgetRange: userData.budgetRange,
+        preferredDay: userData.preferredServiceDay,
+        preferredTime: userData.preferredServiceTime
+      },
+      marketingPreferences: {
+        optIn: userData.marketingOptIn,
+        emailNotifications: userData.emailNotifications,
+        smsNotifications: userData.smsNotifications,
+        contactMethod: userData.preferredContactMethod,
+        frequency: userData.communicationFrequency
+      },
+      customerJourney: {
+        referralSource: userData.referralSource,
+        interests: userData.interests
+      }
+    });
+
+    // Send personalized welcome communication if opted in
+    if (userData.marketingOptIn && userData.emailNotifications) {
+      const welcomeMessage = `Welcome to PoolPal, ${userData.firstName}! 
+
+We're thrilled to help you maintain your beautiful ${userData.poolType} pool in ${userData.city}. Based on your ${userData.poolSize} pool size and preference for ${userData.serviceFrequency || 'customized'} service, we'll connect you with the perfect pool cleaning professional in your area.
+
+Our pool sharks (that's what we call our amazing customers!) love the convenience of our platform. You'll receive ${userData.communicationFrequency} updates via ${userData.preferredContactMethod}, and we'll make sure your pool care fits within your ${userData.budgetRange || 'preferred'} budget range.
+
+Ready to dive in? Start by posting your first cleaning request, and watch our qualified pool cleaners compete to give you the best service!
+
+Welcome to the PoolPal family! 🏊‍♀️`;
+
+      await storage.logCommunication({
+        userId: user.id,
+        type: 'email',
+        subject: `Welcome to PoolPal, ${userData.firstName}! Your Pool Care Journey Starts Now`,
+        content: welcomeMessage,
+        campaignId: 'welcome_pool_sharks_v1'
+      });
+    }
+
+    // Integrate with Flutterbye for enhanced user tracking and rewards
+    if (user.id) {
+      await storage.trackFlutterboyeIntegration(user.id, {
+        flutterboyeUserId: `poolpal_customer_${user.id}`,
+        rewards: 100, // Welcome bonus for new pool sharks
+        activityType: 'new_pool_customer_registration',
+        customerProfile: {
+          segment: 'new_pool_shark',
+          poolType: userData.poolType,
+          poolSize: userData.poolSize,
+          serviceNeeds: userData.serviceFrequency,
+          location: `${userData.city}, ${userData.state}`,
+          contactPreferences: userData.preferredContactMethod,
+          marketingValue: userData.marketingOptIn ? 'high' : 'low'
+        }
+      });
+    }
+
     // Create JWT token
     const token = jwt.sign({ userId: user.id }, JWT_SECRET);
     
@@ -55,12 +130,18 @@ router.post('/auth/register', async (req, res) => {
         id: user.id, 
         name: user.name, 
         email: user.email, 
-        isCleaner: user.isCleaner 
-      } 
+        isCleaner: user.isCleaner,
+        firstName: userData.firstName,
+        poolType: userData.poolType,
+        city: userData.city
+      },
+      message: `Welcome to PoolPal, ${userData.firstName}! Your pool care data has been saved and you've earned 100 Flutterbye rewards points.`,
+      flutterboyeRewards: 100,
+      marketingDataCaptured: true
     });
   } catch (error) {
     console.error('Registration error:', error);
-    res.status(400).json({ error: 'Invalid user data' });
+    res.status(400).json({ error: 'Invalid user data or registration failed' });
   }
 });
 
@@ -145,6 +226,70 @@ router.get('/cleaners', async (req, res) => {
   } catch (error) {
     console.error('Get cleaners error:', error);
     res.status(500).json({ error: 'Server error' });
+  }
+});
+
+// ========== MARKETING & ANALYTICS ROUTES ==========
+
+// Get marketing insights and user activity data
+router.get('/marketing/insights', authenticateToken, async (req: any, res) => {
+  try {
+    const insights = await storage.getMarketingInsights();
+    res.json({
+      success: true,
+      data: insights,
+      message: "Marketing insights retrieved successfully"
+    });
+  } catch (error) {
+    console.error('Marketing insights error:', error);
+    res.status(500).json({ error: 'Failed to retrieve marketing insights' });
+  }
+});
+
+// Get user activities for a specific user
+router.get('/marketing/user/:userId/activities', authenticateToken, async (req: any, res) => {
+  try {
+    const userId = parseInt(req.params.userId);
+    const activities = await storage.getUserActivities(userId);
+    res.json({
+      success: true,
+      data: activities,
+      message: "User activities retrieved successfully"
+    });
+  } catch (error) {
+    console.error('User activities error:', error);
+    res.status(500).json({ error: 'Failed to retrieve user activities' });
+  }
+});
+
+// Get communication logs for a specific user
+router.get('/marketing/user/:userId/communications', authenticateToken, async (req: any, res) => {
+  try {
+    const userId = parseInt(req.params.userId);
+    const communications = await storage.getCommunicationLogs(userId);
+    res.json({
+      success: true,
+      data: communications,
+      message: "Communication logs retrieved successfully"
+    });
+  } catch (error) {
+    console.error('Communication logs error:', error);
+    res.status(500).json({ error: 'Failed to retrieve communication logs' });
+  }
+});
+
+// Track user activity manually (for specific events)
+router.post('/marketing/track-activity', authenticateToken, async (req: any, res) => {
+  try {
+    const { action, details } = req.body;
+    await storage.updateUserEngagement(req.user.userId, action, details);
+    res.json({
+      success: true,
+      message: "Activity tracked successfully"
+    });
+  } catch (error) {
+    console.error('Activity tracking error:', error);
+    res.status(500).json({ error: 'Failed to track activity' });
   }
 });
 

@@ -6,6 +6,9 @@ import {
   ratings, 
   messages, 
   cleanerProfiles,
+  communicationLogs,
+  userActivity,
+  marketingCampaigns,
   type User,
   type InsertUser,
   type Job,
@@ -15,27 +18,96 @@ import {
   type Message,
   type InsertMessage,
   type CleanerProfile,
-  type InsertCleanerProfile
+  type InsertCleanerProfile,
+  type CommunicationLog,
+  type InsertCommunicationLog,
+  type UserActivity,
+  type InsertUserActivity,
+  type MarketingCampaign,
+  type InsertMarketingCampaign
 } from '../shared/schema';
 import { eq, and, desc, asc } from 'drizzle-orm';
 
 const sqlite = new Database(':memory:');
 const db = drizzle(sqlite);
 
-// Initialize database with tables
+// Initialize database with tables - Enhanced for marketing data collection
 sqlite.exec(`
   CREATE TABLE IF NOT EXISTS users (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT NOT NULL,
     email TEXT NOT NULL UNIQUE,
     password TEXT NOT NULL,
-    phone TEXT,
-    address TEXT,
     is_cleaner INTEGER DEFAULT 0,
-    is_active INTEGER DEFAULT 1,
+    
+    -- Contact Information (Marketing & Communication)
+    phone TEXT,
+    alternate_phone TEXT,
+    address TEXT,
+    city TEXT,
+    state TEXT,
+    zip_code TEXT,
+    country TEXT DEFAULT 'USA',
+    
+    -- Personal & Demographic Information
+    first_name TEXT,
+    last_name TEXT,
+    date_of_birth TEXT,
+    gender TEXT,
+    
+    -- Pool Owner Information (for customers)
+    pool_type TEXT, -- 'inground', 'above_ground', 'spa', 'hot_tub'
+    pool_size TEXT, -- 'small', 'medium', 'large', 'extra_large'
+    pool_age INTEGER,
+    pool_equipment TEXT, -- JSON array of equipment
+    special_requirements TEXT,
+    property_type TEXT, -- 'residential', 'commercial', 'hoa'
+    
+    -- Professional Information (for cleaners)
+    business_name TEXT,
+    business_license TEXT,
+    insurance_info TEXT,
+    hourly_rate INTEGER, -- in cents
+    service_areas TEXT, -- JSON array
+    
+    -- Marketing & Communication Preferences
+    marketing_opt_in INTEGER DEFAULT 1,
+    email_notifications INTEGER DEFAULT 1,
+    sms_notifications INTEGER DEFAULT 0,
+    promotional_emails INTEGER DEFAULT 1,
+    preferred_contact_method TEXT DEFAULT 'email',
+    communication_frequency TEXT DEFAULT 'weekly',
+    
+    -- Service Preferences & History
+    preferred_service_day TEXT,
+    preferred_service_time TEXT,
+    service_frequency TEXT,
+    budget_range TEXT,
+    referral_source TEXT,
+    
+    -- Engagement & Analytics
+    last_login_at TEXT,
+    account_status TEXT DEFAULT 'active',
+    lifetime_value INTEGER DEFAULT 0,
+    total_bookings INTEGER DEFAULT 0,
     rating INTEGER DEFAULT 0,
     total_ratings INTEGER DEFAULT 0,
-    created_at TEXT DEFAULT CURRENT_TIMESTAMP
+    
+    -- Additional Marketing Data
+    interests TEXT, -- JSON array of interests
+    customer_segment TEXT,
+    notes TEXT,
+    tags TEXT, -- JSON array
+    
+    -- Flutterbye Integration
+    flutterboye_user_id TEXT,
+    flutterboye_rewards INTEGER DEFAULT 0,
+    
+    -- System Fields
+    is_active INTEGER DEFAULT 1,
+    is_verified INTEGER DEFAULT 0,
+    created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+    updated_at TEXT DEFAULT CURRENT_TIMESTAMP
   );
 
   CREATE TABLE IF NOT EXISTS jobs (
@@ -91,6 +163,48 @@ sqlite.exec(`
     certifications TEXT,
     created_at TEXT DEFAULT CURRENT_TIMESTAMP
   );
+
+  CREATE TABLE IF NOT EXISTS communication_logs (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL REFERENCES users(id),
+    type TEXT NOT NULL, -- 'email', 'sms', 'phone', 'app_notification'
+    subject TEXT,
+    content TEXT NOT NULL,
+    campaign_id TEXT,
+    sent_at TEXT DEFAULT CURRENT_TIMESTAMP,
+    opened INTEGER DEFAULT 0,
+    clicked INTEGER DEFAULT 0,
+    responded INTEGER DEFAULT 0,
+    metadata TEXT -- JSON for additional tracking data
+  );
+
+  CREATE TABLE IF NOT EXISTS user_activity (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL REFERENCES users(id),
+    action TEXT NOT NULL, -- 'login', 'job_created', 'job_viewed', 'profile_updated'
+    details TEXT, -- JSON object with action details
+    ip_address TEXT,
+    user_agent TEXT,
+    timestamp TEXT DEFAULT CURRENT_TIMESTAMP,
+    session_id TEXT,
+    flutterboye_tracked INTEGER DEFAULT 0
+  );
+
+  CREATE TABLE IF NOT EXISTS marketing_campaigns (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    type TEXT NOT NULL, -- 'email', 'sms', 'push', 'in_app'
+    target_segment TEXT, -- JSON array of segments
+    content TEXT NOT NULL,
+    subject TEXT,
+    status TEXT DEFAULT 'draft', -- 'draft', 'scheduled', 'sent', 'completed'
+    scheduled_at TEXT,
+    sent_at TEXT,
+    total_sent INTEGER DEFAULT 0,
+    total_opened INTEGER DEFAULT 0,
+    total_clicked INTEGER DEFAULT 0,
+    created_at TEXT DEFAULT CURRENT_TIMESTAMP
+  );
 `);
 
 // Seed with sample data
@@ -140,6 +254,16 @@ export interface IStorage {
   createCleanerProfile(profile: InsertCleanerProfile): Promise<CleanerProfile>;
   getCleanerProfile(userId: number): Promise<CleanerProfile | null>;
   updateCleanerProfile(userId: number, updates: Partial<CleanerProfile>): Promise<CleanerProfile | null>;
+  
+  // Marketing & Communication operations
+  logUserActivity(activity: InsertUserActivity): Promise<UserActivity>;
+  logCommunication(communication: InsertCommunicationLog): Promise<CommunicationLog>;
+  createMarketingCampaign(campaign: InsertMarketingCampaign): Promise<MarketingCampaign>;
+  getUserActivities(userId: number): Promise<UserActivity[]>;
+  getCommunicationLogs(userId: number): Promise<CommunicationLog[]>;
+  getMarketingInsights(): Promise<any>;
+  updateUserEngagement(userId: number, action: string, details?: any): Promise<void>;
+  trackFlutterboyeIntegration(userId: number, data: any): Promise<void>;
 }
 
 export class SQLiteStorage implements IStorage {
@@ -260,6 +384,112 @@ export class SQLiteStorage implements IStorage {
   async updateCleanerProfile(userId: number, updates: Partial<CleanerProfile>): Promise<CleanerProfile | null> {
     const result = db.update(cleanerProfiles).set(updates).where(eq(cleanerProfiles.userId, userId)).returning().get();
     return result as CleanerProfile || null;
+  }
+
+  // Marketing & Communication operations
+  async logUserActivity(activity: InsertUserActivity): Promise<UserActivity> {
+    const result = db.insert(userActivity).values(activity).returning().get();
+    return result as UserActivity;
+  }
+
+  async logCommunication(communication: InsertCommunicationLog): Promise<CommunicationLog> {
+    const result = db.insert(communicationLogs).values(communication).returning().get();
+    return result as CommunicationLog;
+  }
+
+  async createMarketingCampaign(campaign: InsertMarketingCampaign): Promise<MarketingCampaign> {
+    const result = db.insert(marketingCampaigns).values(campaign).returning().get();
+    return result as MarketingCampaign;
+  }
+
+  async getUserActivities(userId: number): Promise<UserActivity[]> {
+    const result = db.select().from(userActivity)
+      .where(eq(userActivity.userId, userId))
+      .orderBy(desc(userActivity.timestamp))
+      .all();
+    return result as UserActivity[];
+  }
+
+  async getCommunicationLogs(userId: number): Promise<CommunicationLog[]> {
+    const result = db.select().from(communicationLogs)
+      .where(eq(communicationLogs.userId, userId))
+      .orderBy(desc(communicationLogs.sentAt))
+      .all();
+    return result as CommunicationLog[];
+  }
+
+  async getMarketingInsights(): Promise<any> {
+    // Get comprehensive marketing insights
+    const totalUsers = db.select().from(users).all().length;
+    const activeUsers = db.select().from(users).where(eq(users.isActive, true)).all().length;
+    const poolCustomers = db.select().from(users).where(eq(users.isCleaner, false)).all();
+    
+    const customerSegments = poolCustomers.reduce((acc: any, user: any) => {
+      const segment = user.customerSegment || 'new';
+      acc[segment] = (acc[segment] || 0) + 1;
+      return acc;
+    }, {});
+
+    const communicationPreferences = poolCustomers.reduce((acc: any, user: any) => {
+      const method = user.preferredContactMethod || 'email';
+      acc[method] = (acc[method] || 0) + 1;
+      return acc;
+    }, {});
+
+    return {
+      totalUsers,
+      activeUsers,
+      poolCustomers: poolCustomers.length,
+      customerSegments,
+      communicationPreferences,
+      timestamp: new Date().toISOString()
+    };
+  }
+
+  async updateUserEngagement(userId: number, action: string, details?: any): Promise<void> {
+    // Log the activity
+    await this.logUserActivity({
+      userId,
+      action,
+      details: JSON.stringify(details || {}),
+      sessionId: `session_${Date.now()}`,
+      flutterboyeTracked: false
+    });
+
+    // Update user's last activity and engagement metrics
+    const updates: Partial<User> = {
+      lastLoginAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    };
+
+    if (action === 'job_created') {
+      const user = await this.getUserById(userId);
+      if (user) {
+        updates.totalBookings = (user.totalBookings || 0) + 1;
+      }
+    }
+
+    await this.updateUser(userId, updates);
+  }
+
+  async trackFlutterboyeIntegration(userId: number, data: any): Promise<void> {
+    // Update user's Flutterbye integration data
+    const updates: Partial<User> = {
+      flutterboyeUserId: data.flutterboyeUserId,
+      flutterboyeRewards: data.rewards || 0,
+      updatedAt: new Date().toISOString()
+    };
+
+    await this.updateUser(userId, updates);
+
+    // Log the integration activity
+    await this.logUserActivity({
+      userId,
+      action: 'flutterboye_integration',
+      details: JSON.stringify(data),
+      sessionId: `flutterboye_${Date.now()}`,
+      flutterboyeTracked: true
+    });
   }
 }
 
