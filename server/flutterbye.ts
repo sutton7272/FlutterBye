@@ -13,6 +13,17 @@ class FlutterboyeService {
       apiKey: process.env.FLUTTERBYE_API_KEY || '',
       apiUrl: process.env.FLUTTERBYE_API_URL || 'https://api.flutterbye.com'
     };
+    
+    // Log configuration status for debugging
+    console.log('🦋 Flutterbye Service initialized');
+    console.log(`   API Key: ${this.config.apiKey ? 'Configured' : 'Missing'}`);
+    console.log(`   API URL: ${this.config.apiUrl}`);
+  }
+
+  isConfigured(): boolean {
+    const configured = !!(this.config.apiKey && this.config.apiUrl);
+    console.log(`🦋 Flutterbye connection status: ${configured ? 'Connected' : 'Not configured'}`);
+    return configured;
   }
 
   private getHeaders() {
@@ -91,10 +102,6 @@ class FlutterboyeService {
       console.error('Flutterbye rewards error:', error);
       return null;
     }
-  }
-
-  isConfigured(): boolean {
-    return !!(this.config.apiKey && this.config.apiUrl);
   }
 }
 
