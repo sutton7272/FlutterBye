@@ -45,6 +45,7 @@ export default function Navbar() {
 
   // Secondary navigation for additional features
   const secondaryNavItems = [
+    { href: "/launch", label: "Launch", icon: Star, description: "Platform launch countdown" },
     { href: "/intelligence", label: "Intelligence", icon: Brain, description: "Advanced analytics dashboard" },
     { href: "/trending", label: "Trending", icon: Trophy, description: "Viral content discovery" },
     { href: "/activity", label: "Activity", icon: Activity, description: "Platform activity feed" },
