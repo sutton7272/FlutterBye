@@ -33,8 +33,10 @@ import {
   Bitcoin,
   Gavel,
   Target,
-  Brain
+  Brain,
+  ShieldCheck
 } from "lucide-react";
+import { GovernmentSalesDashboard } from './government-sales-dashboard';
 
 export default function EnterpriseDashboard() {
   const { toast } = useToast();
@@ -260,10 +262,14 @@ export default function EnterpriseDashboard() {
 
       {/* Enterprise Features Tabs */}
       <Tabs defaultValue="cross-chain" className="space-y-6">
-        <TabsList className="grid grid-cols-4 bg-slate-700/50 border border-purple-500/20 mb-4">
+        <TabsList className="grid grid-cols-5 bg-slate-700/50 border border-purple-500/20 mb-4">
           <TabsTrigger value="cross-chain" className="data-[state=active]:bg-green-500/20">
             <Network className="h-4 w-4 mr-2" />
             Cross-Chain
+          </TabsTrigger>
+          <TabsTrigger value="government-sales" className="data-[state=active]:bg-red-500/20">
+            <ShieldCheck className="h-4 w-4 mr-2" />
+            Gov Sales
           </TabsTrigger>
           <TabsTrigger value="government" className="data-[state=active]:bg-red-500/20">
             <Gavel className="h-4 w-4 mr-2" />
@@ -297,6 +303,11 @@ export default function EnterpriseDashboard() {
             Analytics
           </TabsTrigger>
         </TabsList>
+
+        {/* Government Sales Tab */}
+        <TabsContent value="government-sales" className="space-y-6">
+          <GovernmentSalesDashboard />
+        </TabsContent>
 
         {/* Cross-Chain Intelligence Tab */}
         <TabsContent value="cross-chain" className="space-y-6">
