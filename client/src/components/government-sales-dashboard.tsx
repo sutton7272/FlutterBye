@@ -222,13 +222,13 @@ export function GovernmentSalesDashboard() {
       </div>
 
       <Tabs value={selectedTab} onValueChange={setSelectedTab}>
-        <TabsList className="grid w-full grid-cols-6">
+        <TabsList className="grid w-full grid-cols-6 bg-slate-700/50 border border-red-500/20">
           <TabsTrigger value="overview">Overview</TabsTrigger>
+          <TabsTrigger value="law-enforcement">Law Enforcement</TabsTrigger>
           <TabsTrigger value="compliance">Compliance</TabsTrigger>
           <TabsTrigger value="demos">Demos</TabsTrigger>
           <TabsTrigger value="case-studies">Case Studies</TabsTrigger>
           <TabsTrigger value="proposals">Proposals</TabsTrigger>
-          <TabsTrigger value="analytics">Analytics</TabsTrigger>
         </TabsList>
 
         <TabsContent value="overview" className="space-y-6">
@@ -767,6 +767,120 @@ export function GovernmentSalesDashboard() {
               </Card>
             </div>
           )}
+        </TabsContent>
+
+        {/* Law Enforcement Tools Tab */}
+        <TabsContent value="law-enforcement" className="space-y-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <Card className="bg-slate-700/50 border-red-500/20">
+              <CardHeader>
+                <CardTitle className="text-white flex items-center gap-2">
+                  <ShieldCheck className="h-5 w-5 text-red-400" />
+                  OFAC Compliance Scanner
+                </CardTitle>
+                <CardDescription className="text-slate-400">
+                  Real-time screening against OFAC sanctions lists
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="bg-red-900/20 border border-red-500/20 p-4 rounded-lg">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Eye className="h-5 w-5 text-red-400" />
+                    <span className="text-white font-semibold">Treasury Sanctions Screening</span>
+                  </div>
+                  <p className="text-slate-400 text-sm mb-3">
+                    Automated screening with 98% confidence rate
+                  </p>
+                  <Button className="w-full bg-red-600 hover:bg-red-700">
+                    <Target className="h-4 w-4 mr-2" />
+                    Run OFAC Scan
+                  </Button>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="bg-slate-800/30 p-3 rounded text-center">
+                    <div className="text-red-400 text-sm">High Risk Wallets</div>
+                    <div className="text-white text-xl font-bold">2,847</div>
+                  </div>
+                  <div className="bg-slate-800/30 p-3 rounded text-center">
+                    <div className="text-red-400 text-sm">OFAC Matches</div>
+                    <div className="text-white text-xl font-bold">143</div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-slate-700/50 border-red-500/20">
+              <CardHeader>
+                <CardTitle className="text-white flex items-center gap-2">
+                  <AlertTriangle className="h-5 w-5 text-red-400" />
+                  AML Investigation Suite
+                </CardTitle>
+                <CardDescription className="text-slate-400">
+                  Advanced anti-money laundering detection and reporting
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="bg-red-900/20 border border-red-500/20 p-4 rounded-lg">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Monitor className="h-5 w-5 text-red-400" />
+                    <span className="text-white font-semibold">Suspicious Activity Detection</span>
+                  </div>
+                  <p className="text-slate-400 text-sm mb-3">
+                    Machine learning-powered AML analysis with SAR generation
+                  </p>
+                  <Button className="w-full bg-red-600 hover:bg-red-700">
+                    <FileText className="h-4 w-4 mr-2" />
+                    Start Investigation
+                  </Button>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="bg-slate-800/30 p-3 rounded text-center">
+                    <div className="text-red-400 text-sm">Investigations</div>
+                    <div className="text-white text-xl font-bold">1,247</div>
+                  </div>
+                  <div className="bg-slate-800/30 p-3 rounded text-center">
+                    <div className="text-red-400 text-sm">SARs Generated</div>
+                    <div className="text-white text-xl font-bold">89</div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Law Enforcement Packages */}
+          <Card className="bg-slate-700/50 border-red-500/20">
+            <CardHeader>
+              <CardTitle className="text-white flex items-center gap-2">
+                <Building className="h-5 w-5 text-red-400" />
+                Enterprise Law Enforcement Packages
+              </CardTitle>
+              <CardDescription className="text-slate-400">
+                Specialized packages for government agencies and law enforcement
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="space-y-3">
+                {[
+                  { package: 'Law Enforcement Basic', agencies: '15 Agencies', price: '$200K/year' },
+                  { package: 'Federal Investigation Suite', agencies: '8 Federal Agencies', price: '$500K/year' },
+                  { package: 'International Compliance', agencies: '6 International Agencies', price: '$300K/year' },
+                  { package: 'Enterprise Government', agencies: 'Unlimited Access', price: '$1M+/year' }
+                ].map((item, index) => (
+                  <div key={index} className="flex justify-between items-center p-3 bg-slate-800/30 rounded-lg">
+                    <div>
+                      <div className="text-white font-medium">{item.package}</div>
+                      <div className="text-red-400 text-sm">{item.agencies}</div>
+                    </div>
+                    <Badge className="bg-red-600/20 text-red-300 border-red-500/20">
+                      {item.price}
+                    </Badge>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
         </TabsContent>
       </Tabs>
     </div>

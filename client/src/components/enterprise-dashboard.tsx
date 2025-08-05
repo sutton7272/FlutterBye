@@ -270,11 +270,7 @@ export default function EnterpriseDashboard() {
             </TabsTrigger>
             <TabsTrigger value="government-sales" className="data-[state=active]:bg-red-500/20 flex-shrink-0">
               <ShieldCheck className="h-4 w-4 mr-2" />
-              Gov Sales
-            </TabsTrigger>
-            <TabsTrigger value="government" className="data-[state=active]:bg-red-500/20 flex-shrink-0">
-              <Gavel className="h-4 w-4 mr-2" />
-              Government
+              Government Sales
             </TabsTrigger>
             <TabsTrigger value="investigation" className="data-[state=active]:bg-orange-500/20 flex-shrink-0">
               <FileSearch className="h-4 w-4 mr-2" />
