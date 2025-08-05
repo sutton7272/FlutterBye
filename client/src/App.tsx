@@ -67,6 +67,7 @@ import AIComprehensiveOverview from "@/pages/ai-comprehensive-overview";
 import RevolutionaryAIShowcase from "@/pages/revolutionary-ai-showcase";
 import AIFeaturesTest from "@/pages/ai-features-test";
 import DynamicPricingDashboard from "@/pages/dynamic-pricing-dashboard";
+import CelestialDashboard from "@/pages/CelestialDashboard";
 import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";
 import { PersonalizedDashboard } from "@/components/PersonalizedDashboard";
@@ -463,6 +464,16 @@ function Router() {
           <>
             <Navbar />
             <DynamicPricingDashboard />
+          </>
+        )} />
+        <Route path="/celestial" component={() => (
+          <>
+            <CelestialDashboard />
+          </>
+        )} />
+        <Route path="/cosmic-wallet" component={() => (
+          <>
+            <CelestialDashboard />
           </>
         )} />
         <Route component={NotFound} />

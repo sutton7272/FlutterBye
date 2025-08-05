@@ -4426,6 +4426,126 @@ export async function registerRoutes(app: Express): Promise<Server> {
   console.log('🚀 ENTERPRISE REVENUE GENERATION COMPLETE!');
   console.log('💰 Target Revenue: $5M-$50M ARR from Enterprise + Government clients');
   
+  // ============ CELESTIAL PERSONALIZATION ENGINE ============
+  console.log('🌟 Initializing Celestial Wallet Personalization Engine...');
+  
+  const { CelestialPersonalizationService } = await import('./celestial-personalization-service');
+  
+  // Generate personalized cosmic identity
+  app.post('/api/celestial/generate-profile', async (req, res) => {
+    try {
+      const { userId, walletData } = req.body;
+      
+      if (!userId) {
+        return res.status(400).json({ error: 'User ID is required' });
+      }
+      
+      const profile = await CelestialPersonalizationService.generateCosmicIdentity(userId, walletData || {});
+      res.json({ success: true, profile });
+    } catch (error) {
+      console.error('Error generating cosmic profile:', error);
+      res.status(500).json({ error: 'Failed to generate cosmic profile' });
+    }
+  });
+  
+  // Get user's personalization profile
+  app.get('/api/celestial/profile/:userId', async (req, res) => {
+    try {
+      const { userId } = req.params;
+      const profile = await CelestialPersonalizationService.getProfile(userId);
+      
+      if (!profile) {
+        return res.status(404).json({ error: 'Cosmic profile not found' });
+      }
+      
+      res.json(profile);
+    } catch (error) {
+      console.error('Error getting cosmic profile:', error);
+      res.status(500).json({ error: 'Failed to get cosmic profile' });
+    }
+  });
+  
+  // Update user's personalization profile
+  app.put('/api/celestial/profile/:userId', async (req, res) => {
+    try {
+      const { userId } = req.params;
+      const updates = req.body;
+      
+      const profile = await CelestialPersonalizationService.updateProfile(userId, updates);
+      res.json({ success: true, profile });
+    } catch (error) {
+      console.error('Error updating cosmic profile:', error);
+      res.status(500).json({ error: 'Failed to update cosmic profile' });
+    }
+  });
+  
+  // Update user's celestial theme
+  app.put('/api/celestial/profile/:userId/theme', async (req, res) => {
+    try {
+      const { userId } = req.params;
+      const { celestialTheme } = req.body;
+      
+      const profile = await CelestialPersonalizationService.updateProfile(userId, { celestialTheme });
+      res.json({ success: true, profile });
+    } catch (error) {
+      console.error('Error updating celestial theme:', error);
+      res.status(500).json({ error: 'Failed to update celestial theme' });
+    }
+  });
+  
+  // Get available celestial themes
+  app.get('/api/celestial/themes', async (req, res) => {
+    try {
+      const themes = CelestialPersonalizationService.getAvailableThemes();
+      res.json(themes);
+    } catch (error) {
+      console.error('Error getting celestial themes:', error);
+      res.status(500).json({ error: 'Failed to get celestial themes' });
+    }
+  });
+  
+  // Generate cosmic name suggestions
+  app.get('/api/celestial/cosmic-names', async (req, res) => {
+    try {
+      const count = parseInt(req.query.count as string) || 5;
+      const names = CelestialPersonalizationService.generateCosmicNames(count);
+      res.json({ names });
+    } catch (error) {
+      console.error('Error generating cosmic names:', error);
+      res.status(500).json({ error: 'Failed to generate cosmic names' });
+    }
+  });
+  
+  // Calculate cosmic compatibility between users
+  app.post('/api/celestial/compatibility', async (req, res) => {
+    try {
+      const { userId1, userId2 } = req.body;
+      
+      if (!userId1 || !userId2) {
+        return res.status(400).json({ error: 'Both user IDs are required' });
+      }
+      
+      const profile1 = await CelestialPersonalizationService.getProfile(userId1);
+      const profile2 = await CelestialPersonalizationService.getProfile(userId2);
+      
+      if (!profile1 || !profile2) {
+        return res.status(404).json({ error: 'One or both cosmic profiles not found' });
+      }
+      
+      const compatibility = CelestialPersonalizationService.calculateCosmicCompatibility(profile1, profile2);
+      res.json({ success: true, compatibility, profiles: { profile1, profile2 } });
+    } catch (error) {
+      console.error('Error calculating cosmic compatibility:', error);
+      res.status(500).json({ error: 'Failed to calculate cosmic compatibility' });
+    }
+  });
+  
+  console.log('✅ Celestial Wallet Personalization Engine activated!');
+  console.log('🌟 AI-powered cosmic identities with 6 unique themes');
+  console.log('🎨 Personalized achievements, insights, and recommendations');
+  console.log('⭐ Cosmic compatibility matching for social features');
+  
+  // ============ END CELESTIAL PERSONALIZATION ============
   // ============ END ENTERPRISE/GOVERNMENT ROUTES ============
   
   const httpServer = createServer(app);
