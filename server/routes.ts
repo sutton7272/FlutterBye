@@ -45,6 +45,7 @@ import { livingAIService } from "./living-ai-service";
 import { immersiveAIService } from "./immersive-ai-service";
 import FlutterbeyeWebSocketServer from "./websocket-server";
 import { aiAdminService } from "./ai-admin-service";
+import apiMonetizationRoutes from "./api-monetization-routes";
 import { aiContentService } from "./ai-content-service";
 import aiEnhancementRoutes from "./ai-enhancement-routes";
 import comprehensiveAIEnhancementRoutes from "./comprehensive-ai-enhancement-routes";
@@ -4459,6 +4460,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // Register FlutterAI Pricing and Monetization routes
   app.use("/api/flutterai", flutterAIPricingRoutes);
+  
+  // Register Enterprise Sales and API Monetization routes
+  app.use('/api', apiMonetizationRoutes);
   
   console.log("🧠 FlutterAI comprehensive wallet scoring and intelligence engine activated");
   console.log("🧠 FlutterAI Wallet Intelligence routes registered");

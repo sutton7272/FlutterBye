@@ -81,6 +81,8 @@ import RevolutionaryAIShowcase from "@/pages/revolutionary-ai-showcase";
 import AIFeaturesTest from "@/pages/ai-features-test";
 import DynamicPricingDashboard from "@/pages/dynamic-pricing-dashboard";
 import CelestialDashboard from "@/pages/CelestialDashboard";
+import EnterpriseSalesDashboard from "@/pages/enterprise-sales-dashboard";
+import APIMonetizationDashboard from "@/pages/api-monetization-dashboard";
 import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";
 import { PersonalizedDashboard } from "@/components/PersonalizedDashboard";
@@ -384,6 +386,18 @@ function Router() {
           <>
             <Navbar />
             <EnterpriseDashboard />
+          </>
+        )} />
+        <Route path="/enterprise-sales" component={() => (
+          <>
+            <Navbar />
+            <EnterpriseSalesDashboard />
+          </>
+        )} />
+        <Route path="/api-monetization" component={() => (
+          <>
+            <Navbar />
+            <APIMonetizationDashboard />
           </>
         )} />
         <Route path="/flby/staking" component={() => (
