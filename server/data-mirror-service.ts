@@ -553,6 +553,30 @@ export class DataMirrorService {
     return this.mirrorHistory.sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
   }
 
+  async downloadMirrorFile(mirrorId: string): Promise<{ data: string; filename: string }> {
+    try {
+      const mirror = this.mirrorHistory.find(m => m.mirrorId === mirrorId);
+      if (!mirror) {
+        throw new Error(`Mirror ${mirrorId} not found`);
+      }
+
+      // Read mirror data
+      const mirrorData = await this.readMirrorData(mirror);
+      
+      // Create filename with timestamp
+      const timestamp = new Date(mirror.timestamp).toISOString().slice(0, 19).replace(/[:.]/g, '-');
+      const filename = `data-mirror-${mirrorId}-${timestamp}.json`;
+
+      return {
+        data: mirrorData,
+        filename
+      };
+    } catch (error) {
+      console.error(`Failed to download mirror ${mirrorId}:`, error);
+      throw error;
+    }
+  }
+
   async deleteMirror(mirrorId: string): Promise<boolean> {
     try {
       const mirror = this.mirrorHistory.find(m => m.mirrorId === mirrorId);

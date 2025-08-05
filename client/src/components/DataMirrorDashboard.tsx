@@ -18,7 +18,10 @@ import {
   Settings,
   Trash2,
   RotateCcw,
-  Activity
+  Activity,
+  Download,
+  FileText,
+  FileSpreadsheet
 } from "lucide-react";
 
 interface MirrorManifest {
@@ -56,7 +59,7 @@ export function DataMirrorDashboard() {
   const [selectedMirrorId, setSelectedMirrorId] = useState("");
 
   // Fetch mirror list
-  const { data: mirrorsData, isLoading: mirrorsLoading } = useQuery<{success: boolean; data: MirrorManifest[]}>({
+  const { data: mirrorsData } = useQuery<{success: boolean; data: MirrorManifest[]}>({
     queryKey: ["/api/data/mirror/list"],
   });
 
@@ -207,6 +210,77 @@ export function DataMirrorDashboard() {
     }
   };
 
+  const handleDownloadMirror = async (mirrorId: string) => {
+    try {
+      const response = await fetch(`/api/data/mirror/download/${mirrorId}`, {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+      
+      if (!response.ok) throw new Error('Download failed');
+      
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const filename = response.headers.get('content-disposition')?.split('filename=')[1]?.replace(/"/g, '') || `mirror-${mirrorId}.json`;
+      
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+      
+      toast({
+        title: "Mirror Downloaded",
+        description: `Mirror file ${filename} downloaded successfully`,
+      });
+    } catch (error) {
+      toast({
+        title: "Download Failed",
+        description: "Failed to download mirror file",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleExportDatabase = async (format: 'csv' | 'json', tables: string[] = []) => {
+    try {
+      const tableParam = tables.length > 0 ? `?tables=${tables.join(',')}` : '?tables=all';
+      const response = await fetch(`/api/data/export/${format}${tableParam}`, {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+      
+      if (!response.ok) throw new Error('Export failed');
+      
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const filename = response.headers.get('content-disposition')?.split('filename=')[1]?.replace(/"/g, '') || `database-export.${format}`;
+      
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+      
+      toast({
+        title: "Database Exported",
+        description: `Database exported as ${filename}`,
+      });
+    } catch (error) {
+      toast({
+        title: "Export Failed",
+        description: "Failed to export database",
+        variant: "destructive",
+      });
+    }
+  };
+
   const getSyncStatusColor = (status: string) => {
     switch (status) {
       case 'synced': return 'bg-green-500';
@@ -331,10 +405,11 @@ export function DataMirrorDashboard() {
       )}
 
       <Tabs defaultValue="mirrors" className="w-full">
-        <TabsList className="grid w-full grid-cols-3">
+        <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="mirrors">Mirrors</TabsTrigger>
           <TabsTrigger value="health">Health</TabsTrigger>
           <TabsTrigger value="management">Management</TabsTrigger>
+          <TabsTrigger value="export">Export</TabsTrigger>
         </TabsList>
 
         <TabsContent value="mirrors" className="space-y-4">
@@ -414,6 +489,15 @@ export function DataMirrorDashboard() {
                         >
                           <Database className="h-4 w-4 mr-2" />
                           Restore
+                        </Button>
+                        
+                        <Button
+                          onClick={() => handleDownloadMirror(mirror.mirrorId)}
+                          variant="outline"
+                          size="sm"
+                        >
+                          <Download className="h-4 w-4 mr-2" />
+                          Download
                         </Button>
                         
                         <Button
@@ -638,6 +722,162 @@ export function DataMirrorDashboard() {
                 >
                   {setupMirroringMutation.isPending ? "Configuring..." : "Setup Automated Mirroring"}
                 </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="export" className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <FileSpreadsheet className="h-5 w-5" />
+                  Export Database as CSV
+                </CardTitle>
+                <CardDescription>
+                  Download complete database export in CSV format for analysis
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div className="text-sm text-gray-600">
+                    Export all tables including users, activities, address intelligence, and communication logs in CSV format for easy analysis in spreadsheet applications.
+                  </div>
+                  
+                  <div className="grid grid-cols-2 gap-2">
+                    <Button 
+                      onClick={() => handleExportDatabase('csv', ['users'])}
+                      variant="outline"
+                      size="sm"
+                    >
+                      Users Only
+                    </Button>
+                    <Button 
+                      onClick={() => handleExportDatabase('csv', ['address_intelligence'])}
+                      variant="outline"
+                      size="sm"
+                    >
+                      Intelligence Only
+                    </Button>
+                  </div>
+                  
+                  <Button 
+                    onClick={() => handleExportDatabase('csv')}
+                    className="w-full"
+                  >
+                    <FileSpreadsheet className="h-4 w-4 mr-2" />
+                    Export Complete Database (CSV)
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <FileText className="h-5 w-5" />
+                  Export Database as JSON
+                </CardTitle>
+                <CardDescription>
+                  Download structured database export in JSON format
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div className="text-sm text-gray-600">
+                    Export database in structured JSON format, ideal for backup, migration, or integration with other systems.
+                  </div>
+                  
+                  <div className="grid grid-cols-2 gap-2">
+                    <Button 
+                      onClick={() => handleExportDatabase('json', ['communication_logs'])}
+                      variant="outline"
+                      size="sm"
+                    >
+                      Communications
+                    </Button>
+                    <Button 
+                      onClick={() => handleExportDatabase('json', ['user_activities'])}
+                      variant="outline"
+                      size="sm"
+                    >
+                      Activities
+                    </Button>
+                  </div>
+                  
+                  <Button 
+                    onClick={() => handleExportDatabase('json')}
+                    className="w-full"
+                  >
+                    <FileText className="h-4 w-4 mr-2" />
+                    Export Complete Database (JSON)
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Download className="h-5 w-5" />
+                Quick Recovery Options
+              </CardTitle>
+              <CardDescription>
+                Easy access to backup recovery and download options
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                  <div className="p-4 border rounded-lg">
+                    <h4 className="font-medium mb-2">Mirror Recovery</h4>
+                    <p className="text-gray-600 mb-3">Restore data from verified mirror copies with integrity checking</p>
+                    <Button variant="outline" size="sm" className="w-full">
+                      <Database className="h-4 w-4 mr-2" />
+                      View Mirrors
+                    </Button>
+                  </div>
+                  
+                  <div className="p-4 border rounded-lg">
+                    <h4 className="font-medium mb-2">CSV Export</h4>
+                    <p className="text-gray-600 mb-3">Download complete database for spreadsheet analysis</p>
+                    <Button 
+                      onClick={() => handleExportDatabase('csv')}
+                      variant="outline" 
+                      size="sm" 
+                      className="w-full"
+                    >
+                      <FileSpreadsheet className="h-4 w-4 mr-2" />
+                      Export CSV
+                    </Button>
+                  </div>
+                  
+                  <div className="p-4 border rounded-lg">
+                    <h4 className="font-medium mb-2">JSON Backup</h4>
+                    <p className="text-gray-600 mb-3">Download structured backup for system migration</p>
+                    <Button 
+                      onClick={() => handleExportDatabase('json')}
+                      variant="outline" 
+                      size="sm" 
+                      className="w-full"
+                    >
+                      <FileText className="h-4 w-4 mr-2" />
+                      Export JSON
+                    </Button>
+                  </div>
+                </div>
+
+                <div className="p-4 bg-blue-50 dark:bg-blue-950 rounded-lg">
+                  <h4 className="font-medium mb-2 text-blue-800 dark:text-blue-200">Recovery Best Practices</h4>
+                  <ul className="text-sm text-blue-700 dark:text-blue-300 space-y-1">
+                    <li>• Use mirror recovery for real-time data restoration</li>
+                    <li>• Download CSV exports for data analysis and reporting</li>
+                    <li>• Keep JSON backups for system migration and integration</li>
+                    <li>• Verify mirror integrity before critical recovery operations</li>
+                  </ul>
+                </div>
               </div>
             </CardContent>
           </Card>

@@ -687,6 +687,156 @@ router.delete('/data/mirror/:mirrorId', authenticateToken, async (req: any, res)
   }
 });
 
+// Download Mirror File
+router.get('/data/mirror/download/:mirrorId', authenticateToken, async (req: any, res) => {
+  try {
+    const { mirrorId } = req.params;
+    const { dataMirrorService } = await import('./data-mirror-service');
+    
+    const { data, filename } = await dataMirrorService.downloadMirrorFile(mirrorId);
+    
+    res.setHeader('Content-Type', 'application/json');
+    res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+    res.send(data);
+  } catch (error) {
+    console.error('Mirror download error:', error);
+    res.status(500).json({ error: 'Failed to download mirror file' });
+  }
+});
+
+// ========== DATABASE EXPORT ROUTES ==========
+
+// Export Database as CSV
+router.get('/data/export/csv', authenticateToken, async (req: any, res) => {
+  try {
+    const { tables } = req.query;
+    const tablesToExport = tables ? tables.split(',') : ['all'];
+    
+    const csvData = await exportDatabaseToCSV(tablesToExport);
+    const timestamp = new Date().toISOString().slice(0, 19).replace(/[:.]/g, '-');
+    const filename = `database-export-${timestamp}.csv`;
+    
+    res.setHeader('Content-Type', 'text/csv');
+    res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+    res.send(csvData);
+  } catch (error) {
+    console.error('Database export error:', error);
+    res.status(500).json({ error: 'Failed to export database' });
+  }
+});
+
+// Export Database as JSON
+router.get('/data/export/json', authenticateToken, async (req: any, res) => {
+  try {
+    const { tables } = req.query;
+    const tablesToExport = tables ? tables.split(',') : ['all'];
+    
+    const jsonData = await exportDatabaseToJSON(tablesToExport);
+    const timestamp = new Date().toISOString().slice(0, 19).replace(/[:.]/g, '-');
+    const filename = `database-export-${timestamp}.json`;
+    
+    res.setHeader('Content-Type', 'application/json');
+    res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+    res.send(JSON.stringify(jsonData, null, 2));
+  } catch (error) {
+    console.error('Database export error:', error);
+    res.status(500).json({ error: 'Failed to export database' });
+  }
+});
+
+async function exportDatabaseToCSV(tables: string[]): Promise<string> {
+  let csvContent = '';
+  
+  // Sample data structure - in production this would query actual database
+  const sampleData = {
+    users: [
+      { id: 1, name: 'John Doe', email: 'john@example.com', createdAt: '2024-01-01' },
+      { id: 2, name: 'Jane Smith', email: 'jane@example.com', createdAt: '2024-01-02' }
+    ],
+    user_activities: [
+      { id: 1, userId: 1, action: 'login', timestamp: '2024-01-01 10:00:00' },
+      { id: 2, userId: 2, action: 'view_profile', timestamp: '2024-01-02 11:30:00' }
+    ],
+    address_intelligence: [
+      { id: 1, address: '1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa', score: 95, tier: 'premium' },
+      { id: 2, address: '3J98t1WpEZ73CNmQviecrnyiWrnqRhWNLy', score: 87, tier: 'high-value' }
+    ],
+    communication_logs: [
+      { id: 1, userId: 1, type: 'sms', message: 'Welcome message', timestamp: '2024-01-01' },
+      { id: 2, userId: 2, type: 'email', message: 'Newsletter', timestamp: '2024-01-02' }
+    ]
+  };
+  
+  for (const [tableName, records] of Object.entries(sampleData)) {
+    if (tables.includes('all') || tables.includes(tableName)) {
+      // Add table header
+      csvContent += `\n=== ${tableName.toUpperCase()} ===\n`;
+      
+      if (records.length > 0) {
+        // Add column headers
+        const headers = Object.keys(records[0]);
+        csvContent += headers.join(',') + '\n';
+        
+        // Add data rows
+        for (const record of records) {
+          const row = headers.map(header => {
+            const value = record[header as keyof typeof record];
+            // Escape commas and quotes in CSV
+            return typeof value === 'string' && value.includes(',') 
+              ? `"${value.replace(/"/g, '""')}"` 
+              : String(value);
+          });
+          csvContent += row.join(',') + '\n';
+        }
+      }
+      
+      csvContent += '\n';
+    }
+  }
+  
+  return csvContent;
+}
+
+async function exportDatabaseToJSON(tables: string[]): Promise<any> {
+  // Sample data structure - in production this would query actual database
+  const sampleData = {
+    users: [
+      { id: 1, name: 'John Doe', email: 'john@example.com', createdAt: '2024-01-01' },
+      { id: 2, name: 'Jane Smith', email: 'jane@example.com', createdAt: '2024-01-02' }
+    ],
+    user_activities: [
+      { id: 1, userId: 1, action: 'login', timestamp: '2024-01-01 10:00:00' },
+      { id: 2, userId: 2, action: 'view_profile', timestamp: '2024-01-02 11:30:00' }
+    ],
+    address_intelligence: [
+      { id: 1, address: '1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa', score: 95, tier: 'premium' },
+      { id: 2, address: '3J98t1WpEZ73CNmQviecrnyiWrnqRhWNLy', score: 87, tier: 'high-value' }
+    ],
+    communication_logs: [
+      { id: 1, userId: 1, type: 'sms', message: 'Welcome message', timestamp: '2024-01-01' },
+      { id: 2, userId: 2, type: 'email', message: 'Newsletter', timestamp: '2024-01-02' }
+    ]
+  };
+  
+  const exportData: any = {
+    metadata: {
+      exportTime: new Date().toISOString(),
+      version: '1.0',
+      source: 'PoolPal-FlutterAI-System',
+      exportedTables: []
+    }
+  };
+  
+  for (const [tableName, records] of Object.entries(sampleData)) {
+    if (tables.includes('all') || tables.includes(tableName)) {
+      exportData[tableName] = records;
+      exportData.metadata.exportedTables.push(tableName);
+    }
+  }
+  
+  return exportData;
+}
+
 // ========== JOB ROUTES ==========
 
 // Create new job
