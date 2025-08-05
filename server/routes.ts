@@ -4515,6 +4515,192 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // Register enterprise wallet infrastructure
   registerEnterpriseWalletRoutes(app);
+
+  // ============ CORE TOKEN OPERATIONS ============
+  console.log('🪙 Initializing Core Token Operations...');
+  
+  const { flutterbyeTokenService } = await import('./core-token-service');
+
+  // Create message token with optional value attachment
+  app.post('/api/tokens/create-message-token', async (req, res) => {
+    try {
+      const { 
+        message, 
+        creatorId, 
+        creatorWallet, 
+        totalSupply = 1, 
+        attachedValue, 
+        currency = 'SOL',
+        expiresAt,
+        imageUrl,
+        smsOrigin = false,
+        emotionType,
+        isPublic = true
+      } = req.body;
+
+      if (!message || !creatorId || !creatorWallet) {
+        return res.status(400).json({ 
+          success: false, 
+          error: 'Missing required fields: message, creatorId, creatorWallet' 
+        });
+      }
+
+      const result = await flutterbyeTokenService.createMessageToken({
+        message,
+        creatorId,
+        creatorWallet,
+        totalSupply,
+        attachedValue,
+        currency,
+        expiresAt: expiresAt ? new Date(expiresAt) : undefined,
+        imageUrl,
+        smsOrigin,
+        emotionType,
+        isPublic
+      });
+
+      res.status(201).json(result);
+    } catch (error) {
+      console.error('Token creation error:', error);
+      res.status(500).json({ 
+        success: false, 
+        error: error instanceof Error ? error.message : 'Failed to create token' 
+      });
+    }
+  });
+
+  // Attach value to existing token
+  app.post('/api/tokens/:tokenId/attach-value', async (req, res) => {
+    try {
+      const { tokenId } = req.params;
+      const { value, currency = 'SOL', expirationDate } = req.body;
+
+      if (!value || value <= 0) {
+        return res.status(400).json({ 
+          success: false, 
+          error: 'Value must be greater than 0' 
+        });
+      }
+
+      const result = await flutterbyeTokenService.attachValue(
+        tokenId,
+        value,
+        currency,
+        expirationDate ? new Date(expirationDate) : undefined
+      );
+
+      res.json(result);
+    } catch (error) {
+      console.error('Value attachment error:', error);
+      res.status(500).json({ 
+        success: false, 
+        error: error instanceof Error ? error.message : 'Failed to attach value' 
+      });
+    }
+  });
+
+  // Burn token to redeem value
+  app.post('/api/tokens/:tokenId/burn-redeem', async (req, res) => {
+    try {
+      const { tokenId } = req.params;
+      const { burnerWallet, recipientWallet } = req.body;
+
+      if (!burnerWallet) {
+        return res.status(400).json({ 
+          success: false, 
+          error: 'Burner wallet address is required' 
+        });
+      }
+
+      const result = await flutterbyeTokenService.burnForRedemption(
+        tokenId,
+        burnerWallet,
+        recipientWallet
+      );
+
+      res.json(result);
+    } catch (error) {
+      console.error('Burn redemption error:', error);
+      res.status(500).json({ 
+        success: false, 
+        error: error instanceof Error ? error.message : 'Failed to burn token for redemption' 
+      });
+    }
+  });
+
+  // Transfer token between wallets
+  app.post('/api/tokens/:tokenId/transfer', async (req, res) => {
+    try {
+      const { tokenId } = req.params;
+      const { fromWallet, toWallet, amount = 1 } = req.body;
+
+      if (!fromWallet || !toWallet) {
+        return res.status(400).json({ 
+          success: false, 
+          error: 'Both fromWallet and toWallet are required' 
+        });
+      }
+
+      const result = await flutterbyeTokenService.transferToken(
+        tokenId,
+        fromWallet,
+        toWallet,
+        amount
+      );
+
+      res.json(result);
+    } catch (error) {
+      console.error('Token transfer error:', error);
+      res.status(500).json({ 
+        success: false, 
+        error: error instanceof Error ? error.message : 'Failed to transfer token' 
+      });
+    }
+  });
+
+  // Get token balance for a wallet
+  app.get('/api/tokens/:mintAddress/balance/:walletAddress', async (req, res) => {
+    try {
+      const { mintAddress, walletAddress } = req.params;
+
+      const balance = await flutterbyeTokenService.getTokenBalance(mintAddress, walletAddress);
+
+      res.json({
+        success: true,
+        mintAddress,
+        walletAddress,
+        balance
+      });
+    } catch (error) {
+      console.error('Balance check error:', error);
+      res.status(500).json({ 
+        success: false, 
+        error: error instanceof Error ? error.message : 'Failed to check token balance' 
+      });
+    }
+  });
+
+  // Handle expired tokens (admin endpoint)
+  app.post('/api/admin/tokens/handle-expired', async (req, res) => {
+    try {
+      await flutterbyeTokenService.handleExpiredTokens();
+      res.json({ 
+        success: true, 
+        message: 'Expired tokens processed successfully' 
+      });
+    } catch (error) {
+      console.error('Handle expired tokens error:', error);
+      res.status(500).json({ 
+        success: false, 
+        error: error instanceof Error ? error.message : 'Failed to handle expired tokens' 
+      });
+    }
+  });
+
+  console.log('✅ Core Token Operations activated!');
+  console.log('🪙 Message token creation and value attachment ready');
+  console.log('🔥 Burn-to-redeem mechanism operational');
+  console.log('📤 Token transfer capabilities enabled');
   
   console.log('🚀 ENTERPRISE REVENUE GENERATION COMPLETE!');
   console.log('💰 Target Revenue: $5M-$50M ARR from Enterprise + Government clients');

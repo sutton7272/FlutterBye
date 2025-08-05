@@ -380,6 +380,37 @@ export class MemStorage implements IStorage {
     return token;
   }
 
+  async updateToken(id: string, updates: Partial<Token>): Promise<Token> {
+    const token = this.tokens.get(id);
+    if (!token) {
+      throw new Error('Token not found');
+    }
+    const updatedToken = { ...token, ...updates, updatedAt: new Date() };
+    this.tokens.set(id, updatedToken);
+    return updatedToken;
+  }
+
+  async getExpiredTokensWithValue(): Promise<Token[]> {
+    const now = new Date();
+    return Array.from(this.tokens.values()).filter(token => 
+      token.hasAttachedValue && 
+      token.escrowStatus === 'escrowed' &&
+      token.expiresAt && 
+      new Date(token.expiresAt) < now
+    );
+  }
+
+  async createTransaction(transactionData: any): Promise<any> {
+    const id = randomUUID();
+    const transaction = {
+      ...transactionData,
+      id,
+      createdAt: new Date()
+    };
+    this.transactions.set(id, transaction);
+    return transaction;
+  }
+
   // Additional methods for Solana integration
   async getTokensByCreatorWallet(walletAddress: string): Promise<Token[]> {
     return Array.from(this.tokens.values())
