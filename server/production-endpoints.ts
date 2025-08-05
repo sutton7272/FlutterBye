@@ -1,5 +1,5 @@
 import type { Express, Request, Response } from 'express';
-import { monitoring } from './monitoring';
+import ProductionMonitoringService from './monitoring';
 import { transactionMonitor } from './transaction-monitor';
 import { realTimeMonitor } from './real-time-monitor';
 import { SecurityMiddleware, adminRateLimit, tokenCreationRateLimit } from './security-middleware';

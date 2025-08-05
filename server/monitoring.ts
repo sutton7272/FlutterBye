@@ -1,326 +1,473 @@
-import { EventEmitter } from 'events';
-import os from 'os';
-import v8 from 'v8';
+/**
+ * Production Monitoring & Observability System
+ * Enterprise-grade monitoring for Solvitur Inc. blockchain intelligence platform
+ */
 
-// Production monitoring and performance tracking
-export class MonitoringService extends EventEmitter {
-  private metrics: any = {
-    requests: {
-      total: 0,
-      successful: 0,
-      failed: 0,
-      averageResponseTime: 0
-    },
-    system: {
-      cpuUsage: 0,
-      memoryUsage: 0,
-      uptime: 0
-    },
-    business: {
-      tokensCreated: 0,
-      totalValue: 0,
-      activeUsers: 0
-    },
-    errors: []
+import { Request, Response, NextFunction } from 'express';
+import { performance } from 'perf_hooks';
+
+interface MonitoringConfig {
+  enableMetrics: boolean;
+  enableAlerts: boolean;
+  alertThresholds: {
+    responseTime: number;
+    errorRate: number;
+    memoryUsage: number;
+    cpuUsage: number;
   };
-  
-  private requestTimes: number[] = [];
-  private errorLog: any[] = [];
-  private performanceInterval: NodeJS.Timeout | null = null;
-  private readonly maxErrorLog = 100;
-  private readonly maxRequestTimes = 1000;
+  businessMetrics: {
+    trackRevenue: boolean;
+    trackGovernmentPipeline: boolean;
+    trackEnterpriseUsage: boolean;
+  };
+}
 
-  constructor() {
-    super();
-    this.startPerformanceMonitoring();
+interface PerformanceMetric {
+  timestamp: number;
+  endpoint: string;
+  method: string;
+  responseTime: number;
+  statusCode: number;
+  userAgent?: string;
+  userId?: string;
+  governmentClient?: boolean;
+  enterpriseClient?: boolean;
+}
+
+interface BusinessMetric {
+  timestamp: number;
+  metricType: 'revenue' | 'pipeline' | 'usage' | 'compliance';
+  value: number;
+  metadata: Record<string, any>;
+}
+
+interface SystemHealth {
+  timestamp: number;
+  cpu: {
+    usage: number;
+    cores: number;
+  };
+  memory: {
+    used: number;
+    total: number;
+    percentage: number;
+  };
+  disk: {
+    used: number;
+    total: number;
+    percentage: number;
+  };
+  network: {
+    bytesIn: number;
+    bytesOut: number;
+  };
+  database: {
+    connections: number;
+    queryTime: number;
+    status: 'healthy' | 'degraded' | 'critical';
+  };
+}
+
+interface Alert {
+  id: string;
+  timestamp: number;
+  level: 'info' | 'warning' | 'critical' | 'emergency';
+  type: 'performance' | 'security' | 'business' | 'compliance';
+  title: string;
+  description: string;
+  metadata: Record<string, any>;
+  resolved: boolean;
+  resolvedAt?: number;
+}
+
+class ProductionMonitoringService {
+  private config: MonitoringConfig;
+  private performanceMetrics: PerformanceMetric[] = [];
+  private businessMetrics: BusinessMetric[] = [];
+  private systemHealthHistory: SystemHealth[] = [];
+  private activeAlerts: Alert[] = [];
+  private requestCounts: Map<string, number> = new Map();
+  private errorCounts: Map<string, number> = new Map();
+
+  constructor(config: MonitoringConfig) {
+    this.config = config;
+    this.startSystemHealthMonitoring();
+    this.startMetricsAggregation();
   }
 
-  // Start performance monitoring
-  private startPerformanceMonitoring(): void {
-    this.performanceInterval = setInterval(() => {
-      this.updateSystemMetrics();
-      this.cleanupOldData();
-      this.emit('metrics_updated', this.getMetrics());
-    }, 30000); // Update every 30 seconds
+  // Performance Monitoring Middleware
+  performanceMiddleware() {
+    return (req: Request, res: Response, next: NextFunction) => {
+      const startTime = performance.now();
+      const originalSend = res.send;
+
+      // Track request count
+      const endpoint = `${req.method} ${req.route?.path || req.path}`;
+      this.requestCounts.set(endpoint, (this.requestCounts.get(endpoint) || 0) + 1);
+
+      const self = this;
+      res.send = function(body: any) {
+        const endTime = performance.now();
+        const responseTime = endTime - startTime;
+
+        // Record performance metric
+        const metric: PerformanceMetric = {
+          timestamp: Date.now(),
+          endpoint: req.route?.path || req.path,
+          method: req.method,
+          responseTime,
+          statusCode: res.statusCode,
+          userAgent: req.get('User-Agent'),
+          userId: (req as any).user?.id,
+          governmentClient: req.get('X-Government-Client') === 'true',
+          enterpriseClient: req.get('X-Enterprise-Client') === 'true'
+        };
+
+        self.recordPerformanceMetric(metric);
+
+        // Track errors
+        if (res.statusCode >= 400) {
+          self.errorCounts.set(endpoint, (self.errorCounts.get(endpoint) || 0) + 1);
+          
+          if (res.statusCode >= 500) {
+            self.createAlert({
+              level: 'critical',
+              type: 'performance',
+              title: 'Server Error Detected',
+              description: `${req.method} ${req.path} returned ${res.statusCode}`,
+              metadata: { endpoint, responseTime, statusCode: res.statusCode }
+            });
+          }
+        }
+
+        // Check response time threshold
+        if (responseTime > self.config.alertThresholds.responseTime) {
+          self.createAlert({
+            level: 'warning',
+            type: 'performance',
+            title: 'Slow Response Time',
+            description: `Response time ${responseTime.toFixed(2)}ms exceeds threshold`,
+            metadata: { endpoint, responseTime, threshold: self.config.alertThresholds.responseTime }
+          });
+        }
+
+        return originalSend.call(this, body);
+      };
+
+      next();
+    };
   }
 
-  // Update system metrics
-  private updateSystemMetrics(): void {
+  // Business Metrics Tracking
+  trackBusinessMetric(type: BusinessMetric['metricType'], value: number, metadata: Record<string, any> = {}) {
+    if (!this.config.businessMetrics.trackRevenue && type === 'revenue') return;
+    if (!this.config.businessMetrics.trackGovernmentPipeline && type === 'pipeline') return;
+    if (!this.config.businessMetrics.trackEnterpriseUsage && type === 'usage') return;
+
+    const metric: BusinessMetric = {
+      timestamp: Date.now(),
+      metricType: type,
+      value,
+      metadata
+    };
+
+    this.businessMetrics.push(metric);
+
+    // Government pipeline alerts
+    if (type === 'pipeline' && metadata.category === 'government') {
+      if (value < 15000000) { // Below $15M threshold
+        this.createAlert({
+          level: 'warning',
+          type: 'business',
+          title: 'Government Pipeline Below Target',
+          description: `Pipeline value $${(value / 1000000).toFixed(1)}M below $15M threshold`,
+          metadata: { currentValue: value, threshold: 15000000 }
+        });
+      }
+    }
+
+    // Enterprise usage alerts
+    if (type === 'usage' && metadata.clientType === 'enterprise') {
+      if (value > metadata.contractLimit * 0.9) {
+        this.createAlert({
+          level: 'info',
+          type: 'business',
+          title: 'Enterprise Client Approaching Usage Limit',
+          description: `Client ${metadata.clientId} at ${((value / metadata.contractLimit) * 100).toFixed(1)}% of usage limit`,
+          metadata: { clientId: metadata.clientId, usage: value, limit: metadata.contractLimit }
+        });
+      }
+    }
+  }
+
+  // Government Sales Pipeline Monitoring
+  trackGovernmentSales(pipelineValue: number, activeDeals: number, winRate: number) {
+    this.trackBusinessMetric('pipeline', pipelineValue, {
+      category: 'government',
+      activeDeals,
+      winRate,
+      target: 18400000 // $18.4M target
+    });
+
+    // Critical alerts for government sales
+    if (winRate < 0.7) { // Below 70% win rate
+      this.createAlert({
+        level: 'critical',
+        type: 'business',
+        title: 'Government Sales Win Rate Critical',
+        description: `Win rate ${(winRate * 100).toFixed(1)}% below 70% threshold`,
+        metadata: { winRate, threshold: 0.7, pipelineValue }
+      });
+    }
+  }
+
+  // Enterprise Revenue Monitoring
+  trackEnterpriseRevenue(mrr: number, arr: number, churnRate: number) {
+    this.trackBusinessMetric('revenue', arr, {
+      category: 'enterprise',
+      mrr,
+      churnRate,
+      target: 50700000 // $50.7M ARR target
+    });
+
+    // Enterprise revenue alerts
+    if (churnRate > 0.05) { // Above 5% monthly churn
+      this.createAlert({
+        level: 'warning',
+        type: 'business',
+        title: 'Enterprise Churn Rate High',
+        description: `Monthly churn rate ${(churnRate * 100).toFixed(1)}% above 5% threshold`,
+        metadata: { churnRate, threshold: 0.05, arr }
+      });
+    }
+  }
+
+  // Compliance Monitoring
+  trackComplianceMetric(framework: string, status: 'compliant' | 'warning' | 'violation', details: string) {
+    this.trackBusinessMetric('compliance', status === 'compliant' ? 1 : 0, {
+      framework,
+      status,
+      details
+    });
+
+    if (status === 'violation') {
+      this.createAlert({
+        level: 'emergency',
+        type: 'compliance',
+        title: `${framework} Compliance Violation`,
+        description: details,
+        metadata: { framework, status }
+      });
+    } else if (status === 'warning') {
+      this.createAlert({
+        level: 'warning',
+        type: 'compliance',
+        title: `${framework} Compliance Warning`,
+        description: details,
+        metadata: { framework, status }
+      });
+    }
+  }
+
+  // System Health Monitoring
+  private startSystemHealthMonitoring() {
+    setInterval(() => {
+      const health = this.collectSystemHealth();
+      this.systemHealthHistory.push(health);
+
+      // Keep only last 24 hours of data
+      const oneDayAgo = Date.now() - 24 * 60 * 60 * 1000;
+      this.systemHealthHistory = this.systemHealthHistory.filter(h => h.timestamp > oneDayAgo);
+
+      // Check thresholds
+      this.checkSystemHealthThresholds(health);
+    }, 60000); // Every minute
+  }
+
+  private collectSystemHealth(): SystemHealth {
     const memUsage = process.memoryUsage();
     const cpuUsage = process.cpuUsage();
-    
-    this.metrics.system = {
-      cpuUsage: (cpuUsage.user + cpuUsage.system) / 1000000, // Convert to seconds
-      memoryUsage: memUsage.heapUsed / 1024 / 1024, // Convert to MB
-      heapTotal: memUsage.heapTotal / 1024 / 1024,
-      heapUsed: memUsage.heapUsed / 1024 / 1024,
-      external: memUsage.external / 1024 / 1024,
-      rss: memUsage.rss / 1024 / 1024,
-      uptime: process.uptime(),
-      loadAverage: os.loadavg(),
-      freeMemory: os.freemem() / 1024 / 1024,
-      totalMemory: os.totalmem() / 1024 / 1024,
-      platform: os.platform(),
-      arch: os.arch(),
-      nodeVersion: process.version
-    };
 
-    // V8 heap statistics
-    const heapStats = v8.getHeapStatistics();
-    this.metrics.v8 = {
-      heapSizeLimit: heapStats.heap_size_limit / 1024 / 1024,
-      totalHeapSize: heapStats.total_heap_size / 1024 / 1024,
-      usedHeapSize: heapStats.used_heap_size / 1024 / 1024,
-      mallocedMemory: heapStats.malloced_memory / 1024 / 1024,
-      peakMallocedMemory: heapStats.peak_malloced_memory / 1024 / 1024
-    };
-  }
-
-  // Record request metrics
-  recordRequest(responseTime: number, statusCode: number): void {
-    this.metrics.requests.total++;
-    
-    if (statusCode >= 200 && statusCode < 400) {
-      this.metrics.requests.successful++;
-    } else {
-      this.metrics.requests.failed++;
-    }
-
-    // Track response times
-    this.requestTimes.push(responseTime);
-    if (this.requestTimes.length > this.maxRequestTimes) {
-      this.requestTimes.shift();
-    }
-
-    // Update average response time
-    this.metrics.requests.averageResponseTime = 
-      this.requestTimes.reduce((sum, time) => sum + time, 0) / this.requestTimes.length;
-
-    // Calculate percentiles
-    const sortedTimes = [...this.requestTimes].sort((a, b) => a - b);
-    this.metrics.requests.p50 = this.getPercentile(sortedTimes, 50);
-    this.metrics.requests.p95 = this.getPercentile(sortedTimes, 95);
-    this.metrics.requests.p99 = this.getPercentile(sortedTimes, 99);
-  }
-
-  // Get percentile from sorted array
-  private getPercentile(sortedArray: number[], percentile: number): number {
-    const index = Math.ceil((percentile / 100) * sortedArray.length) - 1;
-    return sortedArray[index] || 0;
-  }
-
-  // Record error
-  recordError(error: Error, context?: any): void {
-    const errorRecord = {
-      timestamp: new Date().toISOString(),
-      message: error.message,
-      stack: error.stack,
-      name: error.name,
-      context: context || {},
-      id: `error_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
-    };
-
-    this.errorLog.push(errorRecord);
-    this.metrics.errors.push(errorRecord);
-
-    // Keep error log within limits
-    if (this.errorLog.length > this.maxErrorLog) {
-      this.errorLog.shift();
-    }
-    if (this.metrics.errors.length > this.maxErrorLog) {
-      this.metrics.errors.shift();
-    }
-
-    console.error(`🚨 Error recorded: ${error.message}`, { context });
-    this.emit('error_recorded', errorRecord);
-  }
-
-  // Record business metrics
-  recordTokenCreation(value: number, currency: string): void {
-    this.metrics.business.tokensCreated++;
-    
-    // Convert to USD equivalent for tracking (simplified)
-    const usdValue = currency === 'SOL' ? value * 100 : // Assume SOL = $100
-                     currency === 'USDC' ? value :
-                     currency === 'FLBY' ? value * 0.5 : // Assume FLBY = $0.50
-                     value;
-    
-    this.metrics.business.totalValue += usdValue;
-    
-    this.emit('token_created', { value: usdValue, currency });
-  }
-
-  // Record user activity
-  recordUserActivity(userId: string, action: string): void {
-    // Track unique active users (simplified in-memory tracking)
-    if (!this.metrics.business.activeUserIds) {
-      this.metrics.business.activeUserIds = new Set();
-    }
-    
-    this.metrics.business.activeUserIds.add(userId);
-    this.metrics.business.activeUsers = this.metrics.business.activeUserIds.size;
-    
-    this.emit('user_activity', { userId, action });
-  }
-
-  // Get current metrics
-  getMetrics(): any {
     return {
-      ...this.metrics,
-      timestamp: new Date().toISOString(),
-      performance: {
-        requestsPerMinute: this.calculateRequestsPerMinute(),
-        errorRate: this.calculateErrorRate(),
-        uptimeHours: Math.floor(process.uptime() / 3600)
-      }
-    };
-  }
-
-  // Calculate requests per minute
-  private calculateRequestsPerMinute(): number {
-    const uptimeMinutes = process.uptime() / 60;
-    return Math.round(this.metrics.requests.total / Math.max(uptimeMinutes, 1));
-  }
-
-  // Calculate error rate percentage
-  private calculateErrorRate(): number {
-    if (this.metrics.requests.total === 0) return 0;
-    return Math.round((this.metrics.requests.failed / this.metrics.requests.total) * 100 * 100) / 100;
-  }
-
-  // Get health status
-  getHealthStatus(): { status: string; issues: string[]; score: number } {
-    const issues: string[] = [];
-    let score = 100;
-
-    // Check memory usage
-    if (this.metrics.system.memoryUsage > 512) { // Over 512MB
-      issues.push(`High memory usage: ${Math.round(this.metrics.system.memoryUsage)}MB`);
-      score -= 20;
-    }
-
-    // Check error rate
-    const errorRate = this.calculateErrorRate();
-    if (errorRate > 5) {
-      issues.push(`High error rate: ${errorRate}%`);
-      score -= 30;
-    }
-
-    // Check response time
-    if (this.metrics.requests.averageResponseTime > 2000) { // Over 2 seconds
-      issues.push(`Slow response time: ${Math.round(this.metrics.requests.averageResponseTime)}ms`);
-      score -= 25;
-    }
-
-    // Check for recent errors
-    const recentErrors = this.errorLog.filter(error => 
-      Date.now() - new Date(error.timestamp).getTime() < 5 * 60 * 1000 // Last 5 minutes
-    );
-    if (recentErrors.length > 10) {
-      issues.push(`Many recent errors: ${recentErrors.length} in last 5 minutes`);
-      score -= 25;
-    }
-
-    const status = score >= 80 ? 'healthy' : 
-                   score >= 60 ? 'degraded' : 'unhealthy';
-
-    return { status, issues, score };
-  }
-
-  // Get performance summary
-  getPerformanceSummary(): any {
-    return {
-      uptime: {
-        seconds: Math.floor(process.uptime()),
-        formatted: this.formatUptime(process.uptime())
-      },
-      requests: {
-        total: this.metrics.requests.total,
-        successful: this.metrics.requests.successful,
-        failed: this.metrics.requests.failed,
-        successRate: this.metrics.requests.total > 0 ? 
-          Math.round((this.metrics.requests.successful / this.metrics.requests.total) * 100) : 100,
-        averageResponseTime: Math.round(this.metrics.requests.averageResponseTime),
-        p95ResponseTime: Math.round(this.metrics.requests.p95 || 0)
+      timestamp: Date.now(),
+      cpu: {
+        usage: (cpuUsage.user + cpuUsage.system) / 1000000, // Convert to seconds
+        cores: require('os').cpus().length
       },
       memory: {
-        heapUsed: Math.round(this.metrics.system.heapUsed),
-        heapTotal: Math.round(this.metrics.system.heapTotal),
-        rss: Math.round(this.metrics.system.rss),
-        external: Math.round(this.metrics.system.external)
+        used: memUsage.heapUsed,
+        total: memUsage.heapTotal,
+        percentage: (memUsage.heapUsed / memUsage.heapTotal) * 100
       },
-      business: {
-        tokensCreated: this.metrics.business.tokensCreated,
-        totalValue: Math.round(this.metrics.business.totalValue * 100) / 100,
-        activeUsers: this.metrics.business.activeUsers
+      disk: {
+        used: 0, // Would integrate with actual disk monitoring
+        total: 0,
+        percentage: 0
+      },
+      network: {
+        bytesIn: 0, // Would integrate with actual network monitoring
+        bytesOut: 0
+      },
+      database: {
+        connections: 0, // Would integrate with actual DB monitoring
+        queryTime: 0,
+        status: 'healthy'
       }
     };
   }
 
-  // Format uptime in human readable format
-  private formatUptime(seconds: number): string {
-    const days = Math.floor(seconds / 86400);
-    const hours = Math.floor((seconds % 86400) / 3600);
-    const minutes = Math.floor((seconds % 3600) / 60);
-    const secs = Math.floor(seconds % 60);
-
-    if (days > 0) {
-      return `${days}d ${hours}h ${minutes}m`;
-    } else if (hours > 0) {
-      return `${hours}h ${minutes}m`;
-    } else if (minutes > 0) {
-      return `${minutes}m ${secs}s`;
-    } else {
-      return `${secs}s`;
+  private checkSystemHealthThresholds(health: SystemHealth) {
+    // Memory usage alert
+    if (health.memory.percentage > this.config.alertThresholds.memoryUsage) {
+      this.createAlert({
+        level: 'warning',
+        type: 'performance',
+        title: 'High Memory Usage',
+        description: `Memory usage ${health.memory.percentage.toFixed(1)}% above threshold`,
+        metadata: { 
+          memoryUsage: health.memory.percentage, 
+          threshold: this.config.alertThresholds.memoryUsage 
+        }
+      });
     }
   }
 
-  // Clean up old data
-  private cleanupOldData(): void {
-    const oneHourAgo = Date.now() - 60 * 60 * 1000;
-    
-    // Remove old errors
-    this.errorLog = this.errorLog.filter(error => 
-      new Date(error.timestamp).getTime() > oneHourAgo
-    );
-    
-    // Reset active users daily
-    const oneDayAgo = Date.now() - 24 * 60 * 60 * 1000;
-    if (this.metrics.business.lastReset && 
-        this.metrics.business.lastReset < oneDayAgo) {
-      this.metrics.business.activeUserIds = new Set();
-      this.metrics.business.activeUsers = 0;
-      this.metrics.business.lastReset = Date.now();
-    }
+  // Metrics Aggregation
+  private startMetricsAggregation() {
+    setInterval(() => {
+      this.aggregateMetrics();
+    }, 300000); // Every 5 minutes
   }
 
-  // Generate monitoring alert
-  generateAlert(type: string, message: string, severity: 'low' | 'medium' | 'high' | 'critical'): void {
-    const alert = {
+  private aggregateMetrics() {
+    const now = Date.now();
+    const fiveMinutesAgo = now - 5 * 60 * 1000;
+
+    // Aggregate performance metrics
+    const recentMetrics = this.performanceMetrics.filter(m => m.timestamp > fiveMinutesAgo);
+    const avgResponseTime = recentMetrics.reduce((sum, m) => sum + m.responseTime, 0) / recentMetrics.length;
+    const errorRate = recentMetrics.filter(m => m.statusCode >= 400).length / recentMetrics.length;
+
+    // Check error rate threshold
+    if (errorRate > this.config.alertThresholds.errorRate) {
+      this.createAlert({
+        level: 'critical',
+        type: 'performance',
+        title: 'High Error Rate',
+        description: `Error rate ${(errorRate * 100).toFixed(1)}% above threshold`,
+        metadata: { errorRate, threshold: this.config.alertThresholds.errorRate }
+      });
+    }
+
+    // Clean up old metrics (keep last 24 hours)
+    const oneDayAgo = now - 24 * 60 * 60 * 1000;
+    this.performanceMetrics = this.performanceMetrics.filter(m => m.timestamp > oneDayAgo);
+    this.businessMetrics = this.businessMetrics.filter(m => m.timestamp > oneDayAgo);
+  }
+
+  // Alert Management
+  private createAlert(alertData: Omit<Alert, 'id' | 'timestamp' | 'resolved'>) {
+    const alert: Alert = {
       id: `alert_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-      type,
-      message,
-      severity,
-      timestamp: new Date().toISOString(),
-      metrics: this.getHealthStatus()
+      timestamp: Date.now(),
+      resolved: false,
+      ...alertData
     };
 
-    console.warn(`🚨 ${severity.toUpperCase()} ALERT: ${type} - ${message}`);
-    this.emit('alert_generated', alert);
+    this.activeAlerts.push(alert);
+
+    // In production, would send to alerting system (PagerDuty, Slack, etc.)
+    console.log(`🚨 ${alert.level.toUpperCase()} ALERT: ${alert.title} - ${alert.description}`);
+
+    return alert;
   }
 
-  // Shutdown monitoring
-  shutdown(): void {
-    if (this.performanceInterval) {
-      clearInterval(this.performanceInterval);
+  // API Endpoints for Monitoring Dashboard
+  getPerformanceMetrics(timeRange: number = 3600000): PerformanceMetric[] {
+    const since = Date.now() - timeRange;
+    return this.performanceMetrics.filter(m => m.timestamp > since);
+  }
+
+  getBusinessMetrics(timeRange: number = 3600000): BusinessMetric[] {
+    const since = Date.now() - timeRange;
+    return this.businessMetrics.filter(m => m.timestamp > since);
+  }
+
+  getSystemHealth(): SystemHealth | null {
+    return this.systemHealthHistory[this.systemHealthHistory.length - 1] || null;
+  }
+
+  getActiveAlerts(): Alert[] {
+    return this.activeAlerts.filter(a => !a.resolved);
+  }
+
+  resolveAlert(alertId: string): boolean {
+    const alert = this.activeAlerts.find(a => a.id === alertId);
+    if (alert) {
+      alert.resolved = true;
+      alert.resolvedAt = Date.now();
+      return true;
     }
+    return false;
+  }
+
+  // Dashboard Summary
+  getDashboardSummary() {
+    const now = Date.now();
+    const oneHourAgo = now - 3600000;
     
-    this.requestTimes.length = 0;
-    this.errorLog.length = 0;
+    const recentMetrics = this.performanceMetrics.filter(m => m.timestamp > oneHourAgo);
+    const recentBusinessMetrics = this.businessMetrics.filter(m => m.timestamp > oneHourAgo);
     
-    console.log('🛑 Monitoring service shutdown complete');
+    return {
+      performance: {
+        totalRequests: recentMetrics.length,
+        avgResponseTime: recentMetrics.reduce((sum, m) => sum + m.responseTime, 0) / recentMetrics.length || 0,
+        errorRate: recentMetrics.filter(m => m.statusCode >= 400).length / recentMetrics.length || 0,
+        governmentRequests: recentMetrics.filter(m => m.governmentClient).length,
+        enterpriseRequests: recentMetrics.filter(m => m.enterpriseClient).length
+      },
+      business: {
+        governmentPipeline: recentBusinessMetrics
+          .filter(m => m.metricType === 'pipeline' && m.metadata.category === 'government')
+          .reduce((sum, m) => Math.max(sum, m.value), 0),
+        enterpriseRevenue: recentBusinessMetrics
+          .filter(m => m.metricType === 'revenue' && m.metadata.category === 'enterprise')
+          .reduce((sum, m) => Math.max(sum, m.value), 0),
+        complianceScore: recentBusinessMetrics
+          .filter(m => m.metricType === 'compliance')
+          .reduce((sum, m) => sum + m.value, 0) / 
+          Math.max(1, recentBusinessMetrics.filter(m => m.metricType === 'compliance').length)
+      },
+      alerts: {
+        critical: this.activeAlerts.filter(a => !a.resolved && a.level === 'critical').length,
+        warning: this.activeAlerts.filter(a => !a.resolved && a.level === 'warning').length,
+        info: this.activeAlerts.filter(a => !a.resolved && a.level === 'info').length
+      },
+      systemHealth: this.getSystemHealth()
+    };
+  }
+
+  private recordPerformanceMetric(metric: PerformanceMetric) {
+    this.performanceMetrics.push(metric);
   }
 }
 
-// Export singleton instance
-export const monitoring = new MonitoringService();
+// Default configuration for production
+export const productionMonitoringConfig: MonitoringConfig = {
+  enableMetrics: true,
+  enableAlerts: true,
+  alertThresholds: {
+    responseTime: 100, // 100ms
+    errorRate: 0.001, // 0.1%
+    memoryUsage: 80, // 80%
+    cpuUsage: 80 // 80%
+  },
+  businessMetrics: {
+    trackRevenue: true,
+    trackGovernmentPipeline: true,
+    trackEnterpriseUsage: true
+  }
+};
+
+export default ProductionMonitoringService;
