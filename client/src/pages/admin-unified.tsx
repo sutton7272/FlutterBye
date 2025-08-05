@@ -69,7 +69,9 @@ import {
   Monitor,
   Server,
   Heart,
-  Gauge
+  Gauge,
+  Lock,
+  Wallet
 } from "lucide-react";
 
 // Self-Optimization Platform Admin Component
@@ -958,6 +960,7 @@ function DynamicPricingAdminContent() {
 // Consolidated Admin Dashboard - All admin functions in one place
 export default function UnifiedAdminDashboard() {
   const [activeTab, setActiveTab] = useState("overview");
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -966,6 +969,52 @@ export default function UnifiedAdminDashboard() {
   const [newImageUrl, setNewImageUrl] = useState("");
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+
+  // Define category groups
+  const categoryGroups = {
+    'core-management': ['overview', 'settings', 'users', 'tokens', 'pricing', 'codes', 'access'],
+    'business-intelligence': ['competitive', 'wallets', 'behavior', 'api-monetization', 'features'],
+    'analytics-monitoring': ['analytics', 'performance', 'security', 'system', 'realtime', 'revenue', 'viral'],
+    'ai-optimization': ['dynamic-pricing', 'self-optimization', 'staking']
+  };
+
+  // Define all tab configurations
+  const allTabConfigs = [
+    { value: "overview", icon: BarChart3, label: "Overview", color: "blue" },
+    { value: "settings", icon: Settings, label: "Settings", color: "green" },
+    { value: "users", icon: Users, label: "Users", color: "purple" },
+    { value: "tokens", icon: ImageIcon, label: "Tokens", color: "cyan" },
+    { value: "pricing", icon: DollarSign, label: "Pricing", color: "yellow" },
+    { value: "dynamic-pricing", icon: Brain, label: "AI Price", color: "orange" },
+    { value: "self-optimization", icon: Gauge, label: "Auto-Opt", color: "gradient" },
+    { value: "codes", icon: Ticket, label: "Codes", color: "pink" },
+    { value: "access", icon: Lock, label: "Access", color: "red" },
+    { value: "analytics", icon: TrendingUp, label: "Analytics", color: "blue" },
+    { value: "staking", icon: Coins, label: "Staking", color: "yellow" },
+    { value: "system", icon: Database, label: "System", color: "blue" },
+    { value: "viral", icon: Zap, label: "🚀 Viral", color: "purple" },
+    { value: "realtime", icon: Activity, label: "📡 Live", color: "green" },
+    { value: "revenue", icon: TrendingUp, label: "Revenue", color: "emerald" },
+    { value: "security", icon: Shield, label: "Security", color: "red" },
+    { value: "performance", icon: Zap, label: "Perf", color: "purple" },
+    { value: "behavior", icon: Brain, label: "Behavior", color: "indigo" },
+    { value: "competitive", icon: Target, label: "Intel", color: "teal" },
+    { value: "wallets", icon: Wallet, label: "Wallets", color: "amber" },
+    { value: "api-monetization", icon: DollarSign, label: "💰 API $", color: "green" },
+    { value: "features", icon: Settings, label: "🎛️ Features", color: "blue" }
+  ];
+
+  // Get filtered tabs based on selected category
+  const getVisibleTabs = () => {
+    if (!selectedCategory) return Object.values(categoryGroups).flat();
+    return categoryGroups[selectedCategory as keyof typeof categoryGroups] || [];
+  };
+
+  // Get visible tab configurations
+  const getVisibleTabConfigs = () => {
+    const visibleTabValues = getVisibleTabs();
+    return allTabConfigs.filter(tab => visibleTabValues.includes(tab.value));
+  };
 
   // Detect mobile viewport
   useEffect(() => {
@@ -1191,52 +1240,78 @@ export default function UnifiedAdminDashboard() {
           <div className="flex flex-wrap gap-2">
             <Button 
               onClick={() => {
-                // Cycle through Core Management tabs
-                const coreManagementTabs = ['overview', 'settings', 'users', 'tokens', 'pricing', 'codes', 'access'];
-                const currentIndex = coreManagementTabs.indexOf(activeTab);
-                const nextTab = coreManagementTabs[(currentIndex + 1) % coreManagementTabs.length];
-                setActiveTab(nextTab);
+                const category = 'core-management';
+                setSelectedCategory(selectedCategory === category ? null : category);
+                if (selectedCategory !== category) {
+                  setActiveTab(categoryGroups[category][0]);
+                }
               }}
-              className="bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 border border-blue-500/30 h-auto py-1 px-3 text-xs"
+              className={`${
+                selectedCategory === 'core-management' 
+                  ? 'bg-blue-500/40 text-blue-300 border-blue-400' 
+                  : 'bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 border-blue-500/30'
+              } h-auto py-1 px-3 text-xs`}
             >
-              Core Management
+              Core Management {selectedCategory === 'core-management' && '✓'}
             </Button>
             <Button 
               onClick={() => {
-                // Cycle through Business Intelligence tabs
-                const businessIntelTabs = ['competitive', 'wallets', 'behavior', 'api-monetization', 'features'];
-                const currentIndex = businessIntelTabs.indexOf(activeTab);
-                const nextTab = businessIntelTabs[(currentIndex + 1) % businessIntelTabs.length];
-                setActiveTab(nextTab);
+                const category = 'business-intelligence';
+                setSelectedCategory(selectedCategory === category ? null : category);
+                if (selectedCategory !== category) {
+                  setActiveTab(categoryGroups[category][0]);
+                }
               }}
-              className="bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-400 border border-emerald-500/30 h-auto py-1 px-3 text-xs"
+              className={`${
+                selectedCategory === 'business-intelligence' 
+                  ? 'bg-emerald-500/40 text-emerald-300 border-emerald-400' 
+                  : 'bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-400 border-emerald-500/30'
+              } h-auto py-1 px-3 text-xs`}
             >
-              Business Intelligence
+              Business Intelligence {selectedCategory === 'business-intelligence' && '✓'}
             </Button>
             <Button 
               onClick={() => {
-                // Cycle through Analytics & Monitoring tabs
-                const analyticsMonitoringTabs = ['analytics', 'performance', 'security', 'system', 'realtime', 'revenue', 'viral'];
-                const currentIndex = analyticsMonitoringTabs.indexOf(activeTab);
-                const nextTab = analyticsMonitoringTabs[(currentIndex + 1) % analyticsMonitoringTabs.length];
-                setActiveTab(nextTab);
+                const category = 'analytics-monitoring';
+                setSelectedCategory(selectedCategory === category ? null : category);
+                if (selectedCategory !== category) {
+                  setActiveTab(categoryGroups[category][0]);
+                }
               }}
-              className="bg-purple-500/20 hover:bg-purple-500/30 text-purple-400 border border-purple-500/30 h-auto py-1 px-3 text-xs"
+              className={`${
+                selectedCategory === 'analytics-monitoring' 
+                  ? 'bg-purple-500/40 text-purple-300 border-purple-400' 
+                  : 'bg-purple-500/20 hover:bg-purple-500/30 text-purple-400 border-purple-500/30'
+              } h-auto py-1 px-3 text-xs`}
             >
-              Analytics & Monitoring
+              Analytics & Monitoring {selectedCategory === 'analytics-monitoring' && '✓'}
             </Button>
             <Button 
               onClick={() => {
-                // Cycle through AI & Optimization tabs
-                const aiOptimizationTabs = ['dynamic-pricing', 'self-optimization', 'staking'];
-                const currentIndex = aiOptimizationTabs.indexOf(activeTab);
-                const nextTab = aiOptimizationTabs[(currentIndex + 1) % aiOptimizationTabs.length];
-                setActiveTab(nextTab);
+                const category = 'ai-optimization';
+                setSelectedCategory(selectedCategory === category ? null : category);
+                if (selectedCategory !== category) {
+                  setActiveTab(categoryGroups[category][0]);
+                }
               }}
-              className="bg-orange-500/20 hover:bg-orange-500/30 text-orange-400 border border-orange-500/30 h-auto py-1 px-3 text-xs"
+              className={`${
+                selectedCategory === 'ai-optimization' 
+                  ? 'bg-orange-500/40 text-orange-300 border-orange-400' 
+                  : 'bg-orange-500/20 hover:bg-orange-500/30 text-orange-400 border-orange-500/30'
+              } h-auto py-1 px-3 text-xs`}
             >
-              AI & Optimization
+              AI & Optimization {selectedCategory === 'ai-optimization' && '✓'}
             </Button>
+            {selectedCategory && (
+              <Button 
+                onClick={() => {
+                  setSelectedCategory(null);
+                }}
+                className="bg-gray-500/20 hover:bg-gray-500/30 text-gray-400 border-gray-500/30 h-auto py-1 px-3 text-xs"
+              >
+                Show All
+              </Button>
+            )}
           </div>
         </div>
 
@@ -1249,187 +1324,48 @@ export default function UnifiedAdminDashboard() {
                   <SelectValue placeholder="Select Dashboard Section" />
                 </SelectTrigger>
                 <SelectContent className="bg-slate-800 border-slate-600">
-                  <SelectItem value="overview">📊 Overview</SelectItem>
-                  <SelectItem value="pricing">💰 Pricing</SelectItem>
-                  <SelectItem value="dynamic-pricing">🧠 Dynamic AI</SelectItem>
-                  <SelectItem value="self-optimization">🔧 Self-Optimization</SelectItem>
-                  <SelectItem value="users">👥 Users</SelectItem>
-                  <SelectItem value="security">🛡️ Security</SelectItem>
-                  <SelectItem value="revenue">💵 Revenue</SelectItem>
-                  <SelectItem value="performance">⚡ Performance</SelectItem>
-                  <SelectItem value="behavior">🧠 User Behavior</SelectItem>
-                  <SelectItem value="competitive">🎯 Intelligence</SelectItem>
-                  <SelectItem value="settings">⚙️ Settings</SelectItem>
-                  <SelectItem value="tokens">🪙 Tokens</SelectItem>
-                  <SelectItem value="codes">🎫 Codes</SelectItem>
-                  <SelectItem value="access">🔐 Access</SelectItem>
-                  <SelectItem value="analytics">📈 Analytics</SelectItem>
-                  <SelectItem value="staking">🪙 Staking</SelectItem>
-                  <SelectItem value="system">🖥️ System</SelectItem>
-                  <SelectItem value="wallets">👛 Wallets</SelectItem>
-                  <SelectItem value="viral">🚀 Viral</SelectItem>
-                  <SelectItem value="realtime">📡 Live</SelectItem>
-                  <SelectItem value="api-monetization">💰 API $</SelectItem>
-                  <SelectItem value="features">🎛️ Features</SelectItem>
+                  {getVisibleTabConfigs().map((tab) => (
+                    <SelectItem key={tab.value} value={tab.value}>
+                      {tab.label}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
           ) : (
-            <TabsList className="grid grid-cols-4 md:grid-cols-8 lg:grid-cols-9 w-full bg-slate-900/90 border border-slate-600 p-2 rounded-lg gap-1 h-auto">
-            <TabsTrigger 
-              value="overview" 
-              className="flex flex-col items-center gap-1 text-slate-300 font-medium data-[state=active]:text-white data-[state=active]:bg-blue-600/60 data-[state=active]:shadow-lg hover:text-white hover:bg-slate-700/50 transition-all duration-200 px-2 py-2 text-xs"
-            >
-              <BarChart3 className="w-4 h-4" />
-              <span>Overview</span>
-            </TabsTrigger>
-            <TabsTrigger 
-              value="settings" 
-              className="flex flex-col items-center gap-1 text-slate-300 font-medium data-[state=active]:text-white data-[state=active]:bg-green-600/60 data-[state=active]:shadow-lg hover:text-white hover:bg-slate-700/50 transition-all duration-200 px-2 py-2 text-xs"
-            >
-              <Settings className="w-4 h-4" />
-              <span>Settings</span>
-            </TabsTrigger>
-            <TabsTrigger 
-              value="users" 
-              className="flex flex-col items-center gap-1 text-slate-300 font-medium data-[state=active]:text-white data-[state=active]:bg-purple-600/60 data-[state=active]:shadow-lg hover:text-white hover:bg-slate-700/50 transition-all duration-200 px-2 py-2 text-xs"
-            >
-              <Users className="w-4 h-4" />
-              <span>Users</span>
-            </TabsTrigger>
-            <TabsTrigger 
-              value="tokens" 
-              className="flex flex-col items-center gap-1 text-slate-300 font-medium data-[state=active]:text-white data-[state=active]:bg-cyan-600/60 data-[state=active]:shadow-lg hover:text-white hover:bg-slate-700/50 transition-all duration-200 px-2 py-2 text-xs"
-            >
-              <ImageIcon className="w-4 h-4" />
-              <span>Tokens</span>
-            </TabsTrigger>
-            <TabsTrigger 
-              value="pricing" 
-              className="flex flex-col items-center gap-1 text-slate-300 font-medium data-[state=active]:text-white data-[state=active]:bg-yellow-600/60 data-[state=active]:shadow-lg hover:text-white hover:bg-slate-700/50 transition-all duration-200 px-2 py-2 text-xs"
-            >
-              <DollarSign className="w-4 h-4" />
-              <span>Pricing</span>
-            </TabsTrigger>
-            <TabsTrigger 
-              value="dynamic-pricing" 
-              className="flex flex-col items-center gap-1 text-slate-300 font-medium data-[state=active]:text-white data-[state=active]:bg-orange-600/60 data-[state=active]:shadow-lg hover:text-white hover:bg-slate-700/50 transition-all duration-200 px-2 py-2 text-xs"
-            >
-              <Brain className="w-4 h-4" />
-              <span>AI Price</span>
-            </TabsTrigger>
-            <TabsTrigger 
-              value="self-optimization" 
-              className="flex flex-col items-center gap-1 text-slate-300 font-medium data-[state=active]:text-white data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-600/60 data-[state=active]:to-blue-600/60 data-[state=active]:shadow-lg hover:text-white hover:bg-slate-700/50 transition-all duration-200 px-2 py-2 text-xs"
-            >
-              <Gauge className="w-4 h-4" />
-              <span>Auto-Opt</span>
-            </TabsTrigger>
-            <TabsTrigger 
-              value="codes" 
-              className="flex flex-col items-center gap-1 text-slate-300 font-medium data-[state=active]:text-white data-[state=active]:bg-pink-600/60 data-[state=active]:shadow-lg hover:text-white hover:bg-slate-700/50 transition-all duration-200 px-2 py-2 text-xs"
-            >
-              <Ticket className="w-4 h-4" />
-              <span>Codes</span>
-            </TabsTrigger>
-            <TabsTrigger 
-              value="access" 
-              className="flex flex-col items-center gap-1 text-slate-300 font-medium data-[state=active]:text-white data-[state=active]:bg-emerald-600/60 data-[state=active]:shadow-lg hover:text-white hover:bg-slate-700/50 transition-all duration-200 px-2 py-2 text-xs"
-            >
-              <Shield className="w-4 h-4" />
-              <span>Access</span>
-            </TabsTrigger>
-            <TabsTrigger 
-              value="analytics" 
-              className="flex flex-col items-center gap-1 text-slate-300 font-medium data-[state=active]:text-white data-[state=active]:bg-indigo-600/60 data-[state=active]:shadow-lg hover:text-white hover:bg-slate-700/50 transition-all duration-200 px-2 py-2 text-xs"
-            >
-              <Target className="w-4 h-4" />
-              <span>Analytics</span>
-            </TabsTrigger>
-            <TabsTrigger 
-              value="staking" 
-              className="flex flex-col items-center gap-1 text-slate-300 font-medium data-[state=active]:text-white data-[state=active]:bg-orange-600/60 data-[state=active]:shadow-lg hover:text-white hover:bg-slate-700/50 transition-all duration-200 px-2 py-2 text-xs"
-            >
-              <Coins className="w-4 h-4" />
-              <span>Staking</span>
-            </TabsTrigger>
-            <TabsTrigger 
-              value="system" 
-              className="flex flex-col items-center gap-1 text-slate-300 font-medium data-[state=active]:text-white data-[state=active]:bg-red-600/60 data-[state=active]:shadow-lg hover:text-white hover:bg-slate-700/50 transition-all duration-200 px-2 py-2 text-xs"
-            >
-              <Database className="w-4 h-4" />
-              <span>System</span>
-            </TabsTrigger>
-            <TabsTrigger 
-              value="viral" 
-              className="flex flex-col items-center gap-1 text-slate-300 font-medium data-[state=active]:text-white data-[state=active]:bg-gradient-to-r data-[state=active]:from-red-600/60 data-[state=active]:to-orange-600/60 data-[state=active]:shadow-lg hover:text-white hover:bg-slate-700/50 transition-all duration-200 px-2 py-2 text-xs"
-            >
-              <Rocket className="w-4 h-4" />
-              <span>🚀 Viral</span>
-            </TabsTrigger>
-            <TabsTrigger 
-              value="realtime" 
-              className="flex flex-col items-center gap-1 text-slate-300 font-medium data-[state=active]:text-white data-[state=active]:bg-gradient-to-r data-[state=active]:from-green-600/60 data-[state=active]:to-blue-600/60 data-[state=active]:shadow-lg hover:text-white hover:bg-slate-700/50 transition-all duration-200 px-2 py-2 text-xs"
-            >
-              <Radio className="w-4 h-4" />
-              <span>📡 Live</span>
-            </TabsTrigger>
-            <TabsTrigger 
-              value="revenue" 
-              className="flex flex-col items-center gap-1 text-slate-300 font-medium data-[state=active]:text-white data-[state=active]:bg-gradient-to-r data-[state=active]:from-emerald-600/60 data-[state=active]:to-teal-600/60 data-[state=active]:shadow-lg hover:text-white hover:bg-slate-700/50 transition-all duration-200 px-2 py-2 text-xs"
-            >
-              <DollarSign className="w-4 h-4" />
-              <span>Revenue</span>
-            </TabsTrigger>
-            <TabsTrigger 
-              value="security" 
-              className="flex flex-col items-center gap-1 text-slate-300 font-medium data-[state=active]:text-white data-[state=active]:bg-gradient-to-r data-[state=active]:from-red-600/60 data-[state=active]:to-pink-600/60 data-[state=active]:shadow-lg hover:text-white hover:bg-slate-700/50 transition-all duration-200 px-2 py-2 text-xs"
-            >
-              <Shield className="w-4 h-4" />
-              <span>Security</span>
-            </TabsTrigger>
-            <TabsTrigger 
-              value="performance" 
-              className="flex flex-col items-center gap-1 text-slate-300 font-medium data-[state=active]:text-white data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-600/60 data-[state=active]:to-violet-600/60 data-[state=active]:shadow-lg hover:text-white hover:bg-slate-700/50 transition-all duration-200 px-2 py-2 text-xs"
-            >
-              <Zap className="w-4 h-4" />
-              <span>Perf</span>
-            </TabsTrigger>
-            <TabsTrigger 
-              value="behavior" 
-              className="flex flex-col items-center gap-1 text-slate-300 font-medium data-[state=active]:text-white data-[state=active]:bg-gradient-to-r data-[state=active]:from-amber-600/60 data-[state=active]:to-orange-600/60 data-[state=active]:shadow-lg hover:text-white hover:bg-slate-700/50 transition-all duration-200 px-2 py-2 text-xs"
-            >
-              <Brain className="w-4 h-4" />
-              <span>Behavior</span>
-            </TabsTrigger>
-            <TabsTrigger 
-              value="competitive" 
-              className="flex flex-col items-center gap-1 text-slate-300 font-medium data-[state=active]:text-white data-[state=active]:bg-gradient-to-r data-[state=active]:from-cyan-600/60 data-[state=active]:to-blue-600/60 data-[state=active]:shadow-lg hover:text-white hover:bg-slate-700/50 transition-all duration-200 px-2 py-2 text-xs"
-            >
-              <Target className="w-4 h-4" />
-              <span>Intel</span>
-            </TabsTrigger>
-            <TabsTrigger 
-              value="wallets" 
-              className="flex flex-col items-center gap-1 text-slate-300 font-medium data-[state=active]:text-white data-[state=active]:bg-gradient-to-r data-[state=active]:from-amber-600/60 data-[state=active]:to-yellow-600/60 data-[state=active]:shadow-lg hover:text-white hover:bg-slate-700/50 transition-all duration-200 px-2 py-2 text-xs"
-            >
-              <Coins className="w-4 h-4" />
-              <span>Wallets</span>
-            </TabsTrigger>
-            <TabsTrigger 
-              value="api-monetization" 
-              className="flex flex-col items-center gap-1 text-slate-300 font-medium data-[state=active]:text-white data-[state=active]:bg-gradient-to-r data-[state=active]:from-green-600/60 data-[state=active]:to-emerald-600/60 data-[state=active]:shadow-lg hover:text-white hover:bg-slate-700/50 transition-all duration-200 px-2 py-2 text-xs"
-            >
-              <DollarSign className="w-4 h-4" />
-              <span>💰 API $</span>
-            </TabsTrigger>
-            <TabsTrigger 
-              value="features" 
-              className="flex flex-col items-center gap-1 text-slate-300 font-medium data-[state=active]:text-white data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-600/60 data-[state=active]:to-indigo-600/60 data-[state=active]:shadow-lg hover:text-white hover:bg-slate-700/50 transition-all duration-200 px-2 py-2 text-xs"
-            >
-              <Settings className="w-4 h-4" />
-              <span>🎛️ Features</span>
-            </TabsTrigger>
+            <TabsList className={`grid ${selectedCategory ? 'grid-cols-2 md:grid-cols-4 lg:grid-cols-6' : 'grid-cols-4 md:grid-cols-8 lg:grid-cols-9'} w-full bg-slate-900/90 border border-slate-600 p-2 rounded-lg gap-1 h-auto`}>
+              {getVisibleTabConfigs().map((tab) => {
+                const IconComponent = tab.icon;
+                const getColorClasses = (color: string) => {
+                  switch (color) {
+                    case 'blue': return 'data-[state=active]:bg-blue-600/60';
+                    case 'green': return 'data-[state=active]:bg-green-600/60';
+                    case 'purple': return 'data-[state=active]:bg-purple-600/60';
+                    case 'cyan': return 'data-[state=active]:bg-cyan-600/60';
+                    case 'yellow': return 'data-[state=active]:bg-yellow-600/60';
+                    case 'orange': return 'data-[state=active]:bg-orange-600/60';
+                    case 'pink': return 'data-[state=active]:bg-pink-600/60';
+                    case 'red': return 'data-[state=active]:bg-red-600/60';
+                    case 'emerald': return 'data-[state=active]:bg-emerald-600/60';
+                    case 'indigo': return 'data-[state=active]:bg-indigo-600/60';
+                    case 'teal': return 'data-[state=active]:bg-teal-600/60';
+                    case 'amber': return 'data-[state=active]:bg-amber-600/60';
+                    case 'gradient': return 'data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-600/60 data-[state=active]:to-blue-600/60';
+                    default: return 'data-[state=active]:bg-slate-600/60';
+                  }
+                };
+                
+                return (
+                  <TabsTrigger 
+                    key={tab.value}
+                    value={tab.value} 
+                    className={`flex flex-col items-center gap-1 text-slate-300 font-medium data-[state=active]:text-white ${getColorClasses(tab.color)} data-[state=active]:shadow-lg hover:text-white hover:bg-slate-700/50 transition-all duration-200 px-2 py-2 text-xs`}
+                  >
+                    <IconComponent className="w-4 h-4" />
+                    <span>{tab.label}</span>
+                  </TabsTrigger>
+                );
+              })}
           </TabsList>
           )}
           
