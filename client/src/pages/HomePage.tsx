@@ -20,58 +20,37 @@ export default function HomePage() {
       <section className="bg-gradient-to-br from-blue-50 to-teal-50 dark:from-gray-800 dark:to-gray-900 py-20">
         <div className="container mx-auto px-4 text-center">
           <div className="max-w-4xl mx-auto">
-            <div className="wave-animation inline-block text-6xl mb-6">🏊‍♀️</div>
+            <div className="wave-animation inline-block text-6xl mb-6">🦋</div>
             <h1 className="text-5xl md:text-6xl font-bold text-gray-900 dark:text-white mb-6">
-              Crystal Clear Pool
+              FlutterWave
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-teal-600">
-                {" "}Services
+                {" "}Intelligence
               </span>
             </h1>
             <p className="text-xl text-gray-600 dark:text-gray-300 mb-8 max-w-2xl mx-auto">
-              Connect with professional pool cleaners in your area. Get quotes, schedule services, 
-              and enjoy sparkling clean pools year-round.
+              Advanced multi-chain digital financial intelligence platform with AI-powered blockchain 
+              analytics, token creation, and wallet analysis capabilities.
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-              {user ? (
-                <>
-                  {user.isCleaner ? (
-                    <Link href="/jobs">
-                      <button className="pool-button text-lg px-8 py-4">
-                        <Search className="mr-2" size={20} />
-                        Find Work
-                      </button>
-                    </Link>
-                  ) : (
-                    <Link href="/create-job">
-                      <button className="pool-button text-lg px-8 py-4">
-                        <Calendar className="mr-2" size={20} />
-                        Book Service
-                      </button>
-                    </Link>
-                  )}
-                  <Link href="/dashboard">
-                    <button className="bg-white text-blue-600 border-2 border-blue-600 hover:bg-blue-50 font-semibold py-4 px-8 rounded-lg shadow-md hover:shadow-lg transition-all duration-300">
-                      Dashboard
-                    </button>
-                  </Link>
-                </>
-              ) : (
-                <>
-                  <Link href="/register">
-                    <button className="pool-button text-lg px-8 py-4">
-                      <CheckCircle className="mr-2" size={20} />
-                      Get Started
-                    </button>
-                  </Link>
-                  <Link href="/cleaners">
-                    <button className="bg-white text-blue-600 border-2 border-blue-600 hover:bg-blue-50 font-semibold py-4 px-8 rounded-lg shadow-md hover:shadow-lg transition-all duration-300">
-                      <Users className="mr-2" size={20} />
-                      Browse Cleaners
-                    </button>
-                  </Link>
-                </>
-              )}
+              <Link href="/tokens/create">
+                <button className="pool-button text-lg px-8 py-4">
+                  <Calendar className="mr-2" size={20} />
+                  Create Tokens
+                </button>
+              </Link>
+              <Link href="/wallets/analyze">
+                <button className="bg-white text-blue-600 border-2 border-blue-600 hover:bg-blue-50 font-semibold py-4 px-8 rounded-lg shadow-md hover:shadow-lg transition-all duration-300">
+                  <Search className="mr-2" size={20} />
+                  Analyze Wallets
+                </button>
+              </Link>
+              <Link href="/demo">
+                <button className="bg-gradient-to-r from-purple-600 to-blue-600 text-white font-semibold py-4 px-8 rounded-lg shadow-md hover:shadow-lg transition-all duration-300">
+                  <Star className="mr-2" size={20} />
+                  Live Demo
+                </button>
+              </Link>
             </div>
           </div>
         </div>

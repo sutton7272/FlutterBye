@@ -81,10 +81,10 @@ export default function Navigation() {
           <Link href="/">
             <div className="flex items-center space-x-2 cursor-pointer">
               <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-teal-500 rounded-full flex items-center justify-center">
-                <span className="text-white font-bold text-lg">🏊‍♀️</span>
+                <span className="text-white font-bold text-lg">🦋</span>
               </div>
               <span className="text-xl font-bold text-gray-900 dark:text-white">
-                PoolPal
+                FlutterWave
               </span>
             </div>
           </Link>
