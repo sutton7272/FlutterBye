@@ -5,6 +5,7 @@ import { Router } from "express";
 import { crossChainEngine } from "./cross-chain-adapter";
 import { enterpriseCompliance } from "./enterprise-compliance";
 import { governmentIntelligence } from "./government-law-enforcement";
+import { multiChainIntelligence } from "./multi-chain-intelligence";
 
 const router = Router();
 
@@ -206,6 +207,88 @@ router.post("/compliance/regulatory-report", async (req, res) => {
   } catch (error) {
     console.error("Regulatory report error:", error);
     res.status(500).json({ error: "Failed to generate regulatory report" });
+  }
+});
+
+// TRUE MULTI-BLOCKCHAIN WALLET ANALYSIS - Revolutionary Enterprise Feature
+router.post("/multi-chain/analyze-wallet", async (req, res) => {
+  try {
+    const { walletAddress } = req.body;
+    
+    if (!walletAddress) {
+      return res.status(400).json({ error: "walletAddress required" });
+    }
+
+    // Detect blockchain type
+    const detectedBlockchain = multiChainIntelligence.detectBlockchain(walletAddress);
+    
+    if (!detectedBlockchain) {
+      return res.status(400).json({ 
+        error: "Unsupported wallet address format",
+        supportedFormats: ["Ethereum (0x...)", "Bitcoin (1..., 3..., bc1...)", "Solana (Base58)"]
+      });
+    }
+
+    // Perform comprehensive multi-chain analysis
+    const multiChainData = await multiChainIntelligence.analyzeMultiChainWallet(walletAddress);
+    const summary = await multiChainIntelligence.getMultiChainSummary(walletAddress);
+
+    // Store results in database with blockchain identification
+    for (const walletData of multiChainData) {
+      await multiChainIntelligence.storeMultiChainIntelligence(walletData);
+    }
+
+    res.json({
+      success: true,
+      detectedBlockchain,
+      summary,
+      detailedAnalysis: multiChainData,
+      enterpriseFeatures: {
+        crossChainCorrelation: true,
+        blockchainIdentification: true,
+        multiChainPortfolioTracking: true,
+        riskAssessmentAcrossChains: true,
+        enterpriseCompliance: true
+      },
+      analysisTimestamp: new Date()
+    });
+  } catch (error) {
+    console.error("Multi-chain analysis error:", error);
+    res.status(500).json({ 
+      error: "Failed to perform multi-chain analysis",
+      details: error instanceof Error ? error.message : "Unknown error"
+    });
+  }
+});
+
+// Get all wallet intelligence with blockchain identification
+router.get("/multi-chain/all-wallets", async (req, res) => {
+  try {
+    const { blockchain, limit = 100 } = req.query;
+    
+    // This would fetch from the updated database with blockchain field
+    const wallets = await multiChainIntelligence.getAllWalletsWithBlockchain(
+      blockchain as string,
+      parseInt(limit as string)
+    );
+
+    res.json({
+      success: true,
+      wallets,
+      totalCount: wallets.length,
+      supportedBlockchains: ['ethereum', 'bitcoin', 'solana'],
+      enterpriseCapabilities: {
+        blockchainFiltering: true,
+        crossChainCorrelation: true,
+        realTimeUpdates: true
+      }
+    });
+  } catch (error) {
+    console.error("Get all wallets error:", error);
+    res.status(500).json({ 
+      error: "Failed to retrieve wallet intelligence",
+      details: error instanceof Error ? error.message : "Unknown error"
+    });
   }
 });
 

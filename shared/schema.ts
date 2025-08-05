@@ -1087,7 +1087,9 @@ export const insertWalletAlertSchema = createInsertSchema(walletAlerts).omit({
 // Wallet Intelligence Schema - Revolutionary Social Credit Score System
 export const walletIntelligence = pgTable("wallet_intelligence", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  walletAddress: varchar("wallet_address").notNull().unique(),
+  walletAddress: varchar("wallet_address").notNull(),
+  blockchain: varchar("blockchain", { length: 20 }).notNull().default("solana"), // solana, ethereum, bitcoin
+  network: varchar("network", { length: 20 }).default("mainnet"), // mainnet, testnet, devnet
   socialCreditScore: integer("social_credit_score").default(0),
   riskLevel: varchar("risk_level", { length: 20 }).default("unknown"), // low, medium, high, critical, unknown
   tradingBehaviorScore: integer("trading_behavior_score").default(0),
@@ -1142,7 +1144,10 @@ export const walletIntelligence = pgTable("wallet_intelligence", {
   lastAnalyzed: timestamp("last_analyzed").defaultNow(),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
-});
+}, (table) => ({
+  // Unique constraint on wallet address + blockchain combination
+  walletBlockchainUnique: sql`UNIQUE (wallet_address, blockchain)`,
+}));
 
 export const insertWalletIntelligenceSchema = createInsertSchema(walletIntelligence).omit({
   id: true,

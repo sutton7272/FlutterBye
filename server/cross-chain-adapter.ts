@@ -1,5 +1,6 @@
 // Cross-Chain Intelligence Adapter System for Enterprise Clients
 // Revolutionary expansion beyond Solana to universal blockchain intelligence
+// TRUE MULTI-BLOCKCHAIN WALLET ANALYSIS SYSTEM
 
 export interface BlockchainTransaction {
   hash: string;
