@@ -5,28 +5,40 @@ import { WalletConnect } from "@/components/wallet-connect";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Menu, Home, Coins, Trophy, Users, MessageSquare, Settings, Sparkles, Zap, Heart, Building2, MapPin, Activity, Gift, Award, Star, Ticket, HelpCircle, LayoutDashboard, Brain, CreditCard, Stars } from "lucide-react";
 import solviturLogo from "@assets/65d9f126-64e6-4e25-9a10-d3d64807b991_1754352528946.png";
+import { useFeatureToggles } from "@/hooks/useFeatureToggles";
 
 export default function Navbar() {
   const [location] = useLocation();
   const [isOpen, setIsOpen] = useState(false);
+  const { isFeatureEnabled, isLoading: featuresLoading } = useFeatureToggles();
 
-  // Simplified navigation - Primary items only
-  const primaryNavItems = [
-    { href: "/home", label: "Home", icon: Home },
-    { href: "/mint", label: "Mint", icon: Coins },
-    { href: "/payments", label: "Payments", icon: CreditCard, featured: true },
-    { href: "/celestial", label: "Cosmic", icon: Stars, special: true },
-    { href: "/redeem", label: "Dashboard", icon: LayoutDashboard },
-    { href: "/chat", label: "Chat", icon: MessageSquare },
-    { href: "/sms-nexus", label: "FlutterWave", icon: Zap, special: true },
-    { href: "/message-nfts", label: "FlutterArt", icon: Sparkles, featured: true },
-    { href: "/marketplace", label: "Marketplace", icon: Users },
-    { href: "/ai-overview", label: "AI Hub", icon: Brain, featured: true },
-    { href: "/flutterai-dashboard", label: "FlutterAI", icon: Brain, special: true },
-    { href: "/greeting-cards", label: "Cards", icon: Heart },
-    { href: "/enterprise", label: "Marketing", icon: Building2 },
-    { href: "/info", label: "Info", icon: HelpCircle },
+  // All possible navigation items with their feature mapping
+  const allNavItems = [
+    { href: "/home", label: "Home", icon: Home, featureId: "home" },
+    { href: "/mint", label: "Mint", icon: Coins, featureId: "mint" },
+    { href: "/payments", label: "Payments", icon: CreditCard, featured: true, featureId: "payments" },
+    { href: "/celestial", label: "Cosmic", icon: Stars, special: true, featureId: "celestial_wallet" },
+    { href: "/redeem", label: "Dashboard", icon: LayoutDashboard, featureId: "portfolio" },
+    { href: "/chat", label: "Chat", icon: MessageSquare, featureId: "chat" },
+    { href: "/sms-nexus", label: "FlutterWave", icon: Zap, special: true, featureId: "flutterwave" },
+    { href: "/message-nfts", label: "FlutterArt", icon: Sparkles, featured: true, featureId: "message_nfts" },
+    { href: "/marketplace", label: "Marketplace", icon: Users, featureId: "marketplace" },
+    { href: "/ai-overview", label: "AI Hub", icon: Brain, featured: true, featureId: "ai_hub" },
+    { href: "/flutterai-dashboard", label: "FlutterAI", icon: Brain, special: true, featureId: "flutterai" },
+    { href: "/greeting-cards", label: "Cards", icon: Heart, featureId: "greeting_cards" },
+    { href: "/enterprise", label: "Marketing", icon: Building2, featureId: "enterprise_intelligence" },
+    { href: "/info", label: "Info", icon: HelpCircle }, // No feature toggle, always shown
   ];
+
+  // Filter navigation items based on feature toggles
+  const primaryNavItems = featuresLoading 
+    ? allNavItems // Show all items while loading
+    : allNavItems.filter(item => {
+        // If no featureId is specified, show the item by default
+        if (!item.featureId) return true;
+        // Otherwise, check if the feature is enabled
+        return isFeatureEnabled(item.featureId);
+      });
 
   // No secondary navigation - everything consolidated into main pages
 
