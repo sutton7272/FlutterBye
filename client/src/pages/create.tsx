@@ -18,7 +18,8 @@ import {
   Brain,
   Palette,
   Music,
-  Video
+  Video,
+  Users
 } from "lucide-react";
 import Mint from "./mint";
 import { VoiceMessageRecorder } from "@/components/voice-message-recorder";
@@ -250,7 +251,10 @@ export default function Create() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <VoiceMessageRecorder />
+                <VoiceMessageRecorder onVoiceAttached={(audioBlob: Blob) => {
+                  console.log('Voice message recorded:', audioBlob);
+                  // Handle the voice message attachment
+                }} />
               </CardContent>
             </Card>
           </TabsContent>
