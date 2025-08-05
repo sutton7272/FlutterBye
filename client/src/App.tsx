@@ -87,6 +87,9 @@ import { PersonalizedDashboard } from "@/components/PersonalizedDashboard";
 import { ErrorBoundary } from "@/components/error-boundary";
 import { OfflineIndicator } from "@/components/offline-indicator";
 import { PWAInstallPrompt, PWANotificationPrompt } from "@/components/pwa-features";
+import { CommandPalette } from "@/components/command-palette";
+import { WebSocketProvider } from "@/components/websocket-provider";
+import { ThemeProvider } from "@/components/theme-provider";
 
 import { WalletProvider } from "@/components/wallet-adapter";
 import { TestImage } from "@/components/test-image";
@@ -616,17 +619,22 @@ function App() {
   }, []);
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <WalletProvider>
-        <TooltipProvider>
-          <Toaster />
-          <OfflineIndicator />
-          <PWAInstallPrompt />
-          <PWANotificationPrompt />
-          <Router />
-        </TooltipProvider>
-      </WalletProvider>
-    </QueryClientProvider>
+    <ThemeProvider defaultTheme="dark">
+      <QueryClientProvider client={queryClient}>
+        <WalletProvider>
+          <WebSocketProvider>
+            <TooltipProvider>
+              <Toaster />
+              <OfflineIndicator />
+              <PWAInstallPrompt />
+              <PWANotificationPrompt />
+              <CommandPalette />
+              <Router />
+            </TooltipProvider>
+          </WebSocketProvider>
+        </WalletProvider>
+      </QueryClientProvider>
+    </ThemeProvider>
   );
 }
 

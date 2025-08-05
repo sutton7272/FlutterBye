@@ -43,6 +43,7 @@ import { openaiService } from "./openai-service";
 import { messageNFTService } from "./message-nft-service";
 import { livingAIService } from "./living-ai-service";
 import { immersiveAIService } from "./immersive-ai-service";
+import FlutterbeyeWebSocketServer from "./websocket-server";
 import { aiAdminService } from "./ai-admin-service";
 import { aiContentService } from "./ai-content-service";
 import aiEnhancementRoutes from "./ai-enhancement-routes";
@@ -7490,6 +7491,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
   console.log('💰 Enterprise Intelligence: $5M-$50M ARR target from 100+ enterprise clients');
   console.log('📈 Viral User Growth: AI-powered viral multiplication for exponential adoption');
   console.log('🎯 Positioned as "Google of Blockchain Intelligence" with $450M-$750M valuation');
+  
+  // Initialize WebSocket server for real-time updates
+  const wsServer = new FlutterbeyeWebSocketServer(httpServer);
+  
+  // Store WebSocket server reference for broadcasting
+  (httpServer as any).wsServer = wsServer;
+  console.log('📡 Real-time WebSocket intelligence system activated!');
   
   return httpServer;
 }
