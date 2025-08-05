@@ -1,5 +1,6 @@
 import { Link, useLocation } from 'wouter';
 import { useAuth } from '../lib/auth';
+import { useEnabledFeatures } from '../hooks/useEnabledFeatures';
 import { 
   Home, 
   Users, 
@@ -10,14 +11,61 @@ import {
   LogIn,
   UserPlus,
   Settings,
-  Brain
+  Brain,
+  Database,
+  BarChart3,
+  Shield,
+  Cpu
 } from 'lucide-react';
 
 export default function Navigation() {
   const { user, logout } = useAuth();
   const [location] = useLocation();
+  const { isFeatureEnabled, isLoading } = useEnabledFeatures();
 
   const isActive = (path: string) => location === path;
+
+  // Feature to navigation mapping
+  const featureNavItems = [
+    {
+      featureId: 'advanced_analytics',
+      path: '/intelligence',
+      icon: BarChart3,
+      label: 'Intelligence Dashboard'
+    },
+    {
+      featureId: 'data_protection',
+      path: '/data-protection',
+      icon: Shield,
+      label: 'Data Protection'
+    },
+    {
+      featureId: 'data_mirror',
+      path: '/data-mirror',
+      icon: Database,
+      label: 'Data Mirrors'
+    },
+    {
+      featureId: 'advanced_flutterwave',
+      path: '/flutterwave',
+      icon: Cpu,
+      label: 'FlutterWave'
+    }
+  ];
+
+  // Admin-only features (always show for authenticated users)
+  const adminFeatures = [
+    {
+      path: '/feature-toggle',
+      icon: Settings,
+      label: 'Feature Control'
+    },
+    {
+      path: '/ai-analyzer',
+      icon: Brain,
+      label: 'AI Analyzer'
+    }
+  ];
 
   return (
     <nav className="bg-white dark:bg-gray-800 shadow-lg border-b border-blue-200">
@@ -96,60 +144,41 @@ export default function Navigation() {
                   </Link>
                 )}
 
-                <Link href="/intelligence">
-                  <div className={`flex items-center space-x-1 px-3 py-2 rounded-lg transition-colors cursor-pointer ${
-                    isActive('/intelligence') 
-                      ? 'bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300' 
-                      : 'text-gray-600 hover:text-blue-600 dark:text-gray-300 dark:hover:text-blue-400'
-                  }`}>
-                    <Briefcase size={18} />
-                    <span>Intelligence</span>
-                  </div>
-                </Link>
+                {/* Feature-controlled navigation items */}
+                {!isLoading && featureNavItems.map((item) => {
+                  if (!isFeatureEnabled(item.featureId)) return null;
+                  
+                  const Icon = item.icon;
+                  return (
+                    <Link key={item.path} href={item.path}>
+                      <div className={`flex items-center space-x-1 px-3 py-2 rounded-lg transition-colors cursor-pointer ${
+                        isActive(item.path) 
+                          ? 'bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300' 
+                          : 'text-gray-600 hover:text-blue-600 dark:text-gray-300 dark:hover:text-blue-400'
+                      }`}>
+                        <Icon size={18} />
+                        <span>{item.label}</span>
+                      </div>
+                    </Link>
+                  );
+                })}
 
-                <Link href="/data-protection">
-                  <div className={`flex items-center space-x-1 px-3 py-2 rounded-lg transition-colors cursor-pointer ${
-                    isActive('/data-protection') 
-                      ? 'bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300' 
-                      : 'text-gray-600 hover:text-blue-600 dark:text-gray-300 dark:hover:text-blue-400'
-                  }`}>
-                    <Briefcase size={18} />
-                    <span>Data Protection</span>
-                  </div>
-                </Link>
-
-                <Link href="/data-mirrors">
-                  <div className={`flex items-center space-x-1 px-3 py-2 rounded-lg transition-colors cursor-pointer ${
-                    isActive('/data-mirrors') 
-                      ? 'bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300' 
-                      : 'text-gray-600 hover:text-blue-600 dark:text-gray-300 dark:hover:text-blue-400'
-                  }`}>
-                    <Briefcase size={18} />
-                    <span>Data Mirrors</span>
-                  </div>
-                </Link>
-
-                <Link href="/feature-toggle">
-                  <div className={`flex items-center space-x-1 px-3 py-2 rounded-lg transition-colors cursor-pointer ${
-                    isActive('/feature-toggle') 
-                      ? 'bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300' 
-                      : 'text-gray-600 hover:text-blue-600 dark:text-gray-300 dark:hover:text-blue-400'
-                  }`}>
-                    <Settings size={18} />
-                    <span>Feature Control</span>
-                  </div>
-                </Link>
-
-                <Link href="/ai-analyzer">
-                  <div className={`flex items-center space-x-1 px-3 py-2 rounded-lg transition-colors cursor-pointer ${
-                    isActive('/ai-analyzer') 
-                      ? 'bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300' 
-                      : 'text-gray-600 hover:text-blue-600 dark:text-gray-300 dark:hover:text-blue-400'
-                  }`}>
-                    <Brain size={18} />
-                    <span>AI Analyzer</span>
-                  </div>
-                </Link>
+                {/* Admin-only navigation items (always show for authenticated users) */}
+                {adminFeatures.map((item) => {
+                  const Icon = item.icon;
+                  return (
+                    <Link key={item.path} href={item.path}>
+                      <div className={`flex items-center space-x-1 px-3 py-2 rounded-lg transition-colors cursor-pointer ${
+                        isActive(item.path) 
+                          ? 'bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300' 
+                          : 'text-gray-600 hover:text-blue-600 dark:text-gray-300 dark:hover:text-blue-400'
+                      }`}>
+                        <Icon size={18} />
+                        <span>{item.label}</span>
+                      </div>
+                    </Link>
+                  );
+                })}
               </>
             )}
           </div>

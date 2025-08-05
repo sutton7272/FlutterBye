@@ -133,6 +133,28 @@ class FeatureToggleService {
         estimatedApiCost: 75
       },
 
+      // === DATA MANAGEMENT FEATURES ===
+      {
+        featureId: 'data_protection',
+        name: 'Data Protection Dashboard',
+        description: 'Advanced data protection and privacy controls',
+        category: 'advanced',
+        enabled: false, // Disabled for MVP
+        requiresAuth: true,
+        dependencies: ['core_user_management'],
+        estimatedApiCost: 25
+      },
+      {
+        featureId: 'data_mirror',
+        name: 'Data Mirror System',
+        description: 'Database backup and recovery dashboard',
+        category: 'advanced',
+        enabled: false, // Disabled for MVP
+        requiresAuth: true,
+        dependencies: ['core_user_management'],
+        estimatedApiCost: 15
+      },
+
       // === AI FEATURES ===
       {
         featureId: 'ai_living_personality',
@@ -352,14 +374,20 @@ class FeatureToggleService {
     return Array.from(this.features.values());
   }
 
-  getEnabledFeatures(): FeatureToggle[] {
+  getEnabledFeatures(): string[] {
+    return Array.from(this.features.values())
+      .filter(feature => feature.enabled)
+      .map(feature => feature.featureId);
+  }
+
+  getEnabledFeaturesObjects(): FeatureToggle[] {
     return Array.from(this.features.values()).filter(f => f.enabled);
   }
 
   // ========== AI OPTIMIZATION ==========
   
   getActiveAIEndpoints(): AIEndpointConfig[] {
-    const enabledFeatures = this.getEnabledFeatures().map(f => f.featureId);
+    const enabledFeatures = this.getEnabledFeatures();
     
     return Array.from(this.aiEndpoints.values()).filter(endpoint => {
       return endpoint.requiredFeatures.some(feature => enabledFeatures.includes(feature));
@@ -367,7 +395,7 @@ class FeatureToggleService {
   }
 
   getInactiveAIEndpoints(): AIEndpointConfig[] {
-    const enabledFeatures = this.getEnabledFeatures().map(f => f.featureId);
+    const enabledFeatures = this.getEnabledFeatures();
     
     return Array.from(this.aiEndpoints.values()).filter(endpoint => {
       return !endpoint.requiredFeatures.some(feature => enabledFeatures.includes(feature));
@@ -381,7 +409,7 @@ class FeatureToggleService {
     totalAICost: number;
     totalCost: number;
   } {
-    const enabledFeatures = this.getEnabledFeatures();
+    const enabledFeatures = this.getEnabledFeaturesObjects();
     const activeAI = this.getActiveAIEndpoints();
 
     const featureCosts = enabledFeatures.map(f => ({

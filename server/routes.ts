@@ -1345,6 +1345,17 @@ router.get('/feature-analysis', async (req, res) => {
   }
 });
 
+router.get('/feature-toggle/enabled', async (req, res) => {
+  try {
+    const { featureToggleService } = await import('./feature-toggle-service');
+    const enabledFeatures = featureToggleService.getEnabledFeatures();
+    res.json({ enabledFeatures });
+  } catch (error) {
+    console.error('Error getting enabled features:', error);
+    res.status(500).json({ error: 'Failed to get enabled features' });
+  }
+});
+
 router.post('/feature-toggle/enable', async (req, res) => {
   try {
     const { feature } = req.body;
