@@ -1,4 +1,6 @@
 import { useState, useEffect } from "react";
+import { DashboardStatsSkeleton } from "@/components/loading-states";
+import { usePerformance } from "@/hooks/use-performance";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -33,6 +35,7 @@ import { MobileOnboardingWizard } from "@/components/mobile-onboarding-wizard";
 import { WalletConnectionWizard } from "@/components/wallet-connection-wizard";
 import { QuickAccessFAB } from "@/components/quick-access-fab";
 import { PersonalizedDashboard } from "@/components/PersonalizedDashboard";
+import { PerformanceDashboard } from "@/components/performance-dashboard";
 
 interface DashboardStats {
   totalTokens: number;
@@ -52,6 +55,7 @@ export default function Dashboard() {
   const [activeTab, setActiveTab] = useState("overview");
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [showWalletWizard, setShowWalletWizard] = useState(false);
+  const performanceMetrics = usePerformance();
   const [isMobile, setIsMobile] = useState(false);
   
   // Check if user is new (mobile)
@@ -88,6 +92,17 @@ export default function Dashboard() {
     queryKey: ["/api/dashboard/stats"],
     refetchInterval: 30000,
   });
+
+  // Loading state - show skeleton while loading
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-transparent">
+        <div className="container mx-auto px-4 py-8 pt-20">
+          <DashboardStatsSkeleton />
+        </div>
+      </div>
+    );
+  }
 
   // Quick actions data
   const quickActions = [
@@ -182,7 +197,7 @@ export default function Dashboard() {
 
           <TabsContent value="overview" className="space-y-6">
             {/* Stats Overview */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                   <CardTitle className="text-sm font-medium">Total Tokens</CardTitle>
@@ -226,6 +241,9 @@ export default function Dashboard() {
                   <p className="text-xs text-muted-foreground">Growth potential</p>
                 </CardContent>
               </Card>
+
+              {/* Performance Monitoring */}
+              <PerformanceDashboard />
             </div>
 
             {/* Interactive Stats */}

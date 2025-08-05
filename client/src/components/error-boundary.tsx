@@ -1,11 +1,12 @@
-import { Component, ErrorInfo, ReactNode } from 'react';
+import React, { Component, ErrorInfo, ReactNode } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { AlertTriangle, RefreshCw } from 'lucide-react';
+import { AlertTriangle, RefreshCw, Home } from 'lucide-react';
 
 interface Props {
   children: ReactNode;
   fallback?: ReactNode;
+  onError?: (error: Error, errorInfo: ErrorInfo) => void;
 }
 
 interface State {
@@ -24,10 +25,20 @@ export class ErrorBoundary extends Component<Props, State> {
 
   public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     console.error('ErrorBoundary caught an error:', error, errorInfo);
+    this.props.onError?.(error, errorInfo);
+    
+    // Log to monitoring service in production
+    if (process.env.NODE_ENV === 'production') {
+      // Add your error tracking service here (e.g., Sentry)
+    }
   }
 
   private handleRetry = () => {
     this.setState({ hasError: false, error: undefined });
+  };
+
+  private handleGoHome = () => {
+    window.location.href = '/dashboard';
   };
 
   public render() {
@@ -37,34 +48,50 @@ export class ErrorBoundary extends Component<Props, State> {
       }
 
       return (
-        <Card className="bg-red-950/20 border-red-500/30 max-w-md mx-auto">
-          <CardHeader>
-            <CardTitle className="text-red-400 flex items-center gap-2">
-              <AlertTriangle className="h-5 w-5" />
-              Something went wrong
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <p className="text-gray-300 text-sm">
-              An unexpected error occurred. This has been logged and we're working on a fix.
-            </p>
-            {process.env.NODE_ENV === 'development' && this.state.error && (
-              <details className="text-xs text-gray-400 bg-gray-900/50 p-3 rounded">
-                <summary className="cursor-pointer">Error Details</summary>
-                <pre className="mt-2 overflow-auto">
-                  {this.state.error.stack}
-                </pre>
-              </details>
-            )}
-            <Button 
-              onClick={this.handleRetry}
-              className="w-full bg-red-600 hover:bg-red-700"
-            >
-              <RefreshCw className="h-4 w-4 mr-2" />
-              Try Again
-            </Button>
-          </CardContent>
-        </Card>
+        <div className="min-h-screen bg-transparent flex items-center justify-center p-4">
+          <Card className="max-w-md w-full border-red-500/20">
+            <CardHeader className="text-center">
+              <div className="mx-auto w-12 h-12 bg-red-500/10 rounded-full flex items-center justify-center mb-4">
+                <AlertTriangle className="w-6 h-6 text-red-500" />
+              </div>
+              <CardTitle className="text-red-500">Something went wrong</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <p className="text-sm text-muted-foreground text-center">
+                An unexpected error occurred. Our team has been notified and is working on a fix.
+              </p>
+              
+              {process.env.NODE_ENV === 'development' && this.state.error && (
+                <details className="mt-4">
+                  <summary className="text-xs text-muted-foreground cursor-pointer">
+                    Error Details (Development Only)
+                  </summary>
+                  <pre className="mt-2 text-xs text-red-400 bg-red-950/20 p-2 rounded overflow-auto">
+                    {this.state.error.stack}
+                  </pre>
+                </details>
+              )}
+
+              <div className="flex gap-2 pt-4">
+                <Button 
+                  onClick={this.handleRetry} 
+                  variant="outline" 
+                  className="flex-1"
+                >
+                  <RefreshCw className="w-4 h-4 mr-2" />
+                  Try Again
+                </Button>
+                <Button 
+                  onClick={this.handleGoHome} 
+                  className="flex-1"
+                >
+                  <Home className="w-4 h-4 mr-2" />
+                  Go Home
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
       );
     }
 
@@ -72,23 +99,14 @@ export class ErrorBoundary extends Component<Props, State> {
   }
 }
 
-// Quick error fallback for smaller components
-export function ErrorFallback({ 
-  error, 
-  onRetry 
-}: { 
-  error?: Error; 
-  onRetry?: () => void; 
-}) {
-  return (
-    <div className="text-center p-4 space-y-3">
-      <AlertTriangle className="h-8 w-8 text-red-400 mx-auto" />
-      <p className="text-red-300 text-sm">Something went wrong</p>
-      {onRetry && (
-        <Button size="sm" variant="outline" onClick={onRetry}>
-          Try Again
-        </Button>
-      )}
-    </div>
-  );
-}
+// Hook for functional components to handle errors
+export const useErrorHandler = () => {
+  return (error: Error, errorInfo?: ErrorInfo) => {
+    console.error('Error caught by error handler:', error, errorInfo);
+    
+    // You can dispatch to error tracking service here
+    if (process.env.NODE_ENV === 'production') {
+      // Add your error tracking service here
+    }
+  };
+};

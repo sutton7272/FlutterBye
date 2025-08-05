@@ -84,14 +84,18 @@ import CelestialDashboard from "@/pages/CelestialDashboard";
 import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";
 import { PersonalizedDashboard } from "@/components/PersonalizedDashboard";
+import { ErrorBoundary } from "@/components/error-boundary";
+import { OfflineIndicator } from "@/components/offline-indicator";
+import { PWAInstallPrompt, PWANotificationPrompt } from "@/components/pwa-features";
 
 import { WalletProvider } from "@/components/wallet-adapter";
 import { TestImage } from "@/components/test-image";
 function Router() {
   return (
-    <div className="dark min-h-screen flex flex-col bg-transparent">
-      <div className="flex-1 bg-transparent">
-        <Switch>
+    <ErrorBoundary>
+      <div className="dark min-h-screen flex flex-col bg-transparent">
+        <div className="flex-1 bg-transparent">
+          <Switch>
         <Route path="/" component={LaunchCountdown} />
         <Route path="/launch" component={LaunchCountdown} />
         
@@ -559,9 +563,10 @@ function Router() {
         )} />
         <Route component={NotFound} />
         </Switch>
+        </div>
+        <Footer />
       </div>
-      <Footer />
-    </div>
+    </ErrorBoundary>
   );
 }
 
@@ -571,6 +576,9 @@ function App() {
       <WalletProvider>
         <TooltipProvider>
           <Toaster />
+          <OfflineIndicator />
+          <PWAInstallPrompt />
+          <PWANotificationPrompt />
           <Router />
         </TooltipProvider>
       </WalletProvider>
