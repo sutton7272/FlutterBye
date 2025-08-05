@@ -88,9 +88,8 @@ export default function WalletTest() {
 
     try {
       const response = await apiRequest('POST', '/api/tokens/test-token/confirm-burn', {
-        signature: 'test-signature-' + Date.now(),
-        burnerWallet: connectedWallet,
-        recipientWallet: connectedWallet
+        burnId: 'test-burn-' + Date.now(),
+        transactionSignature: 'test-signature-' + Date.now()
       });
 
       const data = await response.json();

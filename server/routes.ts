@@ -7761,13 +7761,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Database connection test endpoint
   app.get('/api/admin/database-test', async (req, res) => {
     try {
-      // Test database connection by trying to access storage
-      const testResult = await storage.getStats();
+      // Test database connection by trying a simple query
+      const users = await storage.getAllUsers(1, 0);
       
       res.json({
         connected: true,
         message: 'Database connection successful',
-        details: `Database operational with ${testResult.totalUsers} users`,
+        details: `Database operational and responding to queries`,
         timestamp: new Date().toISOString()
       });
     } catch (error: any) {
@@ -7822,6 +7822,80 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({
         success: false,
         message: `AI services test failed: ${error.message}`
+      });
+    }
+  });
+
+  // Test burn preparation endpoint (creates mock burn transaction)
+  app.post('/api/tokens/test-token/prepare-burn', async (req, res) => {
+    try {
+      const { burnerWallet, recipientWallet } = req.body;
+      
+      if (!burnerWallet || !recipientWallet) {
+        return res.status(400).json({
+          success: false,
+          message: 'Both burnerWallet and recipientWallet are required'
+        });
+      }
+
+      // Simulate burn preparation
+      const burnData = {
+        burnId: `burn-${Date.now()}`,
+        burnerWallet,
+        recipientWallet,
+        tokenAmount: 1,
+        valueAmount: '0.001',
+        currency: 'SOL',
+        status: 'prepared',
+        timestamp: new Date().toISOString()
+      };
+      
+      res.json({
+        success: true,
+        message: 'Burn transaction prepared successfully',
+        burnData,
+        timestamp: new Date().toISOString()
+      });
+    } catch (error: any) {
+      res.status(500).json({
+        success: false,
+        message: `Burn preparation failed: ${error.message}`
+      });
+    }
+  });
+
+  // Test burn confirmation endpoint (confirms mock burn transaction)
+  app.post('/api/tokens/test-token/confirm-burn', async (req, res) => {
+    try {
+      const { burnId, transactionSignature } = req.body;
+      
+      if (!burnId) {
+        return res.status(400).json({
+          success: false,
+          message: 'burnId is required'
+        });
+      }
+
+      // Simulate burn confirmation
+      const confirmationData = {
+        burnId,
+        transactionSignature: transactionSignature || `mock-signature-${Date.now()}`,
+        status: 'confirmed',
+        blockHash: `mock-block-${Date.now()}`,
+        confirmations: 32,
+        timestamp: new Date().toISOString()
+      };
+      
+      res.json({
+        success: true,
+        message: 'Burn transaction confirmed successfully',
+        confirmationData,
+        timestamp: new Date().toISOString()
+      });
+    } catch (error: any) {
+      res.status(500).json({
+        success: false,
+        message: `Burn confirmation failed: ${error.message}`
       });
     }
   });
