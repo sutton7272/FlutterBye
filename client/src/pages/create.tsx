@@ -110,7 +110,7 @@ export default function Create() {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20">
+    <div className="min-h-screen bg-transparent">
       <div className="container mx-auto px-4 py-6 space-y-8">
         
         {/* Header */}
@@ -269,8 +269,8 @@ export default function Create() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <VoiceMessageRecorder onVoiceAttached={(audioBlob: Blob) => {
-                  console.log('Voice message recorded:', audioBlob);
+                <VoiceMessageRecorder onVoiceRecord={(audioData) => {
+                  console.log('Voice message recorded:', audioData);
                   // Handle the voice message attachment
                 }} />
               </CardContent>

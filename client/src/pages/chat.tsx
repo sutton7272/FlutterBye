@@ -11,7 +11,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { Send, Users, Hash, Coins, MessageSquare, Plus, Settings, Smile, Reply, Edit3, Copy, Star, AlertTriangle, Volume2, VolumeX, Maximize2, Minimize2, Search, Filter, Clock, CheckCircle2, Circle, MoreVertical, Trash2, Pin, Heart, Zap, Gift, BarChart3, RotateCcw, Crown, Sparkles, TrendingUp, DollarSign, Award, Shield, Image, Paperclip, Mic, Video, Calendar, MapPin, Users2, Bot, Lock, Unlock, Eye, EyeOff, Bell, BellOff, Palette, Wand2, Flame, Target, MessageCircle, ThumbsUp, Share2, Download, Upload, Bookmark, Flag, Coffee, Rocket } from 'lucide-react';
+import { Send, Users, Hash, Coins, MessageSquare, Plus, Settings, Smile, Reply, Edit3, Copy, Star, AlertTriangle, Volume2, VolumeX, Maximize2, Minimize2, Search, Filter, Clock, CheckCircle2, Circle, MoreVertical, Trash2, Pin, Heart, Zap, Gift, BarChart3, RotateCcw, Crown, Sparkles, TrendingUp, DollarSign, Award, Shield, Image, Paperclip, Mic, Video, Calendar, MapPin, Users2, Bot, Lock, Unlock, Eye, EyeOff, Bell, BellOff, Palette, Wand2, Flame, Target, MessageCircle, ThumbsUp, Share2, Download, Upload, Bookmark, Flag, Coffee, Rocket, Brain } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { VoiceMessageRecorder } from '@/components/voice-message-recorder';
 import RealTimeAIAssistant from '@/components/RealTimeAIAssistant';
@@ -462,7 +462,7 @@ export function Chat() {
 
   return (
     <TooltipProvider>
-      <div className={`min-h-screen p-6 pt-20 ${isFullscreen ? 'fixed inset-0 z-50 bg-slate-900 pt-6' : ''}`}>
+      <div className={`min-h-screen p-6 pt-20 bg-transparent ${isFullscreen ? 'fixed inset-0 z-50 bg-slate-900 pt-6' : ''}`}>
         <div className="mx-auto max-w-7xl">
           {/* World-Class Header with User Progress */}
           <div className="mb-6 space-y-4">
