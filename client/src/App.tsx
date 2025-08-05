@@ -20,6 +20,7 @@ import ProtectedRoute from './components/ProtectedRoute';
 import { FlutterAIIntelligenceDashboard } from './components/FlutterAIIntelligenceDashboard';
 import { DataProtectionDashboard } from './components/DataProtectionDashboard';
 import { DataMirrorDashboard } from './components/DataMirrorDashboard';
+import FeatureToggleDashboard from './components/FeatureToggleDashboard';
 
 function AppContent() {
   const { loading } = useAuth();
@@ -91,6 +92,12 @@ function AppContent() {
             <Route path="/data-mirrors">
               <ProtectedRoute>
                 <DataMirrorDashboard />
+              </ProtectedRoute>
+            </Route>
+            
+            <Route path="/feature-toggle">
+              <ProtectedRoute>
+                <FeatureToggleDashboard />
               </ProtectedRoute>
             </Route>
             

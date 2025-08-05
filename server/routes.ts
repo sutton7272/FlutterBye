@@ -704,6 +704,158 @@ router.get('/data/mirror/download/:mirrorId', authenticateToken, async (req: any
   }
 });
 
+// ========== FEATURE TOGGLE ROUTES ==========
+
+// Get all features
+router.get('/admin/features', authenticateToken, async (req: any, res) => {
+  try {
+    const { featureToggleService } = await import('./feature-toggle-service');
+    const features = featureToggleService.getAllFeatures();
+    
+    res.json({
+      success: true,
+      data: features
+    });
+  } catch (error) {
+    console.error('Get features error:', error);
+    res.status(500).json({ error: 'Failed to get features' });
+  }
+});
+
+// Get AI endpoints status
+router.get('/admin/features/ai-endpoints', authenticateToken, async (req: any, res) => {
+  try {
+    const { featureToggleService } = await import('./feature-toggle-service');
+    const active = featureToggleService.getActiveAIEndpoints();
+    const inactive = featureToggleService.getInactiveAIEndpoints();
+    
+    res.json({
+      success: true,
+      data: { active, inactive }
+    });
+  } catch (error) {
+    console.error('Get AI endpoints error:', error);
+    res.status(500).json({ error: 'Failed to get AI endpoints' });
+  }
+});
+
+// Get cost analysis
+router.get('/admin/features/costs', authenticateToken, async (req: any, res) => {
+  try {
+    const { featureToggleService } = await import('./feature-toggle-service');
+    const costs = featureToggleService.calculateMonthlyCosts();
+    
+    res.json({
+      success: true,
+      data: costs
+    });
+  } catch (error) {
+    console.error('Get costs error:', error);
+    res.status(500).json({ error: 'Failed to get cost analysis' });
+  }
+});
+
+// Get MVP recommendations
+router.get('/admin/features/mvp-recommendations', authenticateToken, async (req: any, res) => {
+  try {
+    const { featureToggleService } = await import('./feature-toggle-service');
+    const recommendations = featureToggleService.getMVPRecommendations();
+    
+    res.json({
+      success: true,
+      data: recommendations
+    });
+  } catch (error) {
+    console.error('Get MVP recommendations error:', error);
+    res.status(500).json({ error: 'Failed to get MVP recommendations' });
+  }
+});
+
+// Enable feature
+router.post('/admin/features/:featureId/toggle', authenticateToken, async (req: any, res) => {
+  try {
+    const { featureId } = req.params;
+    const { featureToggleService } = await import('./feature-toggle-service');
+    
+    const success = featureToggleService.enableFeature(featureId);
+    
+    if (success) {
+      res.json({
+        success: true,
+        message: `Feature ${featureId} enabled successfully`
+      });
+    } else {
+      res.status(404).json({ error: 'Feature not found' });
+    }
+  } catch (error: any) {
+    console.error('Enable feature error:', error);
+    res.status(400).json({ error: error.message || 'Failed to enable feature' });
+  }
+});
+
+// Disable feature
+router.delete('/admin/features/:featureId/toggle', authenticateToken, async (req: any, res) => {
+  try {
+    const { featureId } = req.params;
+    const { featureToggleService } = await import('./feature-toggle-service');
+    
+    const success = featureToggleService.disableFeature(featureId);
+    
+    if (success) {
+      res.json({
+        success: true,
+        message: `Feature ${featureId} disabled successfully`
+      });
+    } else {
+      res.status(404).json({ error: 'Feature not found' });
+    }
+  } catch (error: any) {
+    console.error('Disable feature error:', error);
+    res.status(400).json({ error: error.message || 'Failed to disable feature' });
+  }
+});
+
+// Apply MVP configuration
+router.post('/admin/features/apply-mvp', authenticateToken, async (req: any, res) => {
+  try {
+    const { featureToggleService } = await import('./feature-toggle-service');
+    const recommendations = featureToggleService.getMVPRecommendations();
+    
+    // Disable all non-MVP features
+    const allFeatures = featureToggleService.getAllFeatures();
+    let changes = 0;
+    
+    for (const feature of allFeatures) {
+      const shouldBeEnabled = recommendations.enabledFeatures.includes(feature.featureId);
+      
+      if (feature.enabled !== shouldBeEnabled) {
+        try {
+          if (shouldBeEnabled) {
+            featureToggleService.enableFeature(feature.featureId);
+          } else {
+            featureToggleService.disableFeature(feature.featureId);
+          }
+          changes++;
+        } catch (error) {
+          console.warn(`Could not toggle ${feature.featureId}:`, error);
+        }
+      }
+    }
+    
+    res.json({
+      success: true,
+      message: `MVP configuration applied. ${changes} features updated.`,
+      data: {
+        changesApplied: changes,
+        estimatedMonthlyCost: recommendations.estimatedMonthlyCost
+      }
+    });
+  } catch (error) {
+    console.error('Apply MVP error:', error);
+    res.status(500).json({ error: 'Failed to apply MVP configuration' });
+  }
+});
+
 // ========== DATABASE EXPORT ROUTES ==========
 
 // Export Database as CSV
@@ -782,9 +934,10 @@ async function exportDatabaseToCSV(tables: string[]): Promise<string> {
           const row = headers.map(header => {
             const value = record[header as keyof typeof record];
             // Escape commas and quotes in CSV
-            return typeof value === 'string' && value.includes(',') 
-              ? `"${value.replace(/"/g, '""')}"` 
-              : String(value);
+            const stringValue = String(value);
+            return typeof value === 'string' && stringValue.includes(',') 
+              ? `"${stringValue.replace(/"/g, '""')}"` 
+              : stringValue;
           });
           csvContent += row.join(',') + '\n';
         }
