@@ -53,6 +53,7 @@ import AIPayments from "@/pages/ai-payments";
 import PaymentSuccess from "@/pages/payment-success";
 import AdminSubscriptions from "@/pages/admin-subscriptions";
 import AdminEarlyAccess from "@/pages/admin-early-access";
+import SearchPage from "@/pages/search";
 import AdminFreeCodes from "@/pages/admin-free-codes";
 import AdminPricing from "@/pages/admin-pricing";
 import AdminDefaultImage from "@/pages/admin-default-image";
@@ -173,6 +174,12 @@ function Router() {
           <>
             <Navbar />
             <FreeCodes />
+          </>
+        )} />
+        <Route path="/search" component={() => (
+          <>
+            <Navbar />
+            <SearchPage />
           </>
         )} />
         <Route path="/admin" component={() => (
