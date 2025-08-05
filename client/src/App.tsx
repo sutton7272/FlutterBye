@@ -16,6 +16,10 @@ import Home from "@/pages/home";
 import Marketplace from "@/pages/marketplace";
 import Portfolio from "@/pages/portfolio";
 import Mint from "@/pages/mint";
+import MintBasic from "@/pages/mint-basic";
+import MintAIEnhanced from "@/pages/mint-ai-enhanced";
+import MintVoice from "@/pages/mint-voice";
+import MintMultimedia from "@/pages/mint-multimedia";
 
 import Redeem from "@/pages/redeem";
 import Activity from "@/pages/activity";
@@ -138,6 +142,30 @@ function Router() {
           <>
             <Navbar />
             <Mint />
+          </>
+        )} />
+        <Route path="/mint/basic" component={() => (
+          <>
+            <Navbar />
+            <MintBasic />
+          </>
+        )} />
+        <Route path="/mint/ai-enhanced" component={() => (
+          <>
+            <Navbar />
+            <MintAIEnhanced />
+          </>
+        )} />
+        <Route path="/mint/voice" component={() => (
+          <>
+            <Navbar />
+            <MintVoice />
+          </>
+        )} />
+        <Route path="/mint/multimedia" component={() => (
+          <>
+            <Navbar />
+            <MintMultimedia />
           </>
         )} />
         <Route path="/redeem" component={() => (

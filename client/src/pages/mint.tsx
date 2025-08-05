@@ -30,7 +30,11 @@ import { MintingProgressOverlay } from "@/components/MintingProgressOverlay";
 import { VoiceMessageRecorder } from "@/components/voice-message-recorder";
 import RealTimeAIAssistant from "@/components/RealTimeAIAssistant";
 
-export default function Mint() {
+interface MintProps {
+  tokenType?: "basic" | "ai-enhanced" | "voice" | "multimedia";
+}
+
+export default function Mint({ tokenType }: MintProps = {}) {
   const { toast } = useToast();
   const [, navigate] = useLocation();
 

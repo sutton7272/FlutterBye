@@ -31,13 +31,13 @@ export default function Create() {
   const getCreationRoute = (optionId: string) => {
     switch (optionId) {
       case "basic-token":
-        return "/mint";
+        return "/mint/basic";
       case "ai-enhanced":
-        return "/mint?ai=true";
+        return "/mint/ai-enhanced";
       case "voice-token":
-        return "/mint?type=voice";
+        return "/mint/voice";
       case "multimedia":
-        return "/mint?type=multimedia";
+        return "/mint/multimedia";
       default:
         return "/mint";
     }
