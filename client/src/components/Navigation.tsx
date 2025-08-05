@@ -16,7 +16,7 @@ import {
   BarChart3,
   Shield,
   Cpu,
-  Zap
+
 } from 'lucide-react';
 
 export default function Navigation() {

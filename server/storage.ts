@@ -9,6 +9,7 @@ import {
   communicationLogs,
   userActivity,
   marketingCampaigns,
+  tokens,
   type User,
   type InsertUser,
   type Job,
@@ -24,7 +25,9 @@ import {
   type UserActivity,
   type InsertUserActivity,
   type MarketingCampaign,
-  type InsertMarketingCampaign
+  type InsertMarketingCampaign,
+  type Token,
+  type InsertToken
 } from '../shared/schema';
 import { eq, and, desc, asc } from 'drizzle-orm';
 
@@ -204,6 +207,18 @@ sqlite.exec(`
     total_opened INTEGER DEFAULT 0,
     total_clicked INTEGER DEFAULT 0,
     created_at TEXT DEFAULT CURRENT_TIMESTAMP
+  );
+
+  CREATE TABLE IF NOT EXISTS tokens (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    address TEXT NOT NULL UNIQUE,
+    name TEXT NOT NULL,
+    symbol TEXT NOT NULL,
+    message TEXT NOT NULL,
+    signature TEXT NOT NULL,
+    created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+    metadata TEXT,
+    user_id TEXT
   );
 `);
 
@@ -490,6 +505,34 @@ export class SQLiteStorage implements IStorage {
       sessionId: `flutterboye_${Date.now()}`,
       flutterboyeTracked: true
     });
+  }
+
+  // Token operations
+  async createToken(token: InsertToken): Promise<Token> {
+    const result = db.insert(tokens).values(token).returning().get();
+    return result as Token;
+  }
+
+  async getToken(address: string): Promise<Token | null> {
+    const result = db.select().from(tokens).where(eq(tokens.address, address)).get();
+    return result as Token || null;
+  }
+
+  async getUserTokens(userId: string): Promise<Token[]> {
+    const result = db.select().from(tokens)
+      .where(eq(tokens.userId, userId))
+      .orderBy(desc(tokens.createdAt))
+      .all();
+    return result as Token[];
+  }
+
+  async getAllTokens(limit: number = 20, offset: number = 0): Promise<Token[]> {
+    const result = db.select().from(tokens)
+      .orderBy(desc(tokens.createdAt))
+      .limit(limit)
+      .offset(offset)
+      .all();
+    return result as Token[];
   }
 }
 

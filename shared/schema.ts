@@ -173,6 +173,24 @@ export const insertCleanerProfileSchema = createInsertSchema(cleanerProfiles).om
   isVerified: true,
 });
 
+// Tokens table for SPL token tracking
+export const tokens = sqliteTable("tokens", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  address: text("address").notNull().unique(),
+  name: text("name").notNull(),
+  symbol: text("symbol").notNull(),
+  message: text("message").notNull(),
+  signature: text("signature").notNull(),
+  createdAt: text("created_at").default(sql`CURRENT_TIMESTAMP`),
+  metadata: text("metadata"), // JSON string for additional data
+  userId: text("user_id") // Foreign key to users
+});
+
+export const insertTokenSchema = createInsertSchema(tokens).omit({
+  id: true,
+  createdAt: true,
+});
+
 // Types
 export type User = typeof users.$inferSelect;
 export type InsertUser = z.infer<typeof insertUserSchema>;
@@ -184,6 +202,8 @@ export type Message = typeof messages.$inferSelect;
 export type InsertMessage = z.infer<typeof insertMessageSchema>;
 export type CleanerProfile = typeof cleanerProfiles.$inferSelect;
 export type InsertCleanerProfile = z.infer<typeof insertCleanerProfileSchema>;
+export type Token = typeof tokens.$inferSelect;
+export type InsertToken = z.infer<typeof insertTokenSchema>;
 
 // Marketing communication log table
 export const communicationLogs = sqliteTable("communication_logs", {

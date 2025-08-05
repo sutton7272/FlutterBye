@@ -23,6 +23,8 @@ import { DataMirrorDashboard } from './components/DataMirrorDashboard';
 import FeatureToggleDashboard from './components/FeatureToggleDashboard';
 import FeatureReleaseAnalyzer from './components/FeatureReleaseAnalyzer';
 import DemoShowcase from './pages/DemoShowcase';
+import TokenCreation from './pages/TokenCreation';
+import WalletAnalysis from './pages/WalletAnalysis';
 
 function AppContent() {
   const { loading } = useAuth();
@@ -111,6 +113,14 @@ function AppContent() {
             
             <Route path="/demo">
               <DemoShowcase />
+            </Route>
+            
+            <Route path="/tokens/create">
+              <TokenCreation />
+            </Route>
+            
+            <Route path="/wallets/analyze">
+              <WalletAnalysis />
             </Route>
             
             {/* 404 Page */}

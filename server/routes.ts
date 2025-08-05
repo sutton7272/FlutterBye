@@ -1380,6 +1380,11 @@ router.post('/feature-toggle/enable', async (req, res) => {
 
 // Import and mount demo routes
 import demoRoutes from './demo-routes';
+import tokenRoutes from './token-routes';
+import walletRoutes from './wallet-routes';
+
 router.use('/demo', demoRoutes);
+router.use('/tokens', tokenRoutes);
+router.use('/wallets', walletRoutes);
 
 export default router;
