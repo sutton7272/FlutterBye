@@ -5513,7 +5513,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Register Solana blockchain integration routes
   registerSolanaRoutes(app);
   // Register production monitoring endpoints
-  registerProductionEndpoints(app);
+  registerProductionEndpoints(app, monitoring);
   // Industry-disrupting feature: Real-time collaborative token creation
   app.get('/api/collaborative/metrics', (req, res) => {
     res.json(collaborativeTokenService.getSessionMetrics());

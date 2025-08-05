@@ -5,7 +5,7 @@ import { realTimeMonitor } from './real-time-monitor';
 import { SecurityMiddleware, adminRateLimit, tokenCreationRateLimit } from './security-middleware';
 
 // Production monitoring and analytics endpoints
-export function registerProductionEndpoints(app: Express): void {
+export function registerProductionEndpoints(app: Express, monitoring: ProductionMonitoringService): void {
   
   // Advanced health check with comprehensive metrics
   app.get('/api/system/health', (req: Request, res: Response) => {
