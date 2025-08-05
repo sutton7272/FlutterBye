@@ -22,6 +22,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Separator } from "@/components/ui/separator";
 import { Link } from "wouter";
+import WalletTestContent from "@/pages/WalletTest";
 import { 
   Settings, 
   Users, 
@@ -972,7 +973,7 @@ export default function UnifiedAdminDashboard() {
 
   // Define category groups
   const categoryGroups = {
-    'core-management': ['overview', 'settings', 'users', 'tokens', 'pricing', 'codes', 'access'],
+    'core-management': ['overview', 'settings', 'users', 'tokens', 'pricing', 'codes', 'access', 'testing'],
     'business-intelligence': ['competitive', 'wallets', 'behavior', 'api-monetization', 'features'],
     'analytics-monitoring': ['analytics', 'performance', 'security', 'system', 'realtime', 'revenue', 'viral'],
     'ai-optimization': ['dynamic-pricing', 'self-optimization', 'staking']
@@ -1000,6 +1001,7 @@ export default function UnifiedAdminDashboard() {
     { value: "behavior", icon: Brain, label: "Behavior", color: "indigo" },
     { value: "competitive", icon: Target, label: "Intel", color: "teal" },
     { value: "wallets", icon: Wallet, label: "Wallets", color: "amber" },
+    { value: "testing", icon: Wallet, label: "🧪 Testing", color: "orange" },
     { value: "api-monetization", icon: DollarSign, label: "💰 API $", color: "green" },
     { value: "features", icon: Settings, label: "🎛️ Features", color: "blue" }
   ];
@@ -3022,6 +3024,21 @@ export default function UnifiedAdminDashboard() {
               </Badge>
             </div>
             <AdminFeatureToggle />
+          </TabsContent>
+
+          {/* Testing Tab */}
+          <TabsContent value="testing" className="space-y-6">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-2xl font-bold text-white">Wallet Testing Center</h2>
+              <Badge className="bg-orange-500/20 text-orange-400 border-orange-500/30">
+                Secure Testing Environment
+              </Badge>
+            </div>
+            <Card className="bg-slate-800/50 border-orange-500/30">
+              <CardContent className="p-6">
+                <WalletTestContent />
+              </CardContent>
+            </Card>
           </TabsContent>
 
         </Tabs>

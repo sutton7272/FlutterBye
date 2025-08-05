@@ -41,10 +41,12 @@ export default function WalletTest() {
         recipientWallet: connectedWallet
       });
 
+      const data = await response.json();
+
       const result = {
         test: 'Burn Preparation',
-        status: response.success ? 'PASSED' : 'FAILED',
-        details: response.message || 'Unknown result',
+        status: data.success ? 'PASSED' : 'FAILED',
+        details: data.message || 'Unknown result',
         timestamp: new Date().toLocaleTimeString()
       };
 
@@ -90,10 +92,12 @@ export default function WalletTest() {
         recipientWallet: connectedWallet
       });
 
+      const data = await response.json();
+
       const result = {
         test: 'Burn Confirmation',
-        status: response.success ? 'PASSED' : 'FAILED',
-        details: response.message || 'Unknown result',
+        status: data.success ? 'PASSED' : 'FAILED',
+        details: data.message || 'Unknown result',
         timestamp: new Date().toLocaleTimeString()
       };
 
