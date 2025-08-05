@@ -27,6 +27,22 @@ import { VoiceMessageRecorder } from "@/components/voice-message-recorder";
 export default function Create() {
   const [activeTab, setActiveTab] = useState("tokens");
 
+  // Function to get creation route based on option type
+  const getCreationRoute = (optionId: string) => {
+    switch (optionId) {
+      case "basic-token":
+        return "/mint";
+      case "ai-enhanced":
+        return "/mint?ai=true";
+      case "voice-token":
+        return "/mint?type=voice";
+      case "multimedia":
+        return "/mint?type=multimedia";
+      default:
+        return "/mint";
+    }
+  };
+
   const creationOptions = [
     {
       id: "basic-token",
@@ -148,12 +164,14 @@ export default function Create() {
                         </li>
                       ))}
                     </ul>
-                    <Button 
-                      className="w-full" 
-                      variant={option.recommended ? "default" : "outline"}
-                    >
-                      Create {option.title} <ArrowRight className="ml-2 h-4 w-4" />
-                    </Button>
+                    <Link href={getCreationRoute(option.id)}>
+                      <Button 
+                        className="w-full" 
+                        variant={option.recommended ? "default" : "outline"}
+                      >
+                        Create {option.title} <ArrowRight className="ml-2 h-4 w-4" />
+                      </Button>
+                    </Link>
                   </CardContent>
                 </Card>
               ))}
