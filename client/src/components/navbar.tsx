@@ -23,6 +23,7 @@ export default function Navbar() {
     { href: "/marketplace", label: "Marketplace", icon: Users },
     { href: "/ai-overview", label: "AI Hub", icon: Brain, featured: true },
     { href: "/flutterai-dashboard", label: "FlutterAI", icon: Brain, special: true },
+    { href: "/enterprise-intelligence", label: "Enterprise", icon: Building2, featured: true },
     { href: "/greeting-cards", label: "Cards", icon: Heart },
     { href: "/enterprise", label: "Marketing", icon: Building2 },
     { href: "/info", label: "Info", icon: HelpCircle },

@@ -54,6 +54,7 @@ import UnifiedAdminDashboard from "@/pages/admin-unified";
 import TokenHolderMapPage from "@/pages/token-holder-map";
 import CollaborativeCreation from "@/pages/collaborative-creation";
 import FlutterAIDashboard from "@/pages/flutterai-dashboard";
+import EnterpriseDashboard from "@/pages/enterprise-dashboard";
 import ViralDashboard from "@/pages/viral-dashboard";
 import MessageNFTCreator from "@/pages/message-nft-creator";
 import NFTClaim from "@/pages/nft-claim";
@@ -259,6 +260,12 @@ function Router() {
           <>
             <Navbar />
             <EnterpriseCampaigns />
+          </>
+        )} />
+        <Route path="/enterprise-intelligence" component={() => (
+          <>
+            <Navbar />
+            <EnterpriseDashboard />
           </>
         )} />
         <Route path="/flby/staking" component={() => (
