@@ -1,6 +1,8 @@
 # Flutterbye
 
 ## Overview
+**Solvitur Inc.** - Parent company producing the revolutionary blockchain ecosystem including Flutterbye, FlutterAI, and PerpeTrader platforms.
+
 Flutterbye is a revolutionary Solana blockchain-powered platform for tokenized messaging and value distribution, aiming to become the communication layer for Web3. It enables users to create unique SPL token messages ("FLBY-MSG"), attaching value, distributing tokens, and fostering viral communication. Key capabilities include targeted marketing through token holder analysis, value attachment with expiration dates, a free token minting system for promotions, Limited Edition Token sets, real-time blockchain chat, SMS-to-blockchain integration for "emotional" tokens, a gamified rewards system, and comprehensive admin content management with marketing analytics.
 
 **Vision**: To transform into the universal communication protocol for Web3, incorporating AI-powered features and cross-chain capabilities to revolutionize value and emotional communication across the blockchain ecosystem.
