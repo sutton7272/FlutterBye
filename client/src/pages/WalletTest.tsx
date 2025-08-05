@@ -801,7 +801,7 @@ export default function WalletTest() {
         {/* Header */}
         <div className="text-center space-y-4">
           <h1 className="text-4xl font-bold text-white">
-            🧪 FlutterAI Platform Diagnostics Center
+            🧪 Flutterbye Platform Diagnostics Center
           </h1>
           <p className="text-xl text-white/70">
             Comprehensive testing suite for blockchain, AI, security, and infrastructure systems
@@ -847,7 +847,7 @@ export default function WalletTest() {
               Platform Diagnostics Suite
             </CardTitle>
             <CardDescription className="text-white/70">
-              Enterprise-grade testing for blockchain, AI, security, performance, and system integration
+              Enterprise-grade testing for Flutterbye's blockchain, AI, security, performance, and system integration
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
