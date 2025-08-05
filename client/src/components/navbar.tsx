@@ -13,22 +13,29 @@ export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const { isFeatureEnabled, isLoading: featuresLoading } = useFeatureToggles();
 
-  // Simplified navigation - 5 core sections based on user workflows
+  // Primary navigation - core platform sections
   const allNavItems = [
     { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard, description: "Your unified home", featureId: "home" },
     { href: "/create", label: "Create", icon: Coins, description: "Token minting & AI tools", featureId: "mint" },
     { href: "/trade", label: "Trade", icon: Users, description: "Marketplace & wallet", featureId: "marketplace" },
-    { href: "/intelligence", label: "Intelligence", icon: Brain, description: "FlutterAI analytics", special: true, featureId: "flutterai" },
+    { href: "/flutterai", label: "FlutterAI", icon: Brain, description: "AI intelligence platform", special: true, featureId: "flutterai" },
+    { href: "/flutter-wave", label: "FlutterWave", icon: Heart, description: "AI butterfly messaging", featureId: "flutter_wave" },
+    { href: "/flutter-art", label: "FlutterArt", icon: Sparkles, description: "Digital art NFTs", featureId: "flutter_art" },
+    { href: "/chat", label: "Chat", icon: MessageSquare, description: "Real-time blockchain chat", featureId: "chat" },
     { href: "/admin", label: "Admin", icon: Settings, description: "Platform management", featureId: "admin_panel" },
   ];
 
   // Filter navigation items based on feature toggles
   const primaryNavItems = featuresLoading 
-    ? allNavItems.slice(0, 4) // Show main items while loading, hide admin
+    ? allNavItems.slice(0, 7) // Show main items while loading, hide admin
     : allNavItems.filter(item => {
         // Admin panel only shows when feature is enabled
         if (item.featureId === "admin_panel") {
           return isFeatureEnabled("admin_panel") || isFeatureEnabled("admin");
+        }
+        // Show core features by default
+        if (["home", "mint", "marketplace", "flutterai", "flutter_wave", "flutter_art", "chat"].includes(item.featureId)) {
+          return true;
         }
         // If no featureId is specified, show the item by default
         if (!item.featureId) return true;
@@ -36,11 +43,11 @@ export default function Navbar() {
         return isFeatureEnabled(item.featureId);
       });
 
-  // Secondary navigation for core features
+  // Secondary navigation for additional features
   const secondaryNavItems = [
-    { href: "/flutter-wave", label: "FlutterWave", icon: Heart, description: "AI-powered butterfly effect messaging" },
-    { href: "/flutter-art", label: "FlutterArt", icon: Sparkles, description: "Digital art NFT gallery" },
-    { href: "/chat", label: "Chat", icon: MessageSquare, description: "Real-time blockchain chat" },
+    { href: "/intelligence", label: "Intelligence", icon: Brain, description: "Advanced analytics dashboard" },
+    { href: "/trending", label: "Trending", icon: Trophy, description: "Viral content discovery" },
+    { href: "/activity", label: "Activity", icon: Activity, description: "Platform activity feed" },
   ];
 
   const isActive = (href: string) => location === href;

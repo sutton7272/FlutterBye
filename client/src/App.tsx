@@ -123,6 +123,30 @@ function Router() {
             <Trade />
           </>
         )} />
+        <Route path="/flutterai" component={() => (
+          <>
+            <Navbar />
+            <FlutterAIDashboard />
+          </>
+        )} />
+        <Route path="/flutter-wave" component={() => (
+          <>
+            <Navbar />
+            <FlutterWave />
+          </>
+        )} />
+        <Route path="/flutter-art" component={() => (
+          <>
+            <Navbar />
+            <FlutterArt />
+          </>
+        )} />
+        <Route path="/chat" component={() => (
+          <>
+            <Navbar />
+            <Chat />
+          </>
+        )} />
         <Route path="/intelligence" component={() => (
           <>
             <Navbar />
