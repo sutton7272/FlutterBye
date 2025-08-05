@@ -293,6 +293,152 @@ router.post('/marketing/track-activity', authenticateToken, async (req: any, res
   }
 });
 
+// ========== FLUTTERBYE-FLUTTERAI INTEGRATION ROUTES ==========
+
+// Address Intelligence API
+router.get('/ai/address/:address/intelligence', authenticateToken, async (req: any, res) => {
+  try {
+    const { flutterAIIntelligence } = await import('./flutterAI-address-intelligence');
+    const intelligence = await flutterAIIntelligence.getAddressIntelligence(req.params.address);
+    
+    if (!intelligence) {
+      return res.status(404).json({ error: 'Address intelligence not found' });
+    }
+
+    res.json({
+      success: true,
+      data: intelligence,
+      message: "Address intelligence retrieved successfully"
+    });
+  } catch (error) {
+    console.error('Address intelligence error:', error);
+    res.status(500).json({ error: 'Failed to retrieve address intelligence' });
+  }
+});
+
+// Bulk Address Analysis
+router.post('/ai/addresses/analyze', authenticateToken, async (req: any, res) => {
+  try {
+    const { addresses } = req.body;
+    const { flutterboyeFlutterAIBridge } = await import('./flutterbye-flutterAI-bridge');
+    
+    if (!Array.isArray(addresses) || addresses.length === 0) {
+      return res.status(400).json({ error: 'Please provide an array of addresses to analyze' });
+    }
+
+    const analysis = await flutterboyeFlutterAIBridge.bulkAddressAnalysis(addresses);
+    
+    res.json({
+      success: true,
+      data: analysis,
+      message: `Analyzed ${addresses.length} addresses successfully`
+    });
+  } catch (error) {
+    console.error('Bulk address analysis error:', error);
+    res.status(500).json({ error: 'Failed to analyze addresses' });
+  }
+});
+
+// Optimize Flutterbye Campaign with AI
+router.post('/ai/campaign/optimize', authenticateToken, async (req: any, res) => {
+  try {
+    const { targetAddresses, campaignType } = req.body;
+    const { flutterboyeFlutterAIBridge } = await import('./flutterbye-flutterAI-bridge');
+    
+    if (!Array.isArray(targetAddresses) || !campaignType) {
+      return res.status(400).json({ error: 'Please provide targetAddresses array and campaignType' });
+    }
+
+    const optimizedCampaign = await flutterboyeFlutterAIBridge.optimizeFlutterboyeCampaign(
+      targetAddresses, 
+      campaignType
+    );
+    
+    res.json({
+      success: true,
+      data: optimizedCampaign,
+      message: `Campaign optimized for ${targetAddresses.length} addresses`
+    });
+  } catch (error) {
+    console.error('Campaign optimization error:', error);
+    res.status(500).json({ error: 'Failed to optimize campaign' });
+  }
+});
+
+// Process Flutterbye Message (webhook endpoint)
+router.post('/ai/flutterbye/message', async (req: any, res) => {
+  try {
+    const message = req.body;
+    const { flutterboyeFlutterAIBridge } = await import('./flutterbye-flutterAI-bridge');
+    
+    // Process the message and extract addresses
+    await flutterboyeFlutterAIBridge.processFlutterboyeMessage(message);
+    
+    res.json({
+      success: true,
+      message: "Flutterbye message processed and addresses captured"
+    });
+  } catch (error) {
+    console.error('Flutterbye message processing error:', error);
+    res.status(500).json({ error: 'Failed to process Flutterbye message' });
+  }
+});
+
+// Address Intelligence Report (Data-as-a-Service)
+router.get('/ai/intelligence/report', authenticateToken, async (req: any, res) => {
+  try {
+    const { flutterboyeFlutterAIBridge } = await import('./flutterbye-flutterAI-bridge');
+    const report = await flutterboyeFlutterAIBridge.generateAddressIntelligenceReport();
+    
+    res.json({
+      success: true,
+      data: report,
+      message: "Intelligence report generated successfully"
+    });
+  } catch (error) {
+    console.error('Intelligence report error:', error);
+    res.status(500).json({ error: 'Failed to generate intelligence report' });
+  }
+});
+
+// Top Value Addresses
+router.get('/ai/addresses/top/:limit?', authenticateToken, async (req: any, res) => {
+  try {
+    const limit = parseInt(req.params.limit) || 50;
+    const { flutterAIIntelligence } = await import('./flutterAI-address-intelligence');
+    
+    const topAddresses = await flutterAIIntelligence.getTopValueAddresses(limit);
+    
+    res.json({
+      success: true,
+      data: topAddresses,
+      message: `Retrieved top ${topAddresses.length} value addresses`
+    });
+  } catch (error) {
+    console.error('Top addresses error:', error);
+    res.status(500).json({ error: 'Failed to retrieve top addresses' });
+  }
+});
+
+// Get Addresses by Customer Segment
+router.get('/ai/addresses/segment/:segment', authenticateToken, async (req: any, res) => {
+  try {
+    const segment = req.params.segment;
+    const { flutterAIIntelligence } = await import('./flutterAI-address-intelligence');
+    
+    const addresses = await flutterAIIntelligence.getAddressesBySegment(segment);
+    
+    res.json({
+      success: true,
+      data: addresses,
+      message: `Retrieved ${addresses.length} addresses in ${segment} segment`
+    });
+  } catch (error) {
+    console.error('Segment addresses error:', error);
+    res.status(500).json({ error: 'Failed to retrieve addresses by segment' });
+  }
+});
+
 // ========== JOB ROUTES ==========
 
 // Create new job
