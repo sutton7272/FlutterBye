@@ -38,6 +38,8 @@ import BadgesPage from "@/pages/badges";
 import InfoPage from "@/pages/info";
 
 import { Chat } from "@/pages/chat";
+import FlutterWave from "@/pages/flutter-wave";
+import FlutterArt from "@/pages/flutter-art";
 import LimitedEdition from "@/pages/limited-edition";
 import AdvancedSearch from "@/pages/advanced-search";
 import AdminSystem from "@/pages/admin-system";
@@ -282,6 +284,16 @@ function Router() {
           <>
             <Navbar />
             <Chat />
+          </>
+        )} />
+        <Route path="/flutter-wave" component={() => (
+          <>
+            <FlutterWave />
+          </>
+        )} />
+        <Route path="/flutter-art" component={() => (
+          <>
+            <FlutterArt />
           </>
         )} />
         <Route path="/limited-edition" component={() => (

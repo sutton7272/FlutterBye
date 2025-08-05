@@ -36,7 +36,12 @@ export default function Navbar() {
         return isFeatureEnabled(item.featureId);
       });
 
-  // No secondary navigation - everything consolidated into main pages
+  // Secondary navigation for core features
+  const secondaryNavItems = [
+    { href: "/flutter-wave", label: "FlutterWave", icon: Heart, description: "AI-powered butterfly effect messaging" },
+    { href: "/flutter-art", label: "FlutterArt", icon: Sparkles, description: "Digital art NFT gallery" },
+    { href: "/chat", label: "Chat", icon: MessageSquare, description: "Real-time blockchain chat" },
+  ];
 
   const isActive = (href: string) => location === href;
 
@@ -74,6 +79,33 @@ export default function Navbar() {
                 <item.icon className="h-4 w-4" />
                 <span className="font-medium">{item.label}</span>
                 {item.special && <span className="text-xs bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent font-bold">AI</span>}
+                
+                {/* Tooltip */}
+                <div className="absolute bottom-full mb-2 left-1/2 transform -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none">
+                  <div className="bg-black/90 text-white text-xs rounded px-2 py-1 whitespace-nowrap">
+                    {item.description}
+                  </div>
+                </div>
+              </Button>
+            </Link>
+          ))}
+        </nav>
+
+        {/* Secondary Navigation - Core Features */}
+        <nav className="hidden lg:flex items-center ml-4 space-x-1 border-l border-border/30 pl-4">
+          {secondaryNavItems.map((item) => (
+            <Link key={item.href} href={item.href}>
+              <Button
+                variant={isActive(item.href) ? "default" : "ghost"}
+                size="sm"
+                className={`flex items-center gap-2 h-9 px-3 relative group ${
+                  isActive(item.href) 
+                    ? "bg-electric-blue text-white shadow-lg" 
+                    : "text-text-secondary hover:text-text-primary hover:bg-muted/50 transition-all duration-200"
+                }`}
+              >
+                <item.icon className="h-3.5 w-3.5" />
+                <span className="text-sm font-medium">{item.label}</span>
                 
                 {/* Tooltip */}
                 <div className="absolute bottom-full mb-2 left-1/2 transform -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none">
@@ -131,6 +163,30 @@ export default function Navbar() {
                     className={`w-full justify-start h-12 ${
                       isActive(item.href) 
                         ? "modern-gradient text-white" 
+                        : "text-text-secondary hover:text-text-primary hover:bg-muted"
+                    }`}
+                    onClick={() => setIsOpen(false)}
+                  >
+                    <item.icon className="h-5 w-5 mr-3" />
+                    <div className="flex flex-col items-start">
+                      <span className="font-medium">{item.label}</span>
+                      <span className="text-xs opacity-70">{item.description}</span>
+                    </div>
+                  </Button>
+                </Link>
+              ))}
+              
+              {/* Divider */}
+              <div className="border-t border-border/30 my-2" />
+              
+              {/* Secondary Navigation in Mobile */}
+              {secondaryNavItems.map((item) => (
+                <Link key={item.href} href={item.href}>
+                  <Button
+                    variant={isActive(item.href) ? "default" : "ghost"}
+                    className={`w-full justify-start h-12 ${
+                      isActive(item.href) 
+                        ? "bg-electric-blue text-white" 
                         : "text-text-secondary hover:text-text-primary hover:bg-muted"
                     }`}
                     onClick={() => setIsOpen(false)}
