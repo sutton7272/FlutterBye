@@ -2,102 +2,872 @@
 @tailwind components;
 @tailwind utilities;
 
-@layer base {
-  :root {
-    --background: 210 40% 98%;
-    --foreground: 222.2 84% 4.9%;
+:root {
+  /* Electric Blue & Green Theme with Pulse Effects */
+  --background: hsl(220, 15%, 3%);
+  --foreground: hsl(0, 0%, 100%);
+  --muted: hsl(220, 12%, 8%);
+  --muted-foreground: hsl(220, 8%, 65%);
+  --popover: hsl(220, 15%, 3%);
+  --popover-foreground: hsl(0, 0%, 100%);
+  --card: hsl(220, 12%, 8%);
+  --card-foreground: hsl(0, 0%, 100%);
+  --border: hsl(220, 15%, 15%);
+  --input: hsl(220, 12%, 8%);
+  --primary: hsl(200, 100%, 50%);
+  --primary-foreground: hsl(220, 15%, 3%);
+  --secondary: hsl(140, 100%, 40%);
+  --secondary-foreground: hsl(220, 15%, 3%);
+  --accent: hsl(155, 100%, 35%);
+  --accent-foreground: hsl(0, 0%, 100%);
+  --destructive: hsl(0, 72%, 51%);
+  --destructive-foreground: hsl(0, 0%, 100%);
+  --ring: hsl(200, 100%, 50%);
+  --radius: 0.75rem;
+  
+  /* Electric Circuit Theme Palette */
+  --ultra-dark: hsl(220, 15%, 3%);
+  --surface-dark: hsl(220, 12%, 8%);
+  --electric-blue: hsl(200, 100%, 50%);
+  --bright-blue: hsl(210, 100%, 60%);
+  --electric-green: hsl(140, 100%, 40%);
+  --neon-green: hsl(155, 100%, 35%);
+  --circuit-teal: hsl(180, 100%, 45%);
+  --warning-orange: hsl(35, 100%, 50%);
+  --text-primary: hsl(0, 0%, 100%);
+  --text-secondary: hsl(220, 8%, 65%);
+  --glass-overlay: hsla(200, 100%, 50%, 0.05);
+  
+  /* Pulse Animation Colors */
+  --pulse-blue: hsla(200, 100%, 50%, 0.8);
+  --pulse-green: hsla(140, 100%, 40%, 0.8);
+  --pulse-teal: hsla(180, 100%, 45%, 0.8);
+}
 
-    --muted: 210 40% 96%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
-
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
-
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
-
-    --secondary: 210 40% 96%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
-
-    --accent: 210 40% 96%;
-    --accent-foreground: 222.2 47.4% 11.2%;
-
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-
-    --ring: 222.2 84% 4.9%;
-
-    --radius: 0.5rem;
-  }
-
-  .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
-
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
-
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
-
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
-
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
-
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
-
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-
-    --ring: 212.7 26.8% 83.9%;
-  }
+.dark {
+  --background: hsl(220, 100%, 3%);
+  --foreground: hsl(210, 40%, 98%);
+  --muted: hsl(215, 40%, 12%);
+  --muted-foreground: hsl(215, 20%, 65%);
+  --popover: hsl(220, 100%, 3%);
+  --popover-foreground: hsl(210, 40%, 98%);
+  --card: hsl(220, 50%, 6%);
+  --card-foreground: hsl(210, 40%, 98%);
+  --border: hsl(210, 80%, 25%);
+  --input: hsl(215, 40%, 12%);
+  --primary: hsl(210, 100%, 45%);
+  --primary-foreground: hsl(220, 100%, 3%);
+  --secondary: hsl(140, 100%, 40%);
+  --secondary-foreground: hsl(220, 100%, 3%);
+  --accent: hsl(270, 100%, 60%);
+  --accent-foreground: hsl(220, 100%, 3%);
+  --destructive: hsl(0, 62.8%, 30.6%);
+  --destructive-foreground: hsl(210, 40%, 98%);
+  --ring: hsl(210, 100%, 45%);
 }
 
 @layer base {
   * {
     @apply border-border;
   }
+
   body {
-    @apply bg-background text-foreground;
+    @apply font-sans antialiased text-foreground;
+    min-height: 100vh;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    position: relative;
+    background: url('/attached_assets/image_1754257352191.png') center/cover fixed no-repeat;
+    /* Mobile optimization */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    -webkit-tap-highlight-color: transparent;
+    -webkit-touch-callout: none;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  #root {
+    background: transparent !important;
+    min-height: 100vh;
+  }
+  
+  /* Add subtle overlay to maintain text readability */
+  body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.3);
+    z-index: -1;
+    pointer-events: none;
   }
 }
 
-/* PoolPal custom styles */
 @layer components {
-  .pool-button {
-    @apply bg-gradient-to-r from-blue-600 to-teal-600 hover:from-blue-700 hover:to-teal-700 text-white font-semibold py-2 px-4 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed;
+  /* Mobile-First Responsive Utilities */
+  .mobile-optimized {
+    @apply transition-all duration-200 ease-out;
+    touch-action: manipulation;
+    min-height: 44px; /* iOS minimum touch target */
+  }
+  
+  .touch-friendly {
+    @apply p-4 rounded-lg;
+    min-height: 44px;
+    min-width: 44px;
+  }
+  
+  .gradient-bg {
+    background: linear-gradient(135deg, 
+      hsl(220, 100%, 3%) 0%, 
+      hsl(215, 60%, 6%) 25%,
+      hsl(210, 80%, 8%) 50%, 
+      hsl(200, 70%, 10%) 75%,
+      hsl(140, 50%, 12%) 100%);
+  }
+  
+  .electric-gradient {
+    background: linear-gradient(45deg, 
+      hsl(210, 100%, 45%) 0%, 
+      hsl(200, 90%, 40%) 25%,
+      hsl(140, 100%, 40%) 50%, 
+      hsl(270, 100%, 60%) 75%,
+      hsl(320, 100%, 60%) 100%);
+  }
+  
+  .glassmorphism {
+    background: hsla(220, 12%, 8%, 0.85);
+    backdrop-filter: blur(20px);
+    border: 1px solid hsla(200, 100%, 50%, 0.25);
+    box-shadow: 0 8px 32px hsla(0, 0%, 0%, 0.4);
+    position: relative;
   }
 
-  .pool-input {
-    @apply border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors;
+  /* Performance optimized animations */
+  .flutter-animate {
+    animation: flutter 3s ease-in-out infinite;
+    transform: translateZ(0);
+    will-change: transform;
   }
 
-  .pool-card {
-    @apply hover:shadow-lg transition-shadow duration-300;
+  .pulse-electric {
+    animation: pulseElectric 2s ease-in-out infinite;
+    transform: translateZ(0);
+    will-change: transform, box-shadow;
   }
 
-  .wave-animation {
-    animation: wave 2s ease-in-out infinite;
+  .circuit-glow {
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
   }
 
-  @keyframes wave {
-    0%, 100% { transform: rotate(0deg); }
-    25% { transform: rotate(-10deg); }
-    75% { transform: rotate(10deg); }
+  .circuit-glow:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px hsla(200, 100%, 50%, 0.4);
   }
+
+  .circuit-glow::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, hsla(200, 100%, 50%, 0.4), transparent);
+    transition: left 0.6s ease;
+  }
+
+  .circuit-glow:hover::before {
+    left: 100%;
+  }
+
+  /* Smooth loading states */
+  .loading-shimmer {
+    background: linear-gradient(90deg, 
+      hsla(220, 12%, 8%, 1) 25%, 
+      hsla(220, 15%, 15%, 1) 50%, 
+      hsla(220, 12%, 8%, 1) 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+  }
+
+  /* Optimized text gradients */
+  .text-gradient {
+    background: linear-gradient(135deg, 
+      hsl(200, 100%, 60%) 0%,
+      hsl(140, 100%, 50%) 50%,
+      hsl(270, 100%, 65%) 100%);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-size: 200% 200%;
+    animation: gradientShift 4s ease-in-out infinite;
+  }
+
+  /* Improved electric frame */
+  .electric-frame {
+    position: relative;
+    border: 2px solid transparent;
+    background: linear-gradient(45deg, 
+      hsla(200, 100%, 50%, 0.8), 
+      hsla(140, 100%, 40%, 0.8), 
+      hsla(270, 100%, 60%, 0.8)) 
+      border-box;
+    background-clip: border-box;
+  }
+
+  .electric-frame::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    padding: 2px;
+    background: linear-gradient(45deg, 
+      hsl(200, 100%, 50%), 
+      hsl(140, 100%, 40%), 
+      hsl(270, 100%, 60%));
+    border-radius: inherit;
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask-composite: xor;
+    animation: electricFlow 3s linear infinite;
+  }
+
+  /* Modern gradient backgrounds */
+  .modern-gradient {
+    background: linear-gradient(135deg, 
+      hsl(200, 100%, 50%) 0%,
+      hsl(180, 100%, 45%) 25%,
+      hsl(140, 100%, 40%) 50%,
+      hsl(270, 100%, 60%) 75%,
+      hsl(320, 100%, 55%) 100%);
+    background-size: 300% 300%;
+    animation: gradientShift 6s ease-in-out infinite;
+  }
+
+  /* Pulse border effect */
+  .pulse-border {
+    border: 2px solid hsl(200, 100%, 50%);
+    animation: pulseBorder 2s ease-in-out infinite;
+  }
+  
+  .glassmorphism::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border: 1px solid transparent;
+    background: linear-gradient(135deg, 
+      hsla(200, 100%, 50%, 0.3) 0%,
+      transparent 25%, 
+      transparent 75%, 
+      hsla(140, 100%, 40%, 0.3) 100%);
+    background-clip: border-box;
+    border-radius: inherit;
+    pointer-events: none;
+    animation: borderPulse 4s ease-in-out infinite;
+  }
+
+  /* Revolutionary SMS Nexus Animations */
+  .quantum-pulse {
+    animation: quantumPulse 3s ease-in-out infinite;
+  }
+  
+  .neural-glow {
+    animation: neuralGlow 2s ease-in-out infinite alternate;
+  }
+  
+  .viral-wave {
+    animation: viralWave 4s ease-in-out infinite;
+  }
+  
+  .emotion-flow {
+    animation: emotionFlow 6s ease-in-out infinite;
+  }
+
+  .hover-float {
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
+  
+  .hover-float:hover {
+    transform: translateY(-8px) scale(1.05);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+  }
+}
+  
+  .cyber-glow {
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    border-radius: 12px;
+  }
+  
+  .cyber-glow:hover {
+    box-shadow: 
+      0 0 20px hsla(190, 100%, 50%, 0.4),
+      0 0 40px hsla(190, 100%, 50%, 0.2),
+      inset 0 0 10px hsla(190, 100%, 50%, 0.05);
+    transform: translateY(-2px) scale(1.01);
+  }
+  
+  .token-card {
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    border-radius: 16px;
+  }
+  
+  .token-card:hover {
+    transform: translateY(-6px) scale(1.02);
+    box-shadow: 
+      0 16px 32px hsla(0, 0%, 0%, 0.4),
+      0 0 24px hsla(190, 100%, 50%, 0.2);
+  }
+  
+  /* Electric Circuit Components */
+  .premium-card {
+    background: hsla(220, 12%, 8%, 0.9);
+    border: 1px solid hsla(200, 100%, 50%, 0.2);
+    border-radius: 16px;
+    backdrop-filter: blur(20px);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .premium-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, 
+      transparent, 
+      hsla(200, 100%, 50%, 0.1), 
+      hsla(140, 100%, 40%, 0.1), 
+      transparent);
+    transition: left 0.5s ease;
+  }
+  
+  .premium-card:hover {
+    border-color: hsla(200, 100%, 50%, 0.4);
+    box-shadow: 
+      0 8px 32px hsla(200, 100%, 50%, 0.15),
+      0 0 20px hsla(140, 100%, 40%, 0.1);
+  }
+  
+  .premium-card:hover::before {
+    left: 100%;
+  }
+  
+  .trust-indicator {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 12px;
+    background: hsla(142, 100%, 55%, 0.1);
+    border: 1px solid hsla(142, 100%, 55%, 0.2);
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 500;
+    color: hsl(142, 100%, 55%);
+  }
+  
+  /* Electric Circuit Animations */
+  @keyframes electricPulse {
+    0%, 100% { 
+      box-shadow: 0 0 5px var(--pulse-blue), 0 0 10px var(--pulse-blue), 0 0 15px var(--pulse-blue);
+      border-color: var(--electric-blue);
+    }
+    50% { 
+      box-shadow: 0 0 10px var(--pulse-green), 0 0 20px var(--pulse-green), 0 0 30px var(--pulse-green);
+      border-color: var(--electric-green);
+    }
+  }
+  
+  @keyframes circuitFlow {
+    0% { 
+      background-position: 0% 50%; 
+      filter: hue-rotate(0deg);
+    }
+    50% { 
+      background-position: 100% 50%; 
+      filter: hue-rotate(90deg);
+    }
+    100% { 
+      background-position: 0% 50%; 
+      filter: hue-rotate(0deg);
+    }
+  }
+  
+  @keyframes borderPulse {
+    0%, 100% { 
+      border-color: var(--electric-blue);
+      box-shadow: inset 0 0 10px var(--pulse-blue);
+    }
+    25% { 
+      border-color: var(--circuit-teal);
+      box-shadow: inset 0 0 10px var(--pulse-teal);
+    }
+    75% { 
+      border-color: var(--electric-green);
+      box-shadow: inset 0 0 10px var(--pulse-green);
+    }
+  }
+
+  /* Butterfly Frame Path Animation - Follows Electric Trail Frame */
+  @keyframes butterfly-frame-path {
+    0% { 
+      transform: translate(320px, -120px);
+      opacity: 0.9;
+    }
+    12.5% { 
+      transform: translate(320px, -60px);
+      opacity: 1;
+    }
+    25% { 
+      transform: translate(320px, 120px);
+      opacity: 1;
+    }
+    37.5% { 
+      transform: translate(160px, 120px);
+      opacity: 1;
+    }
+    50% { 
+      transform: translate(-320px, 120px);
+      opacity: 0.9;
+    }
+    62.5% { 
+      transform: translate(-320px, 60px);
+      opacity: 1;
+    }
+    75% { 
+      transform: translate(-320px, -120px);
+      opacity: 1;
+    }
+    87.5% { 
+      transform: translate(-160px, -120px);
+      opacity: 1;
+    }
+    100% { 
+      transform: translate(320px, -120px);
+      opacity: 0.9;
+    }
+  }
+
+  @keyframes flutter-wing {
+    0%, 100% { 
+      transform: scaleY(1) rotateX(0deg);
+      opacity: 0.9;
+    }
+    50% { 
+      transform: scaleY(0.8) rotateX(15deg);
+      opacity: 1;
+    }
+  }
+
+  /* Responsive Butterfly Frame Path for Mobile */
+  @keyframes butterfly-frame-path-mobile {
+    0% { 
+      transform: translate(200px, -80px);
+      opacity: 0.8;
+    }
+    12.5% { 
+      transform: translate(200px, -40px);
+      opacity: 0.9;
+    }
+    25% { 
+      transform: translate(200px, 80px);
+      opacity: 1;
+    }
+    37.5% { 
+      transform: translate(100px, 80px);
+      opacity: 0.9;
+    }
+    50% { 
+      transform: translate(-200px, 80px);
+      opacity: 0.8;
+    }
+    62.5% { 
+      transform: translate(-200px, 40px);
+      opacity: 0.9;
+    }
+    75% { 
+      transform: translate(-200px, -80px);
+      opacity: 1;
+    }
+    87.5% { 
+      transform: translate(-100px, -80px);
+      opacity: 0.9;
+    }
+    100% { 
+      transform: translate(200px, -80px);
+      opacity: 0.8;
+    }
+  }
+
+  /* Electric Trail Effect */
+  @keyframes electric-trail {
+    0% { 
+      opacity: 1;
+      transform: scale(1);
+    }
+    100% { 
+      opacity: 0;
+      transform: scale(0.3);
+    }
+  }
+
+  @keyframes trail-pulse {
+    0%, 100% {
+      border-color: rgba(0, 212, 255, 0.4);
+      box-shadow: 
+        inset 0 0 20px rgba(0, 212, 255, 0.2),
+        0 0 20px rgba(0, 212, 255, 0.3);
+    }
+    50% {
+      border-color: rgba(0, 255, 136, 0.6);
+      box-shadow: 
+        inset 0 0 30px rgba(0, 255, 136, 0.3),
+        0 0 30px rgba(0, 255, 136, 0.4);
+    }
+  }
+
+  .modern-gradient {
+    background: linear-gradient(135deg, 
+      hsl(200, 100%, 50%) 0%, 
+      hsl(180, 100%, 45%) 50%,
+      hsl(140, 100%, 40%) 100%);
+    background-size: 200% 200%;
+    animation: circuitFlow 3s ease-in-out infinite;
+  }
+  
+  .text-gradient {
+    background: linear-gradient(135deg, 
+      hsl(200, 100%, 50%) 0%, 
+      hsl(180, 100%, 45%) 50%,
+      hsl(140, 100%, 40%) 100%);
+    background-size: 200% 200%;
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: circuitFlow 3s ease-in-out infinite;
+  }
+  
+  /* Electric Pulse Components */
+  .electric-frame {
+    position: relative;
+    border: 2px solid var(--electric-blue);
+    border-radius: 12px;
+    animation: electricPulse 2s ease-in-out infinite;
+    overflow: hidden;
+    background: rgba(0, 0, 0, 0.8); /* Dark background for better text contrast */
+  }
+  
+  .electric-frame::before {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    background: linear-gradient(45deg, 
+      var(--electric-blue), 
+      var(--circuit-teal), 
+      var(--electric-green), 
+      var(--circuit-teal), 
+      var(--electric-blue));
+    border-radius: 12px;
+    z-index: -1;
+    opacity: 0.4; /* Static gradient without animation */
+  }
+  
+  .pulse-border {
+    border: 1px solid var(--electric-blue);
+    animation: borderPulse 3s ease-in-out infinite;
+    transition: all 0.3s ease;
+    background: rgba(0, 0, 0, 0.6); /* Darker background for better contrast */
+  }
+  
+  .circuit-glow {
+    box-shadow: 
+      0 0 10px var(--pulse-blue),
+      0 0 20px var(--pulse-blue),
+      inset 0 0 10px var(--pulse-blue);
+    transition: all 0.3s ease;
+    background: rgba(0, 0, 0, 0.7); /* Dark background for text readability */
+  }
+  
+  .circuit-glow:hover {
+    box-shadow: 
+      0 0 15px var(--pulse-green),
+      0 0 30px var(--pulse-green),
+      inset 0 0 15px var(--pulse-green);
+  }
+  
+  .flutter-animate {
+    animation: flutter 4s ease-in-out infinite;
+  }
+  
+  .pulse-electric {
+    animation: pulse-electric 3s ease-in-out infinite;
+  }
+
+  /* Butterfly Orbit Animation Styles */
+  .butterfly-orbit {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 1px;
+    height: 1px;
+    transform: translate(-50%, -50%);
+  }
+
+  .butterfly-container {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    animation: butterfly-frame-path 12s linear infinite;
+    transform-origin: 0 0;
+  }
+
+  .butterfly-svg {
+    transform: translate(-50%, -50%);
+    filter: drop-shadow(0 0 16px #0088FF) drop-shadow(0 0 32px #0066CC) drop-shadow(0 0 48px rgba(0, 136, 255, 0.4));
+  }
+
+  .animate-flutter-wing {
+    animation: flutter-wing 0.3s ease-in-out infinite;
+    transform-origin: 20px 15px;
+  }
+
+  /* Electric Trail Frame */
+  .electric-trail-frame {
+    position: absolute;
+    inset: -60px;
+    border: 2px solid transparent;
+    border-radius: 20px;
+    background: linear-gradient(45deg, 
+      transparent, 
+      rgba(0, 212, 255, 0.3), 
+      rgba(0, 255, 136, 0.3), 
+      transparent) border-box;
+    mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
+    mask-composite: exclude;
+    animation: trail-pulse 2s ease-in-out infinite;
+    pointer-events: none;
+  }
+
+  .trail-particle {
+    position: absolute;
+    width: 4px;
+    height: 4px;
+    background: radial-gradient(circle, #00D4FF, #00FF88);
+    border-radius: 50%;
+    animation: electric-trail 1s ease-out forwards;
+    pointer-events: none;
+  }
+
+  /* Responsive butterfly frame path for smaller screens */
+  @media (max-width: 768px) {
+    .butterfly-container {
+      animation: butterfly-frame-path-mobile 10s linear infinite;
+    }
+    
+    .electric-trail-frame {
+      inset: -40px;
+    }
+  }
+  
+  /* Better text contrast for electric components */
+  .electric-frame .text-muted-foreground {
+    color: hsl(240, 3.7%, 75%) !important; /* Lighter muted text */
+  }
+  
+  .electric-frame h1, .electric-frame h2, .electric-frame h3, .electric-frame h4 {
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.9); /* Strong text shadow for headings */
+  }
+  
+  .electric-frame p, .electric-frame span, .electric-frame label {
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8); /* Text shadow for body text */
+    color: rgba(255, 255, 255, 0.95) !important; /* Ensure white text is visible */
+  }
+  
+  .circuit-glow p, .circuit-glow span, .circuit-glow label {
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+    color: rgba(255, 255, 255, 0.95) !important;
+  }
+  
+  .pulse-border p, .pulse-border span, .pulse-border label {
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+    color: rgba(255, 255, 255, 0.95) !important;
+  }
+
+  .neon-text {
+    text-shadow: 
+      0 0 5px currentColor,
+      0 0 10px currentColor,
+      0 0 15px currentColor,
+      0 0 20px currentColor;
+  }
+  
+  .electric-border {
+    border: 2px solid transparent;
+    background: linear-gradient(hsl(220, 50%, 6%), hsl(220, 50%, 6%)) padding-box,
+                linear-gradient(45deg, hsl(210, 100%, 45%), hsl(140, 100%, 40%)) border-box;
+  }
+
+@layer utilities {
+  /* Revolutionary SMS Nexus Animation Keyframes */
+  @keyframes quantumPulse {
+    0%, 100% { 
+      background: linear-gradient(45deg, hsl(270, 100%, 60%), hsl(200, 100%, 50%));
+      box-shadow: 0 0 20px hsla(270, 100%, 60%, 0.5);
+    }
+    50% { 
+      background: linear-gradient(45deg, hsl(200, 100%, 50%), hsl(140, 100%, 40%));
+      box-shadow: 0 0 40px hsla(200, 100%, 50%, 0.8);
+    }
+  }
+  
+  @keyframes neuralGlow {
+    0% { 
+      box-shadow: 0 0 10px hsla(200, 100%, 50%, 0.3); 
+      border-color: hsla(200, 100%, 50%, 0.3);
+    }
+    100% { 
+      box-shadow: 0 0 30px hsla(140, 100%, 40%, 0.6); 
+      border-color: hsla(140, 100%, 40%, 0.6);
+    }
+  }
+  
+  @keyframes viralWave {
+    0%, 100% { transform: scale(1) rotate(0deg); }
+    25% { transform: scale(1.1) rotate(90deg); }
+    50% { transform: scale(1.2) rotate(180deg); }
+    75% { transform: scale(1.1) rotate(270deg); }
+  }
+  
+  @keyframes emotionFlow {
+    0% { 
+      background-position: 0% 50%; 
+      filter: hue-rotate(0deg);
+    }
+    50% { 
+      background-position: 100% 50%; 
+      filter: hue-rotate(180deg);
+    }
+    100% { 
+      background-position: 0% 50%; 
+      filter: hue-rotate(360deg);
+    }
+  }
+
+  @keyframes spin-slow {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+
+  /* Utility Classes for Revolutionary Features */
+  .animate-spin-slow {
+    animation: spin-slow 8s linear infinite;
+  }
+  
+  .gradient-neural {
+    background: linear-gradient(135deg, 
+      hsl(270, 100%, 60%) 0%,
+      hsl(200, 100%, 50%) 25%,
+      hsl(140, 100%, 40%) 50%,
+      hsl(320, 100%, 60%) 75%,
+      hsl(270, 100%, 60%) 100%);
+    background-size: 400% 400%;
+    animation: emotionFlow 8s ease-in-out infinite;
+  }
+  
+  .gradient-quantum {
+    background: linear-gradient(45deg,
+      hsl(200, 100%, 50%) 0%,
+      hsl(140, 100%, 40%) 25%,
+      hsl(270, 100%, 60%) 50%,
+      hsl(320, 100%, 60%) 75%,
+      hsl(200, 100%, 50%) 100%);
+    background-size: 300% 300%;
+    animation: quantumPulse 6s ease-in-out infinite;
+  }
+}
+
+@keyframes flutter {
+  0%, 100% { 
+    transform: translateY(0px) rotate(0deg); 
+  }
+  25% { 
+    transform: translateY(-12px) rotate(3deg); 
+  }
+  50% {
+    transform: translateY(-8px) rotate(0deg);
+  }
+  75% { 
+    transform: translateY(-6px) rotate(-2deg); 
+  }
+}
+
+@keyframes pulse-electric {
+  0%, 100% { 
+    box-shadow: 
+      0 0 0 0 rgba(0, 123, 255, 0.8),
+      0 0 0 0 rgba(0, 255, 102, 0.6); 
+  }
+  50% { 
+    box-shadow: 
+      0 0 0 15px rgba(0, 123, 255, 0),
+      0 0 0 30px rgba(0, 255, 102, 0); 
+  }
+}
+
+@keyframes electric-flow {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+@keyframes bounce-in {
+  0% {
+    transform: scale(0.3) rotate(-10deg);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.05) rotate(5deg);
+  }
+  70% {
+    transform: scale(0.9) rotate(-2deg);
+  }
+  100% {
+    transform: scale(1) rotate(0deg);
+    opacity: 1;
+  }
+}
+
+/* Marquee animation - boop.fun style */
+.animate-marquee {
+  animation: marquee 30s linear infinite;
+}
+
+@keyframes marquee {
+  0% { transform: translateX(100%); }
+  100% { transform: translateX(-100%); }
+}
+
+/* Pulse animation for live feed */
+.animate-pulse-custom {
+  animation: pulse-custom 2s ease-in-out infinite;
+}
+
+@keyframes pulse-custom {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.8; }
 }

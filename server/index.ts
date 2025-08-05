@@ -1,69 +1,76 @@
-import express from 'express';
-import cors from 'cors';
-import { fileURLToPath } from 'url';
-import { dirname } from 'path';
-import routes from './routes';
-import { setupVite, serveStatic } from './vite';
-import { createServer } from 'http';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
+import express, { type Request, Response, NextFunction } from "express";
+import { registerRoutes } from "./routes";
+import { setupVite, serveStatic, log } from "./vite";
 
 const app = express();
-const PORT = parseInt(process.env.PORT || '5000');
-const server = createServer(app);
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ extended: false, limit: '50mb' }));
 
-// Middleware
-app.use(cors());
-app.use(express.json());
+app.use((req, res, next) => {
+  const start = Date.now();
+  const path = req.path;
+  let capturedJsonResponse: Record<string, any> | undefined = undefined;
 
-// API routes
-app.use('/api', routes);
+  const originalResJson = res.json;
+  res.json = function (bodyJson, ...args) {
+    capturedJsonResponse = bodyJson;
+    return originalResJson.apply(res, [bodyJson, ...args]);
+  };
 
-async function startServer() {
-  try {
-    if (process.env.NODE_ENV === 'production') {
-      serveStatic(app);
-    } else {
-      await setupVite(app, server);
+  res.on("finish", () => {
+    const duration = Date.now() - start;
+    if (path.startsWith("/api")) {
+      let logLine = `${req.method} ${path} ${res.statusCode} in ${duration}ms`;
+      if (capturedJsonResponse) {
+        logLine += ` :: ${JSON.stringify(capturedJsonResponse)}`;
+      }
+
+      if (logLine.length > 80) {
+        logLine = logLine.slice(0, 79) + "…";
+      }
+
+      log(logLine);
     }
-    
-    server.listen(PORT, '0.0.0.0', () => {
-      console.log(`🦋 FlutterWave Intelligence Platform running on port ${PORT}`);
-      console.log('📋 Available routes:');
-      console.log('  - GET  /api/health - Health check');
-      console.log('  - POST /api/tokens/create - Create SPL token');
-      console.log('  - POST /api/wallets/analyze - Analyze wallet');
-      console.log('  - GET  /api/tokens/my-tokens - Get user tokens');
-      console.log('  - GET  /demo - Live blockchain demo');
-      console.log('  - GET  /api/flutterbye/status - Flutterbye integration status');
-    });
-  } catch (error) {
-    console.error('Failed to start server:', error);
-    process.exit(1);
-  }
-}
-
-// Welcome message
-app.get('/api/health', (req, res) => {
-  res.json({ 
-    message: 'FlutterWave Intelligence Platform API is running!',
-    features: ['Token Creation', 'Wallet Analysis', 'AI Insights'],
-    timestamp: new Date().toISOString(),
-    version: '1.0.0'
   });
+
+  next();
 });
 
-// Initialize services
-const flutterboyeService = {
-  init: () => {
-    console.log('🦋 Flutterbye Service initialized');
-    console.log('   API Key: Configured');
-    console.log('   API URL: https://api.flutterbye.com/v1');
+(async () => {
+  const server = await registerRoutes(app);
+
+  app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
+    const status = err.status || err.statusCode || 500;
+    let message = err.message || "Internal Server Error";
+    
+    // Handle specific payload too large error
+    if (err.type === 'entity.too.large') {
+      message = "File too large. Maximum size is 50MB.";
+    }
+
+    res.status(status).json({ message });
+    console.error('Server error:', err);
+  });
+
+  // importantly only setup vite in development and after
+  // setting up all the other routes so the catch-all route
+  // doesn't interfere with the other routes
+  if (app.get("env") === "development") {
+    await setupVite(app, server);
+  } else {
+    serveStatic(app);
   }
-};
 
-flutterboyeService.init();
-
-// Start the application
-startServer();
+  // ALWAYS serve the app on the port specified in the environment variable PORT
+  // Other ports are firewalled. Default to 5000 if not specified.
+  // this serves both the API and the client.
+  // It is the only port that is not firewalled.
+  const port = parseInt(process.env.PORT || '5000', 10);
+  server.listen({
+    port,
+    host: "0.0.0.0",
+    reusePort: true,
+  }, () => {
+    log(`serving on port ${port}`);
+  });
+})();
