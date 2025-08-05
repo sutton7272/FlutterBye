@@ -651,6 +651,24 @@ function Router() {
             </>
           );
         }} />
+        <Route path="/coin-minting-launch" component={() => {
+          const CoinMintingLaunch = lazy(() => import('./pages/coin-minting-launch'));
+          return (
+            <>
+              <Navbar />
+              <Suspense fallback={
+                <div className="flex items-center justify-center min-h-screen">
+                  <div className="text-center">
+                    <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-500 mx-auto mb-4"></div>
+                    <p className="text-lg text-gray-600">Loading Launch Strategy...</p>
+                  </div>
+                </div>
+              }>
+                <CoinMintingLaunch />
+              </Suspense>
+            </>
+          );
+        }} />
         <Route component={NotFound} />
         </Switch>
         </div>

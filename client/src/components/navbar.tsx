@@ -43,8 +43,9 @@ export default function Navbar() {
         return isFeatureEnabled(item.featureId);
       });
 
-  // Secondary navigation for additional features - prioritize revenue dashboards
+  // Secondary navigation for additional features - prioritize launch strategy
   const secondaryNavItems = [
+    { href: "/coin-minting-launch", label: "Launch Strategy", icon: Coins, description: "Coin minting launch plan", priority: true },
     { href: "/production-deployment", label: "Production", icon: Rocket, description: "Enterprise deployment & MainNet", priority: true },
     { href: "/production-readiness", label: "Readiness", icon: Target, description: "Production readiness assessment", priority: true },
     { href: "/dual-environment", label: "Environment", icon: ArrowRightLeft, description: "DevNet/MainNet dual setup", priority: true },
