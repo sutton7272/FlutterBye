@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Switch } from "@/components/ui/switch";
@@ -19,7 +20,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Separator } from "@/components/ui/separator";
 import { Link } from "wouter";
 import WalletTestContent from "@/pages/WalletTest";
@@ -958,6 +959,167 @@ function DynamicPricingAdminContent() {
   );
 }
 
+// Final 5% Production Readiness Component
+function Final5PercentProductionReadinessContent() {
+  const { data: comprehensiveStatus, isLoading: statusLoading, refetch: refetchStatus } = useQuery({
+    queryKey: ['/api/final-5-percent/comprehensive-status'],
+    refetchInterval: 30000,
+  });
+
+  if (statusLoading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
+      </div>
+    );
+  }
+
+  if (!comprehensiveStatus) {
+    return (
+      <div className="text-center">
+        <h2 className="text-xl font-bold text-red-400 mb-4">Failed to load infrastructure status</h2>
+        <Button onClick={() => refetchStatus()} className="bg-blue-600 hover:bg-blue-700">
+          Retry
+        </Button>
+      </div>
+    );
+  }
+
+  const getComponentIcon = (componentName: string) => {
+    switch (componentName.toLowerCase()) {
+      case 'mainnet deployment':
+        return <Server className="w-4 h-4" />;
+      case 'flby token deployment':
+        return <DollarSign className="w-4 h-4" />;
+      case 'websocket optimization':
+        return <Wifi className="w-4 h-4" />;
+      case 'production rate limiting':
+        return <Shield className="w-4 h-4" />;
+      case 'final security audit':
+        return <Lock className="w-4 h-4" />;
+      default:
+        return <Settings className="w-4 h-4" />;
+    }
+  };
+
+  const getStatusColor = (status: string) => {
+    switch (status.toUpperCase()) {
+      case 'COMPLETE':
+        return 'bg-green-500/10 text-green-400 border-green-500';
+      case 'CONFIGURING':
+      case 'DEPLOYING':
+      case 'OPTIMIZING':
+      case 'AUDITING':
+        return 'bg-yellow-500/10 text-yellow-400 border-yellow-500';
+      default:
+        return 'bg-gray-500/10 text-gray-400 border-gray-500';
+    }
+  };
+
+  const isProductionReady = comprehensiveStatus.status === 'PRODUCTION_READY';
+
+  return (
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex justify-between items-center">
+        <div>
+          <h2 className="text-2xl font-bold text-white flex items-center gap-2">
+            <Rocket className="w-6 h-6 text-green-400" />
+            Final 5% Production Readiness
+          </h2>
+          <p className="text-slate-400">{comprehensiveStatus.milestone}</p>
+        </div>
+        <Badge className={`${isProductionReady ? 'bg-green-500/20 text-green-400 border-green-500/30' : 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30'} px-4 py-2 text-lg font-bold`}>
+          {comprehensiveStatus.overallReadiness}% READY
+        </Badge>
+      </div>
+
+      {/* Overall Progress */}
+      <Card className="bg-slate-800/50 border-blue-500/30">
+        <CardHeader>
+          <CardTitle className="text-white flex items-center justify-between">
+            <span>Overall Production Readiness</span>
+            <Badge className={isProductionReady ? 'bg-green-500/20 text-green-400' : 'bg-yellow-500/20 text-yellow-400'}>
+              {comprehensiveStatus.status.replace('_', ' ')}
+            </Badge>
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            <Progress value={comprehensiveStatus.overallReadiness} className="h-4" />
+            <div className="text-center">
+              <p className="text-slate-300 text-lg">
+                <span className="font-bold text-white">{comprehensiveStatus.overallReadiness}%</span> of critical infrastructure complete
+              </p>
+              <p className="text-sm text-slate-400 mt-1">
+                Last updated: {new Date(comprehensiveStatus.lastUpdated).toLocaleString()}
+              </p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Component Status Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {comprehensiveStatus.components.map((component: any, index: number) => (
+          <Card key={index} className="bg-slate-800/50 border-slate-600/50">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-white text-sm flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  {getComponentIcon(component.name)}
+                  <span>{component.name}</span>
+                </div>
+                <Badge className={`px-2 py-1 text-xs ${getStatusColor(component.status)}`}>
+                  {component.status}
+                </Badge>
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="pt-0">
+              <div className="space-y-3">
+                <Progress value={component.readiness} className="h-2" />
+                <div className="text-xs text-slate-400">
+                  <div className="font-semibold text-white mb-1">{component.readiness}% Complete</div>
+                  {Object.entries(component.details).map(([key, value]: [string, any]) => (
+                    <div key={key} className="flex justify-between">
+                      <span className="capitalize">{key.replace(/([A-Z])/g, ' $1').trim()}:</span>
+                      <span className="text-slate-300">{String(value)}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+
+      {/* Production Ready Alert */}
+      {isProductionReady && (
+        <Alert className="bg-green-900/20 border-green-500/30">
+          <CheckCircle className="h-4 w-4 text-green-400" />
+          <AlertTitle className="text-green-400">Production Ready!</AlertTitle>
+          <AlertDescription className="text-slate-300">
+            All critical infrastructure components are complete and operational. Your platform is ready for the "Coinbase of Token Creation" launch.
+          </AlertDescription>
+        </Alert>
+      )}
+
+      {/* Action Buttons */}
+      <div className="flex gap-4">
+        <Button onClick={() => refetchStatus()} className="bg-blue-600 hover:bg-blue-700">
+          <Activity className="w-4 h-4 mr-2" />
+          Refresh Status
+        </Button>
+        {isProductionReady && (
+          <Button className="bg-green-600 hover:bg-green-700">
+            <Rocket className="w-4 h-4 mr-2" />
+            Deploy to Production
+          </Button>
+        )}
+      </div>
+    </div>
+  );
+}
+
 // Consolidated Admin Dashboard - All admin functions in one place
 export default function UnifiedAdminDashboard() {
   const [activeTab, setActiveTab] = useState("overview");
@@ -975,7 +1137,7 @@ export default function UnifiedAdminDashboard() {
   const categoryGroups = {
     'core-management': ['overview', 'settings', 'users', 'tokens', 'pricing', 'codes', 'access', 'testing'],
     'business-intelligence': ['competitive', 'wallets', 'behavior', 'api-monetization', 'features'],
-    'analytics-monitoring': ['analytics', 'performance', 'security', 'system', 'realtime', 'revenue', 'viral'],
+    'analytics-monitoring': ['analytics', 'performance', 'security', 'system', 'realtime', 'revenue', 'viral', 'final-5-percent'],
     'ai-optimization': ['dynamic-pricing', 'self-optimization', 'staking']
   };
 
@@ -1003,7 +1165,8 @@ export default function UnifiedAdminDashboard() {
     { value: "wallets", icon: Wallet, label: "Wallets", color: "amber" },
     { value: "testing", icon: Wallet, label: "🧪 Testing", color: "orange" },
     { value: "api-monetization", icon: DollarSign, label: "💰 API $", color: "green" },
-    { value: "features", icon: Settings, label: "🎛️ Features", color: "blue" }
+    { value: "features", icon: Settings, label: "🎛️ Features", color: "blue" },
+    { value: "final-5-percent", icon: Rocket, label: "🚀 Final 5%", color: "green" }
   ];
 
   // Get filtered tabs based on selected category
@@ -3039,6 +3202,11 @@ export default function UnifiedAdminDashboard() {
                 <WalletTestContent />
               </CardContent>
             </Card>
+          </TabsContent>
+
+          {/* Final 5% Production Readiness Tab */}
+          <TabsContent value="final-5-percent" className="space-y-6">
+            <Final5PercentProductionReadinessContent />
           </TabsContent>
 
         </Tabs>
