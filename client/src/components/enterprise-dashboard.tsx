@@ -38,6 +38,36 @@ import {
 
 export default function EnterpriseDashboard() {
   const { toast } = useToast();
+  const [walletInput, setWalletInput] = useState("");
+  const [analyzingWallet, setAnalyzingWallet] = useState(false);
+  const [analysisResult, setAnalysisResult] = useState<any>(null);
+
+  const handleCrossChainAnalysis = async () => {
+    if (!walletInput.trim()) return;
+    
+    setAnalyzingWallet(true);
+    try {
+      const response = await apiRequest("POST", "/api/enterprise/multi-chain/analyze-wallet", {
+        walletAddress: walletInput.trim()
+      });
+      
+      setAnalysisResult(response);
+      toast({
+        title: "Analysis Complete",
+        description: `Successfully analyzed ${response.detectedBlockchain} wallet`,
+        variant: "default",
+      });
+    } catch (error) {
+      console.error("Cross-chain analysis error:", error);
+      toast({
+        title: "Analysis Failed",
+        description: "Unable to analyze wallet. Please check the address format.",
+        variant: "destructive",
+      });
+    } finally {
+      setAnalyzingWallet(false);
+    }
+  };
   const queryClient = useQueryClient();
   
   const [whiteLabelConfig, setWhiteLabelConfig] = useState({
@@ -314,15 +344,76 @@ export default function EnterpriseDashboard() {
                   <Label className="text-white">Cross-Chain Wallet Address</Label>
                   <div className="flex gap-2">
                     <Input 
+                      value={walletInput}
+                      onChange={(e) => setWalletInput(e.target.value)}
                       placeholder="Enter wallet address for cross-chain analysis..."
                       className="bg-slate-800 border-green-500/20 text-white"
                     />
-                    <Button className="bg-green-600 hover:bg-green-700">
-                      <Search className="h-4 w-4 mr-2" />
-                      Analyze
+                    <Button 
+                      onClick={handleCrossChainAnalysis}
+                      disabled={analyzingWallet || !walletInput}
+                      className="bg-green-600 hover:bg-green-700 disabled:bg-slate-600"
+                    >
+                      {analyzingWallet ? (
+                        <div className="animate-spin w-4 h-4 mr-2 border-2 border-white border-t-transparent rounded-full" />
+                      ) : (
+                        <Search className="h-4 w-4 mr-2" />
+                      )}
+                      {analyzingWallet ? 'Analyzing...' : 'Analyze'}
                     </Button>
                   </div>
                 </div>
+
+                {/* Live Analysis Results */}
+                {analysisResult && (
+                  <div className="mt-6 space-y-4">
+                    <div className="bg-slate-800/50 p-4 rounded-lg border border-green-500/20">
+                      <h4 className="text-white font-semibold mb-3 flex items-center gap-2">
+                        <CheckCircle className="h-5 w-5 text-green-400" />
+                        Cross-Chain Analysis Complete
+                      </h4>
+                      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                        <div className="text-center">
+                          <div className="text-green-400 text-sm">Detected Blockchain</div>
+                          <div className="text-white text-lg font-bold capitalize">{analysisResult.detectedBlockchain}</div>
+                        </div>
+                        <div className="text-center">
+                          <div className="text-green-400 text-sm">Total Portfolio</div>
+                          <div className="text-white text-lg font-bold">${analysisResult.summary?.totalPortfolioValue?.toLocaleString() || '0'}</div>
+                        </div>
+                        <div className="text-center">
+                          <div className="text-green-400 text-sm">Risk Profile</div>
+                          <div className="text-white text-lg font-bold capitalize">{analysisResult.summary?.riskProfile || 'Unknown'}</div>
+                        </div>
+                        <div className="text-center">
+                          <div className="text-green-400 text-sm">Active Chains</div>
+                          <div className="text-white text-lg font-bold">{analysisResult.summary?.activeChains?.length || 0}</div>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    {/* Detailed Analysis */}
+                    {analysisResult.detailedAnalysis?.map((chainData: any, index: number) => (
+                      <div key={index} className="bg-slate-800/30 p-4 rounded-lg">
+                        <h5 className="text-white font-semibold mb-2 capitalize">{chainData.blockchain} Analysis</h5>
+                        <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 text-sm">
+                          <div>
+                            <span className="text-slate-400">Balance: </span>
+                            <span className="text-white">{chainData.balance} {chainData.blockchain === 'ethereum' ? 'ETH' : chainData.blockchain === 'bitcoin' ? 'BTC' : 'SOL'}</span>
+                          </div>
+                          <div>
+                            <span className="text-slate-400">Transactions: </span>
+                            <span className="text-white">{chainData.transactionCount?.toLocaleString()}</span>
+                          </div>
+                          <div>
+                            <span className="text-slate-400">Portfolio Value: </span>
+                            <span className="text-white">${chainData.portfolioValue?.toLocaleString()}</span>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
 
                 <div className="grid grid-cols-2 gap-4 mt-4">
                   <div className="bg-slate-800/30 p-3 rounded">
@@ -1199,18 +1290,53 @@ export default function EnterpriseDashboard() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-3 gap-6">
-                <div className="text-center">
-                  <div className="text-3xl font-bold text-purple-300">15</div>
-                  <div className="text-sm text-slate-400">Active Enterprise Clients</div>
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+                <div className="text-center p-4 bg-slate-800/50 rounded-lg">
+                  <div className="text-3xl font-bold text-purple-300">127</div>
+                  <div className="text-sm text-slate-400">Total Enterprise Clients</div>
                 </div>
-                <div className="text-center">
-                  <div className="text-3xl font-bold text-green-300">98.7%</div>
+                <div className="text-center p-4 bg-slate-800/50 rounded-lg">
+                  <div className="text-3xl font-bold text-green-300">$1.27M</div>
+                  <div className="text-sm text-slate-400">Monthly Recurring Revenue</div>
+                </div>
+                <div className="text-center p-4 bg-slate-800/50 rounded-lg">
+                  <div className="text-3xl font-bold text-blue-300">15.2M</div>
+                  <div className="text-sm text-slate-400">API Calls This Month</div>
+                </div>
+                <div className="text-center p-4 bg-slate-800/50 rounded-lg">
+                  <div className="text-3xl font-bold text-red-300">98.9%</div>
                   <div className="text-sm text-slate-400">System Uptime</div>
                 </div>
-                <div className="text-center">
-                  <div className="text-3xl font-bold text-blue-300">1.2M</div>
-                  <div className="text-sm text-slate-400">API Calls This Month</div>
+              </div>
+
+              {/* Enterprise Pricing Tiers Breakdown */}
+              <div className="bg-slate-600/30 p-4 rounded-lg mb-6">
+                <h4 className="text-white font-semibold mb-4">Enterprise Pricing Tiers Performance</h4>
+                <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
+                  <div className="bg-green-500/10 border border-green-500/20 p-4 rounded-lg">
+                    <div className="text-green-400 font-semibold">Enterprise Plus</div>
+                    <div className="text-white text-2xl font-bold">43</div>
+                    <div className="text-slate-400 text-sm">$5K/month clients</div>
+                    <div className="text-green-400 text-sm mt-2">$215K MRR</div>
+                  </div>
+                  <div className="bg-purple-500/10 border border-purple-500/20 p-4 rounded-lg">
+                    <div className="text-purple-400 font-semibold">Enterprise Elite</div>
+                    <div className="text-white text-2xl font-bold">18</div>
+                    <div className="text-slate-400 text-sm">$25K/month clients</div>
+                    <div className="text-purple-400 text-sm mt-2">$450K MRR</div>
+                  </div>
+                  <div className="bg-red-500/10 border border-red-500/20 p-4 rounded-lg">
+                    <div className="text-red-400 font-semibold">Government/Law</div>
+                    <div className="text-white text-2xl font-bold">12</div>
+                    <div className="text-slate-400 text-sm">$50K+/month clients</div>
+                    <div className="text-red-400 text-sm mt-2">$600K+ MRR</div>
+                  </div>
+                  <div className="bg-blue-500/10 border border-blue-500/20 p-4 rounded-lg">
+                    <div className="text-blue-400 font-semibold">Standard Enterprise</div>
+                    <div className="text-white text-2xl font-bold">54</div>
+                    <div className="text-slate-400 text-sm">$99.99/month clients</div>
+                    <div className="text-blue-400 text-sm mt-2">$5.4K MRR</div>
+                  </div>
                 </div>
               </div>
               

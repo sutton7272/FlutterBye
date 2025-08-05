@@ -6,8 +6,36 @@ import { crossChainEngine } from "./cross-chain-adapter";
 import { enterpriseCompliance } from "./enterprise-compliance";
 import { governmentIntelligence } from "./government-law-enforcement";
 import { multiChainIntelligence } from "./multi-chain-intelligence";
+import { aiMonetizationService } from "./ai-monetization-service";
 
 const router = Router();
+
+// ============ ENTERPRISE PRICING & ANALYTICS ENDPOINTS ============
+
+// Get enterprise pricing tier analytics
+router.get("/pricing-analytics", async (req, res) => {
+  try {
+    const analytics = await aiMonetizationService.getEnterpriseTierAnalytics();
+    
+    res.json({
+      success: true,
+      analytics,
+      message: 'Enterprise pricing analytics retrieved successfully',
+      targetMarket: {
+        revenueRange: '$5M-$50M ARR',
+        clientCount: '100+ enterprise clients',
+        valuationTarget: '$225M-$2B+',
+        positioning: 'Google of Blockchain Intelligence'
+      }
+    });
+  } catch (error) {
+    console.error('Pricing analytics error:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+});
 
 // ============ CROSS-CHAIN INTELLIGENCE ENDPOINTS ============
 

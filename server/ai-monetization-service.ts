@@ -118,8 +118,155 @@ class AIMonetizationService {
         'priority_processing'
       ],
       active: true
+    },
+    {
+      id: 'enterprise_plus',
+      name: 'Enterprise Plus',
+      price: 5000,
+      currency: 'USD',
+      features: [
+        'Multi-blockchain intelligence (ETH, BTC, SOL)',
+        'Cross-chain wallet analysis',
+        'Enterprise compliance suite',
+        'Advanced risk assessment',
+        'Priority API access',
+        'Custom reporting',
+        'Dedicated account manager',
+        '24/7 premium support'
+      ],
+      aiCredits: -1,
+      rateLimit: {
+        requestsPerMinute: -1,
+        requestsPerDay: -1
+      },
+      advancedFeatures: [
+        'cross_chain_intelligence',
+        'enterprise_compliance',
+        'advanced_risk_assessment',
+        'custom_reporting',
+        'dedicated_manager',
+        'premium_support'
+      ],
+      active: true
+    },
+    {
+      id: 'enterprise_elite',
+      name: 'Enterprise Elite',
+      price: 25000,
+      currency: 'USD',
+      features: [
+        'All Enterprise Plus features',
+        'Government/Law enforcement tools',
+        'OFAC sanctions screening',
+        'Investigation case management',
+        'Real-time monitoring alerts',
+        'Custom white-label deployment',
+        'On-premise installation options',
+        'Custom API endpoints'
+      ],
+      aiCredits: -1,
+      rateLimit: {
+        requestsPerMinute: -1,
+        requestsPerDay: -1
+      },
+      advancedFeatures: [
+        'government_tools',
+        'ofac_screening',
+        'investigation_management',
+        'real_time_monitoring',
+        'white_label_deployment',
+        'on_premise_options',
+        'custom_apis'
+      ],
+      active: true
+    },
+    {
+      id: 'government_law_enforcement',
+      name: 'Government & Law Enforcement',
+      price: 50000,
+      currency: 'USD',
+      features: [
+        'All Enterprise Elite features',
+        'Classified intelligence access',
+        'Multi-jurisdiction compliance',
+        'Chain analysis visualization',
+        'Evidence preservation tools',
+        'Court-ready reporting',
+        'Secure data handling (SOC2/GDPR)',
+        'Custom training programs'
+      ],
+      aiCredits: -1,
+      rateLimit: {
+        requestsPerMinute: -1,
+        requestsPerDay: -1
+      },
+      advancedFeatures: [
+        'classified_access',
+        'multi_jurisdiction',
+        'chain_analysis_viz',
+        'evidence_preservation',
+        'court_ready_reports',
+        'secure_data_handling',
+        'custom_training'
+      ],
+      active: true
     }
   ];
+
+  // Get enterprise tier performance analytics
+  async getEnterpriseTierAnalytics(): Promise<{
+    totalClients: number;
+    totalMRR: number;
+    tierBreakdown: Array<{
+      tierId: string;
+      tierName: string;
+      clientCount: number;
+      monthlyRevenue: number;
+      avgRevenuePerClient: number;
+    }>;
+  }> {
+    // Simulated enterprise analytics data
+    // In production, this would query actual subscription data
+    const tierBreakdown = [
+      {
+        tierId: 'enterprise',
+        tierName: 'Standard Enterprise',
+        clientCount: 54,
+        monthlyRevenue: 5400,
+        avgRevenuePerClient: 99.99
+      },
+      {
+        tierId: 'enterprise_plus',
+        tierName: 'Enterprise Plus',
+        clientCount: 43,
+        monthlyRevenue: 215000,
+        avgRevenuePerClient: 5000
+      },
+      {
+        tierId: 'enterprise_elite',
+        tierName: 'Enterprise Elite',
+        clientCount: 18,
+        monthlyRevenue: 450000,
+        avgRevenuePerClient: 25000
+      },
+      {
+        tierId: 'government_law_enforcement',
+        tierName: 'Government & Law Enforcement',
+        clientCount: 12,
+        monthlyRevenue: 600000,
+        avgRevenuePerClient: 50000
+      }
+    ];
+
+    const totalClients = tierBreakdown.reduce((sum, tier) => sum + tier.clientCount, 0);
+    const totalMRR = tierBreakdown.reduce((sum, tier) => sum + tier.monthlyRevenue, 0);
+
+    return {
+      totalClients,
+      totalMRR,
+      tierBreakdown
+    };
+  }
 
   private mockDashboardData: MonetizationDashboard = {
     totalRevenue: 47500.00,
