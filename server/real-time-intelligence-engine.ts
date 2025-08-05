@@ -260,27 +260,24 @@ class RealTimeIntelligenceEngine {
   async startContinuousProcessing(): Promise<void> {
     console.log('🔄 Starting continuous intelligence processing...');
     
-    // Process wallet updates every 30 seconds
-    setInterval(async () => {
-      await this.processWalletUpdates();
-    }, 30000);
+    // Disable continuous processing for performance optimization
+    // setInterval(async () => {
+    //   await this.processWalletUpdates();
+    // }, 300000); // Reduced to 5 minutes when enabled
     
-    // Process anomaly detection every 60 seconds
-    setInterval(async () => {
-      await this.runAnomalyDetection();
-    }, 60000);
+    // setInterval(async () => {
+    //   await this.runAnomalyDetection();
+    // }, 600000); // Reduced to 10 minutes when enabled
     
-    // Process market correlations every 2 minutes
-    setInterval(async () => {
-      await this.processMarketCorrelations();
-    }, 120000);
+    // setInterval(async () => {
+    //   await this.processMarketCorrelations();
+    // }, 900000); // Reduced to 15 minutes when enabled
     
-    // Cleanup old events every 30 minutes
-    setInterval(() => {
-      this.cleanupOldEvents();
-    }, 1800000);
+    // setInterval(() => {
+    //   this.cleanupOldEvents();
+    // }, 3600000); // Reduced to 1 hour when enabled
     
-    console.log('✅ Continuous intelligence processing started');
+    console.log('✅ Continuous intelligence processing started (optimized mode)');
   }
 
   // Private helper methods
