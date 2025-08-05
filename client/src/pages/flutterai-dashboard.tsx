@@ -641,27 +641,36 @@ export default function FlutterAIDashboard() {
 
         {/* Main Dashboard Tabs */}
         <Tabs defaultValue="intelligence" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-12 bg-slate-800/50">
+          {/* Primary Tabs - Most Important Features */}
+          <TabsList className="grid w-full grid-cols-6 bg-slate-800/50 mb-4">
             <TabsTrigger value="intelligence" className="data-[state=active]:bg-purple-600">
               <Star className="h-4 w-4 mr-2" />
               Intelligence
             </TabsTrigger>
-            <TabsTrigger value="advanced-analytics" className="data-[state=active]:bg-purple-600">
-              <BarChart3 className="h-4 w-4 mr-2" />
-              Advanced Analytics
-            </TabsTrigger>
-            <TabsTrigger value="real-time" className="data-[state=active]:bg-purple-600">
-              <Activity className="h-4 w-4 mr-2" />
-              Real-time
-            </TabsTrigger>
-            <TabsTrigger value="enterprise" className="data-[state=active]:bg-purple-600">
+            <TabsTrigger value="enterprise" className="data-[state=active]:bg-green-600">
               <Globe className="h-4 w-4 mr-2" />
               Enterprise
+            </TabsTrigger>
+            <TabsTrigger value="advanced-analytics" className="data-[state=active]:bg-purple-600">
+              <BarChart3 className="h-4 w-4 mr-2" />
+              Analytics
+            </TabsTrigger>
+            <TabsTrigger value="group-analysis" className="data-[state=active]:bg-purple-600">
+              <Users className="h-4 w-4 mr-2" />
+              Group Analysis
             </TabsTrigger>
             <TabsTrigger value="pricing" className="data-[state=active]:bg-purple-600">
               <DollarSign className="h-4 w-4 mr-2" />
               Pricing
             </TabsTrigger>
+            <TabsTrigger value="real-time" className="data-[state=active]:bg-purple-600">
+              <Activity className="h-4 w-4 mr-2" />
+              Real-time
+            </TabsTrigger>
+          </TabsList>
+
+          {/* Secondary Tabs - Additional Features */}
+          <TabsList className="grid w-full grid-cols-6 bg-slate-800/30 mb-6">
             <TabsTrigger value="collection" className="data-[state=active]:bg-purple-600">
               <Upload className="h-4 w-4 mr-2" />
               Collection
@@ -669,10 +678,6 @@ export default function FlutterAIDashboard() {
             <TabsTrigger value="analysis" className="data-[state=active]:bg-purple-600">
               <Brain className="h-4 w-4 mr-2" />
               Analysis
-            </TabsTrigger>
-            <TabsTrigger value="group-analysis" className="data-[state=active]:bg-purple-600">
-              <Users className="h-4 w-4 mr-2" />
-              Group Analysis
             </TabsTrigger>
             <TabsTrigger value="wallets" className="data-[state=active]:bg-purple-600">
               <Wallet className="h-4 w-4 mr-2" />
