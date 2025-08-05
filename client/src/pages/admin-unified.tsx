@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import AdminFeatureToggle from "@/components/AdminFeatureToggle";
 import { Slider } from "@/components/ui/slider";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -1224,6 +1225,7 @@ export default function UnifiedAdminDashboard() {
                   <SelectItem value="viral">🚀 Viral</SelectItem>
                   <SelectItem value="realtime">📡 Live</SelectItem>
                   <SelectItem value="api-monetization">💰 API $</SelectItem>
+                  <SelectItem value="features">🎛️ Features</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -1375,6 +1377,13 @@ export default function UnifiedAdminDashboard() {
             >
               <DollarSign className="w-4 h-4" />
               <span className="hidden sm:inline">API $</span>
+            </TabsTrigger>
+            <TabsTrigger 
+              value="features" 
+              className="flex-shrink-0 flex items-center gap-2 text-slate-300 font-medium data-[state=active]:text-white data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-600/60 data-[state=active]:to-indigo-600/60 data-[state=active]:shadow-lg hover:text-white hover:bg-slate-700/50 transition-all duration-200 px-4 py-2"
+            >
+              <Settings className="w-4 h-4" />
+              <span className="hidden sm:inline">Features</span>
             </TabsTrigger>
           </TabsList>
           )}
@@ -3021,6 +3030,17 @@ export default function UnifiedAdminDashboard() {
           {/* Wallet Management Tab */}
           <TabsContent value="wallets" className="space-y-6">
             <WalletManagementContent />
+          </TabsContent>
+
+          {/* Feature Toggle Control Tab */}
+          <TabsContent value="features" className="space-y-6">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-2xl font-bold text-white">Feature Toggle Control Center</h2>
+              <Badge className="bg-purple-500/20 text-purple-400 border-purple-500/30">
+                Complete Platform Control
+              </Badge>
+            </div>
+            <AdminFeatureToggle />
           </TabsContent>
 
         </Tabs>

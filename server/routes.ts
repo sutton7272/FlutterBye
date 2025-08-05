@@ -4545,6 +4545,196 @@ export async function registerRoutes(app: Express): Promise<Server> {
   console.log('🎨 Personalized achievements, insights, and recommendations');
   console.log('⭐ Cosmic compatibility matching for social features');
   
+  // ============ FEATURE TOGGLE CONTROL SYSTEM ============
+  console.log('🎛️ Initializing Feature Toggle Control System...');
+  
+  const { FeatureToggleService } = await import('./feature-toggle-service');
+  
+  // Get all features
+  app.get('/api/admin/features', (req, res) => {
+    try {
+      const features = FeatureToggleService.getAllFeatures();
+      res.json(features);
+    } catch (error) {
+      console.error('Error getting features:', error);
+      res.status(500).json({ error: 'Failed to get features' });
+    }
+  });
+  
+  // Get feature statistics
+  app.get('/api/admin/features/stats', (req, res) => {
+    try {
+      const stats = FeatureToggleService.getFeatureStats();
+      res.json(stats);
+    } catch (error) {
+      console.error('Error getting feature stats:', error);
+      res.status(500).json({ error: 'Failed to get feature statistics' });
+    }
+  });
+  
+  // Get features by category
+  app.get('/api/admin/features/category/:category', (req, res) => {
+    try {
+      const { category } = req.params;
+      const features = FeatureToggleService.getFeaturesByCategory(category as any);
+      res.json(features);
+    } catch (error) {
+      console.error('Error getting features by category:', error);
+      res.status(500).json({ error: 'Failed to get features by category' });
+    }
+  });
+  
+  // Toggle feature status
+  app.put('/api/admin/features/:featureId/toggle', (req, res) => {
+    try {
+      const { featureId } = req.params;
+      const { enabled } = req.body;
+      
+      if (typeof enabled !== 'boolean') {
+        return res.status(400).json({ error: 'enabled must be a boolean' });
+      }
+      
+      const success = FeatureToggleService.toggleFeature(featureId, enabled, 'admin');
+      
+      if (success) {
+        res.json({ success: true, message: `Feature ${enabled ? 'enabled' : 'disabled'}` });
+      } else {
+        res.status(404).json({ error: 'Feature not found' });
+      }
+    } catch (error) {
+      console.error('Error toggling feature:', error);
+      res.status(500).json({ error: 'Failed to toggle feature' });
+    }
+  });
+  
+  // Bulk update features
+  app.put('/api/admin/features/bulk-update', (req, res) => {
+    try {
+      const { updates } = req.body;
+      
+      if (!Array.isArray(updates)) {
+        return res.status(400).json({ error: 'updates must be an array' });
+      }
+      
+      const updated = FeatureToggleService.bulkUpdateFeatures(updates, 'admin');
+      res.json({ success: true, updated });
+    } catch (error) {
+      console.error('Error bulk updating features:', error);
+      res.status(500).json({ error: 'Failed to bulk update features' });
+    }
+  });
+  
+  // Create new feature
+  app.post('/api/admin/features', (req, res) => {
+    try {
+      const feature = req.body;
+      
+      if (!feature.id || !feature.name || !feature.category) {
+        return res.status(400).json({ error: 'id, name, and category are required' });
+      }
+      
+      const success = FeatureToggleService.createFeature(feature);
+      
+      if (success) {
+        res.json({ success: true, message: 'Feature created successfully' });
+      } else {
+        res.status(409).json({ error: 'Feature with this ID already exists' });
+      }
+    } catch (error) {
+      console.error('Error creating feature:', error);
+      res.status(500).json({ error: 'Failed to create feature' });
+    }
+  });
+  
+  // Update feature configuration
+  app.put('/api/admin/features/:featureId', (req, res) => {
+    try {
+      const { featureId } = req.params;
+      const updates = req.body;
+      
+      const success = FeatureToggleService.updateFeature(featureId, updates, 'admin');
+      
+      if (success) {
+        res.json({ success: true, message: 'Feature updated successfully' });
+      } else {
+        res.status(404).json({ error: 'Feature not found' });
+      }
+    } catch (error) {
+      console.error('Error updating feature:', error);
+      res.status(500).json({ error: 'Failed to update feature' });
+    }
+  });
+  
+  // Delete feature
+  app.delete('/api/admin/features/:featureId', (req, res) => {
+    try {
+      const { featureId } = req.params;
+      const success = FeatureToggleService.deleteFeature(featureId);
+      
+      if (success) {
+        res.json({ success: true, message: 'Feature deleted successfully' });
+      } else {
+        res.status(404).json({ error: 'Feature not found' });
+      }
+    } catch (error) {
+      console.error('Error deleting feature:', error);
+      res.status(500).json({ error: 'Failed to delete feature' });
+    }
+  });
+  
+  // Export feature configuration
+  app.get('/api/admin/features/export', (req, res) => {
+    try {
+      const config = FeatureToggleService.exportConfiguration();
+      res.json(config);
+    } catch (error) {
+      console.error('Error exporting configuration:', error);
+      res.status(500).json({ error: 'Failed to export configuration' });
+    }
+  });
+  
+  // Import feature configuration
+  app.post('/api/admin/features/import', (req, res) => {
+    try {
+      const config = req.body;
+      const imported = FeatureToggleService.importConfiguration(config);
+      res.json({ success: true, imported });
+    } catch (error) {
+      console.error('Error importing configuration:', error);
+      res.status(500).json({ error: 'Failed to import configuration' });
+    }
+  });
+  
+  // Check if feature is enabled (public endpoint)
+  app.get('/api/features/:featureId/enabled', (req, res) => {
+    try {
+      const { featureId } = req.params;
+      const enabled = FeatureToggleService.isFeatureEnabled(featureId);
+      res.json({ enabled });
+    } catch (error) {
+      console.error('Error checking feature status:', error);
+      res.status(500).json({ error: 'Failed to check feature status' });
+    }
+  });
+  
+  // Get enabled navigation items (public endpoint)
+  app.get('/api/features/navigation', (req, res) => {
+    try {
+      const navItems = FeatureToggleService.getEnabledNavItems();
+      const routes = FeatureToggleService.getEnabledRoutes();
+      res.json({ navItems, routes });
+    } catch (error) {
+      console.error('Error getting navigation items:', error);
+      res.status(500).json({ error: 'Failed to get navigation items' });
+    }
+  });
+  
+  console.log('✅ Feature Toggle Control System activated!');
+  console.log('🎛️ Complete control over all platform features');
+  console.log('🔒 Admin-controlled feature activation/deactivation');
+  console.log('📊 Real-time feature statistics and management');
+  
+  // ============ END FEATURE TOGGLE SYSTEM ============
   // ============ END CELESTIAL PERSONALIZATION ============
   // ============ END ENTERPRISE/GOVERNMENT ROUTES ============
   
