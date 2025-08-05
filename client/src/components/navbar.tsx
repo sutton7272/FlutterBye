@@ -3,7 +3,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { WalletConnect } from "@/components/wallet-connect";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { Menu, Home, Coins, Trophy, Users, MessageSquare, Settings, Sparkles, Zap, Heart, Building2, MapPin, Activity, Gift, Award, Star, Ticket, HelpCircle, LayoutDashboard, Brain, CreditCard, Stars, DollarSign, Code2, Rocket, ArrowRightLeft } from "lucide-react";
+import { Menu, Home, Coins, Trophy, Users, MessageSquare, Settings, Sparkles, Zap, Heart, Building2, MapPin, Activity, Gift, Award, Star, Ticket, HelpCircle, LayoutDashboard, Brain, CreditCard, Stars, DollarSign, Code2, Rocket, ArrowRightLeft, Target } from "lucide-react";
 import solviturLogo from "@assets/65d9f126-64e6-4e25-9a10-d3d64807b991_1754352528946.png";
 import { useFeatureToggles } from "@/hooks/useFeatureToggles";
 import { MobileNavigation } from "@/components/mobile-navigation";
@@ -46,6 +46,7 @@ export default function Navbar() {
   // Secondary navigation for additional features - prioritize revenue dashboards
   const secondaryNavItems = [
     { href: "/production-deployment", label: "Production", icon: Rocket, description: "Enterprise deployment & MainNet", priority: true },
+    { href: "/production-readiness", label: "Readiness", icon: Target, description: "Production readiness assessment", priority: true },
     { href: "/dual-environment", label: "Environment", icon: ArrowRightLeft, description: "DevNet/MainNet dual setup", priority: true },
     { href: "/enterprise-sales", label: "Sales", icon: Building2, description: "$5M-$50M sales pipeline", priority: true },
     { href: "/api-monetization", label: "API", icon: Code2, description: "$347K monthly API revenue", priority: true },
