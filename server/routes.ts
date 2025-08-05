@@ -4628,6 +4628,69 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Prepare burn transaction for client signing
+  app.post('/api/tokens/:tokenId/prepare-burn', async (req, res) => {
+    try {
+      console.log(`🔥 Preparing burn transaction for token ${req.params.tokenId}`);
+      
+      const { burnerWallet, recipientWallet } = req.body;
+      
+      if (!burnerWallet || !recipientWallet) {
+        return res.status(400).json({
+          success: false,
+          error: 'Burner wallet and recipient wallet are required'
+        });
+      }
+
+      // For now, return a success response - full implementation pending wallet adapter installation
+      res.json({
+        success: true,
+        message: 'Burn transaction prepared - wallet integration in progress',
+        tokenId: req.params.tokenId,
+        burnerWallet,
+        recipientWallet
+      });
+    } catch (error: any) {
+      console.error('Prepare burn transaction error:', error);
+      res.status(500).json({
+        success: false,
+        error: `Failed to prepare burn transaction: ${error.message}`
+      });
+    }
+  });
+
+  // Confirm burn transaction after client signing
+  app.post('/api/tokens/:tokenId/confirm-burn', async (req, res) => {
+    try {
+      console.log(`🔥 Confirming burn transaction for token ${req.params.tokenId}`);
+      
+      const { signature, burnerWallet, recipientWallet } = req.body;
+      
+      if (!signature || !burnerWallet || !recipientWallet) {
+        return res.status(400).json({
+          success: false,
+          error: 'Signature, burner wallet, and recipient wallet are required'
+        });
+      }
+
+      // For now, return a success response - full implementation pending wallet adapter installation
+      res.json({
+        success: true,
+        message: 'Burn transaction confirmed - wallet integration in progress',
+        tokenId: req.params.tokenId,
+        signature,
+        burnerWallet,
+        recipientWallet
+      });
+    } catch (error: any) {
+      console.error('Confirm burn redemption error:', error);
+      res.status(500).json({
+        success: false,
+        error: `Failed to confirm burn redemption: ${error.message}`
+      });
+    }
+  });
+
   // Transfer token between wallets
   app.post('/api/tokens/:tokenId/transfer', async (req, res) => {
     try {
