@@ -67,14 +67,16 @@ import RevolutionaryAIShowcase from "@/pages/revolutionary-ai-showcase";
 import AIFeaturesTest from "@/pages/ai-features-test";
 import DynamicPricingDashboard from "@/pages/dynamic-pricing-dashboard";
 import Navbar from "@/components/navbar";
+import Footer from "@/components/footer";
 import { PersonalizedDashboard } from "@/components/PersonalizedDashboard";
 
 import { WalletProvider } from "@/components/wallet-adapter";
 import { TestImage } from "@/components/test-image";
 function Router() {
   return (
-    <div className="dark min-h-screen" style={{ background: 'transparent' }}>
-      <Switch>
+    <div className="dark min-h-screen flex flex-col" style={{ background: 'transparent' }}>
+      <div className="flex-1">
+        <Switch>
         <Route path="/" component={LaunchCountdown} />
         <Route path="/launch" component={LaunchCountdown} />
         
@@ -457,7 +459,9 @@ function Router() {
           </>
         )} />
         <Route component={NotFound} />
-      </Switch>
+        </Switch>
+      </div>
+      <Footer />
     </div>
   );
 }
