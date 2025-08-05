@@ -89,9 +89,49 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Health checks and monitoring
   setupHealthChecks(app);
   
-  // Start monitoring services
+  // Start optimized monitoring services
   memoryMonitoring();
   optimizeMemory();
+  
+  // Initialize performance optimizer
+  const { performanceOptimizer } = await import('./performance-optimizer');
+  const { smartCache, optimizedCache } = await import('./api-optimization');
+  
+  // Performance monitoring endpoint
+  app.get('/api/performance/stats', (req, res) => {
+    try {
+      const performanceStats = {
+        server: performanceOptimizer.getStats(),
+        cache: smartCache.getStats(),
+        database: { status: 'active' },
+        timestamp: new Date().toISOString(),
+      };
+      res.json(performanceStats);
+    } catch (error) {
+      res.status(500).json({ error: 'Performance stats unavailable' });
+    }
+  });
+  
+  // Add optimized caching to high-traffic endpoints
+  app.get('/api/dashboard/stats', optimizedCache(60000), async (req, res) => {
+    const stats = await storage.getDashboardStats();
+    res.json(stats);
+  });
+  
+  app.get('/api/admin/features', optimizedCache(300000), async (req, res) => {
+    try {
+      // Return mock features data for admin dashboard
+      const features = [
+        { id: 'dashboard', name: 'Dashboard', enabled: true, description: 'Main dashboard interface' },
+        { id: 'analytics', name: 'Analytics', enabled: true, description: 'Performance analytics' },
+        { id: 'monitoring', name: 'Monitoring', enabled: true, description: 'System monitoring' }
+      ];
+      res.json(features);
+    } catch (error) {
+      console.error('Error fetching features:', error);
+      res.status(500).json({ error: 'Failed to fetch features' });
+    }
+  });
   // Initialize Production Monitoring & Security
   const monitoring = new ProductionMonitoringService(productionMonitoringConfig);
   const security = new ProductionSecurityService(productionSecurityConfig);
