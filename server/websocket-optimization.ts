@@ -1,573 +1,477 @@
-// WebSocket Connection Optimization for Production
-import WebSocket from 'ws';
-import { EventEmitter } from 'events';
+import { WebSocketServer, WebSocket } from 'ws';
+import { IncomingMessage } from 'http';
+import { Server } from 'http';
 
-export interface WebSocketConfig {
-  maxConnections: number;
-  heartbeatInterval: number;
-  reconnectInterval: number;
-  maxReconnectAttempts: number;
-  connectionTimeout: number;
-  messageQueueSize: number;
-  healthCheckInterval: number;
+export interface WebSocketMessage {
+  type: string;
+  data: any;
+  timestamp: number;
+  id: string;
 }
 
 export interface ConnectionHealth {
-  isHealthy: boolean;
-  latency: number;
-  uptime: number;
+  id: string;
+  status: 'connected' | 'connecting' | 'disconnected';
+  lastPing: number;
+  lastPong: number;
   messagesSent: number;
   messagesReceived: number;
-  reconnectCount: number;
-  lastError?: string;
+  connectionTime: number;
+  errors: number;
 }
 
-// Production WebSocket Configuration
-export const PRODUCTION_WEBSOCKET_CONFIG: WebSocketConfig = {
-  maxConnections: 10000,
-  heartbeatInterval: 30000,    // 30 seconds
-  reconnectInterval: 1000,     // Start with 1 second
-  maxReconnectAttempts: 10,
-  connectionTimeout: 10000,    // 10 seconds
-  messageQueueSize: 1000,
-  healthCheckInterval: 60000   // 1 minute
-};
+export interface WebSocketConfig {
+  maxConnections: number;
+  pingInterval: number;
+  pongTimeout: number;
+  messageQueueSize: number;
+  reconnectInterval: number;
+  maxReconnectAttempts: number;
+  compressionEnabled: boolean;
+  heartbeatEnabled: boolean;
+}
 
-export class OptimizedWebSocketConnection extends EventEmitter {
-  private ws: WebSocket | null = null;
-  private url: string;
-  private config: WebSocketConfig;
-  private isConnecting: boolean = false;
-  private reconnectAttempts: number = 0;
-  private heartbeatTimer: NodeJS.Timeout | null = null;
-  private healthCheckTimer: NodeJS.Timeout | null = null;
-  private connectionStartTime: number = 0;
-  private messageQueue: string[] = [];
-  private health: ConnectionHealth;
+export class WebSocketOptimizationService {
+  private wss: WebSocketServer | null = null;
+  private connections: Map<string, WebSocket> = new Map();
+  private connectionHealth: Map<string, ConnectionHealth> = new Map();
+  private messageQueue: Map<string, WebSocketMessage[]> = new Map();
+  private pingIntervals: Map<string, NodeJS.Timeout> = new Map();
 
-  constructor(url: string, config: WebSocketConfig = PRODUCTION_WEBSOCKET_CONFIG) {
-    super();
-    this.url = url;
-    this.config = config;
-    this.health = {
-      isHealthy: false,
-      latency: 0,
-      uptime: 0,
-      messagesSent: 0,
-      messagesReceived: 0,
-      reconnectCount: 0
-    };
+  // Production WebSocket Configuration
+  public readonly PRODUCTION_WEBSOCKET_CONFIG: WebSocketConfig = {
+    maxConnections: 10000,           // Support up to 10K concurrent connections
+    pingInterval: 30000,             // Ping every 30 seconds
+    pongTimeout: 5000,               // Wait 5 seconds for pong response
+    messageQueueSize: 100,           // Queue up to 100 messages per connection
+    reconnectInterval: 1000,         // Start reconnection after 1 second
+    maxReconnectAttempts: 5,         // Try up to 5 reconnection attempts
+    compressionEnabled: true,        // Enable compression for large messages
+    heartbeatEnabled: true           // Enable heartbeat for connection health
+  };
+
+  constructor() {
+    this.setupOptimizations();
   }
 
-  // Connect with enhanced error handling and retry logic
-  async connect(): Promise<void> {
-    if (this.isConnecting || (this.ws && this.ws.readyState === WebSocket.OPEN)) {
-      return;
-    }
-
-    this.isConnecting = true;
-    this.connectionStartTime = Date.now();
-
-    try {
-      console.log(`🚀 Connecting to WebSocket: ${this.url}`);
-      
-      this.ws = new WebSocket(this.url, {
-        handshakeTimeout: this.config.connectionTimeout,
-        perMessageDeflate: true,
-        maxPayload: 1024 * 1024 // 1MB max message size
-      });
-
-      this.setupEventHandlers();
-      
-      // Connection timeout
-      const connectionTimeout = setTimeout(() => {
-        if (this.ws && this.ws.readyState !== WebSocket.OPEN) {
-          this.ws.terminate();
-          this.handleConnectionError(new Error('Connection timeout'));
+  // Initialize WebSocket server with optimizations
+  initializeServer(server: Server): WebSocketServer {
+    this.wss = new WebSocketServer({
+      server,
+      path: '/ws',
+      perMessageDeflate: this.PRODUCTION_WEBSOCKET_CONFIG.compressionEnabled ? {
+        zlibDeflateOptions: {
+          level: 6,
+          chunkSize: 1024
         }
-      }, this.config.connectionTimeout);
+      } : false,
+      maxPayload: 16 * 1024, // 16KB max message size
+      clientTracking: true,
+      verifyClient: (info) => this.verifyClient(info)
+    });
 
-      this.ws.addEventListener('open', () => {
-        clearTimeout(connectionTimeout);
-        this.onConnected();
-      });
+    this.setupConnectionHandlers();
+    this.startHealthMonitoring();
 
-    } catch (error) {
-      this.isConnecting = false;
-      this.handleConnectionError(error as Error);
-    }
+    console.log('🚀 WebSocket server initialized with production optimizations');
+    return this.wss;
   }
 
-  // Enhanced event handler setup
-  private setupEventHandlers(): void {
-    if (!this.ws) return;
-
-    this.ws.addEventListener('open', () => this.onConnected());
-    this.ws.addEventListener('close', (event) => this.onDisconnected(event));
-    this.ws.addEventListener('error', (error) => this.onError(error));
-    this.ws.addEventListener('message', (event) => this.onMessage(event));
-  }
-
-  // Connection established
-  private onConnected(): void {
-    this.isConnecting = false;
-    this.reconnectAttempts = 0;
-    this.health.isHealthy = true;
-    this.health.uptime = Date.now() - this.connectionStartTime;
-    
-    console.log('✅ WebSocket connected successfully');
-    this.emit('connected');
-    
-    this.startHeartbeat();
-    this.startHealthCheck();
-    this.processMessageQueue();
-  }
-
-  // Connection lost
-  private onDisconnected(event: WebSocket.CloseEvent): void {
-    this.cleanup();
-    this.health.isHealthy = false;
-    
-    console.log(`🔌 WebSocket disconnected: ${event.code} ${event.reason}`);
-    this.emit('disconnected', event.code, event.reason);
-    
-    // Attempt reconnection if not intentionally closed
-    if (event.code !== 1000 && this.reconnectAttempts < this.config.maxReconnectAttempts) {
-      this.scheduleReconnect();
-    }
-  }
-
-  // Error handling
-  private onError(error: Event): void {
-    const errorMessage = `WebSocket error: ${error.type}`;
-    this.health.lastError = errorMessage;
-    
-    console.error('❌ WebSocket error:', error);
-    this.emit('error', error);
-  }
-
-  // Message received
-  private onMessage(event: WebSocket.MessageEvent): void {
-    this.health.messagesReceived++;
-    
-    try {
-      const data = JSON.parse(event.data.toString());
+  // Setup production optimizations
+  private setupOptimizations(): void {
+    // Set process-level optimizations
+    if (process.env.NODE_ENV === 'production') {
+      process.setMaxListeners(20); // Increase event listener limit
       
-      // Handle heartbeat pong
-      if (data.type === 'pong') {
-        this.health.latency = Date.now() - data.timestamp;
-        return;
+      // Set memory limits for WebSocket operations
+      if (global.gc) {
+        setInterval(() => {
+          global.gc();
+        }, 300000); // Run garbage collection every 5 minutes
       }
+    }
+  }
+
+  // Verify client connections for security
+  private verifyClient(info: { req: IncomingMessage; secure: boolean }): boolean {
+    // Check connection limits
+    if (this.connections.size >= this.PRODUCTION_WEBSOCKET_CONFIG.maxConnections) {
+      console.warn('🚫 WebSocket connection rejected: Maximum connections reached');
+      return false;
+    }
+
+    // Verify origin in production
+    if (process.env.NODE_ENV === 'production') {
+      const origin = info.req.headers.origin;
+      const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(',') || [];
       
-      this.emit('message', data);
-    } catch (error) {
-      console.error('❌ Error parsing WebSocket message:', error);
-    }
-  }
-
-  // Enhanced reconnection with exponential backoff
-  private scheduleReconnect(): void {
-    this.reconnectAttempts++;
-    this.health.reconnectCount++;
-    
-    // Exponential backoff with jitter
-    const baseDelay = this.config.reconnectInterval;
-    const exponentialDelay = baseDelay * Math.pow(2, Math.min(this.reconnectAttempts - 1, 6));
-    const jitter = Math.random() * 1000; // Add jitter to prevent thundering herd
-    const delay = Math.min(exponentialDelay + jitter, 30000); // Max 30 seconds
-    
-    console.log(`🔄 Attempting to reconnect in ${Math.round(delay)}ms (attempt ${this.reconnectAttempts}/${this.config.maxReconnectAttempts})`);
-    
-    setTimeout(() => {
-      if (this.reconnectAttempts <= this.config.maxReconnectAttempts) {
-        this.connect();
-      }
-    }, delay);
-  }
-
-  // Connection error handling
-  private handleConnectionError(error: Error): void {
-    this.isConnecting = false;
-    this.health.lastError = error.message;
-    
-    console.error('❌ WebSocket connection error:', error.message);
-    this.emit('error', error);
-    
-    if (this.reconnectAttempts < this.config.maxReconnectAttempts) {
-      this.scheduleReconnect();
-    }
-  }
-
-  // Send message with queue fallback
-  send(data: any): boolean {
-    const message = JSON.stringify(data);
-    
-    if (this.ws && this.ws.readyState === WebSocket.OPEN) {
-      try {
-        this.ws.send(message);
-        this.health.messagesSent++;
-        return true;
-      } catch (error) {
-        console.error('❌ Error sending WebSocket message:', error);
-        this.queueMessage(message);
+      if (origin && allowedOrigins.length > 0 && !allowedOrigins.includes(origin)) {
+        console.warn(`🚫 WebSocket connection rejected: Invalid origin ${origin}`);
         return false;
       }
-    } else {
-      this.queueMessage(message);
+    }
+
+    return true;
+  }
+
+  // Setup connection event handlers
+  private setupConnectionHandlers(): void {
+    if (!this.wss) return;
+
+    this.wss.on('connection', (ws: WebSocket, req: IncomingMessage) => {
+      const connectionId = this.generateConnectionId();
+      
+      // Store connection
+      this.connections.set(connectionId, ws);
+      this.messageQueue.set(connectionId, []);
+      
+      // Initialize connection health tracking
+      this.connectionHealth.set(connectionId, {
+        id: connectionId,
+        status: 'connected',
+        lastPing: Date.now(),
+        lastPong: Date.now(),
+        messagesSent: 0,
+        messagesReceived: 0,
+        connectionTime: Date.now(),
+        errors: 0
+      });
+
+      // Setup heartbeat
+      if (this.PRODUCTION_WEBSOCKET_CONFIG.heartbeatEnabled) {
+        this.startHeartbeat(connectionId, ws);
+      }
+
+      // Handle incoming messages
+      ws.on('message', (data: Buffer) => {
+        this.handleMessage(connectionId, data);
+      });
+
+      // Handle connection close
+      ws.on('close', (code: number, reason: Buffer) => {
+        this.handleDisconnection(connectionId, code, reason);
+      });
+
+      // Handle errors
+      ws.on('error', (error: Error) => {
+        this.handleError(connectionId, error);
+      });
+
+      // Handle pong responses
+      ws.on('pong', () => {
+        this.handlePong(connectionId);
+      });
+
+      console.log(`🔌 WebSocket client connected: ${connectionId} (${this.connections.size} total)`);
+      
+      // Send welcome message
+      this.sendMessage(connectionId, {
+        type: 'connection',
+        data: { 
+          connectionId, 
+          status: 'connected',
+          config: {
+            pingInterval: this.PRODUCTION_WEBSOCKET_CONFIG.pingInterval,
+            compressionEnabled: this.PRODUCTION_WEBSOCKET_CONFIG.compressionEnabled
+          }
+        },
+        timestamp: Date.now(),
+        id: this.generateMessageId()
+      });
+    });
+
+    this.wss.on('error', (error: Error) => {
+      console.error('🚨 WebSocket server error:', error);
+    });
+  }
+
+  // Start heartbeat for connection health monitoring
+  private startHeartbeat(connectionId: string, ws: WebSocket): void {
+    const interval = setInterval(() => {
+      if (ws.readyState === WebSocket.OPEN) {
+        const health = this.connectionHealth.get(connectionId);
+        if (health) {
+          const now = Date.now();
+          
+          // Check if pong was received within timeout
+          if (now - health.lastPong > this.PRODUCTION_WEBSOCKET_CONFIG.pongTimeout) {
+            console.warn(`💔 WebSocket heartbeat timeout: ${connectionId}`);
+            ws.terminate();
+            return;
+          }
+
+          // Send ping
+          ws.ping();
+          health.lastPing = now;
+          this.connectionHealth.set(connectionId, health);
+        }
+      } else {
+        clearInterval(interval);
+        this.pingIntervals.delete(connectionId);
+      }
+    }, this.PRODUCTION_WEBSOCKET_CONFIG.pingInterval);
+
+    this.pingIntervals.set(connectionId, interval);
+  }
+
+  // Handle incoming messages with queuing
+  private handleMessage(connectionId: string, data: Buffer): void {
+    try {
+      const message = JSON.parse(data.toString()) as WebSocketMessage;
+      
+      // Update connection health
+      const health = this.connectionHealth.get(connectionId);
+      if (health) {
+        health.messagesReceived++;
+        this.connectionHealth.set(connectionId, health);
+      }
+
+      // Process message based on type
+      switch (message.type) {
+        case 'ping':
+          this.sendMessage(connectionId, {
+            type: 'pong',
+            data: { timestamp: Date.now() },
+            timestamp: Date.now(),
+            id: this.generateMessageId()
+          });
+          break;
+
+        case 'subscribe':
+          this.handleSubscription(connectionId, message.data);
+          break;
+
+        case 'unsubscribe':
+          this.handleUnsubscription(connectionId, message.data);
+          break;
+
+        default:
+          console.log(`📨 WebSocket message received: ${message.type} from ${connectionId}`);
+      }
+
+    } catch (error) {
+      console.error(`🚨 WebSocket message parsing error for ${connectionId}:`, error);
+      this.handleError(connectionId, error as Error);
+    }
+  }
+
+  // Handle pong responses
+  private handlePong(connectionId: string): void {
+    const health = this.connectionHealth.get(connectionId);
+    if (health) {
+      health.lastPong = Date.now();
+      this.connectionHealth.set(connectionId, health);
+    }
+  }
+
+  // Handle connection errors
+  private handleError(connectionId: string, error: Error): void {
+    console.error(`🚨 WebSocket error for ${connectionId}:`, error);
+    
+    const health = this.connectionHealth.get(connectionId);
+    if (health) {
+      health.errors++;
+      this.connectionHealth.set(connectionId, health);
+    }
+  }
+
+  // Handle client disconnection
+  private handleDisconnection(connectionId: string, code: number, reason: Buffer): void {
+    console.log(`🔌 WebSocket client disconnected: ${connectionId} (code: ${code}, reason: ${reason})`);
+    
+    // Cleanup connection
+    this.connections.delete(connectionId);
+    this.messageQueue.delete(connectionId);
+    this.connectionHealth.delete(connectionId);
+    
+    // Clear ping interval
+    const interval = this.pingIntervals.get(connectionId);
+    if (interval) {
+      clearInterval(interval);
+      this.pingIntervals.delete(connectionId);
+    }
+  }
+
+  // Send message with queuing and retry logic
+  sendMessage(connectionId: string, message: WebSocketMessage): boolean {
+    const ws = this.connections.get(connectionId);
+    if (!ws || ws.readyState !== WebSocket.OPEN) {
+      // Queue message for later delivery
+      this.queueMessage(connectionId, message);
+      return false;
+    }
+
+    try {
+      ws.send(JSON.stringify(message));
+      
+      // Update connection health
+      const health = this.connectionHealth.get(connectionId);
+      if (health) {
+        health.messagesSent++;
+        this.connectionHealth.set(connectionId, health);
+      }
+
+      return true;
+    } catch (error) {
+      console.error(`🚨 Failed to send WebSocket message to ${connectionId}:`, error);
+      this.queueMessage(connectionId, message);
       return false;
     }
   }
 
-  // Queue message for later delivery
-  private queueMessage(message: string): void {
-    if (this.messageQueue.length < this.config.messageQueueSize) {
-      this.messageQueue.push(message);
-    } else {
-      // Remove oldest message if queue is full
-      this.messageQueue.shift();
-      this.messageQueue.push(message);
-      console.warn('⚠️ WebSocket message queue is full, removing oldest message');
-    }
-  }
-
-  // Process queued messages
-  private processMessageQueue(): void {
-    while (this.messageQueue.length > 0 && this.ws && this.ws.readyState === WebSocket.OPEN) {
-      const message = this.messageQueue.shift();
-      if (message) {
-        try {
-          this.ws.send(message);
-          this.health.messagesSent++;
-        } catch (error) {
-          console.error('❌ Error sending queued message:', error);
-          // Put message back at front of queue
-          this.messageQueue.unshift(message);
-          break;
-        }
-      }
-    }
-  }
-
-  // Start heartbeat to keep connection alive
-  private startHeartbeat(): void {
-    this.heartbeatTimer = setInterval(() => {
-      if (this.ws && this.ws.readyState === WebSocket.OPEN) {
-        this.send({
-          type: 'ping',
-          timestamp: Date.now()
-        });
-      }
-    }, this.config.heartbeatInterval);
-  }
-
-  // Start periodic health checks
-  private startHealthCheck(): void {
-    this.healthCheckTimer = setInterval(() => {
-      this.updateHealthMetrics();
-      this.emit('health', this.getHealth());
-    }, this.config.healthCheckInterval);
-  }
-
-  // Update health metrics
-  private updateHealthMetrics(): void {
-    if (this.connectionStartTime > 0) {
-      this.health.uptime = Date.now() - this.connectionStartTime;
+  // Queue message for delivery when connection is restored
+  private queueMessage(connectionId: string, message: WebSocketMessage): void {
+    const queue = this.messageQueue.get(connectionId) || [];
+    
+    // Respect queue size limit
+    if (queue.length >= this.PRODUCTION_WEBSOCKET_CONFIG.messageQueueSize) {
+      queue.shift(); // Remove oldest message
     }
     
-    this.health.isHealthy = this.ws !== null && 
-                           this.ws.readyState === WebSocket.OPEN &&
-                           this.health.latency < 5000; // Consider unhealthy if latency > 5s
+    queue.push(message);
+    this.messageQueue.set(connectionId, queue);
   }
 
-  // Get current connection health
-  getHealth(): ConnectionHealth {
-    return { ...this.health };
-  }
+  // Process queued messages when connection is restored
+  private processQueuedMessages(connectionId: string): void {
+    const queue = this.messageQueue.get(connectionId);
+    if (!queue || queue.length === 0) return;
 
-  // Cleanup resources
-  private cleanup(): void {
-    if (this.heartbeatTimer) {
-      clearInterval(this.heartbeatTimer);
-      this.heartbeatTimer = null;
-    }
-    
-    if (this.healthCheckTimer) {
-      clearInterval(this.healthCheckTimer);
-      this.healthCheckTimer = null;
-    }
-  }
-
-  // Graceful disconnect
-  disconnect(): void {
-    this.reconnectAttempts = this.config.maxReconnectAttempts; // Prevent reconnection
-    this.cleanup();
-    
-    if (this.ws) {
-      this.ws.close(1000, 'Client disconnecting');
-      this.ws = null;
-    }
-  }
-
-  // Get connection status
-  isConnected(): boolean {
-    return this.ws !== null && this.ws.readyState === WebSocket.OPEN;
-  }
-
-  // Get queued message count
-  getQueuedMessageCount(): number {
-    return this.messageQueue.length;
-  }
-}
-
-// WebSocket Server Optimization
-export class OptimizedWebSocketServer extends EventEmitter {
-  private wss: WebSocket.Server;
-  private connections: Map<string, WebSocket> = new Map();
-  private connectionHealth: Map<string, ConnectionHealth> = new Map();
-  private config: WebSocketConfig;
-
-  constructor(server: any, config: WebSocketConfig = PRODUCTION_WEBSOCKET_CONFIG) {
-    super();
-    this.config = config;
-    
-    this.wss = new WebSocket.Server({
-      server,
-      path: '/ws',
-      perMessageDeflate: true,
-      maxPayload: 1024 * 1024, // 1MB max message size
-      clientTracking: true
-    });
-
-    this.setupServerHandlers();
-    this.startHealthMonitoring();
-  }
-
-  private setupServerHandlers(): void {
-    this.wss.on('connection', (ws, request) => {
-      const connectionId = this.generateConnectionId();
-      const clientIP = request.socket.remoteAddress || 'unknown';
-      
-      console.log(`🔗 New WebSocket connection: ${connectionId} from ${clientIP}`);
-      
-      // Check connection limits
-      if (this.connections.size >= this.config.maxConnections) {
-        console.warn(`⚠️ Connection limit reached (${this.config.maxConnections}), rejecting new connection`);
-        ws.close(1013, 'Server overloaded');
-        return;
-      }
-
-      this.connections.set(connectionId, ws);
-      this.connectionHealth.set(connectionId, {
-        isHealthy: true,
-        latency: 0,
-        uptime: Date.now(),
-        messagesSent: 0,
-        messagesReceived: 0,
-        reconnectCount: 0
-      });
-
-      this.setupConnectionHandlers(ws, connectionId);
-    });
-
-    this.wss.on('error', (error) => {
-      console.error('❌ WebSocket server error:', error);
-      this.emit('error', error);
-    });
-  }
-
-  private setupConnectionHandlers(ws: WebSocket, connectionId: string): void {
-    ws.on('message', (message) => {
-      const health = this.connectionHealth.get(connectionId);
-      if (health) {
-        health.messagesReceived++;
-      }
-
-      try {
-        const data = JSON.parse(message.toString());
-        this.handleMessage(connectionId, data);
-      } catch (error) {
-        console.error(`❌ Error parsing message from ${connectionId}:`, error);
-      }
-    });
-
-    ws.on('close', (code, reason) => {
-      console.log(`🔌 WebSocket disconnected: ${connectionId} (${code} ${reason})`);
-      this.connections.delete(connectionId);
-      this.connectionHealth.delete(connectionId);
-    });
-
-    ws.on('error', (error) => {
-      console.error(`❌ WebSocket error for ${connectionId}:`, error);
-      const health = this.connectionHealth.get(connectionId);
-      if (health) {
-        health.lastError = error.message;
-        health.isHealthy = false;
-      }
-    });
-
-    // Send welcome message
-    this.sendToConnection(connectionId, {
-      type: 'welcome',
-      connectionId,
-      timestamp: Date.now()
-    });
-  }
-
-  private handleMessage(connectionId: string, data: any): void {
-    if (data.type === 'ping') {
-      // Respond to ping with pong
-      this.sendToConnection(connectionId, {
-        type: 'pong',
-        timestamp: data.timestamp
-      });
-      return;
-    }
-
-    this.emit('message', connectionId, data);
-  }
-
-  // Send message to specific connection
-  sendToConnection(connectionId: string, data: any): boolean {
     const ws = this.connections.get(connectionId);
-    if (ws && ws.readyState === WebSocket.OPEN) {
-      try {
-        ws.send(JSON.stringify(data));
-        
-        const health = this.connectionHealth.get(connectionId);
-        if (health) {
-          health.messagesSent++;
-        }
-        
-        return true;
-      } catch (error) {
-        console.error(`❌ Error sending message to ${connectionId}:`, error);
-        return false;
+    if (!ws || ws.readyState !== WebSocket.OPEN) return;
+
+    // Send all queued messages
+    while (queue.length > 0) {
+      const message = queue.shift();
+      if (message && !this.sendMessage(connectionId, message)) {
+        // If sending fails, put message back at front of queue
+        queue.unshift(message);
+        break;
       }
     }
-    return false;
   }
 
-  // Broadcast message to all connections
-  broadcast(data: any, excludeConnectionId?: string): number {
-    const message = JSON.stringify(data);
-    let sentCount = 0;
-
-    for (const [connectionId, ws] of this.connections) {
-      if (excludeConnectionId && connectionId === excludeConnectionId) {
-        continue;
-      }
-
-      if (ws.readyState === WebSocket.OPEN) {
-        try {
-          ws.send(message);
-          sentCount++;
-          
-          const health = this.connectionHealth.get(connectionId);
-          if (health) {
-            health.messagesSent++;
-          }
-        } catch (error) {
-          console.error(`❌ Error broadcasting to ${connectionId}:`, error);
-        }
-      }
+  // Broadcast message to all connected clients
+  broadcast(message: WebSocketMessage): void {
+    for (const [connectionId] of this.connections) {
+      this.sendMessage(connectionId, message);
     }
-
-    return sentCount;
   }
 
-  // Generate unique connection ID
-  private generateConnectionId(): string {
-    return `conn_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+  // Broadcast to specific group of connections
+  broadcastToGroup(connectionIds: string[], message: WebSocketMessage): void {
+    for (const connectionId of connectionIds) {
+      this.sendMessage(connectionId, message);
+    }
+  }
+
+  // Handle subscription management
+  private handleSubscription(connectionId: string, data: any): void {
+    console.log(`📢 WebSocket subscription: ${connectionId} -> ${data.channel}`);
+    // Implementation for channel-based subscriptions
+  }
+
+  // Handle unsubscription
+  private handleUnsubscription(connectionId: string, data: any): void {
+    console.log(`📢 WebSocket unsubscription: ${connectionId} -> ${data.channel}`);
+    // Implementation for channel-based unsubscriptions
   }
 
   // Start health monitoring
   private startHealthMonitoring(): void {
     setInterval(() => {
       this.performHealthCheck();
-    }, this.config.healthCheckInterval);
+    }, 60000); // Check health every minute
   }
 
-  // Perform health check on all connections
+  // Perform comprehensive health check
   private performHealthCheck(): void {
     const now = Date.now();
-    const staleConnections: string[] = [];
+    const unhealthyConnections: string[] = [];
 
-    for (const [connectionId, ws] of this.connections) {
-      if (ws.readyState !== WebSocket.OPEN) {
-        staleConnections.push(connectionId);
-        continue;
+    for (const [connectionId, health] of this.connectionHealth) {
+      // Check for stale connections
+      if (now - health.lastPong > this.PRODUCTION_WEBSOCKET_CONFIG.pongTimeout * 2) {
+        unhealthyConnections.push(connectionId);
       }
 
-      const health = this.connectionHealth.get(connectionId);
-      if (health) {
-        health.uptime = now - health.uptime;
-        
-        // Check if connection is responsive
-        if (health.latency > 10000) { // 10 seconds
-          health.isHealthy = false;
-        }
+      // Check for high error rates
+      if (health.errors > 10) {
+        console.warn(`⚠️ High error rate for connection ${connectionId}: ${health.errors} errors`);
       }
     }
 
-    // Clean up stale connections
-    for (const connectionId of staleConnections) {
-      this.connections.delete(connectionId);
-      this.connectionHealth.delete(connectionId);
+    // Cleanup unhealthy connections
+    for (const connectionId of unhealthyConnections) {
+      const ws = this.connections.get(connectionId);
+      if (ws) {
+        console.warn(`🚫 Terminating unhealthy connection: ${connectionId}`);
+        ws.terminate();
+      }
     }
 
-    // Emit health status
-    this.emit('health', this.getServerHealth());
+    // Log health statistics
+    if (this.connections.size > 0) {
+      console.log(`📊 WebSocket Health: ${this.connections.size} connections, ${unhealthyConnections.length} terminated`);
+    }
   }
 
-  // Get server health metrics
-  getServerHealth(): {
-    totalConnections: number;
-    healthyConnections: number;
-    averageLatency: number;
-    totalMessagesSent: number;
-    totalMessagesReceived: number;
-  } {
-    let healthyCount = 0;
-    let totalLatency = 0;
-    let latencyCount = 0;
-    let totalSent = 0;
-    let totalReceived = 0;
-
-    for (const health of this.connectionHealth.values()) {
-      if (health.isHealthy) healthyCount++;
-      if (health.latency > 0) {
-        totalLatency += health.latency;
-        latencyCount++;
-      }
-      totalSent += health.messagesSent;
-      totalReceived += health.messagesReceived;
-    }
-
+  // Get connection statistics
+  getConnectionStats(): any {
+    const totalConnections = this.connections.size;
+    const totalMessages = Array.from(this.connectionHealth.values())
+      .reduce((sum, health) => sum + health.messagesSent + health.messagesReceived, 0);
+    
     return {
-      totalConnections: this.connections.size,
-      healthyConnections: healthyCount,
-      averageLatency: latencyCount > 0 ? totalLatency / latencyCount : 0,
-      totalMessagesSent: totalSent,
-      totalMessagesReceived: totalReceived
+      totalConnections,
+      totalMessages,
+      queuedMessages: Array.from(this.messageQueue.values())
+        .reduce((sum, queue) => sum + queue.length, 0),
+      config: this.PRODUCTION_WEBSOCKET_CONFIG,
+      uptime: process.uptime()
     };
   }
 
-  // Get connection count
-  getConnectionCount(): number {
-    return this.connections.size;
+  // Generate unique connection ID
+  private generateConnectionId(): string {
+    return `ws_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
   }
 
-  // Close all connections
-  close(): void {
-    for (const ws of this.connections.values()) {
-      ws.close(1001, 'Server shutting down');
+  // Generate unique message ID
+  private generateMessageId(): string {
+    return `msg_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+  }
+
+  // Graceful shutdown
+  async shutdown(): Promise<void> {
+    console.log('🔄 Shutting down WebSocket server...');
+    
+    if (this.wss) {
+      // Send shutdown notice to all clients
+      this.broadcast({
+        type: 'shutdown',
+        data: { message: 'Server shutting down' },
+        timestamp: Date.now(),
+        id: this.generateMessageId()
+      });
+
+      // Close all connections gracefully
+      for (const [connectionId, ws] of this.connections) {
+        if (ws.readyState === WebSocket.OPEN) {
+          ws.close(1001, 'Server shutdown');
+        }
+      }
+
+      // Clear all intervals
+      for (const interval of this.pingIntervals.values()) {
+        clearInterval(interval);
+      }
+
+      this.wss.close();
     }
-    this.wss.close();
+
+    console.log('✅ WebSocket server shutdown complete');
   }
 }
 
-export default {
-  OptimizedWebSocketConnection,
-  OptimizedWebSocketServer,
-  PRODUCTION_WEBSOCKET_CONFIG
-};
+export const websocketOptimization = new WebSocketOptimizationService();

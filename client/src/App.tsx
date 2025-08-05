@@ -85,6 +85,7 @@ import DynamicPricingDashboard from "@/pages/dynamic-pricing-dashboard";
 import CelestialDashboard from "@/pages/CelestialDashboard";
 import EnterpriseSalesDashboard from "@/pages/enterprise-sales-dashboard";
 import APIMonetizationDashboard from "@/pages/api-monetization-dashboard";
+import Final5PercentDashboard from "@/pages/final-5-percent-dashboard";
 import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";
 import { PersonalizedDashboard } from "@/components/PersonalizedDashboard";
@@ -492,6 +493,12 @@ function Router() {
           <>
             <Navbar />
             <ViralDashboard />
+          </>
+        )} />
+        <Route path="/final-5-percent-dashboard" component={() => (
+          <>
+            <Navbar />
+            <Final5PercentDashboard />
           </>
         )} />
         <Route path="/message-nfts" component={() => (
