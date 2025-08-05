@@ -552,6 +552,141 @@ router.post('/data/protection/setup', authenticateToken, async (req: any, res) =
   }
 });
 
+// ========== DATA MIRROR ROUTES ==========
+
+// Create Data Mirror
+router.post('/data/mirror/create', authenticateToken, async (req: any, res) => {
+  try {
+    const { dataTypes = ['all'] } = req.body;
+    const { dataMirrorService } = await import('./data-mirror-service');
+    
+    const manifest = await dataMirrorService.createDataMirror(dataTypes);
+    
+    res.json({
+      success: true,
+      data: manifest,
+      message: `Data mirror created successfully: ${manifest.mirrorId}`
+    });
+  } catch (error) {
+    console.error('Mirror creation error:', error);
+    res.status(500).json({ error: 'Failed to create data mirror' });
+  }
+});
+
+// List All Mirrors
+router.get('/data/mirror/list', authenticateToken, async (req: any, res) => {
+  try {
+    const { dataMirrorService } = await import('./data-mirror-service');
+    const mirrors = await dataMirrorService.listAllMirrors();
+    
+    res.json({
+      success: true,
+      data: mirrors,
+      message: `Retrieved ${mirrors.length} data mirrors`
+    });
+  } catch (error) {
+    console.error('Mirror listing error:', error);
+    res.status(500).json({ error: 'Failed to list data mirrors' });
+  }
+});
+
+// Sync All Mirrors
+router.post('/data/mirror/sync', authenticateToken, async (req: any, res) => {
+  try {
+    const { dataMirrorService } = await import('./data-mirror-service');
+    const result = await dataMirrorService.syncAllMirrors();
+    
+    res.json({
+      success: true,
+      data: result,
+      message: `Mirror sync completed: ${result.syncedCount} synced, ${result.failedCount} failed`
+    });
+  } catch (error) {
+    console.error('Mirror sync error:', error);
+    res.status(500).json({ error: 'Failed to sync mirrors' });
+  }
+});
+
+// Restore from Mirror
+router.post('/data/mirror/restore', authenticateToken, async (req: any, res) => {
+  try {
+    const { mirrorId } = req.body;
+    const { dataMirrorService } = await import('./data-mirror-service');
+    
+    if (!mirrorId) {
+      return res.status(400).json({ error: 'Mirror ID is required' });
+    }
+    
+    const result = await dataMirrorService.restoreFromMirror(mirrorId);
+    
+    res.json({
+      success: result.success,
+      data: result,
+      message: result.success ? 
+        `Restored ${result.recordsRestored} records from mirror` : 
+        'Mirror restore failed'
+    });
+  } catch (error) {
+    console.error('Mirror restore error:', error);
+    res.status(500).json({ error: 'Failed to restore from mirror' });
+  }
+});
+
+// Mirror Health Report
+router.get('/data/mirror/health', authenticateToken, async (req: any, res) => {
+  try {
+    const { dataMirrorService } = await import('./data-mirror-service');
+    const healthReport = await dataMirrorService.generateMirrorHealthReport();
+    
+    res.json({
+      success: true,
+      data: healthReport,
+      message: "Mirror health report generated successfully"
+    });
+  } catch (error) {
+    console.error('Mirror health error:', error);
+    res.status(500).json({ error: 'Failed to generate mirror health report' });
+  }
+});
+
+// Setup Automated Mirroring
+router.post('/data/mirror/setup', authenticateToken, async (req: any, res) => {
+  try {
+    const { dataMirrorService } = await import('./data-mirror-service');
+    await dataMirrorService.setupAutomatedMirroring();
+    
+    res.json({
+      success: true,
+      message: "Automated data mirroring configured successfully"
+    });
+  } catch (error) {
+    console.error('Mirror setup error:', error);
+    res.status(500).json({ error: 'Failed to setup automated mirroring' });
+  }
+});
+
+// Delete Mirror
+router.delete('/data/mirror/:mirrorId', authenticateToken, async (req: any, res) => {
+  try {
+    const { mirrorId } = req.params;
+    const { dataMirrorService } = await import('./data-mirror-service');
+    
+    const deleted = await dataMirrorService.deleteMirror(mirrorId);
+    
+    if (deleted) {
+      res.json({
+        success: true,
+        message: `Mirror ${mirrorId} deleted successfully`
+      });
+    } else {
+      res.status(404).json({ error: 'Mirror not found or deletion failed' });
+    }
+  } catch (error) {
+    console.error('Mirror deletion error:', error);
+    res.status(500).json({ error: 'Failed to delete mirror' });
+  }
+});
+
 // ========== JOB ROUTES ==========
 
 // Create new job

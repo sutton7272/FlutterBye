@@ -115,6 +115,17 @@ export default function Navigation() {
                     <span>Data Protection</span>
                   </div>
                 </Link>
+
+                <Link href="/data-mirrors">
+                  <div className={`flex items-center space-x-1 px-3 py-2 rounded-lg transition-colors cursor-pointer ${
+                    isActive('/data-mirrors') 
+                      ? 'bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300' 
+                      : 'text-gray-600 hover:text-blue-600 dark:text-gray-300 dark:hover:text-blue-400'
+                  }`}>
+                    <Briefcase size={18} />
+                    <span>Data Mirrors</span>
+                  </div>
+                </Link>
               </>
             )}
           </div>

@@ -19,6 +19,7 @@ import Navigation from './components/Navigation';
 import ProtectedRoute from './components/ProtectedRoute';
 import { FlutterAIIntelligenceDashboard } from './components/FlutterAIIntelligenceDashboard';
 import { DataProtectionDashboard } from './components/DataProtectionDashboard';
+import { DataMirrorDashboard } from './components/DataMirrorDashboard';
 
 function AppContent() {
   const { loading } = useAuth();
@@ -84,6 +85,12 @@ function AppContent() {
             <Route path="/data-protection">
               <ProtectedRoute>
                 <DataProtectionDashboard />
+              </ProtectedRoute>
+            </Route>
+            
+            <Route path="/data-mirrors">
+              <ProtectedRoute>
+                <DataMirrorDashboard />
               </ProtectedRoute>
             </Route>
             
