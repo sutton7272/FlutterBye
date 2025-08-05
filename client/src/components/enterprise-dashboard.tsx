@@ -262,28 +262,30 @@ export default function EnterpriseDashboard() {
 
       {/* Enterprise Features Tabs */}
       <Tabs defaultValue="cross-chain" className="space-y-6">
-        <TabsList className="grid grid-cols-5 bg-slate-700/50 border border-purple-500/20 mb-4">
-          <TabsTrigger value="cross-chain" className="data-[state=active]:bg-green-500/20">
-            <Network className="h-4 w-4 mr-2" />
-            Cross-Chain
-          </TabsTrigger>
-          <TabsTrigger value="government-sales" className="data-[state=active]:bg-red-500/20">
-            <ShieldCheck className="h-4 w-4 mr-2" />
-            Gov Sales
-          </TabsTrigger>
-          <TabsTrigger value="government" className="data-[state=active]:bg-red-500/20">
-            <Gavel className="h-4 w-4 mr-2" />
-            Government
-          </TabsTrigger>
-          <TabsTrigger value="investigation" className="data-[state=active]:bg-orange-500/20">
-            <FileSearch className="h-4 w-4 mr-2" />
-            Investigation
-          </TabsTrigger>
-          <TabsTrigger value="compliance" className="data-[state=active]:bg-blue-500/20">
-            <Shield className="h-4 w-4 mr-2" />
-            Compliance
-          </TabsTrigger>
-        </TabsList>
+        <div className="overflow-x-auto">
+          <TabsList className="inline-flex w-max bg-slate-700/50 border border-purple-500/20 mb-4 min-w-full">
+            <TabsTrigger value="cross-chain" className="data-[state=active]:bg-green-500/20 flex-shrink-0">
+              <Network className="h-4 w-4 mr-2" />
+              Cross-Chain
+            </TabsTrigger>
+            <TabsTrigger value="government-sales" className="data-[state=active]:bg-red-500/20 flex-shrink-0">
+              <ShieldCheck className="h-4 w-4 mr-2" />
+              Gov Sales
+            </TabsTrigger>
+            <TabsTrigger value="government" className="data-[state=active]:bg-red-500/20 flex-shrink-0">
+              <Gavel className="h-4 w-4 mr-2" />
+              Government
+            </TabsTrigger>
+            <TabsTrigger value="investigation" className="data-[state=active]:bg-orange-500/20 flex-shrink-0">
+              <FileSearch className="h-4 w-4 mr-2" />
+              Investigation
+            </TabsTrigger>
+            <TabsTrigger value="compliance" className="data-[state=active]:bg-blue-500/20 flex-shrink-0">
+              <Shield className="h-4 w-4 mr-2" />
+              Compliance
+            </TabsTrigger>
+          </TabsList>
+        </div>
 
         <TabsList className="grid grid-cols-4 bg-slate-700/30 border border-purple-500/10">
           <TabsTrigger value="white-label" className="data-[state=active]:bg-purple-500/20">

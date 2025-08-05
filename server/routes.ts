@@ -6836,7 +6836,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Government & Law Enforcement Sales routes for $100K+ contracts
   const governmentSalesRoutes = await import('./government-sales-routes');
-  app.use('/api/government', governmentSalesRoutes.governmentSalesRoutes);
+  app.use('/api/government', governmentSalesRoutes.default);
 
   // Viral Growth API routes for Option 2: User Growth Multiplication
   const viralGrowthRoutes = await import('./viral-growth-api');

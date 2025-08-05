@@ -227,4 +227,4 @@ router.post('/cybercrime-investigation-demo', async (req, res) => {
   }
 });
 
-export { router as governmentSalesRoutes };
+export default router;
