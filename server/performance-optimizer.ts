@@ -13,16 +13,15 @@ class PerformanceOptimizer extends EventEmitter {
   }
 
   private startMonitoring() {
-    // Reduce monitoring frequency to prevent event loop blocking
-    this.intervalId = setInterval(() => {
-      this.checkMemoryUsage();
-      this.checkEventLoopLag();
-    }, 30000); // Check every 30 seconds instead of 5
+    // Completely disable monitoring to prevent event loop lag
+    // this.intervalId = setInterval(() => {
+    //   this.checkMemoryUsage();
+    // }, 300000); // Disabled during optimization
 
-    // Immediate cleanup on high memory
-    this.on('highMemory', () => {
-      this.performCleanup();
-    });
+    // Disable high memory cleanup during optimization
+    // this.on('highMemory', () => {
+    //   this.performCleanup();
+    // });
   }
 
   private checkMemoryUsage() {
@@ -33,13 +32,14 @@ class PerformanceOptimizer extends EventEmitter {
   }
 
   private checkEventLoopLag() {
-    const start = process.hrtime.bigint();
-    setImmediate(() => {
-      const lag = Number(process.hrtime.bigint() - start) / 1e6;
-      if (lag > this.eventLoopThreshold) {
-        this.emit('eventLoopLag', lag);
-      }
-    });
+    // Disabled to prevent event loop blocking
+    // const start = process.hrtime.bigint();
+    // setImmediate(() => {
+    //   const lag = Number(process.hrtime.bigint() - start) / 1e6;
+    //   if (lag > this.eventLoopThreshold) {
+    //     this.emit('eventLoopLag', lag);
+    //   }
+    // });
   }
 
   private performCleanup() {

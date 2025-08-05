@@ -26,10 +26,10 @@ class DatabaseOptimizer {
       this.queryStats.errors++;
     });
 
-    // Clear cache periodically
-    setInterval(() => {
-      this.clearExpiredCache();
-    }, 300000); // Every 5 minutes
+    // Disable cache clearing during optimization
+    // setInterval(() => {
+    //   this.clearExpiredCache();
+    // }, 600000); // Every 10 minutes when enabled
   }
 
   // Cached query execution

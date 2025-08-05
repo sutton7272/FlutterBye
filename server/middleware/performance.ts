@@ -100,18 +100,18 @@ export const optimizeMemory = () => {
     }, 60000); // Every minute
   }
 
-  // Monitor event loop lag
-  let start = process.hrtime.bigint();
-  setInterval(() => {
-    const delta = process.hrtime.bigint() - start;
-    const lag = Number(delta) / 1e6; // Convert to milliseconds
-    
-    if (lag > 100) {
-      console.warn(`Event loop lag detected: ${lag.toFixed(2)}ms`);
-    }
-    
-    start = process.hrtime.bigint();
-  }, 5000); // Check every 5 seconds
+  // Disable event loop monitoring during optimization
+  // let start = process.hrtime.bigint();
+  // setInterval(() => {
+  //   const delta = process.hrtime.bigint() - start;
+  //   const lag = Number(delta) / 1e6; // Convert to milliseconds
+  //   
+  //   if (lag > 100) {
+  //     console.warn(`Event loop lag detected: ${lag.toFixed(2)}ms`);
+  //   }
+  //   
+  //   start = process.hrtime.bigint();
+  // }, 30000); // Reduced frequency when enabled
 };
 
 // API response caching

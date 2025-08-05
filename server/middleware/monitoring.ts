@@ -122,18 +122,18 @@ export const checkDatabaseHealth = async (): Promise<boolean> => {
   }
 };
 
-// Memory usage monitoring
+// Disable memory monitoring during optimization
 export const memoryMonitoring = () => {
-  setInterval(() => {
-    const usage = process.memoryUsage();
-    const usedMB = usage.heapUsed / 1024 / 1024;
-    
-    if (usedMB > 400) {
-      console.warn('High memory usage:', {
-        heapUsed: `${usedMB.toFixed(2)} MB`,
-        heapTotal: `${(usage.heapTotal / 1024 / 1024).toFixed(2)} MB`,
-        external: `${(usage.external / 1024 / 1024).toFixed(2)} MB`,
-      });
-    }
-  }, 30000); // Check every 30 seconds
+  // setInterval(() => {
+  //   const usage = process.memoryUsage();
+  //   const usedMB = usage.heapUsed / 1024 / 1024;
+  //   
+  //   if (usedMB > 400) {
+  //     console.warn('High memory usage:', {
+  //       heapUsed: `${usedMB.toFixed(2)} MB`,
+  //       heapTotal: `${(usage.heapTotal / 1024 / 1024).toFixed(2)} MB`,
+  //       external: `${(usage.external / 1024 / 1024).toFixed(2)} MB`,
+  //     });
+  //   }
+  // }, 120000); // Reduced frequency when enabled
 };

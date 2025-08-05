@@ -8,10 +8,10 @@ class SmartCache {
   private cleanupInterval: NodeJS.Timeout;
 
   constructor() {
-    // Cleanup every 5 minutes
-    this.cleanupInterval = setInterval(() => {
-      this.cleanup();
-    }, 300000);
+    // Disable cleanup during optimization phase
+    // this.cleanupInterval = setInterval(() => {
+    //   this.cleanup();
+    // }, 600000); // Every 10 minutes when enabled
   }
 
   set(key: string, data: any, ttl: number = 300000) {

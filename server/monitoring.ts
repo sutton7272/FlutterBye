@@ -269,19 +269,19 @@ class ProductionMonitoringService {
     }
   }
 
-  // System Health Monitoring
+  // Disable system health monitoring during optimization
   private startSystemHealthMonitoring() {
-    setInterval(() => {
-      const health = this.collectSystemHealth();
-      this.systemHealthHistory.push(health);
+    // setInterval(() => {
+    //   const health = this.collectSystemHealth();
+    //   this.systemHealthHistory.push(health);
 
-      // Keep only last 24 hours of data
-      const oneDayAgo = Date.now() - 24 * 60 * 60 * 1000;
-      this.systemHealthHistory = this.systemHealthHistory.filter(h => h.timestamp > oneDayAgo);
+    //   // Keep only last 24 hours of data
+    //   const oneDayAgo = Date.now() - 24 * 60 * 60 * 1000;
+    //   this.systemHealthHistory = this.systemHealthHistory.filter(h => h.timestamp > oneDayAgo);
 
-      // Check thresholds
-      this.checkSystemHealthThresholds(health);
-    }, 60000); // Every minute
+    //   // Check thresholds
+    //   this.checkSystemHealthThresholds(health);
+    // }, 300000); // Every 5 minutes when enabled
   }
 
   private collectSystemHealth(): SystemHealth {
