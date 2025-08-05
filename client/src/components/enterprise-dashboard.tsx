@@ -229,7 +229,7 @@ export default function EnterpriseDashboard() {
       </div>
 
       {/* Enterprise Features Tabs */}
-      <Tabs defaultValue="white-label" className="space-y-6">
+      <Tabs defaultValue="cross-chain" className="space-y-6">
         <TabsList className="grid grid-cols-4 bg-slate-700/50 border border-purple-500/20 mb-4">
           <TabsTrigger value="cross-chain" className="data-[state=active]:bg-green-500/20">
             <Network className="h-4 w-4 mr-2" />
