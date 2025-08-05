@@ -411,6 +411,146 @@ class ProductionMonitoringService {
     return false;
   }
 
+  // Get comprehensive metrics for API endpoints
+  getMetrics() {
+    const now = Date.now();
+    const oneHourAgo = now - 3600000;
+    
+    const recentMetrics = this.performanceMetrics.filter(m => m.timestamp > oneHourAgo);
+    const recentBusinessMetrics = this.businessMetrics.filter(m => m.timestamp > oneHourAgo);
+    const systemHealth = this.getSystemHealth();
+    
+    return {
+      timestamp: now,
+      performance: {
+        totalRequests: recentMetrics.length,
+        avgResponseTime: recentMetrics.reduce((sum, m) => sum + m.responseTime, 0) / recentMetrics.length || 0,
+        errorRate: recentMetrics.filter(m => m.statusCode >= 400).length / recentMetrics.length || 0,
+        governmentRequests: recentMetrics.filter(m => m.governmentClient).length,
+        enterpriseRequests: recentMetrics.filter(m => m.enterpriseClient).length,
+        responseTimePercentiles: this.calculatePercentiles(recentMetrics.map(m => m.responseTime))
+      },
+      business: {
+        governmentPipeline: recentBusinessMetrics
+          .filter(m => m.metricType === 'pipeline' && m.metadata.category === 'government')
+          .reduce((sum, m) => Math.max(sum, m.value), 0),
+        enterpriseRevenue: recentBusinessMetrics
+          .filter(m => m.metricType === 'revenue' && m.metadata.category === 'enterprise')
+          .reduce((sum, m) => Math.max(sum, m.value), 0),
+        complianceScore: recentBusinessMetrics
+          .filter(m => m.metricType === 'compliance')
+          .reduce((sum, m) => sum + m.value, 0) / 
+          Math.max(1, recentBusinessMetrics.filter(m => m.metricType === 'compliance').length)
+      },
+      system: systemHealth,
+      alerts: {
+        active: this.getActiveAlerts(),
+        critical: this.activeAlerts.filter(a => !a.resolved && a.level === 'critical').length,
+        warning: this.activeAlerts.filter(a => !a.resolved && a.level === 'warning').length,
+        info: this.activeAlerts.filter(a => !a.resolved && a.level === 'info').length
+      },
+      errors: this.activeAlerts.filter(a => a.type === 'performance' || a.type === 'security')
+    };
+  }
+
+  // Get health status for system monitoring
+  getHealthStatus() {
+    const systemHealth = this.getSystemHealth();
+    const criticalAlerts = this.activeAlerts.filter(a => !a.resolved && a.level === 'critical').length;
+    const warningAlerts = this.activeAlerts.filter(a => !a.resolved && a.level === 'warning').length;
+    
+    let status = 'healthy';
+    let score = 100;
+    let issues: string[] = [];
+    
+    if (systemHealth) {
+      if (systemHealth.memory.percentage > 90) {
+        status = 'critical';
+        score -= 30;
+        issues.push('High memory usage');
+      } else if (systemHealth.memory.percentage > 80) {
+        status = 'degraded';
+        score -= 15;
+        issues.push('Elevated memory usage');
+      }
+      
+      if (systemHealth.cpu.usage > 90) {
+        status = 'critical';
+        score -= 30;
+        issues.push('High CPU usage');
+      } else if (systemHealth.cpu.usage > 80) {
+        status = 'degraded';
+        score -= 15;
+        issues.push('Elevated CPU usage');
+      }
+    }
+    
+    if (criticalAlerts > 0) {
+      status = 'critical';
+      score -= criticalAlerts * 20;
+      issues.push(`${criticalAlerts} critical alerts`);
+    }
+    
+    if (warningAlerts > 0) {
+      score -= warningAlerts * 5;
+      issues.push(`${warningAlerts} warning alerts`);
+    }
+    
+    return {
+      status,
+      score: Math.max(0, score),
+      issues,
+      timestamp: Date.now()
+    };
+  }
+
+  // Get performance summary
+  getPerformanceSummary() {
+    const now = Date.now();
+    const oneHourAgo = now - 3600000;
+    const recentMetrics = this.performanceMetrics.filter(m => m.timestamp > oneHourAgo);
+    const systemHealth = this.getSystemHealth();
+    
+    return {
+      uptime: process.uptime(),
+      requests: {
+        total: recentMetrics.length,
+        successful: recentMetrics.filter(m => m.statusCode < 400).length,
+        failed: recentMetrics.filter(m => m.statusCode >= 400).length,
+        avgResponseTime: recentMetrics.reduce((sum, m) => sum + m.responseTime, 0) / recentMetrics.length || 0
+      },
+      memory: systemHealth ? {
+        used: systemHealth.memory.used,
+        total: systemHealth.memory.total,
+        percentage: systemHealth.memory.percentage
+      } : { used: 0, total: 0, percentage: 0 },
+      business: {
+        governmentClients: recentMetrics.filter(m => m.governmentClient).length,
+        enterpriseClients: recentMetrics.filter(m => m.enterpriseClient).length,
+        totalRevenue: this.businessMetrics
+          .filter(m => m.metricType === 'revenue')
+          .reduce((sum, m) => sum + m.value, 0)
+      },
+      timestamp: now
+    };
+  }
+
+  // Helper method to calculate response time percentiles
+  private calculatePercentiles(values: number[]) {
+    if (values.length === 0) return { p50: 0, p95: 0, p99: 0 };
+    
+    const sorted = values.sort((a, b) => a - b);
+    const p50Index = Math.floor(sorted.length * 0.5);
+    const p95Index = Math.floor(sorted.length * 0.95);
+    const p99Index = Math.floor(sorted.length * 0.99);
+    
+    return {
+      p50: sorted[p50Index] || 0,
+      p95: sorted[p95Index] || 0,
+      p99: sorted[p99Index] || 0
+    };
+  }
+
   // Dashboard Summary
   getDashboardSummary() {
     const now = Date.now();
