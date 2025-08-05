@@ -78,15 +78,21 @@ const AdminFeatureToggle: React.FC = () => {
   const [selectedFeature, setSelectedFeature] = useState<FeatureConfig | null>(null);
 
   // Fetch all features
-  const { data: features, isLoading } = useQuery({
+  const { data: features, isLoading, error } = useQuery({
     queryKey: ['admin-features'],
-    queryFn: () => apiRequest('GET', '/api/admin/features')
+    queryFn: async () => {
+      const response = await apiRequest('GET', '/api/admin/features');
+      return response.json();
+    }
   });
 
   // Fetch feature statistics
   const { data: stats } = useQuery({
     queryKey: ['admin-features-stats'],
-    queryFn: () => apiRequest('GET', '/api/admin/features/stats')
+    queryFn: async () => {
+      const response = await apiRequest('GET', '/api/admin/features/stats');
+      return response.json();
+    }
   });
 
   // Toggle feature mutation
@@ -183,10 +189,28 @@ const AdminFeatureToggle: React.FC = () => {
   if (isLoading) {
     return (
       <div className="space-y-6">
-        <div className="flex items-center space-x-2">
+        <div className="flex items-center space-x-2 text-white">
           <Settings className="w-6 h-6 animate-spin" />
           <span>Loading feature toggles...</span>
         </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="space-y-6">
+        <Card className="bg-red-900/20 border-red-500/30">
+          <CardContent className="p-6">
+            <div className="flex items-center space-x-2 text-red-400">
+              <AlertTriangle className="w-6 h-6" />
+              <div>
+                <h3 className="font-semibold">Failed to load features</h3>
+                <p className="text-sm text-red-300">Error: {error.message}</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     );
   }
