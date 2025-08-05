@@ -525,6 +525,34 @@ export const walletBatches = pgTable("wallet_batches", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
+// Enterprise Escrow Wallets for Bank-Level Transactions
+export const enterpriseEscrowWallets = pgTable("enterprise_escrow_wallets", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  clientId: text("client_id").notNull(),
+  multisigAddress: text("multisig_address").notNull().unique(),
+  signatoryAddresses: json("signatory_addresses").$type<string[]>(),
+  requiredSignatures: integer("required_signatures").notNull(),
+  contractValue: decimal("contract_value", { precision: 18, scale: 9 }).notNull(),
+  currency: text("currency").notNull(), // SOL, USDC, FLBY
+  status: text("status").default("active"), // active, locked, released, disputed
+  complianceLevel: text("compliance_level").default("bank-level"), // standard, enhanced, bank-level
+  expiresAt: timestamp("expires_at"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Enterprise Wallet Audit Trail
+export const enterpriseWalletAuditTrail = pgTable("enterprise_wallet_audit_trail", { 
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  walletId: varchar("wallet_id").references(() => enterpriseEscrowWallets.id).notNull(),
+  action: text("action").notNull(), // WALLET_CREATED, FUNDS_DEPOSITED, FUNDS_RELEASED, etc.
+  actor: text("actor").notNull(), // SYSTEM, MULTI_SIG, CLIENT, ADMIN
+  transactionHash: text("transaction_hash"),
+  amount: decimal("amount", { precision: 18, scale: 9 }),
+  notes: text("notes"),
+  timestamp: timestamp("timestamp").defaultNow(),
+});
+
 // Analysis Queue for Background Processing
 export const analysisQueue = pgTable("analysis_queue", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),

@@ -55,6 +55,7 @@ import { z } from "zod";
 import { registerNextGenAIRoutes } from "./next-gen-ai-routes";
 import { flutterAIRoutes } from "./flutterai-routes";
 import { registerFlutterAIWalletRoutes } from "./flutterai-wallet-routes";
+import { registerEnterpriseWalletRoutes } from "./enterprise-wallet-routes";
 import { 
   analyzeWallet,
   getWalletIntelligence,
@@ -4511,6 +4512,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get('/api/government/dashboard-metrics', governmentApiHandlers.getDashboardMetrics);
   
   console.log('✅ Government Intelligence APIs activated - Ready for $100K-$2M government contracts!');
+  
+  // Register enterprise wallet infrastructure
+  registerEnterpriseWalletRoutes(app);
+  
   console.log('🚀 ENTERPRISE REVENUE GENERATION COMPLETE!');
   console.log('💰 Target Revenue: $5M-$50M ARR from Enterprise + Government clients');
   
