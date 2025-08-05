@@ -15,7 +15,8 @@ import {
   Database,
   BarChart3,
   Shield,
-  Cpu
+  Cpu,
+  Zap
 } from 'lucide-react';
 
 export default function Navigation() {
@@ -64,6 +65,11 @@ export default function Navigation() {
       path: '/ai-analyzer',
       icon: Brain,
       label: 'AI Analyzer'
+    },
+    {
+      path: '/demo',
+      icon: Cpu,
+      label: 'Live Demo'
     }
   ];
 

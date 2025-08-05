@@ -22,6 +22,7 @@ import { DataProtectionDashboard } from './components/DataProtectionDashboard';
 import { DataMirrorDashboard } from './components/DataMirrorDashboard';
 import FeatureToggleDashboard from './components/FeatureToggleDashboard';
 import FeatureReleaseAnalyzer from './components/FeatureReleaseAnalyzer';
+import DemoShowcase from './pages/DemoShowcase';
 
 function AppContent() {
   const { loading } = useAuth();
@@ -106,6 +107,10 @@ function AppContent() {
               <ProtectedRoute>
                 <FeatureReleaseAnalyzer />
               </ProtectedRoute>
+            </Route>
+            
+            <Route path="/demo">
+              <DemoShowcase />
             </Route>
             
             {/* 404 Page */}

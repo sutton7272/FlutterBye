@@ -1378,4 +1378,8 @@ router.post('/feature-toggle/enable', async (req, res) => {
   }
 });
 
+// Import and mount demo routes
+import demoRoutes from './demo-routes';
+router.use('/demo', demoRoutes);
+
 export default router;
