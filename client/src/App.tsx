@@ -74,6 +74,7 @@ import NFTClaim from "@/pages/nft-claim";
 import AllOpportunities from "@/pages/AllOpportunities";
 import AdminAPIMonetization from "@/pages/admin-api-monetization";
 import WalletTest from "@/pages/WalletTest";
+import ProductionDeployment from "@/pages/ProductionDeployment";
 import NFTMarketplace from "@/pages/nft-marketplace";
 import AIShowcase from "@/pages/ai-showcase";
 import { LivingAIPage } from "@/pages/living-ai";
@@ -606,6 +607,12 @@ function Router() {
         <Route path="/cosmic-wallet" component={() => (
           <>
             <CelestialDashboard />
+          </>
+        )} />
+        <Route path="/production-deployment" component={() => (
+          <>
+            <Navbar />
+            <ProductionDeployment />
           </>
         )} />
         <Route component={NotFound} />
