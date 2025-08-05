@@ -5080,6 +5080,77 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // ============ END CELESTIAL PERSONALIZATION ============
   // ============ END ENTERPRISE/GOVERNMENT ROUTES ============
   
+  // ===== DUAL ENVIRONMENT MANAGEMENT ROUTES =====
+  
+  // Get current environment status
+  app.get("/api/environment/status", async (req, res) => {
+    try {
+      const { getCurrentEnvironment, getEnvironmentStatus } = await import('../shared/environment-config');
+      const status = getEnvironmentStatus();
+      
+      res.json(status);
+    } catch (error) {
+      console.error('Environment status error:', error);
+      res.status(500).json({ 
+        error: "Failed to get environment status",
+        details: error.message 
+      });
+    }
+  });
+
+  // Switch environment
+  app.post("/api/environment/switch", async (req, res) => {
+    try {
+      const { network } = req.body;
+      
+      if (!['devnet', 'mainnet-beta'].includes(network)) {
+        return res.status(400).json({ 
+          error: "Invalid network. Must be 'devnet' or 'mainnet-beta'" 
+        });
+      }
+
+      const { switchEnvironment, getEnvironmentStatus } = await import('../shared/environment-config');
+      
+      // Switch environment
+      const newConfig = switchEnvironment(network);
+      
+      // Get updated status
+      const status = getEnvironmentStatus();
+      
+      console.log(`🔄 Environment switched to ${network.toUpperCase()}`);
+      
+      res.json({
+        success: true,
+        message: `Switched to ${network.toUpperCase()}`,
+        status
+      });
+    } catch (error) {
+      console.error('Environment switch error:', error);
+      res.status(500).json({ 
+        error: "Failed to switch environment",
+        details: error.message 
+      });
+    }
+  });
+
+  // Validate current environment
+  app.post("/api/environment/validate", async (req, res) => {
+    try {
+      const { validateEnvironment } = await import('../shared/environment-config');
+      const validation = validateEnvironment();
+      
+      res.json(validation);
+    } catch (error) {
+      console.error('Environment validation error:', error);
+      res.status(500).json({ 
+        error: "Failed to validate environment",
+        details: error.message 
+      });
+    }
+  });
+
+  // ===== END DUAL ENVIRONMENT MANAGEMENT ROUTES =====
+
   // Error handling middleware (must be last)
   app.use(errorHandler);
 

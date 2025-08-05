@@ -27,7 +27,8 @@ import {
   ArrowRight,
   Target,
   Users,
-  Coins
+  Coins,
+  ArrowRightLeft
 } from "lucide-react";
 
 interface DeploymentMetrics {
