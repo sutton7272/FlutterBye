@@ -43,13 +43,12 @@ export default function Navbar() {
         return isFeatureEnabled(item.featureId);
       });
 
-  // Secondary navigation for additional features
+  // Secondary navigation for additional features - prioritize revenue dashboards
   const secondaryNavItems = [
-    { href: "/enterprise-sales", label: "Enterprise Sales", icon: Building2, description: "$5M-$50M sales pipeline" },
-    { href: "/api-monetization", label: "API Revenue", icon: Code2, description: "$347K monthly API revenue" },
+    { href: "/enterprise-sales", label: "Sales", icon: Building2, description: "$5M-$50M sales pipeline", priority: true },
+    { href: "/api-monetization", label: "API", icon: Code2, description: "$347K monthly API revenue", priority: true },
     { href: "/intelligence", label: "Intelligence", icon: Brain, description: "Advanced analytics dashboard" },
     { href: "/trending", label: "Trending", icon: Trophy, description: "Viral content discovery" },
-    { href: "/activity", label: "Activity", icon: Activity, description: "Platform activity feed" },
   ];
 
   const isActive = (href: string) => location === href;
@@ -101,7 +100,7 @@ export default function Navbar() {
         </nav>
 
         {/* Secondary Navigation - Core Features */}
-        <nav className="hidden lg:flex items-center ml-4 space-x-1 border-l border-border/30 pl-4">
+        <nav className="hidden md:flex items-center ml-4 space-x-1 border-l border-border/30 pl-4">
           {secondaryNavItems.map((item) => (
             <Link key={item.href} href={item.href}>
               <Button
@@ -128,7 +127,7 @@ export default function Navbar() {
         </nav>
 
         {/* Trust Indicator with Solvitur Badge */}
-        <div className="hidden lg:flex ml-4 items-center gap-3">
+        <div className="hidden xl:flex ml-4 items-center gap-3">
           <div className="trust-indicator">
             <div className="w-2 h-2 bg-accent rounded-full"></div>
             Testnet
