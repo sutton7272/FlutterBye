@@ -15,6 +15,7 @@ import FlutterAITokenCollector from '@/components/flutterai-token-collector';
 import AdvancedAnalyticsDashboard from '@/components/advanced-analytics-dashboard';
 import EnterpriseDashboard from '@/components/enterprise-dashboard';
 import RealTimeIntelligenceDashboard from '@/components/real-time-intelligence-dashboard';
+import { SolviturBrandBadge } from '@/components/solvitur-brand-badge';
 import { 
   Brain, 
   Wallet, 
@@ -529,6 +530,10 @@ export default function FlutterAIDashboard() {
             <h1 className="text-4xl font-bold text-white">
               FlutterAI Intelligence Dashboard
             </h1>
+          </div>
+          <div className="flex items-center justify-center gap-2 mb-2">
+            <span className="text-purple-300 text-sm">Powered by</span>
+            <SolviturBrandBadge size="sm" showText={true} />
           </div>
           <p className="text-purple-200 text-lg max-w-3xl mx-auto">
             World's first Social Credit Score system for Solana wallets. 

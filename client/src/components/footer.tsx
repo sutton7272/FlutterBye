@@ -1,4 +1,5 @@
 import { Heart, ExternalLink } from "lucide-react";
+import { SolviturBrandBadge } from "./solvitur-brand-badge";
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();
@@ -28,8 +29,8 @@ export default function Footer() {
             <span>for the Web3 community</span>
           </div>
 
-          {/* Right side - Copyright */}
-          <div className="text-sm text-text-secondary">
+          {/* Right side - Copyright with Logo */}
+          <div className="flex items-center gap-2 text-sm text-text-secondary">
             <span>© {currentYear} </span>
             <a 
               href="https://solvitur.com" 
@@ -37,7 +38,7 @@ export default function Footer() {
               rel="noopener noreferrer"
               className="text-electric-green hover:text-electric-blue transition-all duration-300 font-medium glow-text"
             >
-              Solvitur Inc.
+              <SolviturBrandBadge size="sm" showText={true} />
             </a>
             <span> All rights reserved.</span>
           </div>
