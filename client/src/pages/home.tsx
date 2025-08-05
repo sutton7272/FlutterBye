@@ -14,7 +14,10 @@ import { TutorialLaunchButton } from "@/components/interactive-tutorial";
 import { VoiceMessageRecorder } from "@/components/voice-message-recorder";
 import { ErrorBoundary } from "@/components/error-boundary";
 import { LoadingState } from "@/components/loading-state";
+import { ViralGrowthAccelerator } from "@/components/viral-growth-accelerator";
+import { MobileOnboardingWizard } from "@/components/mobile-onboarding-wizard";
 import { usePerformance } from "@/hooks/use-performance";
+import { useState, useEffect } from "react";
 
 interface RecentActivity {
   id: string;
@@ -27,6 +30,27 @@ interface RecentActivity {
 
 export default function Home() {
   const { measureRender, endRenderMeasurement } = usePerformance('HomePage');
+  const [showOnboarding, setShowOnboarding] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+  
+  // Detect mobile device and first-time user
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    
+    // Check if user is new (simplified check)
+    const isFirstTime = !localStorage.getItem('flutterbye_visited');
+    if (isFirstTime && window.innerWidth < 768) {
+      setShowOnboarding(true);
+      localStorage.setItem('flutterbye_visited', 'true');
+    }
+    
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
   
   // Measure render performance in development
   if (process.env.NODE_ENV === 'development') {
@@ -339,6 +363,11 @@ export default function Home() {
           </div>
         </div>
 
+        {/* Viral Growth Accelerator - Mobile Priority */}
+        <div className="mb-16">
+          <ViralGrowthAccelerator />
+        </div>
+
         {/* Interactive Stats Dashboard */}
         <div className="mb-16">
           <InteractiveStatsDashboard />
@@ -560,6 +589,14 @@ export default function Home() {
           </div>
         </div>
         </div>
+
+        {/* Mobile Onboarding Wizard */}
+        {showOnboarding && (
+          <MobileOnboardingWizard
+            onComplete={() => setShowOnboarding(false)}
+            onSkip={() => setShowOnboarding(false)}
+          />
+        )}
       </div>
     </ErrorBoundary>
   );
