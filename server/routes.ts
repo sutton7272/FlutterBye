@@ -1,5 +1,28 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
+import cors from 'cors';
+import { 
+  globalRateLimit, 
+  apiRateLimit, 
+  securityHeaders, 
+  sanitizeInput, 
+  errorHandler, 
+  auditLogger 
+} from './middleware/security';
+import { 
+  performanceMonitoring, 
+  setupHealthChecks, 
+  memoryMonitoring 
+} from './middleware/monitoring';
+import { 
+  responseCompression, 
+  cacheControl, 
+  requestTimeout, 
+  corsConfig, 
+  responseOptimization, 
+  optimizeMemory,
+  apiCache 
+} from './middleware/performance';
 import { storage } from "./storage";
 import ProductionMonitoringService, { productionMonitoringConfig } from "./monitoring";
 import ProductionSecurityService, { productionSecurityConfig } from "./security";
@@ -49,6 +72,26 @@ import { enterpriseApiHandlers } from "./enterprise-api";
 import { governmentApiHandlers } from "./government-api";
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Trust proxy for rate limiting
+  app.set('trust proxy', 1);
+
+  // Security and performance middleware
+  app.use(securityHeaders);
+  app.use(cors(corsConfig));
+  app.use(responseCompression);
+  app.use(responseOptimization);
+  app.use(globalRateLimit);
+  app.use(sanitizeInput);
+  app.use(auditLogger);
+  app.use(performanceMonitoring);
+  app.use(requestTimeout());
+
+  // Health checks and monitoring
+  setupHealthChecks(app);
+  
+  // Start monitoring services
+  memoryMonitoring();
+  optimizeMemory();
   // Initialize Production Monitoring & Security
   const monitoring = new ProductionMonitoringService(productionMonitoringConfig);
   const security = new ProductionSecurityService(productionSecurityConfig);
@@ -4738,7 +4781,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // ============ END CELESTIAL PERSONALIZATION ============
   // ============ END ENTERPRISE/GOVERNMENT ROUTES ============
   
+  // Error handling middleware (must be last)
+  app.use(errorHandler);
+
   const httpServer = createServer(app);
+
+  // Graceful shutdown handling
+  const gracefulShutdown = (signal: string) => {
+    console.log(`${signal} received, shutting down gracefully...`);
+    httpServer.close(() => {
+      console.log('HTTP server closed');
+      process.exit(0);
+    });
+  };
+
+  process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
+  process.on('SIGINT', () => gracefulShutdown('SIGINT'));
   
   // Setup Real-time Intelligence WebSocket Engine
   try {
