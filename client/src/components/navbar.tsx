@@ -22,7 +22,7 @@ export default function Navbar() {
     { href: "/flutter-wave", label: "FlutterWave", icon: Heart, description: "AI butterfly messaging", featureId: "flutter_wave" },
     { href: "/flutter-art", label: "FlutterArt", icon: Sparkles, description: "Digital art NFTs", featureId: "flutter_art" },
     { href: "/chat", label: "Chat", icon: MessageSquare, description: "Real-time blockchain chat", featureId: "chat" },
-    { href: "/admin", label: "Admin", icon: Settings, description: "Platform management", featureId: "admin_panel" },
+    { href: "/admin-unified", label: "Admin", icon: Settings, description: "Platform management", featureId: "admin_panel" },
   ];
 
   // Filter navigation items based on feature toggles
