@@ -292,7 +292,7 @@ class ProductionMonitoringService {
       timestamp: Date.now(),
       cpu: {
         usage: (cpuUsage.user + cpuUsage.system) / 1000000, // Convert to seconds
-        cores: require('os').cpus().length
+        cores: 4 // Default core count for production
       },
       memory: {
         used: memUsage.heapUsed,

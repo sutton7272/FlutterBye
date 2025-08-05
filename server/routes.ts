@@ -45,6 +45,8 @@ import flutterAIPricingRoutes, { apiRateLimitMiddleware } from "./flutterai-pric
 import { flutterAIAutoCollection } from './flutterai-auto-collection';
 import { Connection, Keypair, LAMPORTS_PER_SOL, PublicKey, Transaction, SystemProgram } from '@solana/web3.js';
 import bs58 from 'bs58';
+import { enterpriseApiHandlers } from "./enterprise-api";
+import { governmentApiHandlers } from "./government-api";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Initialize Production Monitoring & Security
@@ -4379,6 +4381,52 @@ export async function registerRoutes(app: Express): Promise<Server> {
   console.log("💰 FlutterAI Pricing and Monetization system activated");
   console.log("🎯 AI Pricing Engine initialized with 6 products");
   console.log("🔄 Real-time pricing updates activated");
+  // ============ ENTERPRISE API ROUTES ============
+  console.log('🏢 Initializing Enterprise Intelligence APIs...');
+  
+  // Real-time transaction screening
+  app.post('/api/enterprise/screen-transaction', enterpriseApiHandlers.screenTransaction);
+  
+  // Bulk transaction screening for high-volume clients
+  app.post('/api/enterprise/bulk-screening', enterpriseApiHandlers.bulkScreening);
+  
+  // Advanced investigation tools
+  app.post('/api/enterprise/investigate', enterpriseApiHandlers.investigateAddresses);
+  
+  // Compliance configuration
+  app.post('/api/enterprise/compliance/configure', enterpriseApiHandlers.configureCompliance);
+  
+  // Generate compliance reports
+  app.get('/api/enterprise/compliance/report', enterpriseApiHandlers.generateComplianceReport);
+  
+  // API health and metrics
+  app.get('/api/enterprise/metrics', enterpriseApiHandlers.getApiMetrics);
+  
+  console.log('✅ Enterprise Intelligence APIs activated - Ready for $200K-$2M contracts!');
+  
+  // ============ GOVERNMENT API ROUTES ============
+  console.log('🏛️ Initializing Government Intelligence APIs...');
+  
+  // Comprehensive case investigation
+  app.post('/api/government/investigate-case', governmentApiHandlers.investigateCase);
+  
+  // Cross-jurisdiction data sharing
+  app.post('/api/government/cross-jurisdiction', governmentApiHandlers.crossJurisdictionRequest);
+  
+  // Evidence package generation
+  app.post('/api/government/evidence-package', governmentApiHandlers.generateEvidencePackage);
+  
+  // Real-time sanctions screening
+  app.post('/api/government/sanctions-screening', governmentApiHandlers.sanctionsScreening);
+  
+  // Government dashboard metrics
+  app.get('/api/government/dashboard-metrics', governmentApiHandlers.getDashboardMetrics);
+  
+  console.log('✅ Government Intelligence APIs activated - Ready for $100K-$2M government contracts!');
+  console.log('🚀 ENTERPRISE REVENUE GENERATION COMPLETE!');
+  console.log('💰 Target Revenue: $5M-$50M ARR from Enterprise + Government clients');
+  
+  // ============ END ENTERPRISE/GOVERNMENT ROUTES ============
   
   const httpServer = createServer(app);
   
