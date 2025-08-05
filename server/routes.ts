@@ -4,6 +4,7 @@ import jwt from 'jsonwebtoken';
 import { storage } from './storage';
 import { insertUserSchema, insertJobSchema, insertRatingSchema, insertMessageSchema } from '../shared/schema';
 import { z } from 'zod';
+import { flutterboyeService } from './flutterbye';
 
 const router = express.Router();
 const JWT_SECRET = process.env.JWT_SECRET || 'poolpal-secret-key';
@@ -158,6 +159,15 @@ router.post('/jobs', authenticateToken, async (req: any, res) => {
     });
     
     const job = await storage.createJob(jobData);
+    
+    // Send Flutterbye notification to cleaners about new job
+    flutterboyeService.createNotification({
+      recipientId: 'all_cleaners',
+      message: `New pool cleaning job posted: ${job.title}`,
+      type: 'job_posted',
+      metadata: { jobId: job.id, address: job.address }
+    });
+    
     res.json(job);
   } catch (error) {
     console.error('Create job error:', error);
@@ -234,6 +244,21 @@ router.post('/jobs/:id/accept', authenticateToken, async (req: any, res) => {
       return res.status(404).json({ error: 'Job not found' });
     }
     
+    // Send Flutterbye notification to customer
+    flutterboyeService.createNotification({
+      recipientId: job.customerId.toString(),
+      message: `Your pool cleaning job has been accepted by ${user.name}`,
+      type: 'job_accepted',
+      metadata: { jobId: job.id, cleanerName: user.name }
+    });
+    
+    // Track activity
+    flutterboyeService.trackUserActivity({
+      userId: req.user.userId.toString(),
+      action: 'job_accepted',
+      details: { jobId: job.id, jobTitle: job.title }
+    });
+    
     res.json(job);
   } catch (error) {
     console.error('Accept job error:', error);
@@ -258,6 +283,32 @@ router.put('/jobs/:id/status', authenticateToken, async (req: any, res) => {
     }
     
     const updatedJob = await storage.updateJob(jobId, { status });
+    
+    // Send notifications for job completion
+    if (status === 'completed') {
+      const customer = await storage.getUserById(job.customerId);
+      const cleaner = job.cleanerId ? await storage.getUserById(job.cleanerId) : null;
+      
+      if (customer) {
+        flutterboyeService.createNotification({
+          recipientId: customer.id.toString(),
+          message: `Your pool cleaning job has been completed by ${cleaner?.name}`,
+          type: 'job_completed',
+          metadata: { jobId: job.id, cleanerName: cleaner?.name }
+        });
+      }
+      
+      // Send rewards to cleaner
+      if (cleaner && job.cleanerId) {
+        flutterboyeService.sendRewards({
+          userId: cleaner.id.toString(),
+          amount: Math.floor(job.budget * 0.1), // 10% bonus
+          reason: 'Job completion bonus',
+          jobId: job.id
+        });
+      }
+    }
+    
     res.json(updatedJob);
   } catch (error) {
     console.error('Update job status error:', error);
@@ -328,6 +379,79 @@ router.get('/messages/job/:id', authenticateToken, async (req: any, res) => {
     res.json(messages);
   } catch (error) {
     console.error('Get messages error:', error);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+// ========== FLUTTERBYE INTEGRATION ROUTES ==========
+
+// Get Flutterbye status
+router.get('/flutterbye/status', (req, res) => {
+  res.json({ 
+    connected: flutterboyeService.isConfigured(),
+    service: 'Flutterbye Integration',
+    features: ['notifications', 'rewards', 'activity_tracking']
+  });
+});
+
+// Get user notifications (placeholder - would connect to actual Flutterbye API)
+router.get('/flutterbye/notifications', authenticateToken, async (req: any, res) => {
+  try {
+    // In a real implementation, this would fetch from Flutterbye API
+    const mockNotifications = [
+      {
+        id: '1',
+        message: 'Welcome to PoolPal with Flutterbye integration!',
+        type: 'info',
+        timestamp: new Date().toISOString(),
+        read: false
+      }
+    ];
+    
+    res.json(mockNotifications);
+  } catch (error) {
+    console.error('Get notifications error:', error);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+// Get user rewards (placeholder - would connect to actual Flutterbye API)
+router.get('/flutterbye/rewards', authenticateToken, async (req: any, res) => {
+  try {
+    // In a real implementation, this would fetch from Flutterbye API
+    const mockRewards = {
+      rewards: [
+        {
+          id: '1',
+          amount: 50,
+          reason: 'Welcome bonus',
+          timestamp: new Date().toISOString()
+        }
+      ],
+      stats: {
+        totalEarnings: 150,
+        completedJobs: 5,
+        customerRating: 4.8,
+        rewardsEarned: 50
+      }
+    };
+    
+    res.json(mockRewards);
+  } catch (error) {
+    console.error('Get rewards error:', error);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+// Mark notification as read
+router.post('/flutterbye/notifications/:id/read', authenticateToken, async (req: any, res) => {
+  try {
+    const notificationId = req.params.id;
+    // In real implementation, would call Flutterbye API
+    console.log(`Marking notification ${notificationId} as read for user ${req.user.userId}`);
+    res.json({ success: true });
+  } catch (error) {
+    console.error('Mark notification read error:', error);
     res.status(500).json({ error: 'Server error' });
   }
 });

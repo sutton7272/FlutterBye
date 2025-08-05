@@ -10,6 +10,7 @@ import {
   AlertCircle,
   Users
 } from 'lucide-react';
+import { FlutterboyeStatus, FlutterboyeNotifications, FlutterboyeRewards } from '../components/FlutterboyeIntegration';
 
 export default function DashboardPage() {
   const { user, token } = useAuth();
@@ -90,25 +91,28 @@ export default function DashboardPage() {
                 {user.isCleaner ? 'Ready to take on new pool cleaning jobs?' : 'Manage your pool cleaning requests'}
               </p>
             </div>
-            <div className="text-right">
-              <div className="text-sm text-gray-500 dark:text-gray-400">Account Type</div>
-              <div className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
-                user.isCleaner 
-                  ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200' 
-                  : 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
-              }`}>
-                {user.isCleaner ? (
-                  <>
-                    <Users size={14} className="mr-1" />
-                    Pool Cleaner
-                  </>
-                ) : (
-                  <>
-                    <Briefcase size={14} className="mr-1" />
-                    Customer
-                  </>
-                )}
+            <div className="text-right space-y-2">
+              <div>
+                <div className="text-sm text-gray-500 dark:text-gray-400">Account Type</div>
+                <div className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
+                  user.isCleaner 
+                    ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200' 
+                    : 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
+                }`}>
+                  {user.isCleaner ? (
+                    <>
+                      <Users size={14} className="mr-1" />
+                      Pool Cleaner
+                    </>
+                  ) : (
+                    <>
+                      <Briefcase size={14} className="mr-1" />
+                      Customer
+                    </>
+                  )}
+                </div>
               </div>
+              <FlutterboyeStatus />
             </div>
           </div>
         </div>
@@ -161,6 +165,31 @@ export default function DashboardPage() {
                 </p>
               </div>
               <DollarSign className="text-green-500" size={24} />
+            </div>
+          </div>
+        </div>
+
+        {/* Flutterbye Integration Section */}
+        <div className="grid lg:grid-cols-2 gap-8 mb-8">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+            <div className="p-6 border-b border-gray-200 dark:border-gray-700">
+              <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+                Flutterbye Notifications
+              </h2>
+            </div>
+            <div className="p-6">
+              <FlutterboyeNotifications />
+            </div>
+          </div>
+
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+            <div className="p-6 border-b border-gray-200 dark:border-gray-700">
+              <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+                Flutterbye Rewards
+              </h2>
+            </div>
+            <div className="p-6">
+              <FlutterboyeRewards />
             </div>
           </div>
         </div>
@@ -234,7 +263,7 @@ export default function DashboardPage() {
                   </div>
                 ) : openJobs.length === 0 ? (
                   <div className="text-center py-8">
-                    <Search className="mx-auto h-12 w-12 text-gray-400" />
+                    <Briefcase className="mx-auto h-12 w-12 text-gray-400" />
                     <h3 className="mt-2 text-sm font-medium text-gray-900 dark:text-white">No open jobs</h3>
                     <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
                       Check back later for new opportunities

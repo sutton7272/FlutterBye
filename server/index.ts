@@ -37,9 +37,20 @@ async function setupVite() {
       res.sendFile(join(__dirname, '../dist/index.html'));
     });
   }
+  
+  // Start server after Vite is set up
+  app.listen(PORT, '0.0.0.0', () => {
+    console.log(`🏊‍♀️ PoolPal server running on port ${PORT}`);
+    console.log('📋 Available routes:');
+    console.log('  - GET  /api/health - Health check');
+    console.log('  - POST /api/auth/register - Register user');
+    console.log('  - POST /api/auth/login - Login user');
+    console.log('  - GET  /api/jobs/open - Get open jobs');
+    console.log('  - POST /api/jobs - Create job');
+    console.log('  - GET  /api/cleaners - Get all cleaners');
+    console.log('  - GET  /api/flutterbye/status - Flutterbye integration status');
+  });
 }
-
-await setupVite();
 
 // Welcome message
 app.get('/api/health', (req, res) => {
@@ -50,14 +61,4 @@ app.get('/api/health', (req, res) => {
   });
 });
 
-// Start server
-app.listen(PORT, '0.0.0.0', () => {
-  console.log(`🏊‍♀️ PoolPal server running on port ${PORT}`);
-  console.log('📋 Available routes:');
-  console.log('  - GET  /api/health - Health check');
-  console.log('  - POST /api/auth/register - Register user');
-  console.log('  - POST /api/auth/login - Login user');
-  console.log('  - GET  /api/jobs/open - Get open jobs');
-  console.log('  - POST /api/jobs - Create job');
-  console.log('  - GET  /api/cleaners - Get all cleaners');
-});
+setupVite();
