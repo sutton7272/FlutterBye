@@ -52,28 +52,9 @@ export default function Dashboard() {
   const [activeTab, setActiveTab] = useState("overview");
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [showWalletWizard, setShowWalletWizard] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
   
   // Check if user is new (mobile)
-  useEffect(() => {
-    const isMobile = window.innerWidth < 768;
-    const isFirstVisit = !localStorage.getItem("flutter_onboarding_complete");
-    
-    if (isMobile && isFirstVisit) {
-      setShowOnboarding(true);
-    }
-  }, []);
-
-  const handleOnboardingComplete = () => {
-    localStorage.setItem("flutter_onboarding_complete", "true");
-    setShowOnboarding(false);
-  };
-
-  const handleWalletConnect = (walletId: string) => {
-    console.log("Connecting to wallet:", walletId);
-    setShowWalletWizard(false);
-  };
-  
-  // Detect mobile device and first-time user
   useEffect(() => {
     const checkMobile = () => {
       setIsMobile(window.innerWidth < 768);
@@ -91,6 +72,16 @@ export default function Dashboard() {
     
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
+
+  const handleOnboardingComplete = () => {
+    localStorage.setItem("flutter_onboarding_complete", "true");
+    setShowOnboarding(false);
+  };
+
+  const handleWalletConnect = (walletId: string) => {
+    console.log("Connecting to wallet:", walletId);
+    setShowWalletWizard(false);
+  };
 
   // Fetch dashboard data
   const { data: stats, isLoading } = useQuery<DashboardStats>({
@@ -261,7 +252,7 @@ export default function Dashboard() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                {stats?.recentActivity?.length > 0 ? (
+                {stats?.recentActivity && stats.recentActivity.length > 0 ? (
                   <div className="space-y-4">
                     {stats.recentActivity.map((activity) => (
                       <div key={activity.id} className="flex items-center justify-between p-3 rounded-lg bg-muted/50">
