@@ -21,6 +21,7 @@ import { FlutterAIIntelligenceDashboard } from './components/FlutterAIIntelligen
 import { DataProtectionDashboard } from './components/DataProtectionDashboard';
 import { DataMirrorDashboard } from './components/DataMirrorDashboard';
 import FeatureToggleDashboard from './components/FeatureToggleDashboard';
+import FeatureReleaseAnalyzer from './components/FeatureReleaseAnalyzer';
 
 function AppContent() {
   const { loading } = useAuth();
@@ -98,6 +99,12 @@ function AppContent() {
             <Route path="/feature-toggle">
               <ProtectedRoute>
                 <FeatureToggleDashboard />
+              </ProtectedRoute>
+            </Route>
+            
+            <Route path="/ai-analyzer">
+              <ProtectedRoute>
+                <FeatureReleaseAnalyzer />
               </ProtectedRoute>
             </Route>
             

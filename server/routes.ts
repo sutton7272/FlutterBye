@@ -1298,4 +1298,73 @@ router.post('/flutterbye/notifications/:id/read', authenticateToken, async (req:
   }
 });
 
+// Feature Release Analyzer endpoints
+router.get('/feature-analysis', async (req, res) => {
+  try {
+    const { FeatureReleaseAnalyzer } = await import('./feature-release-analyzer');
+    const analyzer = new FeatureReleaseAnalyzer();
+    
+    // Get current site metrics
+    const metrics = {
+      userCount: 150,
+      dailyActiveUsers: 45,
+      monthlyActiveUsers: 120,
+      averageSessionDuration: 180,
+      pageViews: 850,
+      bounceRate: 35,
+      conversionRate: 4.2,
+      revenue: 2500,
+      featureUsage: {
+        'coin_minting': 85,
+        'address_intelligence': 62,
+        'dashboard': 140,
+        'data_protection': 23
+      },
+      userFeedback: [
+        { feature: 'coin_minting', sentiment: 'positive' as const, comment: 'Love the simplicity', timestamp: new Date() },
+        { feature: 'analytics', sentiment: 'neutral' as const, comment: 'Would like more features', timestamp: new Date() }
+      ],
+      supportTickets: [
+        { category: 'feature_request', priority: 'medium' as const, resolved: true, timestamp: new Date() },
+        { category: 'bug', priority: 'low' as const, resolved: false, timestamp: new Date() }
+      ]
+    };
+
+    // Get available features to enable
+    const availableFeatures = [
+      'FlutterWave', 'AI Personalities', 'Analytics Dashboard', 
+      'Enterprise API', 'Advanced Security', 'Mobile App',
+      'Real-time Chat', 'Blockchain Integration', 'Machine Learning'
+    ];
+
+    const analysis = await analyzer.analyzeAndRecommend(metrics, availableFeatures);
+    res.json(analysis);
+  } catch (error) {
+    console.error('Feature analysis error:', error);
+    res.status(500).json({ error: 'Failed to generate feature analysis' });
+  }
+});
+
+router.post('/feature-toggle/enable', async (req, res) => {
+  try {
+    const { feature } = req.body;
+    
+    if (!feature) {
+      return res.status(400).json({ error: 'Feature name is required' });
+    }
+
+    // Import featureToggleService dynamically for this route
+    const { featureToggleService } = await import('./feature-toggle-service');
+    const result = await featureToggleService.enableFeature(feature);
+    res.json({ 
+      success: true, 
+      message: `Feature '${feature}' has been enabled`,
+      feature: result 
+    });
+  } catch (error) {
+    console.error('Error enabling feature:', error);
+    res.status(500).json({ error: 'Failed to enable feature' });
+  }
+});
+
 export default router;

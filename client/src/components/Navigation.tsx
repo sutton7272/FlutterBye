@@ -9,7 +9,8 @@ import {
   LogOut, 
   LogIn,
   UserPlus,
-  Settings
+  Settings,
+  Brain
 } from 'lucide-react';
 
 export default function Navigation() {
@@ -136,6 +137,17 @@ export default function Navigation() {
                   }`}>
                     <Settings size={18} />
                     <span>Feature Control</span>
+                  </div>
+                </Link>
+
+                <Link href="/ai-analyzer">
+                  <div className={`flex items-center space-x-1 px-3 py-2 rounded-lg transition-colors cursor-pointer ${
+                    isActive('/ai-analyzer') 
+                      ? 'bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300' 
+                      : 'text-gray-600 hover:text-blue-600 dark:text-gray-300 dark:hover:text-blue-400'
+                  }`}>
+                    <Brain size={18} />
+                    <span>AI Analyzer</span>
                   </div>
                 </Link>
               </>
