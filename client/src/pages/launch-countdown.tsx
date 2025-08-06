@@ -32,7 +32,7 @@ import flutterbeyeLogoPath from "@assets/image_1754068877999.png";
 import Navbar from "@/components/navbar";
 
 import { TutorialLaunchButton } from "@/components/interactive-tutorial";
-import { FlutterAIInteractiveTutorial } from "@/components/flutterai-interactive-tutorial";
+import { FlutterAIInteractiveTutorial } from "@/components/flutterai-interactive-tutorial-final";
 
 interface TimeLeft {
   days: number;
