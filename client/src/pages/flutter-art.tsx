@@ -80,7 +80,7 @@ export default function FlutterArt() {
   });
 
   // Fetch existing collections
-  const { data: collections = [], isLoading: collectionsLoading } = useQuery({
+  const { data: collections = [], isLoading: collectionsLoading } = useQuery<MessageNFTCollection[]>({
     queryKey: ['/api/message-nfts/collections'],
     retry: false,
   });
