@@ -10,6 +10,8 @@ import { Brain, Wand2, TrendingUp, Shield, DollarSign, Users, Target, MessageCir
  * Perfect for demonstrating the future of blockchain AI throughout the platform
  */
 export function FlutterAIInteractiveTutorial() {
+  console.log('FlutterAI Interactive Tutorial is rendering...');
+  
   const [walletAddress, setWalletAddress] = useState('5tzFkiKscXHK5ZXCGbXZxdw7gTjjD1mBwuoFbhUvuAi9');
   const [contentText, setContentText] = useState('Create revolutionary blockchain tokens');
   

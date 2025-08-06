@@ -26,7 +26,9 @@ import {
   TrendingUp,
   Award,
   Shield,
-  Quote
+  Quote,
+  Brain,
+  MessageCircle
 } from "lucide-react";
 import flutterbeyeLogoPath from "@assets/image_1754068877999.png";
 import Navbar from "@/components/navbar";
@@ -289,7 +291,90 @@ export default function LaunchCountdown() {
 
         {/* FlutterAI Interactive Tutorial */}
         <div className="max-w-7xl mx-auto mb-12">
-          <FlutterAIInteractiveTutorial />
+          <Card className="electric-frame bg-gradient-to-br from-slate-900/95 to-slate-800/95 border-electric-blue/60 shadow-2xl shadow-electric-blue/20">
+            <CardHeader className="text-center">
+              <CardTitle className="text-3xl text-gradient flex items-center justify-center gap-3 mb-4">
+                <Brain className="w-8 h-8 text-electric-blue animate-pulse" />
+                🧠 FlutterAI Interactive Preview
+              </CardTitle>
+              <p className="text-lg text-gray-300 max-w-4xl mx-auto">
+                🚀 Experience the REVOLUTIONARY AI that will power the next generation of blockchain intelligence! 
+                Get ready for mind-blowing wallet analysis, viral content optimization, and predictive market insights.
+              </p>
+            </CardHeader>
+            <CardContent className="space-y-8">
+              
+              {/* Wallet Intelligence Demo */}
+              <div className="bg-gradient-to-r from-purple-500/10 to-blue-500/10 rounded-lg p-6 border border-purple-500/30">
+                <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-3">
+                  <Brain className="w-6 h-6 text-purple-400" />
+                  🧠 Revolutionary Wallet Intelligence Scanning
+                </h3>
+                <div className="grid md:grid-cols-2 gap-6">
+                  <div>
+                    <Input
+                      placeholder="Enter any wallet address..."
+                      className="bg-slate-800/80 border-electric-blue/50 text-white placeholder:text-slate-400 text-lg h-12"
+                      defaultValue="5tzFkiKscXHK5ZXCGbXZxdw7gTjjD1mBwuoFbhUvuAi9"
+                    />
+                    <Button className="w-full mt-3 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 text-white text-lg h-12">
+                      <Zap className="w-5 h-5 mr-2" />
+                      Analyze with AI
+                    </Button>
+                  </div>
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-2 text-green-400">
+                      <CheckCircle className="w-5 h-5" />
+                      <span className="font-semibold">AI Score: 94/100 🔥</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-cyan-400">
+                      <TrendingUp className="w-5 h-5" />
+                      <span>Portfolio Value: $2.4M 💎</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-yellow-400">
+                      <Star className="w-5 h-5" />
+                      <span>Risk Level: LOW 🛡️</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Quick Feature Grid */}
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <Button className="bg-gradient-to-r from-green-600 to-emerald-600 text-white h-16 flex-col gap-2">
+                  <TrendingUp className="w-6 h-6" />
+                  <span className="text-sm">Market Intel</span>
+                </Button>
+                <Button className="bg-gradient-to-r from-orange-600 to-red-600 text-white h-16 flex-col gap-2">
+                  <Shield className="w-6 h-6" />
+                  <span className="text-sm">Security Scan</span>
+                </Button>
+                <Button className="bg-gradient-to-r from-pink-600 to-purple-600 text-white h-16 flex-col gap-2">
+                  <Users className="w-6 h-6" />
+                  <span className="text-sm">Social Analysis</span>
+                </Button>
+                <Button className="bg-gradient-to-r from-cyan-600 to-blue-600 text-white h-16 flex-col gap-2">
+                  <MessageCircle className="w-6 h-6" />
+                  <span className="text-sm">Chat with ARIA</span>
+                </Button>
+              </div>
+
+              {/* Call to Action */}
+              <div className="text-center bg-gradient-to-r from-electric-blue/20 to-circuit-teal/20 rounded-lg p-6 border border-electric-blue/40">
+                <h4 className="text-2xl font-bold text-white mb-3">
+                  🎯 Ready to Experience the Future?
+                </h4>
+                <p className="text-gray-300 mb-4 text-lg">
+                  This is just a TINY preview of what FlutterAI will unleash! The full platform will blow your mind! 🤯
+                </p>
+                <Badge className="bg-gradient-to-r from-electric-blue to-circuit-teal text-white px-6 py-2 text-lg">
+                  <Rocket className="w-5 h-5 mr-2" />
+                  Coming Soon - Full AI Revolution!
+                </Badge>
+              </div>
+              
+            </CardContent>
+          </Card>
         </div>
 
         {/* Countdown Timer */}
