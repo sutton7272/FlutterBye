@@ -15,6 +15,7 @@ export default function Navbar() {
 
   // Primary navigation - core platform sections focused on launch products
   const allNavItems = [
+    { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard, description: "Portfolio & activity", featureId: "dashboard", priority: true },
     { href: "/create", label: "Create", icon: Coins, description: "Message tokens & campaigns", featureId: "mint", priority: true, 
       subItems: [
         { href: "/create", label: "Basic Messages", description: "27-character message tokens" },
@@ -38,7 +39,7 @@ export default function Navbar() {
           return true;
         }
         // Show core features by default
-        if (["home", "mint", "marketplace", "flutterai", "flutter_wave", "flutter_art", "chat"].includes(item.featureId)) {
+        if (["home", "mint", "marketplace", "flutterai", "flutter_wave", "flutter_art", "chat", "dashboard"].includes(item.featureId)) {
           return true;
         }
         // If no featureId is specified, show the item by default
@@ -49,7 +50,6 @@ export default function Navbar() {
 
   // Secondary navigation - business and enterprise features
   const secondaryNavItems = [
-    { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard, description: "Portfolio & activity" },
     { href: "/info", label: "Info", icon: HelpCircle, description: "Platform information & help",
       subItems: [
         { href: "/info", label: "Platform Info", description: "About Flutterbye platform" },
