@@ -238,7 +238,7 @@ export default function AdminGateway() {
           </Link>
 
           {/* FlutterAI Backend Dashboard */}
-          <Link href="/admin/flutterai">
+          <Link href="/admin/enterprise">
             <Card className="bg-slate-800/50 border-green-500/20 hover:border-green-400/40 transition-all cursor-pointer group">
               <CardHeader>
                 <Brain className="w-8 h-8 text-green-400 group-hover:text-green-300" />
@@ -259,7 +259,7 @@ export default function AdminGateway() {
           </Link>
 
           {/* Access Control */}
-          <Link href="/admin/access">
+          <Link href="/admin/access-control">
             <Card className="bg-slate-800/50 border-purple-500/20 hover:border-purple-400/40 transition-all cursor-pointer group">
               <CardHeader>
                 <Users className="w-8 h-8 text-purple-400 group-hover:text-purple-300" />
@@ -280,7 +280,7 @@ export default function AdminGateway() {
           </Link>
 
           {/* System Settings */}
-          <Link href="/admin/settings">
+          <Link href="/admin/features">
             <Card className="bg-slate-800/50 border-orange-500/20 hover:border-orange-400/40 transition-all cursor-pointer group">
               <CardHeader>
                 <Settings className="w-8 h-8 text-orange-400 group-hover:text-orange-300" />

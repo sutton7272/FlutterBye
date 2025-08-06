@@ -8791,7 +8791,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // Get admin wallets list
-  app.get('/api/admin/wallets', async (req, res) => {
+  app.get('/api/admin/wallets', isAdminSessionAuthenticated, async (req, res) => {
     try {
       const wallets = Array.from(adminWallets).map(address => ({
         address,
@@ -8901,7 +8901,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // Get site access status
-  app.get('/api/admin/site-access', async (req, res) => {
+  app.get('/api/admin/site-access', isAdminSessionAuthenticated, async (req, res) => {
     try {
       // In production, this would check database or environment
       res.json({
@@ -8940,7 +8940,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // Enterprise dashboard endpoints
-  app.get('/api/enterprise/dashboard-metrics', async (req, res) => {
+  app.get('/api/enterprise/dashboard-metrics', isAdminSessionAuthenticated, async (req, res) => {
     try {
       res.json({
         metrics: {
@@ -8956,7 +8956,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get('/api/enterprise/cross-chain/supported-chains', async (req, res) => {
+  app.get('/api/enterprise/cross-chain/supported-chains', isAdminSessionAuthenticated, async (req, res) => {
     try {
       res.json({
         supportedChains: [
@@ -8975,7 +8975,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Get admin activity logs
-  app.get('/api/admin/activity-logs', async (req, res) => {
+  app.get('/api/admin/activity-logs', isAdminSessionAuthenticated, async (req, res) => {
     try {
       // Mock activity logs for demonstration
       const logs = [
