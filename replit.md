@@ -33,11 +33,12 @@ Design preference: Electric blue and green color scheme with animated electrical
 Priority focus: Initial release strategy focusing on coin minting as the core entry point, with strategic roadmap for $100M ARR target.
 
 ## Recent Changes
-- **Core Product Definition (January 2025)**: Focused on two main launch products:
-  1. **Coin Creation**: 60-second token deployment with 27-character messages + redeemable value
-  2. **FlutterAI**: Intelligence platform with AI-powered analytics and marketing automation
-- **Strategic Pivot**: Positioned as "The Coinbase of Token Creation" with message-based value tokens
-- **Market Focus**: Simple 27-character message tokens with embedded redemption value for viral adoption
+- **Core Product Definition (January 2025)**: Integrated platform combining FlutterAI wallet intelligence with targeted messaging:
+  1. **FlutterAI Wallet Scoring**: AI-powered analysis of crypto holder behavior, demographics, and patterns
+  2. **27-Character Message Tokens**: Targeted marketing messages with redeemable value sent to specific wallet segments
+  3. **Precision Crypto Marketing**: Enable businesses to communicate directly with targeted crypto holders
+- **Strategic Pivot**: Revolutionary crypto marketing platform - "Target Any Crypto Holder with Precision Messaging"
+- **Market Focus**: B2B crypto marketing with consumer-grade 27-character message distribution
 - **Revenue Model**: SOL-based pricing starting at 0.01 SOL per token creation
 - **AI Marketing Bot Integration**: Fully integrated into FlutterAI dashboard with comprehensive automation
 - **Site Organization Analysis**: Identified need to streamline 80+ routes around two core products
