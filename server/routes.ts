@@ -4287,12 +4287,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const tweetContent = `${content} ${(hashtags || []).join(' ')}`.slice(0, 280);
 
-      // Check if OAuth tokens are available
+      // Check if OAuth tokens are available (using fresh credentials directly for testing)
       const credentials = {
-        apiKey: process.env.TWITTER_API_KEY,
-        apiSecret: process.env.TWITTER_API_SECRET,
-        accessToken: process.env.TWITTER_ACCESS_TOKEN,
-        accessSecret: process.env.TWITTER_ACCESS_TOKEN_SECRET
+        apiKey: process.env.TWITTER_API_KEY || "O6Ad5Epovhe7M5FgfyTvCdCQc",
+        apiSecret: process.env.TWITTER_API_SECRET || "Va60cXSEZKk3S1iW3HqGQHNhTu6ONaln2lxL6gWECfVAJJimPn",
+        accessToken: "1920455247631159296-524SiukjrYNUeBhN4FOqiKpcEnMmgU",
+        accessSecret: "IMndTz4t0fSJihvW0eLBVaHltmFuQOOZ2S8EaKhHgq0op"
       };
 
       const missingCredentials = Object.entries(credentials)
@@ -4309,12 +4309,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
 
-      // Initialize Twitter API client with OAuth tokens
+      // Initialize Twitter API client with fresh OAuth tokens
       const twitterClient = new TwitterApi({
-        appKey: process.env.TWITTER_API_KEY!,
-        appSecret: process.env.TWITTER_API_SECRET!,
-        accessToken: process.env.TWITTER_ACCESS_TOKEN!,
-        accessSecret: process.env.TWITTER_ACCESS_TOKEN_SECRET!,
+        appKey: "O6Ad5Epovhe7M5FgfyTvCdCQc",
+        appSecret: "Va60cXSEZKk3S1iW3HqGQHNhTu6ONaln2lxL6gWECfVAJJimPn",
+        accessToken: "1920455247631159296-524SiukjrYNUeBhN4FOqiKpcEnMmgU",
+        accessSecret: "IMndTz4t0fSJihvW0eLBVaHltmFuQOOZ2S8EaKhHgq0op",
       });
 
       try {
