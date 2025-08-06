@@ -249,21 +249,21 @@ export default function LaunchCountdown() {
 
       <div className={`container mx-auto px-4 relative z-10 ${hasAccess ? 'pt-24 pb-8' : 'py-8'}`}>
         {/* Header */}
-        <div className="text-center mb-12">
+        <div className="text-center mb-8">
           <img 
             src={flutterbeyeLogoPath} 
             alt="Flutterbye Logo" 
-            className="w-32 h-32 mx-auto mb-6 rounded-full electric-frame"
+            className="w-24 h-24 mx-auto mb-4 rounded-full electric-frame"
           />
-          <h1 className="text-6xl font-bold mb-4">
+          <h1 className="text-4xl font-bold mb-3">
             <span className="bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent">
               FLUTTERBYE
             </span>
           </h1>
-          <p className="text-2xl text-gray-300 mb-6">
+          <p className="text-lg text-gray-300 mb-4">
             The Future of Communication is Coming
           </p>
-          <div className="flex justify-center gap-2 mb-8">
+          <div className="flex justify-center gap-2 mb-6">
             <Badge variant="secondary" className="bg-cyan-500/20 text-cyan-400 border-cyan-500/30">
               <Rocket className="w-3 h-3 mr-1" />
               Pre-Launch
@@ -277,77 +277,64 @@ export default function LaunchCountdown() {
               Exclusive Airdrops
             </Badge>
           </div>
-
-          {/* Tutorial Preview Button for All Users */}
-          <div className="flex justify-center mb-8">
-            <TutorialLaunchButton 
-              className="bg-gradient-to-r from-electric-blue to-circuit-teal hover:from-electric-blue/80 hover:to-circuit-teal/80 text-white px-8 py-3 text-lg" 
-              variant="default"
-            />
-          </div>
         </div>
 
-        {/* FlutterAI Interactive Tutorial */}
-        <div className="max-w-7xl mx-auto mb-12">
-          <FlutterAIInteractiveTutorial />
-        </div>
-
-        {/* Countdown Timer */}
-        <Card className="electric-frame max-w-4xl mx-auto mb-12">
-          <CardHeader>
-            <CardTitle className="text-center text-3xl text-gradient flex items-center justify-center gap-3">
-              <Clock className="w-8 h-8" />
+        {/* Countdown Timer - Top of Page */}
+        <Card className="electric-frame max-w-4xl mx-auto mb-8">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-center text-2xl text-gradient flex items-center justify-center gap-3">
+              <Clock className="w-6 h-6" />
               Launch Countdown
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
-              <div className="bg-gradient-to-br from-cyan-500/20 to-blue-500/20 rounded-lg p-6 electric-frame relative overflow-hidden">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-center">
+              <div className="bg-gradient-to-br from-cyan-500/20 to-blue-500/20 rounded-lg p-4 electric-frame relative overflow-hidden">
                 <div className="absolute inset-0 bg-gradient-to-r from-transparent via-cyan-400/10 to-transparent animate-pulse"></div>
                 <div className="relative z-10">
-                  <div className="text-5xl font-bold text-cyan-400 mb-2 font-mono tabular-nums">
+                  <div className="text-3xl font-bold text-cyan-400 mb-1 font-mono tabular-nums">
                     {timeLeft.days.toString().padStart(2, '0')}
                   </div>
-                  <div className="text-sm text-muted-foreground font-semibold tracking-wider">DAYS</div>
+                  <div className="text-xs text-muted-foreground font-semibold tracking-wider">DAYS</div>
                 </div>
               </div>
               
-              <div className="bg-gradient-to-br from-blue-500/20 to-purple-500/20 rounded-lg p-6 electric-frame relative overflow-hidden">
+              <div className="bg-gradient-to-br from-blue-500/20 to-purple-500/20 rounded-lg p-4 electric-frame relative overflow-hidden">
                 <div className="absolute inset-0 bg-gradient-to-r from-transparent via-blue-400/10 to-transparent animate-pulse delay-300"></div>
                 <div className="relative z-10">
-                  <div className="text-5xl font-bold text-blue-400 mb-2 font-mono tabular-nums">
+                  <div className="text-3xl font-bold text-blue-400 mb-1 font-mono tabular-nums">
                     {timeLeft.hours.toString().padStart(2, '0')}
                   </div>
-                  <div className="text-sm text-muted-foreground font-semibold tracking-wider">HOURS</div>
+                  <div className="text-xs text-muted-foreground font-semibold tracking-wider">HOURS</div>
                 </div>
               </div>
               
-              <div className="bg-gradient-to-br from-purple-500/20 to-pink-500/20 rounded-lg p-6 electric-frame relative overflow-hidden">
+              <div className="bg-gradient-to-br from-purple-500/20 to-pink-500/20 rounded-lg p-4 electric-frame relative overflow-hidden">
                 <div className="absolute inset-0 bg-gradient-to-r from-transparent via-purple-400/10 to-transparent animate-pulse delay-700"></div>
                 <div className="relative z-10">
-                  <div className="text-5xl font-bold text-purple-400 mb-2 font-mono tabular-nums">
+                  <div className="text-3xl font-bold text-purple-400 mb-1 font-mono tabular-nums">
                     {timeLeft.minutes.toString().padStart(2, '0')}
                   </div>
-                  <div className="text-sm text-muted-foreground font-semibold tracking-wider">MINUTES</div>
+                  <div className="text-xs text-muted-foreground font-semibold tracking-wider">MINUTES</div>
                 </div>
               </div>
               
-              <div className="bg-gradient-to-br from-pink-500/20 to-cyan-500/20 rounded-lg p-6 electric-frame relative overflow-hidden">
+              <div className="bg-gradient-to-br from-pink-500/20 to-cyan-500/20 rounded-lg p-4 electric-frame relative overflow-hidden">
                 <div className="absolute inset-0 bg-gradient-to-r from-transparent via-pink-400/10 to-transparent animate-pulse delay-1000"></div>
                 <div className="relative z-10">
-                  <div className={`text-5xl font-bold mb-2 font-mono tabular-nums transition-colors duration-300 ${
+                  <div className={`text-3xl font-bold mb-1 font-mono tabular-nums transition-colors duration-300 ${
                     timeLeft.seconds % 2 === 0 ? 'text-pink-400' : 'text-pink-300'
                   }`}>
                     {timeLeft.seconds.toString().padStart(2, '0')}
                   </div>
-                  <div className="text-sm text-muted-foreground font-semibold tracking-wider">SECONDS</div>
+                  <div className="text-xs text-muted-foreground font-semibold tracking-wider">SECONDS</div>
                 </div>
               </div>
             </div>
 
             {/* Launch Date Display */}
-            <div className="mt-6 text-center">
-              <p className="text-muted-foreground">
+            <div className="mt-4 text-center">
+              <p className="text-sm text-muted-foreground">
                 Public Launch: <span className="text-cyan-400 font-semibold">
                   {launchDate.toLocaleDateString('en-US', { 
                     weekday: 'long', 
@@ -358,185 +345,215 @@ export default function LaunchCountdown() {
                   })}
                 </span>
               </p>
-              <p className="text-xs text-muted-foreground mt-1">
-                {launchDate.toLocaleTimeString('en-US', { 
-                  hour: '2-digit', 
-                  minute: '2-digit',
-                  timeZoneName: 'short',
-                  timeZone: 'UTC'
-                })}
-              </p>
             </div>
           </CardContent>
         </Card>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-6xl mx-auto">
-          {/* VIP Waitlist Signup */}
-          <Card className="electric-frame">
-            <CardHeader>
-              <CardTitle className="text-gradient flex items-center gap-2">
-                <Mail className="w-6 h-6" />
-                Join VIP Waitlist
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              {
-                submitted ? (
-                <div className="text-center py-8">
-                  <CheckCircle className="w-16 h-16 mx-auto mb-4 text-green-400" />
-                  <h3 className="text-xl font-bold mb-2 text-green-400">You're In!</h3>
-                  <p className="text-muted-foreground mb-4">
-                    Welcome to the exclusive VIP list. You'll be among the first to access Flutterbye and receive FLBY token airdrops.
-                  </p>
-                  <div className="bg-green-500/10 border border-green-500/20 rounded-lg p-4">
-                    <h4 className="font-medium text-green-400 mb-2">What's Next?</h4>
-                    <ul className="text-sm text-muted-foreground space-y-1">
-                      <li>• Early access invitation before public launch</li>
-                      <li>• Exclusive FLBY token airdrop eligibility</li>
-                      <li>• VIP community Discord access</li>
-                      <li>• Beta testing privileges and feedback opportunities</li>
-                    </ul>
-                  </div>
-                </div>
-              ) : (
-                <div className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="email">Email Address *</Label>
-                    <Input
-                      id="email"
-                      type="email"
-                      placeholder="your@email.com"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      required
-                      className="bg-slate-800/80 border-slate-600 text-white placeholder:text-slate-400 focus:border-cyan-400 focus:ring-cyan-400/20"
-                    />
-                    {email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) && (
-                      <p className="text-yellow-400 text-xs">Please enter a valid email address</p>
-                    )}
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label htmlFor="wallet">Solana Wallet Address (Optional)</Label>
-                    <Input
-                      id="wallet"
-                      placeholder="e.g., 7xKXtg2CW87d97TXJSDpbD5jBkheTqA83TZRuJosgAsU"
-                      value={walletAddress}
-                      onChange={(e) => setWalletAddress(e.target.value)}
-                      className="bg-slate-800/80 border-slate-600 text-white placeholder:text-slate-400 focus:border-cyan-400 focus:ring-cyan-400/20"
-                    />
-                    <p className="text-xs text-muted-foreground">
-                      💰 For FLBY token airdrops (can be added later)
-                    </p>
-                    {walletAddress && walletAddress.length > 0 && walletAddress.length < 32 && (
-                      <p className="text-yellow-400 text-xs">Solana addresses are typically 32-44 characters long</p>
-                    )}
-                  </div>
-
-                  <Button 
-                    type="button" 
-                    className="w-full bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 hover:to-blue-700 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-300 hover:scale-105 border border-cyan-400/30"
-                    disabled={signupMutation.isPending || !email}
-                    onClick={(e) => {
-                      console.log("Raw button click event:", e);
-                      handleSignup();
-                    }}
-                  >
-                    {signupMutation.isPending ? (
-                      <>
-                        <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2"></div>
-                        Joining...
-                      </>
-                    ) : (
-                      <>
-                        <Mail className="w-4 h-4 mr-2" />
-                        Join VIP Waitlist
-                      </>
-                    )}
-                  </Button>
-
-
-
-                  <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-3">
-                    <h4 className="font-medium text-blue-400 mb-2">VIP Benefits</h4>
-                    <ul className="text-sm text-muted-foreground space-y-1">
-                      <li>• Early access before public launch</li>
-                      <li>• Exclusive FLBY token airdrops</li>
-                      <li>• Beta testing privileges</li>
-                      <li>• VIP community access</li>
-                    </ul>
-                  </div>
-
-                  {/* Early Access Section */}
-                  <div className="bg-purple-500/10 border border-purple-500/20 rounded-lg p-4 mt-6">
-                    <div className="flex items-center gap-2 mb-2">
-                      <Key className="w-4 h-4 text-purple-400" />
-                      <h4 className="font-medium text-purple-400">Want Full Access Now?</h4>
-                    </div>
+        {/* Three Column Layout */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 max-w-7xl mx-auto mb-8">
+          {/* Left Column: VIP Signup */}
+          <div>
+            <Card className="electric-frame">
+              <CardHeader>
+                <CardTitle className="text-gradient flex items-center gap-2 text-lg">
+                  <Mail className="w-5 h-5" />
+                  Join VIP Waitlist
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                {submitted ? (
+                  <div className="text-center py-6">
+                    <CheckCircle className="w-12 h-12 mx-auto mb-3 text-green-400" />
+                    <h3 className="text-lg font-bold mb-2 text-green-400">You're In!</h3>
                     <p className="text-sm text-muted-foreground mb-3">
-                      Have an early access code or authorized email? Get immediate access to the full platform features.
+                      Welcome to the exclusive VIP list. You'll be among the first to access Flutterbye.
                     </p>
-                    
-                    <div className="space-y-3">
-                      <div>
-                        <Label htmlFor="accessCode" className="text-xs">Access Code</Label>
-                        <Input
-                          id="accessCode"
-                          placeholder="FLBY-EARLY-XXX"
-                          value={accessCode}
-                          onChange={(e) => setAccessCode(e.target.value)}
-                          className="bg-slate-800/80 border-slate-600 text-white placeholder:text-slate-400 focus:border-purple-400 focus:ring-purple-400/20 text-sm"
-                        />
-                      </div>
-
-                      <div className="text-center text-muted-foreground text-xs">OR</div>
-
-                      <div>
-                        <Label htmlFor="authorizedEmail" className="text-xs">Authorized Email</Label>
-                        <Input
-                          id="authorizedEmail"
-                          type="email"
-                          placeholder="your@email.com"
-                          value={authorizedEmail}
-                          onChange={(e) => setAuthorizedEmail(e.target.value)}
-                          className="bg-slate-800/80 border-slate-600 text-white placeholder:text-slate-400 focus:border-purple-400 focus:ring-purple-400/20 text-sm"
-                        />
-                      </div>
-
-                      <Button 
-                        onClick={handleAccessRequest}
-                        disabled={(!accessCode && !authorizedEmail) || checkAccessMutation.isPending}
-                        className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-sm py-2"
-                        size="sm"
-                      >
-                        {checkAccessMutation.isPending ? (
-                          <>
-                            <div className="w-3 h-3 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2"></div>
-                            Verifying...
-                          </>
-                        ) : (
-                          <>
-                            <Unlock className="w-3 h-3 mr-2" />
-                            Get Early Access
-                          </>
-                        )}
-                      </Button>
+                    <div className="bg-green-500/10 border border-green-500/20 rounded-lg p-3">
+                      <h4 className="font-medium text-green-400 mb-2 text-sm">What's Next?</h4>
+                      <ul className="text-xs text-muted-foreground space-y-1">
+                        <li>• Early access invitation</li>
+                        <li>• Exclusive FLBY airdrops</li>
+                        <li>• VIP community access</li>
+                        <li>• Beta testing privileges</li>
+                      </ul>
                     </div>
                   </div>
-                </div>
-              )}
-            </CardContent>
-          </Card>
+                ) : (
+                  <div className="space-y-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="email" className="text-sm">Email Address *</Label>
+                      <Input
+                        id="email"
+                        type="email"
+                        placeholder="your@email.com"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        required
+                        className="bg-slate-800/80 border-slate-600 text-white placeholder:text-slate-400 focus:border-cyan-400 focus:ring-cyan-400/20 text-sm"
+                      />
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <Label htmlFor="wallet" className="text-sm">Wallet Address (Optional)</Label>
+                      <Input
+                        id="wallet"
+                        placeholder="Solana wallet address"
+                        value={walletAddress}
+                        onChange={(e) => setWalletAddress(e.target.value)}
+                        className="bg-slate-800/80 border-slate-600 text-white placeholder:text-slate-400 focus:border-cyan-400 focus:ring-cyan-400/20 text-sm"
+                      />
+                      <p className="text-xs text-muted-foreground">
+                        💰 For FLBY token airdrops
+                      </p>
+                    </div>
 
-          {/* Social Proof Elements */}
-          <Card className="electric-frame">
-            <CardHeader>
-              <CardTitle className="text-gradient flex items-center gap-2">
-                <Award className="w-6 h-6" />
-                Join Thousands of Early Adopters
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-6">
+                    <Button 
+                      type="button" 
+                      className="w-full bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 hover:to-blue-700 text-white font-semibold py-2 text-sm"
+                      disabled={signupMutation.isPending || !email}
+                      onClick={handleSignup}
+                    >
+                      {signupMutation.isPending ? (
+                        <>
+                          <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2"></div>
+                          Joining...
+                        </>
+                      ) : (
+                        <>
+                          <Mail className="w-4 h-4 mr-2" />
+                          Join VIP Waitlist
+                        </>
+                      )}
+                    </Button>
+
+                    <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-3">
+                      <h4 className="font-medium text-blue-400 mb-2 text-sm">VIP Benefits</h4>
+                      <ul className="text-xs text-muted-foreground space-y-1">
+                        <li>• Early access before launch</li>
+                        <li>• Exclusive FLBY airdrops</li>
+                        <li>• Beta testing privileges</li>
+                        <li>• VIP community access</li>
+                      </ul>
+                    </div>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Middle Column: Both Tutorials */}
+          <div className="space-y-4">
+            {/* Interactive Tutorial */}
+            <Card className="electric-frame">
+              <CardHeader className="pb-3">
+                <CardTitle className="text-gradient text-lg">Platform Tutorial</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-center">
+                  <p className="text-sm text-muted-foreground mb-4">
+                    Experience the FUTURE of token creation! See how easy it is to become "The Coinbase of Token Creation"!
+                  </p>
+                  <TutorialLaunchButton 
+                    className="bg-gradient-to-r from-electric-blue to-circuit-teal hover:from-electric-blue/80 hover:to-circuit-teal/80 text-white px-4 py-2 text-sm w-full" 
+                    variant="default"
+                  />
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* FlutterAI Tutorial */}
+            <div className="max-w-full">
+              <FlutterAIInteractiveTutorial />
+            </div>
+          </div>
+
+          {/* Right Column: Early Access */}
+          <div>
+            <Card className="electric-frame">
+              <CardHeader>
+                <CardTitle className="text-gradient flex items-center gap-2 text-lg">
+                  <Key className="w-5 h-5" />
+                  Early Access
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <p className="text-sm text-muted-foreground">
+                    Have an early access code or authorized email? Get immediate access to the full platform features.
+                  </p>
+                  
+                  <div className="space-y-3">
+                    <div>
+                      <Label htmlFor="accessCode" className="text-sm">Access Code</Label>
+                      <Input
+                        id="accessCode"
+                        placeholder="FLBY-EARLY-XXX"
+                        value={accessCode}
+                        onChange={(e) => setAccessCode(e.target.value)}
+                        className="bg-slate-800/80 border-slate-600 text-white placeholder:text-slate-400 focus:border-purple-400 focus:ring-purple-400/20 text-sm"
+                      />
+                    </div>
+
+                    <div className="text-center text-muted-foreground text-xs">OR</div>
+
+                    <div>
+                      <Label htmlFor="authorizedEmail" className="text-sm">Authorized Email</Label>
+                      <Input
+                        id="authorizedEmail"
+                        type="email"
+                        placeholder="your@email.com"
+                        value={authorizedEmail}
+                        onChange={(e) => setAuthorizedEmail(e.target.value)}
+                        className="bg-slate-800/80 border-slate-600 text-white placeholder:text-slate-400 focus:border-purple-400 focus:ring-purple-400/20 text-sm"
+                      />
+                    </div>
+
+                    <Button 
+                      onClick={handleAccessRequest}
+                      disabled={(!accessCode && !authorizedEmail) || checkAccessMutation.isPending}
+                      className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-sm py-2"
+                    >
+                      {checkAccessMutation.isPending ? (
+                        <>
+                          <div className="w-3 h-3 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2"></div>
+                          Verifying...
+                        </>
+                      ) : (
+                        <>
+                          <Unlock className="w-3 h-3 mr-2" />
+                          Get Early Access
+                        </>
+                      )}
+                    </Button>
+                  </div>
+
+                  <div className="bg-purple-500/10 border border-purple-500/20 rounded-lg p-3">
+                    <h4 className="font-medium text-purple-400 mb-2 text-sm">Instant Access</h4>
+                    <ul className="text-xs text-muted-foreground space-y-1">
+                      <li>• Full platform access now</li>
+                      <li>• Skip the waitlist</li>
+                      <li>• Premium features unlocked</li>
+                      <li>• Direct platform entry</li>
+                    </ul>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+
+        {/* Single Column Content Below Three Columns */}
+        <div className="max-w-6xl mx-auto">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            {/* Social Proof Elements */}
+            <Card className="electric-frame">
+              <CardHeader>
+                <CardTitle className="text-gradient flex items-center gap-2">
+                  <Award className="w-6 h-6" />
+                  Join Thousands of Early Adopters
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-6">
               {/* Statistics */}
               <div className="grid grid-cols-3 gap-4 text-center">
                 <div className="space-y-2">
@@ -727,6 +744,7 @@ export default function LaunchCountdown() {
               </div>
             </CardContent>
           </Card>
+          </div>
         </div>
 
         {/* Progress Bar */}
