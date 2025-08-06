@@ -172,10 +172,28 @@ export function useLocalStorage<T>(key: string, initialValue: T) {
 // Online status hook
 export function useOnlineStatus() {
   const [isOnline, setIsOnline] = useState(navigator.onLine);
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
-    const handleOnline = () => setIsOnline(true);
-    const handleOffline = () => setIsOnline(false);
+    const handleOnline = () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+      // Debounce the online status change to prevent rapid toggling
+      timeoutRef.current = setTimeout(() => {
+        setIsOnline(true);
+      }, 500);
+    };
+    
+    const handleOffline = () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+      // Debounce the offline status change to prevent rapid toggling
+      timeoutRef.current = setTimeout(() => {
+        setIsOnline(false);
+      }, 1000);
+    };
 
     window.addEventListener('online', handleOnline);
     window.addEventListener('offline', handleOffline);
@@ -183,6 +201,9 @@ export function useOnlineStatus() {
     return () => {
       window.removeEventListener('online', handleOnline);
       window.removeEventListener('offline', handleOffline);
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
     };
   }, []);
 
