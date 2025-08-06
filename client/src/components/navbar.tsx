@@ -51,7 +51,6 @@ export default function Navbar() {
   // Secondary navigation - business and enterprise features
   const secondaryNavItems = [
     { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard, description: "Portfolio & activity" },
-    { href: "/trade", label: "Trade", icon: ArrowRightLeft, description: "Token marketplace & trading" },
     { href: "/activity", label: "Activity", icon: Activity, description: "Platform activity & analytics" },
     { href: "/explore", label: "Explore", icon: Star, description: "Discover trending content" },
   ];
