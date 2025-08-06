@@ -38,6 +38,8 @@ Priority focus: Initial release strategy focusing on coin minting as the core en
 - **Market Focus**: Targeting crypto creators, small businesses, and developers with consumer-grade simplicity
 - **Revenue Model**: SOL-based pricing starting at 0.01 SOL per token creation
 - **Timeline**: 3-week launch timeline with phased approach to market entry
+- **AI Marketing Bot Integration (January 2025)**: Added comprehensive AI-powered marketing automation system as built-in admin feature with social media content generation, SEO blog creation, and campaign management
+- **Admin Dashboard Layout**: Restored original Admin component layout after temporary switch to UnifiedAdminDashboard
 
 ## System Architecture
 
