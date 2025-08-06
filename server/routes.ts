@@ -1,6 +1,8 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import cors from 'cors';
+import crypto from 'crypto';
+import { TwitterApi } from 'twitter-api-v2';
 import { 
   globalRateLimit, 
   apiRateLimit, 
@@ -4109,31 +4111,64 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Test Twitter API connection
-  app.post("/api/marketing/bot/test-twitter", async (req, res) => {
+  // Test Twitter API connection with OAuth credentials
+  app.get("/api/marketing/bot/test-twitter", async (req, res) => {
     try {
-      const { bearerToken } = req.body;
-      
-      if (!bearerToken) {
-        return res.status(400).json({ error: "Bearer token required" });
+      const credentials = {
+        apiKey: process.env.TWITTER_API_KEY,
+        apiSecret: process.env.TWITTER_API_SECRET,
+        accessToken: process.env.TWITTER_ACCESS_TOKEN,
+        accessSecret: process.env.TWITTER_ACCESS_TOKEN_SECRET
+      };
+
+      // Check if all required credentials are present
+      const missingCredentials = Object.entries(credentials)
+        .filter(([_, value]) => !value)
+        .map(([key, _]) => key);
+
+      if (missingCredentials.length > 0) {
+        return res.json({
+          success: false,
+          message: "Twitter API credentials missing",
+          missingCredentials,
+          status: "credentials_missing"
+        });
       }
 
-      // In a real implementation, test the Twitter API connection
-      // For now, simulate a connection test
-      const isValid = bearerToken.startsWith('AAAA'); // Basic validation
-      
-      res.json({ 
-        success: isValid, 
-        message: isValid ? "Twitter API connection successful" : "Invalid bearer token",
-        features: isValid ? {
-          canRead: true,
-          canPost: bearerToken.includes('write'), // Simulate write permission check
-          rateLimit: {
-            remaining: 300,
-            reset: new Date(Date.now() + 15 * 60 * 1000).toISOString()
-          }
-        } : null
-      });
+      // Test the Twitter API connection
+      try {
+        const twitterClient = new TwitterApi({
+          appKey: credentials.apiKey!,
+          appSecret: credentials.apiSecret!,
+          accessToken: credentials.accessToken!,
+          accessSecret: credentials.accessSecret!,
+        });
+
+        // Test by getting user information
+        const user = await twitterClient.v2.me();
+        
+        res.json({
+          success: true,
+          message: "Twitter API connection successful",
+          account: {
+            username: user.data.username,
+            name: user.data.name,
+            id: user.data.id
+          },
+          status: "connected",
+          canPost: true
+        });
+      } catch (twitterError: any) {
+        console.log(`❌ Twitter connection test failed:`, twitterError.message);
+        res.json({
+          success: false,
+          message: "Twitter API connection failed",
+          error: twitterError.message,
+          status: "authentication_failed",
+          suggestion: "Please regenerate your Twitter API tokens with Read and Write permissions"
+        });
+      }
+
     } catch (error) {
       console.error("Error testing Twitter connection:", error);
       res.status(500).json({ error: "Failed to test Twitter connection" });
@@ -4162,15 +4197,45 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const tweetContent = `${content} ${(hashtags || []).join(' ')}`.slice(0, 280);
 
-      // For now, log the content that would be posted
-      console.log(`🐦 Ready to post to @flutterbye: ${tweetContent}`);
-      
-      res.json({ 
-        success: true, 
-        message: "Content generated for @flutterbye - OAuth tokens needed for posting",
-        content: tweetContent,
-        instructions: "Generate OAuth tokens (API Key, API Secret, Access Token, Access Token Secret) in Twitter Developer dashboard"
+      // Check if OAuth tokens are available
+      if (!process.env.TWITTER_API_KEY || !process.env.TWITTER_API_SECRET || !process.env.TWITTER_ACCESS_TOKEN || !process.env.TWITTER_ACCESS_TOKEN_SECRET) {
+        console.log(`🐦 Ready to post to @flutterbye: ${tweetContent}`);
+        return res.json({ 
+          success: true, 
+          message: "Content generated for @flutterbye - OAuth tokens needed for posting",
+          content: tweetContent
+        });
+      }
+
+      // Initialize Twitter API client with OAuth tokens
+      const twitterClient = new TwitterApi({
+        appKey: process.env.TWITTER_API_KEY!,
+        appSecret: process.env.TWITTER_API_SECRET!,
+        accessToken: process.env.TWITTER_ACCESS_TOKEN!,
+        accessSecret: process.env.TWITTER_ACCESS_TOKEN_SECRET!,
       });
+
+      try {
+        // Post tweet to @flutterbye
+        const tweet = await twitterClient.v2.tweet(tweetContent);
+        
+        console.log(`✅ Successfully posted to @flutterbye: Tweet ID ${tweet.data.id}`);
+        res.json({ 
+          success: true, 
+          message: "Posted to @flutterbye successfully!",
+          tweet_id: tweet.data.id,
+          tweet_url: `https://twitter.com/flutterbye/status/${tweet.data.id}`,
+          content: tweetContent
+        });
+      } catch (twitterError: any) {
+        console.log(`❌ Twitter posting failed:`, twitterError);
+        res.json({ 
+          success: false, 
+          message: "Failed to post to @flutterbye",
+          error: twitterError.message || 'Unknown Twitter API error',
+          content: tweetContent
+        });
+      }
 
     } catch (error) {
       console.error("Error posting to Twitter:", error);
