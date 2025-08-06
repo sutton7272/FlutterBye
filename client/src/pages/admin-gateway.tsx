@@ -279,22 +279,43 @@ export default function AdminGateway() {
             </Card>
           </Link>
 
-          {/* Marketing & Growth */}
-          <Link href="/admin/dashboard?tab=marketing">
+          {/* Marketing */}
+          <Link href="/admin-marketing">
             <Card className="bg-slate-800/50 border-pink-500/20 hover:border-pink-400/40 transition-all cursor-pointer group">
               <CardHeader>
                 <Target className="w-8 h-8 text-pink-400 group-hover:text-pink-300" />
-                <CardTitle className="text-white">Marketing & Growth</CardTitle>
+                <CardTitle className="text-white">Marketing</CardTitle>
                 <CardDescription className="text-slate-300">
-                  AI-powered marketing campaigns and growth analytics
+                  AI-powered marketing campaigns and optimization
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 <ul className="text-sm text-slate-400 space-y-1">
                   <li>• AI Marketing Bot</li>
-                  <li>• Viral Analytics & Growth</li>
                   <li>• Campaign Management</li>
                   <li>• Pricing Optimization</li>
+                  <li>• Content Generation</li>
+                </ul>
+              </CardContent>
+            </Card>
+          </Link>
+
+          {/* Growth */}
+          <Link href="/admin-growth">
+            <Card className="bg-slate-800/50 border-green-500/20 hover:border-green-400/40 transition-all cursor-pointer group">
+              <CardHeader>
+                <BarChart3 className="w-8 h-8 text-green-400 group-hover:text-green-300" />
+                <CardTitle className="text-white">Growth</CardTitle>
+                <CardDescription className="text-slate-300">
+                  Viral analytics and user growth tracking
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <ul className="text-sm text-slate-400 space-y-1">
+                  <li>• Viral Growth Tracking</li>
+                  <li>• User Acquisition</li>
+                  <li>• Engagement Analytics</li>
+                  <li>• Retention Analysis</li>
                 </ul>
               </CardContent>
             </Card>
