@@ -289,14 +289,15 @@ export default function LaunchCountdown() {
           </div>
         </div>
 
-        {/* FlutterAI Interactive Tutorial */}
-        <div className="max-w-7xl mx-auto mb-12">
-          <Card className="electric-frame bg-gradient-to-br from-slate-900/95 to-slate-800/95 border-electric-blue/60 shadow-2xl shadow-electric-blue/20">
-            <CardHeader className="text-center">
-              <CardTitle className="text-3xl text-gradient flex items-center justify-center gap-3 mb-4">
-                <Brain className="w-8 h-8 text-electric-blue animate-pulse" />
-                🧠 FlutterAI Interactive Preview
-              </CardTitle>
+        {/* FlutterAI Interactive Tutorial - ALWAYS VISIBLE */}
+        <div className="w-full px-4 mb-12 relative z-20">
+          <div className="max-w-7xl mx-auto">
+            <Card className="electric-frame bg-gradient-to-br from-slate-900 to-slate-800 border-4 border-electric-blue shadow-2xl shadow-electric-blue/30">
+              <CardHeader className="text-center bg-gradient-to-r from-electric-blue/20 to-circuit-teal/20">
+                <CardTitle className="text-4xl text-white flex items-center justify-center gap-3 mb-4">
+                  <Brain className="w-10 h-10 text-electric-blue animate-pulse" />
+                  🧠 FlutterAI Interactive Preview
+                </CardTitle>
               <p className="text-lg text-gray-300 max-w-4xl mx-auto">
                 🚀 Experience the REVOLUTIONARY AI that will power the next generation of blockchain intelligence! 
                 Get ready for mind-blowing wallet analysis, viral content optimization, and predictive market insights.
@@ -375,6 +376,7 @@ export default function LaunchCountdown() {
               
             </CardContent>
           </Card>
+          </div>
         </div>
 
         {/* Countdown Timer */}
