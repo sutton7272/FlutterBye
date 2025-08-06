@@ -52,8 +52,12 @@ export default function Navbar() {
   const secondaryNavItems = [
     { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard, description: "Portfolio & activity" },
     { href: "/activity", label: "Activity", icon: Activity, description: "Platform activity & analytics" },
-    { href: "/explore", label: "Explore", icon: Star, description: "Discover trending content" },
-    { href: "/info", label: "Info", icon: HelpCircle, description: "Platform information & help" },
+    { href: "/info", label: "Info", icon: HelpCircle, description: "Platform information & help",
+      subItems: [
+        { href: "/info", label: "Platform Info", description: "About Flutterbye platform" },
+        { href: "/explore", label: "Explore", description: "Discover trending content" }
+      ]
+    },
   ];
 
   const isActive = (href: string) => location === href;
