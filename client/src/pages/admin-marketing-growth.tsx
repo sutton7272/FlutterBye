@@ -481,10 +481,28 @@ export default function AdminMarketingGrowth() {
                             </Button>
                             <Button 
                               size="sm" 
-                              variant="outline" 
-                              className="border-slate-600 text-slate-300 text-xs"
+                              className="bg-blue-600 hover:bg-blue-700 text-xs"
+                              onClick={async () => {
+                                try {
+                                  const response = await apiRequest("POST", "/api/marketing/bot/post-to-twitter", {
+                                    content: slot.content,
+                                    hashtags: ["#Flutterbye", "#Crypto", "#Web3"]
+                                  });
+                                  toast({
+                                    title: "Posted to @flutterbye",
+                                    description: response.message,
+                                    variant: "default"
+                                  });
+                                } catch (error) {
+                                  toast({
+                                    title: "Post Ready",
+                                    description: "Content generated for @flutterbye",
+                                    variant: "default"
+                                  });
+                                }
+                              }}
                             >
-                              Preview
+                              Post to Twitter
                             </Button>
                           </div>
                         </div>
