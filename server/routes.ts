@@ -4249,6 +4249,71 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: 'Failed to generate QR code' });
     }
   });
+
+  // AI Image Generation for NFTs
+  app.post('/api/ai/generate-image', async (req, res) => {
+    try {
+      const { prompt, style, dimensions } = req.body;
+      
+      if (!prompt) {
+        return res.status(400).json({ error: 'Prompt is required' });
+      }
+
+      // Enhance prompt for NFT art generation
+      const enhancedPrompt = `Create a high-quality NFT artwork: ${prompt}. Style: ${style || 'digital art'}. Professional, crisp, suitable for blockchain collectibles.`;
+      
+      const imageResult = await openaiService.generateImage(enhancedPrompt);
+      res.json({ 
+        imageUrl: imageResult.url,
+        prompt: enhancedPrompt 
+      });
+    } catch (error: any) {
+      console.error('AI image generation error:', error);
+      res.status(500).json({ 
+        error: 'Failed to generate AI artwork',
+        details: error.message 
+      });
+    }
+  });
+
+  // QR Code Generation
+  app.post('/api/qr/generate', async (req, res) => {
+    try {
+      const { data, size, errorCorrectionLevel } = req.body;
+      
+      if (!data) {
+        return res.status(400).json({ error: 'Data is required for QR code generation' });
+      }
+
+      // Use QRCode library to generate QR code
+      const QRCode = require('qrcode');
+      
+      const qrCodeDataURL = await QRCode.toDataURL(data, {
+        width: size || 256,
+        errorCorrectionLevel: errorCorrectionLevel || 'M',
+        type: 'image/png',
+        quality: 0.92,
+        margin: 1,
+        color: {
+          dark: '#000000',
+          light: '#FFFFFF'
+        }
+      });
+
+      res.json({ 
+        qrCode: qrCodeDataURL,
+        data: data,
+        size: size || 256
+      });
+    } catch (error: any) {
+      console.error('QR code generation error:', error);
+      res.status(500).json({ 
+        error: 'Failed to generate QR code',
+        details: error.message 
+      });
+    }
+  });
+
   // Browse All Collections
   app.get("/api/message-nfts/browse", async (req, res) => {
     try {

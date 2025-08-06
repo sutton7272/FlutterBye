@@ -79,6 +79,12 @@ export default function FlutterArt() {
     customAttributes: {} as Record<string, string | number>
   });
 
+  // AI and QR Code state
+  const [aiPrompt, setAiPrompt] = useState("");
+  const [qrUrl, setQrUrl] = useState("");
+  const [generatedQrCode, setGeneratedQrCode] = useState("");
+  const [isGeneratingArt, setIsGeneratingArt] = useState(false);
+
   // Fetch existing collections
   const { data: collections = [], isLoading: collectionsLoading } = useQuery<MessageNFTCollection[]>({
     queryKey: ['/api/message-nfts/collections'],
@@ -137,6 +143,102 @@ export default function FlutterArt() {
       }
     };
     reader.readAsDataURL(file);
+  };
+
+  // AI Art Generation
+  const generateAIArt = async () => {
+    if (!aiPrompt.trim()) {
+      toast({
+        title: "Prompt Required",
+        description: "Please enter a description for AI art generation",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsGeneratingArt(true);
+    try {
+      const response = await apiRequest("POST", "/api/ai/generate-image", {
+        prompt: aiPrompt,
+        style: "nft_art",
+        dimensions: "1024x1024"
+      });
+      
+      const result = await response.json();
+      if (result.imageUrl) {
+        // Convert image URL to base64 for storage
+        const img = new Image();
+        img.crossOrigin = "anonymous";
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          canvas.width = img.width;
+          canvas.height = img.height;
+          const ctx = canvas.getContext('2d');
+          ctx?.drawImage(img, 0, 0);
+          const base64 = canvas.toDataURL('image/png');
+          setFormData(prev => ({ ...prev, imageFile: base64 }));
+        };
+        img.src = result.imageUrl;
+        
+        toast({
+          title: "AI Art Generated!",
+          description: "Your custom NFT artwork has been created",
+        });
+      }
+    } catch (error: any) {
+      toast({
+        title: "Generation Failed",
+        description: error.message || "Failed to generate AI artwork",
+        variant: "destructive",
+      });
+    } finally {
+      setIsGeneratingArt(false);
+    }
+  };
+
+  // QR Code Generation
+  const generateQRCode = async () => {
+    if (!qrUrl.trim()) {
+      toast({
+        title: "URL Required",
+        description: "Please enter a URL for QR code generation",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      const response = await apiRequest("POST", "/api/qr/generate", {
+        data: qrUrl,
+        size: 256,
+        errorCorrectionLevel: 'M'
+      });
+      
+      const result = await response.json();
+      if (result.qrCode) {
+        setGeneratedQrCode(result.qrCode);
+        toast({
+          title: "QR Code Generated!",
+          description: "Your QR code is ready for download",
+        });
+      }
+    } catch (error: any) {
+      toast({
+        title: "Generation Failed",
+        description: error.message || "Failed to generate QR code",
+        variant: "destructive",
+      });
+    }
+  };
+
+  // Download QR Code
+  const downloadQRCode = () => {
+    if (!generatedQrCode) return;
+    
+    const link = document.createElement('a');
+    link.href = generatedQrCode;
+    link.download = `qr-code-${Date.now()}.png`;
+    link.click();
   };
 
   const creationOptions = [
@@ -209,7 +311,7 @@ export default function FlutterArt() {
           </CardHeader>
           <CardContent>
             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-              <TabsList className="grid w-full grid-cols-4">
+              <TabsList className="grid w-full grid-cols-5">
                 <TabsTrigger value="create" className="flex items-center gap-2">
                   <Plus className="h-4 w-4" />
                   Create NFT
@@ -217,6 +319,10 @@ export default function FlutterArt() {
                 <TabsTrigger value="collections" className="flex items-center gap-2">
                   <Crown className="h-4 w-4" />
                   My Collections
+                </TabsTrigger>
+                <TabsTrigger value="qr-generator" className="flex items-center gap-2">
+                  <QrCode className="h-4 w-4" />
+                  QR Generator
                 </TabsTrigger>
                 <TabsTrigger value="marketplace" className="flex items-center gap-2">
                   <TrendingUp className="h-4 w-4" />
@@ -310,8 +416,47 @@ export default function FlutterArt() {
                           </div>
 
                           {(createMode === 'multimedia' || createMode === 'limited-edition') && (
-                            <div>
-                              <Label htmlFor="imageUpload">Custom Artwork</Label>
+                            <div className="space-y-4">
+                              <Label>Custom Artwork</Label>
+                              
+                              {/* AI Art Generation */}
+                              <Card className="bg-gradient-to-r from-electric-blue/10 to-purple-500/10 border-electric-blue/30">
+                                <CardHeader className="pb-3">
+                                  <CardTitle className="text-sm flex items-center gap-2">
+                                    <Sparkles className="h-4 w-4 text-electric-blue" />
+                                    AI Art Generator
+                                  </CardTitle>
+                                </CardHeader>
+                                <CardContent className="space-y-3">
+                                  <Textarea
+                                    value={aiPrompt}
+                                    onChange={(e) => setAiPrompt(e.target.value)}
+                                    placeholder="Describe the artwork you want to create (e.g., 'a futuristic butterfly with electric blue wings and cosmic background')"
+                                    className="min-h-[80px]"
+                                  />
+                                  <Button 
+                                    onClick={generateAIArt}
+                                    disabled={isGeneratingArt || !aiPrompt.trim()}
+                                    className="w-full bg-gradient-to-r from-electric-blue to-purple-500"
+                                  >
+                                    {isGeneratingArt ? (
+                                      <>
+                                        <Sparkles className="h-4 w-4 mr-2 animate-spin" />
+                                        Generating AI Art...
+                                      </>
+                                    ) : (
+                                      <>
+                                        <Wand2 className="h-4 w-4 mr-2" />
+                                        Generate AI Artwork
+                                      </>
+                                    )}
+                                  </Button>
+                                </CardContent>
+                              </Card>
+
+                              {/* Manual Upload */}
+                              <div className="text-center text-sm text-muted-foreground">or</div>
+                              
                               <div className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-4 text-center">
                                 <input
                                   id="imageUpload"
@@ -323,14 +468,14 @@ export default function FlutterArt() {
                                 <label htmlFor="imageUpload" className="cursor-pointer">
                                   <Upload className="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
                                   <p className="text-sm text-muted-foreground">
-                                    Click to upload custom artwork
+                                    Click to upload your own artwork
                                   </p>
                                 </label>
                                 {formData.imageFile && (
                                   <div className="mt-2">
                                     <Badge variant="outline" className="text-green-600">
                                       <CheckCircle className="h-3 w-3 mr-1" />
-                                      Image uploaded
+                                      Artwork ready
                                     </Badge>
                                   </div>
                                 )}
@@ -479,6 +624,78 @@ export default function FlutterArt() {
                     </CardContent>
                   </Card>
                 </div>
+              </TabsContent>
+
+              {/* QR Code Generator Tab */}
+              <TabsContent value="qr-generator" className="mt-6">
+                <Card className="max-w-2xl mx-auto electric-frame">
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <QrCode className="h-5 w-5 text-electric-blue" />
+                      QR Code Generator
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-6">
+                    <div className="space-y-4">
+                      <div>
+                        <Label htmlFor="qrUrl">Website URL</Label>
+                        <Input
+                          id="qrUrl"
+                          value={qrUrl}
+                          onChange={(e) => setQrUrl(e.target.value)}
+                          placeholder="https://example.com"
+                          type="url"
+                        />
+                      </div>
+                      
+                      <Button 
+                        onClick={generateQRCode}
+                        disabled={!qrUrl.trim()}
+                        className="w-full bg-gradient-to-r from-electric-blue to-electric-green"
+                      >
+                        <QrCode className="h-4 w-4 mr-2" />
+                        Generate QR Code
+                      </Button>
+                    </div>
+
+                    {generatedQrCode && (
+                      <Card className="bg-muted/50">
+                        <CardContent className="p-6 text-center space-y-4">
+                          <div className="flex justify-center">
+                            <img 
+                              src={generatedQrCode} 
+                              alt="Generated QR Code" 
+                              className="border rounded-lg shadow-lg"
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <p className="text-sm text-muted-foreground">QR Code for: {qrUrl}</p>
+                            <Button 
+                              onClick={downloadQRCode}
+                              variant="outline"
+                              className="w-full"
+                            >
+                              <Download className="h-4 w-4 mr-2" />
+                              Download QR Code
+                            </Button>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    )}
+
+                    <div className="text-center">
+                      <h3 className="font-semibold mb-2">QR Code Uses:</h3>
+                      <div className="grid grid-cols-2 gap-2 text-sm text-muted-foreground">
+                        <div>• Website links</div>
+                        <div>• NFT collections</div>
+                        <div>• Social media</div>
+                        <div>• Contact info</div>
+                        <div>• Event tickets</div>
+                        <div>• Marketing campaigns</div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
               </TabsContent>
 
               {/* Collections Tab */}
