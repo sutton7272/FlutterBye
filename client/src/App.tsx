@@ -64,6 +64,8 @@ import AdminFreeCodes from "@/pages/admin-free-codes";
 import AdminPricing from "@/pages/admin-pricing";
 import AdminDefaultImage from "@/pages/admin-default-image";
 import UnifiedAdminDashboard from "@/pages/admin-unified";
+import AdminGateway from "@/pages/admin-gateway";
+import AdminAccessControl from "@/pages/admin-access-control";
 import TokenHolderMapPage from "@/pages/token-holder-map";
 import CollaborativeCreation from "@/pages/collaborative-creation";
 import FlutterAIDashboard from "@/pages/flutterai-dashboard";
@@ -269,10 +271,22 @@ function Router() {
             <SearchPage />
           </>
         )} />
+        <Route path="/admin-gateway" component={() => (
+          <>
+            <Navbar />
+            <AdminGateway />
+          </>
+        )} />
+        <Route path="/admin-access-control" component={() => (
+          <>
+            <Navbar />
+            <AdminAccessControl />
+          </>
+        )} />
         <Route path="/admin" component={() => (
           <>
             <Navbar />
-            <Admin />
+            <AdminGateway />
           </>
         )} />
         

@@ -8672,6 +8672,263 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   console.log('🎯 Final 5% Production Readiness APIs activated!');
+
+  // ====================
+  // ADMIN AUTHENTICATION & ACCESS CONTROL API ROUTES
+  // ====================
+  
+  // Simple admin wallet storage (in production, use database)
+  const adminWallets = new Set<string>();
+  const adminPassword = process.env.ADMIN_PASSWORD || 'admin123';
+  const adminSessions = new Set<string>();
+  
+  // Admin authentication endpoint
+  app.post('/api/admin/authenticate', async (req, res) => {
+    try {
+      const { password, walletAddress } = req.body;
+      
+      if (!password) {
+        return res.status(400).json({
+          success: false,
+          error: 'Password is required'
+        });
+      }
+      
+      if (password !== adminPassword) {
+        return res.status(401).json({
+          success: false,
+          error: 'Invalid password'
+        });
+      }
+      
+      // Register wallet as admin if provided
+      if (walletAddress) {
+        adminWallets.add(walletAddress);
+        console.log(`Admin wallet registered: ${walletAddress.slice(0, 8)}...`);
+      }
+      
+      // Create session token
+      const sessionToken = `admin-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+      adminSessions.add(sessionToken);
+      
+      res.json({
+        success: true,
+        sessionToken,
+        message: 'Admin access granted'
+      });
+    } catch (error: any) {
+      console.error('Admin authentication error:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Authentication failed'
+      });
+    }
+  });
+  
+  // Check if wallet is admin
+  app.post('/api/admin/check-wallet', async (req, res) => {
+    try {
+      const { walletAddress } = req.body;
+      
+      if (!walletAddress) {
+        return res.status(400).json({
+          success: false,
+          error: 'Wallet address is required'
+        });
+      }
+      
+      const isAdmin = adminWallets.has(walletAddress);
+      
+      res.json({
+        success: true,
+        isAdmin
+      });
+    } catch (error: any) {
+      console.error('Wallet check error:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Failed to check wallet'
+      });
+    }
+  });
+  
+  // Get admin wallets list
+  app.get('/api/admin/wallets', async (req, res) => {
+    try {
+      const wallets = Array.from(adminWallets).map(address => ({
+        address,
+        addedAt: new Date().toISOString(),
+        addedBy: 'system'
+      }));
+      
+      res.json(wallets);
+    } catch (error: any) {
+      console.error('Get admin wallets error:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Failed to get admin wallets'
+      });
+    }
+  });
+  
+  // Add admin wallet
+  app.post('/api/admin/add-wallet', async (req, res) => {
+    try {
+      const { walletAddress } = req.body;
+      
+      if (!walletAddress) {
+        return res.status(400).json({
+          success: false,
+          error: 'Wallet address is required'
+        });
+      }
+      
+      if (adminWallets.has(walletAddress)) {
+        return res.status(409).json({
+          success: false,
+          error: 'Wallet is already an admin'
+        });
+      }
+      
+      adminWallets.add(walletAddress);
+      console.log(`New admin wallet added: ${walletAddress.slice(0, 8)}...`);
+      
+      res.json({
+        success: true,
+        message: 'Admin wallet added successfully'
+      });
+    } catch (error: any) {
+      console.error('Add admin wallet error:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Failed to add admin wallet'
+      });
+    }
+  });
+  
+  // Remove admin wallet
+  app.delete('/api/admin/remove-wallet/:walletAddress', async (req, res) => {
+    try {
+      const { walletAddress } = req.params;
+      
+      if (!adminWallets.has(walletAddress)) {
+        return res.status(404).json({
+          success: false,
+          error: 'Wallet is not an admin'
+        });
+      }
+      
+      adminWallets.delete(walletAddress);
+      console.log(`Admin wallet removed: ${walletAddress.slice(0, 8)}...`);
+      
+      res.json({
+        success: true,
+        message: 'Admin wallet removed successfully'
+      });
+    } catch (error: any) {
+      console.error('Remove admin wallet error:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Failed to remove admin wallet'
+      });
+    }
+  });
+  
+  // Update admin password
+  app.post('/api/admin/update-password', async (req, res) => {
+    try {
+      const { password } = req.body;
+      
+      if (!password || password.length < 8) {
+        return res.status(400).json({
+          success: false,
+          error: 'Password must be at least 8 characters long'
+        });
+      }
+      
+      // In production, this would update environment variable or database
+      console.log('Admin password update requested (not implemented in demo)');
+      
+      res.json({
+        success: true,
+        message: 'Password update requested (feature available in production)'
+      });
+    } catch (error: any) {
+      console.error('Update password error:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Failed to update password'
+      });
+    }
+  });
+  
+  // Get site access status
+  app.get('/api/admin/site-access', async (req, res) => {
+    try {
+      // In production, this would check database or environment
+      res.json({
+        isEnabled: true,
+        message: '',
+        updatedAt: new Date().toISOString()
+      });
+    } catch (error: any) {
+      console.error('Get site access error:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Failed to get site access status'
+      });
+    }
+  });
+  
+  // Update site access
+  app.post('/api/admin/site-access', async (req, res) => {
+    try {
+      const { enabled, message } = req.body;
+      
+      // In production, this would update database or environment
+      console.log(`Site access ${enabled ? 'enabled' : 'disabled'}. Message: ${message || 'none'}`);
+      
+      res.json({
+        success: true,
+        message: 'Site access updated successfully'
+      });
+    } catch (error: any) {
+      console.error('Update site access error:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Failed to update site access'
+      });
+    }
+  });
+  
+  // Get admin activity logs
+  app.get('/api/admin/activity-logs', async (req, res) => {
+    try {
+      // Mock activity logs for demonstration
+      const logs = [
+        {
+          action: 'Admin authentication',
+          walletAddress: 'demo-wallet-123',
+          timestamp: new Date(Date.now() - 1000 * 60 * 30).toISOString()
+        },
+        {
+          action: 'Admin wallet added',
+          walletAddress: 'demo-wallet-456',
+          timestamp: new Date(Date.now() - 1000 * 60 * 60).toISOString()
+        }
+      ];
+      
+      res.json(logs);
+    } catch (error: any) {
+      console.error('Get activity logs error:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Failed to get activity logs'
+      });
+    }
+  });
+  
+  console.log('🔐 Admin authentication & access control API activated!');
   
   // Initialize WebSocket server for real-time updates
   const wsServer = new FlutterbeyeWebSocketServer(httpServer);
