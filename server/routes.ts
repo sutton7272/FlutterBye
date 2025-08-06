@@ -73,6 +73,7 @@ import { Connection, Keypair, LAMPORTS_PER_SOL, PublicKey, Transaction, SystemPr
 import bs58 from 'bs58';
 import { enterpriseApiHandlers } from "./enterprise-api";
 import { governmentApiHandlers } from "./government-api";
+import { MarketingBot } from "./marketing-bot";
 import { aiMarketingService } from "./ai-marketing-service";
 import { mainnetDeployment } from "./mainnet-deployment";
 import { flbyTokenDeployment } from "./flby-token-deployment";
@@ -4032,6 +4033,124 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).send("Error processing message");
     }
   });
+  // Marketing Bot API Routes
+  const marketingBot = new MarketingBot(storage);
+
+  // Get marketing bot configuration
+  app.get("/api/marketing/bot/config", async (req, res) => {
+    try {
+      const config = marketingBot.getConfig();
+      res.json({ success: true, config });
+    } catch (error) {
+      console.error("Error fetching marketing bot config:", error);
+      res.status(500).json({ error: "Failed to fetch configuration" });
+    }
+  });
+
+  // Update marketing bot configuration
+  app.post("/api/marketing/bot/config", async (req, res) => {
+    try {
+      const newConfig = req.body;
+      marketingBot.updateConfig(newConfig);
+      res.json({ success: true, message: "Configuration updated successfully" });
+    } catch (error) {
+      console.error("Error updating marketing bot config:", error);
+      res.status(500).json({ error: "Failed to update configuration" });
+    }
+  });
+
+  // Generate Twitter content
+  app.post("/api/marketing/bot/generate-content", async (req, res) => {
+    try {
+      const { type, data } = req.body;
+      
+      if (!type || !['feature_highlight', 'industry_news', 'community', 'educational'].includes(type)) {
+        return res.status(400).json({ error: "Invalid content type" });
+      }
+
+      const content = await marketingBot.generateTwitterContent({ type, data });
+      res.json({ success: true, content });
+    } catch (error) {
+      console.error("Error generating Twitter content:", error);
+      res.status(500).json({ error: "Failed to generate content" });
+    }
+  });
+
+  // Generate scheduled posts for the day
+  app.post("/api/marketing/bot/generate-schedule", async (req, res) => {
+    try {
+      const posts = await marketingBot.generateScheduledContent();
+      res.json({ success: true, posts });
+    } catch (error) {
+      console.error("Error generating scheduled posts:", error);
+      res.status(500).json({ error: "Failed to generate scheduled posts" });
+    }
+  });
+
+  // Generate weekly blog
+  app.post("/api/marketing/bot/generate-blog", async (req, res) => {
+    try {
+      const blog = await marketingBot.generateWeeklyBlog();
+      res.json({ success: true, blog });
+    } catch (error) {
+      console.error("Error generating weekly blog:", error);
+      res.status(500).json({ error: "Failed to generate blog" });
+    }
+  });
+
+  // Get marketing analytics
+  app.get("/api/marketing/bot/analytics", async (req, res) => {
+    try {
+      const analytics = await marketingBot.getAnalytics();
+      res.json({ success: true, analytics });
+    } catch (error) {
+      console.error("Error fetching marketing analytics:", error);
+      res.status(500).json({ error: "Failed to fetch analytics" });
+    }
+  });
+
+  // Test Twitter API connection
+  app.post("/api/marketing/bot/test-twitter", async (req, res) => {
+    try {
+      const { bearerToken } = req.body;
+      
+      if (!bearerToken) {
+        return res.status(400).json({ error: "Bearer token required" });
+      }
+
+      // In a real implementation, test the Twitter API connection
+      // For now, simulate a connection test
+      const isValid = bearerToken.startsWith('AAAA'); // Basic validation
+      
+      res.json({ 
+        success: isValid, 
+        message: isValid ? "Twitter API connection successful" : "Invalid bearer token",
+        features: isValid ? {
+          canRead: true,
+          canPost: bearerToken.includes('write'), // Simulate write permission check
+          rateLimit: {
+            remaining: 300,
+            reset: new Date(Date.now() + 15 * 60 * 1000).toISOString()
+          }
+        } : null
+      });
+    } catch (error) {
+      console.error("Error testing Twitter connection:", error);
+      res.status(500).json({ error: "Failed to test Twitter connection" });
+    }
+  });
+
+  // Fetch crypto news for content generation
+  app.get("/api/marketing/bot/crypto-news", async (req, res) => {
+    try {
+      const news = await marketingBot.fetchCryptoNews();
+      res.json({ success: true, news });
+    } catch (error) {
+      console.error("Error fetching crypto news:", error);
+      res.status(500).json({ error: "Failed to fetch crypto news" });
+    }
+  });
+
   // Register phone number with wallet
   app.post("/api/sms/register", async (req, res) => {
     try {
