@@ -41,7 +41,11 @@ Priority focus: Initial release strategy focusing on coin minting as the core en
 - **Market Focus**: B2B crypto marketing with consumer-grade 27-character message distribution
 - **Revenue Model**: SOL-based pricing starting at 0.01 SOL per token creation
 - **AI Marketing Bot Integration**: Fully integrated into FlutterAI dashboard with comprehensive automation
-- **Site Organization Analysis**: Identified need to streamline 80+ routes around two core products
+- **Navigation Streamlining (January 2025)**: Simplified navigation around core business workflow:
+  - Primary: Create → FlutterAI → Redeem
+  - Secondary: Dashboard, Enterprise
+  - Chat moved to dashboard access (removed from main navigation)
+  - Campaign Builder integrated with Create workflow
 
 ## System Architecture
 

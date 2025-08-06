@@ -44,7 +44,6 @@ export default function Navbar() {
   const secondaryNavItems = [
     { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard, description: "Portfolio & activity" },
     { href: "/enterprise-campaigns", label: "Enterprise", icon: Building2, description: "B2B crypto marketing campaigns" },
-    { href: "/chat", label: "Chat", icon: MessageSquare, description: "Real-time blockchain chat" },
   ];
 
   const isActive = (href: string) => location === href;
