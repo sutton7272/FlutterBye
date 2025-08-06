@@ -34,7 +34,7 @@ import flutterbeyeLogoPath from "@assets/image_1754068877999.png";
 import Navbar from "@/components/navbar";
 
 import { TutorialLaunchButton } from "@/components/interactive-tutorial";
-import { FlutterAIInteractiveTutorial } from "@/components/flutterai-interactive-tutorial-final";
+import { AIIntegrationDemo } from "@/components/ai-integration-demo";
 
 interface TimeLeft {
   days: number;
@@ -289,8 +289,13 @@ export default function LaunchCountdown() {
           </div>
         </div>
 
-        {/* FlutterAI Interactive Tutorial - ALWAYS VISIBLE */}
-        <div className="w-full px-4 mb-12 relative z-20">
+        {/* FlutterAI Demo */}
+        <div className="max-w-7xl mx-auto mb-12">
+          <AIIntegrationDemo />
+        </div>
+
+        {/* Old Tutorial Section - TO BE REMOVED */}
+        <div className="w-full px-4 mb-12 relative z-20" style={{ display: 'none' }}>
           <div className="max-w-7xl mx-auto">
             <Card className="electric-frame bg-gradient-to-br from-slate-900 to-slate-800 border-4 border-electric-blue shadow-2xl shadow-electric-blue/30">
               <CardHeader className="text-center bg-gradient-to-r from-electric-blue/20 to-circuit-teal/20">
