@@ -4269,12 +4269,33 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       } catch (twitterError: any) {
         console.log(`❌ Twitter posting failed:`, twitterError);
-        res.json({ 
-          success: false, 
-          message: "Failed to post to @flutterbye",
-          error: twitterError.message || 'Unknown Twitter API error',
-          content: tweetContent
-        });
+        
+        // Handle specific error cases
+        if (twitterError.message?.includes('401')) {
+          res.json({ 
+            success: false, 
+            message: "Twitter app permissions issue - needs Read and Write access",
+            error: "401 Unauthorized - App likely has Read-only permissions",
+            content: tweetContent,
+            solution: {
+              step1: "Go to https://developer.twitter.com/en/portal/dashboard",
+              step2: "Select your @flutterbye app",
+              step3: "Go to 'Settings' tab",
+              step4: "Change 'App permissions' from 'Read' to 'Read and Write'",
+              step5: "Go to 'Keys and tokens' tab",
+              step6: "Regenerate Access Token and Secret (required after permission change)",
+              step7: "Update environment variables with new tokens"
+            },
+            troubleshooting: "The 401 error typically means the app has 'Read' permissions but needs 'Read and Write' to post tweets. After changing permissions, you MUST regenerate the Access Token."
+          });
+        } else {
+          res.json({ 
+            success: false, 
+            message: "Failed to post to @flutterbye",
+            error: twitterError.message || 'Unknown Twitter API error',
+            content: tweetContent
+          });
+        }
       }
 
     } catch (error) {
