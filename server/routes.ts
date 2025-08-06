@@ -8939,6 +8939,41 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
+  // Enterprise dashboard endpoints
+  app.get('/api/enterprise/dashboard-metrics', async (req, res) => {
+    try {
+      res.json({
+        metrics: {
+          totalContracts: 45,
+          activeWallets: 12847,
+          monthlyRevenue: 892000,
+          complianceScore: 98
+        }
+      });
+    } catch (error) {
+      console.error('Error fetching enterprise metrics:', error);
+      res.status(500).json({ error: 'Failed to fetch enterprise metrics' });
+    }
+  });
+
+  app.get('/api/enterprise/cross-chain/supported-chains', async (req, res) => {
+    try {
+      res.json({
+        supportedChains: [
+          { id: 'ethereum', name: 'Ethereum', native: 'ETH' },
+          { id: 'bitcoin', name: 'Bitcoin', native: 'BTC' },
+          { id: 'solana', name: 'Solana', native: 'SOL' },
+          { id: 'polygon', name: 'Polygon', native: 'MATIC' },
+          { id: 'avalanche', name: 'Avalanche', native: 'AVAX' },
+          { id: 'binance', name: 'BNB Chain', native: 'BNB' }
+        ]
+      });
+    } catch (error) {
+      console.error('Error fetching supported chains:', error);
+      res.status(500).json({ error: 'Failed to fetch supported chains' });
+    }
+  });
+
   // Get admin activity logs
   app.get('/api/admin/activity-logs', async (req, res) => {
     try {
