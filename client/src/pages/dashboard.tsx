@@ -30,7 +30,7 @@ import { QuickActionPanel } from "@/components/quick-action-panel";
 import { EngagementBooster } from "@/components/engagement-booster";
 import { NFTPortfolioQuickView } from "@/components/dashboard/NFTPortfolioQuickView";
 import { ViralSharingAssistant } from "@/components/viral-sharing-assistant";
-import { VoiceMessageRecorder } from "@/components/voice-message-recorder";
+
 import { ViralGrowthAccelerator } from "@/components/viral-growth-accelerator";
 import { MobileOnboardingWizard } from "@/components/mobile-onboarding-wizard";
 import { WalletConnectionWizard } from "@/components/wallet-connection-wizard";
@@ -366,6 +366,9 @@ export default function Dashboard() {
           </TabsContent>
 
           <TabsContent value="activity" className="space-y-6">
+            {/* Wallet Products Display */}
+            <WalletProductsDisplay />
+            
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
@@ -418,10 +421,7 @@ export default function Dashboard() {
           </TabsContent>
         </Tabs>
 
-        {/* Voice Recording Component */}
-        <VoiceMessageRecorder onVoiceAttached={(voiceData) => {
-          console.log("Voice attached:", voiceData);
-        }} />
+
         
       </div>
       
