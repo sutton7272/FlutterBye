@@ -27,11 +27,11 @@ export default function Navbar() {
 
   // Filter navigation items based on feature toggles
   const primaryNavItems = featuresLoading 
-    ? allNavItems.slice(0, 7) // Show main items while loading, hide admin
+    ? allNavItems // Show all items while loading including admin
     : allNavItems.filter(item => {
-        // Admin panel only shows when feature is enabled
+        // Admin panel is always visible (critical for platform management)
         if (item.featureId === "admin_panel") {
-          return isFeatureEnabled("admin_panel") || isFeatureEnabled("admin");
+          return true;
         }
         // Show core features by default
         if (["home", "mint", "marketplace", "flutterai", "flutter_wave", "flutter_art", "chat"].includes(item.featureId)) {
