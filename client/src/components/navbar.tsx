@@ -18,7 +18,6 @@ export default function Navbar() {
     { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard, description: "Your unified home", featureId: "home" },
     { href: "/create", label: "Create", icon: Coins, description: "Token minting & AI tools", featureId: "mint" },
     { href: "/trade", label: "Trade", icon: Users, description: "Marketplace & wallet", featureId: "marketplace" },
-    { href: "/trending", label: "Trending", icon: Trophy, description: "Viral content discovery", featureId: "trending" },
     { href: "/flutterai", label: "FlutterAI", icon: Brain, description: "AI intelligence platform", special: true, featureId: "flutterai" },
     { href: "/flutter-wave", label: "FlutterWave", icon: Heart, description: "AI butterfly messaging", featureId: "flutter_wave" },
     { href: "/flutter-art", label: "FlutterArt", icon: Sparkles, description: "Digital art NFTs", featureId: "flutter_art" },
@@ -35,7 +34,7 @@ export default function Navbar() {
           return true;
         }
         // Show core features by default
-        if (["home", "mint", "marketplace", "trending", "flutterai", "flutter_wave", "flutter_art", "chat"].includes(item.featureId)) {
+        if (["home", "mint", "marketplace", "flutterai", "flutter_wave", "flutter_art", "chat"].includes(item.featureId)) {
           return true;
         }
         // If no featureId is specified, show the item by default

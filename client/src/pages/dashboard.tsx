@@ -21,7 +21,8 @@ import {
   Heart,
   Gift,
   Target,
-  Sparkles
+  Sparkles,
+  Trophy
 } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { InteractiveStatsDashboard } from "@/components/interactive-stats-dashboard";
@@ -36,6 +37,7 @@ import { WalletConnectionWizard } from "@/components/wallet-connection-wizard";
 import { QuickAccessFAB } from "@/components/quick-access-fab";
 import { PersonalizedDashboard } from "@/components/PersonalizedDashboard";
 import { PerformanceDashboard } from "@/components/performance-dashboard";
+import TrendingPage from "@/pages/trending";
 
 interface DashboardStats {
   totalTokens: number;
@@ -188,10 +190,14 @@ export default function Dashboard() {
 
         {/* Main Dashboard Content */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4">
+          <TabsList className="grid w-full grid-cols-5">
             <TabsTrigger value="overview">Overview</TabsTrigger>
             <TabsTrigger value="portfolio">Portfolio</TabsTrigger>
             <TabsTrigger value="activity">Activity</TabsTrigger>
+            <TabsTrigger value="trending">
+              <Trophy className="h-4 w-4 mr-2" />
+              Trending
+            </TabsTrigger>
             <TabsTrigger value="insights">AI Insights</TabsTrigger>
           </TabsList>
 
@@ -298,6 +304,10 @@ export default function Dashboard() {
                 )}
               </CardContent>
             </Card>
+          </TabsContent>
+
+          <TabsContent value="trending" className="space-y-6">
+            <TrendingPage />
           </TabsContent>
 
           <TabsContent value="insights" className="space-y-6">
