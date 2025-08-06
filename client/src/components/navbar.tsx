@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { WalletConnect } from "@/components/wallet-connect";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Menu, Home, Coins, Trophy, Users, MessageSquare, Settings, Sparkles, Zap, Heart, Building2, MapPin, Activity, Gift, Award, Star, Ticket, HelpCircle, LayoutDashboard, Brain, CreditCard, Stars, DollarSign, Code2, Rocket, ArrowRightLeft, Target, Shield } from "lucide-react";
-import solviturLogo from "@assets/65d9f126-64e6-4e25-9a10-d3d64807b991_1754352528946.png";
+
 import { useFeatureToggles } from "@/hooks/useFeatureToggles";
 import { MobileNavigation } from "@/components/mobile-navigation";
 
@@ -127,19 +127,11 @@ export default function Navbar() {
           ))}
         </nav>
 
-        {/* Trust Indicator with Solvitur Badge */}
+        {/* Trust Indicator */}
         <div className="hidden xl:flex ml-4 items-center gap-3">
           <div className="trust-indicator">
             <div className="w-2 h-2 bg-accent rounded-full"></div>
             Testnet
-          </div>
-          <div className="flex items-center gap-1 px-2 py-1 rounded-md bg-electric-blue/10 border border-electric-blue/20">
-            <img 
-              src={solviturLogo} 
-              alt="Powered by Solvitur" 
-              className="w-4 h-4 rounded-full opacity-80"
-            />
-            <span className="text-xs text-electric-blue font-medium">Solvitur</span>
           </div>
         </div>
         
