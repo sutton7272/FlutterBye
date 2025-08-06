@@ -40,7 +40,17 @@ import {
   Target,
   MessageSquare,
   Trash2,
-  Settings
+  Settings,
+  Bot,
+  Calendar,
+  Play,
+  Pause,
+  Twitter,
+  Linkedin,
+  Instagram,
+  Clock,
+  CheckCircle2,
+  AlertCircle
 } from "lucide-react";
 
 /**
@@ -227,6 +237,406 @@ function AdminPricingEditor() {
           </CardContent>
         </Card>
       ))}
+    </div>
+  );
+}
+
+/**
+ * AI Marketing Bot Component for FlutterAI Dashboard
+ */
+function AIMarketingBotContent() {
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+  const [activeMarketingTab, setActiveMarketingTab] = useState("dashboard");
+
+  // Fetch bot settings
+  const { data: botSettings, isLoading: settingsLoading } = useQuery({
+    queryKey: ['/api/admin/marketing-bot/settings'],
+    retry: false
+  });
+
+  // Fetch campaigns
+  const { data: campaigns, isLoading: campaignsLoading } = useQuery({
+    queryKey: ['/api/admin/marketing-bot/campaigns'],
+    retry: false
+  });
+
+  // Fetch generated content
+  const { data: generatedContent, isLoading: contentLoading } = useQuery({
+    queryKey: ['/api/admin/marketing-bot/content'],
+    retry: false
+  });
+
+  // Fetch analytics
+  const { data: analytics, isLoading: analyticsLoading } = useQuery({
+    queryKey: ['/api/admin/marketing-bot/analytics'],
+    retry: false
+  });
+
+  // Update settings mutation
+  const updateSettingsMutation = useMutation({
+    mutationFn: async (settings: any) => {
+      return apiRequest("PUT", "/api/admin/marketing-bot/settings", settings);
+    },
+    onSuccess: () => {
+      toast({
+        title: "Settings Updated",
+        description: "AI Marketing Bot settings saved successfully."
+      });
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/marketing-bot/settings'] });
+    },
+    onError: () => {
+      toast({
+        title: "Update Failed",
+        description: "Failed to update bot settings.",
+        variant: "destructive"
+      });
+    }
+  });
+
+  // Generate content mutation
+  const generateContentMutation = useMutation({
+    mutationFn: async (params: { platform: string; count: number }) => {
+      return apiRequest("POST", "/api/admin/marketing-bot/generate", params);
+    },
+    onSuccess: () => {
+      toast({
+        title: "Content Generated",
+        description: "New marketing content generated successfully."
+      });
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/marketing-bot/content'] });
+    }
+  });
+
+  // Publish content mutation
+  const publishContentMutation = useMutation({
+    mutationFn: async (contentId: string) => {
+      return apiRequest("POST", `/api/admin/marketing-bot/content/${contentId}/publish`);
+    },
+    onSuccess: () => {
+      toast({
+        title: "Content Published",
+        description: "Content published successfully."
+      });
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/marketing-bot/content'] });
+    }
+  });
+
+  const handleToggleBot = (enabled: boolean) => {
+    updateSettingsMutation.mutate({ enabled });
+  };
+
+  const handleGenerateContent = (platform: string) => {
+    generateContentMutation.mutate({ platform, count: 5 });
+  };
+
+  if (settingsLoading) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <div className="text-center">
+          <RefreshCw className="w-8 h-8 text-purple-400 animate-spin mx-auto mb-4" />
+          <p className="text-purple-200">Loading AI Marketing Bot...</p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <div className="p-2 bg-gradient-to-r from-purple-500/20 to-blue-500/20 rounded-lg">
+            <Bot className="w-6 h-6 text-purple-400" />
+          </div>
+          <div>
+            <h2 className="text-2xl font-bold text-white">AI Marketing Bot</h2>
+            <p className="text-purple-200">
+              Automated social media and SEO content generation
+            </p>
+          </div>
+        </div>
+        <div className="flex items-center gap-2">
+          <Badge className={botSettings?.enabled ? "bg-green-500/20 text-green-400" : "bg-red-500/20 text-red-400"}>
+            {botSettings?.enabled ? "Active" : "Inactive"}
+          </Badge>
+          <Button
+            onClick={() => handleToggleBot(!botSettings?.enabled)}
+            variant={botSettings?.enabled ? "destructive" : "default"}
+            size="sm"
+          >
+            {botSettings?.enabled ? (
+              <>
+                <Pause className="w-4 h-4 mr-2" />
+                Pause Bot
+              </>
+            ) : (
+              <>
+                <Play className="w-4 h-4 mr-2" />
+                Start Bot
+              </>
+            )}
+          </Button>
+        </div>
+      </div>
+
+      {/* Marketing Bot Tabs */}
+      <Tabs value={activeMarketingTab} onValueChange={setActiveMarketingTab} className="space-y-4">
+        <TabsList className="grid w-full grid-cols-4 bg-slate-800/50">
+          <TabsTrigger value="dashboard" className="data-[state=active]:bg-purple-600">
+            <BarChart3 className="h-4 w-4 mr-2" />
+            Dashboard
+          </TabsTrigger>
+          <TabsTrigger value="content" className="data-[state=active]:bg-purple-600">
+            <FileText className="h-4 w-4 mr-2" />
+            Content
+          </TabsTrigger>
+          <TabsTrigger value="campaigns" className="data-[state=active]:bg-purple-600">
+            <Calendar className="h-4 w-4 mr-2" />
+            Campaigns
+          </TabsTrigger>
+          <TabsTrigger value="settings" className="data-[state=active]:bg-purple-600">
+            <Settings className="h-4 w-4 mr-2" />
+            Settings
+          </TabsTrigger>
+        </TabsList>
+
+        {/* Dashboard Tab */}
+        <TabsContent value="dashboard" className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <Card className="bg-slate-800/50 border-purple-500/20">
+              <CardHeader className="pb-3">
+                <CardTitle className="text-sm font-medium text-purple-200">Total Content</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold text-white">{analytics?.totalPosts || 0}</div>
+                <div className="text-xs text-purple-400 mt-1">Posts generated</div>
+              </CardContent>
+            </Card>
+            <Card className="bg-slate-800/50 border-purple-500/20">
+              <CardHeader className="pb-3">
+                <CardTitle className="text-sm font-medium text-purple-200">Published</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold text-white">{analytics?.publishedPosts || 0}</div>
+                <div className="text-xs text-purple-400 mt-1">Live content</div>
+              </CardContent>
+            </Card>
+            <Card className="bg-slate-800/50 border-purple-500/20">
+              <CardHeader className="pb-3">
+                <CardTitle className="text-sm font-medium text-purple-200">Engagement</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold text-white">{analytics?.totalEngagement || 0}</div>
+                <div className="text-xs text-purple-400 mt-1">Total interactions</div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Quick Actions */}
+          <Card className="bg-slate-800/50 border-purple-500/20">
+            <CardHeader>
+              <CardTitle className="text-white flex items-center gap-2">
+                <Zap className="h-5 w-5 text-purple-400" />
+                Quick Generate
+              </CardTitle>
+              <CardDescription className="text-purple-200">
+                Generate content for different platforms
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                <Button
+                  onClick={() => handleGenerateContent('twitter')}
+                  disabled={generateContentMutation.isPending}
+                  className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700"
+                >
+                  <Twitter className="w-4 h-4" />
+                  Twitter
+                </Button>
+                <Button
+                  onClick={() => handleGenerateContent('linkedin')}
+                  disabled={generateContentMutation.isPending}
+                  className="flex items-center gap-2 bg-blue-800 hover:bg-blue-900"
+                >
+                  <Linkedin className="w-4 h-4" />
+                  LinkedIn
+                </Button>
+                <Button
+                  onClick={() => handleGenerateContent('instagram')}
+                  disabled={generateContentMutation.isPending}
+                  className="flex items-center gap-2 bg-pink-600 hover:bg-pink-700"
+                >
+                  <Instagram className="w-4 h-4" />
+                  Instagram
+                </Button>
+                <Button
+                  onClick={() => handleGenerateContent('blog')}
+                  disabled={generateContentMutation.isPending}
+                  className="flex items-center gap-2 bg-purple-600 hover:bg-purple-700"
+                >
+                  <FileText className="w-4 h-4" />
+                  Blog
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* Content Tab */}
+        <TabsContent value="content" className="space-y-4">
+          <Card className="bg-slate-800/50 border-purple-500/20">
+            <CardHeader>
+              <CardTitle className="text-white">Generated Content</CardTitle>
+              <CardDescription className="text-purple-200">
+                All AI-generated marketing content
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              {contentLoading ? (
+                <div className="flex items-center justify-center py-8">
+                  <RefreshCw className="w-6 h-6 text-purple-400 animate-spin" />
+                </div>
+              ) : generatedContent?.length > 0 ? (
+                <div className="space-y-4">
+                  {generatedContent.slice(0, 10).map((content: any) => (
+                    <div key={content.id} className="p-4 bg-slate-700/50 rounded-lg border border-purple-500/10">
+                      <div className="flex items-start justify-between mb-2">
+                        <div className="flex items-center gap-2">
+                          <Badge className="bg-purple-500/20 text-purple-400">
+                            {content.platform}
+                          </Badge>
+                          <Badge className={
+                            content.status === 'published' 
+                              ? "bg-green-500/20 text-green-400"
+                              : "bg-yellow-500/20 text-yellow-400"
+                          }>
+                            {content.status}
+                          </Badge>
+                        </div>
+                        {content.status === 'draft' && (
+                          <Button
+                            onClick={() => publishContentMutation.mutate(content.id)}
+                            disabled={publishContentMutation.isPending}
+                            size="sm"
+                            className="bg-green-600 hover:bg-green-700"
+                          >
+                            <CheckCircle2 className="w-3 h-3 mr-1" />
+                            Publish
+                          </Button>
+                        )}
+                      </div>
+                      <p className="text-white text-sm mb-2">{content.content}</p>
+                      <div className="flex flex-wrap gap-1">
+                        {content.hashtags?.map((tag: string, i: number) => (
+                          <span key={i} className="text-xs text-purple-400">
+                            {tag}
+                          </span>
+                        ))}
+                      </div>
+                      <div className="text-xs text-purple-300 mt-2">
+                        Scheduled: {new Date(content.scheduledFor).toLocaleString()}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-8">
+                  <FileText className="w-12 h-12 text-purple-400 mx-auto mb-4" />
+                  <h3 className="text-lg font-medium text-white mb-2">No Content Generated</h3>
+                  <p className="text-purple-200 mb-4">
+                    Start generating content for your social media platforms.
+                  </p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* Campaigns Tab */}
+        <TabsContent value="campaigns" className="space-y-4">
+          <Card className="bg-slate-800/50 border-purple-500/20">
+            <CardHeader>
+              <CardTitle className="text-white">Marketing Campaigns</CardTitle>
+              <CardDescription className="text-purple-200">
+                Automated campaign management and scheduling
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="text-center py-12">
+                <Calendar className="w-16 h-16 text-purple-400 mx-auto mb-4" />
+                <h3 className="text-lg font-medium text-white mb-2">No Active Campaigns</h3>
+                <p className="text-purple-200 mb-4">
+                  Create your first automated marketing campaign.
+                </p>
+                <Button className="bg-purple-600 hover:bg-purple-700">
+                  <Zap className="w-4 h-4 mr-2" />
+                  Create Campaign
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* Settings Tab */}
+        <TabsContent value="settings" className="space-y-4">
+          <Card className="bg-slate-800/50 border-purple-500/20">
+            <CardHeader>
+              <CardTitle className="text-white">Bot Configuration</CardTitle>
+              <CardDescription className="text-purple-200">
+                Configure AI marketing bot settings and preferences
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="space-y-4">
+                <div>
+                  <Label className="text-purple-200">Content Tone</Label>
+                  <Select value={botSettings?.tone || 'professional'}>
+                    <SelectTrigger className="bg-slate-700 border-purple-500/20 text-white">
+                      <SelectValue placeholder="Select tone" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="professional">Professional</SelectItem>
+                      <SelectItem value="casual">Casual</SelectItem>
+                      <SelectItem value="technical">Technical</SelectItem>
+                      <SelectItem value="friendly">Friendly</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label className="text-purple-200">Post Frequency</Label>
+                  <div className="grid grid-cols-3 gap-4">
+                    <div>
+                      <Label className="text-xs text-purple-300">Twitter/day</Label>
+                      <Input 
+                        type="number" 
+                        value={botSettings?.postFrequency?.twitter || 3}
+                        className="bg-slate-700 border-purple-500/20 text-white"
+                      />
+                    </div>
+                    <div>
+                      <Label className="text-xs text-purple-300">LinkedIn/day</Label>
+                      <Input 
+                        type="number" 
+                        value={botSettings?.postFrequency?.linkedin || 1}
+                        className="bg-slate-700 border-purple-500/20 text-white"
+                      />
+                    </div>
+                    <div>
+                      <Label className="text-xs text-purple-300">Instagram/day</Label>
+                      <Input 
+                        type="number" 
+                        value={botSettings?.postFrequency?.instagram || 1}
+                        className="bg-slate-700 border-purple-500/20 text-white"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }
@@ -691,9 +1101,9 @@ export default function FlutterAIDashboard() {
               <BarChart3 className="h-4 w-4 mr-2" />
               Reports
             </TabsTrigger>
-            <TabsTrigger value="admin" className="data-[state=active]:bg-purple-600">
-              <Settings className="h-4 w-4 mr-2" />
-              Admin
+            <TabsTrigger value="marketing-bot" className="data-[state=active]:bg-purple-600">
+              <Bot className="h-4 w-4 mr-2" />
+              Marketing Bot
             </TabsTrigger>
           </TabsList>
 
@@ -1601,24 +2011,9 @@ export default function FlutterAIDashboard() {
             <FlutterAIGroupAnalysis />
           </TabsContent>
 
-          {/* Admin Controls Tab */}
-          <TabsContent value="admin" className="space-y-6">
-            <div className="grid grid-cols-1 gap-6">
-              <Card className="bg-slate-800/50 border-purple-500/20">
-                <CardHeader>
-                  <CardTitle className="text-white flex items-center gap-2">
-                    <Users className="h-5 w-5 text-purple-400" />
-                    Pricing Management
-                  </CardTitle>
-                  <CardDescription className="text-purple-200">
-                    Edit pricing plans and features for FlutterAI services
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-6">
-                  <AdminPricingEditor />
-                </CardContent>
-              </Card>
-            </div>
+          {/* AI Marketing Bot Tab */}
+          <TabsContent value="marketing-bot" className="space-y-6">
+            <AIMarketingBotContent />
           </TabsContent>
         </Tabs>
       </div>
