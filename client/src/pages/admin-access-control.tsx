@@ -17,8 +17,10 @@ import {
   Lock, 
   Activity,
   AlertTriangle,
-  CheckCircle 
+  CheckCircle,
+  ArrowLeft 
 } from "lucide-react";
+import { Link } from "wouter";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 
@@ -222,6 +224,16 @@ export default function AdminAccessControl() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 p-4">
       <div className="max-w-6xl mx-auto">
+        {/* Back Button */}
+        <div className="flex items-center gap-4 mb-6">
+          <Link href="/admin-gateway">
+            <Button variant="outline" className="bg-slate-800/50 border-slate-600 text-slate-300 hover:bg-slate-700 hover:text-white flex items-center gap-2">
+              <ArrowLeft className="w-4 h-4" />
+              ← Admin Home
+            </Button>
+          </Link>
+        </div>
+
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-white mb-2">Access Control</h1>
           <p className="text-slate-300">Manage admin access and site controls</p>

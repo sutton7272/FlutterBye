@@ -50,8 +50,10 @@ import {
   Instagram,
   Clock,
   CheckCircle2,
-  AlertCircle
+  AlertCircle,
+  ArrowLeft
 } from "lucide-react";
+import { Link } from "wouter";
 
 /**
  * Admin Pricing Editor Component
@@ -930,6 +932,15 @@ export default function FlutterAIDashboard() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 p-6">
       <div className="max-w-7xl mx-auto space-y-6">
+        {/* Back Button */}
+        <div className="flex items-center gap-4">
+          <Link href="/admin-gateway">
+            <Button variant="outline" className="bg-slate-800/50 border-slate-600 text-slate-300 hover:bg-slate-700 hover:text-white flex items-center gap-2">
+              <ArrowLeft className="w-4 h-4" />
+              ← Admin Home
+            </Button>
+          </Link>
+        </div>
         
         {/* Header */}
         <div className="text-center space-y-4">

@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Shield, Lock, Key, Users, Settings, BarChart3, Brain } from "lucide-react";
+import { Shield, Lock, Key, Users, Settings, BarChart3, Brain, Target } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { Link } from "wouter";
@@ -274,6 +274,27 @@ export default function AdminGateway() {
                   <li>• Site Access Controls</li>
                   <li>• Security Settings</li>
                   <li>• Activity Logs</li>
+                </ul>
+              </CardContent>
+            </Card>
+          </Link>
+
+          {/* Marketing & Growth */}
+          <Link href="/admin/dashboard?tab=marketing">
+            <Card className="bg-slate-800/50 border-pink-500/20 hover:border-pink-400/40 transition-all cursor-pointer group">
+              <CardHeader>
+                <Target className="w-8 h-8 text-pink-400 group-hover:text-pink-300" />
+                <CardTitle className="text-white">Marketing & Growth</CardTitle>
+                <CardDescription className="text-slate-300">
+                  AI-powered marketing campaigns and growth analytics
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <ul className="text-sm text-slate-400 space-y-1">
+                  <li>• AI Marketing Bot</li>
+                  <li>• Viral Analytics & Growth</li>
+                  <li>• Campaign Management</li>
+                  <li>• Pricing Optimization</li>
                 </ul>
               </CardContent>
             </Card>
