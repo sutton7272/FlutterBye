@@ -68,6 +68,7 @@ import AdminGateway from "@/pages/admin-gateway";
 import AdminAccessControl from "@/pages/admin-access-control";
 import AdminMarketing from "@/pages/admin-marketing";
 import AdminGrowth from "@/pages/admin-growth";
+import AdminMarketingGrowth from "@/pages/admin-marketing-growth";
 import TokenHolderMapPage from "@/pages/token-holder-map";
 import CollaborativeCreation from "@/pages/collaborative-creation";
 import FlutterAIDashboard from "@/pages/flutterai-dashboard";
@@ -295,6 +296,12 @@ function Router() {
           <>
             <Navbar />
             <AdminGrowth />
+          </>
+        )} />
+        <Route path="/admin-marketing-growth" component={() => (
+          <>
+            <Navbar />
+            <AdminMarketingGrowth />
           </>
         )} />
         <Route path="/admin" component={() => (
