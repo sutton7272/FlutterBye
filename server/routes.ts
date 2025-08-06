@@ -4111,7 +4111,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Test Twitter API connection with OAuth credentials
+  // Comprehensive Twitter credentials diagnostic
   app.get("/api/marketing/bot/test-twitter", async (req, res) => {
     try {
       const credentials = {
@@ -4121,7 +4121,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
         accessSecret: process.env.TWITTER_ACCESS_TOKEN_SECRET
       };
 
-      // Check if all required credentials are present
+      // Show credential status (masked for security)
+      const credentialStatus = Object.entries(credentials).map(([key, value]) => ({
+        name: key,
+        present: !!value,
+        length: value ? value.length : 0,
+        preview: value ? `${value.substring(0, 6)}...${value.substring(value.length - 4)}` : 'MISSING'
+      }));
+
       const missingCredentials = Object.entries(credentials)
         .filter(([_, value]) => !value)
         .map(([key, _]) => key);
@@ -4129,9 +4136,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (missingCredentials.length > 0) {
         return res.json({
           success: false,
-          message: "Twitter API credentials missing",
+          message: "Twitter API credentials incomplete",
           missingCredentials,
-          status: "credentials_missing"
+          status: "credentials_missing",
+          credentialStatus,
+          instructions: {
+            step1: "Go to https://developer.twitter.com/en/portal/dashboard",
+            step2: "Select your @flutterbye app",
+            step3: "Go to 'Keys and tokens' tab",
+            step4: "Copy API Key and API Secret (Consumer Keys)",
+            step5: "Make sure app permissions are 'Read and Write'",
+            step6: "Regenerate Access Token if needed",
+            required: [
+              "TWITTER_API_KEY (Consumer Key)",
+              "TWITTER_API_SECRET (Consumer Secret)", 
+              "TWITTER_ACCESS_TOKEN",
+              "TWITTER_ACCESS_TOKEN_SECRET"
+            ]
+          }
         });
       }
 
@@ -4156,16 +4178,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
             id: user.data.id
           },
           status: "connected",
-          canPost: true
+          canPost: true,
+          credentialStatus
         });
       } catch (twitterError: any) {
         console.log(`❌ Twitter connection test failed:`, twitterError.message);
         res.json({
           success: false,
-          message: "Twitter API connection failed",
+          message: "Twitter API authentication failed",
           error: twitterError.message,
           status: "authentication_failed",
-          suggestion: "Please regenerate your Twitter API tokens with Read and Write permissions"
+          credentialStatus,
+          troubleshooting: {
+            error401: "Invalid credentials or insufficient permissions",
+            solution: "Regenerate Access Token with Read and Write permissions",
+            checkPermissions: "Verify app has 'Read and Write' permissions in Twitter Developer Portal"
+          }
         });
       }
 
@@ -4198,12 +4226,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const tweetContent = `${content} ${(hashtags || []).join(' ')}`.slice(0, 280);
 
       // Check if OAuth tokens are available
-      if (!process.env.TWITTER_API_KEY || !process.env.TWITTER_API_SECRET || !process.env.TWITTER_ACCESS_TOKEN || !process.env.TWITTER_ACCESS_TOKEN_SECRET) {
-        console.log(`🐦 Ready to post to @flutterbye: ${tweetContent}`);
+      const credentials = {
+        apiKey: process.env.TWITTER_API_KEY,
+        apiSecret: process.env.TWITTER_API_SECRET,
+        accessToken: process.env.TWITTER_ACCESS_TOKEN,
+        accessSecret: process.env.TWITTER_ACCESS_TOKEN_SECRET
+      };
+
+      const missingCredentials = Object.entries(credentials)
+        .filter(([_, value]) => !value)
+        .map(([key, _]) => key);
+
+      if (missingCredentials.length > 0) {
+        console.log(`🐦 Missing Twitter credentials: ${missingCredentials.join(', ')}`);
         return res.json({ 
-          success: true, 
-          message: "Content generated for @flutterbye - OAuth tokens needed for posting",
-          content: tweetContent
+          success: false, 
+          message: `Missing Twitter credentials: ${missingCredentials.join(', ')}`,
+          content: tweetContent,
+          missingCredentials
         });
       }
 
