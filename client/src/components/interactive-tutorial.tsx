@@ -160,23 +160,24 @@ const CATEGORY_LABELS = {
 };
 
 function InteractiveTutorialContent() {
-  const [activeStep, setActiveStep] = useState<number | null>(null);
+  const [currentStepIndex, setCurrentStepIndex] = useState(0);
   const [completedSteps, setCompletedSteps] = useState<Set<number>>(new Set());
   const [loadingSteps, setLoadingSteps] = useState<Set<number>>(new Set());
   const [stepResults, setStepResults] = useState<Record<number, any>>({});
 
+  const currentStep = TUTORIAL_STEPS[currentStepIndex];
+
   const runDemo = useCallback(async (step: TutorialStep) => {
     if (loadingSteps.has(step.id)) return;
 
-    setLoadingSteps(prev => new Set([...prev, step.id]));
-    setActiveStep(step.id);
+    setLoadingSteps(prev => new Set([...Array.from(prev), step.id]));
 
     try {
       await new Promise(resolve => setTimeout(resolve, 1500 + Math.random() * 1000));
       const result = await step.demo();
       
       setStepResults(prev => ({ ...prev, [step.id]: result }));
-      setCompletedSteps(prev => new Set([...prev, step.id]));
+      setCompletedSteps(prev => new Set([...Array.from(prev), step.id]));
     } catch (error) {
       console.error(`Demo failed for step ${step.id}:`, error);
     } finally {
@@ -188,117 +189,28 @@ function InteractiveTutorialContent() {
     }
   }, [loadingSteps]);
 
-  const renderStepCard = (step: TutorialStep) => {
-    const isActive = activeStep === step.id;
-    const isLoading = loadingSteps.has(step.id);
-    const isCompleted = completedSteps.has(step.id);
-    const result = stepResults[step.id];
-
-    return (
-      <Card key={step.id} className={cn(
-        "relative overflow-hidden transition-all duration-500 hover:scale-[1.02]",
-        "electric-frame border-2",
-        CATEGORY_COLORS[step.category],
-        isActive && "ring-2 ring-electric-blue/50 shadow-lg shadow-electric-blue/25",
-        isCompleted && "ring-2 ring-green-400/50 shadow-lg shadow-green-400/25"
-      )}>
-        <CardHeader className="pb-3">
-          <div className="flex items-start gap-4">
-            <div className={cn(
-              "w-12 h-12 rounded-xl flex items-center justify-center transition-all duration-300",
-              isCompleted ? "bg-green-500" : 
-              isLoading ? "bg-electric-blue animate-pulse" :
-              "bg-slate-700/50"
-            )}>
-              {isLoading ? (
-                <Loader2 className="w-6 h-6 text-white animate-spin" />
-              ) : (
-                step.icon
-              )}
-            </div>
-            <div className="flex-1 min-w-0">
-              <CardTitle className="text-lg font-bold text-white mb-2 leading-tight">
-                {step.title}
-              </CardTitle>
-              <p className="text-gray-300 text-sm leading-relaxed">
-                {step.description}
-              </p>
-            </div>
-          </div>
-          
-          <div className="flex items-center justify-between mt-4">
-            <Badge 
-              variant="outline" 
-              className={cn(
-                "text-xs font-medium",
-                CATEGORY_COLORS[step.category],
-                `border-${step.category === 'token' ? 'yellow' : step.category === 'value' ? 'green' : step.category === 'economy' ? 'purple' : 'blue'}-400/50`
-              )}
-            >
-              {CATEGORY_LABELS[step.category]}
-            </Badge>
-            
-            <Button
-              onClick={() => runDemo(step)}
-              disabled={isLoading}
-              size="sm"
-              className={cn(
-                "text-xs font-medium transition-all duration-200",
-                isCompleted 
-                  ? "bg-green-600 hover:bg-green-500 text-white"
-                  : isLoading
-                  ? "bg-electric-blue/50 cursor-not-allowed"
-                  : "bg-electric-blue hover:bg-electric-blue/80 text-white"
-              )}
-            >
-              {isLoading ? (
-                <>
-                  <Loader2 className="w-3 h-3 mr-1 animate-spin" />
-                  Running...
-                </>
-              ) : isCompleted ? (
-                "✅ Complete"
-              ) : (
-                <>
-                  <Play className="w-3 h-3 mr-1" />
-                  Try Demo
-                </>
-              )}
-            </Button>
-          </div>
-        </CardHeader>
-
-        {(isLoading || result) && (
-          <CardContent className="pt-0">
-            <div className={cn(
-              "p-4 rounded-lg border-2 transition-all duration-500",
-              isLoading ? "border-electric-blue/30 bg-electric-blue/10" : 
-              "border-green-400/30 bg-green-400/10"
-            )}>
-              {isLoading ? (
-                <div className="space-y-3">
-                  <div className="flex items-center gap-2">
-                    <Loader2 className="w-4 h-4 text-electric-blue animate-spin" />
-                    <span className="text-electric-blue font-medium text-sm">
-                      {step.interactionType === 'click' ? 'Processing...' :
-                       step.interactionType === 'type' ? 'Analyzing input...' :
-                       step.interactionType === 'watch' ? 'Monitoring systems...' :
-                       'Running analysis...'}
-                    </span>
-                  </div>
-                  <div className="text-xs text-gray-400">
-                    {step.expectedResult}
-                  </div>
-                </div>
-              ) : (
-                renderStepResult(result, step.category, step.id)
-              )}
-            </div>
-          </CardContent>
-        )}
-      </Card>
-    );
+  const nextStep = () => {
+    if (currentStepIndex < TUTORIAL_STEPS.length - 1) {
+      setCurrentStepIndex(prev => prev + 1);
+    }
   };
+
+  const prevStep = () => {
+    if (currentStepIndex > 0) {
+      setCurrentStepIndex(prev => prev - 1);
+    }
+  };
+
+  const goToStep = (index: number) => {
+    if (index >= 0 && index < TUTORIAL_STEPS.length) {
+      setCurrentStepIndex(index);
+    }
+  };
+
+  const progress = ((currentStepIndex + 1) / TUTORIAL_STEPS.length) * 100;
+  const isLoading = loadingSteps.has(currentStep.id);
+  const isCompleted = completedSteps.has(currentStep.id);
+  const result = stepResults[currentStep.id];
 
   const renderStepResult = (result: any, category: string, stepId: number) => {
     switch (category) {
@@ -507,75 +419,182 @@ function InteractiveTutorialContent() {
     }
   };
 
-  const completionPercentage = Math.round((completedSteps.size / TUTORIAL_STEPS.length) * 100);
-
   return (
-    <div className="space-y-8">
-      {/* Header Section */}
+    <div className="max-w-4xl mx-auto space-y-6">
+      {/* Header with Progress */}
       <Card className="electric-frame bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900">
-        <CardHeader className="text-center">
-          <div className="flex items-center justify-center gap-4 mb-4">
-            <div className="relative">
-              <Brain className="w-8 h-8 text-electric-blue animate-pulse" />
-              <Sparkles className="w-4 h-4 text-purple-400 absolute -top-1 -right-1 animate-bounce" />
-            </div>
-            <div>
-              <CardTitle className="text-3xl font-bold bg-gradient-to-r from-electric-blue to-purple-400 bg-clip-text text-transparent">
-                🚀 Platform Interactive Tutorial
-              </CardTitle>
-              <p className="text-gray-300 text-base mt-2 font-medium">
-                Experience the FUTURE of blockchain token creation! 🤯 See how easy it is to become "The Coinbase of Token Creation"!
-              </p>
-              <p className="text-electric-blue text-sm mt-1 font-medium animate-pulse">
-                ⚡ Click any demo below to see the magic in action! ⚡
-              </p>
-            </div>
+        <CardHeader className="text-center pb-4">
+          <CardTitle className="text-2xl font-bold bg-gradient-to-r from-electric-blue to-purple-400 bg-clip-text text-transparent mb-2">
+            🚀 Platform Interactive Tutorial
+          </CardTitle>
+          <p className="text-gray-300 text-sm">
+            Step {currentStepIndex + 1} of {TUTORIAL_STEPS.length} • {Math.round(progress)}% Complete
+          </p>
+          <div className="w-full bg-slate-800 rounded-full h-2 mt-3">
+            <div 
+              className="bg-gradient-to-r from-electric-blue to-purple-400 h-2 rounded-full transition-all duration-500"
+              style={{ width: `${progress}%` }}
+            />
           </div>
         </CardHeader>
       </Card>
 
-      {/* Progress Indicator */}
-      <div className="flex items-center justify-center gap-4">
-        <Badge 
-          variant="outline" 
-          className={cn(
-            "px-4 py-2 font-bold text-base transition-all duration-300",
-            completedSteps.size > 0 ? "bg-green-500/20 text-green-400 border-green-400/50" : "bg-slate-700 text-gray-400"
-          )}
+      {/* Current Step Display */}
+      <Card className={cn(
+        "electric-frame border-2 min-h-[500px]",
+        CATEGORY_COLORS[currentStep.category]
+      )}>
+        <CardHeader>
+          <div className="flex items-start gap-4 mb-4">
+            <div className={cn(
+              "w-16 h-16 rounded-xl flex items-center justify-center transition-all duration-300",
+              isCompleted ? "bg-green-500" : 
+              isLoading ? "bg-electric-blue animate-pulse" :
+              "bg-slate-700/50"
+            )}>
+              {isLoading ? (
+                <Loader2 className="w-8 h-8 text-white animate-spin" />
+              ) : (
+                currentStep.icon
+              )}
+            </div>
+            <div className="flex-1">
+              <CardTitle className="text-xl font-bold text-white mb-3 leading-tight">
+                {currentStep.title}
+              </CardTitle>
+              <p className="text-gray-300 leading-relaxed mb-4">
+                {currentStep.description}
+              </p>
+              <div className="flex items-center gap-4">
+                <Badge 
+                  variant="outline" 
+                  className={cn(
+                    "text-sm font-medium",
+                    CATEGORY_COLORS[currentStep.category]
+                  )}
+                >
+                  {CATEGORY_LABELS[currentStep.category]}
+                </Badge>
+                <Button
+                  onClick={() => runDemo(currentStep)}
+                  disabled={isLoading}
+                  className={cn(
+                    "transition-all duration-200",
+                    isCompleted 
+                      ? "bg-green-600 hover:bg-green-500 text-white"
+                      : isLoading
+                      ? "bg-electric-blue/50 cursor-not-allowed"
+                      : "bg-electric-blue hover:bg-electric-blue/80 text-white"
+                  )}
+                >
+                  {isLoading ? (
+                    <>
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      Running Demo...
+                    </>
+                  ) : isCompleted ? (
+                    <>
+                      ✅ Demo Complete
+                    </>
+                  ) : (
+                    <>
+                      <Play className="w-4 h-4 mr-2" />
+                      Try This Demo
+                    </>
+                  )}
+                </Button>
+              </div>
+            </div>
+          </div>
+        </CardHeader>
+
+        {(isLoading || result) && (
+          <CardContent className="pt-0">
+            <div className={cn(
+              "p-6 rounded-lg border-2 transition-all duration-500",
+              isLoading ? "border-electric-blue/30 bg-electric-blue/10" : 
+              "border-green-400/30 bg-green-400/10"
+            )}>
+              {isLoading ? (
+                <div className="space-y-4">
+                  <div className="flex items-center gap-3">
+                    <Loader2 className="w-5 h-5 text-electric-blue animate-spin" />
+                    <span className="text-electric-blue font-medium">
+                      {currentStep.interactionType === 'click' ? 'Processing your request...' :
+                       currentStep.interactionType === 'type' ? 'Analyzing your input...' :
+                       currentStep.interactionType === 'watch' ? 'Monitoring systems...' :
+                       'Running advanced analysis...'}
+                    </span>
+                  </div>
+                  <p className="text-gray-400 text-sm leading-relaxed">
+                    {currentStep.expectedResult}
+                  </p>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  <h4 className="text-green-400 font-semibold text-lg mb-3">🎉 Demo Results</h4>
+                  {renderStepResult(result, currentStep.category, currentStep.id)}
+                </div>
+              )}
+            </div>
+          </CardContent>
+        )}
+      </Card>
+
+      {/* Navigation Controls */}
+      <div className="flex items-center justify-between bg-slate-800/50 backdrop-blur rounded-lg p-4 border border-electric-blue/30">
+        <Button
+          variant="outline"
+          onClick={prevStep}
+          disabled={currentStepIndex === 0}
+          className="flex items-center gap-2"
         >
-          {completedSteps.size}/{TUTORIAL_STEPS.length} Demos Complete ({completionPercentage}%)
-        </Badge>
-        {completedSteps.size === TUTORIAL_STEPS.length && (
-          <Badge className="bg-gradient-to-r from-green-500 to-emerald-500 text-white px-4 py-2 font-bold animate-pulse">
-            🎉 ALL DEMOS MASTERED! 🎉
-          </Badge>
+          ← Previous
+        </Button>
+
+        {/* Step Dots */}
+        <div className="flex items-center gap-2">
+          {TUTORIAL_STEPS.map((_, index) => (
+            <button
+              key={index}
+              onClick={() => goToStep(index)}
+              className={cn(
+                "w-3 h-3 rounded-full transition-all duration-200",
+                index === currentStepIndex ? "bg-electric-blue" :
+                completedSteps.has(TUTORIAL_STEPS[index].id) ? "bg-green-500" :
+                "bg-slate-600 hover:bg-slate-500"
+              )}
+            />
+          ))}
+        </div>
+
+        {currentStepIndex < TUTORIAL_STEPS.length - 1 ? (
+          <Button
+            onClick={nextStep}
+            className="flex items-center gap-2 bg-gradient-to-r from-electric-blue to-circuit-teal"
+          >
+            Next →
+          </Button>
+        ) : (
+          <Button
+            className="flex items-center gap-2 bg-gradient-to-r from-green-600 to-emerald-600"
+          >
+            <Zap className="w-4 h-4" />
+            Get Started!
+          </Button>
         )}
       </div>
 
-      {/* Tutorial Steps Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {TUTORIAL_STEPS.map(renderStepCard)}
-      </div>
-
-      {/* Call to Action */}
-      {completedSteps.size >= TUTORIAL_STEPS.length / 2 && (
+      {/* Completion Message */}
+      {completedSteps.size === TUTORIAL_STEPS.length && (
         <Card className="electric-frame bg-gradient-to-r from-green-900/20 to-emerald-900/20 border-green-400/30">
           <CardHeader className="text-center">
             <CardTitle className="text-xl text-green-400 mb-2">
-              🎉 You're Getting the Hang of It!
+              🎉 Tutorial Mastered!
             </CardTitle>
             <p className="text-gray-300">
-              {completedSteps.size === TUTORIAL_STEPS.length 
-                ? "Congratulations! You've mastered all our revolutionary features. Ready to create your first token?"
-                : `${TUTORIAL_STEPS.length - completedSteps.size} demos remaining. You're doing amazing!`
-              }
+              You've completed all demos! Ready to start creating your own tokens?
             </p>
-            {completedSteps.size === TUTORIAL_STEPS.length && (
-              <Button className="mt-4 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 text-white font-bold">
-                <Zap className="w-4 h-4 mr-2" />
-                Start Creating Tokens Now!
-              </Button>
-            )}
           </CardHeader>
         </Card>
       )}
