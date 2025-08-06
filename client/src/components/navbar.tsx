@@ -18,7 +18,10 @@ export default function Navbar() {
     { href: "/create", label: "Create", icon: Coins, description: "27-character message tokens", featureId: "mint", priority: true },
     { href: "/flutterai", label: "FlutterAI", icon: Brain, description: "Wallet intelligence & targeting", special: true, featureId: "flutterai", priority: true },
     { href: "/redeem", label: "Redeem", icon: Gift, description: "Discover & redeem message tokens", featureId: "marketplace", priority: true },
-    { href: "/flutter-art", label: "FlutterArt", icon: Sparkles, description: "NFT message tokens (coming soon)", featureId: "flutter_art" },
+    { href: "/flutter-art", label: "FlutterArt", icon: Sparkles, description: "NFT message tokens", featureId: "flutter_art" },
+    { href: "/mint/greeting", label: "Greeting", icon: Heart, description: "Create greeting message tokens", featureId: "mint" },
+    { href: "/enterprise-campaigns", label: "Marketing", icon: Target, description: "Enterprise marketing campaigns", featureId: "enterprise" },
+    { href: "/intelligence", label: "AI Hub", icon: Brain, description: "AI intelligence and analytics", featureId: "intelligence" },
     { href: "/admin-unified", label: "Admin", icon: Settings, description: "Platform management", featureId: "admin_panel" },
   ];
 
@@ -43,7 +46,10 @@ export default function Navbar() {
   // Secondary navigation - business and enterprise features
   const secondaryNavItems = [
     { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard, description: "Portfolio & activity" },
-    { href: "/enterprise-campaigns", label: "Enterprise", icon: Building2, description: "B2B crypto marketing campaigns" },
+    { href: "/chat", label: "Chat", icon: MessageSquare, description: "Real-time blockchain chat" },
+    { href: "/trade", label: "Trade", icon: ArrowRightLeft, description: "Token marketplace & trading" },
+    { href: "/activity", label: "Activity", icon: Activity, description: "Platform activity & analytics" },
+    { href: "/explore", label: "Explore", icon: Star, description: "Discover trending content" },
   ];
 
   const isActive = (href: string) => location === href;
