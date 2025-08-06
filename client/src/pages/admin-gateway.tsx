@@ -33,7 +33,7 @@ export default function AdminGateway() {
     try {
       const response = await apiRequest("POST", "/api/admin/authenticate", {
         password,
-        walletAddress: publicKey || "demo-wallet"
+        walletAddress: publicKey || null // Send null if no wallet connected
       });
       
       const data = await response.json();
@@ -63,41 +63,46 @@ export default function AdminGateway() {
     }
   };
 
-  if (!connected) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 flex items-center justify-center p-4">
-        <Card className="w-full max-w-md bg-slate-800/50 border-blue-500/20">
-          <CardHeader className="text-center">
-            <Shield className="w-12 h-12 text-blue-400 mx-auto mb-4" />
-            <CardTitle className="text-white">Admin Access Required</CardTitle>
-            <CardDescription className="text-slate-300">
-              Please connect your wallet to access the admin portal
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Alert>
-              <Lock className="h-4 w-4" />
-              <AlertDescription>
-                Wallet connection is required for admin authentication
-              </AlertDescription>
-            </Alert>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
+  const handleWalletAuth = async () => {
+    if (!publicKey) return;
+    
+    setIsLoading(true);
+    try {
+      const response = await apiRequest("POST", "/api/admin/check-wallet", {
+        walletAddress: publicKey
+      });
+      
+      const data = await response.json();
+      
+      if (data.success && data.isAdmin) {
+        setIsAuthenticated(true);
+        sessionStorage.setItem('admin-authenticated', 'true');
+        toast({
+          title: "Wallet Recognized",
+          description: "Admin access granted through wallet authentication.",
+        });
+      } else {
+        toast({
+          title: "Wallet Not Recognized",
+          description: "This wallet is not registered as an admin wallet. Please use password authentication.",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Wallet Authentication Error",
+        description: "Failed to check wallet. Please try password authentication.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   if (isCheckingWallet) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 flex items-center justify-center p-4">
-        <Card className="w-full max-w-md bg-slate-800/50 border-blue-500/20">
-          <CardContent className="pt-6">
-            <div className="text-center">
-              <div className="animate-spin w-8 h-8 border-4 border-blue-400 border-t-transparent rounded-full mx-auto mb-4" />
-              <p className="text-white">Checking admin credentials...</p>
-            </div>
-          </CardContent>
-        </Card>
+        <div className="text-white">Loading...</div>
       </div>
     );
   }
@@ -108,17 +113,56 @@ export default function AdminGateway() {
         <Card className="w-full max-w-md bg-slate-800/50 border-blue-500/20">
           <CardHeader className="text-center">
             <Shield className="w-12 h-12 text-blue-400 mx-auto mb-4" />
-            <CardTitle className="text-white">Admin Portal Access</CardTitle>
+            <CardTitle className="text-white">Admin Access</CardTitle>
             <CardDescription className="text-slate-300">
-              Enter admin password to access the portal
+              Access the admin portal using wallet connection or password
             </CardDescription>
           </CardHeader>
-          <CardContent>
-            <form onSubmit={handlePasswordAuth} className="space-y-4">
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-white">Admin Password</label>
-                <Input
-                  type="password"
+          <CardContent className="space-y-6">
+            {/* Wallet Connection Option */}
+            {connected && publicKey && (
+              <div className="space-y-4">
+                <div className="flex items-center space-x-2">
+                  <Key className="w-4 h-4 text-green-400" />
+                  <span className="text-sm font-medium text-white">Wallet Authentication</span>
+                </div>
+                <div className="bg-slate-700/50 p-3 rounded-lg">
+                  <p className="text-xs text-slate-300 mb-2">Connected Wallet:</p>
+                  <p className="text-xs font-mono text-blue-400 break-all">{publicKey}</p>
+                </div>
+                <Button 
+                  onClick={handleWalletAuth}
+                  disabled={isLoading}
+                  className="w-full bg-green-600 hover:bg-green-700"
+                >
+                  {isLoading ? "Checking..." : "Authenticate with Wallet"}
+                </Button>
+              </div>
+            )}
+            
+            {/* Divider */}
+            {connected && (
+              <div className="relative">
+                <div className="absolute inset-0 flex items-center">
+                  <span className="w-full border-t border-slate-600" />
+                </div>
+                <div className="relative flex justify-center text-xs uppercase">
+                  <span className="bg-slate-800 px-2 text-slate-400">Or</span>
+                </div>
+              </div>
+            )}
+
+            {/* Password Authentication Option */}
+            <div className="space-y-4">
+              <div className="flex items-center space-x-2">
+                <Lock className="w-4 h-4 text-blue-400" />
+                <span className="text-sm font-medium text-white">Password Authentication</span>
+              </div>
+              <form onSubmit={handlePasswordAuth} className="space-y-4">
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-white">Admin Password</label>
+                  <Input
+                    type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="Enter admin password"
@@ -130,7 +174,10 @@ export default function AdminGateway() {
               <Alert>
                 <Key className="h-4 w-4" />
                 <AlertDescription>
-                  Your wallet will be registered for future admin access
+                  {connected && publicKey 
+                    ? "Your wallet will be registered for future admin access"
+                    : "Access admin portal without wallet connection required"
+                  }
                 </AlertDescription>
               </Alert>
               
@@ -142,6 +189,7 @@ export default function AdminGateway() {
                 {isLoading ? "Authenticating..." : "Access Admin Portal"}
               </Button>
             </form>
+            </div>
           </CardContent>
         </Card>
       </div>
