@@ -16,6 +16,7 @@ import { ErrorBoundary } from "@/components/error-boundary";
 import { LoadingState } from "@/components/loading-state";
 import { ViralGrowthAccelerator } from "@/components/viral-growth-accelerator";
 import { MobileOnboardingWizard } from "@/components/mobile-onboarding-wizard";
+import { BlogShowcase } from "@/components/blog-showcase";
 import { usePerformance } from "@/hooks/use-performance";
 import { useState, useEffect } from "react";
 
@@ -526,6 +527,13 @@ export default function Home() {
             </div>
           </div>
         </div>
+
+        {/* Blog Showcase Section */}
+        <ErrorBoundary>
+          <section className="w-full max-w-6xl mx-auto px-4 mb-16">
+            <BlogShowcase />
+          </section>
+        </ErrorBoundary>
 
         {/* Bottom CTA */}
         <div className="text-center mt-16 py-12 border-t border-purple-500/20">

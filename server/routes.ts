@@ -4214,6 +4214,50 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Generate and publish a blog post
+  app.post("/api/marketing/bot/generate-blog-post", async (req, res) => {
+    try {
+      const { topic, targetKeywords } = req.body;
+      
+      // Generate comprehensive SEO-optimized blog post using OpenAI
+      const blogContent = await marketingBot.generateBlogPost(topic, targetKeywords);
+      
+      res.json({ 
+        success: true, 
+        message: "Blog post generated successfully!",
+        ...blogContent
+      });
+    } catch (error) {
+      console.error("Error generating blog post:", error);
+      res.status(500).json({ error: "Failed to generate blog post" });
+    }
+  });
+
+  // Get all published blog posts
+  app.get("/api/blog/posts", async (req, res) => {
+    try {
+      // For now return mock data - will implement database storage next
+      const posts = [
+        {
+          id: "1",
+          title: "The Future of Crypto Marketing: Precision Targeting Meets Blockchain Innovation",
+          excerpt: "Discover how Flutterbye is revolutionizing crypto marketing with AI-powered wallet analysis and targeted messaging.",
+          content: "Full blog content here...",
+          publishedAt: new Date().toISOString(),
+          readTime: "8 min read",
+          tags: ["Crypto", "Marketing", "AI", "Blockchain"],
+          author: "Flutterbye AI",
+          featured: true
+        }
+      ];
+      
+      res.json({ success: true, posts });
+    } catch (error) {
+      console.error("Error fetching blog posts:", error);
+      res.status(500).json({ error: "Failed to fetch blog posts" });
+    }
+  });
+
   // Debug credential values and test simple connection
   app.get('/api/marketing/bot/debug-credentials', async (req, res) => {
     const creds = {
