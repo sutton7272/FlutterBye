@@ -136,11 +136,24 @@ export default function Create() {
   // Voice NFT Options - Combining voice with blockchain
   const voiceNftOptions = [
     {
+      id: "sms-to-token",
+      title: "FlutterWave SMS",
+      description: "Transform SMS messages into emotional blockchain tokens",
+      icon: MessageSquare,
+      color: "electric-blue",
+      features: ["SMS-to-blockchain", "Emotional AI analysis", "Time-locked delivery", "Burn-to-read privacy"],
+      recommended: true,
+      category: "voice",
+      route: "/flutter-wave",
+      examples: ["Happy Birthday! 🎂", "I love you ❤️", "Thinking of you 💭"],
+      badge: "AI-POWERED"
+    },
+    {
       id: "voice-message",
       title: "Voice Message NFT",
       description: "Personal voice recordings as NFTs",
       icon: Mic,
-      color: "electric-blue",
+      color: "purple",
       features: ["Voice recording", "Audio quality", "Personal touch"],
       recommended: true,
       category: "voice",
@@ -152,7 +165,7 @@ export default function Create() {
       title: "Music NFT",
       description: "Musical compositions and audio art",
       icon: Music,
-      color: "purple",
+      color: "electric-green",
       features: ["Music composition", "Audio art", "Sound design"],
       recommended: false,
       category: "voice",
@@ -164,7 +177,7 @@ export default function Create() {
       title: "Podcast Clip NFT",
       description: "Memorable podcast moments as collectibles",
       icon: Users,
-      color: "electric-green",
+      color: "gold",
       features: ["Podcast clips", "Interview highlights", "Discussion moments"],
       recommended: false,
       category: "voice",
@@ -254,6 +267,13 @@ export default function Create() {
               <div className="absolute -top-2 -right-2">
                 <Badge className="bg-gradient-to-r from-yellow-400 to-orange-400 text-black font-bold pulse-glow">
                   RECOMMENDED
+                </Badge>
+              </div>
+            )}
+            {option.badge && (
+              <div className="absolute -top-2 -left-2">
+                <Badge className="bg-gradient-to-r from-purple-600 to-blue-600 text-white font-bold pulse-glow">
+                  {option.badge}
                 </Badge>
               </div>
             )}
