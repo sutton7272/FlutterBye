@@ -238,7 +238,7 @@ export default function AdminGateway() {
           </Link>
 
           {/* FlutterAI Backend Dashboard */}
-          <Link href="/admin/enterprise">
+          <Link href="/flutterai-dashboard">
             <Card className="bg-slate-800/50 border-green-500/20 hover:border-green-400/40 transition-all cursor-pointer group">
               <CardHeader>
                 <Brain className="w-8 h-8 text-green-400 group-hover:text-green-300" />
