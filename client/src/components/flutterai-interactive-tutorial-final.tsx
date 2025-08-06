@@ -145,7 +145,7 @@ This campaign leverages psychological triggers and trending space metaphors for 
   };
 
   return (
-    <Card className="bg-black/40 border-electric-blue/30 backdrop-blur-lg">
+    <Card className="bg-slate-900/80 border-electric-blue/40 backdrop-blur-lg shadow-2xl shadow-electric-blue/10">
       <CardHeader>
         <div className="flex items-center gap-3">
           <div className="relative">
@@ -168,9 +168,9 @@ This campaign leverages psychological triggers and trending space metaphors for 
       <CardContent className="space-y-6">
         
         {/* Wallet Intelligence Demo */}
-        <div className="space-y-3">
-          <h3 className="text-white font-semibold flex items-center gap-2">
-            <Brain className="w-4 h-4 text-purple-400" />
+        <div className="space-y-4 p-4 bg-slate-800/30 rounded-lg border border-purple-500/20">
+          <h3 className="text-white font-semibold flex items-center gap-2 text-lg">
+            <Brain className="w-5 h-5 text-purple-400" />
             🧠 Wallet Intelligence Scanning
           </h3>
           <div className="flex gap-2">
@@ -178,7 +178,7 @@ This campaign leverages psychological triggers and trending space metaphors for 
               value={walletAddress}
               onChange={(e) => setWalletAddress(e.target.value)}
               placeholder="Enter wallet address to analyze..."
-              className="bg-black/20 border-electric-blue/30 text-white flex-1"
+              className="bg-slate-800/60 border-electric-blue/50 text-white placeholder:text-slate-400 focus:border-electric-blue focus:ring-electric-blue/20 flex-1"
             />
             <Button
               onClick={analyzeWallet}
@@ -214,9 +214,9 @@ This campaign leverages psychological triggers and trending space metaphors for 
         </div>
 
         {/* Content Optimization Demo */}
-        <div className="space-y-3">
-          <h3 className="text-white font-semibold flex items-center gap-2">
-            <Wand2 className="w-4 h-4 text-blue-400" />
+        <div className="space-y-4 p-4 bg-slate-800/30 rounded-lg border border-blue-500/20">
+          <h3 className="text-white font-semibold flex items-center gap-2 text-lg">
+            <Wand2 className="w-5 h-5 text-blue-400" />
             ✨ Content Optimization Engine
           </h3>
           <div className="flex gap-2">
@@ -224,7 +224,7 @@ This campaign leverages psychological triggers and trending space metaphors for 
               value={contentText}
               onChange={(e) => setContentText(e.target.value)}
               placeholder="Enter text to optimize for viral potential..."
-              className="bg-black/20 border-electric-blue/30 text-white flex-1"
+              className="bg-slate-800/60 border-electric-blue/50 text-white placeholder:text-slate-400 focus:border-electric-blue focus:ring-electric-blue/20 flex-1"
             />
             <Button
               onClick={optimizeContent}
@@ -252,7 +252,12 @@ This campaign leverages psychological triggers and trending space metaphors for 
         </div>
 
         {/* Quick Demo Buttons */}
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+        <div className="space-y-4 p-4 bg-slate-800/30 rounded-lg border border-cyan-500/20">
+          <h3 className="text-white font-semibold flex items-center gap-2 text-lg mb-4">
+            <Zap className="w-5 h-5 text-cyan-400" />
+            🚀 Revolutionary AI Features
+          </h3>
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
           <Button
             onClick={getMarketIntelligence}
             className="bg-gradient-to-r from-green-500 to-emerald-500 text-white"
@@ -306,6 +311,7 @@ This campaign leverages psychological triggers and trending space metaphors for 
             <MessageCircle className="w-4 h-4 mr-2" />
             Chat with ARIA
           </Button>
+          </div>
         </div>
 
         {/* Results Display */}
