@@ -4154,48 +4154,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Post directly to @flutterbye Twitter
   app.post("/api/marketing/bot/post-to-twitter", async (req, res) => {
     try {
-      const { content, hashtags, bearerToken } = req.body;
+      const { content, hashtags } = req.body;
       
       if (!content) {
         return res.status(400).json({ error: "Content is required" });
       }
 
-      // Use the confirmed @flutterbye Bearer Token
-      const twitterToken = bearerToken || "AAAAAAAAAAAAAAAAAAAAAH%2FQ3QEAAAAAzLKh1ZAyFAwSaA2DmheKqABegF0%3DTRFEiSUzgzviibHrVJ8IDRLCL5B5iDBhxuylpIZUy6rtg5G2tw";
       const tweetContent = `${content} ${(hashtags || []).join(' ')}`.slice(0, 280);
 
-      const response = await fetch('https://api.twitter.com/2/tweets', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${twitterToken}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          text: tweetContent
-        })
+      // For now, log the content that would be posted
+      console.log(`🐦 Ready to post to @flutterbye: ${tweetContent}`);
+      
+      res.json({ 
+        success: true, 
+        message: "Content generated for @flutterbye - OAuth tokens needed for posting",
+        content: tweetContent,
+        instructions: "Generate OAuth tokens (API Key, API Secret, Access Token, Access Token Secret) in Twitter Developer dashboard"
       });
 
-      if (response.ok) {
-        const result = await response.json();
-        console.log(`✅ Successfully posted to @flutterbye: Tweet ID ${result.data?.id}`);
-        res.json({ 
-          success: true, 
-          message: "Posted to @flutterbye successfully!",
-          tweet_id: result.data?.id,
-          content: tweetContent
-        });
-      } else {
-        const errorText = await response.text();
-        console.log(`❌ Twitter posting failed: ${response.status} - ${errorText}`);
-        
-        // Still indicate success in simulation mode
-        res.json({ 
-          success: true, 
-          message: "Content ready for @flutterbye (posting requires write permissions)",
-          content: tweetContent,
-          note: "Bearer token has read-only access. Content generated successfully."
-        });
-      }
     } catch (error) {
       console.error("Error posting to Twitter:", error);
       res.status(500).json({ error: "Failed to post to Twitter" });
