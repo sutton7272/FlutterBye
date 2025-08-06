@@ -32,6 +32,7 @@ import flutterbeyeLogoPath from "@assets/image_1754068877999.png";
 import Navbar from "@/components/navbar";
 
 import { TutorialLaunchButton } from "@/components/interactive-tutorial";
+import { FlutterAIInteractiveTutorial } from "@/components/flutterai-interactive-tutorial";
 
 interface TimeLeft {
   days: number;
@@ -659,6 +660,11 @@ export default function LaunchCountdown() {
               </div>
             </CardContent>
           </Card>
+
+          {/* FlutterAI Interactive Tutorial */}
+          <div className="space-y-6">
+            <FlutterAIInteractiveTutorial />
+          </div>
 
           {/* What is Flutterbye */}
           <Card className="electric-frame">
