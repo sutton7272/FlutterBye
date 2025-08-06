@@ -63,20 +63,20 @@ interface TutorialStep {
 const TUTORIAL_STEPS: TutorialStep[] = [
   {
     id: 1,
-    title: "Wallet Intelligence Scanning",
-    description: "Analyze any Solana wallet with AI-powered scoring and behavioral patterns",
+    title: "🧠 Wallet Intelligence Scanning",
+    description: "REVOLUTIONARY AI that instantly analyzes any Solana wallet and reveals hidden patterns, risk levels, trading behaviors, and wealth indicators. See what others can't see - from whale activity to diamond hands detection!",
     icon: <Brain className="w-6 h-6 text-purple-400" />,
     category: 'intelligence',
     demo: async () => apiRequest('POST', '/api/flutterai/analyze-wallet', { 
       walletAddress: '5tzFkiKscXHK5ZXCGbXZxdw7gTjjD1mBwuoFbhUvuAi9' 
     }),
     interactionType: 'analyze',
-    expectedResult: "Complete wallet profile with AI scoring, risk assessment, and behavioral insights"
+    expectedResult: "Complete wallet X-ray vision: AI behavioral scoring, risk assessment, trading patterns, wealth indicators, and hidden insights that reveal the true story behind every wallet"
   },
   {
     id: 2,
-    title: "Content Optimization Engine",
-    description: "Transform basic text into viral, engaging blockchain content",
+    title: "✨ Content Optimization Engine",
+    description: "MIND-BLOWING AI that transforms boring text into VIRAL GOLD! Our GPT-4o engine doesn't just rewrite - it predicts virality, optimizes for engagement, and creates content that spreads like wildfire across social media!",
     icon: <Wand2 className="w-6 h-6 text-blue-400" />,
     category: 'content',
     demo: async () => apiRequest('POST', '/api/ai/optimize-content', {
@@ -84,42 +84,42 @@ const TUTORIAL_STEPS: TutorialStep[] = [
       constraints: { maxLength: 27, tone: 'viral', platform: 'twitter' }
     }),
     interactionType: 'type',
-    expectedResult: "Viral-optimized content with engagement predictions"
+    expectedResult: "VIRAL-OPTIMIZED content with engagement predictions, hashtag recommendations, and psychological triggers that make people WANT to share, like, and engage!"
   },
   {
     id: 3,
-    title: "Real-Time Market Intelligence",
-    description: "AI-powered market analysis with predictive insights",
+    title: "📈 Real-Time Market Intelligence",
+    description: "CRYSTAL BALL FOR CRYPTO! Our AI continuously monitors 1000+ data sources, social sentiment, whale movements, and market patterns to predict price movements before they happen. It's like having insider knowledge, but totally legal!",
     icon: <TrendingUp className="w-6 h-6 text-green-400" />,
     category: 'analytics',
     demo: async () => apiRequest('GET', '/api/flutterai/market-intelligence'),
     interactionType: 'watch',
-    expectedResult: "Live market sentiment, trends, and price predictions"
+    expectedResult: "FUTURE-SEEING market intelligence: Live sentiment analysis, whale tracking, price predictions, trend forecasting, and early warning signals for market moves"
   },
   {
     id: 4,
-    title: "Security Threat Detection",
-    description: "Advanced AI security monitoring and threat analysis",
+    title: "🛡️ Security Threat Detection",
+    description: "BULLETPROOF PROTECTION! Our AI security system works like a digital bodyguard, scanning for threats, detecting scams, monitoring suspicious activity, and protecting your assets 24/7. Sleep peacefully knowing AI is watching your back!",
     icon: <Shield className="w-6 h-6 text-red-400" />,
     category: 'security',
     demo: async () => apiRequest('GET', '/api/flutterai/security-scan'),
     interactionType: 'click',
-    expectedResult: "Comprehensive security report with threat levels and recommendations"
+    expectedResult: "FORTRESS-LEVEL security analysis: Threat detection, vulnerability scanning, scam identification, risk assessment, and personalized security recommendations"
   },
   {
     id: 5,
-    title: "Revenue Optimization AI",
-    description: "AI-driven pricing and revenue maximization strategies",
+    title: "💰 Revenue Optimization AI",
+    description: "MONEY-MAKING MACHINE! This AI doesn't just suggest prices - it MAXIMIZES your revenue by analyzing market psychology, competitor pricing, demand patterns, and user behavior to find the PERFECT price that maximizes profits!",
     icon: <DollarSign className="w-6 h-6 text-yellow-400" />,
     category: 'revenue',
     demo: async () => apiRequest('GET', '/api/flutterai/pricing/analytics'),
     interactionType: 'analyze',
-    expectedResult: "Dynamic pricing recommendations and revenue projections"
+    expectedResult: "PROFIT-MAXIMIZING insights: Dynamic pricing optimization, revenue projections, market positioning, competitive analysis, and personalized pricing strategies"
   },
   {
     id: 6,
-    title: "Social Intelligence Engine",
-    description: "AI analysis of social patterns and viral potential",
+    title: "🌐 Social Intelligence Engine",
+    description: "VIRAL PREDICTION SUPERPOWER! This AI analyzes social patterns, emotional triggers, trending topics, and audience psychology to predict what will go viral BEFORE it happens. Create content that explodes across the internet!",
     icon: <Users className="w-6 h-6 text-indigo-400" />,
     category: 'intelligence',
     demo: async () => apiRequest('POST', '/api/ai/social-analysis', {
@@ -127,22 +127,22 @@ const TUTORIAL_STEPS: TutorialStep[] = [
       platform: 'twitter'
     }),
     interactionType: 'type',
-    expectedResult: "Viral potential score, audience insights, and optimization suggestions"
+    expectedResult: "VIRAL PREDICTION ENGINE: Virality scores, audience psychology insights, emotional trigger analysis, optimal posting times, and viral acceleration strategies"
   },
   {
     id: 7,
-    title: "Predictive Analytics Suite",
-    description: "Future trend prediction with quantum-inspired algorithms",
+    title: "🎯 Predictive Analytics Suite",
+    description: "TIME MACHINE FOR CRYPTO! Using quantum-inspired algorithms and deep learning, this AI sees into the future of crypto trends, market movements, and emerging opportunities. It's like having a crystal ball for blockchain!",
     icon: <Target className="w-6 h-6 text-pink-400" />,
     category: 'analytics',
     demo: async () => apiRequest('GET', '/api/flutterai/predictive-analytics'),
     interactionType: 'watch',
-    expectedResult: "Future market predictions and trend forecasts"
+    expectedResult: "FUTURE-SIGHT analytics: Trend predictions, market forecasts, opportunity identification, risk assessment, and strategic recommendations for maximum gains"
   },
   {
     id: 8,
-    title: "Conversational AI ARIA",
-    description: "Advanced AI companion with emotional intelligence",
+    title: "🤖 Conversational AI ARIA",
+    description: "YOUR GENIUS AI COMPANION! ARIA isn't just a chatbot - she's a blockchain expert, marketing strategist, and creative genius rolled into one. Ask her anything and watch her create marketing campaigns, solve problems, and generate brilliant ideas!",
     icon: <MessageCircle className="w-6 h-6 text-cyan-400" />,
     category: 'content',
     demo: async () => apiRequest('POST', '/api/ai/aria/chat', {
@@ -150,7 +150,7 @@ const TUTORIAL_STEPS: TutorialStep[] = [
       context: "marketing"
     }),
     interactionType: 'type',
-    expectedResult: "Intelligent conversation with actionable marketing strategies"
+    expectedResult: "GENIUS-LEVEL conversation: Strategic marketing plans, creative campaign ideas, problem-solving insights, and actionable strategies that actually work!"
   }
 ];
 
@@ -238,39 +238,75 @@ export function FlutterAIInteractiveTutorial() {
         return {
           score: Math.floor(Math.random() * 40) + 60,
           riskLevel: 'LOW',
-          patterns: ['DeFi Trader', 'HODLer', 'NFT Collector'],
-          insights: ['High activity in DeFi protocols', 'Long-term holder behavior', 'Diversified portfolio']
+          patterns: ['🐋 Whale Trader', '💎 Diamond Hands', '🎨 NFT Collector', '⚡ DeFi Power User'],
+          insights: [
+            '🔥 MASSIVE DeFi activity detected - this wallet is a serious player!',
+            '💎 Diamond hands confirmed - holds through major dips',
+            '🌟 Diversified portfolio shows sophisticated trading strategy',
+            '🚀 Early adopter pattern - gets into projects before they moon!'
+          ],
+          walletValue: '$2.4M',
+          tradingStyle: 'Aggressive Growth',
+          riskTolerance: 'High'
         };
       case 'content':
         return {
-          optimizedText: "🚀 Revolutionary blockchain tech that's about to change everything - don't miss out! #NextGenCrypto",
-          viralScore: 87,
-          engagement: '+250% expected',
-          suggestions: ['Add trending hashtags', 'Include call-to-action', 'Optimize timing']
+          optimizedText: "🚀 REVOLUTIONARY blockchain tech that's about to EXPLODE 💥 Don't be the one crying later! #NextGenCrypto #MoonBound #WAGMI",
+          viralScore: 94,
+          engagement: '+347% expected boost',
+          suggestions: [
+            '✨ Added psychological urgency triggers',
+            '🎯 Optimized for maximum shareability', 
+            '🔥 Included trending crypto hashtags',
+            '💰 Enhanced with profit motivation'
+          ],
+          predictedReach: '156K+ impressions',
+          emotionalTrigger: 'FOMO + Excitement'
         };
       case 'analytics':
         return {
-          marketSentiment: 'BULLISH',
-          trendScore: 92,
-          predictions: ['Price increase likely', 'Volume surge expected', 'Social buzz growing'],
-          timeframe: '24-48 hours'
+          marketSentiment: '🚀 EXTREMELY BULLISH',
+          trendScore: 96,
+          predictions: [
+            '📈 Price explosion incoming - 15-30% pump likely',
+            '🌊 Massive volume surge building momentum', 
+            '🔥 Social buzz reaching critical mass',
+            '💎 Whale accumulation phase detected'
+          ],
+          timeframe: '12-24 hours',
+          confidence: '89%',
+          signalStrength: 'VERY STRONG'
         };
       case 'security':
         return {
-          threatLevel: 'LOW',
+          threatLevel: '🟢 SECURE',
           vulnerabilities: 0,
-          recommendations: ['Enable 2FA', 'Regular security audits', 'Monitor suspicious activity'],
-          securityScore: 94
+          recommendations: [
+            '🛡️ Fortress-level protection active',
+            '🔍 Continuous threat monitoring enabled', 
+            '⚡ Real-time scam detection running',
+            '🎯 Advanced wallet protection protocols'
+          ],
+          securityScore: 97,
+          protectionLevel: 'MAXIMUM',
+          lastScan: 'Just now'
         };
       case 'revenue':
         return {
-          optimizedPrice: '$0.045',
-          expectedRevenue: '+34%',
-          recommendations: ['Dynamic pricing enabled', 'Peak hour optimization', 'User segmentation'],
-          projectedROI: '156%'
+          optimizedPrice: '$0.089',
+          expectedRevenue: '+67% PROFIT BOOST',
+          recommendations: [
+            '🎯 AI found your profit sweet spot!',
+            '📊 Market psychology optimization active', 
+            '💰 Competitor analysis shows 40% underpricing',
+            '🚀 Demand surge pricing strategy enabled'
+          ],
+          projectedROI: '234%',
+          monthlyIncrease: '+$47K',
+          competitorAnalysis: 'Beating 87% of similar projects'
         };
       default:
-        return { status: 'success', data: 'Demo completed' };
+        return { status: 'success', data: 'AI demo completed successfully!' };
     }
   };
 
@@ -369,20 +405,38 @@ export function FlutterAIInteractiveTutorial() {
         return (
           <>
             <div className="flex items-center justify-between">
-              <span className="text-gray-300 text-sm">AI Score:</span>
-              <Badge className="bg-purple-500/20 text-purple-400">{result.score}/100</Badge>
+              <span className="text-gray-300 text-sm">🧠 AI Intelligence Score:</span>
+              <Badge className="bg-purple-500/20 text-purple-400 font-bold">{result.score}/100 🔥</Badge>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-gray-300 text-sm">Risk Level:</span>
+              <span className="text-gray-300 text-sm">🛡️ Risk Level:</span>
               <Badge className="bg-green-500/20 text-green-400">{result.riskLevel}</Badge>
             </div>
+            <div className="flex items-center justify-between">
+              <span className="text-gray-300 text-sm">💰 Portfolio Value:</span>
+              <Badge className="bg-yellow-500/20 text-yellow-400 font-bold">{result.walletValue}</Badge>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-gray-300 text-sm">📊 Trading Style:</span>
+              <Badge className="bg-blue-500/20 text-blue-400">{result.tradingStyle}</Badge>
+            </div>
             <div>
-              <span className="text-gray-300 text-sm">Patterns:</span>
-              <div className="flex flex-wrap gap-1 mt-1">
+              <span className="text-gray-300 text-sm mb-2 block">🎯 Behavioral Patterns:</span>
+              <div className="flex flex-wrap gap-1">
                 {result.patterns?.map((pattern: string, i: number) => (
-                  <Badge key={i} className="bg-blue-500/20 text-blue-400 text-xs">
+                  <Badge key={i} className="bg-purple-500/20 text-purple-400 text-xs">
                     {pattern}
                   </Badge>
+                ))}
+              </div>
+            </div>
+            <div>
+              <span className="text-gray-300 text-sm mb-2 block">💡 AI Insights:</span>
+              <div className="space-y-1">
+                {result.insights?.slice(0, 2).map((insight: string, i: number) => (
+                  <div key={i} className="text-white text-xs bg-purple-500/10 p-2 rounded border-l-2 border-purple-400">
+                    {insight}
+                  </div>
                 ))}
               </div>
             </div>
@@ -391,16 +445,31 @@ export function FlutterAIInteractiveTutorial() {
       case 'content':
         return (
           <>
-            <div className="bg-gradient-to-r from-blue-500/10 to-purple-500/10 p-2 rounded text-white text-sm">
-              "{result.optimizedText}"
+            <div className="bg-gradient-to-r from-blue-500/10 to-purple-500/10 p-3 rounded text-white text-sm border-l-4 border-blue-400">
+              <div className="text-xs text-blue-400 mb-1">🔥 VIRAL CONTENT GENERATED:</div>
+              <div className="font-medium">"{result.optimizedText}"</div>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-gray-300 text-sm">Viral Score:</span>
-              <Badge className="bg-yellow-500/20 text-yellow-400">{result.viralScore}/100</Badge>
+              <span className="text-gray-300 text-sm">🚀 Viral Score:</span>
+              <Badge className="bg-yellow-500/20 text-yellow-400 font-bold">{result.viralScore}/100 💥</Badge>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-gray-300 text-sm">Expected Engagement:</span>
-              <span className="text-green-400 text-sm font-medium">{result.engagement}</span>
+              <span className="text-gray-300 text-sm">📈 Expected Engagement:</span>
+              <span className="text-green-400 text-sm font-bold">{result.engagement}</span>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-gray-300 text-sm">👀 Predicted Reach:</span>
+              <Badge className="bg-purple-500/20 text-purple-400">{result.predictedReach}</Badge>
+            </div>
+            <div>
+              <span className="text-gray-300 text-sm mb-2 block">✨ AI Optimizations Applied:</span>
+              <div className="space-y-1">
+                {result.suggestions?.slice(0, 2).map((suggestion: string, i: number) => (
+                  <div key={i} className="text-white text-xs bg-blue-500/10 p-2 rounded border-l-2 border-blue-400">
+                    {suggestion}
+                  </div>
+                ))}
+              </div>
             </div>
           </>
         );
@@ -408,23 +477,31 @@ export function FlutterAIInteractiveTutorial() {
         return (
           <>
             <div className="flex items-center justify-between">
-              <span className="text-gray-300 text-sm">Market Sentiment:</span>
-              <Badge className="bg-green-500/20 text-green-400">{result.marketSentiment}</Badge>
+              <span className="text-gray-300 text-sm">📊 Market Sentiment:</span>
+              <Badge className="bg-green-500/20 text-green-400 font-bold">{result.marketSentiment}</Badge>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-gray-300 text-sm">Trend Score:</span>
-              <Badge className="bg-blue-500/20 text-blue-400">{result.trendScore}/100</Badge>
+              <span className="text-gray-300 text-sm">📈 Trend Score:</span>
+              <Badge className="bg-blue-500/20 text-blue-400 font-bold">{result.trendScore}/100 🔥</Badge>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-gray-300 text-sm">🎯 Prediction Confidence:</span>
+              <Badge className="bg-purple-500/20 text-purple-400">{result.confidence}</Badge>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-gray-300 text-sm">⚡ Signal Strength:</span>
+              <Badge className="bg-yellow-500/20 text-yellow-400">{result.signalStrength}</Badge>
             </div>
             <div>
-              <span className="text-gray-300 text-sm">Predictions:</span>
-              <ul className="mt-1 space-y-1">
-                {result.predictions?.map((pred: string, i: number) => (
-                  <li key={i} className="text-white text-xs flex items-center gap-2">
-                    <TrendingUp className="w-3 h-3 text-green-400" />
+              <span className="text-gray-300 text-sm mb-2 block">🔮 AI Market Predictions:</span>
+              <div className="space-y-1">
+                {result.predictions?.slice(0, 3).map((pred: string, i: number) => (
+                  <div key={i} className="text-white text-xs bg-green-500/10 p-2 rounded border-l-2 border-green-400 flex items-start gap-2">
+                    <TrendingUp className="w-3 h-3 text-green-400 mt-0.5 flex-shrink-0" />
                     {pred}
-                  </li>
+                  </div>
                 ))}
-              </ul>
+              </div>
             </div>
           </>
         );
@@ -432,16 +509,30 @@ export function FlutterAIInteractiveTutorial() {
         return (
           <>
             <div className="flex items-center justify-between">
-              <span className="text-gray-300 text-sm">Threat Level:</span>
-              <Badge className="bg-green-500/20 text-green-400">{result.threatLevel}</Badge>
+              <span className="text-gray-300 text-sm">🛡️ Threat Level:</span>
+              <Badge className="bg-green-500/20 text-green-400 font-bold">{result.threatLevel}</Badge>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-gray-300 text-sm">Security Score:</span>
-              <Badge className="bg-blue-500/20 text-blue-400">{result.securityScore}/100</Badge>
+              <span className="text-gray-300 text-sm">🔒 Security Score:</span>
+              <Badge className="bg-blue-500/20 text-blue-400 font-bold">{result.securityScore}/100 🔥</Badge>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-gray-300 text-sm">Vulnerabilities:</span>
-              <Badge className="bg-green-500/20 text-green-400">{result.vulnerabilities} found</Badge>
+              <span className="text-gray-300 text-sm">⚠️ Vulnerabilities:</span>
+              <Badge className="bg-green-500/20 text-green-400">{result.vulnerabilities} found ✅</Badge>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-gray-300 text-sm">🎯 Protection Level:</span>
+              <Badge className="bg-purple-500/20 text-purple-400">{result.protectionLevel}</Badge>
+            </div>
+            <div>
+              <span className="text-gray-300 text-sm mb-2 block">🔐 Security Measures Active:</span>
+              <div className="space-y-1">
+                {result.recommendations?.slice(0, 3).map((rec: string, i: number) => (
+                  <div key={i} className="text-white text-xs bg-green-500/10 p-2 rounded border-l-2 border-green-400">
+                    {rec}
+                  </div>
+                ))}
+              </div>
             </div>
           </>
         );
@@ -449,16 +540,30 @@ export function FlutterAIInteractiveTutorial() {
         return (
           <>
             <div className="flex items-center justify-between">
-              <span className="text-gray-300 text-sm">Optimized Price:</span>
-              <Badge className="bg-yellow-500/20 text-yellow-400">{result.optimizedPrice}</Badge>
+              <span className="text-gray-300 text-sm">💰 Optimized Price:</span>
+              <Badge className="bg-yellow-500/20 text-yellow-400 font-bold">{result.optimizedPrice} 🚀</Badge>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-gray-300 text-sm">Revenue Increase:</span>
-              <Badge className="bg-green-500/20 text-green-400">{result.expectedRevenue}</Badge>
+              <span className="text-gray-300 text-sm">📈 Revenue Boost:</span>
+              <Badge className="bg-green-500/20 text-green-400 font-bold">{result.expectedRevenue}</Badge>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-gray-300 text-sm">Projected ROI:</span>
-              <Badge className="bg-purple-500/20 text-purple-400">{result.projectedROI}</Badge>
+              <span className="text-gray-300 text-sm">🎯 Projected ROI:</span>
+              <Badge className="bg-purple-500/20 text-purple-400 font-bold">{result.projectedROI}</Badge>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-gray-300 text-sm">💸 Monthly Increase:</span>
+              <Badge className="bg-blue-500/20 text-blue-400">{result.monthlyIncrease}</Badge>
+            </div>
+            <div>
+              <span className="text-gray-300 text-sm mb-2 block">🧠 AI Revenue Optimizations:</span>
+              <div className="space-y-1">
+                {result.recommendations?.slice(0, 3).map((rec: string, i: number) => (
+                  <div key={i} className="text-white text-xs bg-yellow-500/10 p-2 rounded border-l-2 border-yellow-400">
+                    {rec}
+                  </div>
+                ))}
+              </div>
             </div>
           </>
         );
@@ -499,11 +604,14 @@ export function FlutterAIInteractiveTutorial() {
               <Sparkles className="w-4 h-4 text-purple-400 absolute -top-1 -right-1 animate-bounce" />
             </div>
             <div>
-              <CardTitle className="text-2xl font-bold bg-gradient-to-r from-electric-blue to-purple-400 bg-clip-text text-transparent">
-                FlutterAI Interactive Tutorial
+              <CardTitle className="text-3xl font-bold bg-gradient-to-r from-electric-blue to-purple-400 bg-clip-text text-transparent">
+                🚀 FlutterAI: The Future is HERE!
               </CardTitle>
-              <p className="text-gray-400 text-sm mt-1">
-                Experience the world's most advanced blockchain AI in action
+              <p className="text-gray-300 text-base mt-2 font-medium">
+                Experience REVOLUTIONARY AI that will blow your mind! 🤯 Watch as our GPT-4o powered intelligence transforms blockchain forever.
+              </p>
+              <p className="text-electric-blue text-sm mt-1 font-medium animate-pulse">
+                ⚡ This isn't just a demo - it's a glimpse into the AI-powered future of crypto! ⚡
               </p>
             </div>
           </div>
