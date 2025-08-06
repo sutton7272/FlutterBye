@@ -53,6 +53,7 @@ export default function Navbar() {
     { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard, description: "Portfolio & activity" },
     { href: "/activity", label: "Activity", icon: Activity, description: "Platform activity & analytics" },
     { href: "/explore", label: "Explore", icon: Star, description: "Discover trending content" },
+    { href: "/info", label: "Info", icon: HelpCircle, description: "Platform information & help" },
   ];
 
   const isActive = (href: string) => location === href;
