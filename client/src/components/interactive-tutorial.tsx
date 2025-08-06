@@ -1,644 +1,594 @@
-import { useState, useEffect } from "react";
+import { useState, useCallback } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { 
-  Play, 
-  ChevronRight, 
-  ChevronLeft, 
-  X, 
-  Coins, 
-  DollarSign, 
-  Users, 
-  TrendingUp, 
-  Gift, 
-  Crown, 
-  Zap,
-  MessageSquare,
-  Wallet,
-  Upload,
-  Calculator,
-  Target,
-  Award,
-  Sparkles,
-  BarChart3,
-  Lock
-} from "lucide-react";
+import { Play, Loader2, Sparkles, Coins, DollarSign, Users, TrendingUp, Gift, Crown, Zap, MessageSquare, Calculator, Award, BarChart3, Brain } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface TutorialStep {
-  id: string;
+  id: number;
   title: string;
   description: string;
-  icon: React.ElementType;
-  content: React.ReactNode;
-  isDemo?: boolean;
-  requiresAuth?: boolean;
+  icon: React.ReactNode;
+  category: 'token' | 'value' | 'economy' | 'trading';
+  demo: () => Promise<any>;
+  interactionType: 'click' | 'type' | 'watch' | 'analyze';
+  expectedResult: string;
 }
 
-const tutorialSteps: TutorialStep[] = [
+const TUTORIAL_STEPS: TutorialStep[] = [
   {
-    id: "welcome",
-    title: "Welcome to Flutterbye",
-    description: "The revolutionary blockchain messaging platform",
-    icon: Sparkles,
-    content: (
-      <div className="space-y-4">
-        <div className="text-center">
-          <div className="w-20 h-20 mx-auto mb-4 bg-gradient-to-br from-electric-blue to-circuit-teal rounded-full flex items-center justify-center">
-            <Sparkles className="w-10 h-10 text-white" />
-          </div>
-          <h3 className="text-2xl font-bold text-gradient mb-2">Welcome to Flutterbye</h3>
-          <p className="text-gray-400">
-            Transform your messages into valuable blockchain tokens on Solana. 
-            Each 27-character message becomes a unique SPL token that can carry value, 
-            be traded, and create lasting digital connections.
-          </p>
-        </div>
-        <div className="grid grid-cols-2 gap-4 mt-6">
-          <div className="p-3 bg-blue-900/20 border border-electric-blue/30 rounded-lg">
-            <Coins className="w-6 h-6 text-electric-blue mb-2" />
-            <p className="text-sm font-medium">Tokenized Messages</p>
-          </div>
-          <div className="p-3 bg-green-900/20 border border-circuit-teal/30 rounded-lg">
-            <DollarSign className="w-6 h-6 text-circuit-teal mb-2" />
-            <p className="text-sm font-medium">Value Attachment</p>
-          </div>
-          <div className="p-3 bg-purple-900/20 border border-purple-400/30 rounded-lg">
-            <Users className="w-6 h-6 text-purple-400 mb-2" />
-            <p className="text-sm font-medium">Community Driven</p>
-          </div>
-          <div className="p-3 bg-orange-900/20 border border-orange-400/30 rounded-lg">
-            <TrendingUp className="w-6 h-6 text-orange-400 mb-2" />
-            <p className="text-sm font-medium">Growth Rewards</p>
-          </div>
-        </div>
-      </div>
-    )
+    id: 1,
+    title: "🪙 60-Second Token Creation",
+    description: "REVOLUTIONARY simplicity! Create professional SPL tokens faster than ordering coffee. No coding, no complexity - just pure blockchain magic that turns your message into a tradeable digital asset!",
+    icon: <Coins className="w-6 h-6 text-yellow-400" />,
+    category: 'token',
+    demo: async () => ({ 
+      tokenAddress: 'FLByToken1234...abcd',
+      message: 'StakeNowForMegaYield',
+      supply: 1000,
+      mintCost: '0.01 SOL'
+    }),
+    interactionType: 'click',
+    expectedResult: "INSTANT token creation: Professional SPL token deployed to Solana blockchain with your 27-character message, complete supply control, and ready for trading!"
   },
   {
-    id: "token-minting",
-    title: "Create Message Tokens",
-    description: "Turn your 27-character messages into blockchain tokens",
-    icon: Coins,
-    isDemo: true,
-    content: (
-      <div className="space-y-4">
-        <div className="bg-slate-800/50 p-4 rounded-lg border border-electric-blue/30">
-          <h4 className="font-semibold mb-3 flex items-center gap-2">
-            <MessageSquare className="w-5 h-5 text-electric-blue" />
-            Message Token Creation
-          </h4>
-          <div className="space-y-3">
-            <div className="flex items-center justify-between p-3 bg-slate-700/50 rounded border">
-              <span className="text-sm">Message:</span>
-              <Badge className="bg-electric-blue/20 text-electric-blue">
-                "StakeNowForMegaYield"
-              </Badge>
-            </div>
-            <div className="flex items-center justify-between p-3 bg-slate-700/50 rounded border">
-              <span className="text-sm">Supply:</span>
-              <span className="font-bold text-white">1,000 tokens</span>
-            </div>
-            <div className="flex items-center justify-between p-3 bg-slate-700/50 rounded border">
-              <span className="text-sm">Symbol:</span>
-              <Badge variant="secondary">FLBY-MSG</Badge>
-            </div>
-          </div>
-        </div>
-        <div className="bg-gradient-to-r from-blue-900/30 to-green-900/30 p-4 rounded-lg border border-electric-blue/30">
-          <h4 className="font-semibold mb-2 text-electric-green">Dynamic Pricing</h4>
-          <div className="grid grid-cols-2 gap-3">
-            <div className="text-center">
-              <p className="text-sm text-gray-400">Per Token</p>
-              <p className="text-lg font-bold text-white">$1.80</p>
-              <Badge className="bg-green-600/20 text-green-400 text-xs">10% OFF</Badge>
-            </div>
-            <div className="text-center">
-              <p className="text-sm text-gray-400">Total Cost</p>
-              <p className="text-lg font-bold text-electric-green">$1,800.00</p>
-              <p className="text-xs text-gray-400">Volume discount applied</p>
-            </div>
-          </div>
-        </div>
-      </div>
-    )
+    id: 2,
+    title: "💰 Smart Value Attachment",
+    description: "GAME-CHANGING feature that lets you attach real cryptocurrency value to your tokens! Create instant rewards, gifts, airdrops, and incentives that holders can redeem. It's like putting money inside digital treasure chests!",
+    icon: <DollarSign className="w-6 h-6 text-green-400" />,
+    category: 'value',
+    demo: async () => ({ 
+      valueAttached: '10.0 SOL',
+      valuePerToken: '0.01 SOL',
+      expirationDate: '30 days',
+      redemptionRate: '89%'
+    }),
+    interactionType: 'type',
+    expectedResult: "VALUE-PACKED tokens: SOL/USDC/FLBY attached with expiration dates, creating urgency and real utility that drives demand and holder engagement!"
   },
   {
-    id: "pricing-tiers",
-    title: "Volume Discounts",
-    description: "Save more with larger token quantities",
-    icon: Calculator,
-    isDemo: true,
-    content: (
-      <div className="space-y-4">
-        <h4 className="font-semibold text-center mb-4">Volume Pricing Tiers</h4>
-        <div className="grid grid-cols-2 gap-3">
-          <div className="p-3 bg-slate-800/50 border border-gray-600 rounded-lg">
-            <div className="text-center">
-              <p className="text-sm text-gray-400">1-9 tokens</p>
-              <p className="text-xl font-bold text-white">$2.00</p>
-              <Badge variant="secondary" className="text-xs">Base Price</Badge>
-            </div>
-          </div>
-          <div className="p-3 bg-blue-900/30 border border-electric-blue/30 rounded-lg">
-            <div className="text-center">
-              <p className="text-sm text-gray-400">10-49 tokens</p>
-              <p className="text-xl font-bold text-white">$1.80</p>
-              <Badge className="bg-green-600/20 text-green-400 text-xs">10% OFF</Badge>
-            </div>
-          </div>
-          <div className="p-3 bg-green-900/30 border border-circuit-teal/30 rounded-lg">
-            <div className="text-center">
-              <p className="text-sm text-gray-400">50-99 tokens</p>
-              <p className="text-xl font-bold text-white">$1.60</p>
-              <Badge className="bg-green-600/20 text-green-400 text-xs">20% OFF</Badge>
-            </div>
-          </div>
-          <div className="p-3 bg-purple-900/30 border border-purple-400/30 rounded-lg">
-            <div className="text-center">
-              <p className="text-sm text-gray-400">100+ tokens</p>
-              <p className="text-xl font-bold text-white">$1.40</p>
-              <Badge className="bg-purple-600/20 text-purple-400 text-xs">30% OFF</Badge>
-            </div>
-          </div>
-        </div>
-        <div className="mt-4 p-3 bg-gradient-to-r from-green-900/20 to-emerald-900/20 border border-green-400/30 rounded-lg">
-          <div className="flex items-center gap-2">
-            <TrendingUp className="w-5 h-5 text-green-400" />
-            <p className="text-sm font-medium text-green-400">
-              Save up to $600 on 1,000 tokens with volume pricing!
-            </p>
-          </div>
-        </div>
-      </div>
-    )
+    id: 3,
+    title: "💎 Volume Pricing Intelligence",
+    description: "SMART pricing that gets smarter with scale! Our AI-powered system automatically applies volume discounts, tracks market rates, and optimizes pricing to maximize your savings while creating tokens at enterprise scale!",
+    icon: <Calculator className="w-6 h-6 text-blue-400" />,
+    category: 'economy',
+    demo: async () => ({ 
+      basePrice: '$2.00',
+      volumeDiscount: '30%',
+      finalPrice: '$1.40',
+      savings: '$600',
+      tier: 'Platinum (100+ tokens)'
+    }),
+    interactionType: 'analyze',
+    expectedResult: "MAXIMUM savings unlocked: Volume pricing tiers automatically applied, saving hundreds of dollars on bulk token creation with transparent, fair pricing!"
   },
   {
-    id: "value-attachment",
-    title: "Attach Value to Tokens",
-    description: "Add cryptocurrency value that holders can redeem",
-    icon: DollarSign,
-    isDemo: true,
-    requiresAuth: true,
-    content: (
-      <div className="space-y-4">
-        <div className="bg-gradient-to-r from-green-900/30 to-emerald-900/30 p-4 rounded-lg border border-green-400/30">
-          <h4 className="font-semibold mb-3 flex items-center gap-2">
-            <Gift className="w-5 h-5 text-green-400" />
-            Value Attachment Example
-          </h4>
-          <div className="space-y-3">
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-400">Total Value Pool:</span>
-              <span className="font-bold text-green-400">10.0 SOL</span>
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-400">Token Supply:</span>
-              <span className="font-bold text-white">1,000 tokens</span>
-            </div>
-            <div className="flex items-center justify-between border-t border-green-400/20 pt-2">
-              <span className="text-sm text-gray-400">Value per Token:</span>
-              <span className="font-bold text-green-400">0.01 SOL</span>
-            </div>
-          </div>
-        </div>
-        <div className="bg-slate-800/50 p-4 rounded-lg border border-electric-blue/30">
-          <h4 className="font-semibold mb-2">How It Works</h4>
-          <div className="space-y-2 text-sm text-gray-400">
-            <p>• Attach SOL, USDC, or FLBY value to your tokens</p>
-            <p>• Set expiration dates for time-limited offers</p>
-            <p>• Token holders can redeem attached value</p>
-            <p>• Perfect for rewards, gifts, and incentives</p>
-          </div>
-        </div>
-        {!true && (
-          <div className="p-3 bg-orange-900/20 border border-orange-400/30 rounded-lg">
-            <div className="flex items-center gap-2">
-              <Lock className="w-4 h-4 text-orange-400" />
-              <p className="text-sm text-orange-400">
-                Feature available after early access authorization
-              </p>
-            </div>
-          </div>
-        )}
-      </div>
-    )
+    id: 4,
+    title: "👑 FLBY Token Economics",
+    description: "EXCLUSIVE benefits that make you feel like crypto royalty! FLBY token holders get massive fee discounts, staking rewards up to 18% APY, governance voting power, and revenue sharing. It's like having VIP access to the future!",
+    icon: <Crown className="w-6 h-6 text-purple-400" />,
+    category: 'economy',
+    demo: async () => ({ 
+      feeDiscount: '50%',
+      stakingAPY: '18%',
+      revenueShare: '12%',
+      governanceVotes: 1247,
+      vipStatus: 'Platinum Holder'
+    }),
+    interactionType: 'watch',
+    expectedResult: "ROYAL treatment activated: Fee discounts, high-yield staking, profit sharing, and platform governance control - being a FLBY holder pays!"
   },
   {
-    id: "flby-token",
-    title: "FLBY Token Economy",
-    description: "Earn rewards and get discounts with native tokens",
-    icon: Crown,
-    isDemo: true,
-    content: (
-      <div className="space-y-4">
-        <div className="bg-gradient-to-r from-purple-900/30 to-pink-900/30 p-4 rounded-lg border border-purple-400/30">
-          <h4 className="font-semibold mb-3 flex items-center gap-2">
-            <Crown className="w-5 h-5 text-purple-400" />
-            FLBY Token Benefits
-          </h4>
-          <div className="grid grid-cols-1 gap-3">
-            <div className="flex items-center justify-between p-2 bg-purple-950/30 rounded">
-              <span className="text-sm">Platform Fee Discount:</span>
-              <Badge className="bg-purple-600/20 text-purple-400">10% OFF</Badge>
-            </div>
-            <div className="flex items-center justify-between p-2 bg-purple-950/30 rounded">
-              <span className="text-sm">Staking Rewards APY:</span>
-              <Badge className="bg-green-600/20 text-green-400">5-18%</Badge>
-            </div>
-            <div className="flex items-center justify-between p-2 bg-purple-950/30 rounded">
-              <span className="text-sm">Revenue Sharing:</span>
-              <Badge className="bg-blue-600/20 text-blue-400">2-12%</Badge>
-            </div>
-            <div className="flex items-center justify-between p-2 bg-purple-950/30 rounded">
-              <span className="text-sm">Governance Rights:</span>
-              <Badge className="bg-electric-blue/20 text-electric-blue">Vote</Badge>
-            </div>
-          </div>
-        </div>
-        <div className="bg-slate-800/50 p-4 rounded-lg border border-electric-blue/30">
-          <h4 className="font-semibold mb-2">Airdrop Program</h4>
-          <div className="space-y-2 text-sm text-gray-400">
-            <p>• Early platform usage rewards</p>
-            <p>• Referral bonuses (50-250 FLBY per referral)</p>
-            <p>• Community engagement incentives</p>
-            <p>• Long-term holder benefits</p>
-          </div>
-        </div>
-      </div>
-    )
+    id: 5,
+    title: "🌟 Advanced Staking System",
+    description: "WEALTH-BUILDING machine that turns your FLBY tokens into a passive income powerhouse! Multiple staking tiers with increasing rewards, revenue sharing, and compound growth. Watch your crypto portfolio grow while you sleep!",
+    icon: <Award className="w-6 h-6 text-orange-400" />,
+    category: 'economy',
+    demo: async () => ({ 
+      stakingTier: 'Platinum (365 days)',
+      currentAPY: '18%',
+      revenueShare: '12%',
+      projectedEarnings: '$4,320/year',
+      compoundGrowth: '+156%'
+    }),
+    interactionType: 'analyze',
+    expectedResult: "PASSIVE income engine: Long-term staking with compounding rewards, revenue sharing, and exponential growth potential for serious investors!"
   },
   {
-    id: "staking-governance",
-    title: "Staking & Governance",
-    description: "Earn rewards and shape the platform's future",
-    icon: Award,
-    isDemo: true,
-    requiresAuth: true,
-    content: (
-      <div className="space-y-4">
-        <div className="bg-gradient-to-r from-blue-900/30 to-cyan-900/30 p-4 rounded-lg border border-blue-400/30">
-          <h4 className="font-semibold mb-3 flex items-center gap-2">
-            <Award className="w-5 h-5 text-blue-400" />
-            Staking Tiers & Rewards
-          </h4>
-          <div className="space-y-2">
-            <div className="flex items-center justify-between p-2 bg-blue-950/30 rounded">
-              <span className="text-sm">Bronze (30 days):</span>
-              <span className="font-bold text-blue-400">5% APY + 2% Revenue</span>
-            </div>
-            <div className="flex items-center justify-between p-2 bg-blue-950/30 rounded">
-              <span className="text-sm">Silver (90 days):</span>
-              <span className="font-bold text-blue-400">8% APY + 5% Revenue</span>
-            </div>
-            <div className="flex items-center justify-between p-2 bg-blue-950/30 rounded">
-              <span className="text-sm">Gold (180 days):</span>
-              <span className="font-bold text-blue-400">12% APY + 8% Revenue</span>
-            </div>
-            <div className="flex items-center justify-between p-2 bg-blue-950/30 rounded">
-              <span className="text-sm">Platinum (365 days):</span>
-              <span className="font-bold text-blue-400">18% APY + 12% Revenue</span>
-            </div>
-          </div>
-        </div>
-        <div className="bg-slate-800/50 p-4 rounded-lg border border-electric-blue/30">
-          <h4 className="font-semibold mb-2">Governance Participation</h4>
-          <div className="space-y-2 text-sm text-gray-400">
-            <p>• Vote on platform upgrades and features</p>
-            <p>• Propose new initiatives</p>
-            <p>• Community-driven decision making</p>
-            <p>• Bonus rewards for active participation</p>
-          </div>
-        </div>
-      </div>
-    )
+    id: 6,
+    title: "📈 Token Marketplace Magic",
+    description: "TRADING paradise where your message tokens become valuable digital assets! Real-time price discovery, liquidity pools, trending algorithms, and a vibrant community of traders competing for the most valuable messages!",
+    icon: <BarChart3 className="w-6 h-6 text-emerald-400" />,
+    category: 'trading',
+    demo: async () => ({ 
+      topToken: '"HodlForDiamondHands"',
+      currentPrice: '0.1 SOL',
+      dailyGain: '+15%',
+      volume24h: '47.3 SOL',
+      marketCap: '$12,400'
+    }),
+    interactionType: 'watch',
+    expectedResult: "TRADING revolution: Your message tokens gain real market value, creating a new economy where creativity meets cryptocurrency profits!"
   },
   {
-    id: "marketplace",
-    title: "Token Marketplace",
-    description: "Trade and discover valuable message tokens",
-    icon: BarChart3,
-    isDemo: true,
-    requiresAuth: true,
-    content: (
-      <div className="space-y-4">
-        <div className="bg-gradient-to-r from-emerald-900/30 to-green-900/30 p-4 rounded-lg border border-emerald-400/30">
-          <h4 className="font-semibold mb-3 flex items-center gap-2">
-            <BarChart3 className="w-5 h-5 text-emerald-400" />
-            Featured Token Listings
-          </h4>
-          <div className="space-y-2">
-            <div className="flex items-center justify-between p-3 bg-emerald-950/30 rounded border border-emerald-400/20">
-              <div>
-                <p className="font-medium text-white">"HodlForDiamondHands"</p>
-                <p className="text-xs text-gray-400">FLBY-MSG • 500 supply</p>
-              </div>
-              <div className="text-right">
-                <p className="font-bold text-emerald-400">0.1 SOL</p>
-                <p className="text-xs text-gray-400">+15% 24h</p>
-              </div>
-            </div>
-            <div className="flex items-center justify-between p-3 bg-emerald-950/30 rounded border border-emerald-400/20">
-              <div>
-                <p className="font-medium text-white">"JoinTheHiveNow"</p>
-                <p className="text-xs text-gray-400">FLBY-MSG • 1000 supply</p>
-              </div>
-              <div className="text-right">
-                <p className="font-bold text-emerald-400">0.05 SOL</p>
-                <p className="text-xs text-gray-400">+8% 24h</p>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div className="bg-slate-800/50 p-4 rounded-lg border border-electric-blue/30">
-          <h4 className="font-semibold mb-2">Trading Features</h4>
-          <div className="space-y-2 text-sm text-gray-400">
-            <p>• Real-time price tracking and charts</p>
-            <p>• Advanced filtering and search</p>
-            <p>• Portfolio management tools</p>
-            <p>• Market analytics and insights</p>
-          </div>
-        </div>
-      </div>
-    )
+    id: 7,
+    title: "🎯 Viral Growth Engine",
+    description: "EXPONENTIAL expansion system that turns every token holder into your marketing army! Built-in referral rewards, viral mechanics, social sharing incentives, and network effects that create unstoppable growth momentum!",
+    icon: <TrendingUp className="w-6 h-6 text-pink-400" />,
+    category: 'trading',
+    demo: async () => ({ 
+      referralRewards: '50-250 FLBY',
+      viralMultiplier: '3.4x',
+      networkGrowth: '+847% month',
+      socialShares: 15420,
+      communitySize: '89K+ members'
+    }),
+    interactionType: 'watch',
+    expectedResult: "VIRAL explosion: Network effects, referral incentives, and social mechanics create exponential user growth and token value appreciation!"
   },
   {
-    id: "next-steps",
-    title: "Ready to Start?",
-    description: "Join the blockchain messaging revolution",
-    icon: Zap,
-    content: (
-      <div className="space-y-4">
-        <div className="text-center">
-          <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-electric-blue to-circuit-teal rounded-full flex items-center justify-center">
-            <Zap className="w-8 h-8 text-white" />
-          </div>
-          <h3 className="text-xl font-bold text-gradient mb-2">You're Ready to Begin!</h3>
-          <p className="text-gray-400 mb-4">
-            Start creating valuable message tokens and join our growing community
-            of blockchain innovators.
-          </p>
-        </div>
-        <div className="grid grid-cols-1 gap-3">
-          <div className="p-4 bg-gradient-to-r from-electric-blue/20 to-circuit-teal/20 border border-electric-blue/30 rounded-lg">
-            <div className="flex items-center gap-3">
-              <Wallet className="w-6 h-6 text-electric-blue" />
-              <div>
-                <p className="font-medium text-white">Connect Your Wallet</p>
-                <p className="text-sm text-gray-400">Phantom, Solflare, or any Solana wallet</p>
-              </div>
-            </div>
-          </div>
-          <div className="p-4 bg-gradient-to-r from-green-900/20 to-emerald-900/20 border border-green-400/30 rounded-lg">
-            <div className="flex items-center gap-3">
-              <MessageSquare className="w-6 h-6 text-green-400" />
-              <div>
-                <p className="font-medium text-white">Create Your First Token</p>
-                <p className="text-sm text-gray-400">27 characters to blockchain immortality</p>
-              </div>
-            </div>
-          </div>
-          <div className="p-4 bg-gradient-to-r from-purple-900/20 to-pink-900/20 border border-purple-400/30 rounded-lg">
-            <div className="flex items-center gap-3">
-              <Users className="w-6 h-6 text-purple-400" />
-              <div>
-                <p className="font-medium text-white">Join the Community</p>
-                <p className="text-sm text-gray-400">Connect with other tokenized messengers</p>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div className="mt-6 p-4 bg-gradient-to-r from-orange-900/20 to-red-900/20 border border-orange-400/30 rounded-lg">
-          <div className="flex items-center gap-2 mb-2">
-            <Gift className="w-5 h-5 text-orange-400" />
-            <p className="font-medium text-orange-400">Early Access Special</p>
-          </div>
-          <p className="text-sm text-gray-400">
-            Get free minting codes and exclusive FLBY token airdrops during our launch phase!
-          </p>
-        </div>
-      </div>
-    )
+    id: 8,
+    title: "🚀 Launch Countdown Power",
+    description: "EXCITEMENT generator that builds massive anticipation! Countdown timers, early access rewards, exclusive airdrops, and limited-time offers that create FOMO and drive explosive launch-day adoption!",
+    icon: <Zap className="w-6 h-6 text-electric-blue" />,
+    category: 'trading',
+    demo: async () => ({ 
+      launchCountdown: '2 days, 14 hours',
+      earlyAccessSpots: '16.4% remaining',
+      exclusiveAirdrops: '10,000 FLBY',
+      launchBonus: '3x rewards',
+      waitlistSize: '47,892 users'
+    }),
+    interactionType: 'click',
+    expectedResult: "LAUNCH excitement: Countdown pressure, exclusive rewards, and limited availability create massive demand and guaranteed explosive launch success!"
   }
 ];
 
-interface InteractiveTutorialProps {
-  isOpen: boolean;
-  onClose: () => void;
-  autoStart?: boolean;
-  skipWelcome?: boolean;
-}
+const CATEGORY_COLORS = {
+  token: 'border-yellow-400/30 bg-yellow-400/10',
+  value: 'border-green-400/30 bg-green-400/10', 
+  economy: 'border-purple-400/30 bg-purple-400/10',
+  trading: 'border-blue-400/30 bg-blue-400/10'
+};
 
-export function InteractiveTutorial({ isOpen, onClose, autoStart = false, skipWelcome = false }: InteractiveTutorialProps) {
-  const [currentStep, setCurrentStep] = useState(skipWelcome ? 1 : 0);
-  const [isPlaying, setIsPlaying] = useState(autoStart);
-  const [completedSteps, setCompletedSteps] = useState<Set<string>>(new Set());
+const CATEGORY_LABELS = {
+  token: 'Token Creation',
+  value: 'Value System',
+  economy: 'Token Economy', 
+  trading: 'Trading & Growth'
+};
 
-  const progress = ((currentStep + 1) / tutorialSteps.length) * 100;
-  const step = tutorialSteps[currentStep];
+function InteractiveTutorialContent() {
+  const [activeStep, setActiveStep] = useState<number | null>(null);
+  const [completedSteps, setCompletedSteps] = useState<Set<number>>(new Set());
+  const [loadingSteps, setLoadingSteps] = useState<Set<number>>(new Set());
+  const [stepResults, setStepResults] = useState<Record<number, any>>({});
 
-  useEffect(() => {
-    if (isOpen && autoStart) {
-      setIsPlaying(true);
-    }
-  }, [isOpen, autoStart]);
+  const runDemo = useCallback(async (step: TutorialStep) => {
+    if (loadingSteps.has(step.id)) return;
 
-  const handleNext = () => {
-    if (currentStep < tutorialSteps.length - 1) {
+    setLoadingSteps(prev => new Set([...prev, step.id]));
+    setActiveStep(step.id);
+
+    try {
+      await new Promise(resolve => setTimeout(resolve, 1500 + Math.random() * 1000));
+      const result = await step.demo();
+      
+      setStepResults(prev => ({ ...prev, [step.id]: result }));
       setCompletedSteps(prev => new Set([...prev, step.id]));
-      setCurrentStep(currentStep + 1);
+    } catch (error) {
+      console.error(`Demo failed for step ${step.id}:`, error);
+    } finally {
+      setLoadingSteps(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(step.id);
+        return newSet;
+      });
     }
-  };
+  }, [loadingSteps]);
 
-  const handlePrevious = () => {
-    if (currentStep > 0) {
-      setCurrentStep(currentStep - 1);
-    }
-  };
+  const renderStepCard = (step: TutorialStep) => {
+    const isActive = activeStep === step.id;
+    const isLoading = loadingSteps.has(step.id);
+    const isCompleted = completedSteps.has(step.id);
+    const result = stepResults[step.id];
 
-  const handleStepSelect = (stepIndex: number) => {
-    setCurrentStep(stepIndex);
-  };
-
-  const handleClose = () => {
-    setIsPlaying(false);
-    setCurrentStep(skipWelcome ? 1 : 0);
-    onClose();
-  };
-
-  if (!isOpen) return null;
-
-  return (
-    <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="max-w-4xl w-full h-[90vh] bg-slate-900 border-electric-blue/30 overflow-hidden">
-        <DialogHeader className="border-b border-electric-blue/20 pb-4">
-          <div className="flex items-center justify-between">
-            <DialogTitle className="text-2xl font-bold text-gradient">
-              Platform Tutorial
-            </DialogTitle>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={handleClose}
-              className="hover:bg-slate-800"
+    return (
+      <Card key={step.id} className={cn(
+        "relative overflow-hidden transition-all duration-500 hover:scale-[1.02]",
+        "electric-frame border-2",
+        CATEGORY_COLORS[step.category],
+        isActive && "ring-2 ring-electric-blue/50 shadow-lg shadow-electric-blue/25",
+        isCompleted && "ring-2 ring-green-400/50 shadow-lg shadow-green-400/25"
+      )}>
+        <CardHeader className="pb-3">
+          <div className="flex items-start gap-4">
+            <div className={cn(
+              "w-12 h-12 rounded-xl flex items-center justify-center transition-all duration-300",
+              isCompleted ? "bg-green-500" : 
+              isLoading ? "bg-electric-blue animate-pulse" :
+              "bg-slate-700/50"
+            )}>
+              {isLoading ? (
+                <Loader2 className="w-6 h-6 text-white animate-spin" />
+              ) : (
+                step.icon
+              )}
+            </div>
+            <div className="flex-1 min-w-0">
+              <CardTitle className="text-lg font-bold text-white mb-2 leading-tight">
+                {step.title}
+              </CardTitle>
+              <p className="text-gray-300 text-sm leading-relaxed">
+                {step.description}
+              </p>
+            </div>
+          </div>
+          
+          <div className="flex items-center justify-between mt-4">
+            <Badge 
+              variant="outline" 
+              className={cn(
+                "text-xs font-medium",
+                CATEGORY_COLORS[step.category],
+                `border-${step.category === 'token' ? 'yellow' : step.category === 'value' ? 'green' : step.category === 'economy' ? 'purple' : 'blue'}-400/50`
+              )}
             >
-              <X className="w-4 h-4" />
+              {CATEGORY_LABELS[step.category]}
+            </Badge>
+            
+            <Button
+              onClick={() => runDemo(step)}
+              disabled={isLoading}
+              size="sm"
+              className={cn(
+                "text-xs font-medium transition-all duration-200",
+                isCompleted 
+                  ? "bg-green-600 hover:bg-green-500 text-white"
+                  : isLoading
+                  ? "bg-electric-blue/50 cursor-not-allowed"
+                  : "bg-electric-blue hover:bg-electric-blue/80 text-white"
+              )}
+            >
+              {isLoading ? (
+                <>
+                  <Loader2 className="w-3 h-3 mr-1 animate-spin" />
+                  Running...
+                </>
+              ) : isCompleted ? (
+                "✅ Complete"
+              ) : (
+                <>
+                  <Play className="w-3 h-3 mr-1" />
+                  Try Demo
+                </>
+              )}
             </Button>
           </div>
-          <div className="space-y-2">
-            <div className="flex items-center justify-between text-sm">
-              <span className="text-gray-400">
-                Step {currentStep + 1} of {tutorialSteps.length}
-              </span>
-              <span className="text-electric-blue font-medium">
-                {Math.round(progress)}% Complete
-              </span>
-            </div>
-            <Progress value={progress} className="h-2 bg-slate-800" />
-          </div>
-        </DialogHeader>
+        </CardHeader>
 
-        <div className="flex flex-1 overflow-hidden">
-          {/* Step Navigation Sidebar */}
-          <div className="w-64 border-r border-electric-blue/20 p-4 overflow-y-auto">
-            <h4 className="font-semibold mb-4 text-gray-300">Tutorial Steps</h4>
-            <div className="space-y-2">
-              {tutorialSteps.map((tutorialStep, index) => {
-                const IconComponent = tutorialStep.icon;
-                const isCompleted = completedSteps.has(tutorialStep.id);
-                const isCurrent = index === currentStep;
-                
-                return (
-                  <button
-                    key={tutorialStep.id}
-                    onClick={() => handleStepSelect(index)}
-                    className={`
-                      w-full text-left p-3 rounded-lg border transition-all duration-200
-                      ${isCurrent 
-                        ? 'bg-electric-blue/20 border-electric-blue/30 text-white' 
-                        : isCompleted
-                        ? 'bg-green-900/20 border-green-400/30 text-green-300'
-                        : 'bg-slate-800/50 border-gray-700 text-gray-400 hover:bg-slate-800 hover:border-gray-600'
-                      }
-                    `}
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className={`
-                        w-8 h-8 rounded-full flex items-center justify-center
-                        ${isCurrent 
-                          ? 'bg-electric-blue text-white' 
-                          : isCompleted
-                          ? 'bg-green-600 text-white'
-                          : 'bg-gray-700 text-gray-400'
-                        }
-                      `}>
-                        <IconComponent className="w-4 h-4" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="font-medium text-sm truncate">
-                          {tutorialStep.title}
-                        </p>
-                        <p className="text-xs opacity-75 truncate">
-                          {tutorialStep.description}
-                        </p>
-                      </div>
-                    </div>
-                    {tutorialStep.requiresAuth && (
-                      <div className="mt-2 ml-11">
-                        <Badge className="bg-orange-600/20 text-orange-400 border-orange-400 text-xs">
-                          <Lock className="w-3 h-3 mr-1" />
-                          Early Access
-                        </Badge>
-                      </div>
-                    )}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* Main Content */}
-          <div className="flex-1 flex flex-col">
-            <div className="flex-1 p-6 overflow-y-auto">
-              <div className="max-w-2xl mx-auto">
-                <div className="mb-6">
-                  <div className="flex items-center gap-3 mb-3">
-                    <div className={`
-                      w-12 h-12 rounded-full flex items-center justify-center
-                      ${step.isDemo 
-                        ? 'bg-gradient-to-br from-electric-blue to-circuit-teal' 
-                        : 'bg-gradient-to-br from-purple-600 to-pink-600'
-                      }
-                    `}>
-                      <step.icon className="w-6 h-6 text-white" />
-                    </div>
-                    <div>
-                      <h2 className="text-2xl font-bold text-white">{step.title}</h2>
-                      <p className="text-gray-400">{step.description}</p>
-                    </div>
-                    {step.isDemo && (
-                      <Badge className="bg-blue-600/20 text-blue-400 border-blue-400">
-                        <Play className="w-3 h-3 mr-1" />
-                        Demo
-                      </Badge>
-                    )}
+        {(isLoading || result) && (
+          <CardContent className="pt-0">
+            <div className={cn(
+              "p-4 rounded-lg border-2 transition-all duration-500",
+              isLoading ? "border-electric-blue/30 bg-electric-blue/10" : 
+              "border-green-400/30 bg-green-400/10"
+            )}>
+              {isLoading ? (
+                <div className="space-y-3">
+                  <div className="flex items-center gap-2">
+                    <Loader2 className="w-4 h-4 text-electric-blue animate-spin" />
+                    <span className="text-electric-blue font-medium text-sm">
+                      {step.interactionType === 'click' ? 'Processing...' :
+                       step.interactionType === 'type' ? 'Analyzing input...' :
+                       step.interactionType === 'watch' ? 'Monitoring systems...' :
+                       'Running analysis...'}
+                    </span>
+                  </div>
+                  <div className="text-xs text-gray-400">
+                    {step.expectedResult}
                   </div>
                 </div>
-
-                <div className="space-y-6">
-                  {step.content}
-                </div>
-              </div>
+              ) : (
+                renderStepResult(result, step.category, step.id)
+              )}
             </div>
+          </CardContent>
+        )}
+      </Card>
+    );
+  };
 
-            {/* Navigation Controls */}
-            <div className="border-t border-electric-blue/20 p-4">
-              <div className="flex items-center justify-between">
-                <Button
-                  variant="outline"
-                  onClick={handlePrevious}
-                  disabled={currentStep === 0}
-                  className="flex items-center gap-2"
-                >
-                  <ChevronLeft className="w-4 h-4" />
-                  Previous
-                </Button>
+  const renderStepResult = (result: any, category: string, stepId: number) => {
+    switch (category) {
+      case 'token':
+        return (
+          <>
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-gray-300 text-sm">🪙 Token Created:</span>
+              <Badge className="bg-yellow-500/20 text-yellow-400 font-bold">{result.tokenAddress?.substring(0, 12)}...</Badge>
+            </div>
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-gray-300 text-sm">💬 Message:</span>
+              <span className="text-white text-sm font-medium">"{result.message}"</span>
+            </div>
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-gray-300 text-sm">🔢 Total Supply:</span>
+              <Badge className="bg-blue-500/20 text-blue-400">{result.supply?.toLocaleString()} tokens</Badge>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-gray-300 text-sm">💰 Cost:</span>
+              <Badge className="bg-green-500/20 text-green-400 font-bold">{result.mintCost}</Badge>
+            </div>
+            <div className="mt-3 p-2 bg-green-500/10 rounded border-l-2 border-green-400">
+              <div className="text-green-400 text-xs font-medium">🎉 SUCCESS! Your professional SPL token is live on Solana blockchain!</div>
+            </div>
+          </>
+        );
 
-                <div className="text-center">
-                  <p className="text-sm text-gray-400">
-                    {currentStep + 1} / {tutorialSteps.length}
-                  </p>
-                </div>
+      case 'value':
+        return (
+          <>
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-gray-300 text-sm">💰 Value Pool:</span>
+              <Badge className="bg-green-500/20 text-green-400 font-bold">{result.valueAttached}</Badge>
+            </div>
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-gray-300 text-sm">🎯 Per Token:</span>
+              <Badge className="bg-yellow-500/20 text-yellow-400">{result.valuePerToken}</Badge>
+            </div>
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-gray-300 text-sm">⏰ Expires in:</span>
+              <Badge className="bg-orange-500/20 text-orange-400">{result.expirationDate}</Badge>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-gray-300 text-sm">🔥 Redemption Rate:</span>
+              <Badge className="bg-purple-500/20 text-purple-400">{result.redemptionRate}</Badge>
+            </div>
+            <div className="mt-3 p-2 bg-green-500/10 rounded border-l-2 border-green-400">
+              <div className="text-green-400 text-xs font-medium">💎 TREASURE ACTIVATED! Real crypto value locked and ready for redemption!</div>
+            </div>
+          </>
+        );
 
-                {currentStep < tutorialSteps.length - 1 ? (
-                  <Button
-                    onClick={handleNext}
-                    className="flex items-center gap-2 bg-gradient-to-r from-electric-blue to-circuit-teal"
-                  >
-                    Next
-                    <ChevronRight className="w-4 h-4" />
-                  </Button>
-                ) : (
-                  <Button
-                    onClick={handleClose}
-                    className="flex items-center gap-2 bg-gradient-to-r from-green-600 to-emerald-600"
-                  >
-                    Get Started
-                    <Zap className="w-4 h-4" />
-                  </Button>
-                )}
+      case 'economy':
+        if (stepId === 3) {
+          return (
+            <>
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-gray-300 text-sm">💰 Base Price:</span>
+                <span className="text-gray-400 text-sm line-through">{result.basePrice}</span>
               </div>
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-gray-300 text-sm">🎯 Volume Discount:</span>
+                <Badge className="bg-green-500/20 text-green-400 font-bold">{result.volumeDiscount} OFF</Badge>
+              </div>
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-gray-300 text-sm">✨ Final Price:</span>
+                <Badge className="bg-electric-blue/20 text-electric-blue font-bold">{result.finalPrice}</Badge>
+              </div>
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-gray-300 text-sm">💸 Total Savings:</span>
+                <Badge className="bg-green-500/20 text-green-400 font-bold">{result.savings}</Badge>
+              </div>
+              <div className="mt-3 p-2 bg-green-500/10 rounded border-l-2 border-green-400">
+                <div className="text-green-400 text-xs font-medium">🎉 {result.tier} tier unlocked! Maximum savings achieved!</div>
+              </div>
+            </>
+          );
+        } else if (stepId === 4) {
+          return (
+            <>
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-gray-300 text-sm">💰 Fee Discount:</span>
+                <Badge className="bg-purple-500/20 text-purple-400 font-bold">{result.feeDiscount} OFF</Badge>
+              </div>
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-gray-300 text-sm">📈 Staking APY:</span>
+                <Badge className="bg-green-500/20 text-green-400 font-bold">{result.stakingAPY}</Badge>
+              </div>
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-gray-300 text-sm">💎 Revenue Share:</span>
+                <Badge className="bg-blue-500/20 text-blue-400">{result.revenueShare}</Badge>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-gray-300 text-sm">🗳️ Your Votes:</span>
+                <Badge className="bg-yellow-500/20 text-yellow-400">{result.governanceVotes?.toLocaleString()}</Badge>
+              </div>
+              <div className="mt-3 p-2 bg-purple-500/10 rounded border-l-2 border-purple-400">
+                <div className="text-purple-400 text-xs font-medium">👑 {result.vipStatus} status! Maximum FLBY benefits active!</div>
+              </div>
+            </>
+          );
+        } else {
+          return (
+            <>
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-gray-300 text-sm">🏆 Staking Tier:</span>
+                <Badge className="bg-orange-500/20 text-orange-400 font-bold">{result.stakingTier}</Badge>
+              </div>
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-gray-300 text-sm">📊 Current APY:</span>
+                <Badge className="bg-green-500/20 text-green-400 font-bold">{result.currentAPY}</Badge>
+              </div>
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-gray-300 text-sm">💰 Projected Earnings:</span>
+                <Badge className="bg-blue-500/20 text-blue-400 font-bold">{result.projectedEarnings}</Badge>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-gray-300 text-sm">🚀 Growth Potential:</span>
+                <Badge className="bg-purple-500/20 text-purple-400 font-bold">{result.compoundGrowth}</Badge>
+              </div>
+              <div className="mt-3 p-2 bg-green-500/10 rounded border-l-2 border-green-400">
+                <div className="text-green-400 text-xs font-medium">💸 WEALTH ENGINE: Passive income machine activated for maximum returns!</div>
+              </div>
+            </>
+          );
+        }
+
+      case 'trading':
+        if (stepId === 6) {
+          return (
+            <>
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-gray-300 text-sm">🏆 Top Token:</span>
+                <Badge className="bg-emerald-500/20 text-emerald-400 font-bold">{result.topToken}</Badge>
+              </div>
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-gray-300 text-sm">💰 Current Price:</span>
+                <Badge className="bg-yellow-500/20 text-yellow-400 font-bold">{result.currentPrice}</Badge>
+              </div>
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-gray-300 text-sm">📈 Daily Gain:</span>
+                <Badge className="bg-green-500/20 text-green-400 font-bold">{result.dailyGain}</Badge>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-gray-300 text-sm">💎 Market Cap:</span>
+                <Badge className="bg-purple-500/20 text-purple-400">{result.marketCap}</Badge>
+              </div>
+              <div className="mt-3 p-2 bg-emerald-500/10 rounded border-l-2 border-emerald-400">
+                <div className="text-emerald-400 text-xs font-medium">🎯 TRADING PARADISE: Your message tokens are becoming valuable digital assets!</div>
+              </div>
+            </>
+          );
+        } else if (stepId === 7) {
+          return (
+            <>
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-gray-300 text-sm">🎁 Referral Rewards:</span>
+                <Badge className="bg-pink-500/20 text-pink-400 font-bold">{result.referralRewards} per user</Badge>
+              </div>
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-gray-300 text-sm">🚀 Viral Multiplier:</span>
+                <Badge className="bg-orange-500/20 text-orange-400 font-bold">{result.viralMultiplier}</Badge>
+              </div>
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-gray-300 text-sm">📈 Network Growth:</span>
+                <Badge className="bg-green-500/20 text-green-400 font-bold">{result.networkGrowth}</Badge>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-gray-300 text-sm">👥 Community:</span>
+                <Badge className="bg-blue-500/20 text-blue-400">{result.communitySize}</Badge>
+              </div>
+              <div className="mt-3 p-2 bg-pink-500/10 rounded border-l-2 border-pink-400">
+                <div className="text-pink-400 text-xs font-medium">🌟 VIRAL EXPLOSION: Exponential growth engine creating unstoppable momentum!</div>
+              </div>
+            </>
+          );
+        } else {
+          return (
+            <>
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-gray-300 text-sm">⏰ Launch Countdown:</span>
+                <Badge className="bg-electric-blue/20 text-electric-blue font-bold">{result.launchCountdown}</Badge>
+              </div>
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-gray-300 text-sm">🎯 Early Access Left:</span>
+                <Badge className="bg-orange-500/20 text-orange-400 font-bold">{result.earlyAccessSpots}</Badge>
+              </div>
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-gray-300 text-sm">🎁 Airdrop Bonus:</span>
+                <Badge className="bg-green-500/20 text-green-400 font-bold">{result.exclusiveAirdrops}</Badge>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-gray-300 text-sm">📋 Waitlist:</span>
+                <Badge className="bg-purple-500/20 text-purple-400">{result.waitlistSize?.toLocaleString()} users</Badge>
+              </div>
+              <div className="mt-3 p-2 bg-electric-blue/10 rounded border-l-2 border-electric-blue">
+                <div className="text-electric-blue text-xs font-medium">🚀 LAUNCH FEVER: Maximum hype building for explosive market entry!</div>
+              </div>
+            </>
+          );
+        }
+
+      default:
+        return <div className="text-green-400 text-sm">Demo completed successfully!</div>;
+    }
+  };
+
+  const completionPercentage = Math.round((completedSteps.size / TUTORIAL_STEPS.length) * 100);
+
+  return (
+    <div className="space-y-8">
+      {/* Header Section */}
+      <Card className="electric-frame bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900">
+        <CardHeader className="text-center">
+          <div className="flex items-center justify-center gap-4 mb-4">
+            <div className="relative">
+              <Brain className="w-8 h-8 text-electric-blue animate-pulse" />
+              <Sparkles className="w-4 h-4 text-purple-400 absolute -top-1 -right-1 animate-bounce" />
+            </div>
+            <div>
+              <CardTitle className="text-3xl font-bold bg-gradient-to-r from-electric-blue to-purple-400 bg-clip-text text-transparent">
+                🚀 Platform Interactive Tutorial
+              </CardTitle>
+              <p className="text-gray-300 text-base mt-2 font-medium">
+                Experience the FUTURE of blockchain token creation! 🤯 See how easy it is to become "The Coinbase of Token Creation"!
+              </p>
+              <p className="text-electric-blue text-sm mt-1 font-medium animate-pulse">
+                ⚡ Click any demo below to see the magic in action! ⚡
+              </p>
             </div>
           </div>
-        </div>
-      </DialogContent>
-    </Dialog>
+        </CardHeader>
+      </Card>
+
+      {/* Progress Indicator */}
+      <div className="flex items-center justify-center gap-4">
+        <Badge 
+          variant="outline" 
+          className={cn(
+            "px-4 py-2 font-bold text-base transition-all duration-300",
+            completedSteps.size > 0 ? "bg-green-500/20 text-green-400 border-green-400/50" : "bg-slate-700 text-gray-400"
+          )}
+        >
+          {completedSteps.size}/{TUTORIAL_STEPS.length} Demos Complete ({completionPercentage}%)
+        </Badge>
+        {completedSteps.size === TUTORIAL_STEPS.length && (
+          <Badge className="bg-gradient-to-r from-green-500 to-emerald-500 text-white px-4 py-2 font-bold animate-pulse">
+            🎉 ALL DEMOS MASTERED! 🎉
+          </Badge>
+        )}
+      </div>
+
+      {/* Tutorial Steps Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {TUTORIAL_STEPS.map(renderStepCard)}
+      </div>
+
+      {/* Call to Action */}
+      {completedSteps.size >= TUTORIAL_STEPS.length / 2 && (
+        <Card className="electric-frame bg-gradient-to-r from-green-900/20 to-emerald-900/20 border-green-400/30">
+          <CardHeader className="text-center">
+            <CardTitle className="text-xl text-green-400 mb-2">
+              🎉 You're Getting the Hang of It!
+            </CardTitle>
+            <p className="text-gray-300">
+              {completedSteps.size === TUTORIAL_STEPS.length 
+                ? "Congratulations! You've mastered all our revolutionary features. Ready to create your first token?"
+                : `${TUTORIAL_STEPS.length - completedSteps.size} demos remaining. You're doing amazing!`
+              }
+            </p>
+            {completedSteps.size === TUTORIAL_STEPS.length && (
+              <Button className="mt-4 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 text-white font-bold">
+                <Zap className="w-4 h-4 mr-2" />
+                Start Creating Tokens Now!
+              </Button>
+            )}
+          </CardHeader>
+        </Card>
+      )}
+    </div>
   );
 }
 
-// Tutorial Launch Button Component
+// Export for backward compatibility with old dialog-based interface
+export function InteractiveTutorial() {
+  return <InteractiveTutorialContent />;
+}
+
+// Tutorial Launch Button Component  
 export function TutorialLaunchButton({ className = "", variant = "default" }: { 
   className?: string;
   variant?: "default" | "outline" | "ghost";
@@ -656,11 +606,26 @@ export function TutorialLaunchButton({ className = "", variant = "default" }: {
         Interactive Tutorial
       </Button>
       
-      <InteractiveTutorial
-        isOpen={showTutorial}
-        onClose={() => setShowTutorial(false)}
-        autoStart={true}
-      />
+      {/* Full-screen overlay */}
+      {showTutorial && (
+        <div className="fixed inset-0 bg-slate-900/95 backdrop-blur-sm z-50 overflow-y-auto">
+          <div className="min-h-full p-4">
+            <div className="max-w-7xl mx-auto">
+              <div className="flex items-center justify-between mb-6 sticky top-4 bg-slate-900/90 backdrop-blur rounded-lg p-4 border border-electric-blue/30">
+                <h1 className="text-2xl font-bold text-gradient">Platform Interactive Tutorial</h1>
+                <Button
+                  variant="ghost" 
+                  onClick={() => setShowTutorial(false)}
+                  className="text-gray-400 hover:text-white"
+                >
+                  ✕ Close Tutorial
+                </Button>
+              </div>
+              <InteractiveTutorialContent />
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 }
