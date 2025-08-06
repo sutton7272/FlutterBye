@@ -704,6 +704,20 @@ function Router() {
 }
 
 function App() {
+  const [hasEarlyAccess, setHasEarlyAccess] = useState(false);
+  const [isCheckingAccess, setIsCheckingAccess] = useState(true);
+
+  // Check early access status on app load
+  useEffect(() => {
+    const checkEarlyAccess = () => {
+      const storedAccess = localStorage.getItem("flutterbye_early_access");
+      setHasEarlyAccess(storedAccess === "granted");
+      setIsCheckingAccess(false);
+    };
+    
+    setTimeout(checkEarlyAccess, 100);
+  }, []);
+
   // Register service worker for PWA functionality
   useEffect(() => {
     if ('serviceWorker' in navigator) {
@@ -719,17 +733,45 @@ function App() {
     }
   }, []);
 
-  // Always show early access gate as the home page
+  if (isCheckingAccess) {
+    return (
+      <div className="min-h-screen bg-black text-white flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-500 mx-auto mb-4"></div>
+          <p className="text-lg">Loading Flutterbye...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!hasEarlyAccess) {
+    return (
+      <ThemeProvider defaultTheme="dark">
+        <QueryClientProvider client={queryClient}>
+          <TooltipProvider>
+            <Toaster />
+            <EarlyAccessGate onAccessGranted={() => setHasEarlyAccess(true)} />
+          </TooltipProvider>
+        </QueryClientProvider>
+      </ThemeProvider>
+    );
+  }
+
   return (
     <ThemeProvider defaultTheme="dark">
       <QueryClientProvider client={queryClient}>
-        <TooltipProvider>
-          <Toaster />
-          <EarlyAccessGate onAccessGranted={() => {
-            // Do nothing - keep showing the access gate
-            console.log("Access granted but staying on access gate page");
-          }} />
-        </TooltipProvider>
+        <WalletProvider>
+          <WebSocketProvider>
+            <TooltipProvider>
+              <Toaster />
+              <OfflineIndicator />
+              <PWAInstallPrompt />
+              <PWANotificationPrompt />
+              <CommandPalette />
+              <Router />
+            </TooltipProvider>
+          </WebSocketProvider>
+        </WalletProvider>
       </QueryClientProvider>
     </ThemeProvider>
   );
