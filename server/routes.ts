@@ -2493,6 +2493,65 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Failed to fetch dashboard stats" });
     }
   });
+
+  // Get all tokens for a wallet (created and received)
+  app.get("/api/wallet/:walletAddress/tokens", async (req, res) => {
+    try {
+      const { walletAddress } = req.params;
+      
+      if (!walletAddress) {
+        return res.status(400).json({ error: "Wallet address is required" });
+      }
+
+      // Get user by wallet address
+      const user = await storage.getUserByWallet(walletAddress);
+      if (!user) {
+        return res.json({ created: [], received: [] });
+      }
+
+      // Get tokens created by this user
+      const createdTokens = await storage.getTokensByCreator(user.id);
+      
+      // Get tokens received by this user (via holdings)
+      const tokenHoldings = await storage.getTokenHoldingsByUser(user.id);
+      const receivedTokenIds = tokenHoldings.map(h => h.tokenId);
+      const receivedTokens = await storage.getTokensByIds(receivedTokenIds);
+
+      // Add expiration and value status to tokens
+      const enhanceTokenData = (tokens: any[]) => {
+        return tokens.map(token => {
+          const now = new Date();
+          const isExpired = token.expiresAt && new Date(token.expiresAt) < now;
+          const hasValue = parseFloat(token.attachedValue || '0') > 0;
+          const canRedeem = hasValue && !isExpired && token.escrowStatus === 'escrowed';
+          const canBurn = token.isBurnToRead && !isExpired;
+
+          return {
+            ...token,
+            isExpired,
+            hasValue,
+            canRedeem,
+            canBurn,
+            expiresInDays: token.expiresAt ? 
+              Math.ceil((new Date(token.expiresAt).getTime() - now.getTime()) / (1000 * 60 * 60 * 24)) : null
+          };
+        });
+      };
+
+      res.json({
+        created: enhanceTokenData(createdTokens),
+        received: enhanceTokenData(receivedTokens),
+        walletAddress,
+        totalCreated: createdTokens.length,
+        totalReceived: receivedTokens.length,
+        totalValue: [...createdTokens, ...receivedTokens]
+          .reduce((sum, token) => sum + parseFloat(token.attachedValue || '0'), 0)
+      });
+    } catch (error) {
+      console.error("Error fetching wallet tokens:", error);
+      res.status(500).json({ error: "Failed to fetch wallet tokens" });
+    }
+  });
   // Free Flutterbye Code Routes
   app.get("/api/codes/free-flutterbye", async (req, res) => {
     try {

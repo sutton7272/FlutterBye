@@ -38,6 +38,7 @@ import { QuickAccessFAB } from "@/components/quick-access-fab";
 import { PersonalizedDashboard } from "@/components/PersonalizedDashboard";
 import { PerformanceDashboard } from "@/components/performance-dashboard";
 import ViralDashboard from "@/pages/viral-dashboard";
+import { WalletProductsDisplay } from "@/components/dashboard/WalletProductsDisplay";
 
 interface DashboardStats {
   totalTokens: number;
@@ -297,27 +298,8 @@ export default function Dashboard() {
               </Card>
             </div>
 
-            {/* Recent Redeemable Tokens */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Wallet className="h-5 w-5" />
-                  Your Redeemable Tokens
-                </CardTitle>
-                <CardDescription>
-                  Tokens in your wallet that can be redeemed for value
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="text-center py-8 text-muted-foreground">
-                  <Gift className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                  <p>Connect your wallet to see redeemable tokens</p>
-                  <Button variant="outline" className="mt-4">
-                    Connect Wallet
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
+            {/* Wallet Products Display */}
+            <WalletProductsDisplay />
           </TabsContent>
 
           <TabsContent value="overview" className="space-y-6">
