@@ -16,9 +16,16 @@ interface EarlyAccessGateProps {
 export function EarlyAccessGate({ onAccessGranted }: EarlyAccessGateProps) {
   const [accessCode, setAccessCode] = useState("");
   const [email, setEmail] = useState("");
+  const [hasAccess, setHasAccess] = useState(false);
   const { toast } = useToast();
 
-  // Note: Early access check is handled by the main App component
+  // Check if user already has access
+  useEffect(() => {
+    const storedAccess = localStorage.getItem("flutterbye_early_access");
+    if (storedAccess === "granted") {
+      setHasAccess(true);
+    }
+  }, []);
 
   const checkAccessMutation = useMutation({
     mutationFn: async () => {
@@ -28,6 +35,7 @@ export function EarlyAccessGate({ onAccessGranted }: EarlyAccessGateProps) {
     onSuccess: (data: any) => {
       if (data.hasAccess) {
         localStorage.setItem("flutterbye_early_access", "granted");
+        setHasAccess(true);
         toast({
           title: "Access Granted!",
           description: `Welcome to Flutterbye early access (${data.accessMethod} verification).`
@@ -76,82 +84,143 @@ export function EarlyAccessGate({ onAccessGranted }: EarlyAccessGateProps) {
             className="w-20 h-20 mx-auto mb-4 rounded-full electric-frame"
           />
           <CardTitle className="text-2xl text-gradient flex items-center justify-center gap-2">
-            <Lock className="w-6 h-6" />
-            Early Access Required
+            {hasAccess ? (
+              <>
+                <Unlock className="w-6 h-6" />
+                Welcome to Flutterbye
+              </>
+            ) : (
+              <>
+                <Lock className="w-6 h-6" />
+                Early Access Required
+              </>
+            )}
           </CardTitle>
           <p className="text-muted-foreground">
-            Flutterbye is currently in early access mode. Enter your credentials to continue.
+            {hasAccess 
+              ? "Access granted! Choose where you'd like to go." 
+              : "Flutterbye is currently in early access mode. Enter your credentials to continue."
+            }
           </p>
         </CardHeader>
         
         <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="access-code">Access Code</Label>
-              <Input
-                id="access-code"
-                placeholder="FLBY-EARLY-XXX"
-                value={accessCode}
-                onChange={(e) => setAccessCode(e.target.value)}
-                className="bg-muted/20"
-              />
-            </div>
-            
-            <div className="text-center text-sm text-muted-foreground">
-              OR
-            </div>
-            
-            <div className="space-y-2">
-              <Label htmlFor="email">Authorized Email</Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="your@email.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="bg-muted/20"
-              />
-            </div>
+          {hasAccess ? (
+            // Navigation options after access granted
+            <div className="space-y-4">
+              <div className="grid grid-cols-1 gap-3">
+                <Button 
+                  className="w-full"
+                  onClick={() => window.open('/dashboard', '_blank')}
+                >
+                  <Key className="w-4 h-4 mr-2" />
+                  Open Dashboard
+                </Button>
+                
+                <Button 
+                  variant="outline"
+                  className="w-full"
+                  onClick={() => window.open('/create', '_blank')}
+                >
+                  Create Token
+                </Button>
+                
+                <Button 
+                  variant="outline"
+                  className="w-full"
+                  onClick={() => window.open('/launch', '_blank')}
+                >
+                  Launch Page
+                </Button>
+                
+                <Button 
+                  variant="outline"
+                  className="w-full"
+                  onClick={() => window.open('/admin', '_blank')}
+                >
+                  Admin Panel
+                </Button>
+              </div>
 
-            <Button 
-              type="submit" 
-              className="w-full"
-              disabled={checkAccessMutation.isPending}
-            >
-              {checkAccessMutation.isPending ? (
-                "Verifying..."
-              ) : (
-                <>
-                  <Unlock className="w-4 h-4 mr-2" />
-                  Request Access
-                </>
-              )}
-            </Button>
-          </form>
-
-          <div className="mt-6 space-y-4">
-            <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-3">
-              <h4 className="font-medium text-blue-400 mb-2">Need Access?</h4>
-              <p className="text-sm text-muted-foreground">
-                Join our waitlist for early access and FLBY token airdrops.
-              </p>
-              <Button 
-                variant="outline" 
-                size="sm" 
-                className="mt-2"
-                onClick={() => window.location.href = '/launch'}
-              >
-                Join Waitlist
-              </Button>
+              <div className="bg-green-500/10 border border-green-500/20 rounded-lg p-3 mt-6">
+                <h4 className="font-medium text-green-400 mb-2">Early Access Active</h4>
+                <p className="text-sm text-muted-foreground">
+                  You have full access to all Flutterbye features. Links open in new tabs to keep this home page accessible.
+                </p>
+              </div>
             </div>
+          ) : (
+            // Access request form
+            <>
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="access-code">Access Code</Label>
+                  <Input
+                    id="access-code"
+                    placeholder="FLBY-EARLY-XXX"
+                    value={accessCode}
+                    onChange={(e) => setAccessCode(e.target.value)}
+                    className="bg-muted/20"
+                  />
+                </div>
+                
+                <div className="text-center text-sm text-muted-foreground">
+                  OR
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="email">Authorized Email</Label>
+                  <Input
+                    id="email"
+                    type="email"
+                    placeholder="your@email.com"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="bg-muted/20"
+                  />
+                </div>
 
-            <div className="bg-muted/10 border border-muted/20 rounded-lg p-3">
-              <h4 className="font-medium mb-2">Public Launch</h4>
-              <p className="text-sm text-muted-foreground">
-                Flutterbye will be publicly available in 30 days. Early access users get exclusive benefits and token rewards.
-              </p>
-            </div>
-          </div>
+                <Button 
+                  type="submit" 
+                  className="w-full"
+                  disabled={checkAccessMutation.isPending}
+                >
+                  {checkAccessMutation.isPending ? (
+                    "Verifying..."
+                  ) : (
+                    <>
+                      <Unlock className="w-4 h-4 mr-2" />
+                      Request Access
+                    </>
+                  )}
+                </Button>
+              </form>
+
+              <div className="mt-6 space-y-4">
+                <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-3">
+                  <h4 className="font-medium text-blue-400 mb-2">Need Access?</h4>
+                  <p className="text-sm text-muted-foreground">
+                    Join our waitlist for early access and FLBY token airdrops.
+                  </p>
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="mt-2"
+                    onClick={() => window.open('/launch', '_blank')}
+                  >
+                    Join Waitlist
+                  </Button>
+                </div>
+
+                <div className="bg-muted/10 border border-muted/20 rounded-lg p-3">
+                  <h4 className="font-medium mb-2">Public Launch</h4>
+                  <p className="text-sm text-muted-foreground">
+                    Flutterbye will be publicly available in 30 days. Early access users get exclusive benefits and token rewards.
+                  </p>
+                </div>
+              </div>
+            </>
+          )}
         </CardContent>
       </Card>
     </div>
