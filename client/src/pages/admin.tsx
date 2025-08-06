@@ -621,7 +621,7 @@ export default function AdminDashboard() {
               </CardHeader>
               <CardContent className="p-6">
                 <div className="space-y-4">
-                  {platformStats?.topTokens?.length > 0 ? (
+                  {platformStats?.topTokens && platformStats.topTokens.length > 0 ? (
                     <Table>
                       <TableHeader>
                         <TableRow className="border-electric-blue/20 hover:bg-electric-blue/5">
