@@ -13,15 +13,12 @@ export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const { isFeatureEnabled, isLoading: featuresLoading } = useFeatureToggles();
 
-  // Primary navigation - core platform sections
+  // Primary navigation - core platform sections focused on launch products
   const allNavItems = [
-    { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard, description: "Your unified home", featureId: "home" },
-    { href: "/create", label: "Create", icon: Coins, description: "Token minting & AI tools", featureId: "mint" },
-    { href: "/trade", label: "Trade", icon: Users, description: "Marketplace & wallet", featureId: "marketplace" },
-    { href: "/flutterai", label: "FlutterAI", icon: Brain, description: "AI intelligence platform", special: true, featureId: "flutterai" },
-    { href: "/flutter-wave", label: "FlutterWave", icon: Heart, description: "AI butterfly messaging", featureId: "flutter_wave" },
-    { href: "/flutter-art", label: "FlutterArt", icon: Sparkles, description: "Digital art NFTs", featureId: "flutter_art" },
-    { href: "/chat", label: "Chat", icon: MessageSquare, description: "Real-time blockchain chat", featureId: "chat" },
+    { href: "/create", label: "Create", icon: Coins, description: "27-character message tokens", featureId: "mint", priority: true },
+    { href: "/flutterai", label: "FlutterAI", icon: Brain, description: "Wallet intelligence & targeting", special: true, featureId: "flutterai", priority: true },
+    { href: "/redeem", label: "Redeem", icon: Gift, description: "Discover & redeem message tokens", featureId: "marketplace", priority: true },
+    { href: "/flutter-art", label: "FlutterArt", icon: Sparkles, description: "NFT message tokens (coming soon)", featureId: "flutter_art" },
     { href: "/admin-unified", label: "Admin", icon: Settings, description: "Platform management", featureId: "admin_panel" },
   ];
 
@@ -43,12 +40,11 @@ export default function Navbar() {
         return isFeatureEnabled(item.featureId);
       });
 
-  // Secondary navigation for additional features - prioritize launch strategy
+  // Secondary navigation - business and enterprise features
   const secondaryNavItems = [
-    { href: "/coin-minting-launch", label: "Launch Strategy", icon: Coins, description: "Coin minting launch plan", priority: true },
-    { href: "/enterprise-sales", label: "Sales", icon: Building2, description: "$5M-$50M sales pipeline", priority: true },
-    { href: "/api-monetization", label: "API", icon: Code2, description: "$347K monthly API revenue", priority: true },
-    { href: "/intelligence", label: "Intelligence", icon: Brain, description: "Advanced analytics dashboard" },
+    { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard, description: "Portfolio & activity" },
+    { href: "/enterprise-campaigns", label: "Enterprise", icon: Building2, description: "B2B crypto marketing campaigns" },
+    { href: "/chat", label: "Chat", icon: MessageSquare, description: "Real-time blockchain chat" },
   ];
 
   const isActive = (href: string) => location === href;

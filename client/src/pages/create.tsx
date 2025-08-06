@@ -45,40 +45,37 @@ export default function Create() {
 
   const creationOptions = [
     {
-      id: "basic-token",
-      title: "Basic Token",
-      description: "Simple message token with value",
-      icon: Coins,
-      color: "electric-blue",
-      features: ["Custom message", "Set value", "Choose expiration"],
-      recommended: false
+      id: "greeting-card",
+      title: "Digital Greeting Card",
+      description: "Personal 27-character messages with SOL value",
+      icon: Gift,
+      color: "electric-green",
+      features: ["27-character message", "Attach SOL value", "Perfect for gifts"],
+      recommended: true,
+      category: "retail",
+      examples: ["Happy Birthday! $5 gift", "Coffee on me - enjoy!", "Thank you for everything"]
     },
     {
-      id: "ai-enhanced",
-      title: "AI Enhanced Token",
-      description: "Smart tokens with AI optimization",
+      id: "targeted-marketing",
+      title: "Targeted Marketing",
+      description: "Precision crypto marketing with FlutterAI",
       icon: Brain,
       color: "purple",
-      features: ["AI message optimization", "Viral prediction", "Smart pricing"],
-      recommended: true
+      features: ["FlutterAI wallet targeting", "Campaign analytics", "Bulk distribution"],
+      recommended: true,
+      category: "enterprise",
+      examples: ["Try our 5% yield pool!", "New NFT drop preview", "Beta access unlocked!"]
     },
     {
-      id: "voice-token",
-      title: "Voice Message",
-      description: "Audio-powered emotional tokens",
-      icon: Mic,
-      color: "electric-green",
-      features: ["Voice recording", "Emotion analysis", "Audio NFT"],
-      recommended: false
-    },
-    {
-      id: "multimedia",
-      title: "Multimedia Token",
-      description: "Rich media experiences",
-      icon: Image,
-      color: "orange",
-      features: ["Images & GIFs", "Video content", "Interactive media"],
-      recommended: false
+      id: "quick-message",
+      title: "Quick Message",
+      description: "Simple 27-character token creation",
+      icon: MessageSquare,
+      color: "electric-blue",
+      features: ["Fast creation", "Basic targeting", "Instant deployment"],
+      recommended: false,
+      category: "basic",
+      examples: ["GM! Have a great day", "Thanks for the follow", "Welcome to crypto!"]
     }
   ];
 
@@ -116,11 +113,22 @@ export default function Create() {
         {/* Header */}
         <div className="text-center space-y-4">
           <h1 className="text-4xl font-bold bg-gradient-to-r from-electric-blue to-electric-green bg-clip-text text-transparent">
-            Create & Build
+            Create Message Tokens
           </h1>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Transform your ideas into valuable tokens with AI-powered tools and blockchain technology
+            Create 27-character message tokens with redeemable value - perfect for digital greeting cards or targeted crypto marketing
           </p>
+          <div className="flex items-center justify-center gap-4 mt-6">
+            <Badge variant="outline" className="text-electric-blue border-electric-blue">
+              27 Characters Max
+            </Badge>
+            <Badge variant="outline" className="text-electric-green border-electric-green">
+              Redeemable Value
+            </Badge>
+            <Badge variant="outline" className="text-purple-400 border-purple-400">
+              FlutterAI Targeting
+            </Badge>
+          </div>
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
@@ -164,14 +172,38 @@ export default function Create() {
                         </li>
                       ))}
                     </ul>
-                    <Link href={getCreationRoute(option.id)}>
-                      <Button 
-                        className="w-full" 
-                        variant={option.recommended ? "default" : "outline"}
-                      >
-                        Create {option.title} <ArrowRight className="ml-2 h-4 w-4" />
-                      </Button>
-                    </Link>
+                    
+                    {/* Message Examples */}
+                    {option.examples && (
+                      <div className="mb-4 p-3 bg-muted/30 rounded-lg">
+                        <p className="text-xs text-muted-foreground mb-2 font-medium">Example messages:</p>
+                        {option.examples.map((example, index) => (
+                          <div key={index} className="text-xs font-mono text-electric-blue mb-1">
+                            "{example}"
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                    
+                    <div className="space-y-2">
+                      <Link href={getCreationRoute(option.id)}>
+                        <Button 
+                          className="w-full" 
+                          variant={option.recommended ? "default" : "outline"}
+                        >
+                          Create {option.title} <ArrowRight className="ml-2 h-4 w-4" />
+                        </Button>
+                      </Link>
+                      
+                      {option.category === "enterprise" && (
+                        <Link href="/campaign-builder">
+                          <Button variant="outline" size="sm" className="w-full text-xs">
+                            <Brain className="h-3 w-3 mr-1" />
+                            Advanced Campaign Builder
+                          </Button>
+                        </Link>
+                      )}
+                    </div>
                   </CardContent>
                 </Card>
               ))}
