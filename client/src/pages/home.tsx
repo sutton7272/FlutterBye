@@ -29,7 +29,7 @@ interface RecentActivity {
 }
 
 export default function Home() {
-  const { measureRender, endRenderMeasurement } = usePerformance('HomePage');
+  const performanceMetrics = usePerformance();
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   
@@ -51,11 +51,6 @@ export default function Home() {
     
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
-  
-  // Measure render performance in development
-  if (process.env.NODE_ENV === 'development') {
-    measureRender();
-  }
 
   const marqueeText = [
     "TURN MESSAGES INTO MONEY",
@@ -99,10 +94,7 @@ export default function Home() {
     }
   };
 
-  // End render measurement for development
-  if (process.env.NODE_ENV === 'development') {
-    setTimeout(() => endRenderMeasurement(), 0);
-  }
+  // Performance metrics available in performanceMetrics object
 
   return (
     <ErrorBoundary>
@@ -594,7 +586,6 @@ export default function Home() {
         {showOnboarding && (
           <MobileOnboardingWizard
             onComplete={() => setShowOnboarding(false)}
-            onSkip={() => setShowOnboarding(false)}
           />
         )}
       </div>

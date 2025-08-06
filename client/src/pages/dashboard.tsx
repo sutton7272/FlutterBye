@@ -37,7 +37,7 @@ import { WalletConnectionWizard } from "@/components/wallet-connection-wizard";
 import { QuickAccessFAB } from "@/components/quick-access-fab";
 import { PersonalizedDashboard } from "@/components/PersonalizedDashboard";
 import { PerformanceDashboard } from "@/components/performance-dashboard";
-import TrendingPage from "@/pages/trending";
+import ViralDashboard from "@/pages/viral-dashboard";
 
 interface DashboardStats {
   totalTokens: number;
@@ -307,7 +307,7 @@ export default function Dashboard() {
           </TabsContent>
 
           <TabsContent value="trending" className="space-y-6">
-            <TrendingPage />
+            <ViralDashboard />
           </TabsContent>
 
           <TabsContent value="insights" className="space-y-6">

@@ -107,7 +107,7 @@ function Router() {
         <Route path="/" component={() => (
           <>
             <Navbar />
-            <Dashboard />
+            <Home />
           </>
         )} />
         <Route path="/launch" component={LaunchCountdown} />
