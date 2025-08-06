@@ -51,7 +51,6 @@ export default function Navbar() {
   // Secondary navigation - business and enterprise features
   const secondaryNavItems = [
     { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard, description: "Portfolio & activity" },
-    { href: "/activity", label: "Activity", icon: Activity, description: "Platform activity & analytics" },
     { href: "/info", label: "Info", icon: HelpCircle, description: "Platform information & help",
       subItems: [
         { href: "/info", label: "Platform Info", description: "About Flutterbye platform" },
