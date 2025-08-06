@@ -46,8 +46,6 @@ export default function Navbar() {
   // Secondary navigation for additional features - prioritize launch strategy
   const secondaryNavItems = [
     { href: "/coin-minting-launch", label: "Launch Strategy", icon: Coins, description: "Coin minting launch plan", priority: true },
-    { href: "/production-readiness", label: "Readiness", icon: Shield, description: "Production readiness assessment", priority: true },
-    { href: "/dual-environment", label: "Environment", icon: ArrowRightLeft, description: "DevNet/MainNet dual setup", priority: true },
     { href: "/enterprise-sales", label: "Sales", icon: Building2, description: "$5M-$50M sales pipeline", priority: true },
     { href: "/api-monetization", label: "API", icon: Code2, description: "$347K monthly API revenue", priority: true },
     { href: "/intelligence", label: "Intelligence", icon: Brain, description: "Advanced analytics dashboard" },
