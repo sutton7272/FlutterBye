@@ -17,10 +17,10 @@ export default function AdminGateway() {
   const [isCheckingWallet, setIsCheckingWallet] = useState(true);
   const { toast } = useToast();
 
-  // For now, simplified authentication - just check session storage
+  // Check for valid admin session token
   useEffect(() => {
     const adminAuth = sessionStorage.getItem('admin-authenticated');
-    if (adminAuth === 'true') {
+    if (adminAuth && adminAuth !== 'true' && adminAuth.startsWith('admin-')) {
       setIsAuthenticated(true);
     }
     setIsCheckingWallet(false);
@@ -40,7 +40,7 @@ export default function AdminGateway() {
       
       if (data.success) {
         setIsAuthenticated(true);
-        sessionStorage.setItem('admin-authenticated', 'true');
+        sessionStorage.setItem('admin-authenticated', data.sessionToken);
         toast({
           title: "Admin Access Granted",
           description: "Welcome to the admin portal.",
@@ -75,12 +75,21 @@ export default function AdminGateway() {
       const data = await response.json();
       
       if (data.success && data.isAdmin) {
-        setIsAuthenticated(true);
-        sessionStorage.setItem('admin-authenticated', 'true');
-        toast({
-          title: "Wallet Recognized",
-          description: "Admin access granted through wallet authentication.",
+        // For wallet authentication, create a session token
+        const walletResponse = await apiRequest("POST", "/api/admin/authenticate", {
+          password: "admin123", // Use default password for wallet-based auth
+          walletAddress: publicKey
         });
+        const walletData = await walletResponse.json();
+        
+        if (walletData.success) {
+          setIsAuthenticated(true);
+          sessionStorage.setItem('admin-authenticated', walletData.sessionToken);
+          toast({
+            title: "Wallet Recognized",
+            description: "Admin access granted through wallet authentication.",
+          });
+        }
       } else {
         toast({
           title: "Wallet Not Recognized",

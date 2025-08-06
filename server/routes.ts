@@ -1679,7 +1679,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   // User management (requires user management permission)
-  app.get("/api/admin/users", authenticateWallet, requirePermission('users'), async (req, res) => {
+  app.get("/api/admin/users", (req: any, res: any, next: any) => {
+    // Check for admin session first, then wallet auth
+    const sessionToken = req.headers['x-admin-session'];
+    if (sessionToken && adminSessions.has(sessionToken)) {
+      return next();
+    }
+    // Fall back to wallet authentication
+    return authenticateWallet(req, res, next);
+  }, requirePermission('users'), async (req, res) => {
     try {
       const users = await storage.getAllUsersForAdmin();
       res.json(users);
@@ -2147,7 +2155,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: "Failed to fetch revenue analytics" });
     }
   });
-  app.get("/api/admin/stats", authenticateWallet, requirePermission('dashboard'), async (req, res) => {
+  app.get("/api/admin/stats", (req: any, res: any, next: any) => {
+    // Check for admin session first, then wallet auth
+    const sessionToken = req.headers['x-admin-session'];
+    if (sessionToken && adminSessions.has(sessionToken)) {
+      return next();
+    }
+    // Fall back to wallet authentication
+    return authenticateWallet(req, res, next);
+  }, requirePermission('dashboard'), async (req, res) => {
     try {
       const stats = {
         totalUsers: 1247,
@@ -2170,7 +2186,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: "Failed to fetch platform statistics" });
     }
   });
-  app.get("/api/admin/users", authenticateWallet, requirePermission('users'), async (req, res) => {
+  app.get("/api/admin/users", (req: any, res: any, next: any) => {
+    // Check for admin session first, then wallet auth
+    const sessionToken = req.headers['x-admin-session'];
+    if (sessionToken && adminSessions.has(sessionToken)) {
+      return next();
+    }
+    // Fall back to wallet authentication
+    return authenticateWallet(req, res, next);
+  }, requirePermission('users'), async (req, res) => {
     try {
       const users = [
         {
@@ -8681,6 +8705,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
   const adminWallets = new Set<string>();
   const adminPassword = process.env.ADMIN_PASSWORD || 'admin123';
   const adminSessions = new Set<string>();
+  
+  // Admin session middleware
+  const isAdminSessionAuthenticated = (req: any, res: any, next: any) => {
+    const sessionToken = req.headers['x-admin-session'];
+    
+    if (!sessionToken || !adminSessions.has(sessionToken)) {
+      return res.status(401).json({
+        success: false,
+        error: 'Admin session authentication required'
+      });
+    }
+    
+    next();
+  };
   
   // Admin authentication endpoint
   app.post('/api/admin/authenticate', async (req, res) => {
