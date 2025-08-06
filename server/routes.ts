@@ -73,6 +73,7 @@ import { Connection, Keypair, LAMPORTS_PER_SOL, PublicKey, Transaction, SystemPr
 import bs58 from 'bs58';
 import { enterpriseApiHandlers } from "./enterprise-api";
 import { governmentApiHandlers } from "./government-api";
+import { aiMarketingService } from "./ai-marketing-service";
 import { mainnetDeployment } from "./mainnet-deployment";
 import { flbyTokenDeployment } from "./flby-token-deployment";
 import { websocketOptimization } from "./websocket-optimization";
@@ -602,6 +603,83 @@ export async function registerRoutes(app: Express): Promise<Server> {
       cpu: { usage: Math.random() * 100 },
       activeConnections: Math.floor(Math.random() * 50) + 10
     });
+  });
+
+  // AI Marketing Bot endpoints
+  app.get('/api/admin/marketing-bot/settings', async (req, res) => {
+    try {
+      const settings = await aiMarketingService.getSettings();
+      res.json(settings);
+    } catch (error) {
+      console.error('Error getting marketing bot settings:', error);
+      res.status(500).json({ error: 'Failed to get settings' });
+    }
+  });
+
+  app.put('/api/admin/marketing-bot/settings', async (req, res) => {
+    try {
+      const updatedSettings = await aiMarketingService.updateSettings(req.body);
+      res.json(updatedSettings);
+    } catch (error) {
+      console.error('Error updating marketing bot settings:', error);
+      res.status(500).json({ error: 'Failed to update settings' });
+    }
+  });
+
+  app.get('/api/admin/marketing-bot/content', async (req, res) => {
+    try {
+      const content = await aiMarketingService.getContentLibrary();
+      res.json(content);
+    } catch (error) {
+      console.error('Error getting content library:', error);
+      res.status(500).json({ error: 'Failed to get content' });
+    }
+  });
+
+  app.post('/api/admin/marketing-bot/generate', async (req, res) => {
+    try {
+      const { platform, count } = req.body;
+      const generatedContent = await aiMarketingService.generateContent(platform, count);
+      res.json(generatedContent);
+    } catch (error) {
+      console.error('Error generating content:', error);
+      res.status(500).json({ error: 'Failed to generate content' });
+    }
+  });
+
+  app.post('/api/admin/marketing-bot/content/:id/publish', async (req, res) => {
+    try {
+      const { id } = req.params;
+      const success = await aiMarketingService.publishContent(id);
+      if (success) {
+        res.json({ success: true, message: 'Content published successfully' });
+      } else {
+        res.status(404).json({ error: 'Content not found' });
+      }
+    } catch (error) {
+      console.error('Error publishing content:', error);
+      res.status(500).json({ error: 'Failed to publish content' });
+    }
+  });
+
+  app.get('/api/admin/marketing-bot/campaigns', async (req, res) => {
+    try {
+      const campaigns = await aiMarketingService.getCampaigns();
+      res.json(campaigns);
+    } catch (error) {
+      console.error('Error getting campaigns:', error);
+      res.status(500).json({ error: 'Failed to get campaigns' });
+    }
+  });
+
+  app.get('/api/admin/marketing-bot/analytics', async (req, res) => {
+    try {
+      const analytics = await aiMarketingService.getAnalytics();
+      res.json(analytics);
+    } catch (error) {
+      console.error('Error getting analytics:', error);
+      res.status(500).json({ error: 'Failed to get analytics' });
+    }
   });
   // Advanced search endpoints
   app.post('/api/search/tokens', async (req, res) => {

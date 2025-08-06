@@ -73,6 +73,7 @@ import MessageNFTCreator from "@/pages/message-nft-creator";
 import NFTClaim from "@/pages/nft-claim";
 import AllOpportunities from "@/pages/AllOpportunities";
 import AdminAPIMonetization from "@/pages/admin-api-monetization";
+import AIMarketingBot from "@/pages/ai-marketing-bot";
 import WalletTest from "@/pages/WalletTest";
 import ProductionDeployment from "@/pages/ProductionDeployment";
 import NFTMarketplace from "@/pages/nft-marketplace";
@@ -695,6 +696,12 @@ function Router() {
             </>
           );
         }} />
+        <Route path="/admin-ai-marketing" component={() => (
+          <>
+            <Navbar />
+            <AIMarketingBot />
+          </>
+        )} />
         <Route component={NotFound} />
         </Switch>
         </div>
