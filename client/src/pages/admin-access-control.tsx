@@ -43,6 +43,15 @@ export default function AdminAccessControl() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
+  // Check admin authentication
+  useEffect(() => {
+    const adminAuth = sessionStorage.getItem('admin-authenticated');
+    if (!adminAuth) {
+      window.location.href = '/admin-gateway';
+      return;
+    }
+  }, []);
+
   // Fetch admin wallets
   const { data: adminWallets = [], isLoading: walletsLoading } = useQuery({
     queryKey: ["/api/admin/wallets"],

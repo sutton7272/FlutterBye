@@ -21,6 +21,15 @@ export default function AdminSystem() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
+  // Check admin authentication
+  useEffect(() => {
+    const adminAuth = sessionStorage.getItem('admin-authenticated');
+    if (!adminAuth) {
+      window.location.href = '/admin-gateway';
+      return;
+    }
+  }, []);
+
   // System health monitoring
   const { data: health, isLoading: healthLoading } = useQuery({
     queryKey: ['/api/health'],

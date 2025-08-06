@@ -25,6 +25,15 @@ export default function EnterpriseDashboard() {
   const [searchAddress, setSearchAddress] = useState("");
   const [selectedChain, setSelectedChain] = useState("ethereum");
 
+  // Check admin authentication
+  useEffect(() => {
+    const adminAuth = sessionStorage.getItem('admin-authenticated');
+    if (!adminAuth) {
+      window.location.href = '/admin-gateway';
+      return;
+    }
+  }, []);
+
   // Enterprise dashboard metrics
   const { data: dashboardMetrics } = useQuery({
     queryKey: ["/api/enterprise/dashboard-metrics"],
