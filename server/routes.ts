@@ -4214,6 +4214,68 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Debug credential values and test simple connection
+  app.get('/api/marketing/bot/debug-credentials', async (req, res) => {
+    const creds = {
+      apiKey: process.env.TWITTER_API_KEY,
+      apiSecret: process.env.TWITTER_API_SECRET, 
+      accessToken: process.env.TWITTER_ACCESS_TOKEN,
+      accessSecret: process.env.TWITTER_ACCESS_TOKEN_SECRET
+    };
+    
+    // Check for common issues
+    const issues = [];
+    if (!creds.apiKey || creds.apiKey.trim() === '') issues.push('API Key missing or empty');
+    if (!creds.apiSecret || creds.apiSecret.trim() === '') issues.push('API Secret missing or empty');
+    if (!creds.accessToken || creds.accessToken.trim() === '') issues.push('Access Token missing or empty');
+    if (!creds.accessSecret || creds.accessSecret.trim() === '') issues.push('Access Token Secret missing or empty');
+    
+    // Check for whitespace issues
+    Object.entries(creds).forEach(([key, value]) => {
+      if (value && (value.startsWith(' ') || value.endsWith(' '))) {
+        issues.push(`${key} has leading/trailing whitespace`);
+      }
+    });
+    
+    // Test simple connection
+    let connectionTest = null;
+    try {
+      const twitterClient = new TwitterApi({
+        appKey: creds.apiKey!,
+        appSecret: creds.apiSecret!,
+        accessToken: creds.accessToken!,
+        accessSecret: creds.accessSecret!,
+      });
+      
+      // Try the simplest possible API call
+      await twitterClient.v2.me();
+      connectionTest = { success: true, message: "Connection successful" };
+    } catch (error: any) {
+      connectionTest = { success: false, error: error.message, code: error.code || 'unknown' };
+    }
+    
+    res.json({
+      credentials: {
+        apiKey: creds.apiKey ? `${creds.apiKey.substring(0, 8)}...${creds.apiKey.slice(-4)} (${creds.apiKey.length} chars)` : 'Missing',
+        apiSecret: creds.apiSecret ? `${creds.apiSecret.substring(0, 8)}...${creds.apiSecret.slice(-4)} (${creds.apiSecret.length} chars)` : 'Missing',
+        accessToken: creds.accessToken ? `${creds.accessToken.substring(0, 8)}...${creds.accessToken.slice(-4)} (${creds.accessToken.length} chars)` : 'Missing',
+        accessSecret: creds.accessSecret ? `${creds.accessSecret.substring(0, 8)}...${creds.accessSecret.slice(-4)} (${creds.accessSecret.length} chars)` : 'Missing'
+      },
+      issues: issues.length > 0 ? issues : ['No obvious formatting issues detected'],
+      connectionTest,
+      rawValues: {
+        apiKeyStartsWithNumber: creds.apiKey ? /^\d/.test(creds.apiKey) : false,
+        accessTokenFormat: creds.accessToken ? (creds.accessToken.includes('-') ? 'standard format' : 'unexpected format') : 'missing'
+      },
+      recommendations: [
+        'Verify credentials are exactly as provided by Twitter (no extra spaces)',
+        'Ensure app has Read and Write permissions',
+        'Try regenerating Access Token and Secret if issues persist',
+        'Check if credentials were copied correctly from Twitter Developer Portal'
+      ]
+    });
+  });
+
   // Post directly to @flutterbye Twitter
   app.post("/api/marketing/bot/post-to-twitter", async (req, res) => {
     try {
