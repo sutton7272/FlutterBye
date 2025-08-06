@@ -287,6 +287,11 @@ export default function LaunchCountdown() {
           </div>
         </div>
 
+        {/* FlutterAI Interactive Tutorial */}
+        <div className="max-w-7xl mx-auto mb-12">
+          <FlutterAIInteractiveTutorial />
+        </div>
+
         {/* Countdown Timer */}
         <Card className="electric-frame max-w-4xl mx-auto mb-12">
           <CardHeader>
@@ -660,11 +665,6 @@ export default function LaunchCountdown() {
               </div>
             </CardContent>
           </Card>
-
-          {/* FlutterAI Interactive Tutorial */}
-          <div className="space-y-6">
-            <FlutterAIInteractiveTutorial />
-          </div>
 
           {/* What is Flutterbye */}
           <Card className="electric-frame">
