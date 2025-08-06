@@ -711,11 +711,13 @@ function App() {
   useEffect(() => {
     const checkEarlyAccess = () => {
       const storedAccess = localStorage.getItem("flutterbye_early_access");
+      console.log("Checking early access:", storedAccess);
       setHasEarlyAccess(storedAccess === "granted");
       setIsCheckingAccess(false);
     };
     
-    checkEarlyAccess();
+    // Small delay to ensure localStorage is ready
+    setTimeout(checkEarlyAccess, 100);
   }, []);
 
   // Register service worker for PWA functionality

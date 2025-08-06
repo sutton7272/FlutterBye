@@ -18,13 +18,7 @@ export function EarlyAccessGate({ onAccessGranted }: EarlyAccessGateProps) {
   const [email, setEmail] = useState("");
   const { toast } = useToast();
 
-  // Check if user already has access stored locally
-  useEffect(() => {
-    const storedAccess = localStorage.getItem("flutterbye_early_access");
-    if (storedAccess === "granted") {
-      onAccessGranted();
-    }
-  }, [onAccessGranted]);
+  // Note: Early access check is handled by the main App component
 
   const checkAccessMutation = useMutation({
     mutationFn: async () => {
