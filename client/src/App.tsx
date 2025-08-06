@@ -290,6 +290,32 @@ function Router() {
           </>
         )} />
         
+        {/* Admin Portal Routes */}
+        <Route path="/admin/dashboard" component={() => (
+          <>
+            <Navbar />
+            <UnifiedAdminDashboard />
+          </>
+        )} />
+        <Route path="/admin/access-control" component={() => (
+          <>
+            <Navbar />
+            <AdminAccessControl />
+          </>
+        )} />
+        <Route path="/admin/enterprise" component={() => (
+          <>
+            <Navbar />
+            <EnterpriseDashboard />
+          </>
+        )} />
+        <Route path="/admin/features" component={() => (
+          <>
+            <Navbar />
+            <AdminSystem />
+          </>
+        )} />
+        
         {/* Admin routes should use the new admin page structure */}
         <Route path="/admin-unified" component={() => (
           <>
