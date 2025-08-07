@@ -669,6 +669,12 @@ function Router() {
             <FlutterAIDashboard />
           </>
         )} />
+        <Route path="/multi-chain-dashboard" component={() => (
+          <>
+            <Navbar />
+            <MultiChainDashboard />
+          </>
+        )} />
         <Route path="/all-opportunities" component={() => (
           <>
             <Navbar />
