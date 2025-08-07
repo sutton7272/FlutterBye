@@ -206,6 +206,8 @@ export default function AdminGateway() {
   }
 
   // Admin Portal - Main navigation hub
+  console.log("AdminGateway rendering main portal, isAuthenticated:", isAuthenticated);
+  
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 p-4">
       <div className="max-w-6xl mx-auto">
@@ -215,26 +217,19 @@ export default function AdminGateway() {
           <p className="text-slate-300">Central hub for all administrative functions</p>
         </div>
 
+        {/* SIMPLE DIAGNOSTIC FIRST */}
+        <div className="mb-4 p-4 bg-red-500 text-white">
+          <p>DIAGNOSTIC: This red box should always appear before the cards</p>
+          <p>If you see this but not the yellow card below, there's a card rendering issue</p>
+        </div>
+        
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-6">
-          {/* FIRST CARD - MULTI-CHAIN INTELLIGENCE - TESTING POSITION */}
-          <Link href="/admin">
-            <Card className="bg-yellow-500 border-yellow-400 hover:border-yellow-300 transition-all cursor-pointer group">
-              <CardHeader>
-                <Globe className="w-8 h-8 text-black group-hover:text-gray-800" />
-                <CardTitle className="text-black">MULTI-CHAIN INTELLIGENCE TEST</CardTitle>
-                <CardDescription className="text-gray-800">
-                  Testing if this shows up as the FIRST card
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <ul className="text-sm text-gray-800 space-y-1">
-                  <li>• This should be visible</li>
-                  <li>• If you see this, the issue is positioning</li>
-                  <li>• If you don't see this, there's a code issue</li>
-                </ul>
-              </CardContent>
-            </Card>
-          </Link>
+          {/* SIMPLE TEST CARD */}
+          <div className="bg-yellow-500 p-4 rounded text-black">
+            <h2 className="font-bold">SIMPLE YELLOW TEST CARD</h2>
+            <p>Multi-Chain Intelligence would go here</p>
+            <p>Globe icon: 🌐</p>
+          </div>
           {/* Unified Admin Dashboard */}
           <Link href="/admin/dashboard">
             <Card className="bg-slate-800/50 border-blue-500/20 hover:border-blue-400/40 transition-all cursor-pointer group">
