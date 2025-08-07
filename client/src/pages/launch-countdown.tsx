@@ -832,13 +832,22 @@ export default function LaunchCountdown() {
               <CardTitle className="text-gradient">What is Flutterbye?</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="space-y-4">
+              <div className="bg-gradient-to-r from-purple-900/30 to-blue-900/30 rounded-lg p-4 mb-4">
+                <p className="text-sm text-white/90 font-medium mb-2">
+                  🚀 The world's first AI-powered crypto marketing platform that transforms how businesses communicate with blockchain users
+                </p>
+                <p className="text-xs text-white/70">
+                  Flutterbye enables precision targeting of crypto holders through 27-character tokenized messages with redeemable value
+                </p>
+              </div>
+
+              <div className="space-y-3">
                 <div className="flex items-start gap-3">
                   <Zap className="w-5 h-5 text-yellow-400 mt-1" />
                   <div>
-                    <h4 className="font-medium">Tokenized Messaging</h4>
-                    <p className="text-sm text-muted-foreground">
-                      Turn your 27-character messages into valuable SPL tokens on Solana
+                    <h4 className="font-medium text-yellow-300">Tokenized Messaging</h4>
+                    <p className="text-xs text-muted-foreground">
+                      Turn your 27-character messages into valuable SPL tokens on Solana blockchain with real monetary value
                     </p>
                   </div>
                 </div>
@@ -846,9 +855,9 @@ export default function LaunchCountdown() {
                 <div className="flex items-start gap-3">
                   <Coins className="w-5 h-5 text-green-400 mt-1" />
                   <div>
-                    <h4 className="font-medium">Value Attachment</h4>
-                    <p className="text-sm text-muted-foreground">
-                      Attach real value to your messages - turn words into wealth
+                    <h4 className="font-medium text-green-300">Value Attachment</h4>
+                    <p className="text-xs text-muted-foreground">
+                      Attach SOL, USDC, or FLBY tokens to messages. Recipients burn tokens to redeem attached value
                     </p>
                   </div>
                 </div>
@@ -856,9 +865,9 @@ export default function LaunchCountdown() {
                 <div className="flex items-start gap-3">
                   <Users className="w-5 h-5 text-blue-400 mt-1" />
                   <div>
-                    <h4 className="font-medium">Viral Distribution</h4>
-                    <p className="text-sm text-muted-foreground">
-                      Share tokens with specific wallets, create viral campaigns
+                    <h4 className="font-medium text-blue-300">AI-Powered Targeting</h4>
+                    <p className="text-xs text-muted-foreground">
+                      FlutterAI analyzes wallet behavior, demographics, and patterns to identify perfect target audiences
                     </p>
                   </div>
                 </div>
@@ -866,24 +875,79 @@ export default function LaunchCountdown() {
                 <div className="flex items-start gap-3">
                   <Wallet className="w-5 h-5 text-purple-400 mt-1" />
                   <div>
-                    <h4 className="font-medium">FLBY Token Economy</h4>
-                    <p className="text-sm text-muted-foreground">
-                      Stake, govern, and earn with our native FLBY token ecosystem
+                    <h4 className="font-medium text-purple-300">Cross-Chain Intelligence</h4>
+                    <p className="text-xs text-muted-foreground">
+                      Track and analyze activity across 6 blockchains for comprehensive crypto holder insights
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3">
+                  <div className="w-5 h-5 text-red-400 mt-1">🎯</div>
+                  <div>
+                    <h4 className="font-medium text-red-300">Enterprise Ready</h4>
+                    <p className="text-xs text-muted-foreground">
+                      Fortune 500 contracts, government compliance, bank-level security for $100K-$2M deals
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3">
+                  <div className="w-5 h-5 text-cyan-400 mt-1">⚡</div>
+                  <div>
+                    <h4 className="font-medium text-cyan-300">Real-Time Intelligence</h4>
+                    <p className="text-xs text-muted-foreground">
+                      WebSocket-powered live data streaming, instant market insights, automated campaign optimization
                     </p>
                   </div>
                 </div>
               </div>
 
-              <div className="bg-muted/20 rounded-lg p-4 mt-6">
-                <h4 className="font-medium text-cyan-400 mb-2">Revolutionary Features Coming:</h4>
-                <ul className="text-sm text-muted-foreground space-y-1">
-                  <li>• SMS-to-blockchain integration</li>
-                  <li>• AI-powered emotion analysis</li>
-                  <li>• Enterprise marketing campaigns</li>
-                  <li>• Greeting cards with scheduled delivery</li>
-                  <li>• Real-time chat with tokenized rewards</li>
-                  <li>• Comprehensive staking and governance</li>
-                </ul>
+              <div className="grid grid-cols-2 gap-3 mt-4">
+                <div className="bg-green-500/10 border border-green-500/20 rounded-lg p-3">
+                  <h5 className="font-medium text-green-400 mb-1 text-xs">💰 Revenue Streams</h5>
+                  <ul className="text-xs text-muted-foreground space-y-0.5">
+                    <li>• 0.01 SOL per token creation</li>
+                    <li>• Enterprise API licensing</li>
+                    <li>• Government contracts</li>
+                    <li>• White-label solutions</li>
+                  </ul>
+                </div>
+
+                <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-3">
+                  <h5 className="font-medium text-blue-400 mb-1 text-xs">🔧 Core Features</h5>
+                  <ul className="text-xs text-muted-foreground space-y-0.5">
+                    <li>• Burn-to-redeem mechanism</li>
+                    <li>• Multi-currency support</li>
+                    <li>• Viral campaign tracking</li>
+                    <li>• Analytics dashboard</li>
+                  </ul>
+                </div>
+              </div>
+
+              <div className="bg-muted/20 rounded-lg p-3 mt-4">
+                <h4 className="font-medium text-cyan-400 mb-2 text-xs">🚀 Revolutionary Features Coming:</h4>
+                <div className="grid grid-cols-2 gap-2">
+                  <ul className="text-xs text-muted-foreground space-y-0.5">
+                    <li>• SMS-to-blockchain integration</li>
+                    <li>• AI emotion analysis</li>
+                    <li>• Enterprise marketing campaigns</li>
+                    <li>• Scheduled message delivery</li>
+                  </ul>
+                  <ul className="text-xs text-muted-foreground space-y-0.5">
+                    <li>• Real-time tokenized chat</li>
+                    <li>• Comprehensive staking</li>
+                    <li>• Governance voting system</li>
+                    <li>• NFT integration</li>
+                  </ul>
+                </div>
+              </div>
+
+              <div className="bg-gradient-to-r from-red-900/20 to-purple-900/20 rounded-lg p-3 border border-red-500/20">
+                <h4 className="font-medium text-red-400 mb-1 text-xs">🎯 Market Position</h4>
+                <p className="text-xs text-white/80">
+                  "Google of Blockchain Intelligence" - The definitive platform for crypto marketing with $450M-$750M valuation target
+                </p>
               </div>
             </CardContent>
           </Card>
