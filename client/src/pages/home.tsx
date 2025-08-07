@@ -111,6 +111,11 @@ export default function Home() {
         <div className="absolute inset-0 bg-black/20 backdrop-blur-[1px]"></div>
         <div className="relative z-10">
         
+        {/* REACT APP TEST MARKER */}
+        <div className="fixed top-0 right-0 z-50 bg-red-600 text-white p-2 text-xs">
+          REACT APP LOADED - {new Date().toLocaleTimeString()}
+        </div>
+
         {/* Top Scrolling Marquee */}
         <div className="border-y border-primary/30 py-6 mb-12 overflow-hidden bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900">
           <div className="flex animate-marquee whitespace-nowrap text-3xl font-bold">

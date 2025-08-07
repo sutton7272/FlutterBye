@@ -95,6 +95,8 @@ app.use((req, res, next) => {
           
           <p>Port: ${process.env.PORT || 5000} | Environment: ${process.env.NODE_ENV || 'development'}</p>
           <p>URL: ${req.protocol}://${req.get('host')}${req.originalUrl}</p>
+          <p><a href="/" style="color: #3b82f6;">Go to Homepage (React App)</a></p>
+          <p><a href="/?v=${Date.now()}" style="color: #10b981;">Force Refresh Homepage</a></p>
       </body>
       </html>
     `);
