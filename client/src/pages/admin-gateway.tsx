@@ -117,8 +117,14 @@ export default function AdminGateway() {
   }
 
   if (!isAuthenticated) {
+    console.log("Showing authentication screen - user needs to login");
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 flex items-center justify-center p-4">
+        {/* DIAGNOSTIC - This should show the login form */}
+        <div className="mb-4 p-4 bg-green-500 text-white rounded">
+          <p>DIAGNOSTIC: You're seeing the LOGIN SCREEN - not the admin portal yet</p>
+          <p>Use password 'admin123' to authenticate and see the admin portal with cards</p>
+        </div>
         <Card className="w-full max-w-md bg-slate-800/50 border-blue-500/20">
           <CardHeader className="text-center">
             <Shield className="w-12 h-12 text-blue-400 mx-auto mb-4" />
