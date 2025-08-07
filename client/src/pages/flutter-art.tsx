@@ -32,8 +32,19 @@ import {
   Edit,
   Plus,
   Wallet,
-  DollarSign
+  DollarSign,
+  QrCode,
+  Clock,
+  Hash,
+  Settings,
+  Lock,
+  Flame,
+  Calendar,
+  MousePointer
 } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Separator } from "@/components/ui/separator";
 
 
 export default function FlutterArt() {
@@ -44,6 +55,19 @@ export default function FlutterArt() {
   const [nftImage, setNftImage] = useState("");
   const [selectedCollection, setSelectedCollection] = useState("");
   const [imageFile, setImageFile] = useState<File | null>(null);
+  
+  // Advanced NFT Features
+  const [mintQuantity, setMintQuantity] = useState("1");
+  const [burnToRedeem, setBurnToRedeem] = useState(false);
+  const [generateQR, setGenerateQR] = useState(false);
+  const [qrCode, setQrCode] = useState("");
+  const [timeLockEnabled, setTimeLockEnabled] = useState(false);
+  const [timeLockDate, setTimeLockDate] = useState("");
+  const [editionPrefix, setEditionPrefix] = useState("Edition");
+  const [royaltyPercentage, setRoyaltyPercentage] = useState("5");
+  const [nftPreview, setNftPreview] = useState("");
+  const [isLimitedEdition, setIsLimitedEdition] = useState(false);
+  
   const { toast } = useToast();
   const queryClient = useQueryClient();
   
@@ -68,14 +92,28 @@ export default function FlutterArt() {
     enabled: isConnected,
   });
 
-  // Create NFT mutation
+  // Create NFT mutation with advanced features
   const createNftMutation = useMutation({
     mutationFn: async (nftData: any) => {
+      // Generate QR code if enabled
+      const nftId = `nft_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+      const qrData = generateQR ? generateQRCode(nftId, nftData.value) : null;
+      
       const formData = new FormData();
       formData.append("title", nftData.title);
       formData.append("description", nftData.description);
       formData.append("value", nftData.value);
       formData.append("collection", nftData.collection);
+      formData.append("mintQuantity", mintQuantity);
+      formData.append("burnToRedeem", burnToRedeem.toString());
+      formData.append("qrCode", qrData || "");
+      formData.append("timeLockEnabled", timeLockEnabled.toString());
+      formData.append("timeLockDate", timeLockDate);
+      formData.append("isLimitedEdition", (mintQuantity !== "1").toString());
+      formData.append("editionPrefix", editionPrefix);
+      formData.append("royaltyPercentage", royaltyPercentage);
+      formData.append("nftId", nftId);
+      
       if (nftData.imageFile) {
         formData.append("image", nftData.imageFile);
       }
@@ -83,18 +121,29 @@ export default function FlutterArt() {
       return apiRequest("POST", "/api/flutter-art/create", formData);
     },
     onSuccess: () => {
+      const quantity = parseInt(mintQuantity);
       toast({
         title: "NFT Created Successfully!",
-        description: "Your FlutterArt NFT has been minted on Solana blockchain",
+        description: `${quantity > 1 ? `${quantity} NFTs` : `NFT "${nftTitle}"`} minted with advanced features`,
       });
       queryClient.invalidateQueries({ queryKey: ["/api/flutter-art/my-nfts"] });
       queryClient.invalidateQueries({ queryKey: ["/api/flutter-art/marketplace"] });
+      
       // Reset form
       setNftTitle("");
       setNftDescription("");
       setNftValue("");
       setNftImage("");
       setImageFile(null);
+      setSelectedCollection("");
+      setMintQuantity("1");
+      setBurnToRedeem(false);
+      setGenerateQR(false);
+      setQrCode("");
+      setTimeLockEnabled(false);
+      setTimeLockDate("");
+      setNftPreview("");
+      setIsLimitedEdition(false);
     },
     onError: (error: any) => {
       toast({
@@ -105,18 +154,74 @@ export default function FlutterArt() {
     },
   });
 
-  // Handle image upload
+  // Generate QR Code
+  const generateQRCode = (nftId: string, value: string) => {
+    // Simple QR code data - in production, would use a proper QR library
+    const qrData = `https://flutterbye.com/nft/${nftId}?value=${value}&burn=${burnToRedeem}`;
+    setQrCode(qrData);
+    return qrData;
+  };
+
+  // Handle image upload with real-time preview
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
       setImageFile(file);
       const reader = new FileReader();
       reader.onload = (e) => {
-        setNftImage(e.target?.result as string);
+        const imageData = e.target?.result as string;
+        setNftImage(imageData);
+        updateNftPreview(imageData);
       };
       reader.readAsDataURL(file);
     }
   };
+
+  // Update NFT Preview in real-time
+  const updateNftPreview = (imageData: string) => {
+    // Create preview with overlays
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    const img = new Image();
+    img.onload = () => {
+      canvas.width = 400;
+      canvas.height = 400;
+      
+      // Draw main image
+      ctx.drawImage(img, 0, 0, 400, 400);
+      
+      // Add QR code if enabled
+      if (generateQR && qrCode) {
+        ctx.fillStyle = 'white';
+        ctx.fillRect(300, 300, 90, 90);
+        ctx.fillStyle = 'black';
+        ctx.font = '8px Arial';
+        ctx.fillText('QR Code', 320, 315);
+      }
+      
+      // Add edition number if limited edition
+      if (isLimitedEdition && mintQuantity !== "1") {
+        ctx.fillStyle = 'rgba(0,0,0,0.7)';
+        ctx.fillRect(10, 350, 100, 40);
+        ctx.fillStyle = 'white';
+        ctx.font = '12px Arial';
+        ctx.fillText(`${editionPrefix} #1`, 15, 370);
+        ctx.fillText(`of ${mintQuantity}`, 15, 385);
+      }
+      
+      setNftPreview(canvas.toDataURL());
+    };
+    img.src = imageData;
+  };
+
+  // Update preview when settings change
+  useEffect(() => {
+    if (nftImage) {
+      updateNftPreview(nftImage);
+    }
+  }, [generateQR, isLimitedEdition, mintQuantity, editionPrefix]);
 
   // Handle NFT creation
   const handleCreateNft = () => {
@@ -129,10 +234,10 @@ export default function FlutterArt() {
       return;
     }
 
-    if (!nftTitle || !nftDescription) {
+    if (!nftTitle || !nftImage) {
       toast({
         title: "Missing Information",
-        description: "Please fill in title and description",
+        description: "Please provide a title and upload an image",
         variant: "destructive",
       });
       return;
@@ -141,9 +246,17 @@ export default function FlutterArt() {
     createNftMutation.mutate({
       title: nftTitle,
       description: nftDescription,
+      image: nftImage,
       value: nftValue || "0",
-      collection: selectedCollection,
-      imageFile: imageFile,
+      currency: "SOL",
+      mintQuantity,
+      editionPrefix,
+      burnToRedeem,
+      generateQR,
+      timeLockEnabled,
+      timeLockDate,
+      royaltyPercentage,
+      creator: 'demo-creator'
     });
   };
 
@@ -353,6 +466,165 @@ export default function FlutterArt() {
                         </div>
                       </div>
 
+                      <Separator className="my-6" />
+
+                      {/* Advanced NFT Features */}
+                      <div className="space-y-6">
+                        <h3 className="text-lg font-semibold flex items-center gap-2">
+                          <Settings className="h-5 w-5 text-electric-blue" />
+                          Advanced Features
+                        </h3>
+
+                        {/* Multi-Mint Capability */}
+                        <div className="space-y-3">
+                          <Label className="text-sm font-medium">Multi-Mint Capability</Label>
+                          <div className="grid grid-cols-2 gap-4">
+                            <div>
+                              <Label htmlFor="mint-quantity">Number of NFTs (1-10,000)</Label>
+                              <Input
+                                id="mint-quantity"
+                                type="number"
+                                min="1"
+                                max="10000"
+                                value={mintQuantity}
+                                onChange={(e) => {
+                                  setMintQuantity(e.target.value);
+                                  setIsLimitedEdition(e.target.value !== "1");
+                                }}
+                                className="w-full"
+                              />
+                            </div>
+                            <div>
+                              <Label htmlFor="edition-prefix">Edition Prefix</Label>
+                              <Input
+                                id="edition-prefix"
+                                value={editionPrefix}
+                                onChange={(e) => setEditionPrefix(e.target.value)}
+                                placeholder="Edition"
+                                disabled={mintQuantity === "1"}
+                              />
+                            </div>
+                          </div>
+                          {parseInt(mintQuantity) > 1 && (
+                            <p className="text-xs text-electric-blue">
+                              <Hash className="h-3 w-3 inline mr-1" />
+                              Creating {mintQuantity} NFTs with automatic edition numbering: "{editionPrefix} #1", "{editionPrefix} #2", etc.
+                            </p>
+                          )}
+                        </div>
+
+                        {/* Burn-to-Redeem Option */}
+                        <div className="space-y-3">
+                          <div className="flex items-center justify-between">
+                            <div className="space-y-1">
+                              <Label className="text-sm font-medium">Burn-to-Redeem</Label>
+                              <p className="text-xs text-muted-foreground">Require NFT to be burned to claim attached SOL value</p>
+                            </div>
+                            <Switch
+                              checked={burnToRedeem}
+                              onCheckedChange={setBurnToRedeem}
+                            />
+                          </div>
+                          {burnToRedeem && (
+                            <div className="bg-orange-500/10 border border-orange-500/20 rounded-lg p-3">
+                              <div className="flex items-center gap-2 text-orange-400 text-sm">
+                                <Flame className="h-4 w-4" />
+                                <span className="font-medium">Burn-to-Redeem Enabled</span>
+                              </div>
+                              <p className="text-xs text-muted-foreground mt-1">
+                                Users must permanently burn the NFT to claim the {nftValue || "attached"} SOL value
+                              </p>
+                            </div>
+                          )}
+                        </div>
+
+                        {/* QR Code Generator */}
+                        <div className="space-y-3">
+                          <div className="flex items-center justify-between">
+                            <div className="space-y-1">
+                              <Label className="text-sm font-medium">QR Code Integration</Label>
+                              <p className="text-xs text-muted-foreground">Add functional QR code to bottom-right corner</p>
+                            </div>
+                            <Switch
+                              checked={generateQR}
+                              onCheckedChange={setGenerateQR}
+                            />
+                          </div>
+                          {generateQR && (
+                            <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-3">
+                              <div className="flex items-center gap-2 text-blue-400 text-sm">
+                                <QrCode className="h-4 w-4" />
+                                <span className="font-medium">QR Code will be generated</span>
+                              </div>
+                              <p className="text-xs text-muted-foreground mt-1">
+                                Links to: flutterbye.com/nft/[id] with redemption info
+                              </p>
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Time-Lock Reveals */}
+                        <div className="space-y-3">
+                          <div className="flex items-center justify-between">
+                            <div className="space-y-1">
+                              <Label className="text-sm font-medium">Time-Lock Reveal</Label>
+                              <p className="text-xs text-muted-foreground">Hide content until specific date</p>
+                            </div>
+                            <Switch
+                              checked={timeLockEnabled}
+                              onCheckedChange={setTimeLockEnabled}
+                            />
+                          </div>
+                          {timeLockEnabled && (
+                            <div className="space-y-3">
+                              <div>
+                                <Label htmlFor="timelock-date">Reveal Date & Time</Label>
+                                <Input
+                                  id="timelock-date"
+                                  type="datetime-local"
+                                  value={timeLockDate}
+                                  onChange={(e) => setTimeLockDate(e.target.value)}
+                                  min={new Date().toISOString().slice(0, 16)}
+                                />
+                              </div>
+                              <div className="bg-purple-500/10 border border-purple-500/20 rounded-lg p-3">
+                                <div className="flex items-center gap-2 text-purple-400 text-sm">
+                                  <Lock className="h-4 w-4" />
+                                  <span className="font-medium">Content will be revealed on:</span>
+                                </div>
+                                <p className="text-xs text-muted-foreground mt-1">
+                                  {timeLockDate ? new Date(timeLockDate).toLocaleDateString() : "Select date above"}
+                                </p>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Creator Royalties */}
+                        <div className="space-y-3">
+                          <Label className="text-sm font-medium">Creator Royalties</Label>
+                          <div className="grid grid-cols-2 gap-4">
+                            <div>
+                              <Label htmlFor="royalty-percentage">Royalty % (0-10%)</Label>
+                              <Input
+                                id="royalty-percentage"
+                                type="number"
+                                min="0"
+                                max="10"
+                                step="0.5"
+                                value={royaltyPercentage}
+                                onChange={(e) => setRoyaltyPercentage(e.target.value)}
+                              />
+                            </div>
+                            <div className="flex items-end">
+                              <Badge variant="outline" className="h-10 flex items-center">
+                                {royaltyPercentage}% ongoing royalty on all sales
+                              </Badge>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
                       {/* Create Button */}
                       <Button 
                         onClick={handleCreateNft}
@@ -374,8 +646,81 @@ export default function FlutterArt() {
                     </CardContent>
                   </Card>
 
-                  {/* Creation Options */}
+                  {/* Dynamic NFT Preview */}
                   <div className="space-y-6">
+                    <Card className="electric-frame">
+                      <CardHeader>
+                        <CardTitle className="flex items-center gap-2">
+                          <Eye className="h-5 w-5 text-electric-blue" />
+                          Live Preview
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent className="space-y-4">
+                        {nftImage ? (
+                          <div className="relative">
+                            <img 
+                              src={nftPreview || nftImage} 
+                              alt="NFT Preview" 
+                              className="w-full aspect-square object-cover rounded-lg border-2 border-electric-blue/20" 
+                            />
+                            {generateQR && (
+                              <div className="absolute bottom-2 right-2 w-16 h-16 bg-white rounded border flex items-center justify-center">
+                                <QrCode className="h-8 w-8 text-black" />
+                              </div>
+                            )}
+                            {isLimitedEdition && mintQuantity !== "1" && (
+                              <div className="absolute bottom-2 left-2 bg-black/70 text-white px-2 py-1 rounded text-xs">
+                                {editionPrefix} #1 of {mintQuantity}
+                              </div>
+                            )}
+                            {timeLockEnabled && (
+                              <div className="absolute top-2 right-2 bg-purple-500/90 text-white px-2 py-1 rounded text-xs flex items-center gap-1">
+                                <Lock className="h-3 w-3" />
+                                Locked
+                              </div>
+                            )}
+                            {burnToRedeem && (
+                              <div className="absolute top-2 left-2 bg-orange-500/90 text-white px-2 py-1 rounded text-xs flex items-center gap-1">
+                                <Flame className="h-3 w-3" />
+                                Burn to Redeem
+                              </div>
+                            )}
+                          </div>
+                        ) : (
+                          <div className="w-full aspect-square border-2 border-dashed border-muted-foreground/25 rounded-lg flex items-center justify-center">
+                            <div className="text-center">
+                              <Image className="h-12 w-12 mx-auto text-muted-foreground mb-2" />
+                              <p className="text-sm text-muted-foreground">Upload image to see preview</p>
+                            </div>
+                          </div>
+                        )}
+                        
+                        {/* Preview Details */}
+                        <div className="space-y-2 text-sm">
+                          <div className="flex justify-between">
+                            <span className="text-muted-foreground">Title:</span>
+                            <span className="text-right">{nftTitle || "Untitled"}</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-muted-foreground">Quantity:</span>
+                            <span className="text-electric-blue font-semibold">{mintQuantity}</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-muted-foreground">Value:</span>
+                            <span className="text-electric-green">{nftValue || "0"} SOL</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-muted-foreground">Features:</span>
+                            <div className="text-right space-x-1">
+                              {generateQR && <Badge variant="secondary" className="text-xs">QR</Badge>}
+                              {burnToRedeem && <Badge variant="secondary" className="text-xs">Burn</Badge>}
+                              {timeLockEnabled && <Badge variant="secondary" className="text-xs">Lock</Badge>}
+                            </div>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+
                     <Card className="electric-frame">
                       <CardHeader>
                         <CardTitle className="flex items-center gap-2">

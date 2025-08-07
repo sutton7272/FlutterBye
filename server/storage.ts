@@ -224,6 +224,16 @@ export interface IStorage {
   updateAnalysisQueueStatus(id: string, status: string, attempts?: number): Promise<AnalysisQueue>;
   getAnalysisQueueStats(): Promise<{queued: number, processing: number, completed: number, failed: number}>;
   resolveWalletAlert(alertId: string, resolvedBy: string, actionTaken?: string): Promise<any>;
+
+  // FlutterArt NFT Operations
+  createFlutterArtNFT(nftData: any): Promise<any>;
+  getFlutterArtCollection(collectionId: string): Promise<any>;
+  mintFlutterArtNFT(nftData: any): Promise<any>;
+  updateCollectionMintCount(collectionId: string, mintedCount: number): Promise<void>;
+  getFlutterArtNFT(nftId: string): Promise<any>;
+  burnFlutterArtNFT(nftId: string, burnerAddress: string): Promise<any>;
+  getUserFlutterArtNFTs(walletAddress: string, status?: string): Promise<any[]>;
+  getFlutterArtAnalytics(creatorId: string): Promise<any>;
 }
 
 // In-memory storage implementation
@@ -255,6 +265,10 @@ export class MemStorage implements IStorage {
   private walletIntelligenceData = new Map<string, any>(); // Comprehensive intelligence storage
   private walletBatches: Map<string, WalletBatch> = new Map();
   private analysisQueue: Map<string, AnalysisQueue> = new Map();
+  
+  // FlutterArt NFT Storage
+  private flutterArtCollections: Map<string, any> = new Map();
+  private flutterArtNFTs: Map<string, any> = new Map();
 
   constructor() {
     this.initializeTestData();
@@ -1847,6 +1861,93 @@ export class MemStorage implements IStorage {
     stats.topPerformers = sortedByScore.slice(0, topCount);
 
     return stats;
+  }
+
+  // FlutterArt NFT Operations Implementation
+  async createFlutterArtNFT(nftData: any): Promise<any> {
+    const collection = {
+      ...nftData,
+      id: nftData.id,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    };
+    
+    this.flutterArtCollections.set(nftData.id, collection);
+    return collection;
+  }
+
+  async getFlutterArtCollection(collectionId: string): Promise<any> {
+    return this.flutterArtCollections.get(collectionId);
+  }
+
+  async mintFlutterArtNFT(nftData: any): Promise<any> {
+    const nft = {
+      ...nftData,
+      mintedAt: new Date().toISOString()
+    };
+    
+    this.flutterArtNFTs.set(nftData.id, nft);
+    return nft;
+  }
+
+  async updateCollectionMintCount(collectionId: string, mintedCount: number): Promise<void> {
+    const collection = this.flutterArtCollections.get(collectionId);
+    if (collection) {
+      collection.mintedCount = mintedCount;
+      collection.updatedAt = new Date().toISOString();
+      this.flutterArtCollections.set(collectionId, collection);
+    }
+  }
+
+  async getFlutterArtNFT(nftId: string): Promise<any> {
+    return this.flutterArtNFTs.get(nftId);
+  }
+
+  async burnFlutterArtNFT(nftId: string, burnerAddress: string): Promise<any> {
+    const nft = this.flutterArtNFTs.get(nftId);
+    if (nft) {
+      nft.status = "burned";
+      nft.burnedAt = new Date().toISOString();
+      nft.burnedBy = burnerAddress;
+      this.flutterArtNFTs.set(nftId, nft);
+    }
+    return nft;
+  }
+
+  async getUserFlutterArtNFTs(walletAddress: string, status?: string): Promise<any[]> {
+    const nfts = Array.from(this.flutterArtNFTs.values()).filter(nft => 
+      nft.owner === walletAddress && (!status || nft.status === status)
+    );
+    return nfts;
+  }
+
+  async getFlutterArtAnalytics(creatorId: string): Promise<any> {
+    const collections = Array.from(this.flutterArtCollections.values()).filter(c => c.creator === creatorId);
+    const nfts = Array.from(this.flutterArtNFTs.values()).filter(n => collections.some(c => c.id === n.collectionId));
+    
+    const totalCollections = collections.length;
+    const totalNFTsCreated = collections.reduce((sum, c) => sum + c.mintQuantity, 0);
+    const totalNFTsMinted = nfts.length;
+    const totalValueAttached = collections.reduce((sum, c) => sum + (c.value * c.mintQuantity), 0);
+    const burnedNFTs = nfts.filter(n => n.status === 'burned');
+    const totalValueRedeemed = burnedNFTs.reduce((sum, n) => sum + n.value, 0);
+    const burnRate = nfts.length > 0 ? (burnedNFTs.length / nfts.length) * 100 : 0;
+
+    return {
+      totalCollections,
+      totalNFTsCreated,
+      totalNFTsMinted,
+      totalValueAttached,
+      totalValueRedeemed,
+      burnRate: Math.round(burnRate * 100) / 100,
+      mostPopularCollection: collections.length > 0 ? collections[0] : null,
+      creationFees: totalCollections * 0.01, // Mock fee calculation
+      royalties: totalValueRedeemed * 0.05, // Mock royalty calculation
+      multiMintUsage: collections.filter(c => c.mintQuantity > 1).length,
+      burnToRedeemUsage: collections.filter(c => c.burnToRedeem).length,
+      qrCodeUsage: collections.filter(c => c.generateQR).length,
+      timeLockUsage: collections.filter(c => c.timeLockEnabled).length
+    };
   }
 }
 

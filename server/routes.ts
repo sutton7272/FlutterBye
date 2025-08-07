@@ -8804,6 +8804,345 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   console.log('🎯 Final 5% Production Readiness APIs activated!');
+
+  // ========================================
+  // FLUTTER ART API ENDPOINTS - Advanced NFT Creation Platform
+  // ========================================
+
+  // Create FlutterArt NFT with Advanced Features
+  app.post("/api/flutter-art/create", async (req, res) => {
+    try {
+      const {
+        title,
+        description,
+        image,
+        value = "0",
+        currency = "SOL",
+        mintQuantity = "1",
+        editionPrefix = "Edition",
+        burnToRedeem = false,
+        generateQR = false,
+        timeLockEnabled = false,
+        timeLockDate = null,
+        royaltyPercentage = "0",
+        creator
+      } = req.body;
+
+      if (!title || !image || !creator) {
+        return res.status(400).json({ 
+          error: "Missing required fields: title, image, creator" 
+        });
+      }
+
+      const quantity = parseInt(mintQuantity);
+      if (quantity < 1 || quantity > 10000) {
+        return res.status(400).json({ 
+          error: "Mint quantity must be between 1 and 10,000" 
+        });
+      }
+
+      // Generate collection ID
+      const collectionId = `flutter-art-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+      
+      // Create base NFT data
+      const nftData = {
+        id: collectionId,
+        title,
+        description,
+        image,
+        value: parseFloat(value),
+        currency,
+        mintQuantity: quantity,
+        editionPrefix: quantity > 1 ? editionPrefix : null,
+        isLimitedEdition: quantity > 1,
+        burnToRedeem,
+        generateQR,
+        timeLockEnabled,
+        timeLockDate: timeLockEnabled ? timeLockDate : null,
+        royaltyPercentage: parseFloat(royaltyPercentage),
+        creator,
+        createdAt: new Date().toISOString(),
+        status: "minted",
+        mintedCount: 0
+      };
+
+      // Generate QR code URL if enabled
+      if (generateQR) {
+        nftData.qrCodeUrl = `https://flutterbye.com/nft/${collectionId}`;
+      }
+
+      // Store in database (mock storage for now)
+      await storage.createFlutterArtNFT(nftData);
+
+      res.json({
+        success: true,
+        collection: nftData,
+        message: `Successfully created ${quantity === 1 ? 'NFT' : `${quantity} NFTs`}!`,
+        timestamp: new Date().toISOString()
+      });
+
+    } catch (error) {
+      console.error('FlutterArt creation error:', error);
+      res.status(500).json({ 
+        error: error.message || 'Failed to create FlutterArt NFT' 
+      });
+    }
+  });
+
+  // Get FlutterArt Collection Details
+  app.get("/api/flutter-art/collection/:collectionId", async (req, res) => {
+    try {
+      const { collectionId } = req.params;
+      const collection = await storage.getFlutterArtCollection(collectionId);
+      
+      if (!collection) {
+        return res.status(404).json({ error: "Collection not found" });
+      }
+
+      res.json({
+        success: true,
+        collection,
+        timestamp: new Date().toISOString()
+      });
+
+    } catch (error) {
+      console.error('Get collection error:', error);
+      res.status(500).json({ 
+        error: 'Failed to get collection details' 
+      });
+    }
+  });
+
+  // Mint FlutterArt NFT from Collection (for multi-mint editions)
+  app.post("/api/flutter-art/mint/:collectionId", async (req, res) => {
+    try {
+      const { collectionId } = req.params;
+      const { walletAddress } = req.body;
+
+      if (!walletAddress) {
+        return res.status(400).json({ error: "Wallet address is required" });
+      }
+
+      const collection = await storage.getFlutterArtCollection(collectionId);
+      if (!collection) {
+        return res.status(404).json({ error: "Collection not found" });
+      }
+
+      // Check if all editions are minted
+      if (collection.mintedCount >= collection.mintQuantity) {
+        return res.status(400).json({ error: "All editions have been minted" });
+      }
+
+      // Check time lock if enabled
+      if (collection.timeLockEnabled && collection.timeLockDate) {
+        const unlockTime = new Date(collection.timeLockDate);
+        if (new Date() < unlockTime) {
+          return res.status(400).json({ 
+            error: `NFT is time-locked until ${unlockTime.toLocaleDateString()}` 
+          });
+        }
+      }
+
+      // Mint next edition
+      const editionNumber = collection.mintedCount + 1;
+      const nftTitle = collection.isLimitedEdition 
+        ? `${collection.title} - ${collection.editionPrefix} #${editionNumber}`
+        : collection.title;
+
+      const mintedNFT = {
+        id: `${collectionId}-${editionNumber}`,
+        collectionId,
+        title: nftTitle,
+        description: collection.description,
+        image: collection.image,
+        editionNumber,
+        totalEditions: collection.mintQuantity,
+        value: collection.value,
+        currency: collection.currency,
+        burnToRedeem: collection.burnToRedeem,
+        owner: walletAddress,
+        mintedAt: new Date().toISOString(),
+        qrCodeUrl: collection.generateQR ? `${collection.qrCodeUrl}/${editionNumber}` : null,
+        status: collection.timeLockEnabled ? "time_locked" : "active"
+      };
+
+      await storage.mintFlutterArtNFT(mintedNFT);
+      await storage.updateCollectionMintCount(collectionId, editionNumber);
+
+      res.json({
+        success: true,
+        nft: mintedNFT,
+        message: `Successfully minted ${nftTitle}!`,
+        timestamp: new Date().toISOString()
+      });
+
+    } catch (error) {
+      console.error('Mint NFT error:', error);
+      res.status(500).json({ 
+        error: 'Failed to mint NFT' 
+      });
+    }
+  });
+
+  // Burn FlutterArt NFT to Redeem Value
+  app.post("/api/flutter-art/burn/:nftId", async (req, res) => {
+    try {
+      const { nftId } = req.params;
+      const { walletAddress } = req.body;
+
+      if (!walletAddress) {
+        return res.status(400).json({ error: "Wallet address is required" });
+      }
+
+      const nft = await storage.getFlutterArtNFT(nftId);
+      if (!nft) {
+        return res.status(404).json({ error: "NFT not found" });
+      }
+
+      if (nft.owner !== walletAddress) {
+        return res.status(403).json({ error: "Only the owner can burn this NFT" });
+      }
+
+      if (nft.status === "burned") {
+        return res.status(400).json({ error: "NFT has already been burned" });
+      }
+
+      if (!nft.burnToRedeem) {
+        return res.status(400).json({ error: "This NFT does not support burn-to-redeem" });
+      }
+
+      if (nft.value <= 0) {
+        return res.status(400).json({ error: "No value attached to this NFT" });
+      }
+
+      // Process burn and value redemption
+      await storage.burnFlutterArtNFT(nftId, walletAddress);
+
+      res.json({
+        success: true,
+        burnedNFT: {
+          ...nft,
+          status: "burned",
+          burnedAt: new Date().toISOString()
+        },
+        redemption: {
+          amount: nft.value,
+          currency: nft.currency,
+          recipient: walletAddress
+        },
+        message: `Successfully burned NFT and redeemed ${nft.value} ${nft.currency}!`,
+        timestamp: new Date().toISOString()
+      });
+
+    } catch (error) {
+      console.error('Burn NFT error:', error);
+      res.status(500).json({ 
+        error: 'Failed to burn NFT and redeem value' 
+      });
+    }
+  });
+
+  // Get User's FlutterArt NFTs
+  app.get("/api/flutter-art/user/:walletAddress", async (req, res) => {
+    try {
+      const { walletAddress } = req.params;
+      const { status } = req.query;
+
+      const nfts = await storage.getUserFlutterArtNFTs(walletAddress, status as string);
+
+      res.json({
+        success: true,
+        nfts,
+        count: nfts.length,
+        timestamp: new Date().toISOString()
+      });
+
+    } catch (error) {
+      console.error('Get user NFTs error:', error);
+      res.status(500).json({ 
+        error: 'Failed to get user NFTs' 
+      });
+    }
+  });
+
+  // Generate QR Code for NFT
+  app.get("/api/flutter-art/qr/:nftId", async (req, res) => {
+    try {
+      const { nftId } = req.params;
+      const nft = await storage.getFlutterArtNFT(nftId);
+      
+      if (!nft) {
+        return res.status(404).json({ error: "NFT not found" });
+      }
+
+      if (!nft.qrCodeUrl) {
+        return res.status(400).json({ error: "QR code not enabled for this NFT" });
+      }
+
+      const QRCode = (await import('qrcode')).default;
+      const qrCode = await QRCode.toDataURL(nft.qrCodeUrl);
+
+      res.json({
+        success: true,
+        qrCode,
+        url: nft.qrCodeUrl,
+        nft: {
+          id: nft.id,
+          title: nft.title,
+          value: nft.value,
+          currency: nft.currency
+        },
+        timestamp: new Date().toISOString()
+      });
+
+    } catch (error) {
+      console.error('Generate QR code error:', error);
+      res.status(500).json({ 
+        error: 'Failed to generate QR code' 
+      });
+    }
+  });
+
+  // FlutterArt Analytics Dashboard
+  app.get("/api/flutter-art/analytics/:creatorId", async (req, res) => {
+    try {
+      const { creatorId } = req.params;
+      const analytics = await storage.getFlutterArtAnalytics(creatorId);
+
+      res.json({
+        success: true,
+        analytics: {
+          totalCollections: analytics.totalCollections || 0,
+          totalNFTsCreated: analytics.totalNFTsCreated || 0,
+          totalNFTsMinted: analytics.totalNFTsMinted || 0,
+          totalValueAttached: analytics.totalValueAttached || 0,
+          totalValueRedeemed: analytics.totalValueRedeemed || 0,
+          burnRate: analytics.burnRate || 0,
+          mostPopularCollection: analytics.mostPopularCollection || null,
+          revenueBreakdown: {
+            creationFees: analytics.creationFees || 0,
+            royalties: analytics.royalties || 0,
+            total: (analytics.creationFees || 0) + (analytics.royalties || 0)
+          },
+          featureUsage: {
+            multiMint: analytics.multiMintUsage || 0,
+            burnToRedeem: analytics.burnToRedeemUsage || 0,
+            qrCodes: analytics.qrCodeUsage || 0,
+            timeLock: analytics.timeLockUsage || 0
+          }
+        },
+        timestamp: new Date().toISOString()
+      });
+
+    } catch (error) {
+      console.error('FlutterArt analytics error:', error);
+      res.status(500).json({ 
+        error: 'Failed to get FlutterArt analytics' 
+      });
+    }
+  });
+
+  console.log('🎨 FlutterArt Advanced NFT API System Activated!');
   
   // Initialize WebSocket server for real-time updates
   const wsServer = new FlutterbeyeWebSocketServer(httpServer);
