@@ -265,47 +265,87 @@ export default function LaunchCountdown() {
             </h1>
             {/* Digital Butterflies */}
             <div className="digital-butterfly butterfly-1">
-              <svg viewBox="0 0 32 32" fill="currentColor">
-                <path d="M16 4c-.5 0-1 .2-1.3.6C14 5.5 14 6.5 14.5 7.2L16 9l1.5-1.8c.5-.7.5-1.7-.2-2.6C16.9 4.2 16.5 4 16 4z"/>
-                <ellipse cx="11" cy="12" rx="6" ry="8" transform="rotate(-15 11 12)"/>
-                <ellipse cx="21" cy="12" rx="6" ry="8" transform="rotate(15 21 12)"/>
-                <ellipse cx="9" cy="20" rx="4" ry="6" transform="rotate(-25 9 20)"/>
-                <ellipse cx="23" cy="20" rx="4" ry="6" transform="rotate(25 23 20)"/>
-                <circle cx="12" cy="14" r="1.5" opacity="0.7"/>
-                <circle cx="20" cy="14" r="1.5" opacity="0.7"/>
+              <svg viewBox="0 0 32 32" fill="none" stroke="currentColor" strokeWidth="1.5">
+                {/* Body */}
+                <line x1="16" y1="6" x2="16" y2="26" strokeWidth="2"/>
+                <circle cx="16" cy="5" r="1.5" fill="currentColor"/>
+                
+                {/* Upper Wings - Wireframe */}
+                <path d="M16 8 L8 6 L4 12 L8 18 L16 16 Z" strokeWidth="1"/>
+                <path d="M16 8 L24 6 L28 12 L24 18 L16 16 Z" strokeWidth="1"/>
+                
+                {/* Lower Wings - Wireframe */}
+                <path d="M16 16 L10 18 L6 24 L10 26 L16 24 Z" strokeWidth="1"/>
+                <path d="M16 16 L22 18 L26 24 L22 26 L16 24 Z" strokeWidth="1"/>
+                
+                {/* Wing Details - Geometric Lines */}
+                <path d="M8 10 L12 14 L8 16" strokeWidth="0.8"/>
+                <path d="M24 10 L20 14 L24 16" strokeWidth="0.8"/>
+                <path d="M10 20 L14 22 L10 24" strokeWidth="0.8"/>
+                <path d="M22 20 L18 22 L22 24" strokeWidth="0.8"/>
               </svg>
             </div>
             <div className="digital-butterfly butterfly-2">
-              <svg viewBox="0 0 32 32" fill="currentColor">
-                <path d="M16 4c-.5 0-1 .2-1.3.6C14 5.5 14 6.5 14.5 7.2L16 9l1.5-1.8c.5-.7.5-1.7-.2-2.6C16.9 4.2 16.5 4 16 4z"/>
-                <ellipse cx="11" cy="12" rx="6" ry="8" transform="rotate(-15 11 12)"/>
-                <ellipse cx="21" cy="12" rx="6" ry="8" transform="rotate(15 21 12)"/>
-                <ellipse cx="9" cy="20" rx="4" ry="6" transform="rotate(-25 9 20)"/>
-                <ellipse cx="23" cy="20" rx="4" ry="6" transform="rotate(25 23 20)"/>
-                <circle cx="12" cy="14" r="1.5" opacity="0.7"/>
-                <circle cx="20" cy="14" r="1.5" opacity="0.7"/>
+              <svg viewBox="0 0 32 32" fill="none" stroke="currentColor" strokeWidth="1.5">
+                {/* Body */}
+                <line x1="16" y1="6" x2="16" y2="26" strokeWidth="2"/>
+                <circle cx="16" cy="5" r="1.5" fill="currentColor"/>
+                
+                {/* Upper Wings - Wireframe */}
+                <path d="M16 8 L8 6 L4 12 L8 18 L16 16 Z" strokeWidth="1"/>
+                <path d="M16 8 L24 6 L28 12 L24 18 L16 16 Z" strokeWidth="1"/>
+                
+                {/* Lower Wings - Wireframe */}
+                <path d="M16 16 L10 18 L6 24 L10 26 L16 24 Z" strokeWidth="1"/>
+                <path d="M16 16 L22 18 L26 24 L22 26 L16 24 Z" strokeWidth="1"/>
+                
+                {/* Wing Details - Geometric Lines */}
+                <path d="M8 10 L12 14 L8 16" strokeWidth="0.8"/>
+                <path d="M24 10 L20 14 L24 16" strokeWidth="0.8"/>
+                <path d="M10 20 L14 22 L10 24" strokeWidth="0.8"/>
+                <path d="M22 20 L18 22 L22 24" strokeWidth="0.8"/>
               </svg>
             </div>
             <div className="digital-butterfly butterfly-3">
-              <svg viewBox="0 0 32 32" fill="currentColor">
-                <path d="M16 4c-.5 0-1 .2-1.3.6C14 5.5 14 6.5 14.5 7.2L16 9l1.5-1.8c.5-.7.5-1.7-.2-2.6C16.9 4.2 16.5 4 16 4z"/>
-                <ellipse cx="11" cy="12" rx="6" ry="8" transform="rotate(-15 11 12)"/>
-                <ellipse cx="21" cy="12" rx="6" ry="8" transform="rotate(15 21 12)"/>
-                <ellipse cx="9" cy="20" rx="4" ry="6" transform="rotate(-25 9 20)"/>
-                <ellipse cx="23" cy="20" rx="4" ry="6" transform="rotate(25 23 20)"/>
-                <circle cx="12" cy="14" r="1.5" opacity="0.7"/>
-                <circle cx="20" cy="14" r="1.5" opacity="0.7"/>
+              <svg viewBox="0 0 32 32" fill="none" stroke="currentColor" strokeWidth="1.5">
+                {/* Body */}
+                <line x1="16" y1="6" x2="16" y2="26" strokeWidth="2"/>
+                <circle cx="16" cy="5" r="1.5" fill="currentColor"/>
+                
+                {/* Upper Wings - Wireframe */}
+                <path d="M16 8 L8 6 L4 12 L8 18 L16 16 Z" strokeWidth="1"/>
+                <path d="M16 8 L24 6 L28 12 L24 18 L16 16 Z" strokeWidth="1"/>
+                
+                {/* Lower Wings - Wireframe */}
+                <path d="M16 16 L10 18 L6 24 L10 26 L16 24 Z" strokeWidth="1"/>
+                <path d="M16 16 L22 18 L26 24 L22 26 L16 24 Z" strokeWidth="1"/>
+                
+                {/* Wing Details - Geometric Lines */}
+                <path d="M8 10 L12 14 L8 16" strokeWidth="0.8"/>
+                <path d="M24 10 L20 14 L24 16" strokeWidth="0.8"/>
+                <path d="M10 20 L14 22 L10 24" strokeWidth="0.8"/>
+                <path d="M22 20 L18 22 L22 24" strokeWidth="0.8"/>
               </svg>
             </div>
             <div className="digital-butterfly butterfly-4">
-              <svg viewBox="0 0 32 32" fill="currentColor">
-                <path d="M16 4c-.5 0-1 .2-1.3.6C14 5.5 14 6.5 14.5 7.2L16 9l1.5-1.8c.5-.7.5-1.7-.2-2.6C16.9 4.2 16.5 4 16 4z"/>
-                <ellipse cx="11" cy="12" rx="6" ry="8" transform="rotate(-15 11 12)"/>
-                <ellipse cx="21" cy="12" rx="6" ry="8" transform="rotate(15 21 12)"/>
-                <ellipse cx="9" cy="20" rx="4" ry="6" transform="rotate(-25 9 20)"/>
-                <ellipse cx="23" cy="20" rx="4" ry="6" transform="rotate(25 23 20)"/>
-                <circle cx="12" cy="14" r="1.5" opacity="0.7"/>
-                <circle cx="20" cy="14" r="1.5" opacity="0.7"/>
+              <svg viewBox="0 0 32 32" fill="none" stroke="currentColor" strokeWidth="1.5">
+                {/* Body */}
+                <line x1="16" y1="6" x2="16" y2="26" strokeWidth="2"/>
+                <circle cx="16" cy="5" r="1.5" fill="currentColor"/>
+                
+                {/* Upper Wings - Wireframe */}
+                <path d="M16 8 L8 6 L4 12 L8 18 L16 16 Z" strokeWidth="1"/>
+                <path d="M16 8 L24 6 L28 12 L24 18 L16 16 Z" strokeWidth="1"/>
+                
+                {/* Lower Wings - Wireframe */}
+                <path d="M16 16 L10 18 L6 24 L10 26 L16 24 Z" strokeWidth="1"/>
+                <path d="M16 16 L22 18 L26 24 L22 26 L16 24 Z" strokeWidth="1"/>
+                
+                {/* Wing Details - Geometric Lines */}
+                <path d="M8 10 L12 14 L8 16" strokeWidth="0.8"/>
+                <path d="M24 10 L20 14 L24 16" strokeWidth="0.8"/>
+                <path d="M10 20 L14 22 L10 24" strokeWidth="0.8"/>
+                <path d="M22 20 L18 22 L22 24" strokeWidth="0.8"/>
               </svg>
             </div>
           </div>

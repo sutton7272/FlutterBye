@@ -209,10 +209,10 @@
 
   /* Electric Branding Styles */
   .electric-branding {
-    font-family: 'Orbitron', monospace;
-    font-weight: 800;
+    font-family: 'Courier New', 'Orbitron', monospace;
+    font-weight: 900;
     font-size: clamp(2.5rem, 6vw, 4rem);
-    letter-spacing: 0.1em;
+    letter-spacing: 0.15em;
     position: relative;
     display: inline-block;
     background: linear-gradient(135deg, 
@@ -225,9 +225,10 @@
     background-size: 300% 300%;
     animation: electricPulse 3s ease-in-out infinite, gradientShift 6s linear infinite;
     text-shadow: 
-      0 0 10px hsla(200, 100%, 70%, 0.5),
-      0 0 20px hsla(140, 100%, 60%, 0.3),
-      0 0 40px hsla(180, 100%, 55%, 0.2);
+      0 0 20px hsla(200, 100%, 70%, 0.8),
+      0 0 40px hsla(140, 100%, 60%, 0.6),
+      0 0 60px hsla(180, 100%, 55%, 0.4);
+    filter: drop-shadow(2px 2px 0px rgba(0, 255, 255, 0.3));
   }
 
 
@@ -246,12 +247,13 @@
   /* Digital Butterfly Animations */
   .digital-butterfly {
     position: absolute;
-    width: 28px;
-    height: 28px;
-    filter: drop-shadow(0 0 12px currentColor) brightness(1.2);
+    width: 32px;
+    height: 32px;
+    filter: drop-shadow(0 0 15px currentColor) brightness(1.5);
     animation-timing-function: ease-in-out;
     animation-iteration-count: infinite;
     z-index: 10;
+    stroke-width: 1.5;
   }
 
   .butterfly-1 {
