@@ -40,6 +40,8 @@ import InfoPage from "@/pages/info";
 import { Chat } from "@/pages/chat";
 import FlutterWave from "@/pages/flutter-wave";
 import FlutterArt from "@/pages/flutter-art";
+import FlutterbeyeMessages from "@/pages/flutterbye-messages";
+import FlutterWaveEnhanced from "@/pages/flutter-wave-enhanced";
 import LimitedEdition from "@/pages/limited-edition";
 import AdvancedSearch from "@/pages/advanced-search";
 import AdminSystem from "@/pages/admin-system";
@@ -123,6 +125,24 @@ function Router() {
             <Home />
           </>
         )} />
+        <Route path="/flutterbye-messages" component={() => (
+          <>
+            <Navbar />
+            <FlutterbeyeMessages />
+          </>
+        )} />
+        <Route path="/flutter-art" component={() => (
+          <>
+            <Navbar />
+            <FlutterArt />
+          </>
+        )} />
+        <Route path="/flutter-wave" component={() => (
+          <>
+            <Navbar />
+            <FlutterWaveEnhanced />
+          </>
+        )} />
         
         {/* Simplified Routes with navbar - unified navigation structure */}
         <Route path="/dashboard" component={() => (
@@ -161,18 +181,6 @@ function Router() {
             <FlutterAIDashboard />
           </>
         )} />
-        <Route path="/flutter-wave" component={() => (
-          <>
-            <Navbar />
-            <FlutterWave />
-          </>
-        )} />
-        <Route path="/flutter-art" component={() => (
-          <>
-            <Navbar />
-            <FlutterArt />
-          </>
-        )} />
         <Route path="/chat" component={() => (
           <>
             <Navbar />
@@ -186,13 +194,7 @@ function Router() {
           </>
         )} />
         
-        {/* Legacy routes for backward compatibility */}
-        <Route path="/home" component={() => (
-          <>
-            <Navbar />
-            <Dashboard />
-          </>
-        )} />
+
         <Route path="/marketplace" component={() => (
           <>
             <Navbar />
@@ -407,16 +409,7 @@ function Router() {
             <Chat />
           </>
         )} />
-        <Route path="/flutter-wave" component={() => (
-          <>
-            <FlutterWave />
-          </>
-        )} />
-        <Route path="/flutter-art" component={() => (
-          <>
-            <FlutterArt />
-          </>
-        )} />
+
         <Route path="/limited-edition" component={() => (
           <>
             <Navbar />

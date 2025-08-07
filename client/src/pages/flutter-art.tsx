@@ -61,18 +61,421 @@ interface MessageNFTCollection {
 }
 
 export default function FlutterArt() {
-  const [activeTab, setActiveTab] = useState("create");
-  const [createMode, setCreateMode] = useState("basic");
-  const queryClient = useQueryClient();
+  const [prompt, setPrompt] = useState("");
+  const [negativePrompt, setNegativePrompt] = useState("");
+  const [style, setStyle] = useState("digital");
+  const [quality, setQuality] = useState([80]);
+  const [creativity, setCreativity] = useState([70]);
+  const [isGenerating, setIsGenerating] = useState(false);
 
-  // Form state for NFT creation
-  const [formData, setFormData] = useState({
-    message: "",
-    collectionName: "",
-    description: "",
-    totalSupply: 1,
-    valuePerNFT: 0,
-    currency: "SOL" as "SOL" | "USDC" | "FLBY",
+  const handleGenerate = async () => {
+    setIsGenerating(true);
+    // API integration for AI art generation
+    console.log("Generating art:", { prompt, negativePrompt, style, quality: quality[0], creativity: creativity[0] });
+    setTimeout(() => setIsGenerating(false), 3000);
+  };
+
+  const artStyles = [
+    { value: "digital", label: "Digital Art", popular: true },
+    { value: "oil_painting", label: "Oil Painting", popular: false },
+    { value: "watercolor", label: "Watercolor", popular: true },
+    { value: "sketch", label: "Pencil Sketch", popular: false },
+    { value: "abstract", label: "Abstract", popular: true },
+    { value: "photorealistic", label: "Photorealistic", popular: false },
+    { value: "anime", label: "Anime Style", popular: true },
+    { value: "cyberpunk", label: "Cyberpunk", popular: true },
+    { value: "fantasy", label: "Fantasy Art", popular: false },
+    { value: "minimalist", label: "Minimalist", popular: false }
+  ];
+
+  const featuredArtworks = [
+    {
+      id: 1,
+      title: "Cosmic Butterfly Dreams",
+      artist: "ArtistDAO",
+      price: "2.5 SOL",
+      likes: 124,
+      views: 1847,
+      rarity: "Rare",
+      category: "Digital"
+    },
+    {
+      id: 2,
+      title: "Neon Genesis Protocol",
+      artist: "CryptoCreator",
+      price: "1.8 SOL",
+      likes: 89,
+      views: 1203,
+      rarity: "Common",
+      category: "Cyberpunk"
+    },
+    {
+      id: 3,
+      title: "Ethereal Landscapes",
+      artist: "PixelMaster",
+      price: "3.2 SOL",
+      likes: 203,
+      views: 2591,
+      rarity: "Epic",
+      category: "Fantasy"
+    },
+    {
+      id: 4,
+      title: "Abstract Emotions",
+      artist: "DigitalDreamer",
+      price: "1.2 SOL",
+      likes: 156,
+      views: 1674,
+      rarity: "Uncommon",
+      category: "Abstract"
+    }
+  ];
+
+  return (
+    <div className="min-h-screen pt-20 pb-12">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Header */}
+        <div className="text-center mb-12">
+          <h1 className="text-5xl font-bold mb-6 text-gradient">FlutterArt Studio</h1>
+          <p className="text-xl text-muted-foreground mb-8">
+            AI-powered NFT creation and decentralized art marketplace
+          </p>
+          <div className="flex justify-center gap-4 mb-8">
+            <Badge variant="outline" className="px-4 py-2">
+              <Wand2 className="w-4 h-4 mr-2" />
+              AI Generation
+            </Badge>
+            <Badge variant="outline" className="px-4 py-2">
+              <Image className="w-4 h-4 mr-2" />
+              NFT Marketplace
+            </Badge>
+            <Badge variant="outline" className="px-4 py-2">
+              <Sparkles className="w-4 h-4 mr-2" />
+              Instant Minting
+            </Badge>
+            <Badge variant="outline" className="px-4 py-2">
+              <Coins className="w-4 h-4 mr-2" />
+              Royalty System
+            </Badge>
+          </div>
+        </div>
+
+        {/* Statistics Dashboard */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+          <Card className="electric-border">
+            <CardContent className="p-4 text-center">
+              <div className="text-2xl font-bold text-electric-blue">12,847</div>
+              <div className="text-sm text-muted-foreground">Artworks Created</div>
+            </CardContent>
+          </Card>
+          <Card className="electric-border">
+            <CardContent className="p-4 text-center">
+              <div className="text-2xl font-bold text-electric-green">892.5 SOL</div>
+              <div className="text-sm text-muted-foreground">Total Volume</div>
+            </CardContent>
+          </Card>
+          <Card className="electric-border">
+            <CardContent className="p-4 text-center">
+              <div className="text-2xl font-bold text-electric-purple">3,421</div>
+              <div className="text-sm text-muted-foreground">Active Artists</div>
+            </CardContent>
+          </Card>
+          <Card className="electric-border">
+            <CardContent className="p-4 text-center">
+              <div className="text-2xl font-bold text-electric-blue">15,692</div>
+              <div className="text-sm text-muted-foreground">Collectors</div>
+            </CardContent>
+          </Card>
+        </div>
+
+        <div className="grid lg:grid-cols-2 gap-8 mb-12">
+          {/* Enhanced Art Generation */}
+          <Card className="electric-border">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Palette className="w-5 h-5" />
+                AI Art Generator
+              </CardTitle>
+              <CardDescription>
+                Create unique NFTs with advanced AI-powered art generation
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div>
+                <Label htmlFor="prompt">Art Description</Label>
+                <Textarea
+                  id="prompt"
+                  value={prompt}
+                  onChange={(e) => setPrompt(e.target.value)}
+                  placeholder="Describe your artwork in detail..."
+                  className="electric-border min-h-[80px]"
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="negative">Negative Prompt (Optional)</Label>
+                <Input
+                  id="negative"
+                  value={negativePrompt}
+                  onChange={(e) => setNegativePrompt(e.target.value)}
+                  placeholder="What to avoid in the artwork..."
+                  className="electric-border"
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="style">Art Style</Label>
+                <div className="grid grid-cols-2 gap-2 mt-2">
+                  {artStyles.map((styleOption) => (
+                    <Button
+                      key={styleOption.value}
+                      variant={style === styleOption.value ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => setStyle(styleOption.value)}
+                      className="justify-start"
+                    >
+                      {styleOption.label}
+                      {styleOption.popular && <Star className="w-3 h-3 ml-1" />}
+                    </Button>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <Label>Quality: {quality[0]}%</Label>
+                <input
+                  type="range"
+                  min="10"
+                  max="100"
+                  step="10"
+                  value={quality[0]}
+                  onChange={(e) => setQuality([Number(e.target.value)])}
+                  className="w-full mt-2"
+                />
+              </div>
+
+              <div>
+                <Label>Creativity: {creativity[0]}%</Label>
+                <input
+                  type="range"
+                  min="10"
+                  max="100"
+                  step="10"
+                  value={creativity[0]}
+                  onChange={(e) => setCreativity([Number(e.target.value)])}
+                  className="w-full mt-2"
+                />
+              </div>
+
+              <Button 
+                onClick={handleGenerate}
+                className="w-full electric-glow"
+                disabled={!prompt || isGenerating}
+              >
+                {isGenerating ? (
+                  <>
+                    <Sparkles className="w-4 h-4 mr-2 animate-spin" />
+                    Generating Art...
+                  </>
+                ) : (
+                  <>
+                    <Wand2 className="w-4 h-4 mr-2" />
+                    Generate NFT Art
+                  </>
+                )}
+              </Button>
+            </CardContent>
+          </Card>
+
+          {/* Enhanced Preview Canvas */}
+          <Card className="electric-border">
+            <CardHeader>
+              <CardTitle>Art Preview</CardTitle>
+              <CardDescription>Your generated artwork will appear here</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="aspect-square bg-muted rounded-lg flex items-center justify-center relative overflow-hidden">
+                {isGenerating ? (
+                  <div className="text-center">
+                    <div className="relative">
+                      <div className="w-16 h-16 border-4 border-electric-blue border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+                      <Sparkles className="w-6 h-6 absolute top-5 left-1/2 transform -translate-x-1/2 text-electric-blue" />
+                    </div>
+                    <p className="text-muted-foreground">Creating your masterpiece...</p>
+                    <div className="text-sm text-electric-blue mt-2">AI Processing: {Math.floor(Math.random() * 100)}%</div>
+                  </div>
+                ) : (
+                  <div className="text-center text-muted-foreground">
+                    <Image className="w-16 h-16 mx-auto mb-4" />
+                    <p className="text-lg">Your AI-generated art will appear here</p>
+                    <p className="text-sm mt-2">High-resolution NFT ready for minting</p>
+                  </div>
+                )}
+              </div>
+              
+              {!isGenerating && (
+                <div className="grid grid-cols-2 gap-2 mt-4">
+                  <Button variant="outline" size="sm">
+                    <Download className="w-4 h-4 mr-2" />
+                    Download
+                  </Button>
+                  <Button variant="outline" size="sm">
+                    <Sparkles className="w-4 h-4 mr-2" />
+                    Share
+                  </Button>
+                  <Button variant="outline" size="sm">
+                    <Zap className="w-4 h-4 mr-2" />
+                    Mint NFT
+                  </Button>
+                  <Button variant="outline" size="sm">
+                    <Brush className="w-4 h-4 mr-2" />
+                    Variations
+                  </Button>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Featured Artworks Marketplace */}
+        <div className="mb-12">
+          <div className="flex items-center justify-between mb-8">
+            <h2 className="text-3xl font-bold">Featured Artworks</h2>
+            <Link href="/nft-marketplace">
+              <Button variant="outline">
+                <Eye className="w-4 h-4 mr-2" />
+                View All
+              </Button>
+            </Link>
+          </div>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {featuredArtworks.map((artwork) => (
+              <Card key={artwork.id} className="electric-border hover-lift overflow-hidden group">
+                <div className="aspect-square bg-gradient-to-br from-electric-blue/20 to-electric-green/20 relative">
+                  <div className="w-full h-full flex items-center justify-center">
+                    <Image className="w-16 h-16 text-muted-foreground group-hover:scale-110 transition-transform" />
+                  </div>
+                  <Badge className="absolute top-2 right-2" variant="secondary">
+                    {artwork.rarity}
+                  </Badge>
+                </div>
+                <CardContent className="p-4">
+                  <h3 className="font-semibold mb-1 truncate">{artwork.title}</h3>
+                  <p className="text-sm text-muted-foreground mb-2">by {artwork.artist}</p>
+                  <div className="flex items-center justify-between mb-2">
+                    <Badge variant="outline" className="text-xs">{artwork.category}</Badge>
+                    <div className="flex items-center gap-1 text-sm text-muted-foreground">
+                      <Eye className="w-3 h-3" />
+                      {artwork.views}
+                    </div>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <Badge variant="outline" className="font-bold">{artwork.price}</Badge>
+                    <div className="flex items-center gap-1 text-sm text-red-400">
+                      <Heart className="w-4 h-4" />
+                      {artwork.likes}
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+
+        {/* Art Categories and Features */}
+        <div className="grid md:grid-cols-3 gap-6 mb-12">
+          <Card className="electric-border hover-lift">
+            <CardHeader>
+              <Brush className="w-8 h-8 text-electric-blue mb-2" />
+              <CardTitle>Custom Commissions</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-muted-foreground mb-4">
+                Commission personalized artworks from top FlutterArt creators
+              </p>
+              <Button variant="outline" className="w-full">
+                Commission Art
+              </Button>
+            </CardContent>
+          </Card>
+
+          <Card className="electric-border hover-lift">
+            <CardHeader>
+              <Crown className="w-8 h-8 text-electric-green mb-2" />
+              <CardTitle>Limited Collections</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-muted-foreground mb-4">
+                Exclusive limited edition NFT collections with special utilities
+              </p>
+              <Link href="/limited-edition">
+                <Button variant="outline" className="w-full">
+                  Explore Collections
+                </Button>
+              </Link>
+            </CardContent>
+          </Card>
+
+          <Card className="electric-border hover-lift">
+            <CardHeader>
+              <TrendingUp className="w-8 h-8 text-electric-purple mb-2" />
+              <CardTitle>Artist Analytics</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-muted-foreground mb-4">
+                Track performance, earnings, and collector engagement
+              </p>
+              <Button variant="outline" className="w-full">
+                View Analytics
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Enhanced Quick Actions */}
+        <Card className="electric-border">
+          <CardHeader>
+            <CardTitle>FlutterArt Studio Features</CardTitle>
+            <CardDescription>
+              Complete NFT art creation and marketplace ecosystem
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              <Button variant="outline" className="h-auto py-4 flex flex-col gap-2">
+                <Wand2 className="w-6 h-6" />
+                <span>AI Generation</span>
+                <span className="text-xs text-muted-foreground">Create with AI</span>
+              </Button>
+              
+              <Link href="/nft-marketplace">
+                <Button variant="outline" className="w-full h-auto py-4 flex flex-col gap-2">
+                  <Image className="w-6 h-6" />
+                  <span>Marketplace</span>
+                  <span className="text-xs text-muted-foreground">Buy & Sell NFTs</span>
+                </Button>
+              </Link>
+              
+              <Link href="/message-nft-creator">
+                <Button variant="outline" className="w-full h-auto py-4 flex flex-col gap-2">
+                  <Sparkles className="w-6 h-6" />
+                  <span>Message NFTs</span>
+                  <span className="text-xs text-muted-foreground">Art + Messages</span>
+                </Button>
+              </Link>
+              
+              <Button variant="outline" className="h-auto py-4 flex flex-col gap-2">
+                <Users className="w-6 h-6" />
+                <span>Artist Hub</span>
+                <span className="text-xs text-muted-foreground">Creator Tools</span>
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  );
+}
     burnToRedeem: true,
     imageFile: "",
     voiceFile: "",
