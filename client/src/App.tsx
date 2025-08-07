@@ -140,7 +140,7 @@ function Router() {
         <Route path="/campaign-builder" component={() => (
           <>
             <Navbar />
-            <TestUpdate />
+            <CampaignBuilder />
           </>
         )} />
         <Route path="/trade" component={() => (
