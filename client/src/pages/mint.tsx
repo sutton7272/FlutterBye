@@ -114,6 +114,9 @@ export default function Mint({ tokenType }: MintProps = {}) {
   const [copiedQRText, setCopiedQRText] = useState(false);
   const [copiedQRImage, setCopiedQRImage] = useState(false);
   
+  // Creation type selection
+  const [activeCreationType, setActiveCreationType] = useState<'coins' | 'art' | 'collaborative'>('coins');
+  
   // Progress tracking for step-by-step guidance
   const [currentStep, setCurrentStep] = useState(1);
   
@@ -503,25 +506,156 @@ export default function Mint({ tokenType }: MintProps = {}) {
     <div className="min-h-screen pt-20 pb-12">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold mb-4 text-gradient">Token Creation Center</h1>
-          <p className="text-xl text-muted-foreground">Create individual tokens or limited edition collections</p>
+          <h1 className="text-5xl font-bold mb-6 text-gradient">Flutterbye Creation Hub</h1>
+          <p className="text-xl text-muted-foreground mb-8">The ultimate blockchain creation platform</p>
         </div>
 
-        <Tabs defaultValue="individual" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-3 bg-slate-800/50">
-            <TabsTrigger value="individual" className="flex items-center gap-2">
-              <Coins className="w-4 h-4" />
-              Individual Token
-            </TabsTrigger>
-            <TabsTrigger value="limited" className="flex items-center gap-2">
-              <Star className="w-4 h-4" />
-              Limited Edition
-            </TabsTrigger>
-            <TabsTrigger value="collaborative" className="flex items-center gap-2">
-              <Users className="w-4 h-4" />
-              🚀 Collaborative Mode
-            </TabsTrigger>
-          </TabsList>
+        {/* Main Creation Cards */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
+          {/* Flutterbye Coins */}
+          <Card className="electric-frame bg-gradient-to-br from-electric-blue/20 to-circuit-teal/20 border-2 border-electric-blue/50 hover:border-electric-blue/80 transition-all duration-500 hover:shadow-2xl hover:shadow-electric-blue/25">
+            <CardHeader className="text-center pb-4">
+              <div className="w-20 h-20 mx-auto mb-4 bg-gradient-to-r from-electric-blue to-circuit-teal rounded-full flex items-center justify-center">
+                <Coins className="w-10 h-10 text-white" />
+              </div>
+              <CardTitle className="text-3xl font-bold text-electric-blue mb-2">Flutterbye Coins</CardTitle>
+              <CardDescription className="text-lg text-gray-300">
+                Create personalized message tokens with attached value
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="bg-slate-800/50 p-4 rounded-lg border border-electric-blue/30">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Sparkles className="w-5 h-5 text-electric-blue" />
+                    <span className="font-semibold text-electric-blue">27-Character Messages</span>
+                  </div>
+                  <p className="text-sm text-gray-400">Precision messaging on blockchain</p>
+                </div>
+                <div className="bg-slate-800/50 p-4 rounded-lg border border-electric-green/30">
+                  <div className="flex items-center gap-2 mb-2">
+                    <DollarSign className="w-5 h-5 text-electric-green" />
+                    <span className="font-semibold text-electric-green">Value Attachment</span>
+                  </div>
+                  <p className="text-sm text-gray-400">SOL, USDC, FLBY rewards</p>
+                </div>
+                <div className="bg-slate-800/50 p-4 rounded-lg border border-purple-400/30">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Target className="w-5 h-5 text-purple-400" />
+                    <span className="font-semibold text-purple-400">AI Targeting</span>
+                  </div>
+                  <p className="text-sm text-gray-400">Precision holder analysis</p>
+                </div>
+                <div className="bg-slate-800/50 p-4 rounded-lg border border-orange-400/30">
+                  <div className="flex items-center gap-2 mb-2">
+                    <TrendingUp className="w-5 h-5 text-orange-400" />
+                    <span className="font-semibold text-orange-400">Viral Mechanics</span>
+                  </div>
+                  <p className="text-sm text-gray-400">Growth amplification</p>
+                </div>
+              </div>
+              <Button 
+                className="w-full bg-gradient-to-r from-electric-blue to-circuit-teal hover:from-electric-blue/80 hover:to-circuit-teal/80 text-white py-6 text-lg font-semibold"
+                onClick={() => setActiveCreationType('coins')}
+              >
+                <Coins className="w-5 h-5 mr-2" />
+                Create Flutterbye Coin
+              </Button>
+            </CardContent>
+          </Card>
+
+          {/* FlutterArt */}
+          <Card className="electric-frame bg-gradient-to-br from-purple-600/20 to-pink-600/20 border-2 border-purple-500/50 hover:border-purple-500/80 transition-all duration-500 hover:shadow-2xl hover:shadow-purple-500/25">
+            <CardHeader className="text-center pb-4">
+              <div className="w-20 h-20 mx-auto mb-4 bg-gradient-to-r from-purple-600 to-pink-600 rounded-full flex items-center justify-center">
+                <ImageIcon className="w-10 h-10 text-white" />
+              </div>
+              <CardTitle className="text-3xl font-bold text-purple-400 mb-2">FlutterArt</CardTitle>
+              <CardDescription className="text-lg text-gray-300">
+                Limited edition NFT collections with multimedia
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="bg-slate-800/50 p-4 rounded-lg border border-purple-400/30">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Star className="w-5 h-5 text-purple-400" />
+                    <span className="font-semibold text-purple-400">Limited Editions</span>
+                  </div>
+                  <p className="text-sm text-gray-400">Exclusive NFT collections</p>
+                </div>
+                <div className="bg-slate-800/50 p-4 rounded-lg border border-pink-400/30">
+                  <div className="flex items-center gap-2 mb-2">
+                    <FileImage className="w-5 h-5 text-pink-400" />
+                    <span className="font-semibold text-pink-400">Rich Media</span>
+                  </div>
+                  <p className="text-sm text-gray-400">Images, GIFs, QR codes</p>
+                </div>
+                <div className="bg-slate-800/50 p-4 rounded-lg border border-indigo-400/30">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Mic className="w-5 h-5 text-indigo-400" />
+                    <span className="font-semibold text-indigo-400">Voice & Music</span>
+                  </div>
+                  <p className="text-sm text-gray-400">Audio NFT integration</p>
+                </div>
+                <div className="bg-slate-800/50 p-4 rounded-lg border border-cyan-400/30">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Users className="w-5 h-5 text-cyan-400" />
+                    <span className="font-semibold text-cyan-400">Collaborative</span>
+                  </div>
+                  <p className="text-sm text-gray-400">Multi-creator works</p>
+                </div>
+              </div>
+              <Button 
+                className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-600/80 hover:to-pink-600/80 text-white py-6 text-lg font-semibold"
+                onClick={() => setActiveCreationType('art')}
+              >
+                <Star className="w-5 h-5 mr-2" />
+                Create FlutterArt NFT
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Back to Selection Button */}
+        {(activeCreationType === 'coins' || activeCreationType === 'art') && (
+          <div className="text-center mb-8">
+            <Button 
+              variant="outline" 
+              onClick={() => setActiveCreationType('coins')}
+              className="mr-4 bg-slate-800/50 border-electric-blue/30 hover:border-electric-blue/60"
+            >
+              <Coins className="w-4 h-4 mr-2" />
+              {activeCreationType === 'coins' ? '✓ ' : ''}Flutterbye Coins
+            </Button>
+            <Button 
+              variant="outline" 
+              onClick={() => setActiveCreationType('art')}
+              className="bg-slate-800/50 border-purple-500/30 hover:border-purple-500/60"
+            >
+              <Star className="w-4 h-4 mr-2" />
+              {activeCreationType === 'art' ? '✓ ' : ''}FlutterArt NFTs
+            </Button>
+          </div>
+        )}
+
+        <Tabs value={activeCreationType === 'coins' ? 'individual' : activeCreationType === 'art' ? 'limited' : 'individual'} className="space-y-6">
+          <div className="hidden">
+            <TabsList className="grid w-full grid-cols-3 bg-slate-800/50">
+              <TabsTrigger value="individual" className="flex items-center gap-2">
+                <Coins className="w-4 h-4" />
+                Individual Token
+              </TabsTrigger>
+              <TabsTrigger value="limited" className="flex items-center gap-2">
+                <Star className="w-4 h-4" />
+                Limited Edition
+              </TabsTrigger>
+              <TabsTrigger value="collaborative" className="flex items-center gap-2">
+                <Users className="w-4 h-4" />
+                🚀 Collaborative Mode
+              </TabsTrigger>
+            </TabsList>
+          </div>
 
           <TabsContent value="individual" className="space-y-6">
                 {/* Floating Progress Indicator - Always Visible */}
