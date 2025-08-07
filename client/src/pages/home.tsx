@@ -536,11 +536,11 @@ export default function Home() {
         <div className="w-full max-w-6xl mx-auto px-4 mb-16">
           <div className="electric-border bg-gray-900 rounded-xl p-8">
             <div className="text-center">
-              <h2 className="text-4xl font-bold bg-gradient-to-r from-blue-400 to-green-400 bg-clip-text text-transparent mb-4">
-                🚀 Latest AI Marketing Insights
+              <h2 className="text-5xl font-bold bg-gradient-to-r from-blue-400 to-green-400 bg-clip-text text-transparent mb-4">
+                🚀 AI MARKETING REVOLUTION
               </h2>
-              <p className="text-gray-300 text-lg mb-8">
-                Revolutionary AI-powered blog content powered by Flutterbye Intelligence
+              <p className="text-white text-xl mb-8 font-medium">
+                🤖 LIVE: Automated Marketing Bot with AI Blog Generation System
               </p>
               
               {/* Featured blog post display */}
