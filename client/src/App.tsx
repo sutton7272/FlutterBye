@@ -155,6 +155,12 @@ function Router() {
             <FlutterAIUser />
           </>
         )} />
+        <Route path="/multi-chain" component={() => (
+          <>
+            <Navbar />
+            <MultiChainDashboard />
+          </>
+        )} />
         <Route path="/flutterai/admin" component={() => (
           <>
             <Navbar />
@@ -624,12 +630,6 @@ function Router() {
           <>
             <Navbar />
             <FlutterAIDashboard />
-          </>
-        )} />
-        <Route path="/multi-chain" component={() => (
-          <>
-            <Navbar />
-            <MultiChainDashboard />
           </>
         )} />
         <Route path="/flutterai-dashboard" component={() => (

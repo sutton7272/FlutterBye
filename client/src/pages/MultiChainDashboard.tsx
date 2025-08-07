@@ -58,19 +58,19 @@ export default function MultiChainDashboard() {
   });
 
   // Fetch supported chains
-  const { data: chainsData, isLoading: chainsLoading } = useQuery({
+  const { data: chainsData, isLoading: chainsLoading } = useQuery<any>({
     queryKey: ['/api/multi-chain/chains'],
     refetchInterval: 30000 // Refresh every 30 seconds
   });
 
   // Fetch chain health status
-  const { data: healthData, isLoading: healthLoading } = useQuery({
+  const { data: healthData, isLoading: healthLoading } = useQuery<any>({
     queryKey: ['/api/multi-chain/health'],
     refetchInterval: 10000 // Refresh every 10 seconds
   });
 
   // Fetch wallet balances
-  const { data: balancesData, isLoading: balancesLoading, refetch: refetchBalances } = useQuery({
+  const { data: balancesData, isLoading: balancesLoading, refetch: refetchBalances } = useQuery<any>({
     queryKey: ['/api/multi-chain/balance', walletAddresses],
     queryFn: async () => {
       const addresses = Object.fromEntries(
@@ -117,7 +117,7 @@ export default function MultiChainDashboard() {
       sui: 1.85,
       kaspa: 0.12
     };
-    return balance * (mockRates[balancesData?.data?.find((b: WalletBalance) => b.chain)?.chain] || 1);
+    return balance * (mockRates[balancesData?.data?.find((b: WalletBalance) => b.chain)?.chain || 'ethereum'] || 1);
   };
 
   const totalUSDValue = balancesData?.data?.reduce((total: number, wallet: WalletBalance) => {
