@@ -321,28 +321,32 @@ export default function AdminGateway() {
             </Card>
           </Link>
 
-          {/* Multi-Chain Intelligence - FORCED VISIBLE VERSION */}
-          <div className="col-span-full">
-            <Link href="/admin">
-              <Card className="bg-red-500/20 border-red-500 hover:border-red-400 transition-all cursor-pointer group">
-                <CardHeader>
-                  <Globe className="w-8 h-8 text-red-400 group-hover:text-red-300" />
-                  <CardTitle className="text-white text-2xl">🚨 MULTI-CHAIN INTELLIGENCE 🚨</CardTitle>
-                  <CardDescription className="text-red-300">
-                    Revolutionary blockchain intelligence across 7 networks - TESTING VISIBILITY
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <ul className="text-sm text-red-200 space-y-1">
-                    <li>• 7 Blockchain Networks</li>
-                    <li>• Real-time Market Data</li>
-                    <li>• Enterprise Intelligence</li>
-                    <li>• Cross-Chain Analytics</li>
-                  </ul>
-                </CardContent>
-              </Card>
-            </Link>
-          </div>
+          {/* Multi-Chain Intelligence */}
+          <Link href="/admin">
+            <Card className="bg-slate-800/50 border-cyan-500/20 hover:border-cyan-400/40 transition-all cursor-pointer group">
+              <CardHeader>
+                <Globe className="w-8 h-8 text-cyan-400 group-hover:text-cyan-300" />
+                <CardTitle className="text-white">Multi-Chain Intelligence</CardTitle>
+                <CardDescription className="text-slate-300">
+                  Revolutionary blockchain intelligence across 7 networks
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <ul className="text-sm text-slate-400 space-y-1">
+                  <li>• 7 Blockchain Networks</li>
+                  <li>• Real-time Market Data</li>
+                  <li>• Enterprise Intelligence</li>
+                  <li>• Cross-Chain Analytics</li>
+                </ul>
+              </CardContent>
+            </Card>
+          </Link>
+        </div>
+
+        {/* TEST: Simple text to verify Multi-Chain card is being rendered */}
+        <div className="mt-8 p-4 bg-yellow-500 text-black">
+          <p>DEBUG: Multi-Chain Intelligence card should appear above this message as card #6</p>
+          <p>Total cards expected: 6 (Dashboard, FlutterAI, Access Control, Marketing & Growth, System Settings, Multi-Chain Intelligence)</p>
         </div>
 
         <div className="mt-8 text-center">
