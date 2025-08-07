@@ -4832,10 +4832,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: 'Data is required for QR code generation' });
       }
 
-      // Use QRCode library to generate QR code
-      const QRCode = require('qrcode');
+      // Use QRCode library to generate QR code (ES module import)
+      const QRCode = await import('qrcode');
       
-      const qrCodeDataURL = await QRCode.toDataURL(data, {
+      const qrCodeDataURL = await QRCode.default.toDataURL(data, {
         width: size || 256,
         errorCorrectionLevel: errorCorrectionLevel || 'M',
         type: 'image/png',
