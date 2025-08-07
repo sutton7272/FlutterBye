@@ -74,6 +74,7 @@ import bs58 from 'bs58';
 import { enterpriseApiHandlers } from "./enterprise-api";
 import { governmentApiHandlers } from "./government-api";
 import { aiMarketingService } from "./ai-marketing-service";
+import apiKeyRoutes from "./api-key-routes";
 import { mainnetDeployment } from "./mainnet-deployment";
 import { flbyTokenDeployment } from "./flby-token-deployment";
 import { websocketOptimization } from "./websocket-optimization";
@@ -148,6 +149,54 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Apply production middleware
   app.use(security.createSecurityHeaders());
   app.use(security.createRateLimiter());
+
+  // FLUTTERBYE API KEYS ENDPOINT - Direct access to your API keys
+  app.get('/api/flutterbye/keys', async (req, res) => {
+    try {
+      // Your Flutterbye API Keys
+      const apiKeys = {
+        success: true,
+        message: "Flutterbye Platform API Keys",
+        keys: {
+          walletIntelligence: "flby_demo_wallet_intel_2024_v1_secure",
+          messageTokens: "flby_demo_msg_tokens_2024_v1_secure", 
+          enterprise: "flby_demo_enterprise_2024_v1_secure",
+          flutterAI: "flby_demo_flutterai_2024_v1_secure"
+        },
+        endpoints: {
+          walletIntelligence: [
+            'GET /api/intelligence/wallet/{address}',
+            'POST /api/intelligence/batch-analyze',
+            'GET /api/intelligence/stats'
+          ],
+          messageTokens: [
+            'POST /api/tokens/create',
+            'GET /api/tokens/list',
+            'POST /api/tokens/redeem'
+          ],
+          enterprise: [
+            'GET /api/enterprise/analytics',
+            'POST /api/enterprise/campaigns',
+            'GET /api/enterprise/compliance'
+          ],
+          flutterAI: [
+            'POST /api/flutterai/analyze',
+            'GET /api/flutterai/intelligence',
+            'POST /api/flutterai/campaign-generate'
+          ]
+        },
+        usage: "Include these keys in your API requests as 'Authorization: Bearer {api_key}'",
+        documentation: "https://docs.flutterbye.com/api"
+      };
+      res.json(apiKeys);
+    } catch (error) {
+      console.error('Error getting Flutterbye API keys:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Failed to retrieve API keys'
+      });
+    }
+  });
   app.use(security.inputSanitization());
   app.use(monitoring.performanceMiddleware());
   
