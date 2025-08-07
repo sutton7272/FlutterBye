@@ -507,7 +507,13 @@ export default function LaunchCountdown() {
                       <li>• Personal messages</li>
                     </ul>
                   </div>
-                  <Button className="w-full bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-500 hover:to-purple-500">
+                  <Button 
+                    className="w-full bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-500 hover:to-purple-500"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setLocation('/greeting-cards');
+                    }}
+                  >
                     Create Greeting Card
                   </Button>
                 </div>
@@ -536,7 +542,13 @@ export default function LaunchCountdown() {
                       <li>• Bulk token distribution</li>
                     </ul>
                   </div>
-                  <Button className="w-full bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-500 hover:to-cyan-500">
+                  <Button 
+                    className="w-full bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-500 hover:to-cyan-500"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setLocation('/enterprise');
+                    }}
+                  >
                     Launch Campaign
                   </Button>
                 </div>
@@ -565,7 +577,13 @@ export default function LaunchCountdown() {
                       <li>• Instant blockchain creation</li>
                     </ul>
                   </div>
-                  <Button className="w-full bg-gradient-to-r from-green-600 to-teal-600 hover:from-green-500 hover:to-teal-500">
+                  <Button 
+                    className="w-full bg-gradient-to-r from-green-600 to-teal-600 hover:from-green-500 hover:to-teal-500"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setLocation('/create');
+                    }}
+                  >
                     Create Token
                   </Button>
                 </div>
