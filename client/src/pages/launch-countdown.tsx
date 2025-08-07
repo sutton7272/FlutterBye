@@ -477,6 +477,103 @@ export default function LaunchCountdown() {
           </div>
         </div>
 
+        {/* Creation Hub Section */}
+        <div className="max-w-6xl mx-auto mb-12">
+          <div className="text-center mb-8">
+            <h2 className="text-2xl font-bold text-gradient mb-2">🎯 Creation Hub</h2>
+            <p className="text-muted-foreground">Choose your creation path and start building valuable tokens</p>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {/* Digital Greeting Card */}
+            <Card className="electric-frame cursor-pointer hover:scale-105 transition-transform duration-300" onClick={() => setLocation('/greeting-cards')}>
+              <CardHeader>
+                <CardTitle className="text-gradient flex items-center gap-2">
+                  <div className="w-6 h-6 text-pink-400">💌</div>
+                  Digital Greeting Card
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  <p className="text-sm text-muted-foreground">
+                    Create personalized greeting cards with tokenized messages and attach real value
+                  </p>
+                  <div className="bg-pink-500/10 border border-pink-500/20 rounded-lg p-3">
+                    <h4 className="font-medium text-pink-400 mb-1 text-sm">Features</h4>
+                    <ul className="text-xs text-muted-foreground space-y-1">
+                      <li>• Custom card designs</li>
+                      <li>• Scheduled delivery</li>
+                      <li>• Value attachment (SOL/USDC/FLBY)</li>
+                      <li>• Personal messages</li>
+                    </ul>
+                  </div>
+                  <Button className="w-full bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-500 hover:to-purple-500">
+                    Create Greeting Card
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Targeted Marketing */}
+            <Card className="electric-frame cursor-pointer hover:scale-105 transition-transform duration-300" onClick={() => setLocation('/enterprise')}>
+              <CardHeader>
+                <CardTitle className="text-gradient flex items-center gap-2">
+                  <div className="w-6 h-6 text-blue-400">🎯</div>
+                  Targeted Marketing
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  <p className="text-sm text-muted-foreground">
+                    Launch precision marketing campaigns targeting specific crypto holder segments
+                  </p>
+                  <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-3">
+                    <h4 className="font-medium text-blue-400 mb-1 text-sm">Features</h4>
+                    <ul className="text-xs text-muted-foreground space-y-1">
+                      <li>• AI-powered targeting</li>
+                      <li>• Cross-chain intelligence</li>
+                      <li>• Campaign analytics</li>
+                      <li>• Bulk token distribution</li>
+                    </ul>
+                  </div>
+                  <Button className="w-full bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-500 hover:to-cyan-500">
+                    Launch Campaign
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Token Creation Center */}
+            <Card className="electric-frame cursor-pointer hover:scale-105 transition-transform duration-300" onClick={() => setLocation('/create')}>
+              <CardHeader>
+                <CardTitle className="text-gradient flex items-center gap-2">
+                  <Coins className="w-6 h-6 text-green-400" />
+                  Token Creation Center
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  <p className="text-sm text-muted-foreground">
+                    Create custom 27-character message tokens with value attachment capabilities
+                  </p>
+                  <div className="bg-green-500/10 border border-green-500/20 rounded-lg p-3">
+                    <h4 className="font-medium text-green-400 mb-1 text-sm">Features</h4>
+                    <ul className="text-xs text-muted-foreground space-y-1">
+                      <li>• Custom message tokens</li>
+                      <li>• Multi-currency support</li>
+                      <li>• Burn-to-redeem mechanism</li>
+                      <li>• Instant blockchain creation</li>
+                    </ul>
+                  </div>
+                  <Button className="w-full bg-gradient-to-r from-green-600 to-teal-600 hover:from-green-500 hover:to-teal-500">
+                    Create Token
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+
         {/* Three Column Info Section */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 max-w-7xl mx-auto mb-8">
           {/* Left Column: VIP Signup */}
