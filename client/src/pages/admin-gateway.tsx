@@ -215,7 +215,7 @@ export default function AdminGateway() {
           <p className="text-slate-300">Central hub for all administrative functions</p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-6">
           {/* Unified Admin Dashboard */}
           <Link href="/admin/dashboard">
             <Card className="bg-slate-800/50 border-blue-500/20 hover:border-blue-400/40 transition-all cursor-pointer group">
