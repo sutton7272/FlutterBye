@@ -63,20 +63,20 @@ interface TutorialStep {
 const TUTORIAL_STEPS: TutorialStep[] = [
   {
     id: 1,
-    title: "🧠 AI Wallet Analysis",
-    description: "AI analyzes wallets to reveal trading patterns and risk levels.",
+    title: "🧠 Wallet Intelligence Scanning",
+    description: "REVOLUTIONARY AI that instantly analyzes any Solana wallet and reveals hidden patterns, risk levels, trading behaviors, and wealth indicators. See what others can't see - from whale activity to diamond hands detection!",
     icon: <Brain className="w-6 h-6 text-purple-400" />,
     category: 'intelligence',
     demo: async () => apiRequest('POST', '/api/flutterai/analyze-wallet', { 
       walletAddress: '5tzFkiKscXHK5ZXCGbXZxdw7gTjjD1mBwuoFbhUvuAi9' 
     }),
     interactionType: 'analyze',
-    expectedResult: "Wallet analysis complete: Risk scoring, trading patterns, and behavioral insights revealed."
+    expectedResult: "Complete wallet X-ray vision: AI behavioral scoring, risk assessment, trading patterns, wealth indicators, and hidden insights that reveal the true story behind every wallet"
   },
   {
     id: 2,
-    title: "✨ Content Optimization",
-    description: "AI optimizes content for maximum viral engagement.",
+    title: "✨ Content Optimization Engine",
+    description: "MIND-BLOWING AI that transforms boring text into VIRAL GOLD! Our GPT-4o engine doesn't just rewrite - it predicts virality, optimizes for engagement, and creates content that spreads like wildfire across social media!",
     icon: <Wand2 className="w-6 h-6 text-blue-400" />,
     category: 'content',
     demo: async () => apiRequest('POST', '/api/ai/optimize-content', {
@@ -84,17 +84,73 @@ const TUTORIAL_STEPS: TutorialStep[] = [
       constraints: { maxLength: 27, tone: 'viral', platform: 'twitter' }
     }),
     interactionType: 'type',
-    expectedResult: "Content optimized: Viral scoring, hashtag suggestions, and engagement predictions provided."
+    expectedResult: "VIRAL-OPTIMIZED content with engagement predictions, hashtag recommendations, and psychological triggers that make people WANT to share, like, and engage!"
   },
   {
     id: 3,
-    title: "📈 Market Intelligence",
-    description: "AI monitors market data and sentiment for trend predictions.",
+    title: "📈 Real-Time Market Intelligence",
+    description: "CRYSTAL BALL FOR CRYPTO! Our AI continuously monitors 1000+ data sources, social sentiment, whale movements, and market patterns to predict price movements before they happen. It's like having insider knowledge, but totally legal!",
     icon: <TrendingUp className="w-6 h-6 text-green-400" />,
     category: 'analytics',
     demo: async () => apiRequest('GET', '/api/flutterai/market-intelligence'),
     interactionType: 'watch',
-    expectedResult: "Market analysis complete: Sentiment tracking, price predictions, and trend forecasting ready."
+    expectedResult: "FUTURE-SEEING market intelligence: Live sentiment analysis, whale tracking, price predictions, trend forecasting, and early warning signals for market moves"
+  },
+  {
+    id: 4,
+    title: "🛡️ Security Threat Detection",
+    description: "BULLETPROOF PROTECTION! Our AI security system works like a digital bodyguard, scanning for threats, detecting scams, monitoring suspicious activity, and protecting your assets 24/7. Sleep peacefully knowing AI is watching your back!",
+    icon: <Shield className="w-6 h-6 text-red-400" />,
+    category: 'security',
+    demo: async () => apiRequest('GET', '/api/flutterai/security-scan'),
+    interactionType: 'click',
+    expectedResult: "FORTRESS-LEVEL security analysis: Threat detection, vulnerability scanning, scam identification, risk assessment, and personalized security recommendations"
+  },
+  {
+    id: 5,
+    title: "💰 Revenue Optimization AI",
+    description: "MONEY-MAKING MACHINE! This AI doesn't just suggest prices - it MAXIMIZES your revenue by analyzing market psychology, competitor pricing, demand patterns, and user behavior to find the PERFECT price that maximizes profits!",
+    icon: <DollarSign className="w-6 h-6 text-yellow-400" />,
+    category: 'revenue',
+    demo: async () => apiRequest('GET', '/api/flutterai/pricing/analytics'),
+    interactionType: 'analyze',
+    expectedResult: "PROFIT-MAXIMIZING insights: Dynamic pricing optimization, revenue projections, market positioning, competitive analysis, and personalized pricing strategies"
+  },
+  {
+    id: 6,
+    title: "🌐 Social Intelligence Engine",
+    description: "VIRAL PREDICTION SUPERPOWER! This AI analyzes social patterns, emotional triggers, trending topics, and audience psychology to predict what will go viral BEFORE it happens. Create content that explodes across the internet!",
+    icon: <Users className="w-6 h-6 text-indigo-400" />,
+    category: 'intelligence',
+    demo: async () => apiRequest('POST', '/api/ai/social-analysis', {
+      content: "gm frens, new token launch tomorrow 🚀",
+      platform: 'twitter'
+    }),
+    interactionType: 'type',
+    expectedResult: "VIRAL PREDICTION ENGINE: Virality scores, audience psychology insights, emotional trigger analysis, optimal posting times, and viral acceleration strategies"
+  },
+  {
+    id: 7,
+    title: "🎯 Predictive Analytics Suite",
+    description: "TIME MACHINE FOR CRYPTO! Using quantum-inspired algorithms and deep learning, this AI sees into the future of crypto trends, market movements, and emerging opportunities. It's like having a crystal ball for blockchain!",
+    icon: <Target className="w-6 h-6 text-pink-400" />,
+    category: 'analytics',
+    demo: async () => apiRequest('GET', '/api/flutterai/predictive-analytics'),
+    interactionType: 'watch',
+    expectedResult: "FUTURE-SIGHT analytics: Trend predictions, market forecasts, opportunity identification, risk assessment, and strategic recommendations for maximum gains"
+  },
+  {
+    id: 8,
+    title: "🤖 Conversational AI ARIA",
+    description: "YOUR GENIUS AI COMPANION! ARIA isn't just a chatbot - she's a blockchain expert, marketing strategist, and creative genius rolled into one. Ask her anything and watch her create marketing campaigns, solve problems, and generate brilliant ideas!",
+    icon: <MessageCircle className="w-6 h-6 text-cyan-400" />,
+    category: 'content',
+    demo: async () => apiRequest('POST', '/api/ai/aria/chat', {
+      message: "Help me create a viral token campaign",
+      context: "marketing"
+    }),
+    interactionType: 'type',
+    expectedResult: "GENIUS-LEVEL conversation: Strategic marketing plans, creative campaign ideas, problem-solving insights, and actionable strategies that actually work!"
   }
 ];
 
@@ -631,16 +687,58 @@ export function FlutterAIInteractiveTutorial() {
           </Button>
         </div>
 
-        {/* Tutorial Steps */}
+        {/* Current Step Display */}
         <div className="space-y-4">
-          <div className="flex items-center gap-2 mb-4">
-            <Rocket className="w-5 h-5 text-electric-blue" />
-            <h3 className="text-lg font-semibold text-white">
-              Interactive AI Demonstrations
-            </h3>
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2">
+              <Rocket className="w-5 h-5 text-electric-blue" />
+              <h3 className="text-lg font-semibold text-white">
+                Interactive AI Demonstrations
+              </h3>
+            </div>
+            <div className="flex items-center gap-2">
+              <Button
+                onClick={() => setCurrentStep(Math.max(0, currentStep - 1))}
+                disabled={currentStep === 0 || isPlaying}
+                variant="outline"
+                size="sm"
+                className="border-purple-500/30 text-purple-400 hover:bg-purple-500/10"
+              >
+                ← Previous
+              </Button>
+              <Button
+                onClick={() => setCurrentStep(Math.min(TUTORIAL_STEPS.length - 1, currentStep + 1))}
+                disabled={currentStep === TUTORIAL_STEPS.length - 1 || isPlaying}
+                variant="outline"
+                size="sm"
+                className="border-purple-500/30 text-purple-400 hover:bg-purple-500/10"
+              >
+                Next →
+              </Button>
+            </div>
           </div>
           
-          {TUTORIAL_STEPS.map((step, index) => renderStepCard(step, index))}
+          {/* Show only current step */}
+          {renderStepCard(TUTORIAL_STEPS[currentStep], currentStep)}
+          
+          {/* Step indicators */}
+          <div className="flex justify-center items-center gap-2 mt-4">
+            {TUTORIAL_STEPS.map((_, index) => (
+              <button
+                key={index}
+                onClick={() => !isPlaying && setCurrentStep(index)}
+                disabled={isPlaying}
+                className={`w-3 h-3 rounded-full transition-all duration-300 ${
+                  index === currentStep
+                    ? 'bg-electric-blue scale-125'
+                    : completedSteps.has(TUTORIAL_STEPS[index].id)
+                    ? 'bg-green-400'
+                    : 'bg-gray-600 hover:bg-gray-500'
+                }`}
+                title={TUTORIAL_STEPS[index].title}
+              />
+            ))}
+          </div>
         </div>
 
         {/* Summary */}
