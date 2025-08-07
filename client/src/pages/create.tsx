@@ -16,12 +16,13 @@ import {
 } from "lucide-react";
 
 export default function Create() {
+  console.log("CREATE PAGE LOADING - NEW VERSION");
   return (
     <div className="min-h-screen pt-20 pb-12">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12">
           <h1 className="text-5xl font-bold mb-6 text-gradient">Flutterbye Creation Hub</h1>
-          <p className="text-xl text-muted-foreground mb-8">The ultimate blockchain creation platform</p>
+          <p className="text-xl text-muted-foreground mb-8">Revolutionary blockchain creation platform featuring Flutterbye Coins and FlutterArt</p>
         </div>
 
         {/* Main Creation Cards */}
