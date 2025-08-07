@@ -73,6 +73,7 @@ import AdminMarketingGrowth from "@/pages/admin-marketing-growth";
 import TokenHolderMapPage from "@/pages/token-holder-map";
 import CollaborativeCreation from "@/pages/collaborative-creation";
 import FlutterAIDashboard from "@/pages/flutterai-dashboard";
+import MultiChainDashboard from "@/pages/MultiChainDashboard";
 import FlutterAIUser from "@/pages/flutterai-user";
 import EnterpriseDashboard from "@/pages/enterprise-dashboard";
 import ViralDashboard from "@/pages/viral-dashboard";
@@ -623,6 +624,12 @@ function Router() {
           <>
             <Navbar />
             <FlutterAIDashboard />
+          </>
+        )} />
+        <Route path="/multi-chain" component={() => (
+          <>
+            <Navbar />
+            <MultiChainDashboard />
           </>
         )} />
         <Route path="/flutterai-dashboard" component={() => (
