@@ -3,7 +3,8 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { WalletConnect } from "@/components/wallet-connect";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { Menu, Home, Coins, Trophy, Users, MessageSquare, Settings, Sparkles, Zap, Heart, Building2, MapPin, Activity, Gift, Award, Star, Ticket, HelpCircle, LayoutDashboard, Brain, CreditCard, Stars, DollarSign, Code2, Rocket, ArrowRightLeft, Target, Shield } from "lucide-react";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { Menu, Home, Coins, Trophy, Users, MessageSquare, Settings, Sparkles, Zap, Heart, Building2, MapPin, Activity, Gift, Award, Star, Ticket, HelpCircle, LayoutDashboard, Brain, CreditCard, Stars, DollarSign, Code2, Rocket, ArrowRightLeft, Target, Shield, Palette, Waves, Send } from "lucide-react";
 
 import { useFeatureToggles } from "@/hooks/useFeatureToggles";
 import { MobileNavigation } from "@/components/mobile-navigation";
@@ -11,6 +12,7 @@ import { MobileNavigation } from "@/components/mobile-navigation";
 export default function Navbar() {
   const [location] = useLocation();
   const [isOpen, setIsOpen] = useState(false);
+  const [activeProductTab, setActiveProductTab] = useState("flutterbye");
   const { isFeatureEnabled, isLoading: featuresLoading } = useFeatureToggles();
 
   // Primary navigation - core platform sections focused on launch products
@@ -74,6 +76,89 @@ export default function Navbar() {
               Flutterbye
             </span>
           </Link>
+        </div>
+
+        {/* Product Development Tabs - Desktop */}
+        <div className="hidden md:flex items-center space-x-4 flex-1">
+          <Tabs value={activeProductTab} onValueChange={setActiveProductTab} className="w-auto">
+            <TabsList className="bg-slate-800/50 border border-electric-blue/30 electric-glow">
+              <TabsTrigger 
+                value="flutterbye" 
+                className="data-[state=active]:bg-electric-blue data-[state=active]:text-white text-slate-300 hover:text-white transition-all duration-200"
+              >
+                <Send className="h-4 w-4 mr-2" />
+                Flutterbye
+              </TabsTrigger>
+              <TabsTrigger 
+                value="flutterart" 
+                className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-600 data-[state=active]:to-pink-600 data-[state=active]:text-white text-slate-300 hover:text-white transition-all duration-200"
+              >
+                <Palette className="h-4 w-4 mr-2" />
+                FlutterArt
+              </TabsTrigger>
+              <TabsTrigger 
+                value="flutterwave" 
+                className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-cyan-600 data-[state=active]:text-white text-slate-300 hover:text-white transition-all duration-200"
+              >
+                <Waves className="h-4 w-4 mr-2" />
+                FlutterWave
+              </TabsTrigger>
+            </TabsList>
+          </Tabs>
+          
+          {/* Quick Action Buttons */}
+          <div className="flex items-center space-x-2">
+            {activeProductTab === "flutterbye" && (
+              <>
+                <Link href="/create">
+                  <Button size="sm" variant="outline" className="border-electric-blue/50 hover:bg-electric-blue/20">
+                    <Coins className="h-4 w-4 mr-2" />
+                    Create Token
+                  </Button>
+                </Link>
+                <Link href="/enterprise-campaigns">
+                  <Button size="sm" variant="outline" className="border-electric-blue/50 hover:bg-electric-blue/20">
+                    <Target className="h-4 w-4 mr-2" />
+                    Campaign
+                  </Button>
+                </Link>
+              </>
+            )}
+            
+            {activeProductTab === "flutterart" && (
+              <>
+                <Link href="/flutter-art">
+                  <Button size="sm" variant="outline" className="border-purple-500/50 hover:bg-purple-500/20">
+                    <Palette className="h-4 w-4 mr-2" />
+                    Create Art
+                  </Button>
+                </Link>
+                <Link href="/mint/multimedia">
+                  <Button size="sm" variant="outline" className="border-purple-500/50 hover:bg-purple-500/20">
+                    <Sparkles className="h-4 w-4 mr-2" />
+                    AI Generate
+                  </Button>
+                </Link>
+              </>
+            )}
+            
+            {activeProductTab === "flutterwave" && (
+              <>
+                <Link href="/flutter-wave">
+                  <Button size="sm" variant="outline" className="border-cyan-500/50 hover:bg-cyan-500/20">
+                    <Waves className="h-4 w-4 mr-2" />
+                    Send SMS
+                  </Button>
+                </Link>
+                <Link href="/sms-integration">
+                  <Button size="sm" variant="outline" className="border-cyan-500/50 hover:bg-cyan-500/20">
+                    <MessageSquare className="h-4 w-4 mr-2" />
+                    Integrate
+                  </Button>
+                </Link>
+              </>
+            )}
+          </div>
         </div>
 
         {/* Primary Navigation - Desktop */}
@@ -163,6 +248,105 @@ export default function Navbar() {
               </span>
             </Link>
             <nav className="flex flex-col space-y-2">
+              {/* Product Creation Section */}
+              <div className="mb-4">
+                <h3 className="text-sm font-medium text-slate-400 mb-3 px-2">Product Creation</h3>
+                
+                {/* Flutterbye Section */}
+                <div className="mb-3">
+                  <div className="text-xs font-medium text-electric-blue mb-2 px-2 flex items-center">
+                    <Send className="h-3 w-3 mr-1" />
+                    Flutterbye - Message Tokens
+                  </div>
+                  <div className="space-y-1">
+                    <Link href="/create">
+                      <Button
+                        variant="ghost"
+                        className="w-full justify-start h-10 text-text-secondary hover:text-text-primary hover:bg-electric-blue/20"
+                        onClick={() => setIsOpen(false)}
+                      >
+                        <Coins className="h-4 w-4 mr-3" />
+                        Create Message Token
+                      </Button>
+                    </Link>
+                    <Link href="/enterprise-campaigns">
+                      <Button
+                        variant="ghost"
+                        className="w-full justify-start h-10 text-text-secondary hover:text-text-primary hover:bg-electric-blue/20"
+                        onClick={() => setIsOpen(false)}
+                      >
+                        <Target className="h-4 w-4 mr-3" />
+                        Marketing Campaign
+                      </Button>
+                    </Link>
+                  </div>
+                </div>
+
+                {/* FlutterArt Section */}
+                <div className="mb-3">
+                  <div className="text-xs font-medium text-purple-400 mb-2 px-2 flex items-center">
+                    <Palette className="h-3 w-3 mr-1" />
+                    FlutterArt - Digital Art
+                  </div>
+                  <div className="space-y-1">
+                    <Link href="/flutter-art">
+                      <Button
+                        variant="ghost"
+                        className="w-full justify-start h-10 text-text-secondary hover:text-text-primary hover:bg-purple-500/20"
+                        onClick={() => setIsOpen(false)}
+                      >
+                        <Palette className="h-4 w-4 mr-3" />
+                        Create Digital Art
+                      </Button>
+                    </Link>
+                    <Link href="/mint/multimedia">
+                      <Button
+                        variant="ghost"
+                        className="w-full justify-start h-10 text-text-secondary hover:text-text-primary hover:bg-purple-500/20"
+                        onClick={() => setIsOpen(false)}
+                      >
+                        <Sparkles className="h-4 w-4 mr-3" />
+                        AI Art Generator
+                      </Button>
+                    </Link>
+                  </div>
+                </div>
+
+                {/* FlutterWave Section */}
+                <div className="mb-4">
+                  <div className="text-xs font-medium text-cyan-400 mb-2 px-2 flex items-center">
+                    <Waves className="h-3 w-3 mr-1" />
+                    FlutterWave - SMS Integration
+                  </div>
+                  <div className="space-y-1">
+                    <Link href="/flutter-wave">
+                      <Button
+                        variant="ghost"
+                        className="w-full justify-start h-10 text-text-secondary hover:text-text-primary hover:bg-cyan-500/20"
+                        onClick={() => setIsOpen(false)}
+                      >
+                        <Waves className="h-4 w-4 mr-3" />
+                        Send SMS Token
+                      </Button>
+                    </Link>
+                    <Link href="/sms-integration">
+                      <Button
+                        variant="ghost"
+                        className="w-full justify-start h-10 text-text-secondary hover:text-text-primary hover:bg-cyan-500/20"
+                        onClick={() => setIsOpen(false)}
+                      >
+                        <MessageSquare className="h-4 w-4 mr-3" />
+                        SMS Integration
+                      </Button>
+                    </Link>
+                  </div>
+                </div>
+              </div>
+
+              {/* Divider */}
+              <div className="border-t border-border/30 my-3" />
+              
+              {/* Standard Navigation */}
               {primaryNavItems.map((item) => (
                 <Link key={item.href} href={item.href}>
                   <Button
