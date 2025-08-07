@@ -15,10 +15,11 @@ export default function Navbar() {
 
   // Primary navigation - core platform sections focused on launch products
   const allNavItems = [
-    { href: "/create", label: "Create", icon: Coins, description: "27-character message tokens", featureId: "mint", priority: true },
+    { href: "/create", label: "FlutterbyeMSG", icon: MessageSquare, description: "27-character message tokens with value", featureId: "mint", priority: true },
+    { href: "/flutter-art", label: "FlutterArt", icon: Sparkles, description: "NFT message tokens & visual messages", featureId: "flutter_art", priority: true },
+    { href: "/flutter-wave", label: "FlutterWave", icon: Zap, description: "SMS-to-blockchain emotional tokens", featureId: "flutter_wave", priority: true },
     { href: "/flutterai", label: "FlutterAI", icon: Brain, description: "Wallet intelligence & targeting", special: true, featureId: "flutterai", priority: true },
     { href: "/redeem", label: "Redeem", icon: Gift, description: "Discover & redeem message tokens", featureId: "marketplace", priority: true },
-    { href: "/flutter-art", label: "FlutterArt", icon: Sparkles, description: "NFT message tokens", featureId: "flutter_art" },
     { href: "/mint/greeting", label: "Greeting", icon: Heart, description: "Create greeting message tokens", featureId: "mint" },
     { href: "/enterprise-campaigns", label: "Marketing", icon: Target, description: "Enterprise marketing campaigns", featureId: "enterprise" },
     { href: "/intelligence", label: "AI Hub", icon: Brain, description: "AI intelligence and analytics", featureId: "intelligence" },
