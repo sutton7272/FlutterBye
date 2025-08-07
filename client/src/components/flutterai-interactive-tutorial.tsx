@@ -595,145 +595,137 @@ export function FlutterAIInteractiveTutorial() {
   };
 
   return (
-    <Card className="bg-black/60 border-electric-blue/30 backdrop-blur-lg">
-      <CardHeader className="pb-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="relative">
-              <Brain className="w-8 h-8 text-electric-blue animate-pulse" />
-              <Sparkles className="w-4 h-4 text-purple-400 absolute -top-1 -right-1 animate-bounce" />
-            </div>
-            <div>
-              <CardTitle className="text-3xl font-bold bg-gradient-to-r from-electric-blue to-purple-400 bg-clip-text text-transparent">
-                🚀 FlutterAI: The Future is HERE!
-              </CardTitle>
-              <p className="text-gray-300 text-base mt-2 font-medium">
-                Experience REVOLUTIONARY AI that will blow your mind! 🤯 Watch as our GPT-4o powered intelligence transforms blockchain forever.
-              </p>
-              <p className="text-electric-blue text-sm mt-1 font-medium animate-pulse">
-                ⚡ This isn't just a demo - it's a glimpse into the AI-powered future of crypto! ⚡
-              </p>
-            </div>
+    <Card className="electric-frame relative overflow-hidden">
+      <div className="absolute inset-0 bg-gradient-to-br from-purple/5 via-electric-blue/5 to-pink/5 pointer-events-none"></div>
+      <CardHeader className="pb-3 relative">
+        <CardTitle className="text-gradient text-lg flex items-center gap-2">
+          <div className="p-2 rounded-lg bg-gradient-to-br from-purple/20 to-electric-blue/20">
+            <Brain className="w-4 h-4 text-purple-400" />
           </div>
-          <div className="flex items-center gap-2">
-            <Badge className="bg-electric-blue/20 text-electric-blue border-electric-blue/30 px-3 py-1">
-              🧠 GPT-4o Powered
-            </Badge>
-            <Badge className="bg-purple-500/20 text-purple-400 border-purple-500/30 px-3 py-1">
-              ⚡ Live Demo
-            </Badge>
-          </div>
-        </div>
-        
-        {/* Progress Bar */}
-        <div className="space-y-2">
-          <div className="flex items-center justify-between text-sm">
-            <span className="text-gray-400">Tutorial Progress</span>
-            <span className="text-electric-blue font-medium">{Math.round(progress)}% Complete</span>
-          </div>
-          <Progress 
-            value={progress} 
-            className="h-2 bg-black/40"
-          />
-          <div className="flex items-center justify-between text-xs text-gray-500">
-            <span>{completedSteps.size} of {TUTORIAL_STEPS.length} demos completed</span>
-            <span>Step {currentStep + 1} of {TUTORIAL_STEPS.length}</span>
-          </div>
-        </div>
+          FlutterAI: The Future is HERE!
+          <Badge className="bg-purple/20 text-purple-400 text-xs ml-auto">
+            8 AI demos
+          </Badge>
+        </CardTitle>
       </CardHeader>
-
-      <CardContent className="space-y-6">
-        {/* Control Buttons */}
-        <div className="flex items-center justify-center gap-3">
-          <Button
-            onClick={playTutorial}
-            disabled={isPlaying}
-            className="bg-gradient-to-r from-green-500 to-teal-500 text-white hover:from-green-600 hover:to-teal-600"
-          >
-            <Play className="w-4 h-4 mr-2" />
-            {isPlaying ? 'Playing...' : 'Start Auto Demo'}
-          </Button>
-          
-          <Button
-            onClick={pauseTutorial}
-            disabled={!isPlaying}
-            variant="outline"
-            className="border-yellow-500/30 text-yellow-400 hover:bg-yellow-500/10"
-          >
-            <Pause className="w-4 h-4 mr-2" />
-            Pause
-          </Button>
-          
-          <Button
-            onClick={resetTutorial}
-            variant="outline"
-            className="border-purple-500/30 text-purple-400 hover:bg-purple-500/10"
-          >
-            <RotateCcw className="w-4 h-4 mr-2" />
-            Reset
-          </Button>
-
-          <Button
-            onClick={() => executeStep(currentStep)}
-            disabled={isLoading}
-            className="bg-gradient-to-r from-purple-500 to-blue-500 text-white hover:from-purple-600 hover:to-blue-600"
-          >
-            {isLoading ? (
-              <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
-            ) : (
-              <Zap className="w-4 h-4 mr-2" />
-            )}
-            {isLoading ? 'Running...' : 'Run Current Step'}
-          </Button>
-        </div>
-
-        {/* Tutorial Steps */}
+      <CardContent className="relative">
         <div className="space-y-4">
-          <div className="flex items-center gap-2 mb-4">
-            <Rocket className="w-5 h-5 text-electric-blue" />
-            <h3 className="text-lg font-semibold text-white">
-              Interactive AI Demonstrations
-            </h3>
+          <div className="text-center">
+            <h4 className="text-sm font-semibold text-white mb-2">
+              🧠 Experience REVOLUTIONARY AI Intelligence
+            </h4>
+            <p className="text-xs text-muted-foreground mb-3">
+              GPT-4o powered intelligence that transforms blockchain forever with wallet analysis, content optimization, and predictive analytics
+            </p>
           </div>
-          
-          {TUTORIAL_STEPS.map((step, index) => renderStepCard(step, index))}
-        </div>
 
-        {/* Summary */}
-        {completedSteps.size > 0 && (
-          <Card className="bg-gradient-to-r from-electric-blue/10 to-purple-500/10 border-electric-blue/30">
-            <CardHeader>
-              <CardTitle className="text-white flex items-center gap-2">
-                <Crown className="w-5 h-5 text-yellow-400" />
-                FlutterAI Capabilities Summary
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-purple-400">{completedSteps.size}</div>
-                  <div className="text-sm text-gray-400">Demos Completed</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-blue-400">8+</div>
-                  <div className="text-sm text-gray-400">AI Features</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-green-400">∞</div>
-                  <div className="text-sm text-gray-400">Possibilities</div>
-                </div>
+          {/* AI Features Preview */}
+          <div className="grid grid-cols-2 gap-2 text-xs">
+            <div className="bg-slate-800/50 rounded-lg p-2 border border-purple/20">
+              <div className="flex items-center gap-1 mb-1">
+                <Brain className="w-3 h-3 text-purple-400" />
+                <span className="font-medium text-purple-400">Wallet Intelligence</span>
               </div>
+              <p className="text-muted-foreground text-xs">AI wallet scoring</p>
+            </div>
+            
+            <div className="bg-slate-800/50 rounded-lg p-2 border border-electric-blue/20">
+              <div className="flex items-center gap-1 mb-1">
+                <Wand2 className="w-3 h-3 text-electric-blue" />
+                <span className="font-medium text-electric-blue">Content Engine</span>
+              </div>
+              <p className="text-muted-foreground text-xs">Viral optimization</p>
+            </div>
+            
+            <div className="bg-slate-800/50 rounded-lg p-2 border border-green/20">
+              <div className="flex items-center gap-1 mb-1">
+                <TrendingUp className="w-3 h-3 text-green-400" />
+                <span className="font-medium text-green-400">Market Intel</span>
+              </div>
+              <p className="text-muted-foreground text-xs">Price predictions</p>
+            </div>
+            
+            <div className="bg-slate-800/50 rounded-lg p-2 border border-red/20">
+              <div className="flex items-center gap-1 mb-1">
+                <Shield className="w-3 h-3 text-red-400" />
+                <span className="font-medium text-red-400">Security AI</span>
+              </div>
+              <p className="text-muted-foreground text-xs">Threat detection</p>
+            </div>
+          </div>
+
+          {/* What You'll Experience */}
+          <div className="bg-slate-900/50 rounded-lg p-3 border border-slate-700">
+            <h5 className="text-xs font-semibold text-white mb-2">AI Capabilities You'll Experience:</h5>
+            <ul className="text-xs text-muted-foreground space-y-1">
+              <li>• Revolutionary wallet intelligence and behavioral analysis</li>
+              <li>• Content optimization that predicts viral potential</li>
+              <li>• Real-time market intelligence and price predictions</li>
+              <li>• Advanced security threat detection and protection</li>
+              <li>• Revenue optimization using market psychology</li>
+            </ul>
+          </div>
+
+          {/* Progress */}
+          {completedSteps.size > 0 && (
+            <div className="bg-purple/10 rounded-lg p-2 border border-purple/20">
+              <div className="flex items-center justify-between text-xs mb-1">
+                <span className="text-gray-400">Progress</span>
+                <span className="text-purple-400 font-medium">{Math.round(progress)}% Complete</span>
+              </div>
+              <Progress value={progress} className="h-1.5 bg-black/40" />
+              <div className="text-xs text-gray-500 mt-1">
+                {completedSteps.size} of 8 AI demos completed
+              </div>
+            </div>
+          )}
+
+          {/* CTA Button */}
+          <div className="pt-2">
+            <Button
+              onClick={playTutorial}
+              disabled={isPlaying}
+              className="bg-gradient-to-r from-purple-500 to-electric-blue hover:from-purple-500/80 hover:to-electric-blue/80 text-white px-4 py-2 text-sm w-full flex items-center justify-center gap-2 shadow-lg"
+              variant="default"
+            >
+              <Play className="w-4 h-4" />
+              {isPlaying ? 'Running AI Demo...' : 'Start AI Intelligence Demo'}
+            </Button>
+          </div>
+
+          {/* Quick Control Buttons */}
+          {(isPlaying || completedSteps.size > 0) && (
+            <div className="flex justify-center gap-2 pt-1">
+              <Button
+                onClick={pauseTutorial}
+                disabled={!isPlaying}
+                size="sm"
+                variant="outline"
+                className="border-yellow-500/30 text-yellow-400 hover:bg-yellow-500/10 text-xs px-2 py-1"
+              >
+                <Pause className="w-3 h-3 mr-1" />
+                Pause
+              </Button>
               
-              <div className="mt-4 p-3 bg-black/20 rounded-lg">
-                <p className="text-white text-sm text-center">
-                  🚀 <strong>FlutterAI</strong> is the world's most advanced blockchain AI platform, 
-                  featuring real-time intelligence, predictive analytics, and revolutionary automation. 
-                  Experience the future of Web3 communication today!
-                </p>
-              </div>
-            </CardContent>
-          </Card>
-        )}
+              <Button
+                onClick={resetTutorial}
+                size="sm"
+                variant="outline"
+                className="border-gray-500/30 text-gray-400 hover:bg-gray-500/10 text-xs px-2 py-1"
+              >
+                <RotateCcw className="w-3 h-3 mr-1" />
+                Reset
+              </Button>
+            </div>
+          )}
+
+          {/* Stats */}
+          <div className="flex justify-center gap-4 text-xs text-muted-foreground pt-2 border-t border-slate-700">
+            <span>🧠 8 AI systems</span>
+            <span>⚡ Live demos</span>
+            <span>🚀 Future ready</span>
+          </div>
+        </div>
       </CardContent>
     </Card>
   );
