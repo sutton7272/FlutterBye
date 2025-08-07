@@ -13,8 +13,6 @@ import {
   Zap,
   Palette,
   Image,
-  Mic,
-  Users,
   Waves,
   Heart,
   Globe,
@@ -28,34 +26,31 @@ export default function Create() {
     <div className="min-h-screen pt-20 pb-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12">
-          <h1 className="text-5xl font-bold mb-6 text-gradient">Flutterbye Creation Hub ✨ UPDATED</h1>
-          <div className="w-16 h-16 mx-auto mb-4 bg-red-500 animate-pulse rounded-full flex items-center justify-center">
-            <span className="text-white font-bold">NEW</span>
-          </div>
+          <h1 className="text-5xl font-bold mb-6 text-gradient">Flutterbye Creation Hub</h1>
           <p className="text-xl text-muted-foreground mb-8">Revolutionary blockchain creation platform for Web3 communication</p>
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-3 mb-8">
+          <TabsList className="grid w-full grid-cols-3 mb-8 h-16">
             <TabsTrigger 
               value="flutterbye-coins" 
-              className="flex items-center gap-2 text-lg py-3"
+              className="flex items-center gap-2 text-lg py-4 h-full"
             >
-              <Coins className="w-5 h-5" />
+              <Coins className="w-6 h-6" />
               Flutterbye Coins
             </TabsTrigger>
             <TabsTrigger 
               value="flutter-art" 
-              className="flex items-center gap-2 text-lg py-3"
+              className="flex items-center gap-2 text-lg py-4 h-full"
             >
-              <Palette className="w-5 h-5" />
+              <Palette className="w-6 h-6" />
               FlutterArt
             </TabsTrigger>
             <TabsTrigger 
               value="flutter-wave" 
-              className="flex items-center gap-2 text-lg py-3"
+              className="flex items-center gap-2 text-lg py-4 h-full"
             >
-              <Waves className="w-5 h-5" />
+              <Waves className="w-6 h-6" />
               FlutterWave
             </TabsTrigger>
           </TabsList>
