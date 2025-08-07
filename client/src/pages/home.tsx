@@ -16,7 +16,7 @@ import { ErrorBoundary } from "@/components/error-boundary";
 import { LoadingState } from "@/components/loading-state";
 import { ViralGrowthAccelerator } from "@/components/viral-growth-accelerator";
 import { MobileOnboardingWizard } from "@/components/mobile-onboarding-wizard";
-import { BlogShowcase } from "@/components/blog-showcase";
+
 import { usePerformance } from "@/hooks/use-performance";
 import { useState, useEffect } from "react";
 
@@ -33,6 +33,7 @@ export default function Home() {
   const performanceMetrics = usePerformance();
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const [demoMode, setDemoMode] = useState(false);
   
   // Detect mobile device and first-time user
   useEffect(() => {
@@ -356,24 +357,27 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Viral Growth Accelerator - Mobile Priority */}
-        <div className="mb-16">
-          <ViralGrowthAccelerator />
-        </div>
+        {/* Demo Components - Hidden by default, shown only during active demos */}
+        <div id="demo-section" className={demoMode ? "block" : "hidden"}>
+          {/* Viral Growth Accelerator - Mobile Priority */}
+          <div className="mb-16">
+            <ViralGrowthAccelerator />
+          </div>
 
-        {/* Interactive Stats Dashboard */}
-        <div className="mb-16">
-          <InteractiveStatsDashboard />
-        </div>
+          {/* Interactive Stats Dashboard */}
+          <div className="mb-16">
+            <InteractiveStatsDashboard />
+          </div>
 
-        {/* NFT Portfolio Quick View */}
-        <div className="mb-16">
-          <NFTPortfolioQuickView />
-        </div>
+          {/* NFT Portfolio Quick View */}
+          <div className="mb-16">
+            <NFTPortfolioQuickView />
+          </div>
 
-        {/* Quick Actions Panel */}
-        <div className="mb-16">
-          <QuickActionPanel />
+          {/* Quick Actions Panel */}
+          <div className="mb-16">
+            <QuickActionPanel />
+          </div>
         </div>
 
         {/* Engagement Features */}
@@ -529,8 +533,61 @@ export default function Home() {
         </div>
 
         {/* AI Marketing Blog Showcase */}
-        <div className="w-full mb-16">
-          <BlogShowcase />
+        <div className="w-full max-w-6xl mx-auto px-4 mb-16">
+          <div className="electric-border bg-gray-900 rounded-xl p-8">
+            <div className="text-center">
+              <h2 className="text-4xl font-bold bg-gradient-to-r from-blue-400 to-green-400 bg-clip-text text-transparent mb-4">
+                🚀 Latest AI Marketing Insights
+              </h2>
+              <p className="text-gray-300 text-lg mb-8">
+                Revolutionary AI-powered blog content powered by Flutterbye Intelligence
+              </p>
+              
+              {/* Featured blog post display */}
+              <div className="bg-gradient-to-r from-blue-900/40 to-green-900/40 rounded-xl p-8 border border-blue-500/30 mb-8">
+                <h3 className="text-2xl font-bold text-white mb-4">
+                  The Future of Crypto Marketing: AI-Powered Precision Targeting
+                </h3>
+                <p className="text-gray-300 mb-6">
+                  Discover how Flutterbye is revolutionizing crypto marketing with AI-powered wallet analysis, 
+                  precision targeting, and value-attached messaging that transforms how businesses communicate 
+                  with crypto holders.
+                </p>
+                <div className="flex items-center justify-center gap-4 text-sm text-gray-400 mb-6">
+                  <span>🤖 AI Generated</span>
+                  <span>📖 8 min read</span>
+                  <span>🏷️ Crypto Marketing</span>
+                </div>
+                <button className="bg-gradient-to-r from-blue-600 to-green-600 hover:from-blue-500 hover:to-green-500 px-8 py-3 rounded-lg font-bold transition-all duration-300">
+                  Read Full Article →
+                </button>
+              </div>
+              
+              {/* Marketing bot features */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                <div className="bg-gray-800/50 rounded-lg p-6">
+                  <h4 className="text-lg font-bold text-blue-400 mb-2">AI Content Creation</h4>
+                  <p className="text-gray-400 text-sm">Automated blog generation using GPT-4o</p>
+                </div>
+                <div className="bg-gray-800/50 rounded-lg p-6">
+                  <h4 className="text-lg font-bold text-green-400 mb-2">SEO Optimization</h4>
+                  <p className="text-gray-400 text-sm">Advanced keyword targeting and meta descriptions</p>
+                </div>
+                <div className="bg-gray-800/50 rounded-lg p-6">
+                  <h4 className="text-lg font-bold text-purple-400 mb-2">Multi-Platform Distribution</h4>
+                  <p className="text-gray-400 text-sm">Automated posting to Twitter, LinkedIn, Instagram</p>
+                </div>
+              </div>
+              
+              {/* Demo toggle button */}
+              <button 
+                onClick={() => setDemoMode(!demoMode)}
+                className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 px-6 py-2 rounded-lg text-sm font-medium transition-all duration-300"
+              >
+                {demoMode ? "Hide FlutterAI Demos" : "Show FlutterAI Demos"}
+              </button>
+            </div>
+          </div>
         </div>
 
         {/* Bottom CTA */}
