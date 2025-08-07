@@ -63,20 +63,20 @@ interface TutorialStep {
 const TUTORIAL_STEPS: TutorialStep[] = [
   {
     id: 1,
-    title: "🧠 Wallet Intelligence Scanning",
-    description: "REVOLUTIONARY AI that instantly analyzes any Solana wallet and reveals hidden patterns, risk levels, trading behaviors, and wealth indicators. See what others can't see - from whale activity to diamond hands detection!",
+    title: "🧠 AI Wallet Analysis",
+    description: "AI analyzes wallets to reveal trading patterns and risk levels.",
     icon: <Brain className="w-6 h-6 text-purple-400" />,
     category: 'intelligence',
     demo: async () => apiRequest('POST', '/api/flutterai/analyze-wallet', { 
       walletAddress: '5tzFkiKscXHK5ZXCGbXZxdw7gTjjD1mBwuoFbhUvuAi9' 
     }),
     interactionType: 'analyze',
-    expectedResult: "Complete wallet X-ray vision: AI behavioral scoring, risk assessment, trading patterns, wealth indicators, and hidden insights that reveal the true story behind every wallet"
+    expectedResult: "Wallet analysis complete: Risk scoring, trading patterns, and behavioral insights revealed."
   },
   {
     id: 2,
-    title: "✨ Content Optimization Engine",
-    description: "MIND-BLOWING AI that transforms boring text into VIRAL GOLD! Our GPT-4o engine doesn't just rewrite - it predicts virality, optimizes for engagement, and creates content that spreads like wildfire across social media!",
+    title: "✨ Content Optimization",
+    description: "AI optimizes content for maximum viral engagement.",
     icon: <Wand2 className="w-6 h-6 text-blue-400" />,
     category: 'content',
     demo: async () => apiRequest('POST', '/api/ai/optimize-content', {
@@ -84,73 +84,17 @@ const TUTORIAL_STEPS: TutorialStep[] = [
       constraints: { maxLength: 27, tone: 'viral', platform: 'twitter' }
     }),
     interactionType: 'type',
-    expectedResult: "VIRAL-OPTIMIZED content with engagement predictions, hashtag recommendations, and psychological triggers that make people WANT to share, like, and engage!"
+    expectedResult: "Content optimized: Viral scoring, hashtag suggestions, and engagement predictions provided."
   },
   {
     id: 3,
-    title: "📈 Real-Time Market Intelligence",
-    description: "CRYSTAL BALL FOR CRYPTO! Our AI continuously monitors 1000+ data sources, social sentiment, whale movements, and market patterns to predict price movements before they happen. It's like having insider knowledge, but totally legal!",
+    title: "📈 Market Intelligence",
+    description: "AI monitors market data and sentiment for trend predictions.",
     icon: <TrendingUp className="w-6 h-6 text-green-400" />,
     category: 'analytics',
     demo: async () => apiRequest('GET', '/api/flutterai/market-intelligence'),
     interactionType: 'watch',
-    expectedResult: "FUTURE-SEEING market intelligence: Live sentiment analysis, whale tracking, price predictions, trend forecasting, and early warning signals for market moves"
-  },
-  {
-    id: 4,
-    title: "🛡️ Security Threat Detection",
-    description: "BULLETPROOF PROTECTION! Our AI security system works like a digital bodyguard, scanning for threats, detecting scams, monitoring suspicious activity, and protecting your assets 24/7. Sleep peacefully knowing AI is watching your back!",
-    icon: <Shield className="w-6 h-6 text-red-400" />,
-    category: 'security',
-    demo: async () => apiRequest('GET', '/api/flutterai/security-scan'),
-    interactionType: 'click',
-    expectedResult: "FORTRESS-LEVEL security analysis: Threat detection, vulnerability scanning, scam identification, risk assessment, and personalized security recommendations"
-  },
-  {
-    id: 5,
-    title: "💰 Revenue Optimization AI",
-    description: "MONEY-MAKING MACHINE! This AI doesn't just suggest prices - it MAXIMIZES your revenue by analyzing market psychology, competitor pricing, demand patterns, and user behavior to find the PERFECT price that maximizes profits!",
-    icon: <DollarSign className="w-6 h-6 text-yellow-400" />,
-    category: 'revenue',
-    demo: async () => apiRequest('GET', '/api/flutterai/pricing/analytics'),
-    interactionType: 'analyze',
-    expectedResult: "PROFIT-MAXIMIZING insights: Dynamic pricing optimization, revenue projections, market positioning, competitive analysis, and personalized pricing strategies"
-  },
-  {
-    id: 6,
-    title: "🌐 Social Intelligence Engine",
-    description: "VIRAL PREDICTION SUPERPOWER! This AI analyzes social patterns, emotional triggers, trending topics, and audience psychology to predict what will go viral BEFORE it happens. Create content that explodes across the internet!",
-    icon: <Users className="w-6 h-6 text-indigo-400" />,
-    category: 'intelligence',
-    demo: async () => apiRequest('POST', '/api/ai/social-analysis', {
-      content: "gm frens, new token launch tomorrow 🚀",
-      platform: 'twitter'
-    }),
-    interactionType: 'type',
-    expectedResult: "VIRAL PREDICTION ENGINE: Virality scores, audience psychology insights, emotional trigger analysis, optimal posting times, and viral acceleration strategies"
-  },
-  {
-    id: 7,
-    title: "🎯 Predictive Analytics Suite",
-    description: "TIME MACHINE FOR CRYPTO! Using quantum-inspired algorithms and deep learning, this AI sees into the future of crypto trends, market movements, and emerging opportunities. It's like having a crystal ball for blockchain!",
-    icon: <Target className="w-6 h-6 text-pink-400" />,
-    category: 'analytics',
-    demo: async () => apiRequest('GET', '/api/flutterai/predictive-analytics'),
-    interactionType: 'watch',
-    expectedResult: "FUTURE-SIGHT analytics: Trend predictions, market forecasts, opportunity identification, risk assessment, and strategic recommendations for maximum gains"
-  },
-  {
-    id: 8,
-    title: "🤖 Conversational AI ARIA",
-    description: "YOUR GENIUS AI COMPANION! ARIA isn't just a chatbot - she's a blockchain expert, marketing strategist, and creative genius rolled into one. Ask her anything and watch her create marketing campaigns, solve problems, and generate brilliant ideas!",
-    icon: <MessageCircle className="w-6 h-6 text-cyan-400" />,
-    category: 'content',
-    demo: async () => apiRequest('POST', '/api/ai/aria/chat', {
-      message: "Help me create a viral token campaign",
-      context: "marketing"
-    }),
-    interactionType: 'type',
-    expectedResult: "GENIUS-LEVEL conversation: Strategic marketing plans, creative campaign ideas, problem-solving insights, and actionable strategies that actually work!"
+    expectedResult: "Market analysis complete: Sentiment tracking, price predictions, and trend forecasting ready."
   }
 ];
 
