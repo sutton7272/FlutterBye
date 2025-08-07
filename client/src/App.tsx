@@ -149,16 +149,16 @@ function Router() {
             <Trade />
           </>
         )} />
-        <Route path="/flutterai" component={() => (
-          <>
-            <Navbar />
-            <FlutterAIUser />
-          </>
-        )} />
         <Route path="/multi-chain" component={() => (
           <>
             <Navbar />
             <MultiChainDashboard />
+          </>
+        )} />
+        <Route path="/flutterai" component={() => (
+          <>
+            <Navbar />
+            <FlutterAIUser />
           </>
         )} />
         <Route path="/flutterai/admin" component={() => (
