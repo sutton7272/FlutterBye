@@ -17,7 +17,7 @@ import { apiRequest } from "@/lib/queryClient";
 import ImageUpload from "@/components/image-upload";
 import { LoadingSpinner } from "@/components/loading-spinner";
 import { validateTokenQuantity, validateWholeNumber } from "@/lib/validators";
-import { Coins, Upload, Calculator, DollarSign, Lock, Globe, Gift, AlertCircle, Wand2, Star, Sparkles, Users, Target, ImageIcon, FileImage, QrCode, Plus, X, Ticket, Loader2, Zap, CheckCircle, Mic, TrendingUp, Heart } from "lucide-react";
+import { Coins, Upload, Calculator, DollarSign, Lock, Globe, Gift, AlertCircle, Wand2, Star, Sparkles, Users, Target, ImageIcon, FileImage, QrCode, Plus, X, Ticket, Loader2, Zap, CheckCircle, Mic, TrendingUp, Heart, Copy, Check } from "lucide-react";
 import AITextOptimizer from "@/components/ai-text-optimizer";
 import { EmotionAnalyzer } from "@/components/EmotionAnalyzer";
 import { ViralMechanics } from "@/components/ViralMechanics";
@@ -110,6 +110,9 @@ export default function Mint({ tokenType }: MintProps = {}) {
   const [showQRDialog, setShowQRDialog] = useState(false);
   const [qrCodeText, setQRCodeText] = useState("");
   const [isGeneratingQR, setIsGeneratingQR] = useState(false);
+  const [generatedQRCode, setGeneratedQRCode] = useState<string>("");
+  const [copiedQRText, setCopiedQRText] = useState(false);
+  const [copiedQRImage, setCopiedQRImage] = useState(false);
   
   // Progress tracking for step-by-step guidance
   const [currentStep, setCurrentStep] = useState(1);
@@ -380,6 +383,7 @@ export default function Mint({ tokenType }: MintProps = {}) {
       });
 
       const qrData = await response.json();
+      setGeneratedQRCode(qrData.qrCode);
       
       const newMedia = {
         id: Math.random().toString(36).substr(2, 9),
@@ -389,8 +393,6 @@ export default function Mint({ tokenType }: MintProps = {}) {
       };
       
       setMessageMedia(prev => [...prev, newMedia]);
-      setShowQRDialog(false);
-      setQRCodeText("");
       
       toast({
         title: "QR Code Generated",
@@ -405,6 +407,65 @@ export default function Mint({ tokenType }: MintProps = {}) {
     } finally {
       setIsGeneratingQR(false);
     }
+  };
+
+  const copyQRText = async () => {
+    try {
+      await navigator.clipboard.writeText(qrCodeText);
+      setCopiedQRText(true);
+      setTimeout(() => setCopiedQRText(false), 2000);
+      toast({
+        title: "Copied!",
+        description: "QR code text copied to clipboard",
+      });
+    } catch (error) {
+      toast({
+        title: "Copy Failed",
+        description: "Failed to copy text to clipboard",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const copyQRImage = async () => {
+    if (!generatedQRCode) return;
+    
+    try {
+      // Convert base64 to blob and copy to clipboard
+      const response = await fetch(generatedQRCode);
+      const blob = await response.blob();
+      await navigator.clipboard.write([
+        new ClipboardItem({ [blob.type]: blob })
+      ]);
+      setCopiedQRImage(true);
+      setTimeout(() => setCopiedQRImage(false), 2000);
+      toast({
+        title: "Copied!",
+        description: "QR code image copied to clipboard",
+      });
+    } catch (error) {
+      toast({
+        title: "Copy Failed",
+        description: "Failed to copy image to clipboard",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const downloadQRCode = () => {
+    if (!generatedQRCode) return;
+    
+    const link = document.createElement('a');
+    link.href = generatedQRCode;
+    link.download = `qr-code-${qrCodeText.substring(0, 10)}.png`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    toast({
+      title: "Downloaded!",
+      description: "QR code saved to your device",
+    });
   };
 
   const removeMessageMedia = (id: string) => {
@@ -690,19 +751,39 @@ export default function Mint({ tokenType }: MintProps = {}) {
                             Add QR Code
                           </Button>
                         </DialogTrigger>
-                        <DialogContent className="bg-slate-900 border-electric-blue/30">
+                        <DialogContent className="bg-slate-900 border-electric-blue/30 max-w-md">
                           <DialogHeader>
                             <DialogTitle className="text-electric-blue">Generate QR Code</DialogTitle>
                           </DialogHeader>
                           <div className="space-y-4">
                             <div>
-                              <Label htmlFor="qr-text" className="text-white">
-                                Text or URL to encode
-                              </Label>
+                              <div className="flex items-center justify-between">
+                                <Label htmlFor="qr-text" className="text-white">
+                                  Text or URL to encode
+                                </Label>
+                                {qrCodeText && (
+                                  <Button
+                                    type="button"
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={copyQRText}
+                                    className="text-electric-blue hover:text-electric-green"
+                                  >
+                                    {copiedQRText ? (
+                                      <Check className="w-4 h-4" />
+                                    ) : (
+                                      <Copy className="w-4 h-4" />
+                                    )}
+                                  </Button>
+                                )}
+                              </div>
                               <Textarea
                                 id="qr-text"
                                 value={qrCodeText}
-                                onChange={(e) => setQRCodeText(e.target.value)}
+                                onChange={(e) => {
+                                  setQRCodeText(e.target.value);
+                                  setGeneratedQRCode("");
+                                }}
                                 placeholder="Enter website URL, wallet address, contact info, or any text..."
                                 rows={3}
                                 className="bg-black/40 text-white border-electric-blue/30 focus:border-electric-green"
@@ -711,6 +792,51 @@ export default function Mint({ tokenType }: MintProps = {}) {
                                 Examples: https://flutterbye.com, wallet address, contact details
                               </p>
                             </div>
+
+                            {/* QR Code Preview */}
+                            {generatedQRCode && (
+                              <div className="space-y-3">
+                                <Label className="text-white">Generated QR Code</Label>
+                                <div className="flex flex-col items-center space-y-3 p-4 bg-white rounded-lg">
+                                  <img 
+                                    src={generatedQRCode} 
+                                    alt="Generated QR Code" 
+                                    className="w-48 h-48 object-contain"
+                                  />
+                                  <div className="flex gap-2">
+                                    <Button
+                                      type="button"
+                                      variant="outline"
+                                      size="sm"
+                                      onClick={copyQRImage}
+                                      className="text-xs"
+                                    >
+                                      {copiedQRImage ? (
+                                        <>
+                                          <Check className="w-3 h-3 mr-1" />
+                                          Copied
+                                        </>
+                                      ) : (
+                                        <>
+                                          <Copy className="w-3 h-3 mr-1" />
+                                          Copy Image
+                                        </>
+                                      )}
+                                    </Button>
+                                    <Button
+                                      type="button"
+                                      variant="outline"
+                                      size="sm"
+                                      onClick={downloadQRCode}
+                                      className="text-xs"
+                                    >
+                                      <Upload className="w-3 h-3 mr-1" />
+                                      Download
+                                    </Button>
+                                  </div>
+                                </div>
+                              </div>
+                            )}
                             
                             <div>
                               <Label className="text-white text-sm">Quick Templates</Label>
@@ -755,29 +881,46 @@ export default function Mint({ tokenType }: MintProps = {}) {
                               </div>
                             </div>
                             <div className="flex gap-2">
-                              <Button
-                                onClick={handleGenerateQRCode}
-                                disabled={isGeneratingQR || !qrCodeText.trim()}
-                                className="bg-electric-blue hover:bg-electric-blue/80"
-                              >
-                                {isGeneratingQR ? (
-                                  <>
-                                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                                    Generating...
-                                  </>
-                                ) : (
-                                  <>
-                                    <QrCode className="w-4 h-4 mr-2" />
-                                    Generate QR Code
-                                  </>
-                                )}
-                              </Button>
+                              {!generatedQRCode ? (
+                                <Button
+                                  onClick={handleGenerateQRCode}
+                                  disabled={isGeneratingQR || !qrCodeText.trim()}
+                                  className="bg-electric-blue hover:bg-electric-blue/80"
+                                >
+                                  {isGeneratingQR ? (
+                                    <>
+                                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                                      Generating...
+                                    </>
+                                  ) : (
+                                    <>
+                                      <QrCode className="w-4 h-4 mr-2" />
+                                      Generate QR Code
+                                    </>
+                                  )}
+                                </Button>
+                              ) : (
+                                <Button
+                                  onClick={() => {
+                                    setShowQRDialog(false);
+                                    setQRCodeText("");
+                                    setGeneratedQRCode("");
+                                  }}
+                                  className="bg-electric-green hover:bg-electric-green/80"
+                                >
+                                  <CheckCircle className="w-4 h-4 mr-2" />
+                                  Done
+                                </Button>
+                              )}
                               <Button
                                 type="button"
                                 variant="outline"
                                 onClick={() => {
                                   setShowQRDialog(false);
                                   setQRCodeText("");
+                                  setGeneratedQRCode("");
+                                  setCopiedQRText(false);
+                                  setCopiedQRImage(false);
                                 }}
                               >
                                 Cancel
