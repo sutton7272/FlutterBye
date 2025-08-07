@@ -34,8 +34,7 @@ import Navbar from "@/components/navbar";
 import { TutorialLaunchButton } from "@/components/interactive-tutorial";
 import { FlutterAIInteractiveTutorial } from "@/components/flutterai-interactive-tutorial";
 
-// Import FlutterAI Demo Components - using existing components
-import { PersonalizedDashboard } from "@/components/PersonalizedDashboard";
+// No additional imports needed - using only tutorial components
 
 interface TimeLeft {
   days: number;
@@ -797,93 +796,27 @@ export default function LaunchCountdown() {
                   onClick={() => setDemoMode(!demoMode)}
                   className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 px-8 py-3 rounded-lg text-sm font-medium transition-all duration-300 shadow-lg"
                 >
-                  {demoMode ? "⬆️ Hide FlutterAI Demos" : "⬇️ Show FlutterAI Demos (6 Components)"}
+                  {demoMode ? "⬆️ Hide FlutterAI Tutorial" : "⬇️ Show FlutterAI Tutorial"}
                 </button>
               </div>
 
-              {/* Consolidated FlutterAI Demo Section - Hidden by Default */}
+              {/* FlutterAI Interactive Tutorial Section - Hidden by Default */}
               {demoMode && (
                 <div className="mt-8 p-6 bg-gradient-to-r from-purple-900/30 to-blue-900/30 rounded-xl border border-purple-500/30">
                   <div className="text-center mb-6">
-                    <h3 className="text-2xl font-bold text-purple-300 mb-2">🤖 FlutterAI Demo Playground</h3>
-                    <p className="text-gray-400">Interactive demonstrations of our AI-powered features</p>
+                    <h3 className="text-2xl font-bold text-purple-300 mb-2">🤖 FlutterAI Interactive Tutorial</h3>
+                    <p className="text-gray-400">Click the tutorial button below to experience our AI-powered features</p>
                   </div>
                   
                   <div className="space-y-8" id="demo-section">
-                    {/* Personalized Dashboard Demo */}
-                    <div className="mb-16">
-                      <h4 className="text-lg font-bold text-purple-300 mb-4">📊 AI-Powered Dashboard</h4>
-                      <PersonalizedDashboard />
-                    </div>
-
                     {/* Tutorial Launch Button */}
                     <div className="mb-16 text-center">
                       <TutorialLaunchButton />
                     </div>
 
-                    {/* Interactive Tutorial */}
+                    {/* Interactive Tutorial Container */}
                     <div className="mb-16">
                       <FlutterAIInteractiveTutorial />
-                    </div>
-
-                    {/* Mock Demo Components */}
-                    <div className="mb-16">
-                      <h4 className="text-lg font-bold text-blue-300 mb-4">🚀 Viral Growth Accelerator</h4>
-                      <div className="bg-gray-800/30 p-6 rounded-lg border border-blue-500/30">
-                        <p className="text-gray-400">AI-powered viral content optimization and growth tracking dashboard.</p>
-                        <div className="mt-4 grid grid-cols-3 gap-4">
-                          <div className="bg-blue-600/20 p-4 rounded text-center">
-                            <div className="text-2xl font-bold text-blue-400">+147%</div>
-                            <div className="text-xs text-gray-400">Viral Growth</div>
-                          </div>
-                          <div className="bg-green-600/20 p-4 rounded text-center">
-                            <div className="text-2xl font-bold text-green-400">23.4K</div>
-                            <div className="text-xs text-gray-400">Engagement</div>
-                          </div>
-                          <div className="bg-purple-600/20 p-4 rounded text-center">
-                            <div className="text-2xl font-bold text-purple-400">0.89</div>
-                            <div className="text-xs text-gray-400">AI Score</div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="mb-16">
-                      <h4 className="text-lg font-bold text-green-300 mb-4">📈 Interactive Stats Dashboard</h4>
-                      <div className="bg-gray-800/30 p-6 rounded-lg border border-green-500/30">
-                        <p className="text-gray-400">Real-time analytics and performance metrics visualization.</p>
-                        <div className="mt-4 space-y-3">
-                          <div className="flex justify-between items-center">
-                            <span className="text-sm">Token Creation Rate</span>
-                            <span className="text-green-400 font-bold">+34.2%</span>
-                          </div>
-                          <div className="flex justify-between items-center">
-                            <span className="text-sm">Active Users</span>
-                            <span className="text-blue-400 font-bold">2,847</span>
-                          </div>
-                          <div className="flex justify-between items-center">
-                            <span className="text-sm">Revenue Growth</span>
-                            <span className="text-purple-400 font-bold">+127%</span>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="mb-16">
-                      <h4 className="text-lg font-bold text-yellow-300 mb-4">💎 NFT Portfolio Quick View</h4>
-                      <div className="bg-gray-800/30 p-6 rounded-lg border border-yellow-500/30">
-                        <p className="text-gray-400">Comprehensive NFT portfolio management and analytics.</p>
-                        <div className="mt-4 flex gap-4">
-                          <div className="bg-yellow-600/20 p-3 rounded flex-1 text-center">
-                            <div className="text-lg font-bold text-yellow-400">127</div>
-                            <div className="text-xs text-gray-400">Total NFTs</div>
-                          </div>
-                          <div className="bg-pink-600/20 p-3 rounded flex-1 text-center">
-                            <div className="text-lg font-bold text-pink-400">45.3 SOL</div>
-                            <div className="text-xs text-gray-400">Portfolio Value</div>
-                          </div>
-                        </div>
-                      </div>
                     </div>
                   </div>
                 </div>
