@@ -15,7 +15,7 @@ import {
   Zap,
   BarChart3
 } from "lucide-react";
-import Navbar from "@/components/navbar";
+
 
 export default function FlutterWave() {
   const [activeTab, setActiveTab] = useState("composer");
@@ -61,7 +61,6 @@ export default function FlutterWave() {
 
   return (
     <div className="min-h-screen bg-transparent">
-      <Navbar />
       <div className="container mx-auto px-4 py-6 space-y-8">
         {/* Header */}
         <div className="text-center space-y-4">
