@@ -528,14 +528,10 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Blog Showcase Section */}
-        <ErrorBoundary>
-          <section className="w-full max-w-6xl mx-auto px-4 mb-16">
-            <div className="my-8">
-              <BlogShowcase />
-            </div>
-          </section>
-        </ErrorBoundary>
+        {/* AI Marketing Blog Showcase */}
+        <div className="w-full mb-16">
+          <BlogShowcase />
+        </div>
 
         {/* Bottom CTA */}
         <div className="text-center mt-16 py-12 border-t border-purple-500/20">

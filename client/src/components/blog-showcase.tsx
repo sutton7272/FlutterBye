@@ -21,18 +21,61 @@ interface BlogPost {
 }
 
 export function BlogShowcase() {
-  const [hoveredPost, setHoveredPost] = useState<string | null>(null);
+  console.log('BlogShowcase: Component initialized');
   
-  console.log('BlogShowcase component rendering');
-  console.log('Window location:', window.location.href);
+  const [hoveredPost, setHoveredPost] = useState<string | null>(null);
 
-  const { data: blogData, isLoading, error } = useQuery({
-    queryKey: ["/api/blog/posts"],
-    retry: 1,
-    staleTime: 5 * 60 * 1000, // 5 minutes
-  });
-
-  console.log('BlogShowcase query state:', { isLoading, error, blogData });
+  // Always render something visible first to confirm component is being called
+  return (
+    <div className="w-full max-w-6xl mx-auto px-4 py-8">
+      <div className="electric-border bg-gray-900 rounded-xl p-8">
+        <div className="text-center">
+          <h2 className="text-4xl font-bold bg-gradient-to-r from-blue-400 to-green-400 bg-clip-text text-transparent mb-4">
+            🚀 Latest AI Marketing Insights
+          </h2>
+          <p className="text-gray-300 text-lg mb-8">
+            Revolutionary AI-powered blog content powered by Flutterbye Intelligence
+          </p>
+          
+          {/* Simple featured blog post display */}
+          <div className="bg-gradient-to-r from-blue-900/40 to-green-900/40 rounded-xl p-8 border border-blue-500/30">
+            <h3 className="text-2xl font-bold text-white mb-4">
+              The Future of Crypto Marketing: AI-Powered Precision Targeting
+            </h3>
+            <p className="text-gray-300 mb-6">
+              Discover how Flutterbye is revolutionizing crypto marketing with AI-powered wallet analysis, 
+              precision targeting, and value-attached messaging that transforms how businesses communicate 
+              with crypto holders.
+            </p>
+            <div className="flex items-center justify-center gap-4 text-sm text-gray-400 mb-6">
+              <span>🤖 AI Generated</span>
+              <span>📖 8 min read</span>
+              <span>🏷️ Crypto Marketing</span>
+            </div>
+            <button className="bg-gradient-to-r from-blue-600 to-green-600 hover:from-blue-500 hover:to-green-500 px-8 py-3 rounded-lg font-bold transition-all duration-300">
+              Read Full Article →
+            </button>
+          </div>
+          
+          {/* Coming soon section */}
+          <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="bg-gray-800/50 rounded-lg p-6">
+              <h4 className="text-lg font-bold text-blue-400 mb-2">AI Content Creation</h4>
+              <p className="text-gray-400 text-sm">Automated blog generation using GPT-4o</p>
+            </div>
+            <div className="bg-gray-800/50 rounded-lg p-6">
+              <h4 className="text-lg font-bold text-green-400 mb-2">SEO Optimization</h4>
+              <p className="text-gray-400 text-sm">Advanced keyword targeting and meta descriptions</p>
+            </div>
+            <div className="bg-gray-800/50 rounded-lg p-6">
+              <h4 className="text-lg font-bold text-purple-400 mb-2">Multi-Platform Distribution</h4>
+              <p className="text-gray-400 text-sm">Automated posting to Twitter, LinkedIn, Instagram</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 
   // Show error state for debugging
   if (error) {
