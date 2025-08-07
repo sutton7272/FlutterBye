@@ -539,8 +539,9 @@ export default function Home() {
               <h2 className="text-5xl font-bold bg-gradient-to-r from-blue-400 to-green-400 bg-clip-text text-transparent mb-4">
                 🚀 AI MARKETING REVOLUTION - LIVE NOW
               </h2>
-              <div className="bg-red-500 text-white p-4 rounded-lg mb-4">
-                DEPLOYMENT TEST: If you can see this red box, the changes are working!
+              <div className="bg-red-500 text-white p-4 rounded-lg mb-4 animate-pulse">
+                🔴 REACT COMPONENT TEST: Homepage changes are now LIVE! 
+                <br />Time: {new Date().toLocaleString()}
               </div>
               <p className="text-white text-xl mb-8 font-medium">
                 🤖 LIVE: Automated Marketing Bot with AI Blog Generation System
