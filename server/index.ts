@@ -52,6 +52,54 @@ app.use((req, res, next) => {
     console.error('Server error:', err);
   });
 
+  // Test deployment endpoint
+  app.get('/test-deploy', (req, res) => {
+    res.send(`
+      <!DOCTYPE html>
+      <html>
+      <head>
+          <title>Flutterbye Deployment Test</title>
+          <style>
+              body { 
+                  background: #000; 
+                  color: #fff; 
+                  font-family: Arial; 
+                  text-align: center; 
+                  padding: 50px;
+              }
+              .test-box { 
+                  background: red; 
+                  padding: 20px; 
+                  margin: 20px;
+                  border-radius: 10px;
+              }
+              .marketing-section {
+                  background: linear-gradient(to right, #3b82f6, #10b981);
+                  padding: 40px;
+                  margin: 20px;
+                  border-radius: 15px;
+              }
+          </style>
+      </head>
+      <body>
+          <div class="test-box">
+              DEPLOYMENT TEST - SERVER IS WORKING! Time: ${new Date().toISOString()}
+          </div>
+          
+          <div class="marketing-section">
+              <h1>🚀 AI MARKETING REVOLUTION - LIVE NOW</h1>
+              <p>Revolutionary AI-powered blog content powered by Flutterbye Intelligence</p>
+              <h2>The Future of Crypto Marketing: AI-Powered Precision Targeting</h2>
+              <p>Discover how Flutterbye is revolutionizing crypto marketing.</p>
+          </div>
+          
+          <p>Port: ${process.env.PORT || 5000} | Environment: ${process.env.NODE_ENV || 'development'}</p>
+          <p>URL: ${req.protocol}://${req.get('host')}${req.originalUrl}</p>
+      </body>
+      </html>
+    `);
+  });
+
   // importantly only setup vite in development and after
   // setting up all the other routes so the catch-all route
   // doesn't interfere with the other routes
