@@ -480,15 +480,15 @@ export default function LaunchCountdown() {
         {/* Three Column Info Section */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 max-w-7xl mx-auto mb-8">
           {/* Left Column: VIP Signup */}
-          <div>
-            <Card className="electric-frame">
+          <div className="flex">
+            <Card className="electric-frame flex-1 flex flex-col min-h-[600px]">
               <CardHeader>
                 <CardTitle className="text-gradient flex items-center gap-2 text-lg">
                   <Mail className="w-5 h-5" />
                   Join VIP Waitlist
                 </CardTitle>
               </CardHeader>
-              <CardContent>
+              <CardContent className="flex-1 flex flex-col">
                 {submitted ? (
                   <div className="text-center py-6">
                     <CheckCircle className="w-12 h-12 mx-auto mb-3 text-green-400" />
@@ -570,15 +570,15 @@ export default function LaunchCountdown() {
           </div>
 
           {/* Middle Column: AI Marketing Revolution */}
-          <div>
-            <Card className="electric-frame h-full">
+          <div className="flex">
+            <Card className="electric-frame flex-1 flex flex-col min-h-[600px]">
               <CardHeader>
                 <CardTitle className="text-gradient flex items-center gap-2 text-lg">
                   <Brain className="w-5 h-5" />
                   AI Marketing Revolution
                 </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-4">
+              <CardContent className="flex-1 flex flex-col space-y-4">
                 <p className="text-sm text-muted-foreground">
                   Experience the world's most advanced crypto marketing platform powered by AI intelligence.
                 </p>
@@ -611,15 +611,15 @@ export default function LaunchCountdown() {
           </div>
 
           {/* Right Column: Early Access */}
-          <div>
-            <Card className="electric-frame">
+          <div className="flex">
+            <Card className="electric-frame flex-1 flex flex-col min-h-[600px]">
               <CardHeader>
                 <CardTitle className="text-gradient flex items-center gap-2 text-lg">
                   <Key className="w-5 h-5" />
                   Early Access
                 </CardTitle>
               </CardHeader>
-              <CardContent>
+              <CardContent className="flex-1 flex flex-col">
                 <div className="space-y-4">
                   <p className="text-sm text-muted-foreground">
                     Have an early access code or authorized email? Get immediate access to the full platform features.
