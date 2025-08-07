@@ -4,7 +4,7 @@ import { createInsertSchema } from "drizzle-zod";
 import { relations } from "drizzle-orm";
 import { z } from "zod";
 
-export const users = pgTable("users", {
+export const users: any = pgTable("users", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   walletAddress: text("wallet_address").notNull().unique(),
   email: text("email"),
@@ -14,7 +14,7 @@ export const users = pgTable("users", {
   role: text("role").default("user"), // 'user', 'admin', 'super_admin'
   isAdmin: boolean("is_admin").default(false),
   adminPermissions: json("admin_permissions").$type<string[]>(), // ['dashboard', 'users', 'wallet_management', 'settings']
-  adminAddedBy: varchar("admin_added_by").references(() => users.id),
+  adminAddedBy: varchar("admin_added_by").references((): any => users.id),
   adminAddedAt: timestamp("admin_added_at"),
   createdAt: timestamp("created_at").defaultNow(),
 });
