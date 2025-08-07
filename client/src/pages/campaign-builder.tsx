@@ -24,6 +24,7 @@ import {
 export default function CampaignBuilder() {
   const [message, setMessage] = useState("");
   const [value, setValue] = useState("0.01");
+  const [selectedCreationType, setSelectedCreationType] = useState("");
   const [targetCriteria, setTargetCriteria] = useState({
     minBalance: [1000],
     tokenHoldings: "",
@@ -33,6 +34,27 @@ export default function CampaignBuilder() {
 
   const characterCount = message.length;
   const isValidLength = characterCount <= 27;
+
+  const creationTypes = [
+    {
+      id: "flutterbye-coins",
+      title: "Flutterbye Coins",
+      description: "Revolutionary tokenized messages with redeemable value - the future of Web3 communication",
+      icon: Coins,
+      color: "electric-blue",
+      features: ["27-character messages", "SOL value attachment", "Burn-to-redeem", "Viral distribution"],
+      useCase: "flagship"
+    },
+    {
+      id: "flutter-art",
+      title: "FlutterArt",
+      description: "AI-powered artistic blockchain creations with unique digital signatures",
+      icon: Brain,
+      color: "purple-pink",
+      features: ["AI-generated art", "Unique signatures", "Collectible NFTs", "Creative expression"],
+      useCase: "creative"
+    }
+  ];
 
   const campaignTypes = [
     {
@@ -80,20 +102,100 @@ export default function CampaignBuilder() {
   ];
 
   return (
-    <div className="min-h-screen bg-transparent">
-      <div className="container mx-auto px-4 py-6 space-y-8">
-        
+    <div className="min-h-screen pt-20 pb-12">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
-        <div className="text-center space-y-4">
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-electric-blue to-electric-green bg-clip-text text-transparent">
-            Campaign Builder
-          </h1>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Create targeted 27-character message campaigns using FlutterAI wallet intelligence
+        <div className="text-center mb-12">
+          <h1 className="text-5xl font-bold mb-6 text-gradient">Flutterbye Creation Hub</h1>
+          <p className="text-xl text-muted-foreground mb-8">
+            Revolutionary blockchain creation platform featuring Flutterbye Coins and FlutterArt
           </p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        {/* Main Creation Cards */}
+        <div className="grid md:grid-cols-2 gap-8 mb-12">
+          {creationTypes.map((type) => {
+            const IconComponent = type.icon;
+            return (
+              <Card 
+                key={type.id}
+                className={`group cursor-pointer transition-all duration-300 hover:scale-105 border-2 ${
+                  type.color === 'electric-blue' 
+                    ? 'border-electric-blue bg-gradient-to-br from-electric-blue/5 to-electric-blue/20 hover:border-electric-blue/80' 
+                    : 'border-purple-500 bg-gradient-to-br from-purple-500/5 to-pink-500/20 hover:border-purple-400'
+                } relative overflow-hidden`}
+                onClick={() => setSelectedCreationType(type.id)}
+              >
+                {/* Animated Electric Border Effect */}
+                <div className={`absolute inset-0 ${
+                  type.color === 'electric-blue' 
+                    ? 'bg-gradient-to-r from-transparent via-electric-blue/20 to-transparent' 
+                    : 'bg-gradient-to-r from-transparent via-purple-400/20 to-transparent'
+                } opacity-0 group-hover:opacity-100 transition-opacity duration-500 -translate-x-full group-hover:translate-x-full transform`} 
+                style={{animation: 'electric-flow 2s infinite linear'}} />
+                
+                <CardHeader className="pb-4">
+                  <div className="flex items-center gap-4 mb-4">
+                    <div className={`p-4 rounded-xl ${
+                      type.color === 'electric-blue' 
+                        ? 'bg-electric-blue/20 text-electric-blue' 
+                        : 'bg-purple-500/20 text-purple-400'
+                    }`}>
+                      <IconComponent size={32} />
+                    </div>
+                    <div>
+                      <CardTitle className="text-2xl mb-2">{type.title}</CardTitle>
+                      <Badge variant="outline" className={
+                        type.color === 'electric-blue' 
+                          ? 'border-electric-blue text-electric-blue' 
+                          : 'border-purple-400 text-purple-400'
+                      }>
+                        {type.useCase === 'flagship' ? 'Flagship Product' : 'Creative Platform'}
+                      </Badge>
+                    </div>
+                  </div>
+                </CardHeader>
+                
+                <CardContent>
+                  <CardDescription className="text-base mb-6 leading-relaxed">
+                    {type.description}
+                  </CardDescription>
+                  
+                  <div className="space-y-3">
+                    <h4 className="font-semibold text-sm uppercase tracking-wide">Key Features:</h4>
+                    <div className="grid grid-cols-2 gap-2">
+                      {type.features.map((feature, index) => (
+                        <div key={index} className="flex items-center gap-2">
+                          <div className={`w-1.5 h-1.5 rounded-full ${
+                            type.color === 'electric-blue' ? 'bg-electric-blue' : 'bg-purple-400'
+                          }`} />
+                          <span className="text-sm">{feature}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                  
+                  <Button 
+                    className={`w-full mt-6 ${
+                      type.color === 'electric-blue'
+                        ? 'bg-electric-blue hover:bg-electric-blue/80 text-dark'
+                        : 'bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600'
+                    }`}
+                  >
+                    Create {type.title}
+                  </Button>
+                </CardContent>
+              </Card>
+            );
+          })}
+        </div>
+
+        {/* Advanced Campaign Tools - Only show if a creation type is selected */}
+        {selectedCreationType && (
+          <div className="mt-12">
+            <h2 className="text-3xl font-bold mb-8 text-center">Advanced Campaign Tools</h2>
+            
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           
           {/* Campaign Setup */}
           <div className="lg:col-span-2 space-y-6">
@@ -405,6 +507,8 @@ export default function CampaignBuilder() {
             </Card>
           </div>
         </div>
+          </div>
+        )}
       </div>
     </div>
   );
