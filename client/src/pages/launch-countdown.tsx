@@ -604,13 +604,7 @@ export default function LaunchCountdown() {
                     </ul>
                   </div>
 
-                  <Button 
-                    onClick={() => setLocation('/flutterai')}
-                    className="w-full bg-gradient-to-r from-red-600 to-pink-600 hover:from-red-700 hover:to-pink-700 text-white"
-                  >
-                    <Sparkles className="w-4 h-4 mr-2" />
-                    Explore AI Platform
-                  </Button>
+
                 </div>
               </CardContent>
             </Card>
