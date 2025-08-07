@@ -35,6 +35,7 @@ export const tokens = pgTable("tokens", {
   additionalMessages: json("additional_messages").$type<string[]>(), // Array of additional text messages
   links: json("links").$type<Array<{url: string, title: string}>>(), // Array of {url, title} objects
   gifs: json("gifs").$type<string[]>(), // Array of GIF URLs
+  qrCodes: json("qr_codes").$type<Array<{data: string, image: string, type: string}>>(), // Array of QR codes with data and base64 images
   solscanMetadata: json("solscan_metadata").$type<Record<string, any>>(), // Custom metadata for blockchain display
   
   // Phase 2: Value attachment

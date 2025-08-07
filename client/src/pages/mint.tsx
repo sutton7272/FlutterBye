@@ -11,6 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import ImageUpload from "@/components/image-upload";
@@ -104,6 +105,11 @@ export default function Mint({ tokenType }: MintProps = {}) {
   const [validatedCode, setValidatedCode] = useState<any>(null);
   const [isFreeMode, setIsFreeMode] = useState(false);
   const [attachedVoice, setAttachedVoice] = useState<{ url: string; duration: number; type: 'voice' | 'music' } | null>(null);
+  
+  // QR Code generation states
+  const [showQRDialog, setShowQRDialog] = useState(false);
+  const [qrCodeText, setQRCodeText] = useState("");
+  const [isGeneratingQR, setIsGeneratingQR] = useState(false);
   
   // Progress tracking for step-by-step guidance
   const [currentStep, setCurrentStep] = useState(1);
@@ -318,15 +324,14 @@ export default function Mint({ tokenType }: MintProps = {}) {
     mintToken.mutate(tokenData);
   };
 
-  const handleMessageMediaUpload = (e: React.ChangeEvent<HTMLInputElement>, type: 'image' | 'gif' | 'qr') => {
+  const handleMessageMediaUpload = (e: React.ChangeEvent<HTMLInputElement>, type: 'image' | 'gif') => {
     const file = e.target.files?.[0];
     if (!file) return;
 
     // Validate file type
     const validTypes = {
       image: ['image/jpeg', 'image/png', 'image/webp'],
-      gif: ['image/gif'],
-      qr: ['image/jpeg', 'image/png', 'image/webp']
+      gif: ['image/gif']
     };
 
     if (!validTypes[type].includes(file.type)) {
@@ -355,6 +360,51 @@ export default function Mint({ tokenType }: MintProps = {}) {
       });
     };
     reader.readAsDataURL(file);
+  };
+
+  const handleGenerateQRCode = async () => {
+    if (!qrCodeText.trim()) {
+      toast({
+        title: "QR Code Error",
+        description: "Please enter some text or URL to generate a QR code",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsGeneratingQR(true);
+    try {
+      const response = await apiRequest("/api/qr/generate", "POST", {
+        data: qrCodeText,
+        size: 256
+      });
+
+      const qrData = await response.json();
+      
+      const newMedia = {
+        id: Math.random().toString(36).substr(2, 9),
+        type: 'qr' as const,
+        url: qrData.qrCode,
+        name: `QR Code: ${qrCodeText.substring(0, 20)}...`
+      };
+      
+      setMessageMedia(prev => [...prev, newMedia]);
+      setShowQRDialog(false);
+      setQRCodeText("");
+      
+      toast({
+        title: "QR Code Generated",
+        description: "QR code has been added to your message",
+      });
+    } catch (error) {
+      toast({
+        title: "QR Generation Failed",
+        description: error instanceof Error ? error.message : "Failed to generate QR code",
+        variant: "destructive",
+      });
+    } finally {
+      setIsGeneratingQR(false);
+    }
   };
 
   const removeMessageMedia = (id: string) => {
@@ -633,21 +683,109 @@ export default function Mint({ tokenType }: MintProps = {}) {
                           </Button>
                         </Label>
                       </div>
-                      <div className="relative">
-                        <input
-                          type="file"
-                          accept="image/jpeg,image/png"
-                          onChange={(e) => handleMessageMediaUpload(e, 'qr')}
-                          className="hidden"
-                          id="message-qr-upload"
-                        />
-                        <Label htmlFor="message-qr-upload" className="cursor-pointer">
+                      <Dialog open={showQRDialog} onOpenChange={setShowQRDialog}>
+                        <DialogTrigger asChild>
                           <Button type="button" variant="outline" size="sm">
                             <QrCode className="w-4 h-4 mr-2" />
                             Add QR Code
                           </Button>
-                        </Label>
-                      </div>
+                        </DialogTrigger>
+                        <DialogContent className="bg-slate-900 border-electric-blue/30">
+                          <DialogHeader>
+                            <DialogTitle className="text-electric-blue">Generate QR Code</DialogTitle>
+                          </DialogHeader>
+                          <div className="space-y-4">
+                            <div>
+                              <Label htmlFor="qr-text" className="text-white">
+                                Text or URL to encode
+                              </Label>
+                              <Textarea
+                                id="qr-text"
+                                value={qrCodeText}
+                                onChange={(e) => setQRCodeText(e.target.value)}
+                                placeholder="Enter website URL, wallet address, contact info, or any text..."
+                                rows={3}
+                                className="bg-black/40 text-white border-electric-blue/30 focus:border-electric-green"
+                              />
+                              <p className="text-xs text-gray-400 mt-1">
+                                Examples: https://flutterbye.com, wallet address, contact details
+                              </p>
+                            </div>
+                            
+                            <div>
+                              <Label className="text-white text-sm">Quick Templates</Label>
+                              <div className="flex gap-2 flex-wrap mt-2">
+                                <Button
+                                  type="button"
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => setQRCodeText("https://flutterbye.com")}
+                                  className="text-xs"
+                                >
+                                  Flutterbye
+                                </Button>
+                                <Button
+                                  type="button"
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => setQRCodeText(`Token: ${message}`)}
+                                  className="text-xs"
+                                  disabled={!message}
+                                >
+                                  Token Link
+                                </Button>
+                                <Button
+                                  type="button"
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => setQRCodeText("mailto:contact@example.com")}
+                                  className="text-xs"
+                                >
+                                  Email
+                                </Button>
+                                <Button
+                                  type="button"
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => setQRCodeText("tel:+1234567890")}
+                                  className="text-xs"
+                                >
+                                  Phone
+                                </Button>
+                              </div>
+                            </div>
+                            <div className="flex gap-2">
+                              <Button
+                                onClick={handleGenerateQRCode}
+                                disabled={isGeneratingQR || !qrCodeText.trim()}
+                                className="bg-electric-blue hover:bg-electric-blue/80"
+                              >
+                                {isGeneratingQR ? (
+                                  <>
+                                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                                    Generating...
+                                  </>
+                                ) : (
+                                  <>
+                                    <QrCode className="w-4 h-4 mr-2" />
+                                    Generate QR Code
+                                  </>
+                                )}
+                              </Button>
+                              <Button
+                                type="button"
+                                variant="outline"
+                                onClick={() => {
+                                  setShowQRDialog(false);
+                                  setQRCodeText("");
+                                }}
+                              >
+                                Cancel
+                              </Button>
+                            </div>
+                          </div>
+                        </DialogContent>
+                      </Dialog>
                       <Button 
                         type="button" 
                         variant="outline" 
@@ -675,23 +813,34 @@ export default function Mint({ tokenType }: MintProps = {}) {
                         <Label>Attached Media ({messageMedia.length})</Label>
                         <div className="grid grid-cols-2 gap-3">
                           {messageMedia.map((media) => (
-                            <div key={media.id} className="relative border border-slate-200 dark:border-slate-700 rounded-lg p-2">
-                              <div className="flex items-center gap-2">
-                                <div className="w-12 h-12 bg-slate-100 dark:bg-slate-800 rounded flex items-center justify-center overflow-hidden">
-                                  {media.type === 'image' && <ImageIcon className="w-6 h-6 text-blue-500" />}
-                                  {media.type === 'gif' && <FileImage className="w-6 h-6 text-green-500" />}
-                                  {media.type === 'qr' && <QrCode className="w-6 h-6 text-purple-500" />}
+                            <div key={media.id} className="relative border border-electric-blue/30 rounded-lg p-3 bg-slate-800/50">
+                              <div className="flex items-center gap-3">
+                                <div className="w-16 h-16 bg-slate-100 dark:bg-slate-800 rounded flex items-center justify-center overflow-hidden border border-electric-blue/20">
+                                  {media.type === 'image' && (
+                                    <img src={media.url} alt="Preview" className="w-full h-full object-cover rounded" />
+                                  )}
+                                  {media.type === 'gif' && (
+                                    <img src={media.url} alt="GIF Preview" className="w-full h-full object-cover rounded" />
+                                  )}
+                                  {media.type === 'qr' && (
+                                    <img src={media.url} alt="QR Code" className="w-full h-full object-contain rounded bg-white p-1" />
+                                  )}
                                 </div>
                                 <div className="flex-1 min-w-0">
-                                  <p className="text-sm font-medium truncate">{media.name}</p>
-                                  <p className="text-xs text-muted-foreground capitalize">{media.type}</p>
+                                  <p className="text-sm font-medium truncate text-electric-blue">{media.name}</p>
+                                  <p className="text-xs text-gray-400 capitalize">{media.type}</p>
+                                  {media.type === 'qr' && (
+                                    <Badge variant="outline" className="mt-1 text-xs border-purple-400 text-purple-400">
+                                      QR Generated
+                                    </Badge>
+                                  )}
                                 </div>
                                 <Button
                                   type="button"
                                   variant="ghost"
                                   size="sm"
                                   onClick={() => removeMessageMedia(media.id)}
-                                  className="w-6 h-6 p-0 text-red-500 hover:text-red-700"
+                                  className="w-6 h-6 p-0 text-red-400 hover:text-red-600 hover:bg-red-400/10"
                                 >
                                   <X className="w-4 h-4" />
                                 </Button>
