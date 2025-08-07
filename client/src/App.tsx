@@ -1,4 +1,4 @@
-import { Switch, Route } from "wouter";
+import { Switch, Route, useLocation } from "wouter";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
@@ -74,6 +74,9 @@ import TokenHolderMapPage from "@/pages/token-holder-map";
 import CollaborativeCreation from "@/pages/collaborative-creation";
 import FlutterAIDashboard from "@/pages/flutterai-dashboard";
 import MultiChainDashboard from "@/pages/MultiChainDashboard";
+import SimpleMultiChain from "@/pages/SimpleMultiChain";
+import RouteDebug from "@/pages/RouteDebug";
+import TestRoute from "@/pages/TestRoute";
 import FlutterAIUser from "@/pages/flutterai-user";
 import EnterpriseDashboard from "@/pages/enterprise-dashboard";
 import ViralDashboard from "@/pages/viral-dashboard";
@@ -109,11 +112,44 @@ import { ThemeProvider } from "@/components/theme-provider";
 import { WalletProvider } from "@/components/wallet-adapter";
 import { TestImage } from "@/components/test-image";
 function Router() {
+  const [location] = useLocation();
+  console.log('🔍 Current route location:', location);
+  
+  // Override for multi-chain - direct return
+  if (location === '/multi-chain') {
+    console.log('🚀 Direct multi-chain override activated!');
+    const MultiChainApp = lazy(() => import('./MultiChainApp'));
+    return (
+      <QueryClientProvider client={queryClient}>
+        <ThemeProvider defaultTheme="dark">
+          <Suspense fallback={<div className="p-8 text-white">Loading Multi-Chain Dashboard...</div>}>
+            <MultiChainApp />
+          </Suspense>
+        </ThemeProvider>
+      </QueryClientProvider>
+    );
+  }
+  
   return (
     <ErrorBoundary>
       <div className="dark min-h-screen flex flex-col bg-transparent">
         <div className="flex-1 bg-transparent">
           <Switch>
+        <Route path="/test" component={TestRoute} />
+        <Route path="/debug">
+          <RouteDebug />
+        </Route>
+        <Route path="/multi-chain">
+          {() => {
+            console.log('🚀 Multi-chain route matched!');
+            return (
+              <>
+                <Navbar />
+                <SimpleMultiChain />
+              </>
+            );
+          }}
+        </Route>
         <Route path="/" component={LaunchCountdown} />
         <Route path="/launch" component={LaunchCountdown} />
         <Route path="/blog" component={BlogPage} />
@@ -149,7 +185,7 @@ function Router() {
             <Trade />
           </>
         )} />
-        <Route path="/multi-chain" component={MultiChainDashboard} />
+
         <Route path="/flutterai" component={() => (
           <>
             <Navbar />
@@ -781,7 +817,12 @@ function Router() {
             <AIMarketingBot />
           </>
         )} />
-        <Route component={NotFound} />
+        <Route>
+          {() => {
+            console.log('🚨 Fallback NotFound route matched for:', window.location.pathname);
+            return <NotFound />;
+          }}
+        </Route>
         </Switch>
         </div>
         <Footer />

@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head><title>Debug Routing</title></head>
+<body>
+<h1>Debug Test</h1>
+<div id="debug-info">
+<p>Current URL: <span id="current-url"></span></p>
+<p>Pathname: <span id="pathname"></span></p>
+<p>Search: <span id="search"></span></p>
+</div>
+
+<script>
+document.getElementById('current-url').textContent = window.location.href;
+document.getElementById('pathname').textContent = window.location.pathname;
+document.getElementById('search').textContent = window.location.search;
+console.log('Debug: Current location', window.location);
+</script>
+</body>
+</html>
