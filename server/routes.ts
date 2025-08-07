@@ -5867,6 +5867,213 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: 'Failed to fetch tokens' });
     }
   });
+  // ===============================
+  // FlutterArt NFT API Endpoints
+  // ===============================
+
+  // Create FlutterArt NFT
+  app.post("/api/flutter-art/create", async (req, res) => {
+    try {
+      const { title, description, value = "0", collection = "", imageData } = req.body;
+      
+      if (!title || !description) {
+        return res.status(400).json({ error: "Title and description are required" });
+      }
+
+      // Create NFT with FlutterArt metadata
+      const nftData = {
+        id: `nft_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+        title,
+        description,
+        value: parseFloat(value) || 0,
+        collection,
+        image: imageData || null,
+        category: 'digital-art',
+        creator: req.body.creatorWallet || 'mock-creator',
+        createdAt: new Date().toISOString(),
+        views: 0,
+        likes: 0,
+        hasValue: parseFloat(value) > 0,
+        mintAddress: `FLART${Date.now()}`, // Mock Solana mint address
+        metadata: {
+          type: 'FlutterArt NFT',
+          platform: 'Flutterbye',
+          blockchain: 'Solana'
+        }
+      };
+
+      res.json({
+        success: true,
+        nft: nftData,
+        message: "FlutterArt NFT created successfully!"
+      });
+    } catch (error) {
+      console.error("Error creating FlutterArt NFT:", error);
+      res.status(500).json({ error: "Failed to create NFT" });
+    }
+  });
+
+  // Get user's NFTs
+  app.get("/api/flutter-art/my-nfts", async (req, res) => {
+    try {
+      // Mock user NFTs for demonstration
+      const userNfts = [
+        {
+          id: "nft_1",
+          title: "Digital Butterfly Dreams",
+          description: "A mesmerizing digital artwork featuring ethereal butterflies",
+          value: "0.5",
+          image: null,
+          category: "digital-art",
+          creator: "mock-creator",
+          createdAt: new Date(Date.now() - 86400000).toISOString(),
+          views: 124,
+          likes: 15,
+          hasValue: true
+        },
+        {
+          id: "nft_2", 
+          title: "Electric Pulse",
+          description: "High-energy circuit design with pulsing electrical effects",
+          value: "0.3",
+          image: null,
+          category: "ai-art",
+          creator: "mock-creator",
+          createdAt: new Date(Date.now() - 172800000).toISOString(),
+          views: 89,
+          likes: 23,
+          hasValue: true
+        }
+      ];
+
+      res.json(userNfts);
+    } catch (error) {
+      console.error("Error fetching user NFTs:", error);
+      res.status(500).json({ error: "Failed to fetch NFTs" });
+    }
+  });
+
+  // Get marketplace NFTs
+  app.get("/api/flutter-art/marketplace", async (req, res) => {
+    try {
+      // Mock marketplace NFTs
+      const marketplaceNfts = [
+        {
+          id: "market_nft_1",
+          title: "Quantum Vortex",
+          description: "Abstract quantum mechanics visualization",
+          price: "1.2",
+          image: null,
+          creator: "QuantumArtist",
+          likes: 67,
+          category: "ai-art"
+        },
+        {
+          id: "market_nft_2",
+          title: "Neon Dreams",
+          description: "Cyberpunk inspired neon landscape",
+          price: "0.8",
+          image: null, 
+          creator: "CyberCreator",
+          likes: 43,
+          category: "digital-art"
+        },
+        {
+          id: "market_nft_3",
+          title: "Crystal Formation",
+          description: "Geometric crystal structure with light refraction",
+          price: "2.1",
+          image: null,
+          creator: "GeoArtist",
+          likes: 91,
+          category: "photography"
+        },
+        {
+          id: "market_nft_4",
+          title: "Wave Pattern",
+          description: "Mathematical wave interference pattern",
+          price: "0.6",
+          image: null,
+          creator: "MathArt",
+          likes: 28,
+          category: "ai-art"
+        }
+      ];
+
+      res.json(marketplaceNfts);
+    } catch (error) {
+      console.error("Error fetching marketplace NFTs:", error);
+      res.status(500).json({ error: "Failed to fetch marketplace NFTs" });
+    }
+  });
+
+  // Get NFT collections
+  app.get("/api/flutter-art/collections", async (req, res) => {
+    try {
+      // Mock collections
+      const collections = [
+        {
+          id: "collection_1",
+          name: "Digital Dreams",
+          description: "Abstract digital artworks exploring consciousness",
+          itemCount: 12,
+          floorPrice: "0.3",
+          creator: "mock-creator"
+        },
+        {
+          id: "collection_2", 
+          name: "Electric Circuits",
+          description: "High-energy electrical pulse designs",
+          itemCount: 8,
+          floorPrice: "0.5",
+          creator: "mock-creator"
+        }
+      ];
+
+      res.json(collections);
+    } catch (error) {
+      console.error("Error fetching collections:", error);
+      res.status(500).json({ error: "Failed to fetch collections" });
+    }
+  });
+
+  // Get NFT analytics
+  app.get("/api/flutter-art/analytics", async (req, res) => {
+    try {
+      const analytics = {
+        totalCreated: 2,
+        totalValue: "0.8",
+        totalViews: 213,
+        totalLikes: 38,
+        topPerforming: [
+          {
+            id: "nft_1",
+            title: "Digital Butterfly Dreams", 
+            views: 124,
+            engagement: 12.1
+          }
+        ],
+        recentActivity: [
+          {
+            type: "view",
+            nftId: "nft_1",
+            timestamp: new Date(Date.now() - 3600000).toISOString()
+          },
+          {
+            type: "like", 
+            nftId: "nft_2",
+            timestamp: new Date(Date.now() - 7200000).toISOString()
+          }
+        ]
+      };
+
+      res.json(analytics);
+    } catch (error) {
+      console.error("Error fetching NFT analytics:", error);
+      res.status(500).json({ error: "Failed to fetch analytics" });
+    }
+  });
+
   // Redemption Code Management API
   app.get("/api/admin/redemption-codes", async (req, res) => {
     try {
