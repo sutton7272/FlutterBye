@@ -72,11 +72,11 @@ import {
 } from "./flutterai-intelligence-routes";
 import flutterAIPricingRoutes, { apiRateLimitMiddleware } from "./flutterai-pricing-routes";
 import { flutterAIAutoCollection } from './flutterai-auto-collection';
+import { MarketingBot } from './marketing-bot';
 import { Connection, Keypair, LAMPORTS_PER_SOL, PublicKey, Transaction, SystemProgram } from '@solana/web3.js';
 import bs58 from 'bs58';
 import { enterpriseApiHandlers } from "./enterprise-api";
 import { governmentApiHandlers } from "./government-api";
-import { MarketingBot } from "./marketing-bot";
 import { aiMarketingService } from "./ai-marketing-service";
 import { mainnetDeployment } from "./mainnet-deployment";
 import { flbyTokenDeployment } from "./flby-token-deployment";
@@ -112,6 +112,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Initialize performance optimizer
   const { performanceOptimizer } = await import('./performance-optimizer');
   const { smartCache, optimizedCache } = await import('./api-optimization');
+  
+  // Initialize Marketing Bot for Twitter Automation
+  const marketingBot = new MarketingBot(storage);
+  console.log('🤖 Marketing Bot initialized - Twitter automation ready');
+  
+  // Start scheduled content generation (4x daily posting)
+  setInterval(async () => {
+    try {
+      const posts = await marketingBot.generateScheduledContent();
+      console.log(`📝 Generated ${posts.length} marketing posts for Twitter`);
+      
+      // Log posts for review (in production, these would be auto-posted)
+      posts.forEach(post => {
+        console.log(`🐦 Scheduled Tweet (${post.scheduled_time.toLocaleTimeString()}): ${post.content}`);
+      });
+    } catch (error) {
+      console.error('Marketing bot error:', error);
+    }
+  }, 6 * 60 * 60 * 1000); // Every 6 hours
   
   // Performance monitoring endpoint
   app.get('/api/performance/stats', (req, res) => {
@@ -612,11 +631,75 @@ export async function registerRoutes(app: Express): Promise<Server> {
     });
   });
 
-  // AI Marketing Bot endpoints
+  // Marketing Bot API Endpoints
+  app.get('/api/marketing/config', async (req, res) => {
+    try {
+      const config = marketingBot.getConfig();
+      res.json({ success: true, config });
+    } catch (error) {
+      console.error('Error getting marketing bot config:', error);
+      res.status(500).json({ error: 'Failed to get marketing bot configuration' });
+    }
+  });
+
+  app.put('/api/marketing/config', async (req, res) => {
+    try {
+      const { config } = req.body;
+      marketingBot.updateConfig(config);
+      res.json({ success: true, message: 'Marketing bot configuration updated' });
+    } catch (error) {
+      console.error('Error updating marketing bot config:', error);
+      res.status(500).json({ error: 'Failed to update marketing bot configuration' });
+    }
+  });
+
+  app.get('/api/marketing/analytics', async (req, res) => {
+    try {
+      const analytics = await marketingBot.getAnalytics();
+      res.json({ success: true, analytics });
+    } catch (error) {
+      console.error('Error getting marketing analytics:', error);
+      res.status(500).json({ error: 'Failed to get marketing analytics' });
+    }
+  });
+
+  app.post('/api/marketing/generate-content', async (req, res) => {
+    try {
+      const { type, data, news } = req.body;
+      const content = await marketingBot.generateTwitterContent({ type, data, news });
+      res.json({ success: true, content });
+    } catch (error) {
+      console.error('Error generating marketing content:', error);
+      res.status(500).json({ error: 'Failed to generate marketing content' });
+    }
+  });
+
+  app.post('/api/marketing/generate-blog', async (req, res) => {
+    try {
+      const { topic, targetKeywords } = req.body;
+      const blog = await marketingBot.generateBlogPost(topic, targetKeywords);
+      res.json({ success: true, blog });
+    } catch (error) {
+      console.error('Error generating blog post:', error);
+      res.status(500).json({ error: 'Failed to generate blog post' });
+    }
+  });
+
+  app.get('/api/marketing/scheduled-posts', async (req, res) => {
+    try {
+      const posts = await marketingBot.generateScheduledContent();
+      res.json({ success: true, posts });
+    } catch (error) {
+      console.error('Error getting scheduled posts:', error);
+      res.status(500).json({ error: 'Failed to get scheduled posts' });
+    }
+  });
+
+  // AI Marketing Bot endpoints (legacy support)
   app.get('/api/admin/marketing-bot/settings', async (req, res) => {
     try {
-      const settings = await aiMarketingService.getSettings();
-      res.json(settings);
+      const config = marketingBot.getConfig();
+      res.json(config);
     } catch (error) {
       console.error('Error getting marketing bot settings:', error);
       res.status(500).json({ error: 'Failed to get settings' });
@@ -4040,7 +4123,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   // Marketing Bot API Routes
-  const marketingBot = new MarketingBot(storage);
 
   // Get marketing bot configuration
   app.get("/api/marketing/bot/config", async (req, res) => {
