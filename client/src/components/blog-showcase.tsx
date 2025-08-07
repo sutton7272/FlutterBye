@@ -22,12 +22,32 @@ interface BlogPost {
 
 export function BlogShowcase() {
   const [hoveredPost, setHoveredPost] = useState<string | null>(null);
+  
+  console.log('BlogShowcase component rendering');
 
-  const { data: blogData, isLoading } = useQuery({
+  const { data: blogData, isLoading, error } = useQuery({
     queryKey: ["/api/blog/posts"],
     retry: 1,
     staleTime: 5 * 60 * 1000, // 5 minutes
   });
+
+  // Show error state for debugging
+  if (error) {
+    return (
+      <div className="w-full max-w-6xl mx-auto px-4">
+        <div className="electric-border bg-gray-900 rounded-xl p-8">
+          <div className="text-center">
+            <h2 className="text-3xl font-bold bg-gradient-to-r from-blue-400 to-green-400 bg-clip-text text-transparent mb-4">
+              Latest Insights
+            </h2>
+            <p className="text-red-400">
+              Error loading blog posts: {error.message}
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (isLoading) {
     return (
@@ -50,9 +70,27 @@ export function BlogShowcase() {
     );
   }
 
-  const posts = blogData?.posts || [];
-  const featuredPost = posts.find(p => p.featured) || posts[0];
-  const recentPosts = posts.filter(p => !p.featured).slice(0, 4);
+  const posts: BlogPost[] = (blogData as any)?.posts || [];
+  const featuredPost = posts.find((p: BlogPost) => p.featured) || posts[0];
+  const recentPosts = posts.filter((p: BlogPost) => !p.featured).slice(0, 4);
+
+  // If no posts, show a simple message instead of empty space
+  if (posts.length === 0) {
+    return (
+      <div className="w-full max-w-6xl mx-auto px-4">
+        <div className="electric-border bg-gray-900 rounded-xl p-8">
+          <div className="text-center">
+            <h2 className="text-3xl font-bold bg-gradient-to-r from-blue-400 to-green-400 bg-clip-text text-transparent mb-4">
+              Latest Insights
+            </h2>
+            <p className="text-gray-300">
+              AI-powered blog posts coming soon...
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="w-full max-w-6xl mx-auto px-4">
@@ -117,12 +155,12 @@ export function BlogShowcase() {
                     
                     <Button 
                       className="bg-gradient-to-r from-blue-600 to-green-600 hover:from-blue-500 hover:to-green-500 transition-all duration-300"
-                      asChild
+                      onClick={() => {
+                        window.open(`/blog/${featuredPost.id}`, '_blank');
+                      }}
                     >
-                      <Link href={`/blog/${featuredPost.id}`}>
-                        Read Full Article
-                        <ArrowRight className="ml-2 w-4 h-4" />
-                      </Link>
+                      Read Full Article
+                      <ArrowRight className="ml-2 w-4 h-4" />
                     </Button>
                   </div>
                 </div>
@@ -148,7 +186,7 @@ export function BlogShowcase() {
             </h3>
             
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {recentPosts.map((post) => (
+              {recentPosts.map((post: BlogPost) => (
                 <Card 
                   key={post.id}
                   className="bg-gray-800/50 border border-gray-700 hover:border-blue-500/50 transition-all duration-300 cursor-pointer group"
