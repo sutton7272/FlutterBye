@@ -43,6 +43,7 @@ import { viralAccelerationService } from "./viral-acceleration-service";
 import { stripeService } from "./stripe-service";
 import { openaiService } from "./openai-service";
 import { messageNFTService } from "./message-nft-service";
+import { SecurityIntegration } from "./security-integration";
 import { livingAIService } from "./living-ai-service";
 import { immersiveAIService } from "./immersive-ai-service";
 import FlutterbeyeWebSocketServer from "./websocket-server";
@@ -87,7 +88,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Trust proxy for rate limiting
   app.set('trust proxy', 1);
 
-  // Security and performance middleware
+  // Initialize comprehensive security system first
+  await SecurityIntegration.initialize(app);
+
+  // Additional legacy security and performance middleware
   app.use(securityHeaders);
   app.use(cors(corsConfig));
   app.use(responseCompression);
@@ -9070,6 +9074,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error('Error in comprehensive status:', error);
       res.status(500).json({ error: 'Failed to get comprehensive final 5% status' });
+    }
+  });
+
+  // Production Environment Check API
+  app.get('/api/admin/production-check', async (req, res) => {
+    try {
+      const { ProductionEnvironmentCheck } = await import('./production-environment-check');
+      const check = await ProductionEnvironmentCheck.performComprehensiveCheck();
+      res.json(check);
+    } catch (error: any) {
+      res.status(500).json({
+        status: 'error',
+        message: `Production check failed: ${error.message}`
+      });
     }
   });
 
