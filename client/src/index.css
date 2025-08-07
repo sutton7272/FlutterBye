@@ -211,7 +211,7 @@
   .electric-branding {
     font-family: 'Orbitron', monospace;
     font-weight: 800;
-    font-size: clamp(3rem, 8vw, 6rem);
+    font-size: clamp(2.5rem, 6vw, 4rem);
     letter-spacing: 0.1em;
     position: relative;
     display: inline-block;
@@ -251,24 +251,6 @@
     filter: blur(2px);
   }
 
-  .electric-branding::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -20%;
-    width: 140%;
-    height: 100%;
-    background: linear-gradient(90deg, 
-      transparent 0%,
-      hsla(200, 100%, 80%, 0.8) 20%,
-      hsla(140, 100%, 70%, 0.8) 50%,
-      hsla(180, 100%, 65%, 0.8) 80%,
-      transparent 100%);
-    opacity: 0;
-    animation: electricSweep 4s ease-in-out infinite;
-    z-index: -1;
-  }
-
   @keyframes electricPulse {
     0%, 100% {
       filter: brightness(1) saturate(1);
@@ -280,15 +262,60 @@
     }
   }
 
-  @keyframes electricSweep {
-    0%, 90%, 100% {
-      opacity: 0;
-      transform: translateX(-100%);
-    }
-    10%, 80% {
-      opacity: 0.6;
-      transform: translateX(0%);
-    }
+  /* Digital Butterfly Animations */
+  .digital-butterfly {
+    position: absolute;
+    width: 24px;
+    height: 24px;
+    filter: drop-shadow(0 0 8px currentColor);
+    animation-timing-function: ease-in-out;
+    animation-iteration-count: infinite;
+    z-index: 10;
+  }
+
+  .butterfly-1 {
+    color: hsl(200, 100%, 70%);
+    animation: butterflyFly1 8s infinite;
+    top: -20px;
+    left: -50px;
+  }
+
+  .butterfly-2 {
+    color: hsl(140, 100%, 60%);
+    animation: butterflyFly2 10s infinite;
+    top: 20px;
+    right: -60px;
+    animation-delay: -2s;
+  }
+
+  .butterfly-3 {
+    color: hsl(180, 100%, 55%);
+    animation: butterflyFly3 12s infinite;
+    top: -30px;
+    right: -20px;
+    animation-delay: -5s;
+  }
+
+  @keyframes butterflyFly1 {
+    0%, 100% { transform: translate(0, 0) rotate(0deg) scale(1); }
+    25% { transform: translate(80px, -20px) rotate(15deg) scale(0.8); }
+    50% { transform: translate(160px, 10px) rotate(-10deg) scale(1.1); }
+    75% { transform: translate(80px, 40px) rotate(20deg) scale(0.9); }
+  }
+
+  @keyframes butterflyFly2 {
+    0%, 100% { transform: translate(0, 0) rotate(0deg) scale(1); }
+    25% { transform: translate(-70px, 15px) rotate(-20deg) scale(1.2); }
+    50% { transform: translate(-140px, -25px) rotate(10deg) scale(0.7); }
+    75% { transform: translate(-70px, -10px) rotate(-15deg) scale(1); }
+  }
+
+  @keyframes butterflyFly3 {
+    0%, 100% { transform: translate(0, 0) rotate(0deg) scale(1); }
+    20% { transform: translate(-40px, 30px) rotate(25deg) scale(0.8); }
+    40% { transform: translate(20px, 50px) rotate(-30deg) scale(1.3); }
+    60% { transform: translate(60px, 20px) rotate(15deg) scale(0.6); }
+    80% { transform: translate(10px, -20px) rotate(-10deg) scale(1.1); }
   }
 
   /* Improved electric frame */
