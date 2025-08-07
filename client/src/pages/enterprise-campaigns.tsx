@@ -212,7 +212,7 @@ export default function EnterpriseCampaigns() {
                     >
                       <CardContent className="p-4">
                         <div className="flex items-start space-x-3">
-                          <template.icon className="w-6 h-6 text-primary mt-1" />
+                          <template.icon />
                           <div className="flex-1">
                             <h3 className="font-semibold text-sm">{template.name}</h3>
                             <p className="text-xs text-muted-foreground mt-1">{template.description}</p>
@@ -258,7 +258,7 @@ export default function EnterpriseCampaigns() {
                     <div className="space-y-2">
                       <Label>Total Budget ({selectedCurrency.symbol})</Label>
                       <div className="relative">
-                        <selectedCurrency.icon className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                        <selectedCurrency.icon />
                         <Input
                           type="number"
                           step="0.1"
@@ -273,7 +273,7 @@ export default function EnterpriseCampaigns() {
                     <div className="space-y-2">
                       <Label>Value Per Token ({selectedCurrency.symbol})</Label>
                       <div className="relative">
-                        <selectedCurrency.icon className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                        <selectedCurrency.icon />
                         <Input
                           type="number"
                           step="0.001"
