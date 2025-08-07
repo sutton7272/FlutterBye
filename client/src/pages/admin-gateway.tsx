@@ -216,6 +216,25 @@ export default function AdminGateway() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-6">
+          {/* FIRST CARD - MULTI-CHAIN INTELLIGENCE - TESTING POSITION */}
+          <Link href="/admin">
+            <Card className="bg-yellow-500 border-yellow-400 hover:border-yellow-300 transition-all cursor-pointer group">
+              <CardHeader>
+                <Globe className="w-8 h-8 text-black group-hover:text-gray-800" />
+                <CardTitle className="text-black">MULTI-CHAIN INTELLIGENCE TEST</CardTitle>
+                <CardDescription className="text-gray-800">
+                  Testing if this shows up as the FIRST card
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <ul className="text-sm text-gray-800 space-y-1">
+                  <li>• This should be visible</li>
+                  <li>• If you see this, the issue is positioning</li>
+                  <li>• If you don't see this, there's a code issue</li>
+                </ul>
+              </CardContent>
+            </Card>
+          </Link>
           {/* Unified Admin Dashboard */}
           <Link href="/admin/dashboard">
             <Card className="bg-slate-800/50 border-blue-500/20 hover:border-blue-400/40 transition-all cursor-pointer group">
