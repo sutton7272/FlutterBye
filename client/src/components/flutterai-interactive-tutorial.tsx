@@ -155,6 +155,7 @@ const TUTORIAL_STEPS: TutorialStep[] = [
 ];
 
 export function FlutterAIInteractiveTutorial() {
+  const [showTutorial, setShowTutorial] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
   const [stepResults, setStepResults] = useState<Record<number, any>>({});
@@ -195,7 +196,7 @@ export function FlutterAIInteractiveTutorial() {
       const data = await result.json();
       
       setStepResults(prev => ({ ...prev, [step.id]: data }));
-      setCompletedSteps(prev => new Set([...prev, step.id]));
+      setCompletedSteps(prev => new Set(Array.from(prev).concat(step.id)));
       setShowResults(true);
       
       toast({
@@ -219,7 +220,7 @@ export function FlutterAIInteractiveTutorial() {
       // Use mock data for demo purposes
       const mockData = generateMockData(step.category);
       setStepResults(prev => ({ ...prev, [step.id]: mockData }));
-      setCompletedSteps(prev => new Set([...prev, step.id]));
+      setCompletedSteps(prev => new Set(Array.from(prev).concat(step.id)));
       setShowResults(true);
 
       if (isPlaying) {
@@ -594,8 +595,22 @@ export function FlutterAIInteractiveTutorial() {
     }
   };
 
-  return (
-    <Card className="bg-black/60 border-electric-blue/30 backdrop-blur-lg">
+  if (showTutorial) {
+    return (
+      <div className="fixed inset-0 bg-slate-900/95 backdrop-blur-sm z-50 overflow-y-auto">
+        <div className="min-h-full p-4">
+          <div className="max-w-7xl mx-auto">
+            <div className="flex items-center justify-between mb-6 sticky top-4 bg-slate-900/90 backdrop-blur rounded-lg p-4 border border-electric-blue/30">
+              <h1 className="text-2xl font-bold text-gradient">FlutterAI Interactive Tutorial</h1>
+              <Button
+                variant="ghost" 
+                onClick={() => setShowTutorial(false)}
+                className="text-gray-400 hover:text-white"
+              >
+                ✕ Close Tutorial
+              </Button>
+            </div>
+            <Card className="bg-black/60 border-electric-blue/30 backdrop-blur-lg">
       <CardHeader className="pb-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -776,6 +791,63 @@ export function FlutterAIInteractiveTutorial() {
             </CardContent>
           </Card>
         )}
+      </CardContent>
+    </Card>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <Card className="electric-frame">
+      <CardHeader className="pb-3">
+        <CardTitle className="text-gradient text-lg flex items-center gap-2">
+          <Brain className="w-5 h-5" />
+          FlutterAI Tutorial
+        </CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className="space-y-4">
+          <p className="text-sm text-muted-foreground">
+            Experience REVOLUTIONARY AI that will blow your mind! Watch as our GPT-4o powered intelligence transforms blockchain forever.
+          </p>
+          
+          {/* Compact preview showing first step */}
+          <div className="bg-slate-800/40 rounded-lg p-3 border border-electric-blue/20">
+            <div className="flex items-center gap-3 mb-2">
+              <Brain className="w-5 h-5 text-purple-400" />
+              <span className="text-sm font-medium text-white">Wallet Intelligence Scanning</span>
+            </div>
+            <p className="text-xs text-muted-foreground">
+              REVOLUTIONARY AI that instantly analyzes wallets and reveals hidden patterns...
+            </p>
+          </div>
+
+          <Button
+            onClick={() => setShowTutorial(true)}
+            className="w-full bg-gradient-to-r from-electric-blue to-circuit-teal hover:from-electric-blue/80 hover:to-circuit-teal/80 text-white flex items-center gap-2"
+          >
+            <Play className="w-4 h-4" />
+            Start FlutterAI Demo
+          </Button>
+
+          {/* Quick stats */}
+          <div className="grid grid-cols-3 gap-2 text-center pt-2">
+            <div>
+              <div className="text-lg font-bold text-purple-400">8</div>
+              <div className="text-xs text-gray-400">AI Features</div>
+            </div>
+            <div>
+              <div className="text-lg font-bold text-blue-400">GPT-4o</div>
+              <div className="text-xs text-gray-400">Powered</div>
+            </div>
+            <div>
+              <div className="text-lg font-bold text-green-400">∞</div>
+              <div className="text-xs text-gray-400">Intelligence</div>
+            </div>
+          </div>
+        </div>
       </CardContent>
     </Card>
   );
