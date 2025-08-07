@@ -44,7 +44,7 @@ export default function Navbar() {
         return isFeatureEnabled(item.featureId);
       });
 
-  // Secondary navigation - business and enterprise features
+  // Secondary navigation - business and enterprise features (Dashboard moved to first position)
   const secondaryNavItems = [
     { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard, description: "Portfolio & activity" },
     { href: "/chat", label: "Chat", icon: MessageSquare, description: "Real-time blockchain chat" },
