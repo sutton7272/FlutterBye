@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Shield, Lock, Key, Users, Settings, BarChart3, Brain, Target } from "lucide-react";
+import { Shield, Lock, Key, Users, Settings, BarChart3, Brain, Target, Globe } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { Link } from "wouter";
@@ -316,6 +316,27 @@ export default function AdminGateway() {
                   <li>• Environment Settings</li>
                   <li>• API Configuration</li>
                   <li>• Default Values</li>
+                </ul>
+              </CardContent>
+            </Card>
+          </Link>
+
+          {/* Multi-Chain Intelligence */}
+          <Link href="/admin">
+            <Card className="bg-slate-800/50 border-cyan-500/20 hover:border-cyan-400/40 transition-all cursor-pointer group">
+              <CardHeader>
+                <Globe className="w-8 h-8 text-cyan-400 group-hover:text-cyan-300" />
+                <CardTitle className="text-white">Multi-Chain Intelligence</CardTitle>
+                <CardDescription className="text-slate-300">
+                  Revolutionary blockchain intelligence across 7 networks
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <ul className="text-sm text-slate-400 space-y-1">
+                  <li>• 7 Blockchain Networks</li>
+                  <li>• Real-time Market Data</li>
+                  <li>• Enterprise Intelligence</li>
+                  <li>• Cross-Chain Analytics</li>
                 </ul>
               </CardContent>
             </Card>
