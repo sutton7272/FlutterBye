@@ -53,6 +53,7 @@ import FlbyAirdrop from "@/pages/flby-airdrop";
 import AdminStaking from "@/pages/admin-staking";
 import ReferralRewards from "@/pages/referral-rewards";
 import LaunchCountdown from "@/pages/launch-countdown";
+import BlogPage from "@/pages/blog";
 import Subscribe from "@/pages/subscribe";
 import Payments from "@/pages/payments";
 import AIPayments from "@/pages/ai-payments";
@@ -114,6 +115,7 @@ function Router() {
           <Switch>
         <Route path="/" component={LaunchCountdown} />
         <Route path="/launch" component={LaunchCountdown} />
+        <Route path="/blog" component={BlogPage} />
         <Route path="/home" component={() => (
           <>
             <Navbar />

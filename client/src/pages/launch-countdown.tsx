@@ -502,7 +502,10 @@ export default function LaunchCountdown() {
                     <span>•</span>
                     <span>🏷️ AI Marketing, Blockchain</span>
                   </div>
-                  <button className="bg-gradient-to-r from-blue-600 to-green-600 hover:from-blue-500 hover:to-green-500 px-6 py-2 rounded-lg font-medium text-sm transition-all duration-300 flex items-center gap-2">
+                  <button 
+                    onClick={() => setLocation('/blog')}
+                    className="bg-gradient-to-r from-blue-600 to-green-600 hover:from-blue-500 hover:to-green-500 px-6 py-2 rounded-lg font-medium text-sm transition-all duration-300 flex items-center gap-2"
+                  >
                     Read Article
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
