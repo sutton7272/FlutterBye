@@ -11,13 +11,12 @@ import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import ImageUpload from "@/components/image-upload";
 import { LoadingSpinner } from "@/components/loading-spinner";
 import { validateTokenQuantity, validateWholeNumber } from "@/lib/validators";
-import { Coins, Upload, Calculator, DollarSign, Lock, Globe, Gift, AlertCircle, Wand2, Star, Sparkles, Users, Target, ImageIcon, FileImage, QrCode, Plus, X, Ticket, Loader2, Zap, CheckCircle, Mic, TrendingUp, Heart, Copy, Check } from "lucide-react";
+import { Coins, Upload, Calculator, DollarSign, Lock, Globe, Gift, AlertCircle, Wand2, Star, Sparkles, Users, Target, ImageIcon, FileImage, QrCode, Plus, X, Ticket, Loader2, Zap, CheckCircle, Mic, TrendingUp, Heart } from "lucide-react";
 import AITextOptimizer from "@/components/ai-text-optimizer";
 import { EmotionAnalyzer } from "@/components/EmotionAnalyzer";
 import { ViralMechanics } from "@/components/ViralMechanics";
@@ -105,17 +104,6 @@ export default function Mint({ tokenType }: MintProps = {}) {
   const [validatedCode, setValidatedCode] = useState<any>(null);
   const [isFreeMode, setIsFreeMode] = useState(false);
   const [attachedVoice, setAttachedVoice] = useState<{ url: string; duration: number; type: 'voice' | 'music' } | null>(null);
-  
-  // QR Code generation states
-  const [showQRDialog, setShowQRDialog] = useState(false);
-  const [qrCodeText, setQRCodeText] = useState("");
-  const [isGeneratingQR, setIsGeneratingQR] = useState(false);
-  const [generatedQRCode, setGeneratedQRCode] = useState<string>("");
-  const [copiedQRText, setCopiedQRText] = useState(false);
-  const [copiedQRImage, setCopiedQRImage] = useState(false);
-  
-  // Creation type selection
-  const [activeCreationType, setActiveCreationType] = useState<'coins' | 'art' | 'collaborative'>('coins');
   
   // Progress tracking for step-by-step guidance
   const [currentStep, setCurrentStep] = useState(1);
@@ -330,14 +318,15 @@ export default function Mint({ tokenType }: MintProps = {}) {
     mintToken.mutate(tokenData);
   };
 
-  const handleMessageMediaUpload = (e: React.ChangeEvent<HTMLInputElement>, type: 'image' | 'gif') => {
+  const handleMessageMediaUpload = (e: React.ChangeEvent<HTMLInputElement>, type: 'image' | 'gif' | 'qr') => {
     const file = e.target.files?.[0];
     if (!file) return;
 
     // Validate file type
     const validTypes = {
       image: ['image/jpeg', 'image/png', 'image/webp'],
-      gif: ['image/gif']
+      gif: ['image/gif'],
+      qr: ['image/jpeg', 'image/png', 'image/webp']
     };
 
     if (!validTypes[type].includes(file.type)) {
@@ -366,109 +355,6 @@ export default function Mint({ tokenType }: MintProps = {}) {
       });
     };
     reader.readAsDataURL(file);
-  };
-
-  const handleGenerateQRCode = async () => {
-    if (!qrCodeText.trim()) {
-      toast({
-        title: "QR Code Error",
-        description: "Please enter some text or URL to generate a QR code",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    setIsGeneratingQR(true);
-    try {
-      const response = await apiRequest("/api/qr/generate", "POST", {
-        data: qrCodeText,
-        size: 256
-      });
-
-      const qrData = await response.json();
-      setGeneratedQRCode(qrData.qrCode);
-      
-      const newMedia = {
-        id: Math.random().toString(36).substr(2, 9),
-        type: 'qr' as const,
-        url: qrData.qrCode,
-        name: `QR Code: ${qrCodeText.substring(0, 20)}...`
-      };
-      
-      setMessageMedia(prev => [...prev, newMedia]);
-      
-      toast({
-        title: "QR Code Generated",
-        description: "QR code has been added to your message",
-      });
-    } catch (error) {
-      toast({
-        title: "QR Generation Failed",
-        description: error instanceof Error ? error.message : "Failed to generate QR code",
-        variant: "destructive",
-      });
-    } finally {
-      setIsGeneratingQR(false);
-    }
-  };
-
-  const copyQRText = async () => {
-    try {
-      await navigator.clipboard.writeText(qrCodeText);
-      setCopiedQRText(true);
-      setTimeout(() => setCopiedQRText(false), 2000);
-      toast({
-        title: "Copied!",
-        description: "QR code text copied to clipboard",
-      });
-    } catch (error) {
-      toast({
-        title: "Copy Failed",
-        description: "Failed to copy text to clipboard",
-        variant: "destructive",
-      });
-    }
-  };
-
-  const copyQRImage = async () => {
-    if (!generatedQRCode) return;
-    
-    try {
-      // Convert base64 to blob and copy to clipboard
-      const response = await fetch(generatedQRCode);
-      const blob = await response.blob();
-      await navigator.clipboard.write([
-        new ClipboardItem({ [blob.type]: blob })
-      ]);
-      setCopiedQRImage(true);
-      setTimeout(() => setCopiedQRImage(false), 2000);
-      toast({
-        title: "Copied!",
-        description: "QR code image copied to clipboard",
-      });
-    } catch (error) {
-      toast({
-        title: "Copy Failed",
-        description: "Failed to copy image to clipboard",
-        variant: "destructive",
-      });
-    }
-  };
-
-  const downloadQRCode = () => {
-    if (!generatedQRCode) return;
-    
-    const link = document.createElement('a');
-    link.href = generatedQRCode;
-    link.download = `qr-code-${qrCodeText.substring(0, 10)}.png`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    
-    toast({
-      title: "Downloaded!",
-      description: "QR code saved to your device",
-    });
   };
 
   const removeMessageMedia = (id: string) => {
@@ -506,156 +392,25 @@ export default function Mint({ tokenType }: MintProps = {}) {
     <div className="min-h-screen pt-20 pb-12">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12">
-          <h1 className="text-5xl font-bold mb-6 text-gradient">Flutterbye Creation Hub</h1>
-          <p className="text-xl text-muted-foreground mb-8">The ultimate blockchain creation platform</p>
+          <h1 className="text-4xl font-bold mb-4 text-gradient">Token Creation Center</h1>
+          <p className="text-xl text-muted-foreground">Create individual tokens or limited edition collections</p>
         </div>
 
-        {/* Main Creation Cards */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
-          {/* Flutterbye Coins */}
-          <Card className="electric-frame bg-gradient-to-br from-electric-blue/20 to-circuit-teal/20 border-2 border-electric-blue/50 hover:border-electric-blue/80 transition-all duration-500 hover:shadow-2xl hover:shadow-electric-blue/25">
-            <CardHeader className="text-center pb-4">
-              <div className="w-20 h-20 mx-auto mb-4 bg-gradient-to-r from-electric-blue to-circuit-teal rounded-full flex items-center justify-center">
-                <Coins className="w-10 h-10 text-white" />
-              </div>
-              <CardTitle className="text-3xl font-bold text-electric-blue mb-2">Flutterbye Coins</CardTitle>
-              <CardDescription className="text-lg text-gray-300">
-                Create personalized message tokens with attached value
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="bg-slate-800/50 p-4 rounded-lg border border-electric-blue/30">
-                  <div className="flex items-center gap-2 mb-2">
-                    <Sparkles className="w-5 h-5 text-electric-blue" />
-                    <span className="font-semibold text-electric-blue">27-Character Messages</span>
-                  </div>
-                  <p className="text-sm text-gray-400">Precision messaging on blockchain</p>
-                </div>
-                <div className="bg-slate-800/50 p-4 rounded-lg border border-electric-green/30">
-                  <div className="flex items-center gap-2 mb-2">
-                    <DollarSign className="w-5 h-5 text-electric-green" />
-                    <span className="font-semibold text-electric-green">Value Attachment</span>
-                  </div>
-                  <p className="text-sm text-gray-400">SOL, USDC, FLBY rewards</p>
-                </div>
-                <div className="bg-slate-800/50 p-4 rounded-lg border border-purple-400/30">
-                  <div className="flex items-center gap-2 mb-2">
-                    <Target className="w-5 h-5 text-purple-400" />
-                    <span className="font-semibold text-purple-400">AI Targeting</span>
-                  </div>
-                  <p className="text-sm text-gray-400">Precision holder analysis</p>
-                </div>
-                <div className="bg-slate-800/50 p-4 rounded-lg border border-orange-400/30">
-                  <div className="flex items-center gap-2 mb-2">
-                    <TrendingUp className="w-5 h-5 text-orange-400" />
-                    <span className="font-semibold text-orange-400">Viral Mechanics</span>
-                  </div>
-                  <p className="text-sm text-gray-400">Growth amplification</p>
-                </div>
-              </div>
-              <Button 
-                className="w-full bg-gradient-to-r from-electric-blue to-circuit-teal hover:from-electric-blue/80 hover:to-circuit-teal/80 text-white py-6 text-lg font-semibold"
-                onClick={() => setActiveCreationType('coins')}
-              >
-                <Coins className="w-5 h-5 mr-2" />
-                Create Flutterbye Coin
-              </Button>
-            </CardContent>
-          </Card>
-
-          {/* FlutterArt */}
-          <Card className="electric-frame bg-gradient-to-br from-purple-600/20 to-pink-600/20 border-2 border-purple-500/50 hover:border-purple-500/80 transition-all duration-500 hover:shadow-2xl hover:shadow-purple-500/25">
-            <CardHeader className="text-center pb-4">
-              <div className="w-20 h-20 mx-auto mb-4 bg-gradient-to-r from-purple-600 to-pink-600 rounded-full flex items-center justify-center">
-                <ImageIcon className="w-10 h-10 text-white" />
-              </div>
-              <CardTitle className="text-3xl font-bold text-purple-400 mb-2">FlutterArt</CardTitle>
-              <CardDescription className="text-lg text-gray-300">
-                Limited edition NFT collections with multimedia
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="bg-slate-800/50 p-4 rounded-lg border border-purple-400/30">
-                  <div className="flex items-center gap-2 mb-2">
-                    <Star className="w-5 h-5 text-purple-400" />
-                    <span className="font-semibold text-purple-400">Limited Editions</span>
-                  </div>
-                  <p className="text-sm text-gray-400">Exclusive NFT collections</p>
-                </div>
-                <div className="bg-slate-800/50 p-4 rounded-lg border border-pink-400/30">
-                  <div className="flex items-center gap-2 mb-2">
-                    <FileImage className="w-5 h-5 text-pink-400" />
-                    <span className="font-semibold text-pink-400">Rich Media</span>
-                  </div>
-                  <p className="text-sm text-gray-400">Images, GIFs, QR codes</p>
-                </div>
-                <div className="bg-slate-800/50 p-4 rounded-lg border border-indigo-400/30">
-                  <div className="flex items-center gap-2 mb-2">
-                    <Mic className="w-5 h-5 text-indigo-400" />
-                    <span className="font-semibold text-indigo-400">Voice & Music</span>
-                  </div>
-                  <p className="text-sm text-gray-400">Audio NFT integration</p>
-                </div>
-                <div className="bg-slate-800/50 p-4 rounded-lg border border-cyan-400/30">
-                  <div className="flex items-center gap-2 mb-2">
-                    <Users className="w-5 h-5 text-cyan-400" />
-                    <span className="font-semibold text-cyan-400">Collaborative</span>
-                  </div>
-                  <p className="text-sm text-gray-400">Multi-creator works</p>
-                </div>
-              </div>
-              <Button 
-                className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-600/80 hover:to-pink-600/80 text-white py-6 text-lg font-semibold"
-                onClick={() => setActiveCreationType('art')}
-              >
-                <Star className="w-5 h-5 mr-2" />
-                Create FlutterArt NFT
-              </Button>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Back to Selection Button */}
-        {(activeCreationType === 'coins' || activeCreationType === 'art') && (
-          <div className="text-center mb-8">
-            <Button 
-              variant="outline" 
-              onClick={() => setActiveCreationType('coins')}
-              className="mr-4 bg-slate-800/50 border-electric-blue/30 hover:border-electric-blue/60"
-            >
-              <Coins className="w-4 h-4 mr-2" />
-              {activeCreationType === 'coins' ? '✓ ' : ''}Flutterbye Coins
-            </Button>
-            <Button 
-              variant="outline" 
-              onClick={() => setActiveCreationType('art')}
-              className="bg-slate-800/50 border-purple-500/30 hover:border-purple-500/60"
-            >
-              <Star className="w-4 h-4 mr-2" />
-              {activeCreationType === 'art' ? '✓ ' : ''}FlutterArt NFTs
-            </Button>
-          </div>
-        )}
-
-        <Tabs value={activeCreationType === 'coins' ? 'individual' : activeCreationType === 'art' ? 'limited' : 'individual'} className="space-y-6">
-          <div className="hidden">
-            <TabsList className="grid w-full grid-cols-3 bg-slate-800/50">
-              <TabsTrigger value="individual" className="flex items-center gap-2">
-                <Coins className="w-4 h-4" />
-                Individual Token
-              </TabsTrigger>
-              <TabsTrigger value="limited" className="flex items-center gap-2">
-                <Star className="w-4 h-4" />
-                Limited Edition
-              </TabsTrigger>
-              <TabsTrigger value="collaborative" className="flex items-center gap-2">
-                <Users className="w-4 h-4" />
-                🚀 Collaborative Mode
-              </TabsTrigger>
-            </TabsList>
-          </div>
+        <Tabs defaultValue="individual" className="space-y-6">
+          <TabsList className="grid w-full grid-cols-3 bg-slate-800/50">
+            <TabsTrigger value="individual" className="flex items-center gap-2">
+              <Coins className="w-4 h-4" />
+              Individual Token
+            </TabsTrigger>
+            <TabsTrigger value="limited" className="flex items-center gap-2">
+              <Star className="w-4 h-4" />
+              Limited Edition
+            </TabsTrigger>
+            <TabsTrigger value="collaborative" className="flex items-center gap-2">
+              <Users className="w-4 h-4" />
+              🚀 Collaborative Mode
+            </TabsTrigger>
+          </TabsList>
 
           <TabsContent value="individual" className="space-y-6">
                 {/* Floating Progress Indicator - Always Visible */}
@@ -878,191 +633,21 @@ export default function Mint({ tokenType }: MintProps = {}) {
                           </Button>
                         </Label>
                       </div>
-                      <Dialog open={showQRDialog} onOpenChange={setShowQRDialog}>
-                        <DialogTrigger asChild>
+                      <div className="relative">
+                        <input
+                          type="file"
+                          accept="image/jpeg,image/png"
+                          onChange={(e) => handleMessageMediaUpload(e, 'qr')}
+                          className="hidden"
+                          id="message-qr-upload"
+                        />
+                        <Label htmlFor="message-qr-upload" className="cursor-pointer">
                           <Button type="button" variant="outline" size="sm">
                             <QrCode className="w-4 h-4 mr-2" />
                             Add QR Code
                           </Button>
-                        </DialogTrigger>
-                        <DialogContent className="bg-slate-900 border-electric-blue/30 max-w-md">
-                          <DialogHeader>
-                            <DialogTitle className="text-electric-blue">Generate QR Code</DialogTitle>
-                          </DialogHeader>
-                          <div className="space-y-4">
-                            <div>
-                              <div className="flex items-center justify-between">
-                                <Label htmlFor="qr-text" className="text-white">
-                                  Text or URL to encode
-                                </Label>
-                                {qrCodeText && (
-                                  <Button
-                                    type="button"
-                                    variant="ghost"
-                                    size="sm"
-                                    onClick={copyQRText}
-                                    className="text-electric-blue hover:text-electric-green"
-                                  >
-                                    {copiedQRText ? (
-                                      <Check className="w-4 h-4" />
-                                    ) : (
-                                      <Copy className="w-4 h-4" />
-                                    )}
-                                  </Button>
-                                )}
-                              </div>
-                              <Textarea
-                                id="qr-text"
-                                value={qrCodeText}
-                                onChange={(e) => {
-                                  setQRCodeText(e.target.value);
-                                  setGeneratedQRCode("");
-                                }}
-                                placeholder="Enter website URL, wallet address, contact info, or any text..."
-                                rows={3}
-                                className="bg-black/40 text-white border-electric-blue/30 focus:border-electric-green"
-                              />
-                              <p className="text-xs text-gray-400 mt-1">
-                                Examples: https://flutterbye.com, wallet address, contact details
-                              </p>
-                            </div>
-
-                            {/* QR Code Preview */}
-                            {generatedQRCode && (
-                              <div className="space-y-3">
-                                <Label className="text-white">Generated QR Code</Label>
-                                <div className="flex flex-col items-center space-y-3 p-4 bg-white rounded-lg">
-                                  <img 
-                                    src={generatedQRCode} 
-                                    alt="Generated QR Code" 
-                                    className="w-48 h-48 object-contain"
-                                  />
-                                  <div className="flex gap-2">
-                                    <Button
-                                      type="button"
-                                      variant="outline"
-                                      size="sm"
-                                      onClick={copyQRImage}
-                                      className="text-xs"
-                                    >
-                                      {copiedQRImage ? (
-                                        <>
-                                          <Check className="w-3 h-3 mr-1" />
-                                          Copied
-                                        </>
-                                      ) : (
-                                        <>
-                                          <Copy className="w-3 h-3 mr-1" />
-                                          Copy Image
-                                        </>
-                                      )}
-                                    </Button>
-                                    <Button
-                                      type="button"
-                                      variant="outline"
-                                      size="sm"
-                                      onClick={downloadQRCode}
-                                      className="text-xs"
-                                    >
-                                      <Upload className="w-3 h-3 mr-1" />
-                                      Download
-                                    </Button>
-                                  </div>
-                                </div>
-                              </div>
-                            )}
-                            
-                            <div>
-                              <Label className="text-white text-sm">Quick Templates</Label>
-                              <div className="flex gap-2 flex-wrap mt-2">
-                                <Button
-                                  type="button"
-                                  variant="outline"
-                                  size="sm"
-                                  onClick={() => setQRCodeText("https://flutterbye.com")}
-                                  className="text-xs"
-                                >
-                                  Flutterbye
-                                </Button>
-                                <Button
-                                  type="button"
-                                  variant="outline"
-                                  size="sm"
-                                  onClick={() => setQRCodeText(`Token: ${message}`)}
-                                  className="text-xs"
-                                  disabled={!message}
-                                >
-                                  Token Link
-                                </Button>
-                                <Button
-                                  type="button"
-                                  variant="outline"
-                                  size="sm"
-                                  onClick={() => setQRCodeText("mailto:contact@example.com")}
-                                  className="text-xs"
-                                >
-                                  Email
-                                </Button>
-                                <Button
-                                  type="button"
-                                  variant="outline"
-                                  size="sm"
-                                  onClick={() => setQRCodeText("tel:+1234567890")}
-                                  className="text-xs"
-                                >
-                                  Phone
-                                </Button>
-                              </div>
-                            </div>
-                            <div className="flex gap-2">
-                              {!generatedQRCode ? (
-                                <Button
-                                  onClick={handleGenerateQRCode}
-                                  disabled={isGeneratingQR || !qrCodeText.trim()}
-                                  className="bg-electric-blue hover:bg-electric-blue/80"
-                                >
-                                  {isGeneratingQR ? (
-                                    <>
-                                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                                      Generating...
-                                    </>
-                                  ) : (
-                                    <>
-                                      <QrCode className="w-4 h-4 mr-2" />
-                                      Generate QR Code
-                                    </>
-                                  )}
-                                </Button>
-                              ) : (
-                                <Button
-                                  onClick={() => {
-                                    setShowQRDialog(false);
-                                    setQRCodeText("");
-                                    setGeneratedQRCode("");
-                                  }}
-                                  className="bg-electric-green hover:bg-electric-green/80"
-                                >
-                                  <CheckCircle className="w-4 h-4 mr-2" />
-                                  Done
-                                </Button>
-                              )}
-                              <Button
-                                type="button"
-                                variant="outline"
-                                onClick={() => {
-                                  setShowQRDialog(false);
-                                  setQRCodeText("");
-                                  setGeneratedQRCode("");
-                                  setCopiedQRText(false);
-                                  setCopiedQRImage(false);
-                                }}
-                              >
-                                Cancel
-                              </Button>
-                            </div>
-                          </div>
-                        </DialogContent>
-                      </Dialog>
+                        </Label>
+                      </div>
                       <Button 
                         type="button" 
                         variant="outline" 
@@ -1090,34 +675,23 @@ export default function Mint({ tokenType }: MintProps = {}) {
                         <Label>Attached Media ({messageMedia.length})</Label>
                         <div className="grid grid-cols-2 gap-3">
                           {messageMedia.map((media) => (
-                            <div key={media.id} className="relative border border-electric-blue/30 rounded-lg p-3 bg-slate-800/50">
-                              <div className="flex items-center gap-3">
-                                <div className="w-16 h-16 bg-slate-100 dark:bg-slate-800 rounded flex items-center justify-center overflow-hidden border border-electric-blue/20">
-                                  {media.type === 'image' && (
-                                    <img src={media.url} alt="Preview" className="w-full h-full object-cover rounded" />
-                                  )}
-                                  {media.type === 'gif' && (
-                                    <img src={media.url} alt="GIF Preview" className="w-full h-full object-cover rounded" />
-                                  )}
-                                  {media.type === 'qr' && (
-                                    <img src={media.url} alt="QR Code" className="w-full h-full object-contain rounded bg-white p-1" />
-                                  )}
+                            <div key={media.id} className="relative border border-slate-200 dark:border-slate-700 rounded-lg p-2">
+                              <div className="flex items-center gap-2">
+                                <div className="w-12 h-12 bg-slate-100 dark:bg-slate-800 rounded flex items-center justify-center overflow-hidden">
+                                  {media.type === 'image' && <ImageIcon className="w-6 h-6 text-blue-500" />}
+                                  {media.type === 'gif' && <FileImage className="w-6 h-6 text-green-500" />}
+                                  {media.type === 'qr' && <QrCode className="w-6 h-6 text-purple-500" />}
                                 </div>
                                 <div className="flex-1 min-w-0">
-                                  <p className="text-sm font-medium truncate text-electric-blue">{media.name}</p>
-                                  <p className="text-xs text-gray-400 capitalize">{media.type}</p>
-                                  {media.type === 'qr' && (
-                                    <Badge variant="outline" className="mt-1 text-xs border-purple-400 text-purple-400">
-                                      QR Generated
-                                    </Badge>
-                                  )}
+                                  <p className="text-sm font-medium truncate">{media.name}</p>
+                                  <p className="text-xs text-muted-foreground capitalize">{media.type}</p>
                                 </div>
                                 <Button
                                   type="button"
                                   variant="ghost"
                                   size="sm"
                                   onClick={() => removeMessageMedia(media.id)}
-                                  className="w-6 h-6 p-0 text-red-400 hover:text-red-600 hover:bg-red-400/10"
+                                  className="w-6 h-6 p-0 text-red-500 hover:text-red-700"
                                 >
                                   <X className="w-4 h-4" />
                                 </Button>

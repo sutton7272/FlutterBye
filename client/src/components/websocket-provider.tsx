@@ -26,80 +26,63 @@ export function WebSocketProvider({ children }: WebSocketProviderProps) {
   const [lastMessage, setLastMessage] = useState<any>(null);
 
   useEffect(() => {
-    let ws: WebSocket | null = null;
-    let reconnectTimeout: NodeJS.Timeout;
-    let isReconnecting = false;
-
-    const connect = () => {
-      if (isReconnecting) return;
+    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+    const wsUrl = `${protocol}//${window.location.host}/ws`;
+    
+    console.log('🚀 Connecting to WebSocket:', wsUrl);
+    setConnectionStatus('connecting');
+    
+    const ws = new WebSocket(wsUrl);
+    
+    ws.onopen = () => {
+      console.log('✅ WebSocket connected');
+      setConnectionStatus('connected');
+      setSocket(ws);
       
-      const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-      const wsUrl = `${protocol}//${window.location.host}/ws`;
-      
-      console.log('🚀 Connecting to WebSocket:', wsUrl);
-      setConnectionStatus('connecting');
-      
-      ws = new WebSocket(wsUrl);
-      
-      ws.onopen = () => {
-        console.log('✅ WebSocket connected');
-        setConnectionStatus('connected');
-        setSocket(ws);
-        isReconnecting = false;
-        
-        // Send initial connection message
-        if (ws && ws.readyState === WebSocket.OPEN) {
-          ws.send(JSON.stringify({
-            type: 'connection',
-            timestamp: new Date().toISOString(),
-            clientId: `client_${Date.now()}`
-          }));
-        }
-      };
-
-      ws.onmessage = (event) => {
-        try {
-          const data = JSON.parse(event.data);
-          console.log('📨 WebSocket message received:', data);
-          setLastMessage(data);
-        } catch (error) {
-          console.error('❌ Error parsing WebSocket message:', error);
-        }
-      };
-
-      ws.onclose = (event) => {
-        console.log('🔌 WebSocket disconnected:', event.code, event.reason);
-        setConnectionStatus('disconnected');
-        setSocket(null);
-        
-        // Only attempt to reconnect if it wasn't a manual close
-        if (event.code !== 1000 && !isReconnecting) {
-          isReconnecting = true;
-          console.log('🔄 Attempting to reconnect WebSocket in 3 seconds...');
-          reconnectTimeout = setTimeout(() => {
-            connect();
-          }, 3000);
-        }
-      };
-
-      ws.onerror = (error) => {
-        console.error('❌ WebSocket error:', error);
-        setConnectionStatus('error');
-      };
+      // Send initial connection message
+      ws.send(JSON.stringify({
+        type: 'connection',
+        timestamp: new Date().toISOString(),
+        clientId: `client_${Date.now()}`
+      }));
     };
 
-    connect();
+    ws.onmessage = (event) => {
+      try {
+        const data = JSON.parse(event.data);
+        console.log('📨 WebSocket message received:', data);
+        setLastMessage(data);
+      } catch (error) {
+        console.error('❌ Error parsing WebSocket message:', error);
+      }
+    };
+
+    ws.onclose = (event) => {
+      console.log('🔌 WebSocket disconnected:', event.code, event.reason);
+      setConnectionStatus('disconnected');
+      setSocket(null);
+      
+      // Attempt to reconnect after 3 seconds
+      setTimeout(() => {
+        if (!socket || socket.readyState === WebSocket.CLOSED) {
+          console.log('🔄 Attempting to reconnect WebSocket...');
+          // Trigger re-render to reconnect
+          setConnectionStatus('connecting');
+        }
+      }, 3000);
+    };
+
+    ws.onerror = (error) => {
+      console.error('❌ WebSocket error:', error);
+      setConnectionStatus('error');
+    };
 
     return () => {
-      isReconnecting = false;
-      if (reconnectTimeout) {
-        clearTimeout(reconnectTimeout);
-      }
-      if (ws && ws.readyState === WebSocket.OPEN) {
-        ws.close(1000); // Normal closure
+      if (ws.readyState === WebSocket.OPEN) {
+        ws.close();
       }
     };
-  }, []); // Remove the problematic dependency
+  }, [connectionStatus === 'connecting']); // Reconnect trigger
 
   const sendMessage = (message: any) => {
     if (socket && socket.readyState === WebSocket.OPEN) {
@@ -136,15 +119,8 @@ export function WebSocketProvider({ children }: WebSocketProviderProps) {
         
         {connectionStatus === 'connected' && (
           <div className="flex items-center gap-2 px-3 py-2 bg-green-500/20 border border-green-500/30 rounded-lg text-green-200 text-sm opacity-75 hover:opacity-100 transition-opacity">
-            <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-            Connected
-          </div>
-        )}
-        
-        {connectionStatus === 'error' && (
-          <div className="flex items-center gap-2 px-3 py-2 bg-red-500/20 border border-red-500/30 rounded-lg text-red-200 text-sm">
-            <div className="w-2 h-2 bg-red-500 rounded-full"></div>
-            Connection Error
+            <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+            Live
           </div>
         )}
         

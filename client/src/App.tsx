@@ -40,8 +40,6 @@ import InfoPage from "@/pages/info";
 import { Chat } from "@/pages/chat";
 import FlutterWave from "@/pages/flutter-wave";
 import FlutterArt from "@/pages/flutter-art";
-import FlutterbeyeMessages from "@/pages/flutterbye-messages";
-import FlutterWaveEnhanced from "@/pages/flutter-wave-enhanced";
 import LimitedEdition from "@/pages/limited-edition";
 import AdvancedSearch from "@/pages/advanced-search";
 import AdminSystem from "@/pages/admin-system";
@@ -83,7 +81,6 @@ import NFTClaim from "@/pages/nft-claim";
 import AllOpportunities from "@/pages/AllOpportunities";
 import AdminAPIMonetization from "@/pages/admin-api-monetization";
 import CampaignBuilder from "@/pages/campaign-builder";
-import TestUpdate from "@/pages/test-update";
 import AIMarketingBot from "@/pages/ai-marketing-bot";
 import WalletTest from "@/pages/WalletTest";
 import ProductionDeployment from "@/pages/ProductionDeployment";
@@ -116,36 +113,13 @@ function Router() {
       <div className="dark min-h-screen flex flex-col bg-transparent">
         <div className="flex-1 bg-transparent">
           <Switch>
+        <Route path="/" component={LaunchCountdown} />
         <Route path="/launch" component={LaunchCountdown} />
-        <Route path="/" component={() => (
-          <>
-            <Navbar />
-            <Home />
-          </>
-        )} />
         <Route path="/blog" component={BlogPage} />
         <Route path="/home" component={() => (
           <>
             <Navbar />
             <Home />
-          </>
-        )} />
-        <Route path="/flutterbye-messages" component={() => (
-          <>
-            <Navbar />
-            <FlutterbeyeMessages />
-          </>
-        )} />
-        <Route path="/flutter-art" component={() => (
-          <>
-            <Navbar />
-            <FlutterArt />
-          </>
-        )} />
-        <Route path="/flutter-wave" component={() => (
-          <>
-            <Navbar />
-            <FlutterWaveEnhanced />
           </>
         )} />
         
@@ -186,6 +160,18 @@ function Router() {
             <FlutterAIDashboard />
           </>
         )} />
+        <Route path="/flutter-wave" component={() => (
+          <>
+            <Navbar />
+            <FlutterWave />
+          </>
+        )} />
+        <Route path="/flutter-art" component={() => (
+          <>
+            <Navbar />
+            <FlutterArt />
+          </>
+        )} />
         <Route path="/chat" component={() => (
           <>
             <Navbar />
@@ -199,7 +185,13 @@ function Router() {
           </>
         )} />
         
-
+        {/* Legacy routes for backward compatibility */}
+        <Route path="/home" component={() => (
+          <>
+            <Navbar />
+            <Dashboard />
+          </>
+        )} />
         <Route path="/marketplace" component={() => (
           <>
             <Navbar />
@@ -414,7 +406,16 @@ function Router() {
             <Chat />
           </>
         )} />
-
+        <Route path="/flutter-wave" component={() => (
+          <>
+            <FlutterWave />
+          </>
+        )} />
+        <Route path="/flutter-art" component={() => (
+          <>
+            <FlutterArt />
+          </>
+        )} />
         <Route path="/limited-edition" component={() => (
           <>
             <Navbar />

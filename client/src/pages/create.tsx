@@ -7,281 +7,430 @@ import { Link } from "wouter";
 import { 
   Coins, 
   Sparkles, 
-  Star, 
-  Gift,
-  Brain,
-  Zap,
-  Palette,
+  MessageSquare, 
+  Heart, 
+  Mic, 
   Image,
-  Waves,
-  Heart,
-  Globe,
-  BarChart3
+  Zap,
+  Star,
+  Gift,
+  ArrowRight,
+  Brain,
+  Palette,
+  Music,
+  Video,
+  Users,
+  Crown
 } from "lucide-react";
+import Mint from "./mint";
+import { VoiceMessageRecorder } from "@/components/voice-message-recorder";
 
 export default function Create() {
-  const [activeTab, setActiveTab] = useState("flutterbye-coins");
+  const [activeTab, setActiveTab] = useState("message-coins");
 
-  return (
-    <div className="min-h-screen pt-20 pb-12">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-12">
-          <h1 className="text-5xl font-bold mb-6 text-gradient">Flutterbye Creation Hub</h1>
-          <p className="text-xl text-muted-foreground mb-8">Revolutionary blockchain creation platform for Web3 communication</p>
-        </div>
+  // Function to get creation route based on option type
+  const getCreationRoute = (optionId: string) => {
+    switch (optionId) {
+      case "basic-token":
+        return "/mint/basic";
+      case "ai-enhanced":
+        return "/mint/ai-enhanced";
+      case "voice-token":
+        return "/mint/voice";
+      case "multimedia":
+        return "/mint/multimedia";
+      default:
+        return "/mint";
+    }
+  };
 
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-3 mb-8 h-16">
-            <TabsTrigger 
-              value="flutterbye-coins" 
-              className="flex items-center gap-2 text-lg py-4 h-full"
-            >
-              <Coins className="w-6 h-6" />
-              Flutterbye Coins
-            </TabsTrigger>
-            <TabsTrigger 
-              value="flutter-art" 
-              className="flex items-center gap-2 text-lg py-4 h-full"
-            >
-              <Palette className="w-6 h-6" />
-              FlutterArt
-            </TabsTrigger>
-            <TabsTrigger 
-              value="flutter-wave" 
-              className="flex items-center gap-2 text-lg py-4 h-full"
-            >
-              <Waves className="w-6 h-6" />
-              FlutterWave
-            </TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="flutterbye-coins" className="space-y-8">
-            <FlutterbyCoinCreation />
-          </TabsContent>
-
-          <TabsContent value="flutter-art" className="space-y-8">
-            <FlutterArtCreation />
-          </TabsContent>
-
-          <TabsContent value="flutter-wave" className="space-y-8">
-            <FlutterWaveCreation />
-          </TabsContent>
-        </Tabs>
-      </div>
-    </div>
-  );
-}
-
-function FlutterbyCoinCreation() {
-  return (
-    <div className="space-y-8">
-      <div className="text-center">
-        <h2 className="text-4xl font-bold mb-4 text-electric-blue">Create Flutterbye Coins</h2>
-        <p className="text-xl text-muted-foreground">Revolutionary tokenized messages with redeemable value</p>
-      </div>
-
-      <Card className="electric-frame bg-gradient-to-br from-electric-blue/20 to-circuit-teal/20 border-2 border-electric-blue/50 hover:border-electric-blue/80 transition-all duration-500 hover:shadow-2xl hover:shadow-electric-blue/25">
-        <CardHeader className="text-center pb-4">
-          <div className="w-20 h-20 mx-auto mb-4 bg-gradient-to-r from-electric-blue to-circuit-teal rounded-full flex items-center justify-center">
-            <Coins className="w-10 h-10 text-white" />
-          </div>
-          <CardTitle className="text-3xl font-bold text-electric-blue mb-2">Flutterbye Coins</CardTitle>
-          <CardDescription className="text-lg text-gray-300">
-            Create personalized message tokens with attached value
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
-            <div className="bg-slate-800/50 p-4 rounded-lg border border-electric-blue/30">
-              <div className="flex items-center gap-2 mb-2">
-                <Sparkles className="w-5 h-5 text-electric-blue" />
-                <span className="font-semibold text-electric-blue">27-Character Messages</span>
-              </div>
-              <p className="text-sm text-gray-400">Precision messaging on blockchain</p>
-            </div>
-            <div className="bg-slate-800/50 p-4 rounded-lg border border-electric-green/30">
-              <div className="flex items-center gap-2 mb-2">
-                <Gift className="w-5 h-5 text-electric-green" />
-                <span className="font-semibold text-electric-green">Value Attachment</span>
-              </div>
-              <p className="text-sm text-gray-400">SOL, USDC, FLBY rewards</p>
-            </div>
-            <div className="bg-slate-800/50 p-4 rounded-lg border border-purple-400/30">
-              <div className="flex items-center gap-2 mb-2">
-                <Brain className="w-5 h-5 text-purple-400" />
-                <span className="font-semibold text-purple-400">AI Targeting</span>
-              </div>
-              <p className="text-sm text-gray-400">Precision holder analysis</p>
-            </div>
-            <div className="bg-slate-800/50 p-4 rounded-lg border border-orange-400/30">
-              <div className="flex items-center gap-2 mb-2">
-                <Zap className="w-5 h-5 text-orange-400" />
-                <span className="font-semibold text-orange-400">Viral Mechanics</span>
-              </div>
-              <p className="text-sm text-gray-400">Growth amplification</p>
-            </div>
-          </div>
-          <Link href="/mint">
-            <Button className="w-full bg-gradient-to-r from-electric-blue to-circuit-teal hover:from-electric-blue/80 hover:to-circuit-teal/80 text-white py-6 text-lg font-semibold">
-              <Coins className="w-5 h-5 mr-2" />
-              Create Flutterbye Coin
-            </Button>
-          </Link>
-        </CardContent>
-      </Card>
-    </div>
-  );
-}
-
-function FlutterArtCreation() {
-  return (
-    <div className="space-y-8">
-      <div className="text-center">
-        <h2 className="text-4xl font-bold mb-4 text-purple-400">Create FlutterArt</h2>
-        <p className="text-xl text-muted-foreground">AI-powered artistic blockchain creations with unique digital signatures</p>
-      </div>
-
-      <Card className="electric-frame bg-gradient-to-br from-purple-600/20 to-pink-600/20 border-2 border-purple-500/50 hover:border-purple-500/80 transition-all duration-500 hover:shadow-2xl hover:shadow-purple-500/25">
-        <CardHeader className="text-center pb-4">
-          <div className="w-20 h-20 mx-auto mb-4 bg-gradient-to-r from-purple-600 to-pink-600 rounded-full flex items-center justify-center">
-            <Palette className="w-10 h-10 text-white" />
-          </div>
-          <CardTitle className="text-3xl font-bold text-purple-400 mb-2">FlutterArt</CardTitle>
-          <CardDescription className="text-lg text-gray-300">
-            AI-generated artistic blockchain creations with collectible value
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
-            <div className="bg-slate-800/50 p-4 rounded-lg border border-purple-400/30">
-              <div className="flex items-center gap-2 mb-2">
-                <Brain className="w-5 h-5 text-purple-400" />
-                <span className="font-semibold text-purple-400">AI-Generated Art</span>
-              </div>
-              <p className="text-sm text-gray-400">Unique digital masterpieces</p>
-            </div>
-            <div className="bg-slate-800/50 p-4 rounded-lg border border-pink-400/30">
-              <div className="flex items-center gap-2 mb-2">
-                <Star className="w-5 h-5 text-pink-400" />
-                <span className="font-semibold text-pink-400">Unique Signatures</span>
-              </div>
-              <p className="text-sm text-gray-400">Blockchain authentication</p>
-            </div>
-            <div className="bg-slate-800/50 p-4 rounded-lg border border-yellow-400/30">
-              <div className="flex items-center gap-2 mb-2">
-                <Image className="w-5 h-5 text-yellow-400" />
-                <span className="font-semibold text-yellow-400">Collectible NFTs</span>
-              </div>
-              <p className="text-sm text-gray-400">Limited edition artwork</p>
-            </div>
-            <div className="bg-slate-800/50 p-4 rounded-lg border border-green-400/30">
-              <div className="flex items-center gap-2 mb-2">
-                <Sparkles className="w-5 h-5 text-green-400" />
-                <span className="font-semibold text-green-400">Creative Expression</span>
-              </div>
-              <p className="text-sm text-gray-400">Personal artistic vision</p>
-            </div>
-          </div>
-          <Link href="/flutter-art">
-            <Button className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white py-6 text-lg font-semibold">
-              <Palette className="w-5 h-5 mr-2" />
-              Create FlutterArt
-            </Button>
-          </Link>
-        </CardContent>
-      </Card>
-    </div>
-  );
-}
-
-function FlutterWaveCreation() {
-  const features = [
+  // Message Coins - Traditional Flutterbye tokens
+  const messageCoinOptions = [
     {
+      id: "greeting-card",
+      title: "Digital Greeting Card",
+      description: "Personal 27-character messages with SOL value",
+      icon: Gift,
+      color: "electric-green",
+      features: ["27-character message", "Attach SOL value", "Perfect for gifts"],
+      recommended: true,
+      category: "retail",
+      route: "/greeting-cards",
+      examples: ["Happy Birthday! $5 gift", "Coffee on me - enjoy!", "Thank you for everything"]
+    },
+    {
+      id: "targeted-marketing",
+      title: "Targeted Marketing",
+      description: "Precision crypto marketing with FlutterAI",
       icon: Brain,
-      title: "Neural Emotional Spectrum",
-      description: "127-emotion detection with 97.3% accuracy",
-      color: "text-purple-400"
+      color: "purple",
+      features: ["FlutterAI wallet targeting", "Campaign analytics", "Bulk distribution"],
+      recommended: true,
+      category: "enterprise",
+      route: "/enterprise",
+      examples: ["Try our 5% yield pool!", "New NFT drop preview", "Beta access unlocked!"]
     },
     {
-      icon: Heart,
-      title: "AI Avatar Companions",
-      description: "ARIA v2.0 intelligent conversation system",
-      color: "text-red-400"
-    },
-    {
-      icon: Globe,
-      title: "Global Butterfly Effect",
-      description: "Track emotional waves across the network",
-      color: "text-blue-400"
-    },
-    {
-      icon: Sparkles,
-      title: "Quantum Message Threads",
-      description: "Multi-dimensional conversation experiences",
-      color: "text-yellow-400"
-    },
-    {
-      icon: Zap,
-      title: "Temporal Message Capsules",
-      description: "Time-locked emotional delivery system",
-      color: "text-green-400"
-    },
-    {
-      icon: BarChart3,
-      title: "Emotional Market Exchange",
-      description: "Trade and monetize emotional intelligence",
-      color: "text-orange-400"
+      id: "quick-message",
+      title: "Quick Message",
+      description: "Simple 27-character token creation",
+      icon: MessageSquare,
+      color: "electric-blue",
+      features: ["Fast creation", "Basic targeting", "Instant deployment"],
+      recommended: false,
+      category: "basic",
+      examples: ["GM! Have a great day", "Thanks for the follow", "Welcome to crypto!"]
     }
   ];
 
-  return (
-    <div className="space-y-8">
-      <div className="text-center space-y-4">
-        <div className="flex items-center justify-center gap-3">
-          <Waves className="h-12 w-12 text-electric-blue animate-pulse" />
-          <h2 className="text-5xl font-bold bg-gradient-to-r from-electric-blue via-purple to-electric-green bg-clip-text text-transparent">
-            FlutterWave
-          </h2>
-          <Badge className="bg-gradient-to-r from-purple-600 to-blue-600 text-white font-bold">
-            AI-POWERED
-          </Badge>
-        </div>
-        <p className="text-xl text-gray-300 max-w-4xl mx-auto">
-          Revolutionary AI-Powered Butterfly Effect Messaging - Harness the quantum power of emotions with advanced sentiment analysis, viral prediction algorithms, and quantum-inspired sentiment creation
-        </p>
-      </div>
+  // FlutterArt NFT Options - Enhanced multimedia tokens
+  const nftArtOptions = [
+    {
+      id: "basic-nft",
+      title: "Basic Message NFT",
+      description: "Simple NFT with text message",
+      icon: MessageSquare,
+      color: "electric-blue",
+      features: ["Text message", "Custom image", "Basic metadata"],
+      recommended: false,
+      category: "nft",
+      route: "/flutter-art",
+      examples: ["Memorable quotes", "Digital certificates", "Simple announcements"]
+    },
+    {
+      id: "multimedia-nft",
+      title: "Multimedia NFT",
+      description: "Rich NFT with custom artwork and voice",
+      icon: Palette,
+      color: "purple",
+      features: ["Custom artwork", "Voice recording", "Rich metadata"],
+      recommended: true,
+      category: "nft",
+      route: "/flutter-art",
+      examples: ["Personal messages", "Art collections", "Voice memories"]
+    },
+    {
+      id: "ai-generated-nft",
+      title: "AI-Generated Art NFT",
+      description: "NFT with AI-created artwork",
+      icon: Sparkles,
+      color: "electric-green",
+      features: ["AI artwork generation", "DALL-E integration", "Unique designs"],
+      recommended: true,
+      category: "nft",
+      route: "/flutter-art",
+      examples: ["Fantasy landscapes", "Abstract art", "Digital portraits"]
+    },
+    {
+      id: "limited-edition",
+      title: "Limited Edition Set",
+      description: "Exclusive NFT collections with limited supply",
+      icon: Crown,
+      color: "gold",
+      features: ["Limited supply", "Collection series", "Exclusive access"],
+      recommended: false,
+      category: "nft",
+      route: "/flutter-art",
+      examples: ["Artist collections", "Event commemoratives", "VIP access tokens"]
+    }
+  ];
 
-      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {features.map((feature, index) => {
-          const IconComponent = feature.icon;
-          return (
-            <Card 
-              key={index}
-              className="bg-gradient-to-br from-slate-900/80 to-slate-800/80 border border-slate-700/50 hover:border-electric-blue/50 transition-all duration-300 hover:shadow-lg hover:shadow-electric-blue/10"
-            >
-              <CardHeader className="pb-3">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 rounded-lg bg-slate-800/50">
-                    <IconComponent className={`w-6 h-6 ${feature.color}`} />
-                  </div>
-                  <CardTitle className="text-lg font-semibold">{feature.title}</CardTitle>
+  // Voice NFT Options - Combining voice with blockchain
+  const voiceNftOptions = [
+    {
+      id: "sms-to-token",
+      title: "FlutterWave SMS",
+      description: "Transform SMS messages into emotional blockchain tokens",
+      icon: MessageSquare,
+      color: "electric-blue",
+      features: ["SMS-to-blockchain", "Emotional AI analysis", "Time-locked delivery", "Burn-to-read privacy"],
+      recommended: true,
+      category: "voice",
+      route: "/flutter-wave",
+      examples: ["Happy Birthday! 🎂", "I love you ❤️", "Thinking of you 💭"],
+      badge: "AI-POWERED"
+    },
+    {
+      id: "voice-message",
+      title: "Voice Message NFT",
+      description: "Personal voice recordings as NFTs",
+      icon: Mic,
+      color: "purple",
+      features: ["Voice recording", "Audio quality", "Personal touch"],
+      recommended: true,
+      category: "voice",
+      route: "/flutter-art",
+      examples: ["Birthday wishes", "Thank you messages", "Motivational quotes"]
+    },
+    {
+      id: "music-nft",
+      title: "Music NFT",
+      description: "Musical compositions and audio art",
+      icon: Music,
+      color: "electric-green",
+      features: ["Music composition", "Audio art", "Sound design"],
+      recommended: false,
+      category: "voice",
+      route: "/flutter-art",
+      examples: ["Original compositions", "Audio loops", "Sound effects"]
+    },
+    {
+      id: "podcast-nft",
+      title: "Podcast Clip NFT",
+      description: "Memorable podcast moments as collectibles",
+      icon: Users,
+      color: "gold",
+      features: ["Podcast clips", "Interview highlights", "Discussion moments"],
+      recommended: false,
+      category: "voice",
+      route: "/flutter-art",
+      examples: ["Key insights", "Funny moments", "Expert advice"]
+    }
+  ];
+
+  // Collection Options - Batch and series creation
+  const collectionOptions = [
+    {
+      id: "batch-tokens",
+      title: "Batch Token Creation",
+      description: "Create multiple tokens simultaneously",
+      icon: Users,
+      color: "electric-blue",
+      features: ["Bulk creation", "Consistent theming", "Efficient workflow"],
+      recommended: true,
+      category: "collection",
+      route: "/campaign-builder",
+      examples: ["Event invitations", "Team rewards", "Marketing campaigns"]
+    },
+    {
+      id: "series-collection",
+      title: "NFT Series",
+      description: "Connected NFT collections with shared themes",
+      icon: Star,
+      color: "purple",
+      features: ["Series narrative", "Progressive unlocking", "Collector value"],
+      recommended: false,
+      category: "collection",
+      route: "/flutter-art",
+      examples: ["Story chapters", "Character series", "Evolution chains"]
+    },
+    {
+      id: "interactive-collection",
+      title: "Interactive Collection",
+      description: "Dynamic collections that evolve over time",
+      icon: Zap,
+      color: "electric-green",
+      features: ["Dynamic content", "User interaction", "Evolving metadata"],
+      recommended: false,
+      category: "collection",
+      route: "/flutter-art",
+      examples: ["Growing plants", "Aging characters", "Weather systems"]
+    }
+  ];
+
+  const aiTools = [
+    {
+      title: "Message Optimizer",
+      description: "AI-powered message enhancement for maximum impact",
+      icon: Sparkles,
+      href: "/ai-content-optimizer"
+    },
+    {
+      title: "Viral Predictor",
+      description: "Predict and optimize viral potential",
+      icon: Zap,
+      href: "/viral-predictor"
+    },
+    {
+      title: "Smart Pricing",
+      description: "AI-recommended token pricing",
+      icon: Star,
+      href: "/smart-pricing"
+    },
+    {
+      title: "Emotion Analysis",
+      description: "Deep emotional intelligence for your content",
+      icon: Heart,
+      href: "/emotion-analysis"
+    }
+  ];
+
+  // Render creation option cards
+  const renderCreationOptions = (options: any[], title: string, description: string) => (
+    <div className="space-y-6">
+      <div className="text-center space-y-2">
+        <h3 className="text-2xl font-bold text-white">{title}</h3>
+        <p className="text-muted-foreground">{description}</p>
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {options.map((option) => (
+          <Card key={option.id} className="group hover:shadow-lg hover:shadow-electric-blue/20 transition-all duration-300 cursor-pointer relative electric-frame">
+            {option.recommended && (
+              <div className="absolute -top-2 -right-2">
+                <Badge className="bg-gradient-to-r from-yellow-400 to-orange-400 text-black font-bold pulse-glow">
+                  RECOMMENDED
+                </Badge>
+              </div>
+            )}
+            {option.badge && (
+              <div className="absolute -top-2 -left-2">
+                <Badge className="bg-gradient-to-r from-purple-600 to-blue-600 text-white font-bold pulse-glow">
+                  {option.badge}
+                </Badge>
+              </div>
+            )}
+            <CardHeader>
+              <div className="flex items-center gap-3">
+                <div className={`p-3 rounded-lg bg-${option.color}/10 group-hover:bg-${option.color}/20 transition-colors electric-pulse`}>
+                  <option.icon className={`h-6 w-6 text-${option.color === 'gold' ? 'yellow-400' : option.color}`} />
                 </div>
-              </CardHeader>
-              <CardContent>
-                <p className="text-sm text-gray-400">{feature.description}</p>
-              </CardContent>
-            </Card>
-          );
-        })}
+                <div>
+                  <CardTitle className="group-hover:text-electric-blue transition-colors">
+                    {option.title}
+                  </CardTitle>
+                  <CardDescription>{option.description}</CardDescription>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <ul className="space-y-2 mb-4">
+                {option.features.map((feature: string, index: number) => (
+                  <li key={index} className="flex items-center gap-2 text-sm">
+                    <div className="w-1 h-1 bg-electric-blue rounded-full pulse-dot"></div>
+                    {feature}
+                  </li>
+                ))}
+              </ul>
+              
+              <div className="space-y-3">
+                <div className="text-xs text-muted-foreground">
+                  <span className="font-medium">Examples:</span>
+                  <div className="mt-1 space-y-1">
+                    {option.examples.slice(0, 2).map((example: string, index: number) => (
+                      <div key={index} className="italic text-electric-green/70">"{example}"</div>
+                    ))}
+                  </div>
+                </div>
+                
+                <Link href={option.route || getCreationRoute(option.id)}>
+                  <Button className="w-full group modern-gradient hover:shadow-lg hover:shadow-electric-blue/30 transition-all duration-300">
+                    Create {option.title}
+                    <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                  </Button>
+                </Link>
+              </div>
+            </CardContent>
+          </Card>
+        ))}
       </div>
+    </div>
+  );
 
-      <div className="text-center">
-        <Link href="/flutter-wave">
-          <Button className="bg-gradient-to-r from-electric-blue to-purple hover:from-electric-blue/80 hover:to-purple/80 text-white px-8 py-6 text-lg font-semibold">
-            <Waves className="w-5 h-5 mr-2" />
-            Launch FlutterWave Experience
-          </Button>
-        </Link>
+  return (
+    <div className="min-h-screen bg-transparent">
+      <div className="container mx-auto px-4 py-6 space-y-8">
+        
+        {/* Header */}
+        <div className="text-center space-y-4">
+          <h1 className="text-4xl font-bold bg-gradient-to-r from-electric-blue to-electric-green bg-clip-text text-transparent">
+            Creation Hub
+          </h1>
+          <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
+            Create everything from simple message tokens to complex NFT collections. Choose your creation type and start building on the blockchain.
+          </p>
+          <div className="flex flex-wrap items-center justify-center gap-4 mt-6">
+            <Badge variant="outline" className="text-electric-blue border-electric-blue">
+              Message Coins
+            </Badge>
+            <Badge variant="outline" className="text-purple-400 border-purple-400">
+              Art NFTs
+            </Badge>
+            <Badge variant="outline" className="text-electric-green border-electric-green">
+              Voice NFTs
+            </Badge>
+            <Badge variant="outline" className="text-yellow-400 border-yellow-400">
+              Collections
+            </Badge>
+          </div>
+        </div>
+
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+          <TabsList className="grid w-full grid-cols-4 electric-frame">
+            <TabsTrigger value="message-coins" className="flex items-center gap-2">
+              <Coins className="h-4 w-4" />
+              Message Coins
+            </TabsTrigger>
+            <TabsTrigger value="art-nfts" className="flex items-center gap-2">
+              <Palette className="h-4 w-4" />
+              Art NFTs
+            </TabsTrigger>
+            <TabsTrigger value="voice-nfts" className="flex items-center gap-2">
+              <Mic className="h-4 w-4" />
+              Voice NFTs
+            </TabsTrigger>
+            <TabsTrigger value="collections" className="flex items-center gap-2">
+              <Star className="h-4 w-4" />
+              Collections
+            </TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="message-coins" className="space-y-6">
+            {renderCreationOptions(
+              messageCoinOptions,
+              "Flutterbye Message Coins",
+              "27-character tokens perfect for greetings, marketing, and value transfer"
+            )}
+          </TabsContent>
+
+          <TabsContent value="art-nfts" className="space-y-6">
+            {renderCreationOptions(
+              nftArtOptions,
+              "FlutterArt NFT Collection",
+              "Rich multimedia NFTs with custom artwork, AI generation, and unique designs"
+            )}
+          </TabsContent>
+
+          <TabsContent value="voice-nfts" className="space-y-6">
+            {renderCreationOptions(
+              voiceNftOptions,
+              "Voice-Powered NFTs",
+              "Combine voice recordings with blockchain technology for personal, memorable tokens"
+            )}
+          </TabsContent>
+
+          <TabsContent value="collections" className="space-y-6">
+            {renderCreationOptions(
+              collectionOptions,
+              "Collection & Series Creation",
+              "Batch creation tools and series management for large-scale token deployment"
+            )}
+          </TabsContent>
+
+          {/* Cross-promotion section */}
+          <div className="mt-12 p-6 bg-gradient-to-r from-electric-blue/10 to-purple-600/10 rounded-lg border border-electric-blue/20 electric-frame">
+            <div className="text-center space-y-4">
+              <h3 className="text-xl font-bold text-white">Need Help Choosing?</h3>
+              <p className="text-muted-foreground">
+                Not sure which creation type fits your needs? Start with Message Coins for simple value transfer, 
+                or explore Art NFTs for rich multimedia experiences.
+              </p>
+              <div className="flex flex-wrap items-center justify-center gap-4">
+                <Link href="/info">
+                  <Button variant="outline" className="border-electric-blue text-electric-blue hover:bg-electric-blue/10">
+                    Learn More
+                  </Button>
+                </Link>
+                <Link href="/flutterai">
+                  <Button className="modern-gradient">
+                    <Brain className="mr-2 h-4 w-4" />
+                    AI-Powered Targeting
+                  </Button>
+                </Link>
+              </div>
+            </div>
+          </div>
+
+        </Tabs>
       </div>
     </div>
   );

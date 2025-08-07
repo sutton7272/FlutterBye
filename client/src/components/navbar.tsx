@@ -3,7 +3,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { WalletConnect } from "@/components/wallet-connect";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { Menu, Home, Coins, Trophy, Users, MessageSquare, Settings, Sparkles, Zap, Heart, Building2, MapPin, Activity, Gift, Award, Star, Ticket, HelpCircle, LayoutDashboard, Brain, CreditCard, Stars, DollarSign, Code2, Rocket, ArrowRightLeft, Target, Shield, Palette, Waves } from "lucide-react";
+import { Menu, Home, Coins, Trophy, Users, MessageSquare, Settings, Sparkles, Zap, Heart, Building2, MapPin, Activity, Gift, Award, Star, Ticket, HelpCircle, LayoutDashboard, Brain, CreditCard, Stars, DollarSign, Code2, Rocket, ArrowRightLeft, Target, Shield } from "lucide-react";
 
 import { useFeatureToggles } from "@/hooks/useFeatureToggles";
 import { MobileNavigation } from "@/components/mobile-navigation";
@@ -13,34 +13,20 @@ export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const { isFeatureEnabled, isLoading: featuresLoading } = useFeatureToggles();
 
-  // Primary navigation - three core products
+  // Primary navigation - core platform sections focused on launch products
   const allNavItems = [
-    { href: "/flutterbye-messages", label: "Flutterbye Messages", icon: Coins, description: "27-character blockchain messages", featureId: "flutterbye_messages", priority: true,
+    { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard, description: "Portfolio & activity", featureId: "dashboard", priority: true },
+    { href: "/create", label: "Create", icon: Coins, description: "Message tokens & campaigns", featureId: "mint", priority: true, 
       subItems: [
-        { href: "/create", label: "Create Messages", description: "Basic 27-character tokens" },
-        { href: "/redeem", label: "Redeem Messages", description: "Discover & redeem tokens" },
-        { href: "/enterprise-campaigns", label: "Enterprise Campaigns", description: "Business messaging" },
-        { href: "/campaign-builder", label: "Campaign Builder", description: "Advanced campaigns" }
+        { href: "/create", label: "Basic Messages", description: "27-character message tokens" },
+        { href: "/mint/greeting", label: "Greeting Cards", description: "Personal greeting messages" },
+        { href: "/enterprise-campaigns", label: "Marketing Campaigns", description: "Enterprise targeting campaigns" },
+        { href: "/campaign-builder", label: "Campaign Builder", description: "Advanced campaign creation" }
       ]
     },
-    { href: "/flutter-art", label: "FlutterArt", icon: Palette, description: "NFT art creation & marketplace", featureId: "flutter_art", priority: true,
-      subItems: [
-        { href: "/flutter-art", label: "Create Art", description: "AI-powered NFT creation" },
-        { href: "/nft-marketplace", label: "Art Marketplace", description: "Browse & trade NFTs" },
-        { href: "/message-nft-creator", label: "Message NFTs", description: "Combine art & messages" },
-        { href: "/limited-edition", label: "Limited Editions", description: "Exclusive collections" }
-      ]
-    },
-    { href: "/flutter-wave", label: "FlutterWave", icon: Waves, description: "SMS to blockchain integration", featureId: "flutter_wave", priority: true,
-      subItems: [
-        { href: "/flutter-wave", label: "SMS Integration", description: "Convert SMS to tokens" },
-        { href: "/sms-nexus", label: "SMS Nexus", description: "Advanced SMS features" },
-        { href: "/sms-demo", label: "SMS Demo", description: "Try SMS features" },
-        { href: "/ai-marketing-bot", label: "Marketing Bot", description: "Automated marketing" }
-      ]
-    },
-    { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard, description: "Portfolio & analytics", featureId: "dashboard" },
-    { href: "/flutterai", label: "FlutterAI", icon: Brain, description: "Wallet intelligence", featureId: "flutterai" },
+    { href: "/flutterai", label: "FlutterAI", icon: Brain, description: "Wallet intelligence & targeting", special: true, featureId: "flutterai", priority: true },
+    { href: "/redeem", label: "Redeem", icon: Gift, description: "Discover & redeem message tokens", featureId: "marketplace", priority: true },
+    { href: "/intelligence", label: "AI Hub", icon: Brain, description: "AI intelligence and analytics", featureId: "intelligence" },
     { href: "/admin-gateway", label: "Admin", icon: Settings, description: "Platform management", featureId: "admin_panel" },
   ];
 
@@ -100,13 +86,14 @@ export default function Navbar() {
                 className={`flex items-center gap-2 h-10 px-4 relative group ${
                   isActive(item.href) 
                     ? "modern-gradient text-white shadow-lg" 
-                    : "bg-gradient-to-r from-purple-600/20 to-blue-600/20 text-purple-200 border border-purple-500/30 hover:from-purple-600/30 hover:to-blue-600/30 hover:text-white transition-all duration-300"
+                    : item.special
+                    ? "bg-gradient-to-r from-purple-600/20 to-blue-600/20 text-purple-200 border border-purple-500/30 hover:from-purple-600/30 hover:to-blue-600/30 hover:text-white transition-all duration-300"
                     : "text-text-secondary hover:text-text-primary hover:bg-muted/50 transition-all duration-200"
                 }`}
               >
                 <item.icon className="h-4 w-4" />
                 <span className="font-medium">{item.label}</span>
-
+                {item.special && <span className="text-xs bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent font-bold">AI</span>}
                 
                 {/* Tooltip */}
                 <div className="absolute bottom-full mb-2 left-1/2 transform -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none">
