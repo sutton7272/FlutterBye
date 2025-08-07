@@ -259,10 +259,8 @@ export default function LaunchCountdown() {
             alt="Flutterbye Logo" 
             className="w-24 h-24 mx-auto mb-4 rounded-full electric-frame"
           />
-          <h1 className="text-4xl font-bold mb-3">
-            <span className="bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent">
-              FLUTTERBYE
-            </span>
+          <h1 className="electric-branding mb-6">
+            FLUTTERBYE
           </h1>
           <p className="text-lg text-gray-300 mb-4">
             The Future of Communication is Coming
