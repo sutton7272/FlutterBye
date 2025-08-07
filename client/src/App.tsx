@@ -116,8 +116,13 @@ function Router() {
       <div className="dark min-h-screen flex flex-col bg-transparent">
         <div className="flex-1 bg-transparent">
           <Switch>
-        <Route path="/" component={LaunchCountdown} />
         <Route path="/launch" component={LaunchCountdown} />
+        <Route path="/" component={() => (
+          <>
+            <Navbar />
+            <Home />
+          </>
+        )} />
         <Route path="/blog" component={BlogPage} />
         <Route path="/home" component={() => (
           <>
