@@ -5849,6 +5849,66 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Error handling middleware (must be last)
   app.use(errorHandler);
 
+  // Advanced Platform Enhancement APIs
+  const { aiContentOptimizer } = await import('./ai-content-optimizer');
+  const { viralGrowthEngine } = await import('./viral-growth-engine');  
+  const { advancedAnalytics } = await import('./advanced-analytics');
+
+  // AI Content Optimization endpoints
+  app.post('/api/ai/optimize-message', async (req, res) => {
+    try {
+      const { message, targetAudience } = req.body;
+      const optimization = await aiContentOptimizer.optimizeTokenMessage(message, targetAudience);
+      res.json({ success: true, optimization });
+    } catch (error) {
+      console.error('Message optimization error:', error);
+      res.status(500).json({ error: 'Failed to optimize message' });
+    }
+  });
+
+  app.post('/api/ai/generate-hashtags', async (req, res) => {
+    try {
+      const { content, count } = req.body;
+      const hashtags = await aiContentOptimizer.generateTrendingHashtags(content, count);
+      res.json({ success: true, hashtags });
+    } catch (error) {
+      console.error('Hashtag generation error:', error);
+      res.status(500).json({ error: 'Failed to generate hashtags' });
+    }
+  });
+
+  // Advanced Analytics endpoints  
+  app.get('/api/analytics/executive-dashboard', async (req, res) => {
+    try {
+      const dashboard = await advancedAnalytics.getExecutiveDashboard();
+      res.json({ success: true, dashboard });
+    } catch (error) {
+      console.error('Executive dashboard error:', error);
+      res.status(500).json({ error: 'Failed to get executive dashboard' });
+    }
+  });
+
+  app.get('/api/analytics/revenue', async (req, res) => {
+    try {
+      const analytics = await advancedAnalytics.getRevenueAnalytics();
+      res.json({ success: true, analytics });
+    } catch (error) {
+      console.error('Revenue analytics error:', error);
+      res.status(500).json({ error: 'Failed to get revenue analytics' });
+    }
+  });
+
+  // Viral Growth Engine endpoints
+  app.get('/api/viral/trends', async (req, res) => {
+    try {
+      const trends = await viralGrowthEngine.detectViralTrends();
+      res.json({ success: true, trends });
+    } catch (error) {
+      console.error('Trend detection error:', error);
+      res.status(500).json({ error: 'Failed to detect trends' });
+    }
+  });
+
   const httpServer = createServer(app);
 
   // Graceful shutdown handling
