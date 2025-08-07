@@ -222,7 +222,7 @@ export default function AdminGateway() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-6">
           {/* Multi-Chain Intelligence Dashboard */}
           <Link href="/multi-chain-dashboard">
-            <Card className="bg-slate-800/50 border-cyan-500/20 hover:border-cyan-400/40 transition-all cursor-pointer group">
+            <Card className="bg-slate-800/50 border-cyan-500/20 hover:border-cyan-400/40 transition-all cursor-pointer group transform hover:scale-105">
               <CardHeader>
                 <Globe className="w-8 h-8 text-cyan-400 group-hover:text-cyan-300" />
                 <CardTitle className="text-white">Multi-Chain Intelligence</CardTitle>
@@ -232,11 +232,15 @@ export default function AdminGateway() {
               </CardHeader>
               <CardContent>
                 <ul className="text-sm text-slate-400 space-y-1">
-                  <li>• 7 Blockchain Networks</li>
+                  <li>• 7 Blockchain Networks Live</li>
                   <li>• Real-time Market Data</li>
                   <li>• Enterprise Intelligence</li>
-                  <li>• Cross-Chain Analytics</li>
+                  <li>• $500K-$5M Contracts Ready</li>
                 </ul>
+                <div className="mt-3 flex items-center gap-2">
+                  <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                  <span className="text-green-400 text-xs font-semibold">OPERATIONAL</span>
+                </div>
               </CardContent>
             </Card>
           </Link>

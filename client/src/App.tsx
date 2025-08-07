@@ -77,7 +77,9 @@ import MultiChainDashboard from "@/pages/MultiChainDashboard";
 import SimpleMultiChain from "@/pages/SimpleMultiChain";
 import SimpleMultiChainTest from "@/pages/SimpleMultiChainTest";
 import MultiChainIntelligence from "@/pages/MultiChainIntelligence";
+import NewMultiChain from "@/pages/NewMultiChain";
 import RouteDebug from "@/pages/RouteDebug";
+import RouteTest from "@/pages/RouteTest";
 import TestRoute from "@/pages/TestRoute";
 import FlutterAIUser from "@/pages/flutterai-user";
 import EnterpriseDashboard from "@/pages/enterprise-dashboard";
@@ -676,7 +678,13 @@ function Router() {
         <Route path="/multi-chain-dashboard" component={() => (
           <>
             <Navbar />
-            <MultiChainIntelligence />
+            <RouteTest />
+          </>
+        )} />
+        <Route path="/multi-chain-full" component={() => (
+          <>
+            <Navbar />
+            <NewMultiChain />
           </>
         )} />
         <Route path="/all-opportunities" component={() => (
@@ -826,6 +834,11 @@ function Router() {
             <Navbar />
             <AIMarketingBot />
           </>
+        )} />
+        <Route path="/multi-chain-test" component={() => (
+          <div className="min-h-screen bg-slate-900 p-8">
+            <h1 className="text-white text-4xl">Multi-Chain Test Route Works!</h1>
+          </div>
         )} />
         <Route>
           {() => {
