@@ -691,46 +691,6 @@ export default function LaunchCountdown() {
           </div>
         </div>
 
-        {/* Latest Blog Section */}
-        <div className="max-w-4xl mx-auto mt-12 mb-12">
-          <Card className="electric-frame bg-gradient-to-r from-red-900/20 to-purple-900/20">
-            <CardContent className="p-6">
-              <div className="text-center mb-6">
-                <h2 className="text-2xl font-bold text-gradient mb-2">📰 Latest Blog Post</h2>
-                <p className="text-sm text-gray-400">Stay updated with the latest insights and developments</p>
-              </div>
-              
-              <div className="bg-red-600/20 border border-red-500/30 rounded-lg p-6">
-                <h3 className="text-xl font-bold text-red-300 mb-3">The Future of Crypto Marketing</h3>
-                <p className="text-gray-300 text-sm mb-4 leading-relaxed">
-                  Discover how Flutterbye is revolutionizing crypto marketing with AI-powered precision targeting, 
-                  enabling businesses to communicate directly with specific crypto holder segments through 
-                  27-character tokenized messages with redeemable value. Learn about the breakthrough technology 
-                  that's transforming how we think about blockchain communication and value distribution.
-                </p>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2 text-xs text-gray-400">
-                    <span>📅 January 7, 2025</span>
-                    <span>•</span>
-                    <span>⏱️ 5 min read</span>
-                    <span>•</span>
-                    <span>🏷️ AI Marketing, Blockchain</span>
-                  </div>
-                  <button 
-                    onClick={() => setLocation('/blog')}
-                    className="bg-gradient-to-r from-blue-600 to-green-600 hover:from-blue-500 hover:to-green-500 px-6 py-2 rounded-lg font-medium text-sm transition-all duration-300 flex items-center gap-2"
-                  >
-                    Read Article
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                    </svg>
-                  </button>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
         {/* Single Column Content Below Three Columns */}
         <div className="max-w-6xl mx-auto">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -952,6 +912,46 @@ export default function LaunchCountdown() {
             <span>Pre-Launch Started</span>
             <span>Launch Day</span>
           </div>
+        </div>
+
+        {/* Latest Blog Section */}
+        <div className="max-w-4xl mx-auto mt-16 mb-12">
+          <Card className="electric-frame bg-gradient-to-r from-red-900/20 to-purple-900/20">
+            <CardContent className="p-6">
+              <div className="text-center mb-6">
+                <h2 className="text-2xl font-bold text-gradient mb-2">📰 Latest Blog Post</h2>
+                <p className="text-sm text-gray-400">Stay updated with the latest insights and developments</p>
+              </div>
+              
+              <div className="bg-red-600/20 border border-red-500/30 rounded-lg p-6">
+                <h3 className="text-xl font-bold text-red-300 mb-3">The Future of Crypto Marketing</h3>
+                <p className="text-gray-300 text-sm mb-4 leading-relaxed">
+                  Discover how Flutterbye is revolutionizing crypto marketing with AI-powered precision targeting, 
+                  enabling businesses to communicate directly with specific crypto holder segments through 
+                  27-character tokenized messages with redeemable value. Learn about the breakthrough technology 
+                  that's transforming how we think about blockchain communication and value distribution.
+                </p>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2 text-xs text-gray-400">
+                    <span>📅 January 7, 2025</span>
+                    <span>•</span>
+                    <span>⏱️ 5 min read</span>
+                    <span>•</span>
+                    <span>🏷️ AI Marketing, Blockchain</span>
+                  </div>
+                  <button 
+                    onClick={() => setLocation('/blog')}
+                    className="bg-gradient-to-r from-blue-600 to-green-600 hover:from-blue-500 hover:to-green-500 px-6 py-2 rounded-lg font-medium text-sm transition-all duration-300 flex items-center gap-2"
+                  >
+                    Read Article
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
         </div>
 
         {/* Footer */}
