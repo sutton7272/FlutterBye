@@ -265,24 +265,47 @@ export default function LaunchCountdown() {
             </h1>
             {/* Digital Butterflies */}
             <div className="digital-butterfly butterfly-1">
-              <svg viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12 2C10.5 2 9.5 3 9.5 4.5C9.5 6 10.5 7 12 7C13.5 7 14.5 6 14.5 4.5C14.5 3 13.5 2 12 2ZM12 8C8 8 5 11 5 15C5 17 6 18.5 7.5 19.5L12 22L16.5 19.5C18 18.5 19 17 19 15C19 11 16 8 12 8Z"/>
-                <path d="M7 12C6 12 5.5 12.5 5.5 13.5C5.5 14.5 6 15 7 15C8 15 8.5 14.5 8.5 13.5C8.5 12.5 8 12 7 12Z"/>
-                <path d="M17 12C16 12 15.5 12.5 15.5 13.5C15.5 14.5 16 15 17 15C18 15 18.5 14.5 18.5 13.5C18.5 12.5 18 12 17 12Z"/>
+              <svg viewBox="0 0 32 32" fill="currentColor">
+                <path d="M16 4c-.5 0-1 .2-1.3.6C14 5.5 14 6.5 14.5 7.2L16 9l1.5-1.8c.5-.7.5-1.7-.2-2.6C16.9 4.2 16.5 4 16 4z"/>
+                <ellipse cx="11" cy="12" rx="6" ry="8" transform="rotate(-15 11 12)"/>
+                <ellipse cx="21" cy="12" rx="6" ry="8" transform="rotate(15 21 12)"/>
+                <ellipse cx="9" cy="20" rx="4" ry="6" transform="rotate(-25 9 20)"/>
+                <ellipse cx="23" cy="20" rx="4" ry="6" transform="rotate(25 23 20)"/>
+                <circle cx="12" cy="14" r="1.5" opacity="0.7"/>
+                <circle cx="20" cy="14" r="1.5" opacity="0.7"/>
               </svg>
             </div>
             <div className="digital-butterfly butterfly-2">
-              <svg viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12 2C10.5 2 9.5 3 9.5 4.5C9.5 6 10.5 7 12 7C13.5 7 14.5 6 14.5 4.5C14.5 3 13.5 2 12 2ZM12 8C8 8 5 11 5 15C5 17 6 18.5 7.5 19.5L12 22L16.5 19.5C18 18.5 19 17 19 15C19 11 16 8 12 8Z"/>
-                <path d="M7 12C6 12 5.5 12.5 5.5 13.5C5.5 14.5 6 15 7 15C8 15 8.5 14.5 8.5 13.5C8.5 12.5 8 12 7 12Z"/>
-                <path d="M17 12C16 12 15.5 12.5 15.5 13.5C15.5 14.5 16 15 17 15C18 15 18.5 14.5 18.5 13.5C18.5 12.5 18 12 17 12Z"/>
+              <svg viewBox="0 0 32 32" fill="currentColor">
+                <path d="M16 4c-.5 0-1 .2-1.3.6C14 5.5 14 6.5 14.5 7.2L16 9l1.5-1.8c.5-.7.5-1.7-.2-2.6C16.9 4.2 16.5 4 16 4z"/>
+                <ellipse cx="11" cy="12" rx="6" ry="8" transform="rotate(-15 11 12)"/>
+                <ellipse cx="21" cy="12" rx="6" ry="8" transform="rotate(15 21 12)"/>
+                <ellipse cx="9" cy="20" rx="4" ry="6" transform="rotate(-25 9 20)"/>
+                <ellipse cx="23" cy="20" rx="4" ry="6" transform="rotate(25 23 20)"/>
+                <circle cx="12" cy="14" r="1.5" opacity="0.7"/>
+                <circle cx="20" cy="14" r="1.5" opacity="0.7"/>
               </svg>
             </div>
             <div className="digital-butterfly butterfly-3">
-              <svg viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12 2C10.5 2 9.5 3 9.5 4.5C9.5 6 10.5 7 12 7C13.5 7 14.5 6 14.5 4.5C14.5 3 13.5 2 12 2ZM12 8C8 8 5 11 5 15C5 17 6 18.5 7.5 19.5L12 22L16.5 19.5C18 18.5 19 17 19 15C19 11 16 8 12 8Z"/>
-                <path d="M7 12C6 12 5.5 12.5 5.5 13.5C5.5 14.5 6 15 7 15C8 15 8.5 14.5 8.5 13.5C8.5 12.5 8 12 7 12Z"/>
-                <path d="M17 12C16 12 15.5 12.5 15.5 13.5C15.5 14.5 16 15 17 15C18 15 18.5 14.5 18.5 13.5C18.5 12.5 18 12 17 12Z"/>
+              <svg viewBox="0 0 32 32" fill="currentColor">
+                <path d="M16 4c-.5 0-1 .2-1.3.6C14 5.5 14 6.5 14.5 7.2L16 9l1.5-1.8c.5-.7.5-1.7-.2-2.6C16.9 4.2 16.5 4 16 4z"/>
+                <ellipse cx="11" cy="12" rx="6" ry="8" transform="rotate(-15 11 12)"/>
+                <ellipse cx="21" cy="12" rx="6" ry="8" transform="rotate(15 21 12)"/>
+                <ellipse cx="9" cy="20" rx="4" ry="6" transform="rotate(-25 9 20)"/>
+                <ellipse cx="23" cy="20" rx="4" ry="6" transform="rotate(25 23 20)"/>
+                <circle cx="12" cy="14" r="1.5" opacity="0.7"/>
+                <circle cx="20" cy="14" r="1.5" opacity="0.7"/>
+              </svg>
+            </div>
+            <div className="digital-butterfly butterfly-4">
+              <svg viewBox="0 0 32 32" fill="currentColor">
+                <path d="M16 4c-.5 0-1 .2-1.3.6C14 5.5 14 6.5 14.5 7.2L16 9l1.5-1.8c.5-.7.5-1.7-.2-2.6C16.9 4.2 16.5 4 16 4z"/>
+                <ellipse cx="11" cy="12" rx="6" ry="8" transform="rotate(-15 11 12)"/>
+                <ellipse cx="21" cy="12" rx="6" ry="8" transform="rotate(15 21 12)"/>
+                <ellipse cx="9" cy="20" rx="4" ry="6" transform="rotate(-25 9 20)"/>
+                <ellipse cx="23" cy="20" rx="4" ry="6" transform="rotate(25 23 20)"/>
+                <circle cx="12" cy="14" r="1.5" opacity="0.7"/>
+                <circle cx="20" cy="14" r="1.5" opacity="0.7"/>
               </svg>
             </div>
           </div>
@@ -385,22 +408,14 @@ export default function LaunchCountdown() {
               Experience the revolutionary platform that combines AI-powered intelligence with tokenized communication
             </p>
             
-            {/* Quick Action Buttons */}
-            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+            {/* Quick Action Button */}
+            <div className="flex justify-center">
               <Button 
                 onClick={() => setLocation('/create')}
                 className="bg-gradient-to-r from-electric-blue to-circuit-teal hover:from-electric-blue/80 hover:to-circuit-teal/80 text-white px-8 py-3 text-lg font-semibold"
               >
                 <Rocket className="w-5 h-5 mr-2" />
                 Start Creating Tokens
-              </Button>
-              <Button 
-                variant="outline"
-                onClick={() => setLocation('/flutterai')}
-                className="border-electric-blue text-electric-blue hover:bg-electric-blue hover:text-white px-8 py-3 text-lg"
-              >
-                <Brain className="w-5 h-5 mr-2" />
-                Explore FlutterAI
               </Button>
             </div>
           </div>

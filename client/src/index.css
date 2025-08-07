@@ -230,26 +230,7 @@
       0 0 40px hsla(180, 100%, 55%, 0.2);
   }
 
-  .electric-branding::before {
-    content: '';
-    position: absolute;
-    top: -10px;
-    left: -10px;
-    right: -10px;
-    bottom: -10px;
-    background: linear-gradient(45deg, 
-      hsla(200, 100%, 70%, 0.3) 0%,
-      transparent 20%,
-      transparent 40%,
-      hsla(140, 100%, 60%, 0.3) 50%,
-      transparent 60%,
-      transparent 80%,
-      hsla(180, 100%, 55%, 0.3) 100%);
-    border-radius: 12px;
-    z-index: -1;
-    animation: electricFlow 2s linear infinite;
-    filter: blur(2px);
-  }
+
 
   @keyframes electricPulse {
     0%, 100% {
@@ -265,9 +246,9 @@
   /* Digital Butterfly Animations */
   .digital-butterfly {
     position: absolute;
-    width: 24px;
-    height: 24px;
-    filter: drop-shadow(0 0 8px currentColor);
+    width: 28px;
+    height: 28px;
+    filter: drop-shadow(0 0 12px currentColor) brightness(1.2);
     animation-timing-function: ease-in-out;
     animation-iteration-count: infinite;
     z-index: 10;
@@ -276,46 +257,61 @@
   .butterfly-1 {
     color: hsl(200, 100%, 70%);
     animation: butterflyFly1 8s infinite;
-    top: -20px;
-    left: -50px;
+    top: -25px;
+    left: -60px;
   }
 
   .butterfly-2 {
     color: hsl(140, 100%, 60%);
     animation: butterflyFly2 10s infinite;
-    top: 20px;
-    right: -60px;
+    top: 15px;
+    right: -70px;
     animation-delay: -2s;
   }
 
   .butterfly-3 {
     color: hsl(180, 100%, 55%);
     animation: butterflyFly3 12s infinite;
-    top: -30px;
-    right: -20px;
+    top: -35px;
+    right: -30px;
     animation-delay: -5s;
+  }
+
+  .butterfly-4 {
+    color: hsl(270, 100%, 65%);
+    animation: butterflyFly4 9s infinite;
+    top: 25px;
+    left: -40px;
+    animation-delay: -3s;
   }
 
   @keyframes butterflyFly1 {
     0%, 100% { transform: translate(0, 0) rotate(0deg) scale(1); }
-    25% { transform: translate(80px, -20px) rotate(15deg) scale(0.8); }
-    50% { transform: translate(160px, 10px) rotate(-10deg) scale(1.1); }
-    75% { transform: translate(80px, 40px) rotate(20deg) scale(0.9); }
+    25% { transform: translate(90px, -25px) rotate(18deg) scale(0.7); }
+    50% { transform: translate(170px, 15px) rotate(-12deg) scale(1.2); }
+    75% { transform: translate(85px, 45px) rotate(25deg) scale(0.8); }
   }
 
   @keyframes butterflyFly2 {
     0%, 100% { transform: translate(0, 0) rotate(0deg) scale(1); }
-    25% { transform: translate(-70px, 15px) rotate(-20deg) scale(1.2); }
-    50% { transform: translate(-140px, -25px) rotate(10deg) scale(0.7); }
-    75% { transform: translate(-70px, -10px) rotate(-15deg) scale(1); }
+    25% { transform: translate(-80px, 20px) rotate(-22deg) scale(1.3); }
+    50% { transform: translate(-150px, -30px) rotate(12deg) scale(0.6); }
+    75% { transform: translate(-75px, -15px) rotate(-18deg) scale(1.1); }
   }
 
   @keyframes butterflyFly3 {
     0%, 100% { transform: translate(0, 0) rotate(0deg) scale(1); }
-    20% { transform: translate(-40px, 30px) rotate(25deg) scale(0.8); }
-    40% { transform: translate(20px, 50px) rotate(-30deg) scale(1.3); }
-    60% { transform: translate(60px, 20px) rotate(15deg) scale(0.6); }
-    80% { transform: translate(10px, -20px) rotate(-10deg) scale(1.1); }
+    20% { transform: translate(-50px, 35px) rotate(28deg) scale(0.7); }
+    40% { transform: translate(25px, 55px) rotate(-35deg) scale(1.4); }
+    60% { transform: translate(70px, 25px) rotate(18deg) scale(0.5); }
+    80% { transform: translate(15px, -25px) rotate(-12deg) scale(1.2); }
+  }
+
+  @keyframes butterflyFly4 {
+    0%, 100% { transform: translate(0, 0) rotate(0deg) scale(1); }
+    30% { transform: translate(60px, -40px) rotate(-25deg) scale(0.9); }
+    60% { transform: translate(-20px, -60px) rotate(30deg) scale(1.1); }
+    90% { transform: translate(-80px, 10px) rotate(-15deg) scale(0.8); }
   }
 
   /* Improved electric frame */
