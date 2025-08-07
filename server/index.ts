@@ -1,3 +1,27 @@
+// Load environment variables from .env.local first
+import { readFileSync } from 'fs';
+import { join } from 'path';
+
+// Parse and load .env.local manually
+try {
+  const envPath = join(process.cwd(), '.env.local');
+  const envFile = readFileSync(envPath, 'utf8');
+  const envVars = envFile.split('\n').filter(line => line.trim() && !line.trim().startsWith('#'));
+  envVars.forEach(line => {
+    const equalIndex = line.indexOf('=');
+    if (equalIndex > 0) {
+      const key = line.substring(0, equalIndex).trim();
+      const value = line.substring(equalIndex + 1).trim();
+      if (key && value) {
+        process.env[key] = value;
+      }
+    }
+  });
+  console.log(`✅ Environment loaded: NODE_ENV=${process.env.NODE_ENV}, JWT_SECRET=${process.env.JWT_SECRET ? 'SET' : 'NOT SET'}`);
+} catch (error: any) {
+  console.warn('⚠️ Could not load .env.local file:', error.message);
+}
+
 import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
