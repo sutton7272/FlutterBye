@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
-import { useLocation } from "wouter";
+import { useLocation, Link } from "wouter";
 import { 
   Clock, 
   Mail, 
@@ -507,17 +507,11 @@ export default function LaunchCountdown() {
                       <li>• Personal messages</li>
                     </ul>
                   </div>
-                  <Button 
-                    className="w-full bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-500 hover:to-purple-500"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      console.log('Navigating to greeting-cards...');
-                      setLocation('/greeting-cards');
-                    }}
-                  >
-                    Create Greeting Card
-                  </Button>
+                  <Link href="/greeting-cards" className="w-full">
+                    <Button className="w-full bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-500 hover:to-purple-500">
+                      Create Greeting Card
+                    </Button>
+                  </Link>
                 </div>
               </CardContent>
             </Card>
@@ -544,17 +538,11 @@ export default function LaunchCountdown() {
                       <li>• Bulk token distribution</li>
                     </ul>
                   </div>
-                  <Button 
-                    className="w-full bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-500 hover:to-cyan-500"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      console.log('Navigating to enterprise...');
-                      setLocation('/enterprise');
-                    }}
-                  >
-                    Launch Campaign
-                  </Button>
+                  <Link href="/enterprise" className="w-full">
+                    <Button className="w-full bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-500 hover:to-cyan-500">
+                      Launch Campaign
+                    </Button>
+                  </Link>
                 </div>
               </CardContent>
             </Card>
@@ -581,15 +569,11 @@ export default function LaunchCountdown() {
                       <li>• Instant blockchain creation</li>
                     </ul>
                   </div>
-                  <Button 
-                    className="w-full bg-gradient-to-r from-green-600 to-teal-600 hover:from-green-500 hover:to-teal-500"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setLocation('/create');
-                    }}
-                  >
-                    Create Token
-                  </Button>
+                  <Link href="/create" className="w-full">
+                    <Button className="w-full bg-gradient-to-r from-green-600 to-teal-600 hover:from-green-500 hover:to-teal-500">
+                      Create Token
+                    </Button>
+                  </Link>
                 </div>
               </CardContent>
             </Card>
