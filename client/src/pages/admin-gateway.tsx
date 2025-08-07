@@ -321,12 +321,12 @@ export default function AdminGateway() {
             </Card>
           </Link>
 
-          {/* Multi-Chain Intelligence */}
+          {/* Multi-Chain Intelligence - DEBUG VERSION */}
           <Link href="/admin">
             <Card className="bg-slate-800/50 border-cyan-500/20 hover:border-cyan-400/40 transition-all cursor-pointer group">
               <CardHeader>
                 <Globe className="w-8 h-8 text-cyan-400 group-hover:text-cyan-300" />
-                <CardTitle className="text-white">Multi-Chain Intelligence</CardTitle>
+                <CardTitle className="text-white">🌐 Multi-Chain Intelligence</CardTitle>
                 <CardDescription className="text-slate-300">
                   Revolutionary blockchain intelligence across 7 networks
                 </CardDescription>
