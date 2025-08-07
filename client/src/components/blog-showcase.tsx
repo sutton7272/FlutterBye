@@ -24,12 +24,15 @@ export function BlogShowcase() {
   const [hoveredPost, setHoveredPost] = useState<string | null>(null);
   
   console.log('BlogShowcase component rendering');
+  console.log('Window location:', window.location.href);
 
   const { data: blogData, isLoading, error } = useQuery({
     queryKey: ["/api/blog/posts"],
     retry: 1,
     staleTime: 5 * 60 * 1000, // 5 minutes
   });
+
+  console.log('BlogShowcase query state:', { isLoading, error, blogData });
 
   // Show error state for debugging
   if (error) {

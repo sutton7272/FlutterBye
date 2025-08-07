@@ -531,7 +531,9 @@ export default function Home() {
         {/* Blog Showcase Section */}
         <ErrorBoundary>
           <section className="w-full max-w-6xl mx-auto px-4 mb-16">
-            <BlogShowcase />
+            <div className="my-8">
+              <BlogShowcase />
+            </div>
           </section>
         </ErrorBoundary>
 
