@@ -21,42 +21,45 @@ import {
   BarChart3
 } from "lucide-react";
 
-export default function Create() {
+export default function CreateNew() {
   const [activeTab, setActiveTab] = useState("flutterbye-coins");
 
   return (
-    <div className="min-h-screen pt-20 pb-12">
+    <div className="min-h-screen pt-20 pb-12 bg-red-900">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Giant Visual Marker */}
+        <div className="text-center mb-8 p-8 bg-yellow-500 text-black">
+          <h1 className="text-8xl font-bold mb-4">🚀 NEW CREATE PAGE - WORKING 🚀</h1>
+          <p className="text-2xl">If you can see this yellow banner, the changes are working!</p>
+        </div>
+
         <div className="text-center mb-12">
-          <h1 className="text-5xl font-bold mb-6 text-gradient">Flutterbye Creation Hub ✨ UPDATED</h1>
-          <div className="w-16 h-16 mx-auto mb-4 bg-red-500 animate-pulse rounded-full flex items-center justify-center">
-            <span className="text-white font-bold">NEW</span>
-          </div>
+          <h1 className="text-5xl font-bold mb-6 text-gradient">Flutterbye Creation Hub</h1>
           <p className="text-xl text-muted-foreground mb-8">Revolutionary blockchain creation platform for Web3 communication</p>
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-3 mb-8">
+          <TabsList className="grid w-full grid-cols-3 mb-8 h-16">
             <TabsTrigger 
               value="flutterbye-coins" 
-              className="flex items-center gap-2 text-lg py-3"
+              className="flex items-center gap-2 text-lg py-4 h-full"
             >
-              <Coins className="w-5 h-5" />
+              <Coins className="w-6 h-6" />
               Flutterbye Coins
             </TabsTrigger>
             <TabsTrigger 
               value="flutter-art" 
-              className="flex items-center gap-2 text-lg py-3"
+              className="flex items-center gap-2 text-lg py-4 h-full"
             >
-              <Palette className="w-5 h-5" />
+              <Palette className="w-6 h-6" />
               FlutterArt
             </TabsTrigger>
             <TabsTrigger 
               value="flutter-wave" 
-              className="flex items-center gap-2 text-lg py-3"
+              className="flex items-center gap-2 text-lg py-4 h-full bg-purple-600"
             >
-              <Waves className="w-5 h-5" />
-              FlutterWave
+              <Waves className="w-6 h-6" />
+              FlutterWave ⭐
             </TabsTrigger>
           </TabsList>
 
@@ -241,19 +244,21 @@ function FlutterWaveCreation() {
 
   return (
     <div className="space-y-8">
-      <div className="text-center space-y-4">
-        <div className="flex items-center justify-center gap-3">
-          <Waves className="h-12 w-12 text-electric-blue animate-pulse" />
-          <h2 className="text-5xl font-bold bg-gradient-to-r from-electric-blue via-purple to-electric-green bg-clip-text text-transparent">
-            FlutterWave
-          </h2>
-          <Badge className="bg-gradient-to-r from-purple-600 to-blue-600 text-white font-bold">
-            AI-POWERED
-          </Badge>
+      <div className="p-8 bg-gradient-to-r from-purple-600 to-blue-600 rounded-lg">
+        <div className="text-center space-y-4">
+          <div className="flex items-center justify-center gap-3">
+            <Waves className="h-12 w-12 text-white animate-pulse" />
+            <h2 className="text-5xl font-bold text-white">
+              FlutterWave
+            </h2>
+            <Badge className="bg-white text-purple-600 font-bold">
+              AI-POWERED
+            </Badge>
+          </div>
+          <p className="text-xl text-purple-100 max-w-4xl mx-auto">
+            Revolutionary AI-Powered Butterfly Effect Messaging - Harness the quantum power of emotions with advanced sentiment analysis, viral prediction algorithms, and quantum-inspired sentiment creation
+          </p>
         </div>
-        <p className="text-xl text-gray-300 max-w-4xl mx-auto">
-          Revolutionary AI-Powered Butterfly Effect Messaging - Harness the quantum power of emotions with advanced sentiment analysis, viral prediction algorithms, and quantum-inspired sentiment creation
-        </p>
       </div>
 
       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">

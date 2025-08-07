@@ -9,7 +9,7 @@ import NotFound from "@/pages/not-found";
 
 // New Simplified Pages
 import Dashboard from "@/pages/dashboard";
-import Create from "@/pages/create";
+import CreateNew from "@/pages/create-new";
 import Trade from "@/pages/trade";
 import Intelligence from "@/pages/intelligence";
 import Home from "@/pages/home";
@@ -134,7 +134,7 @@ function Router() {
         <Route path="/create" component={() => (
           <>
             <Navbar />
-            <Create />
+            <CreateNew />
           </>
         )} />
         <Route path="/campaign-builder" component={() => (
