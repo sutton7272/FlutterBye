@@ -26,7 +26,10 @@ import {
   TrendingUp,
   Award,
   Shield,
-  Quote
+  Quote,
+  Play,
+  Palette,
+  Brain
 } from "lucide-react";
 import flutterbeyeLogoPath from "@assets/image_1754068877999.png";
 import Navbar from "@/components/navbar";
@@ -444,19 +447,94 @@ export default function LaunchCountdown() {
           {/* Middle Column: Both Tutorials */}
           <div className="space-y-4">
             {/* Interactive Tutorial */}
-            <Card className="electric-frame">
-              <CardHeader className="pb-3">
-                <CardTitle className="text-gradient text-lg">Platform Tutorial</CardTitle>
+            <Card className="electric-frame relative overflow-hidden">
+              <div className="absolute inset-0 bg-gradient-to-br from-electric-blue/5 via-purple/5 to-electric-green/5 pointer-events-none"></div>
+              <CardHeader className="pb-3 relative">
+                <CardTitle className="text-gradient text-lg flex items-center gap-2">
+                  <div className="p-2 rounded-lg bg-gradient-to-br from-electric-blue/20 to-purple/20">
+                    <Play className="w-4 h-4 text-electric-blue" />
+                  </div>
+                  Platform Tutorial
+                  <Badge className="bg-electric-green/20 text-electric-green text-xs ml-auto">
+                    3 min demo
+                  </Badge>
+                </CardTitle>
               </CardHeader>
-              <CardContent>
-                <div className="text-center">
-                  <p className="text-sm text-muted-foreground mb-4">
-                    Experience the FUTURE of token creation! See how easy it is to become "The Coinbase of Token Creation"!
-                  </p>
-                  <TutorialLaunchButton 
-                    className="bg-gradient-to-r from-electric-blue to-circuit-teal hover:from-electric-blue/80 hover:to-circuit-teal/80 text-white px-4 py-2 text-sm w-full" 
-                    variant="default"
-                  />
+              <CardContent className="relative">
+                <div className="space-y-4">
+                  <div className="text-center">
+                    <h4 className="text-sm font-semibold text-white mb-2">
+                      🚀 Master the "Google Ads of Crypto" Platform
+                    </h4>
+                    <p className="text-xs text-muted-foreground mb-3">
+                      Interactive walkthrough of revolutionary crypto marketing tools that enable precision targeting of any wallet holder
+                    </p>
+                  </div>
+
+                  {/* Tutorial Features Preview */}
+                  <div className="grid grid-cols-2 gap-2 text-xs">
+                    <div className="bg-slate-800/50 rounded-lg p-2 border border-electric-blue/20">
+                      <div className="flex items-center gap-1 mb-1">
+                        <Sparkles className="w-3 h-3 text-electric-blue" />
+                        <span className="font-medium text-electric-blue">FlutterbyeMSG</span>
+                      </div>
+                      <p className="text-muted-foreground text-xs">27-char message tokens</p>
+                    </div>
+                    
+                    <div className="bg-slate-800/50 rounded-lg p-2 border border-purple/20">
+                      <div className="flex items-center gap-1 mb-1">
+                        <Palette className="w-3 h-3 text-purple-400" />
+                        <span className="font-medium text-purple-400">FlutterArt</span>
+                      </div>
+                      <p className="text-muted-foreground text-xs">Advanced NFT creation</p>
+                    </div>
+                    
+                    <div className="bg-slate-800/50 rounded-lg p-2 border border-electric-green/20">
+                      <div className="flex items-center gap-1 mb-1">
+                        <Brain className="w-3 h-3 text-electric-green" />
+                        <span className="font-medium text-electric-green">FlutterAI</span>
+                      </div>
+                      <p className="text-muted-foreground text-xs">Wallet intelligence</p>
+                    </div>
+                    
+                    <div className="bg-slate-800/50 rounded-lg p-2 border border-orange/20">
+                      <div className="flex items-center gap-1 mb-1">
+                        <Zap className="w-3 h-3 text-orange-400" />
+                        <span className="font-medium text-orange-400">FlutterWave</span>
+                      </div>
+                      <p className="text-muted-foreground text-xs">SMS-to-blockchain</p>
+                    </div>
+                  </div>
+
+                  {/* What You'll Learn */}
+                  <div className="bg-slate-900/50 rounded-lg p-3 border border-slate-700">
+                    <h5 className="text-xs font-semibold text-white mb-2">What You'll Learn:</h5>
+                    <ul className="text-xs text-muted-foreground space-y-1">
+                      <li>• Create targeted crypto marketing campaigns</li>
+                      <li>• Mint valuable NFTs with advanced features</li>
+                      <li>• Analyze wallet behavior with AI intelligence</li>
+                      <li>• Deploy SMS-to-blockchain emotional tokens</li>
+                      <li>• Generate revenue with precision targeting</li>
+                    </ul>
+                  </div>
+
+                  {/* CTA Button */}
+                  <div className="pt-2">
+                    <TutorialLaunchButton 
+                      className="bg-gradient-to-r from-electric-blue to-circuit-teal hover:from-electric-blue/80 hover:to-circuit-teal/80 text-white px-4 py-2 text-sm w-full flex items-center justify-center gap-2 shadow-lg" 
+                      variant="default"
+                    >
+                      <Play className="w-4 h-4" />
+                      Start Interactive Demo
+                    </TutorialLaunchButton>
+                  </div>
+
+                  {/* Stats */}
+                  <div className="flex justify-center gap-4 text-xs text-muted-foreground pt-2 border-t border-slate-700">
+                    <span>⚡ 3 min setup</span>
+                    <span>🎯 4 products</span>
+                    <span>💰 Revenue ready</span>
+                  </div>
                 </div>
               </CardContent>
             </Card>
