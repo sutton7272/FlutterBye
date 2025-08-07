@@ -75,6 +75,8 @@ import CollaborativeCreation from "@/pages/collaborative-creation";
 import FlutterAIDashboard from "@/pages/flutterai-dashboard";
 import MultiChainDashboard from "@/pages/MultiChainDashboard";
 import SimpleMultiChain from "@/pages/SimpleMultiChain";
+import SimpleMultiChainTest from "@/pages/SimpleMultiChainTest";
+import MultiChainIntelligence from "@/pages/MultiChainIntelligence";
 import RouteDebug from "@/pages/RouteDebug";
 import TestRoute from "@/pages/TestRoute";
 import FlutterAIUser from "@/pages/flutterai-user";
@@ -115,7 +117,7 @@ function Router() {
   const [location] = useLocation();
   console.log('🔍 Current route location:', location);
   
-  // Override for multi-chain - direct return
+  // Handle multi-chain routes directly
   if (location === '/multi-chain') {
     console.log('🚀 Direct multi-chain override activated!');
     const MultiChainApp = lazy(() => import('./MultiChainApp'));
@@ -129,6 +131,8 @@ function Router() {
       </QueryClientProvider>
     );
   }
+
+
   
   return (
     <ErrorBoundary>
@@ -672,7 +676,7 @@ function Router() {
         <Route path="/multi-chain-dashboard" component={() => (
           <>
             <Navbar />
-            <MultiChainDashboard />
+            <MultiChainIntelligence />
           </>
         )} />
         <Route path="/all-opportunities" component={() => (
