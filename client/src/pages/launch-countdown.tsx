@@ -486,7 +486,7 @@ export default function LaunchCountdown() {
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {/* Digital Greeting Card */}
-            <Card className="electric-frame cursor-pointer hover:scale-105 transition-transform duration-300" onClick={() => setLocation('/greeting-cards')}>
+            <Card className="electric-frame hover:scale-105 transition-transform duration-300">
               <CardHeader>
                 <CardTitle className="text-gradient flex items-center gap-2">
                   <div className="w-6 h-6 text-pink-400">💌</div>
@@ -510,7 +510,9 @@ export default function LaunchCountdown() {
                   <Button 
                     className="w-full bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-500 hover:to-purple-500"
                     onClick={(e) => {
+                      e.preventDefault();
                       e.stopPropagation();
+                      console.log('Navigating to greeting-cards...');
                       setLocation('/greeting-cards');
                     }}
                   >
@@ -521,7 +523,7 @@ export default function LaunchCountdown() {
             </Card>
 
             {/* Targeted Marketing */}
-            <Card className="electric-frame cursor-pointer hover:scale-105 transition-transform duration-300" onClick={() => setLocation('/enterprise')}>
+            <Card className="electric-frame hover:scale-105 transition-transform duration-300">
               <CardHeader>
                 <CardTitle className="text-gradient flex items-center gap-2">
                   <div className="w-6 h-6 text-blue-400">🎯</div>
@@ -545,7 +547,9 @@ export default function LaunchCountdown() {
                   <Button 
                     className="w-full bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-500 hover:to-cyan-500"
                     onClick={(e) => {
+                      e.preventDefault();
                       e.stopPropagation();
+                      console.log('Navigating to enterprise...');
                       setLocation('/enterprise');
                     }}
                   >
@@ -556,7 +560,7 @@ export default function LaunchCountdown() {
             </Card>
 
             {/* Token Creation Center */}
-            <Card className="electric-frame cursor-pointer hover:scale-105 transition-transform duration-300" onClick={() => setLocation('/create')}>
+            <Card className="electric-frame hover:scale-105 transition-transform duration-300">
               <CardHeader>
                 <CardTitle className="text-gradient flex items-center gap-2">
                   <Coins className="w-6 h-6 text-green-400" />
