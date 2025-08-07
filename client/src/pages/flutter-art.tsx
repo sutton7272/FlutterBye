@@ -7,8 +7,6 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
-import { WalletConnect } from "@/components/wallet-connect";
-import { useWallet } from "@/hooks/useWallet";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { 
@@ -47,8 +45,11 @@ export default function FlutterArt() {
   const [selectedCollection, setSelectedCollection] = useState("");
   const [imageFile, setImageFile] = useState<File | null>(null);
   const { toast } = useToast();
-  const { wallet, isConnected } = useWallet();
   const queryClient = useQueryClient();
+  
+  // Mock wallet connection for now
+  const isConnected = true;
+  const wallet = { address: "mock-wallet-address" };
 
   // Fetch user's NFT collections
   const { data: collections, isLoading: collectionsLoading } = useQuery({
@@ -207,7 +208,9 @@ export default function FlutterArt() {
                 <p className="text-muted-foreground mb-4">
                   Connect your wallet to create and manage NFTs
                 </p>
-                <WalletConnect />
+                <Button className="bg-electric-blue hover:bg-electric-blue/80">
+                  Connect Wallet
+                </Button>
               </CardContent>
             </Card>
           </div>
