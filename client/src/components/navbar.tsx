@@ -78,47 +78,65 @@ export default function Navbar() {
           </Link>
         </div>
 
-        {/* Product Development Tabs - Desktop */}
-        <div className="hidden md:flex items-center space-x-4 flex-1">
-          <Tabs value={activeProductTab} onValueChange={setActiveProductTab} className="w-auto">
-            <TabsList className="bg-slate-800/50 border border-electric-blue/30 electric-glow">
-              <TabsTrigger 
-                value="flutterbye" 
-                className="data-[state=active]:bg-electric-blue data-[state=active]:text-white text-slate-300 hover:text-white transition-all duration-200"
-              >
-                <Send className="h-4 w-4 mr-2" />
-                Flutterbye
-              </TabsTrigger>
-              <TabsTrigger 
-                value="flutterart" 
-                className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-600 data-[state=active]:to-pink-600 data-[state=active]:text-white text-slate-300 hover:text-white transition-all duration-200"
-              >
-                <Palette className="h-4 w-4 mr-2" />
-                FlutterArt
-              </TabsTrigger>
-              <TabsTrigger 
-                value="flutterwave" 
-                className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-cyan-600 data-[state=active]:text-white text-slate-300 hover:text-white transition-all duration-200"
-              >
-                <Waves className="h-4 w-4 mr-2" />
-                FlutterWave
-              </TabsTrigger>
-            </TabsList>
-          </Tabs>
+        {/* Product Development Tabs - Always Visible */}
+        <div className="flex items-center justify-center flex-1 max-w-2xl mx-auto">
+          <div className="flex items-center bg-slate-900/80 rounded-lg p-1 border border-electric-blue/30 backdrop-blur-sm">
+            <Button
+              onClick={() => setActiveProductTab("flutterbye")}
+              size="sm"
+              variant={activeProductTab === "flutterbye" ? "default" : "ghost"}
+              className={`mr-1 ${
+                activeProductTab === "flutterbye" 
+                  ? "bg-electric-blue text-white shadow-lg" 
+                  : "text-slate-300 hover:text-white hover:bg-electric-blue/20"
+              }`}
+            >
+              <Send className="h-4 w-4 mr-1" />
+              Flutterbye
+            </Button>
+            
+            <Button
+              onClick={() => setActiveProductTab("flutterart")}
+              size="sm"
+              variant={activeProductTab === "flutterart" ? "default" : "ghost"}
+              className={`mr-1 ${
+                activeProductTab === "flutterart" 
+                  ? "bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg" 
+                  : "text-slate-300 hover:text-white hover:bg-purple-500/20"
+              }`}
+            >
+              <Palette className="h-4 w-4 mr-1" />
+              FlutterArt
+            </Button>
+            
+            <Button
+              onClick={() => setActiveProductTab("flutterwave")}
+              size="sm"
+              variant={activeProductTab === "flutterwave" ? "default" : "ghost"}
+              className={`${
+                activeProductTab === "flutterwave" 
+                  ? "bg-gradient-to-r from-blue-600 to-cyan-600 text-white shadow-lg" 
+                  : "text-slate-300 hover:text-white hover:bg-cyan-500/20"
+              }`}
+            >
+              <Waves className="h-4 w-4 mr-1" />
+              FlutterWave
+            </Button>
+          </div>
           
           {/* Quick Action Buttons */}
-          <div className="flex items-center space-x-2">
+          <div className="hidden lg:flex items-center space-x-2 ml-4">
             {activeProductTab === "flutterbye" && (
               <>
                 <Link href="/create">
-                  <Button size="sm" variant="outline" className="border-electric-blue/50 hover:bg-electric-blue/20">
-                    <Coins className="h-4 w-4 mr-2" />
-                    Create Token
+                  <Button size="sm" variant="outline" className="border-electric-blue/50 hover:bg-electric-blue/20 text-xs">
+                    <Coins className="h-3 w-3 mr-1" />
+                    Create
                   </Button>
                 </Link>
                 <Link href="/enterprise-campaigns">
-                  <Button size="sm" variant="outline" className="border-electric-blue/50 hover:bg-electric-blue/20">
-                    <Target className="h-4 w-4 mr-2" />
+                  <Button size="sm" variant="outline" className="border-electric-blue/50 hover:bg-electric-blue/20 text-xs">
+                    <Target className="h-3 w-3 mr-1" />
                     Campaign
                   </Button>
                 </Link>
@@ -128,15 +146,15 @@ export default function Navbar() {
             {activeProductTab === "flutterart" && (
               <>
                 <Link href="/flutter-art">
-                  <Button size="sm" variant="outline" className="border-purple-500/50 hover:bg-purple-500/20">
-                    <Palette className="h-4 w-4 mr-2" />
-                    Create Art
+                  <Button size="sm" variant="outline" className="border-purple-500/50 hover:bg-purple-500/20 text-xs">
+                    <Palette className="h-3 w-3 mr-1" />
+                    Create
                   </Button>
                 </Link>
                 <Link href="/mint/multimedia">
-                  <Button size="sm" variant="outline" className="border-purple-500/50 hover:bg-purple-500/20">
-                    <Sparkles className="h-4 w-4 mr-2" />
-                    AI Generate
+                  <Button size="sm" variant="outline" className="border-purple-500/50 hover:bg-purple-500/20 text-xs">
+                    <Sparkles className="h-3 w-3 mr-1" />
+                    AI Gen
                   </Button>
                 </Link>
               </>
@@ -145,15 +163,15 @@ export default function Navbar() {
             {activeProductTab === "flutterwave" && (
               <>
                 <Link href="/flutter-wave">
-                  <Button size="sm" variant="outline" className="border-cyan-500/50 hover:bg-cyan-500/20">
-                    <Waves className="h-4 w-4 mr-2" />
-                    Send SMS
+                  <Button size="sm" variant="outline" className="border-cyan-500/50 hover:bg-cyan-500/20 text-xs">
+                    <Waves className="h-3 w-3 mr-1" />
+                    SMS
                   </Button>
                 </Link>
                 <Link href="/sms-integration">
-                  <Button size="sm" variant="outline" className="border-cyan-500/50 hover:bg-cyan-500/20">
-                    <MessageSquare className="h-4 w-4 mr-2" />
-                    Integrate
+                  <Button size="sm" variant="outline" className="border-cyan-500/50 hover:bg-cyan-500/20 text-xs">
+                    <MessageSquare className="h-3 w-3 mr-1" />
+                    Setup
                   </Button>
                 </Link>
               </>
