@@ -1,6 +1,5 @@
 // Placeholder for wallet adapter integration
 // In a real implementation, this would use @solana/wallet-adapter-react
-import React from 'react';
 
 export interface WalletContextState {
   publicKey: string | null;

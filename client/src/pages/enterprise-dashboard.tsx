@@ -18,23 +18,12 @@ import {
   Eye,
   BarChart3,
   Lock,
-  Zap,
-  ArrowLeft
+  Zap
 } from "lucide-react";
-import { Link } from "wouter";
 
 export default function EnterpriseDashboard() {
   const [searchAddress, setSearchAddress] = useState("");
   const [selectedChain, setSelectedChain] = useState("ethereum");
-
-  // Check admin authentication
-  useEffect(() => {
-    const adminAuth = sessionStorage.getItem('admin-authenticated');
-    if (!adminAuth) {
-      window.location.href = '/admin-gateway';
-      return;
-    }
-  }, []);
 
   // Enterprise dashboard metrics
   const { data: dashboardMetrics } = useQuery({
@@ -56,16 +45,6 @@ export default function EnterpriseDashboard() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 p-6">
-      {/* Back Button */}
-      <div className="flex items-center gap-4 mb-6">
-        <Link href="/admin-gateway">
-          <Button variant="outline" className="bg-slate-800/50 border-slate-600 text-slate-300 hover:bg-slate-700 hover:text-white flex items-center gap-2">
-            <ArrowLeft className="w-4 h-4" />
-            ← Admin Home
-          </Button>
-        </Link>
-      </div>
-
       {/* Enterprise Header */}
       <div className="mb-8">
         <div className="flex items-center justify-between">

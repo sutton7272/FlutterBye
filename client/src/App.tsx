@@ -53,7 +53,6 @@ import FlbyAirdrop from "@/pages/flby-airdrop";
 import AdminStaking from "@/pages/admin-staking";
 import ReferralRewards from "@/pages/referral-rewards";
 import LaunchCountdown from "@/pages/launch-countdown";
-import BlogPage from "@/pages/blog";
 import Subscribe from "@/pages/subscribe";
 import Payments from "@/pages/payments";
 import AIPayments from "@/pages/ai-payments";
@@ -65,15 +64,9 @@ import AdminFreeCodes from "@/pages/admin-free-codes";
 import AdminPricing from "@/pages/admin-pricing";
 import AdminDefaultImage from "@/pages/admin-default-image";
 import UnifiedAdminDashboard from "@/pages/admin-unified";
-import AdminGateway from "@/pages/admin-gateway";
-import AdminAccessControl from "@/pages/admin-access-control";
-import AdminMarketing from "@/pages/admin-marketing";
-import AdminGrowth from "@/pages/admin-growth";
-import AdminMarketingGrowth from "@/pages/admin-marketing-growth";
 import TokenHolderMapPage from "@/pages/token-holder-map";
 import CollaborativeCreation from "@/pages/collaborative-creation";
 import FlutterAIDashboard from "@/pages/flutterai-dashboard";
-import FlutterAIUser from "@/pages/flutterai-user";
 import EnterpriseDashboard from "@/pages/enterprise-dashboard";
 import ViralDashboard from "@/pages/viral-dashboard";
 import MessageNFTCreator from "@/pages/message-nft-creator";
@@ -115,7 +108,6 @@ function Router() {
           <Switch>
         <Route path="/" component={LaunchCountdown} />
         <Route path="/launch" component={LaunchCountdown} />
-        <Route path="/blog" component={BlogPage} />
         <Route path="/home" component={() => (
           <>
             <Navbar />
@@ -149,12 +141,6 @@ function Router() {
           </>
         )} />
         <Route path="/flutterai" component={() => (
-          <>
-            <Navbar />
-            <FlutterAIUser />
-          </>
-        )} />
-        <Route path="/flutterai/admin" component={() => (
           <>
             <Navbar />
             <FlutterAIDashboard />
@@ -276,66 +262,10 @@ function Router() {
             <SearchPage />
           </>
         )} />
-        <Route path="/admin-gateway" component={() => (
-          <>
-            <Navbar />
-            <AdminGateway />
-          </>
-        )} />
-        <Route path="/admin-access-control" component={() => (
-          <>
-            <Navbar />
-            <AdminAccessControl />
-          </>
-        )} />
-        <Route path="/admin-marketing" component={() => (
-          <>
-            <Navbar />
-            <AdminMarketing />
-          </>
-        )} />
-        <Route path="/admin-growth" component={() => (
-          <>
-            <Navbar />
-            <AdminGrowth />
-          </>
-        )} />
-        <Route path="/admin-marketing-growth" component={() => (
-          <>
-            <Navbar />
-            <AdminMarketingGrowth />
-          </>
-        )} />
         <Route path="/admin" component={() => (
           <>
             <Navbar />
-            <AdminGateway />
-          </>
-        )} />
-        
-        {/* Admin Portal Routes */}
-        <Route path="/admin/dashboard" component={() => (
-          <>
-            <Navbar />
-            <UnifiedAdminDashboard />
-          </>
-        )} />
-        <Route path="/admin/access-control" component={() => (
-          <>
-            <Navbar />
-            <AdminAccessControl />
-          </>
-        )} />
-        <Route path="/admin/enterprise" component={() => (
-          <>
-            <Navbar />
-            <EnterpriseDashboard />
-          </>
-        )} />
-        <Route path="/admin/features" component={() => (
-          <>
-            <Navbar />
-            <AdminSystem />
+            <Admin />
           </>
         )} />
         

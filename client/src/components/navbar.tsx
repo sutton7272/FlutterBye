@@ -3,8 +3,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { WalletConnect } from "@/components/wallet-connect";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { Menu, Home, Coins, Trophy, Users, MessageSquare, Settings, Sparkles, Zap, Heart, Building2, MapPin, Activity, Gift, Award, Star, Ticket, HelpCircle, LayoutDashboard, Brain, CreditCard, Stars, DollarSign, Code2, Rocket, ArrowRightLeft, Target, Shield, Palette, Waves, Send } from "lucide-react";
+import { Menu, Home, Coins, Trophy, Users, MessageSquare, Settings, Sparkles, Zap, Heart, Building2, MapPin, Activity, Gift, Award, Star, Ticket, HelpCircle, LayoutDashboard, Brain, CreditCard, Stars, DollarSign, Code2, Rocket, ArrowRightLeft, Target, Shield } from "lucide-react";
 
 import { useFeatureToggles } from "@/hooks/useFeatureToggles";
 import { MobileNavigation } from "@/components/mobile-navigation";
@@ -12,24 +11,18 @@ import { MobileNavigation } from "@/components/mobile-navigation";
 export default function Navbar() {
   const [location] = useLocation();
   const [isOpen, setIsOpen] = useState(false);
-  const [activeProductTab, setActiveProductTab] = useState("flutterbye");
   const { isFeatureEnabled, isLoading: featuresLoading } = useFeatureToggles();
 
   // Primary navigation - core platform sections focused on launch products
   const allNavItems = [
-    { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard, description: "Portfolio & activity", featureId: "dashboard", priority: true },
-    { href: "/create", label: "Create", icon: Coins, description: "Message tokens & campaigns", featureId: "mint", priority: true, 
-      subItems: [
-        { href: "/create", label: "Basic Messages", description: "27-character message tokens" },
-        { href: "/mint/greeting", label: "Greeting Cards", description: "Personal greeting messages" },
-        { href: "/enterprise-campaigns", label: "Marketing Campaigns", description: "Enterprise targeting campaigns" },
-        { href: "/campaign-builder", label: "Campaign Builder", description: "Advanced campaign creation" }
-      ]
-    },
+    { href: "/create", label: "Create", icon: Coins, description: "27-character message tokens", featureId: "mint", priority: true },
     { href: "/flutterai", label: "FlutterAI", icon: Brain, description: "Wallet intelligence & targeting", special: true, featureId: "flutterai", priority: true },
     { href: "/redeem", label: "Redeem", icon: Gift, description: "Discover & redeem message tokens", featureId: "marketplace", priority: true },
+    { href: "/flutter-art", label: "FlutterArt", icon: Sparkles, description: "NFT message tokens", featureId: "flutter_art" },
+    { href: "/mint/greeting", label: "Greeting", icon: Heart, description: "Create greeting message tokens", featureId: "mint" },
+    { href: "/enterprise-campaigns", label: "Marketing", icon: Target, description: "Enterprise marketing campaigns", featureId: "enterprise" },
     { href: "/intelligence", label: "AI Hub", icon: Brain, description: "AI intelligence and analytics", featureId: "intelligence" },
-    { href: "/admin-gateway", label: "Admin", icon: Settings, description: "Platform management", featureId: "admin_panel" },
+    { href: "/admin-unified", label: "Admin", icon: Settings, description: "Platform management", featureId: "admin_panel" },
   ];
 
   // Filter navigation items based on feature toggles
@@ -41,7 +34,7 @@ export default function Navbar() {
           return true;
         }
         // Show core features by default
-        if (["home", "mint", "marketplace", "flutterai", "flutter_wave", "flutter_art", "chat", "dashboard"].includes(item.featureId)) {
+        if (["home", "mint", "marketplace", "flutterai", "flutter_wave", "flutter_art", "chat"].includes(item.featureId)) {
           return true;
         }
         // If no featureId is specified, show the item by default
@@ -52,12 +45,11 @@ export default function Navbar() {
 
   // Secondary navigation - business and enterprise features
   const secondaryNavItems = [
-    { href: "/info", label: "Info", icon: HelpCircle, description: "Platform information & help",
-      subItems: [
-        { href: "/info", label: "Platform Info", description: "About Flutterbye platform" },
-        { href: "/explore", label: "Explore", description: "Discover trending content" }
-      ]
-    },
+    { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard, description: "Portfolio & activity" },
+    { href: "/chat", label: "Chat", icon: MessageSquare, description: "Real-time blockchain chat" },
+    { href: "/trade", label: "Trade", icon: ArrowRightLeft, description: "Token marketplace & trading" },
+    { href: "/activity", label: "Activity", icon: Activity, description: "Platform activity & analytics" },
+    { href: "/explore", label: "Explore", icon: Star, description: "Discover trending content" },
   ];
 
   const isActive = (href: string) => location === href;
@@ -76,107 +68,6 @@ export default function Navbar() {
               Flutterbye
             </span>
           </Link>
-        </div>
-
-        {/* Product Development Tabs - Always Visible */}
-        <div className="flex items-center justify-center flex-1 max-w-2xl mx-auto">
-          <div className="flex items-center bg-slate-900/80 rounded-lg p-1 border border-electric-blue/30 backdrop-blur-sm">
-            <Button
-              onClick={() => setActiveProductTab("flutterbye")}
-              size="sm"
-              variant={activeProductTab === "flutterbye" ? "default" : "ghost"}
-              className={`mr-1 ${
-                activeProductTab === "flutterbye" 
-                  ? "bg-electric-blue text-white shadow-lg" 
-                  : "text-slate-300 hover:text-white hover:bg-electric-blue/20"
-              }`}
-            >
-              <Send className="h-4 w-4 mr-1" />
-              Flutterbye
-            </Button>
-            
-            <Button
-              onClick={() => setActiveProductTab("flutterart")}
-              size="sm"
-              variant={activeProductTab === "flutterart" ? "default" : "ghost"}
-              className={`mr-1 ${
-                activeProductTab === "flutterart" 
-                  ? "bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg" 
-                  : "text-slate-300 hover:text-white hover:bg-purple-500/20"
-              }`}
-            >
-              <Palette className="h-4 w-4 mr-1" />
-              FlutterArt
-            </Button>
-            
-            <Button
-              onClick={() => setActiveProductTab("flutterwave")}
-              size="sm"
-              variant={activeProductTab === "flutterwave" ? "default" : "ghost"}
-              className={`${
-                activeProductTab === "flutterwave" 
-                  ? "bg-gradient-to-r from-blue-600 to-cyan-600 text-white shadow-lg" 
-                  : "text-slate-300 hover:text-white hover:bg-cyan-500/20"
-              }`}
-            >
-              <Waves className="h-4 w-4 mr-1" />
-              FlutterWave
-            </Button>
-          </div>
-          
-          {/* Quick Action Buttons */}
-          <div className="hidden lg:flex items-center space-x-2 ml-4">
-            {activeProductTab === "flutterbye" && (
-              <>
-                <Link href="/create">
-                  <Button size="sm" variant="outline" className="border-electric-blue/50 hover:bg-electric-blue/20 text-xs">
-                    <Coins className="h-3 w-3 mr-1" />
-                    Create
-                  </Button>
-                </Link>
-                <Link href="/enterprise-campaigns">
-                  <Button size="sm" variant="outline" className="border-electric-blue/50 hover:bg-electric-blue/20 text-xs">
-                    <Target className="h-3 w-3 mr-1" />
-                    Campaign
-                  </Button>
-                </Link>
-              </>
-            )}
-            
-            {activeProductTab === "flutterart" && (
-              <>
-                <Link href="/flutter-art">
-                  <Button size="sm" variant="outline" className="border-purple-500/50 hover:bg-purple-500/20 text-xs">
-                    <Palette className="h-3 w-3 mr-1" />
-                    Create
-                  </Button>
-                </Link>
-                <Link href="/mint/multimedia">
-                  <Button size="sm" variant="outline" className="border-purple-500/50 hover:bg-purple-500/20 text-xs">
-                    <Sparkles className="h-3 w-3 mr-1" />
-                    AI Gen
-                  </Button>
-                </Link>
-              </>
-            )}
-            
-            {activeProductTab === "flutterwave" && (
-              <>
-                <Link href="/flutter-wave">
-                  <Button size="sm" variant="outline" className="border-cyan-500/50 hover:bg-cyan-500/20 text-xs">
-                    <Waves className="h-3 w-3 mr-1" />
-                    SMS
-                  </Button>
-                </Link>
-                <Link href="/sms-integration">
-                  <Button size="sm" variant="outline" className="border-cyan-500/50 hover:bg-cyan-500/20 text-xs">
-                    <MessageSquare className="h-3 w-3 mr-1" />
-                    Setup
-                  </Button>
-                </Link>
-              </>
-            )}
-          </div>
         </div>
 
         {/* Primary Navigation - Desktop */}
@@ -266,105 +157,6 @@ export default function Navbar() {
               </span>
             </Link>
             <nav className="flex flex-col space-y-2">
-              {/* Product Creation Section */}
-              <div className="mb-4">
-                <h3 className="text-sm font-medium text-slate-400 mb-3 px-2">Product Creation</h3>
-                
-                {/* Flutterbye Section */}
-                <div className="mb-3">
-                  <div className="text-xs font-medium text-electric-blue mb-2 px-2 flex items-center">
-                    <Send className="h-3 w-3 mr-1" />
-                    Flutterbye - Message Tokens
-                  </div>
-                  <div className="space-y-1">
-                    <Link href="/create">
-                      <Button
-                        variant="ghost"
-                        className="w-full justify-start h-10 text-text-secondary hover:text-text-primary hover:bg-electric-blue/20"
-                        onClick={() => setIsOpen(false)}
-                      >
-                        <Coins className="h-4 w-4 mr-3" />
-                        Create Message Token
-                      </Button>
-                    </Link>
-                    <Link href="/enterprise-campaigns">
-                      <Button
-                        variant="ghost"
-                        className="w-full justify-start h-10 text-text-secondary hover:text-text-primary hover:bg-electric-blue/20"
-                        onClick={() => setIsOpen(false)}
-                      >
-                        <Target className="h-4 w-4 mr-3" />
-                        Marketing Campaign
-                      </Button>
-                    </Link>
-                  </div>
-                </div>
-
-                {/* FlutterArt Section */}
-                <div className="mb-3">
-                  <div className="text-xs font-medium text-purple-400 mb-2 px-2 flex items-center">
-                    <Palette className="h-3 w-3 mr-1" />
-                    FlutterArt - Digital Art
-                  </div>
-                  <div className="space-y-1">
-                    <Link href="/flutter-art">
-                      <Button
-                        variant="ghost"
-                        className="w-full justify-start h-10 text-text-secondary hover:text-text-primary hover:bg-purple-500/20"
-                        onClick={() => setIsOpen(false)}
-                      >
-                        <Palette className="h-4 w-4 mr-3" />
-                        Create Digital Art
-                      </Button>
-                    </Link>
-                    <Link href="/mint/multimedia">
-                      <Button
-                        variant="ghost"
-                        className="w-full justify-start h-10 text-text-secondary hover:text-text-primary hover:bg-purple-500/20"
-                        onClick={() => setIsOpen(false)}
-                      >
-                        <Sparkles className="h-4 w-4 mr-3" />
-                        AI Art Generator
-                      </Button>
-                    </Link>
-                  </div>
-                </div>
-
-                {/* FlutterWave Section */}
-                <div className="mb-4">
-                  <div className="text-xs font-medium text-cyan-400 mb-2 px-2 flex items-center">
-                    <Waves className="h-3 w-3 mr-1" />
-                    FlutterWave - SMS Integration
-                  </div>
-                  <div className="space-y-1">
-                    <Link href="/flutter-wave">
-                      <Button
-                        variant="ghost"
-                        className="w-full justify-start h-10 text-text-secondary hover:text-text-primary hover:bg-cyan-500/20"
-                        onClick={() => setIsOpen(false)}
-                      >
-                        <Waves className="h-4 w-4 mr-3" />
-                        Send SMS Token
-                      </Button>
-                    </Link>
-                    <Link href="/sms-integration">
-                      <Button
-                        variant="ghost"
-                        className="w-full justify-start h-10 text-text-secondary hover:text-text-primary hover:bg-cyan-500/20"
-                        onClick={() => setIsOpen(false)}
-                      >
-                        <MessageSquare className="h-4 w-4 mr-3" />
-                        SMS Integration
-                      </Button>
-                    </Link>
-                  </div>
-                </div>
-              </div>
-
-              {/* Divider */}
-              <div className="border-t border-border/30 my-3" />
-              
-              {/* Standard Navigation */}
               {primaryNavItems.map((item) => (
                 <Link key={item.href} href={item.href}>
                   <Button

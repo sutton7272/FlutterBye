@@ -1,27 +1,3 @@
-// Load environment variables from .env.local first
-import { readFileSync } from 'fs';
-import { join } from 'path';
-
-// Parse and load .env.local manually
-try {
-  const envPath = join(process.cwd(), '.env.local');
-  const envFile = readFileSync(envPath, 'utf8');
-  const envVars = envFile.split('\n').filter(line => line.trim() && !line.trim().startsWith('#'));
-  envVars.forEach(line => {
-    const equalIndex = line.indexOf('=');
-    if (equalIndex > 0) {
-      const key = line.substring(0, equalIndex).trim();
-      const value = line.substring(equalIndex + 1).trim();
-      if (key && value) {
-        process.env[key] = value;
-      }
-    }
-  });
-  console.log(`✅ Environment loaded: NODE_ENV=${process.env.NODE_ENV}, JWT_SECRET=${process.env.JWT_SECRET ? 'SET' : 'NOT SET'}`);
-} catch (error: any) {
-  console.warn('⚠️ Could not load .env.local file:', error.message);
-}
-
 import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
@@ -74,56 +50,6 @@ app.use((req, res, next) => {
 
     res.status(status).json({ message });
     console.error('Server error:', err);
-  });
-
-  // Test deployment endpoint
-  app.get('/test-deploy', (req, res) => {
-    res.send(`
-      <!DOCTYPE html>
-      <html>
-      <head>
-          <title>Flutterbye Deployment Test</title>
-          <style>
-              body { 
-                  background: #000; 
-                  color: #fff; 
-                  font-family: Arial; 
-                  text-align: center; 
-                  padding: 50px;
-              }
-              .test-box { 
-                  background: red; 
-                  padding: 20px; 
-                  margin: 20px;
-                  border-radius: 10px;
-              }
-              .marketing-section {
-                  background: linear-gradient(to right, #3b82f6, #10b981);
-                  padding: 40px;
-                  margin: 20px;
-                  border-radius: 15px;
-              }
-          </style>
-      </head>
-      <body>
-          <div class="test-box">
-              DEPLOYMENT TEST - SERVER IS WORKING! Time: ${new Date().toISOString()}
-          </div>
-          
-          <div class="marketing-section">
-              <h1>🚀 AI MARKETING REVOLUTION - LIVE NOW</h1>
-              <p>Revolutionary AI-powered blog content powered by Flutterbye Intelligence</p>
-              <h2>The Future of Crypto Marketing: AI-Powered Precision Targeting</h2>
-              <p>Discover how Flutterbye is revolutionizing crypto marketing.</p>
-          </div>
-          
-          <p>Port: ${process.env.PORT || 5000} | Environment: ${process.env.NODE_ENV || 'development'}</p>
-          <p>URL: ${req.protocol}://${req.get('host')}${req.originalUrl}</p>
-          <p><a href="/" style="color: #3b82f6;">Go to Homepage (React App)</a></p>
-          <p><a href="/?v=${Date.now()}" style="color: #10b981;">Force Refresh Homepage</a></p>
-      </body>
-      </html>
-    `);
   });
 
   // importantly only setup vite in development and after

@@ -69,7 +69,6 @@ export interface IStorage {
   createToken(token: InsertToken): Promise<Token>;
   updateTokenSupply(tokenId: string, availableSupply: number): Promise<Token>;
   getTokensByCreator(creatorId: string): Promise<Token[]>;
-  getTokensByIds(tokenIds: string[]): Promise<Token[]>;
   getAllTokens(limit?: number, offset?: number): Promise<Token[]>;
   searchTokens(query: string): Promise<Token[]>;
   updateToken(tokenId: string, updateData: Partial<Token>): Promise<Token>;
@@ -80,7 +79,6 @@ export interface IStorage {
   createTokenHolding(holding: InsertTokenHolding): Promise<TokenHolding>;
   updateTokenHolding(userId: string, tokenId: string, quantity: number): Promise<TokenHolding>;
   getUserHoldings(userId: string): Promise<TokenHolding[]>;
-  getTokenHoldingsByUser(userId: string): Promise<TokenHolding[]>;
 
   // Transactions
   createTransaction(transaction: InsertTransaction): Promise<Transaction>;
@@ -490,12 +488,6 @@ export class MemStorage implements IStorage {
       .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
   }
 
-  async getTokensByIds(tokenIds: string[]): Promise<Token[]> {
-    return Array.from(this.tokens.values())
-      .filter(token => tokenIds.includes(token.id))
-      .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
-  }
-
   async getAllTokens(limit = 50, offset = 0): Promise<Token[]> {
     return Array.from(this.tokens.values())
       .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
@@ -553,11 +545,6 @@ export class MemStorage implements IStorage {
   }
 
   async getUserHoldings(userId: string): Promise<TokenHolding[]> {
-    return Array.from(this.tokenHoldings.values())
-      .filter(holding => holding.userId === userId);
-  }
-
-  async getTokenHoldingsByUser(userId: string): Promise<TokenHolding[]> {
     return Array.from(this.tokenHoldings.values())
       .filter(holding => holding.userId === userId);
   }

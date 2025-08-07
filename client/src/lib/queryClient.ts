@@ -12,23 +12,9 @@ export async function apiRequest(
   url: string,
   data?: unknown | undefined,
 ): Promise<Response> {
-  const headers: Record<string, string> = {};
-  
-  if (data) {
-    headers["Content-Type"] = "application/json";
-  }
-  
-  // Add admin session token if available for admin endpoints
-  if (url.includes('/api/admin/')) {
-    const adminAuth = sessionStorage.getItem('admin-authenticated');
-    if (adminAuth) {
-      headers["X-Admin-Session"] = adminAuth;
-    }
-  }
-
   const res = await fetch(url, {
     method,
-    headers,
+    headers: data ? { "Content-Type": "application/json" } : {},
     body: data ? JSON.stringify(data) : undefined,
     credentials: "include",
   });
@@ -43,19 +29,7 @@ export const getQueryFn: <T>(options: {
 }) => QueryFunction<T> =
   ({ on401: unauthorizedBehavior }) =>
   async ({ queryKey }) => {
-    const url = queryKey.join("/") as string;
-    const headers: Record<string, string> = {};
-    
-    // Add admin session token if available for admin endpoints
-    if (url.includes('/api/admin/')) {
-      const adminAuth = sessionStorage.getItem('admin-authenticated');
-      if (adminAuth) {
-        headers["X-Admin-Session"] = adminAuth;
-      }
-    }
-
-    const res = await fetch(url, {
-      headers,
+    const res = await fetch(queryKey.join("/") as string, {
       credentials: "include",
     });
 

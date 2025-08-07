@@ -411,30 +411,6 @@ Respond naturally as ARIA would, with enthusiasm and helpfulness. Keep responses
   }
 
   /**
-   * Generate AI image using DALL-E
-   */
-  async generateImage(prompt: string): Promise<{ url: string }> {
-    if (!this.isAvailable()) {
-      throw new Error("OpenAI service not available - API key missing");
-    }
-
-    try {
-      const response = await openai.images.generate({
-        model: "dall-e-3",
-        prompt: prompt,
-        n: 1,
-        size: "1024x1024",
-        quality: "standard",
-      });
-
-      return { url: response.data[0].url! };
-    } catch (error: any) {
-      console.error('OpenAI image generation error:', error);
-      throw new Error(`Failed to generate image: ${error.message}`);
-    }
-  }
-
-  /**
    * General-purpose OpenAI response generation for comprehensive AI services
    */
   async generateResponse(

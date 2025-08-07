@@ -4,7 +4,7 @@ import { createInsertSchema } from "drizzle-zod";
 import { relations } from "drizzle-orm";
 import { z } from "zod";
 
-export const users: any = pgTable("users", {
+export const users = pgTable("users", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   walletAddress: text("wallet_address").notNull().unique(),
   email: text("email"),
@@ -14,7 +14,7 @@ export const users: any = pgTable("users", {
   role: text("role").default("user"), // 'user', 'admin', 'super_admin'
   isAdmin: boolean("is_admin").default(false),
   adminPermissions: json("admin_permissions").$type<string[]>(), // ['dashboard', 'users', 'wallet_management', 'settings']
-  adminAddedBy: varchar("admin_added_by").references((): any => users.id),
+  adminAddedBy: varchar("admin_added_by").references(() => users.id),
   adminAddedAt: timestamp("admin_added_at"),
   createdAt: timestamp("created_at").defaultNow(),
 });
@@ -969,58 +969,6 @@ export type JourneyMilestone = typeof journeyMilestones.$inferSelect;
 export const insertUserJourneyProgressSchema = createInsertSchema(userJourneyProgress).omit({ id: true, achievedAt: true });
 export type InsertUserJourneyProgress = z.infer<typeof insertUserJourneyProgressSchema>;
 export type UserJourneyProgress = typeof userJourneyProgress.$inferSelect;
-
-// Blog Posts for SEO and Marketing
-export const blogPosts = pgTable("blog_posts", {
-  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  title: text("title").notNull(),
-  slug: text("slug").notNull().unique(),
-  excerpt: text("excerpt").notNull(),
-  content: text("content").notNull(),
-  metaDescription: text("meta_description"),
-  featuredImage: text("featured_image"),
-  tags: json("tags").$type<string[]>(),
-  keywords: json("keywords").$type<string[]>(),
-  author: text("author").default("Flutterbye AI"),
-  readTime: text("read_time"),
-  featured: boolean("featured").default(false),
-  published: boolean("published").default(false),
-  publishedAt: timestamp("published_at"),
-  viewCount: integer("view_count").default(0),
-  likeCount: integer("like_count").default(0),
-  createdBy: varchar("created_by").references(() => users.id),
-  createdAt: timestamp("created_at").defaultNow(),
-  updatedAt: timestamp("updated_at").defaultNow(),
-});
-
-// Blog Comments
-export const blogComments = pgTable("blog_comments", {
-  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  postId: varchar("post_id").references(() => blogPosts.id).notNull(),
-  authorName: text("author_name").notNull(),
-  authorEmail: text("author_email"),
-  content: text("content").notNull(),
-  approved: boolean("approved").default(false),
-  parentCommentId: varchar("parent_comment_id").references((): any => blogComments.id),
-  createdAt: timestamp("created_at").defaultNow(),
-});
-
-// Blog schema types and validation
-export const insertBlogPostSchema = createInsertSchema(blogPosts).omit({
-  id: true,
-  createdAt: true,
-  updatedAt: true,
-});
-
-export const insertBlogCommentSchema = createInsertSchema(blogComments).omit({
-  id: true,
-  createdAt: true,
-});
-
-export type InsertBlogPost = z.infer<typeof insertBlogPostSchema>;
-export type BlogPost = typeof blogPosts.$inferSelect;
-export type InsertBlogComment = z.infer<typeof insertBlogCommentSchema>;
-export type BlogComment = typeof blogComments.$inferSelect;
 
 export const insertJourneyInsightSchema = createInsertSchema(journeyInsights).omit({ id: true, createdAt: true });
 export type InsertJourneyInsight = z.infer<typeof insertJourneyInsightSchema>;

@@ -75,10 +75,7 @@ import {
   Lock,
   Wallet,
   ArrowRightLeft,
-  TestTube,
-  ArrowLeft,
-  Bot,
-  MessageSquare
+  TestTube
 } from "lucide-react";
 
 // Self-Optimization Platform Admin Component
@@ -1620,8 +1617,7 @@ export default function UnifiedAdminDashboard() {
     'core-management': ['overview', 'settings', 'users', 'tokens', 'pricing', 'codes', 'access', 'testing'],
     'business-intelligence': ['competitive', 'wallets', 'behavior', 'api-monetization', 'features'],
     'analytics-monitoring': ['analytics', 'performance', 'security', 'system', 'realtime', 'revenue', 'viral', 'final-5-percent', 'production-deployment', 'production-readiness', 'environment-management'],
-    'ai-optimization': ['dynamic-pricing', 'self-optimization', 'staking'],
-    'marketing-growth': ['marketing', 'campaigns', 'growth-tools']
+    'ai-optimization': ['dynamic-pricing', 'self-optimization', 'staking']
   };
 
   // Define all tab configurations
@@ -1652,10 +1648,7 @@ export default function UnifiedAdminDashboard() {
     { value: "final-5-percent", icon: Rocket, label: "🚀 Final 5%", color: "green" },
     { value: "production-deployment", icon: Rocket, label: "🚀 Production", color: "blue" },
     { value: "production-readiness", icon: Shield, label: "🛡️ Readiness", color: "green" },
-    { value: "environment-management", icon: ArrowRightLeft, label: "🔄 Environment", color: "blue" },
-    { value: "marketing", icon: Target, label: "🎯 Marketing", color: "pink" },
-    { value: "campaigns", icon: MessageSquare, label: "📢 Campaigns", color: "purple" },
-    { value: "growth-tools", icon: TrendingUp, label: "📈 Growth", color: "emerald" }
+    { value: "environment-management", icon: ArrowRightLeft, label: "🔄 Environment", color: "blue" }
   ];
 
   // Get filtered tabs based on selected category
@@ -1807,16 +1800,6 @@ export default function UnifiedAdminDashboard() {
   return (
     <div className={`min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 ${isMobile ? 'p-3' : 'p-6'}`}>
       <div className={`${isMobile ? 'max-w-full' : 'max-w-7xl'} mx-auto space-y-6`}>
-        {/* Back Button */}
-        <div className="flex items-center gap-4">
-          <Link href="/admin-gateway">
-            <Button variant="outline" className="bg-slate-800/50 border-slate-600 text-slate-300 hover:bg-slate-700 hover:text-white flex items-center gap-2">
-              <ArrowLeft className="w-4 h-4" />
-              ← Admin Home
-            </Button>
-          </Link>
-        </div>
-
         {/* Header */}
         <div className="text-center space-y-2">
           <h1 className={`${isMobile ? 'text-2xl' : 'text-4xl'} font-bold text-white flex items-center justify-center gap-2`}>
@@ -1965,22 +1948,6 @@ export default function UnifiedAdminDashboard() {
               } h-auto py-1 px-3 text-xs`}
             >
               AI & Optimization {selectedCategory === 'ai-optimization' && '✓'}
-            </Button>
-            <Button 
-              onClick={() => {
-                const category = 'marketing-growth';
-                setSelectedCategory(selectedCategory === category ? null : category);
-                if (selectedCategory !== category) {
-                  setActiveTab(categoryGroups[category][0]);
-                }
-              }}
-              className={`${
-                selectedCategory === 'marketing-growth' 
-                  ? 'bg-pink-500/40 text-pink-300 border-pink-400' 
-                  : 'bg-pink-500/20 hover:bg-pink-500/30 text-pink-400 border-pink-500/30'
-              } h-auto py-1 px-3 text-xs`}
-            >
-              Marketing & Growth {selectedCategory === 'marketing-growth' && '✓'}
             </Button>
             {selectedCategory && (
               <Button 
@@ -3739,21 +3706,6 @@ export default function UnifiedAdminDashboard() {
             <EnvironmentManagementContent />
           </TabsContent>
 
-          {/* Marketing & Growth Tab */}
-          <TabsContent value="marketing" className="space-y-6">
-            <MarketingDashboardContent />
-          </TabsContent>
-
-          {/* Campaign Management Tab */}
-          <TabsContent value="campaigns" className="space-y-6">
-            <CampaignManagementContent />
-          </TabsContent>
-
-          {/* Growth Tools Tab */}
-          <TabsContent value="growth-tools" className="space-y-6">
-            <GrowthToolsContent />
-          </TabsContent>
-
         </Tabs>
 
         {/* Image Preview Modal */}
@@ -3787,314 +3739,6 @@ export default function UnifiedAdminDashboard() {
           </div>
         )}
       </div>
-    </div>
-  );
-}
-
-// Marketing Dashboard Content Component - Main marketing hub
-function MarketingDashboardContent() {
-  const { toast } = useToast();
-  const queryClient = useQueryClient();
-
-  // Fetch AI Marketing Bot settings and data
-  const { data: botSettings, isLoading: settingsLoading } = useQuery({
-    queryKey: ['/api/admin/marketing-bot/settings'],
-    retry: false
-  });
-
-  const { data: campaignData, isLoading: campaignsLoading } = useQuery({
-    queryKey: ['/api/admin/marketing-bot/campaigns'],
-    retry: false
-  });
-
-  const { data: contentData, isLoading: contentLoading } = useQuery({
-    queryKey: ['/api/admin/marketing-bot/content'],
-    retry: false
-  });
-
-  const { data: analyticsData, isLoading: analyticsLoading } = useQuery({
-    queryKey: ['/api/admin/marketing-bot/analytics'],
-    retry: false
-  });
-
-  // Update bot settings mutation
-  const updateSettingsMutation = useMutation({
-    mutationFn: async (settings: any) => {
-      return apiRequest("PUT", "/api/admin/marketing-bot/settings", settings);
-    },
-    onSuccess: () => {
-      toast({
-        title: "Settings Updated",
-        description: "AI Marketing Bot settings saved successfully."
-      });
-      queryClient.invalidateQueries({ queryKey: ['/api/admin/marketing-bot/settings'] });
-    },
-    onError: () => {
-      toast({
-        title: "Error",
-        description: "Failed to update bot settings.",
-        variant: "destructive"
-      });
-    }
-  });
-
-  // Generate content mutation
-  const generateContentMutation = useMutation({
-    mutationFn: async (params: any) => {
-      return apiRequest("POST", "/api/admin/marketing-bot/generate", params);
-    },
-    onSuccess: () => {
-      toast({
-        title: "Content Generated",
-        description: "AI marketing content generated successfully."
-      });
-      queryClient.invalidateQueries({ queryKey: ['/api/admin/marketing-bot/content'] });
-    }
-  });
-
-  return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-3xl font-bold text-white flex items-center gap-3">
-            <Target className="w-8 h-8 text-pink-400" />
-            Marketing & Growth Hub
-          </h2>
-          <p className="text-slate-300 mt-2">AI-powered marketing campaigns and growth analytics</p>
-        </div>
-        <Badge className="bg-pink-500/20 text-pink-400 border-pink-500/30">
-          Marketing Central
-        </Badge>
-      </div>
-
-      {/* AI Marketing Bot Main Section */}
-      <Card className="bg-gradient-to-r from-pink-900/30 to-purple-900/30 border-pink-500/30">
-        <CardHeader>
-          <CardTitle className="text-white flex items-center gap-2">
-            <Bot className="w-6 h-6 text-pink-400" />
-            AI Marketing Bot
-            <Badge className="bg-green-500/20 text-green-400 ml-2">Active</Badge>
-          </CardTitle>
-          <CardDescription className="text-slate-300">
-            Automated marketing campaign generation and content creation
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          {settingsLoading ? (
-            <div className="flex items-center justify-center p-8">
-              <RefreshCw className="w-6 h-6 animate-spin text-pink-400" />
-              <p className="text-slate-400 ml-2">Loading AI Marketing Bot...</p>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {/* Bot Settings Panel */}
-              <div className="space-y-4">
-                <h3 className="text-lg font-medium text-white">Bot Configuration</h3>
-                <div className="space-y-3">
-                  <div>
-                    <Label className="text-slate-300">Campaign Frequency</Label>
-                    <Select defaultValue="daily">
-                      <SelectTrigger className="bg-slate-700 border-slate-600 text-white">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="hourly">Every Hour</SelectItem>
-                        <SelectItem value="daily">Daily</SelectItem>
-                        <SelectItem value="weekly">Weekly</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div>
-                    <Label className="text-slate-300">Target Audience</Label>
-                    <Select defaultValue="all">
-                      <SelectTrigger className="bg-slate-700 border-slate-600 text-white">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="all">All Users</SelectItem>
-                        <SelectItem value="high-value">High-Value Wallets</SelectItem>
-                        <SelectItem value="active">Active Users</SelectItem>
-                        <SelectItem value="new">New Users</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Switch id="auto-publish" defaultChecked />
-                    <Label htmlFor="auto-publish" className="text-slate-300">Auto-publish campaigns</Label>
-                  </div>
-                </div>
-              </div>
-
-              {/* Quick Stats */}
-              <div className="space-y-4">
-                <h3 className="text-lg font-medium text-white">Performance Overview</h3>
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="bg-slate-800/50 p-3 rounded-lg">
-                    <p className="text-xs text-slate-400">Active Campaigns</p>
-                    <p className="text-xl font-bold text-white">{campaignData?.activeCampaigns || 12}</p>
-                  </div>
-                  <div className="bg-slate-800/50 p-3 rounded-lg">
-                    <p className="text-xs text-slate-400">Content Generated</p>
-                    <p className="text-xl font-bold text-white">{contentData?.totalContent || 347}</p>
-                  </div>
-                  <div className="bg-slate-800/50 p-3 rounded-lg">
-                    <p className="text-xs text-slate-400">Engagement Rate</p>
-                    <p className="text-xl font-bold text-green-400">{analyticsData?.engagementRate || "24.5%"}</p>
-                  </div>
-                  <div className="bg-slate-800/50 p-3 rounded-lg">
-                    <p className="text-xs text-slate-400">Conversion Rate</p>
-                    <p className="text-xl font-bold text-blue-400">{analyticsData?.conversionRate || "8.2%"}</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* Action Buttons */}
-          <div className="flex gap-3 pt-4 border-t border-slate-600">
-            <Button
-              onClick={() => generateContentMutation.mutate({ type: 'campaign', audience: 'all' })}
-              disabled={generateContentMutation.isPending}
-              className="bg-pink-600 hover:bg-pink-700"
-            >
-              {generateContentMutation.isPending ? (
-                <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
-              ) : (
-                <Sparkles className="w-4 h-4 mr-2" />
-              )}
-              Generate Campaign
-            </Button>
-            <Button variant="outline" className="border-slate-600 text-slate-300 hover:text-white">
-              <BarChart3 className="w-4 h-4 mr-2" />
-              View Analytics
-            </Button>
-            <Button variant="outline" className="border-slate-600 text-slate-300 hover:text-white">
-              <Settings className="w-4 h-4 mr-2" />
-              Configure Bot
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Viral Analytics Section */}
-      <Card className="bg-slate-800/50 border-slate-600">
-        <CardHeader>
-          <CardTitle className="text-white flex items-center gap-2">
-            <TrendingUp className="w-6 h-6 text-green-400" />
-            Viral Growth Analytics
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="bg-gradient-to-r from-green-900/40 to-emerald-600/40 p-4 rounded-lg">
-              <p className="text-sm text-green-200">Viral Tokens</p>
-              <p className="text-2xl font-bold text-white">47</p>
-              <p className="text-xs text-green-300">+15% this week</p>
-            </div>
-            <div className="bg-gradient-to-r from-blue-900/40 to-cyan-600/40 p-4 rounded-lg">
-              <p className="text-sm text-blue-200">Growth Rate</p>
-              <p className="text-2xl font-bold text-white">+340%</p>
-              <p className="text-xs text-blue-300">24h change</p>
-            </div>
-            <div className="bg-gradient-to-r from-purple-900/40 to-pink-600/40 p-4 rounded-lg">
-              <p className="text-sm text-purple-200">Campaigns Active</p>
-              <p className="text-2xl font-bold text-white">23</p>
-              <p className="text-xs text-purple-300">running now</p>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Pricing Optimization */}
-      <Card className="bg-slate-800/50 border-slate-600">
-        <CardHeader>
-          <CardTitle className="text-white flex items-center gap-2">
-            <DollarSign className="w-6 h-6 text-yellow-400" />
-            Dynamic Pricing & Revenue
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <h4 className="text-white font-medium mb-3">AI Pricing Recommendations</h4>
-              <div className="space-y-2">
-                <div className="flex justify-between text-sm">
-                  <span className="text-slate-400">Token Creation</span>
-                  <span className="text-green-400">$1.25 (+15%)</span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-slate-400">Message Value</span>
-                  <span className="text-blue-400">$0.85 (-5%)</span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-slate-400">Viral Boost</span>
-                  <span className="text-purple-400">$2.50 (+25%)</span>
-                </div>
-              </div>
-            </div>
-            <div>
-              <h4 className="text-white font-medium mb-3">Revenue Impact</h4>
-              <div className="space-y-2">
-                <div className="flex justify-between text-sm">
-                  <span className="text-slate-400">Daily Revenue</span>
-                  <span className="text-white">$1,247.50</span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-slate-400">Projected Monthly</span>
-                  <span className="text-green-400">$37,425.00</span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-slate-400">Optimization Gain</span>
-                  <span className="text-emerald-400">+18.5%</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-    </div>
-  );
-}
-
-// Campaign Management Content Component
-function CampaignManagementContent() {
-  return (
-    <div className="space-y-6">
-      <h2 className="text-2xl font-bold text-white flex items-center gap-2">
-        <MessageSquare className="w-6 h-6 text-purple-400" />
-        Campaign Management
-      </h2>
-      
-      <Card className="bg-slate-800/50 border-slate-600">
-        <CardHeader>
-          <CardTitle className="text-white">Active Campaigns</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-slate-400">Campaign management features will be implemented here.</p>
-        </CardContent>
-      </Card>
-    </div>
-  );
-}
-
-// Growth Tools Content Component
-function GrowthToolsContent() {
-  return (
-    <div className="space-y-6">
-      <h2 className="text-2xl font-bold text-white flex items-center gap-2">
-        <TrendingUp className="w-6 h-6 text-emerald-400" />
-        Growth Tools
-      </h2>
-      
-      <Card className="bg-slate-800/50 border-slate-600">
-        <CardHeader>
-          <CardTitle className="text-white">Growth Acceleration Tools</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-slate-400">Growth tools and viral features will be implemented here.</p>
-        </CardContent>
-      </Card>
     </div>
   );
 }

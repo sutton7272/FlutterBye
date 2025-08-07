@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
-import { useLocation, Link } from "wouter";
+import { useLocation } from "wouter";
 import { 
   Clock, 
   Mail, 
@@ -26,16 +26,13 @@ import {
   TrendingUp,
   Award,
   Shield,
-  Quote,
-  Brain
+  Quote
 } from "lucide-react";
 import flutterbeyeLogoPath from "@assets/image_1754068877999.png";
 import Navbar from "@/components/navbar";
 
 import { TutorialLaunchButton } from "@/components/interactive-tutorial";
 import { FlutterAIInteractiveTutorial } from "@/components/flutterai-interactive-tutorial";
-
-// No additional imports needed - using only tutorial components
 
 interface TimeLeft {
   days: number;
@@ -56,7 +53,6 @@ export default function LaunchCountdown() {
   const { toast } = useToast();
   const [, setLocation] = useLocation();
   const [signupCount, setSignupCount] = useState(12847);
-  const [demoMode, setDemoMode] = useState(false);
 
   // Set launch date to September 1, 2025
   const launchDate = new Date('2025-09-01T00:00:00Z'); // Public launch date
@@ -259,96 +255,11 @@ export default function LaunchCountdown() {
             alt="Flutterbye Logo" 
             className="w-24 h-24 mx-auto mb-4 rounded-full electric-frame"
           />
-          <div className="relative inline-block mb-6">
-            <h1 className="electric-branding">
+          <h1 className="text-4xl font-bold mb-3">
+            <span className="bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent">
               FLUTTERBYE
-            </h1>
-            {/* Digital Butterflies */}
-            <div className="digital-butterfly butterfly-1">
-              <svg viewBox="0 0 32 32" fill="none" stroke="currentColor" strokeWidth="1.5">
-                {/* Body */}
-                <line x1="16" y1="6" x2="16" y2="26" strokeWidth="2"/>
-                <circle cx="16" cy="5" r="1.5" fill="currentColor"/>
-                
-                {/* Upper Wings - Wireframe */}
-                <path d="M16 8 L8 6 L4 12 L8 18 L16 16 Z" strokeWidth="1"/>
-                <path d="M16 8 L24 6 L28 12 L24 18 L16 16 Z" strokeWidth="1"/>
-                
-                {/* Lower Wings - Wireframe */}
-                <path d="M16 16 L10 18 L6 24 L10 26 L16 24 Z" strokeWidth="1"/>
-                <path d="M16 16 L22 18 L26 24 L22 26 L16 24 Z" strokeWidth="1"/>
-                
-                {/* Wing Details - Geometric Lines */}
-                <path d="M8 10 L12 14 L8 16" strokeWidth="0.8"/>
-                <path d="M24 10 L20 14 L24 16" strokeWidth="0.8"/>
-                <path d="M10 20 L14 22 L10 24" strokeWidth="0.8"/>
-                <path d="M22 20 L18 22 L22 24" strokeWidth="0.8"/>
-              </svg>
-            </div>
-            <div className="digital-butterfly butterfly-2">
-              <svg viewBox="0 0 32 32" fill="none" stroke="currentColor" strokeWidth="1.5">
-                {/* Body */}
-                <line x1="16" y1="6" x2="16" y2="26" strokeWidth="2"/>
-                <circle cx="16" cy="5" r="1.5" fill="currentColor"/>
-                
-                {/* Upper Wings - Wireframe */}
-                <path d="M16 8 L8 6 L4 12 L8 18 L16 16 Z" strokeWidth="1"/>
-                <path d="M16 8 L24 6 L28 12 L24 18 L16 16 Z" strokeWidth="1"/>
-                
-                {/* Lower Wings - Wireframe */}
-                <path d="M16 16 L10 18 L6 24 L10 26 L16 24 Z" strokeWidth="1"/>
-                <path d="M16 16 L22 18 L26 24 L22 26 L16 24 Z" strokeWidth="1"/>
-                
-                {/* Wing Details - Geometric Lines */}
-                <path d="M8 10 L12 14 L8 16" strokeWidth="0.8"/>
-                <path d="M24 10 L20 14 L24 16" strokeWidth="0.8"/>
-                <path d="M10 20 L14 22 L10 24" strokeWidth="0.8"/>
-                <path d="M22 20 L18 22 L22 24" strokeWidth="0.8"/>
-              </svg>
-            </div>
-            <div className="digital-butterfly butterfly-3">
-              <svg viewBox="0 0 32 32" fill="none" stroke="currentColor" strokeWidth="1.5">
-                {/* Body */}
-                <line x1="16" y1="6" x2="16" y2="26" strokeWidth="2"/>
-                <circle cx="16" cy="5" r="1.5" fill="currentColor"/>
-                
-                {/* Upper Wings - Wireframe */}
-                <path d="M16 8 L8 6 L4 12 L8 18 L16 16 Z" strokeWidth="1"/>
-                <path d="M16 8 L24 6 L28 12 L24 18 L16 16 Z" strokeWidth="1"/>
-                
-                {/* Lower Wings - Wireframe */}
-                <path d="M16 16 L10 18 L6 24 L10 26 L16 24 Z" strokeWidth="1"/>
-                <path d="M16 16 L22 18 L26 24 L22 26 L16 24 Z" strokeWidth="1"/>
-                
-                {/* Wing Details - Geometric Lines */}
-                <path d="M8 10 L12 14 L8 16" strokeWidth="0.8"/>
-                <path d="M24 10 L20 14 L24 16" strokeWidth="0.8"/>
-                <path d="M10 20 L14 22 L10 24" strokeWidth="0.8"/>
-                <path d="M22 20 L18 22 L22 24" strokeWidth="0.8"/>
-              </svg>
-            </div>
-            <div className="digital-butterfly butterfly-4">
-              <svg viewBox="0 0 32 32" fill="none" stroke="currentColor" strokeWidth="1.5">
-                {/* Body */}
-                <line x1="16" y1="6" x2="16" y2="26" strokeWidth="2"/>
-                <circle cx="16" cy="5" r="1.5" fill="currentColor"/>
-                
-                {/* Upper Wings - Wireframe */}
-                <path d="M16 8 L8 6 L4 12 L8 18 L16 16 Z" strokeWidth="1"/>
-                <path d="M16 8 L24 6 L28 12 L24 18 L16 16 Z" strokeWidth="1"/>
-                
-                {/* Lower Wings - Wireframe */}
-                <path d="M16 16 L10 18 L6 24 L10 26 L16 24 Z" strokeWidth="1"/>
-                <path d="M16 16 L22 18 L26 24 L22 26 L16 24 Z" strokeWidth="1"/>
-                
-                {/* Wing Details - Geometric Lines */}
-                <path d="M8 10 L12 14 L8 16" strokeWidth="0.8"/>
-                <path d="M24 10 L20 14 L24 16" strokeWidth="0.8"/>
-                <path d="M10 20 L14 22 L10 24" strokeWidth="0.8"/>
-                <path d="M22 20 L18 22 L22 24" strokeWidth="0.8"/>
-              </svg>
-            </div>
-          </div>
+            </span>
+          </h1>
           <p className="text-lg text-gray-300 mb-4">
             The Future of Communication is Coming
           </p>
@@ -438,160 +349,18 @@ export default function LaunchCountdown() {
           </CardContent>
         </Card>
 
-        {/* Hero Section with Action Buttons */}
-        <div className="text-center max-w-4xl mx-auto mb-12">
-          <div className="space-y-6">
-            <h2 className="text-3xl lg:text-4xl font-bold bg-gradient-to-r from-electric-blue via-circuit-teal to-electric-blue bg-clip-text text-transparent">
-              Transform Messages Into Valuable Tokens
-            </h2>
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              Experience the revolutionary platform that combines AI-powered intelligence with tokenized communication
-            </p>
-            
-            {/* Quick Action Button */}
-            <div className="flex justify-center">
-              <Button 
-                onClick={() => setLocation('/create')}
-                className="bg-gradient-to-r from-electric-blue to-circuit-teal hover:from-electric-blue/80 hover:to-circuit-teal/80 text-white px-8 py-3 text-lg font-semibold"
-              >
-                <Rocket className="w-5 h-5 mr-2" />
-                Start Creating Tokens
-              </Button>
-            </div>
-          </div>
-        </div>
-
-        {/* Interactive Tutorials Section */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-5xl mx-auto mb-12">
-          {/* Platform Tutorial */}
-          <div className="max-w-full">
-            <TutorialLaunchButton 
-              className="w-full" 
-              variant="default"
-            />
-          </div>
-
-          {/* FlutterAI Tutorial */}
-          <div className="max-w-full">
-            <FlutterAIInteractiveTutorial />
-          </div>
-        </div>
-
-        {/* Creation Hub Section */}
-        <div className="max-w-6xl mx-auto mb-12">
-          <div className="text-center mb-8">
-            <h2 className="text-2xl font-bold text-gradient mb-2">🎯 Creation Hub</h2>
-            <p className="text-muted-foreground">Choose your creation path and start building valuable tokens</p>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {/* Digital Greeting Card */}
-            <Card className="electric-frame hover:scale-105 transition-transform duration-300">
-              <CardHeader>
-                <CardTitle className="text-gradient flex items-center gap-2">
-                  <div className="w-6 h-6 text-pink-400">💌</div>
-                  Digital Greeting Card
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  <p className="text-sm text-muted-foreground">
-                    Create personalized greeting cards with tokenized messages and attach real value
-                  </p>
-                  <div className="bg-pink-500/10 border border-pink-500/20 rounded-lg p-3">
-                    <h4 className="font-medium text-pink-400 mb-1 text-sm">Features</h4>
-                    <ul className="text-xs text-muted-foreground space-y-1">
-                      <li>• Custom card designs</li>
-                      <li>• Scheduled delivery</li>
-                      <li>• Value attachment (SOL/USDC/FLBY)</li>
-                      <li>• Personal messages</li>
-                    </ul>
-                  </div>
-                  <Link href="/greeting-cards" className="w-full">
-                    <Button className="w-full bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-500 hover:to-purple-500">
-                      Create Greeting Card
-                    </Button>
-                  </Link>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Targeted Marketing */}
-            <Card className="electric-frame hover:scale-105 transition-transform duration-300">
-              <CardHeader>
-                <CardTitle className="text-gradient flex items-center gap-2">
-                  <div className="w-6 h-6 text-blue-400">🎯</div>
-                  Targeted Marketing
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  <p className="text-sm text-muted-foreground">
-                    Launch precision marketing campaigns targeting specific crypto holder segments
-                  </p>
-                  <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-3">
-                    <h4 className="font-medium text-blue-400 mb-1 text-sm">Features</h4>
-                    <ul className="text-xs text-muted-foreground space-y-1">
-                      <li>• AI-powered targeting</li>
-                      <li>• Cross-chain intelligence</li>
-                      <li>• Campaign analytics</li>
-                      <li>• Bulk token distribution</li>
-                    </ul>
-                  </div>
-                  <Link href="/enterprise" className="w-full">
-                    <Button className="w-full bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-500 hover:to-cyan-500">
-                      Launch Campaign
-                    </Button>
-                  </Link>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Token Creation Center */}
-            <Card className="electric-frame hover:scale-105 transition-transform duration-300">
-              <CardHeader>
-                <CardTitle className="text-gradient flex items-center gap-2">
-                  <Coins className="w-6 h-6 text-green-400" />
-                  Token Creation Center
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  <p className="text-sm text-muted-foreground">
-                    Create custom 27-character message tokens with value attachment capabilities
-                  </p>
-                  <div className="bg-green-500/10 border border-green-500/20 rounded-lg p-3">
-                    <h4 className="font-medium text-green-400 mb-1 text-sm">Features</h4>
-                    <ul className="text-xs text-muted-foreground space-y-1">
-                      <li>• Custom message tokens</li>
-                      <li>• Multi-currency support</li>
-                      <li>• Burn-to-redeem mechanism</li>
-                      <li>• Instant blockchain creation</li>
-                    </ul>
-                  </div>
-                  <Link href="/create" className="w-full">
-                    <Button className="w-full bg-gradient-to-r from-green-600 to-teal-600 hover:from-green-500 hover:to-teal-500">
-                      Create Token
-                    </Button>
-                  </Link>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
-
-        {/* Three Column Info Section */}
+        {/* Three Column Layout */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 max-w-7xl mx-auto mb-8">
           {/* Left Column: VIP Signup */}
-          <div className="flex">
-            <Card className="electric-frame flex-1 flex flex-col min-h-[600px]">
+          <div>
+            <Card className="electric-frame">
               <CardHeader>
                 <CardTitle className="text-gradient flex items-center gap-2 text-lg">
                   <Mail className="w-5 h-5" />
                   Join VIP Waitlist
                 </CardTitle>
               </CardHeader>
-              <CardContent className="flex-1 flex flex-col">
+              <CardContent>
                 {submitted ? (
                   <div className="text-center py-6">
                     <CheckCircle className="w-12 h-12 mx-auto mb-3 text-green-400" />
@@ -672,57 +441,42 @@ export default function LaunchCountdown() {
             </Card>
           </div>
 
-          {/* Middle Column: AI Marketing Revolution */}
-          <div className="flex">
-            <Card className="electric-frame flex-1 flex flex-col min-h-[600px]">
-              <CardHeader>
-                <CardTitle className="text-gradient flex items-center gap-2 text-lg">
-                  <Brain className="w-5 h-5" />
-                  AI Marketing Revolution
-                </CardTitle>
+          {/* Middle Column: Both Tutorials */}
+          <div className="space-y-4">
+            {/* Interactive Tutorial */}
+            <Card className="electric-frame">
+              <CardHeader className="pb-3">
+                <CardTitle className="text-gradient text-lg">Platform Tutorial</CardTitle>
               </CardHeader>
-              <CardContent className="flex-1 flex flex-col space-y-4">
-                <p className="text-sm text-muted-foreground">
-                  Experience the world's most advanced crypto marketing platform powered by AI intelligence.
-                </p>
-                
-                <div className="space-y-3">
-                  <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-3">
-                    <h4 className="font-medium text-red-400 mb-2 text-sm">🚀 Revolutionary Features</h4>
-                    <ul className="text-xs text-muted-foreground space-y-1">
-                      <li>• AI wallet behavior analysis</li>
-                      <li>• Precision demographic targeting</li>
-                      <li>• Cross-chain intelligence (6 blockchains)</li>
-                      <li>• Real-time market insights</li>
-                    </ul>
-                  </div>
-
-                  <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-3">
-                    <h4 className="font-medium text-blue-400 mb-2 text-sm">💰 Enterprise Ready</h4>
-                    <ul className="text-xs text-muted-foreground space-y-1">
-                      <li>• $100K-$2M government contracts</li>
-                      <li>• Fortune 500 compliance tools</li>
-                      <li>• Bank-level security standards</li>
-                      <li>• White-label solutions</li>
-                    </ul>
-                  </div>
-
-
+              <CardContent>
+                <div className="text-center">
+                  <p className="text-sm text-muted-foreground mb-4">
+                    Experience the FUTURE of token creation! See how easy it is to become "The Coinbase of Token Creation"!
+                  </p>
+                  <TutorialLaunchButton 
+                    className="bg-gradient-to-r from-electric-blue to-circuit-teal hover:from-electric-blue/80 hover:to-circuit-teal/80 text-white px-4 py-2 text-sm w-full" 
+                    variant="default"
+                  />
                 </div>
               </CardContent>
             </Card>
+
+            {/* FlutterAI Tutorial */}
+            <div className="max-w-full">
+              <FlutterAIInteractiveTutorial />
+            </div>
           </div>
 
           {/* Right Column: Early Access */}
-          <div className="flex">
-            <Card className="electric-frame flex-1 flex flex-col min-h-[600px]">
+          <div>
+            <Card className="electric-frame">
               <CardHeader>
                 <CardTitle className="text-gradient flex items-center gap-2 text-lg">
                   <Key className="w-5 h-5" />
                   Early Access
                 </CardTitle>
               </CardHeader>
-              <CardContent className="flex-1 flex flex-col">
+              <CardContent>
                 <div className="space-y-4">
                   <p className="text-sm text-muted-foreground">
                     Have an early access code or authorized email? Get immediate access to the full platform features.
@@ -935,22 +689,13 @@ export default function LaunchCountdown() {
               <CardTitle className="text-gradient">What is Flutterbye?</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="bg-gradient-to-r from-purple-900/30 to-blue-900/30 rounded-lg p-4 mb-4">
-                <p className="text-sm text-white/90 font-medium mb-2">
-                  🚀 The world's first AI-powered crypto marketing platform that transforms how businesses communicate with blockchain users
-                </p>
-                <p className="text-xs text-white/70">
-                  Flutterbye enables precision targeting of crypto holders through 27-character tokenized messages with redeemable value
-                </p>
-              </div>
-
-              <div className="space-y-3">
+              <div className="space-y-4">
                 <div className="flex items-start gap-3">
                   <Zap className="w-5 h-5 text-yellow-400 mt-1" />
                   <div>
-                    <h4 className="font-medium text-yellow-300">Tokenized Messaging</h4>
-                    <p className="text-xs text-muted-foreground">
-                      Turn your 27-character messages into valuable SPL tokens on Solana blockchain with real monetary value
+                    <h4 className="font-medium">Tokenized Messaging</h4>
+                    <p className="text-sm text-muted-foreground">
+                      Turn your 27-character messages into valuable SPL tokens on Solana
                     </p>
                   </div>
                 </div>
@@ -958,9 +703,9 @@ export default function LaunchCountdown() {
                 <div className="flex items-start gap-3">
                   <Coins className="w-5 h-5 text-green-400 mt-1" />
                   <div>
-                    <h4 className="font-medium text-green-300">Value Attachment</h4>
-                    <p className="text-xs text-muted-foreground">
-                      Attach SOL, USDC, or FLBY tokens to messages. Recipients burn tokens to redeem attached value
+                    <h4 className="font-medium">Value Attachment</h4>
+                    <p className="text-sm text-muted-foreground">
+                      Attach real value to your messages - turn words into wealth
                     </p>
                   </div>
                 </div>
@@ -968,9 +713,9 @@ export default function LaunchCountdown() {
                 <div className="flex items-start gap-3">
                   <Users className="w-5 h-5 text-blue-400 mt-1" />
                   <div>
-                    <h4 className="font-medium text-blue-300">AI-Powered Targeting</h4>
-                    <p className="text-xs text-muted-foreground">
-                      FlutterAI analyzes wallet behavior, demographics, and patterns to identify perfect target audiences
+                    <h4 className="font-medium">Viral Distribution</h4>
+                    <p className="text-sm text-muted-foreground">
+                      Share tokens with specific wallets, create viral campaigns
                     </p>
                   </div>
                 </div>
@@ -978,79 +723,24 @@ export default function LaunchCountdown() {
                 <div className="flex items-start gap-3">
                   <Wallet className="w-5 h-5 text-purple-400 mt-1" />
                   <div>
-                    <h4 className="font-medium text-purple-300">Cross-Chain Intelligence</h4>
-                    <p className="text-xs text-muted-foreground">
-                      Track and analyze activity across 6 blockchains for comprehensive crypto holder insights
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-3">
-                  <div className="w-5 h-5 text-red-400 mt-1">🎯</div>
-                  <div>
-                    <h4 className="font-medium text-red-300">Enterprise Ready</h4>
-                    <p className="text-xs text-muted-foreground">
-                      Fortune 500 contracts, government compliance, bank-level security for $100K-$2M deals
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-3">
-                  <div className="w-5 h-5 text-cyan-400 mt-1">⚡</div>
-                  <div>
-                    <h4 className="font-medium text-cyan-300">Real-Time Intelligence</h4>
-                    <p className="text-xs text-muted-foreground">
-                      WebSocket-powered live data streaming, instant market insights, automated campaign optimization
+                    <h4 className="font-medium">FLBY Token Economy</h4>
+                    <p className="text-sm text-muted-foreground">
+                      Stake, govern, and earn with our native FLBY token ecosystem
                     </p>
                   </div>
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-3 mt-4">
-                <div className="bg-green-500/10 border border-green-500/20 rounded-lg p-3">
-                  <h5 className="font-medium text-green-400 mb-1 text-xs">💰 Revenue Streams</h5>
-                  <ul className="text-xs text-muted-foreground space-y-0.5">
-                    <li>• 0.01 SOL per token creation</li>
-                    <li>• Enterprise API licensing</li>
-                    <li>• Government contracts</li>
-                    <li>• White-label solutions</li>
-                  </ul>
-                </div>
-
-                <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-3">
-                  <h5 className="font-medium text-blue-400 mb-1 text-xs">🔧 Core Features</h5>
-                  <ul className="text-xs text-muted-foreground space-y-0.5">
-                    <li>• Burn-to-redeem mechanism</li>
-                    <li>• Multi-currency support</li>
-                    <li>• Viral campaign tracking</li>
-                    <li>• Analytics dashboard</li>
-                  </ul>
-                </div>
-              </div>
-
-              <div className="bg-muted/20 rounded-lg p-3 mt-4">
-                <h4 className="font-medium text-cyan-400 mb-2 text-xs">🚀 Revolutionary Features Coming:</h4>
-                <div className="grid grid-cols-2 gap-2">
-                  <ul className="text-xs text-muted-foreground space-y-0.5">
-                    <li>• SMS-to-blockchain integration</li>
-                    <li>• AI emotion analysis</li>
-                    <li>• Enterprise marketing campaigns</li>
-                    <li>• Scheduled message delivery</li>
-                  </ul>
-                  <ul className="text-xs text-muted-foreground space-y-0.5">
-                    <li>• Real-time tokenized chat</li>
-                    <li>• Comprehensive staking</li>
-                    <li>• Governance voting system</li>
-                    <li>• NFT integration</li>
-                  </ul>
-                </div>
-              </div>
-
-              <div className="bg-gradient-to-r from-red-900/20 to-purple-900/20 rounded-lg p-3 border border-red-500/20">
-                <h4 className="font-medium text-red-400 mb-1 text-xs">🎯 Market Position</h4>
-                <p className="text-xs text-white/80">
-                  "Google of Blockchain Intelligence" - The definitive platform for crypto marketing with $450M-$750M valuation target
-                </p>
+              <div className="bg-muted/20 rounded-lg p-4 mt-6">
+                <h4 className="font-medium text-cyan-400 mb-2">Revolutionary Features Coming:</h4>
+                <ul className="text-sm text-muted-foreground space-y-1">
+                  <li>• SMS-to-blockchain integration</li>
+                  <li>• AI-powered emotion analysis</li>
+                  <li>• Enterprise marketing campaigns</li>
+                  <li>• Greeting cards with scheduled delivery</li>
+                  <li>• Real-time chat with tokenized rewards</li>
+                  <li>• Comprehensive staking and governance</li>
+                </ul>
               </div>
             </CardContent>
           </Card>
@@ -1073,46 +763,6 @@ export default function LaunchCountdown() {
             <span>Pre-Launch Started</span>
             <span>Launch Day</span>
           </div>
-        </div>
-
-        {/* Latest Blog Section */}
-        <div className="max-w-4xl mx-auto mt-16 mb-12">
-          <Card className="electric-frame bg-gradient-to-r from-red-900/20 to-purple-900/20">
-            <CardContent className="p-6">
-              <div className="text-center mb-6">
-                <h2 className="text-2xl font-bold text-gradient mb-2">📰 Latest Blog Post</h2>
-                <p className="text-sm text-gray-400">Stay updated with the latest insights and developments</p>
-              </div>
-              
-              <div className="bg-red-600/20 border border-red-500/30 rounded-lg p-6">
-                <h3 className="text-xl font-bold text-red-300 mb-3">The Future of Crypto Marketing</h3>
-                <p className="text-gray-300 text-sm mb-4 leading-relaxed">
-                  Discover how Flutterbye is revolutionizing crypto marketing with AI-powered precision targeting, 
-                  enabling businesses to communicate directly with specific crypto holder segments through 
-                  27-character tokenized messages with redeemable value. Learn about the breakthrough technology 
-                  that's transforming how we think about blockchain communication and value distribution.
-                </p>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2 text-xs text-gray-400">
-                    <span>📅 January 7, 2025</span>
-                    <span>•</span>
-                    <span>⏱️ 5 min read</span>
-                    <span>•</span>
-                    <span>🏷️ AI Marketing, Blockchain</span>
-                  </div>
-                  <button 
-                    onClick={() => setLocation('/blog')}
-                    className="bg-gradient-to-r from-blue-600 to-green-600 hover:from-blue-500 hover:to-green-500 px-6 py-2 rounded-lg font-medium text-sm transition-all duration-300 flex items-center gap-2"
-                  >
-                    Read Article
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                    </svg>
-                  </button>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
         </div>
 
         {/* Footer */}

@@ -16,7 +16,6 @@ import { ErrorBoundary } from "@/components/error-boundary";
 import { LoadingState } from "@/components/loading-state";
 import { ViralGrowthAccelerator } from "@/components/viral-growth-accelerator";
 import { MobileOnboardingWizard } from "@/components/mobile-onboarding-wizard";
-
 import { usePerformance } from "@/hooks/use-performance";
 import { useState, useEffect } from "react";
 
@@ -33,7 +32,6 @@ export default function Home() {
   const performanceMetrics = usePerformance();
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
-  const [demoMode, setDemoMode] = useState(false);
   
   // Detect mobile device and first-time user
   useEffect(() => {
@@ -111,11 +109,6 @@ export default function Home() {
         <div className="absolute inset-0 bg-black/20 backdrop-blur-[1px]"></div>
         <div className="relative z-10">
         
-        {/* REACT APP TEST MARKER */}
-        <div className="fixed top-0 right-0 z-50 bg-red-600 text-white p-2 text-xs">
-          REACT APP LOADED - {new Date().toLocaleTimeString()}
-        </div>
-
         {/* Top Scrolling Marquee */}
         <div className="border-y border-primary/30 py-6 mb-12 overflow-hidden bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900">
           <div className="flex animate-marquee whitespace-nowrap text-3xl font-bold">
@@ -362,27 +355,24 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Demo Components - Hidden by default, shown only during active demos */}
-        <div id="demo-section" className={demoMode ? "block" : "hidden"}>
-          {/* Viral Growth Accelerator - Mobile Priority */}
-          <div className="mb-16">
-            <ViralGrowthAccelerator />
-          </div>
+        {/* Viral Growth Accelerator - Mobile Priority */}
+        <div className="mb-16">
+          <ViralGrowthAccelerator />
+        </div>
 
-          {/* Interactive Stats Dashboard */}
-          <div className="mb-16">
-            <InteractiveStatsDashboard />
-          </div>
+        {/* Interactive Stats Dashboard */}
+        <div className="mb-16">
+          <InteractiveStatsDashboard />
+        </div>
 
-          {/* NFT Portfolio Quick View */}
-          <div className="mb-16">
-            <NFTPortfolioQuickView />
-          </div>
+        {/* NFT Portfolio Quick View */}
+        <div className="mb-16">
+          <NFTPortfolioQuickView />
+        </div>
 
-          {/* Quick Actions Panel */}
-          <div className="mb-16">
-            <QuickActionPanel />
-          </div>
+        {/* Quick Actions Panel */}
+        <div className="mb-16">
+          <QuickActionPanel />
         </div>
 
         {/* Engagement Features */}
@@ -533,122 +523,6 @@ export default function Home() {
                   </div>
                 </CardContent>
               </Card>
-            </div>
-          </div>
-        </div>
-
-        {/* TEST MARKER - AI Marketing Blog Showcase */}
-        <div className="w-full max-w-6xl mx-auto px-4 mb-16" id="marketing-revolution-section">
-          <div className="electric-border bg-gray-900 rounded-xl p-8">
-            <div className="text-center">
-              <h2 className="text-5xl font-bold bg-gradient-to-r from-blue-400 to-green-400 bg-clip-text text-transparent mb-4">
-                🚀 AI MARKETING REVOLUTION - LIVE NOW
-              </h2>
-              <div className="bg-red-500 text-white p-4 rounded-lg mb-4 animate-pulse">
-                🔴 REACT COMPONENT TEST: Homepage changes are now LIVE! 
-                <br />Time: {new Date().toLocaleString()}
-              </div>
-              <p className="text-white text-xl mb-8 font-medium">
-                🤖 LIVE: Automated Marketing Bot with AI Blog Generation System
-              </p>
-              
-              {/* Featured blog post display */}
-              <div className="bg-gradient-to-r from-blue-900/40 to-green-900/40 rounded-xl p-8 border border-blue-500/30 mb-8">
-                <h3 className="text-2xl font-bold text-white mb-4">
-                  The Future of Crypto Marketing: AI-Powered Precision Targeting
-                </h3>
-                <p className="text-gray-300 mb-6">
-                  Discover how Flutterbye is revolutionizing crypto marketing with AI-powered wallet analysis, 
-                  precision targeting, and value-attached messaging that transforms how businesses communicate 
-                  with crypto holders.
-                </p>
-                <div className="flex items-center justify-center gap-4 text-sm text-gray-400 mb-6">
-                  <span>🤖 AI Generated</span>
-                  <span>📖 8 min read</span>
-                  <span>🏷️ Crypto Marketing</span>
-                </div>
-                <button className="bg-gradient-to-r from-blue-600 to-green-600 hover:from-blue-500 hover:to-green-500 px-8 py-3 rounded-lg font-bold transition-all duration-300">
-                  Read Full Article →
-                </button>
-              </div>
-              
-              {/* Marketing bot features */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-                <div className="bg-gray-800/50 rounded-lg p-6">
-                  <h4 className="text-lg font-bold text-blue-400 mb-2">AI Content Creation</h4>
-                  <p className="text-gray-400 text-sm">Automated blog generation using GPT-4o</p>
-                </div>
-                <div className="bg-gray-800/50 rounded-lg p-6">
-                  <h4 className="text-lg font-bold text-green-400 mb-2">SEO Optimization</h4>
-                  <p className="text-gray-400 text-sm">Advanced keyword targeting and meta descriptions</p>
-                </div>
-                <div className="bg-gray-800/50 rounded-lg p-6">
-                  <h4 className="text-lg font-bold text-purple-400 mb-2">Multi-Platform Distribution</h4>
-                  <p className="text-gray-400 text-sm">Automated posting to Twitter, LinkedIn, Instagram</p>
-                </div>
-              </div>
-              
-              {/* Demo toggle button */}
-              <div className="text-center mt-8">
-                <button 
-                  onClick={() => setDemoMode(!demoMode)}
-                  className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 px-8 py-3 rounded-lg text-sm font-medium transition-all duration-300 shadow-lg"
-                >
-                  {demoMode ? "⬆️ Hide FlutterAI Demos" : "⬇️ Show FlutterAI Demos (8 Components)"}
-                </button>
-              </div>
-
-              {/* Consolidated FlutterAI Demo Section - Hidden by Default */}
-              {demoMode && (
-                <div className="mt-8 p-6 bg-gradient-to-r from-purple-900/30 to-blue-900/30 rounded-xl border border-purple-500/30">
-                  <div className="text-center mb-6">
-                    <h3 className="text-2xl font-bold text-purple-300 mb-2">🤖 FlutterAI Demo Playground</h3>
-                    <p className="text-gray-400">Interactive demonstrations of our AI-powered features</p>
-                  </div>
-                  
-                  <div className="space-y-8" id="demo-section">
-                    {/* Viral Growth Accelerator */}
-                    <div className="mb-16">
-                      <ViralGrowthAccelerator />
-                    </div>
-
-                    {/* Interactive Stats Dashboard */}
-                    <div className="mb-16">
-                      <InteractiveStatsDashboard />
-                    </div>
-
-                    {/* NFT Portfolio Quick View */}
-                    <div className="mb-16">
-                      <NFTPortfolioQuickView />
-                    </div>
-
-                    {/* Quick Actions Panel */}
-                    <div className="mb-16">
-                      <QuickActionPanel />
-                    </div>
-
-                    {/* Engagement Booster */}
-                    <div className="mb-16">
-                      <EngagementBooster />
-                    </div>
-
-                    {/* Viral Sharing Assistant */}
-                    <div className="mb-16">
-                      <ViralSharingAssistant />
-                    </div>
-
-                    {/* Tutorial Launch Button */}
-                    <div className="mb-16">
-                      <TutorialLaunchButton />
-                    </div>
-
-                    {/* Voice Message Recorder */}
-                    <div className="mb-16">
-                      <VoiceMessageRecorder />
-                    </div>
-                  </div>
-                </div>
-              )}
             </div>
           </div>
         </div>

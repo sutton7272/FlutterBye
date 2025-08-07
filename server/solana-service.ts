@@ -8,8 +8,7 @@ import {
   getAssociatedTokenAddress,
   createAssociatedTokenAccountInstruction
 } from '@solana/spl-token';
-// Note: Using simplified metadata approach for DevNet compatibility
-import { Metaplex, keypairIdentity } from '@metaplex-foundation/js';
+import { Metaplex, keypairIdentity, bundlrStorage } from '@metaplex-foundation/js';
 import bs58 from 'bs58';
 
 export class SolanaBackendService {
@@ -47,33 +46,49 @@ export class SolanaBackendService {
       // Generate new mint keypair
       const mintKeypair = Keypair.generate();
       
-      // Define token metadata (simplified for DevNet)
-      const metadata = {
+      // Define token metadata
+      const metadata: TokenMetadata = {
         mint: mintKeypair.publicKey,
         name: "FLBY-MSG",
         symbol: "FLBY-MSG",
         uri: `http://localhost:5000/api/metadata/${mintKeypair.publicKey.toString()}`,
-        message: params.message,
-        totalSupply: params.totalSupply.toString(),
-        tokenType: "FLBY-MSG",
-        description: `Flutterbye Message Token: "${params.message}"`
+        additionalMetadata: [
+          ["message", params.message],
+          ["totalSupply", params.totalSupply.toString()],
+          ["tokenType", "FLBY-MSG"],
+          ["description", `Flutterbye Message Token: "${params.message}"`]
+        ],
       };
 
-      // Calculate space needed for basic mint
-      const lamports = await getMinimumBalanceForRentExemptMint(this.connection);
+      // Calculate space needed for mint with metadata extension
+      const metadataExtension = TYPE_SIZE + LENGTH_SIZE + pack(metadata).length;
+      const mintLen = getMintLen([ExtensionType.MetadataPointer]);
+      const lamports = await this.connection.getMinimumBalanceForRentExemption(
+        mintLen + metadataExtension
+      );
       
       // Create transaction
       const transaction = new Transaction();
       
-      // Add create mint account instruction (standard SPL)
+      // Add create mint account instruction for Token-2022
       transaction.add(
         SystemProgram.createAccount({
           fromPubkey: this.keypair.publicKey,
           newAccountPubkey: mintKeypair.publicKey,
-          space: MINT_SIZE,
+          space: mintLen + metadataExtension,
           lamports,
-          programId: TOKEN_PROGRAM_ID,
+          programId: TOKEN_2022_PROGRAM_ID,
         })
+      );
+
+      // Add initialize metadata pointer instruction
+      transaction.add(
+        createInitializeMetadataPointerInstruction(
+          mintKeypair.publicKey,
+          this.keypair.publicKey,
+          mintKeypair.publicKey, // Metadata account same as mint
+          TOKEN_2022_PROGRAM_ID
+        )
       );
       
       // Add initialize mint instruction (0 decimals for whole numbers only)
@@ -83,9 +98,36 @@ export class SolanaBackendService {
           0, // Decimals = 0 for whole number tokens
           this.keypair.publicKey,
           this.keypair.publicKey,
-          TOKEN_PROGRAM_ID
+          TOKEN_2022_PROGRAM_ID
         )
       );
+
+      // Add initialize metadata instruction
+      transaction.add(
+        createInitializeInstruction({
+          programId: TOKEN_2022_PROGRAM_ID,
+          mint: mintKeypair.publicKey,
+          metadata: mintKeypair.publicKey,
+          name: metadata.name,
+          symbol: metadata.symbol,
+          uri: metadata.uri,
+          mintAuthority: this.keypair.publicKey,
+          updateAuthority: this.keypair.publicKey,
+        })
+      );
+
+      // Add additional metadata fields
+      for (const [key, value] of metadata.additionalMetadata || []) {
+        transaction.add(
+          createUpdateFieldInstruction({
+            programId: TOKEN_2022_PROGRAM_ID,
+            metadata: mintKeypair.publicKey,
+            updateAuthority: this.keypair.publicKey,
+            field: key,
+            value,
+          })
+        );
+      }
 
       // Note: Metaplex metadata creation temporarily disabled due to deprecated API
       // Tokens will work properly but may show as "Unknown Token" in wallets
@@ -108,7 +150,7 @@ export class SolanaBackendService {
       const distributionWallets = params.distributionWallets || params.recipientWallets || [];
       
       // Remove duplicates and exclude minter wallet from distribution
-      const uniqueDistributionWallets = Array.from(new Set(distributionWallets))
+      const uniqueDistributionWallets = [...new Set(distributionWallets)]
         .filter(wallet => wallet !== minterWallet)
         .slice(0, params.totalSupply); // Limit to total supply
       
@@ -129,7 +171,7 @@ export class SolanaBackendService {
           mintKeypair.publicKey,
           recipientPubkey,
           false,
-          TOKEN_PROGRAM_ID
+          TOKEN_2022_PROGRAM_ID
         );
 
         // Create associated token account for Token-2022
@@ -139,7 +181,7 @@ export class SolanaBackendService {
             associatedTokenAddress,
             recipientPubkey,
             mintKeypair.publicKey,
-            TOKEN_PROGRAM_ID
+            TOKEN_2022_PROGRAM_ID
           )
         );
 
@@ -151,7 +193,7 @@ export class SolanaBackendService {
             this.keypair.publicKey,
             1, // Always 1 token per distribution wallet
             [],
-            TOKEN_PROGRAM_ID
+            TOKEN_2022_PROGRAM_ID
           )
         );
       }
@@ -163,7 +205,7 @@ export class SolanaBackendService {
           mintKeypair.publicKey,
           minterPubkey,
           false,
-          TOKEN_PROGRAM_ID
+          TOKEN_2022_PROGRAM_ID
         );
 
         // Create associated token account for minter (Token-2022)
@@ -173,7 +215,7 @@ export class SolanaBackendService {
             minterTokenAddress,
             minterPubkey,
             mintKeypair.publicKey,
-            TOKEN_PROGRAM_ID
+            TOKEN_2022_PROGRAM_ID
           )
         );
 
@@ -185,7 +227,7 @@ export class SolanaBackendService {
             this.keypair.publicKey,
             surplusTokens,
             [],
-            TOKEN_PROGRAM_ID
+            TOKEN_2022_PROGRAM_ID
           )
         );
       }

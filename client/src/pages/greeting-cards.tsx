@@ -185,7 +185,7 @@ export default function GreetingCards() {
                     onClick={() => setSelectedTemplate(template)}
                   >
                     <CardContent className="p-4 text-center">
-                      <template.icon />
+                      <template.icon className="w-8 h-8 mx-auto mb-2 text-primary" />
                       <h3 className="font-semibold text-sm">{template.name}</h3>
                       <p className="text-xs text-muted-foreground mt-1">{template.description}</p>
                       {template.template && (
@@ -248,7 +248,7 @@ export default function GreetingCards() {
                   <div className="space-y-2">
                     <Label>Attached Value</Label>
                     <div className="relative">
-                      <selectedCurrency.icon />
+                      <selectedCurrency.icon className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                       <Input
                         type="number"
                         step="0.001"
@@ -302,7 +302,7 @@ export default function GreetingCards() {
                 <div className="bg-muted/20 p-4 rounded-lg border">
                   <h4 className="font-semibold mb-2">Preview</h4>
                   <div className="text-center py-4">
-                    <selectedTemplate.icon />
+                    <selectedTemplate.icon className="w-12 h-12 mx-auto mb-2 text-primary" />
                     <p className="text-lg font-medium">{getMessage()}</p>
                     {attachedValue && (
                       <Badge variant="secondary" className="mt-2">

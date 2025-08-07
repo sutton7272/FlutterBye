@@ -14,23 +14,12 @@ import { apiRequest } from "@/lib/queryClient";
 import { 
   Server, Database, Shield, Zap, Users, Settings, 
   Activity, AlertTriangle, CheckCircle, Clock, 
-  TrendingUp, HardDrive, Cpu, MemoryStick, Wifi,
-  ArrowLeft
+  TrendingUp, HardDrive, Cpu, MemoryStick, Wifi
 } from 'lucide-react';
-import { Link } from "wouter";
 
 export default function AdminSystem() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
-
-  // Check admin authentication
-  useEffect(() => {
-    const adminAuth = sessionStorage.getItem('admin-authenticated');
-    if (!adminAuth) {
-      window.location.href = '/admin-gateway';
-      return;
-    }
-  }, []);
 
   // System health monitoring
   const { data: health, isLoading: healthLoading } = useQuery({
@@ -134,16 +123,6 @@ export default function AdminSystem() {
   return (
     <div className="min-h-screen text-white p-6">
       <div className="max-w-7xl mx-auto space-y-8">
-        {/* Back Button */}
-        <div className="flex items-center gap-4">
-          <Link href="/admin-gateway">
-            <Button variant="outline" className="bg-slate-800/50 border-slate-600 text-slate-300 hover:bg-slate-700 hover:text-white flex items-center gap-2">
-              <ArrowLeft className="w-4 h-4" />
-              ← Admin Home
-            </Button>
-          </Link>
-        </div>
-
         {/* Header */}
         <div className="flex justify-between items-center">
           <div>
