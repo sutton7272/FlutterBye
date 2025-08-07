@@ -25,7 +25,6 @@ export default function Navbar() {
       ]
     },
     { href: "/flutterai", label: "FlutterAI", icon: Brain, description: "Wallet intelligence & targeting", special: true, featureId: "flutterai", priority: true },
-    { href: "/multi-chain", label: "Multi-Chain", icon: Activity, description: "Cross-blockchain intelligence", special: true, featureId: "multi_chain", priority: true },
     { href: "/redeem", label: "Redeem", icon: Gift, description: "Discover & redeem message tokens", featureId: "marketplace", priority: true },
     { href: "/intelligence", label: "AI Hub", icon: Brain, description: "AI intelligence and analytics", featureId: "intelligence" },
     { href: "/admin-gateway", label: "Admin", icon: Settings, description: "Platform management", featureId: "admin_panel" },
@@ -40,7 +39,7 @@ export default function Navbar() {
           return true;
         }
         // Show core features by default
-        if (["home", "mint", "marketplace", "flutterai", "flutter_wave", "flutter_art", "chat", "dashboard", "multi_chain"].includes(item.featureId)) {
+        if (["home", "mint", "marketplace", "flutterai", "flutter_wave", "flutter_art", "chat", "dashboard"].includes(item.featureId)) {
           return true;
         }
         // If no featureId is specified, show the item by default

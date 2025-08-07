@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Shield, Lock, Key, Users, Settings, BarChart3, Brain, Target, Globe } from "lucide-react";
+import { Shield, Lock, Key, Users, Settings, BarChart3, Brain, Target } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { Link } from "wouter";
@@ -117,10 +117,8 @@ export default function AdminGateway() {
   }
 
   if (!isAuthenticated) {
-    console.log("Showing authentication screen - user needs to login");
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 flex items-center justify-center p-4">
-
         <Card className="w-full max-w-md bg-slate-800/50 border-blue-500/20">
           <CardHeader className="text-center">
             <Shield className="w-12 h-12 text-blue-400 mx-auto mb-4" />
@@ -208,8 +206,6 @@ export default function AdminGateway() {
   }
 
   // Admin Portal - Main navigation hub
-  console.log("AdminGateway rendering main portal, isAuthenticated:", isAuthenticated);
-  
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 p-4">
       <div className="max-w-6xl mx-auto">
@@ -219,31 +215,7 @@ export default function AdminGateway() {
           <p className="text-slate-300">Central hub for all administrative functions</p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-6">
-          {/* Multi-Chain Intelligence Dashboard */}
-          <Link href="/multi-chain-dashboard">
-            <Card className="bg-slate-800/50 border-cyan-500/20 hover:border-cyan-400/40 transition-all cursor-pointer group transform hover:scale-105">
-              <CardHeader>
-                <Globe className="w-8 h-8 text-cyan-400 group-hover:text-cyan-300" />
-                <CardTitle className="text-white">Multi-Chain Intelligence</CardTitle>
-                <CardDescription className="text-slate-300">
-                  Revolutionary blockchain intelligence across 7 networks
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <ul className="text-sm text-slate-400 space-y-1">
-                  <li>• 7 Blockchain Networks Live</li>
-                  <li>• Real-time Market Data</li>
-                  <li>• Enterprise Intelligence</li>
-                  <li>• $500K-$5M Contracts Ready</li>
-                </ul>
-                <div className="mt-3 flex items-center gap-2">
-                  <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-                  <span className="text-green-400 text-xs font-semibold">OPERATIONAL</span>
-                </div>
-              </CardContent>
-            </Card>
-          </Link>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {/* Unified Admin Dashboard */}
           <Link href="/admin/dashboard">
             <Card className="bg-slate-800/50 border-blue-500/20 hover:border-blue-400/40 transition-all cursor-pointer group">
@@ -348,11 +320,7 @@ export default function AdminGateway() {
               </CardContent>
             </Card>
           </Link>
-
-
         </div>
-
-
 
         <div className="mt-8 text-center">
           <p className="text-slate-400 text-sm">

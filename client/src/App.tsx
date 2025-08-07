@@ -1,4 +1,4 @@
-import { Switch, Route, useLocation } from "wouter";
+import { Switch, Route } from "wouter";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
@@ -73,14 +73,6 @@ import AdminMarketingGrowth from "@/pages/admin-marketing-growth";
 import TokenHolderMapPage from "@/pages/token-holder-map";
 import CollaborativeCreation from "@/pages/collaborative-creation";
 import FlutterAIDashboard from "@/pages/flutterai-dashboard";
-import MultiChainDashboard from "@/pages/MultiChainDashboard";
-import SimpleMultiChain from "@/pages/SimpleMultiChain";
-import SimpleMultiChainTest from "@/pages/SimpleMultiChainTest";
-import MultiChainIntelligence from "@/pages/MultiChainIntelligence";
-import NewMultiChain from "@/pages/NewMultiChain";
-import RouteDebug from "@/pages/RouteDebug";
-import RouteTest from "@/pages/RouteTest";
-import TestRoute from "@/pages/TestRoute";
 import FlutterAIUser from "@/pages/flutterai-user";
 import EnterpriseDashboard from "@/pages/enterprise-dashboard";
 import ViralDashboard from "@/pages/viral-dashboard";
@@ -116,46 +108,11 @@ import { ThemeProvider } from "@/components/theme-provider";
 import { WalletProvider } from "@/components/wallet-adapter";
 import { TestImage } from "@/components/test-image";
 function Router() {
-  const [location] = useLocation();
-  console.log('🔍 Current route location:', location);
-  
-  // Handle multi-chain routes directly
-  if (location === '/multi-chain') {
-    console.log('🚀 Direct multi-chain override activated!');
-    const MultiChainApp = lazy(() => import('./MultiChainApp'));
-    return (
-      <QueryClientProvider client={queryClient}>
-        <ThemeProvider defaultTheme="dark">
-          <Suspense fallback={<div className="p-8 text-white">Loading Multi-Chain Dashboard...</div>}>
-            <MultiChainApp />
-          </Suspense>
-        </ThemeProvider>
-      </QueryClientProvider>
-    );
-  }
-
-
-  
   return (
     <ErrorBoundary>
       <div className="dark min-h-screen flex flex-col bg-transparent">
         <div className="flex-1 bg-transparent">
           <Switch>
-        <Route path="/test" component={TestRoute} />
-        <Route path="/debug">
-          <RouteDebug />
-        </Route>
-        <Route path="/multi-chain">
-          {() => {
-            console.log('🚀 Multi-chain route matched!');
-            return (
-              <>
-                <Navbar />
-                <SimpleMultiChain />
-              </>
-            );
-          }}
-        </Route>
         <Route path="/" component={LaunchCountdown} />
         <Route path="/launch" component={LaunchCountdown} />
         <Route path="/blog" component={BlogPage} />
@@ -191,7 +148,6 @@ function Router() {
             <Trade />
           </>
         )} />
-
         <Route path="/flutterai" component={() => (
           <>
             <Navbar />
@@ -675,18 +631,6 @@ function Router() {
             <FlutterAIDashboard />
           </>
         )} />
-        <Route path="/multi-chain-dashboard" component={() => (
-          <>
-            <Navbar />
-            <RouteTest />
-          </>
-        )} />
-        <Route path="/multi-chain-full" component={() => (
-          <>
-            <Navbar />
-            <NewMultiChain />
-          </>
-        )} />
         <Route path="/all-opportunities" component={() => (
           <>
             <Navbar />
@@ -835,17 +779,7 @@ function Router() {
             <AIMarketingBot />
           </>
         )} />
-        <Route path="/multi-chain-test" component={() => (
-          <div className="min-h-screen bg-slate-900 p-8">
-            <h1 className="text-white text-4xl">Multi-Chain Test Route Works!</h1>
-          </div>
-        )} />
-        <Route>
-          {() => {
-            console.log('🚨 Fallback NotFound route matched for:', window.location.pathname);
-            return <NotFound />;
-          }}
-        </Route>
+        <Route component={NotFound} />
         </Switch>
         </div>
         <Footer />

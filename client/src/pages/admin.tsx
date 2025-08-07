@@ -45,7 +45,6 @@ import {
   ExternalLink
 } from "lucide-react";
 import { Link } from "wouter";
-import SimpleMultiChain from "@/pages/SimpleMultiChain";
 
 interface AdminSettings {
   baseMintingFee: number;
@@ -406,7 +405,7 @@ export default function AdminDashboard() {
         </div>
 
         <Tabs defaultValue="overview" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-12 glassmorphism electric-frame border-0 p-2">
+          <TabsList className="grid w-full grid-cols-11 glassmorphism electric-frame border-0 p-2">
             <TabsTrigger value="overview" className="flex items-center gap-2 pulse-border hover:text-electric-blue transition-all">
               <BarChart3 className="w-4 h-4" />
               <span className="hidden sm:inline">Overview</span>
@@ -450,10 +449,6 @@ export default function AdminDashboard() {
             <TabsTrigger value="api-monetization" className="flex items-center gap-2 pulse-border hover:text-electric-green transition-all">
               <DollarSign className="w-4 h-4" />
               <span className="hidden sm:inline">API $</span>
-            </TabsTrigger>
-            <TabsTrigger value="multi-chain" className="flex items-center gap-2 pulse-border hover:text-electric-green transition-all">
-              <Globe className="w-4 h-4" />
-              <span className="hidden sm:inline">Multi-Chain</span>
             </TabsTrigger>
           </TabsList>
 
@@ -2000,24 +1995,6 @@ export default function AdminDashboard() {
                 </CardContent>
               </Card>
             </div>
-          </TabsContent>
-
-          {/* Multi-Chain Intelligence Tab */}
-          <TabsContent value="multi-chain" className="space-y-6">
-            <Card className="glassmorphism electric-frame">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Globe className="w-5 h-5 text-electric-green" />
-                  Multi-Chain Intelligence Dashboard
-                </CardTitle>
-                <CardDescription>
-                  Revolutionary blockchain intelligence across 7 major networks
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="p-0">
-                <SimpleMultiChain />
-              </CardContent>
-            </Card>
           </TabsContent>
         </Tabs>
         
