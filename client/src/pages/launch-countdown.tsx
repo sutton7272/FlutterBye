@@ -400,6 +400,81 @@ export default function LaunchCountdown() {
           </div>
         </div>
 
+        {/* AI Marketing Revolution Section */}
+        <div className="max-w-4xl mx-auto mt-12 mb-8">
+          <Card className="electric-frame bg-gradient-to-r from-red-900/20 to-purple-900/20">
+            <CardHeader className="text-center">
+              <CardTitle className="text-3xl font-bold text-gradient mb-4">
+                🚀 AI MARKETING REVOLUTION
+              </CardTitle>
+              <p className="text-lg text-gray-300">
+                FlutterAI: Revolutionary crypto marketing platform targeting any wallet with precision messaging
+              </p>
+            </CardHeader>
+            <CardContent>
+              <div className="bg-red-600/20 border border-red-500/30 rounded-lg p-4 mb-6">
+                <h3 className="text-xl font-bold text-red-300 mb-2">Latest Blog: The Future of Crypto Marketing</h3>
+                <p className="text-gray-400 text-sm mb-4">
+                  Discover how Flutterbye is revolutionizing crypto marketing with AI-powered precision targeting, 
+                  enabling businesses to communicate directly with specific crypto holder segments through 
+                  27-character tokenized messages with redeemable value.
+                </p>
+                <button className="bg-gradient-to-r from-blue-600 to-green-600 hover:from-blue-500 hover:to-green-500 px-8 py-3 rounded-lg font-bold transition-all duration-300">
+                  Read Full Article →
+                </button>
+              </div>
+              
+              {/* Marketing bot features */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                <div className="bg-gray-800/50 rounded-lg p-6">
+                  <h4 className="text-lg font-bold text-blue-400 mb-2">AI Content Creation</h4>
+                  <p className="text-gray-400 text-sm">Automated blog generation using GPT-4o</p>
+                </div>
+                <div className="bg-gray-800/50 rounded-lg p-6">
+                  <h4 className="text-lg font-bold text-green-400 mb-2">SEO Optimization</h4>
+                  <p className="text-gray-400 text-sm">Advanced keyword targeting and meta descriptions</p>
+                </div>
+                <div className="bg-gray-800/50 rounded-lg p-6">
+                  <h4 className="text-lg font-bold text-purple-400 mb-2">Multi-Platform Distribution</h4>
+                  <p className="text-gray-400 text-sm">Automated posting to Twitter, LinkedIn, Instagram</p>
+                </div>
+              </div>
+              
+              {/* Demo toggle button */}
+              <div className="text-center mt-8">
+                <button 
+                  onClick={() => setDemoMode(!demoMode)}
+                  className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 px-8 py-3 rounded-lg text-sm font-medium transition-all duration-300 shadow-lg"
+                >
+                  {demoMode ? "⬆️ Hide FlutterAI Tutorial" : "⬇️ Show FlutterAI Tutorial"}
+                </button>
+              </div>
+
+              {/* FlutterAI Interactive Tutorial Section - Shortened */}
+              {demoMode && (
+                <div className="mt-6 p-4 bg-gradient-to-r from-purple-900/30 to-blue-900/30 rounded-xl border border-purple-500/30">
+                  <div className="text-center mb-3">
+                    <h3 className="text-lg font-bold text-purple-300 mb-1">🤖 FlutterAI Tutorial</h3>
+                    <p className="text-gray-400 text-sm">Click below to start the interactive demo</p>
+                  </div>
+                  
+                  <div className="space-y-4" id="demo-section">
+                    {/* Tutorial Launch Button */}
+                    <div className="mb-4 text-center">
+                      <TutorialLaunchButton />
+                    </div>
+
+                    {/* Interactive Tutorial Container */}
+                    <div>
+                      <FlutterAIInteractiveTutorial />
+                    </div>
+                  </div>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </div>
+
         {/* Three Column Info Section */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 max-w-7xl mx-auto mb-8">
           {/* Left Column: VIP Signup */}
@@ -817,81 +892,6 @@ export default function LaunchCountdown() {
             </CardContent>
           </Card>
           </div>
-        </div>
-
-        {/* AI Marketing Revolution Section */}
-        <div className="max-w-4xl mx-auto mt-12 mb-8">
-          <Card className="electric-frame bg-gradient-to-r from-red-900/20 to-purple-900/20">
-            <CardHeader className="text-center">
-              <CardTitle className="text-3xl font-bold text-gradient mb-4">
-                🚀 AI MARKETING REVOLUTION
-              </CardTitle>
-              <p className="text-lg text-gray-300">
-                FlutterAI: Revolutionary crypto marketing platform targeting any wallet with precision messaging
-              </p>
-            </CardHeader>
-            <CardContent>
-              <div className="bg-red-600/20 border border-red-500/30 rounded-lg p-4 mb-6">
-                <h3 className="text-xl font-bold text-red-300 mb-2">Latest Blog: The Future of Crypto Marketing</h3>
-                <p className="text-gray-400 text-sm mb-4">
-                  Discover how Flutterbye is revolutionizing crypto marketing with AI-powered precision targeting, 
-                  enabling businesses to communicate directly with specific crypto holder segments through 
-                  27-character tokenized messages with redeemable value.
-                </p>
-                <button className="bg-gradient-to-r from-blue-600 to-green-600 hover:from-blue-500 hover:to-green-500 px-8 py-3 rounded-lg font-bold transition-all duration-300">
-                  Read Full Article →
-                </button>
-              </div>
-              
-              {/* Marketing bot features */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-                <div className="bg-gray-800/50 rounded-lg p-6">
-                  <h4 className="text-lg font-bold text-blue-400 mb-2">AI Content Creation</h4>
-                  <p className="text-gray-400 text-sm">Automated blog generation using GPT-4o</p>
-                </div>
-                <div className="bg-gray-800/50 rounded-lg p-6">
-                  <h4 className="text-lg font-bold text-green-400 mb-2">SEO Optimization</h4>
-                  <p className="text-gray-400 text-sm">Advanced keyword targeting and meta descriptions</p>
-                </div>
-                <div className="bg-gray-800/50 rounded-lg p-6">
-                  <h4 className="text-lg font-bold text-purple-400 mb-2">Multi-Platform Distribution</h4>
-                  <p className="text-gray-400 text-sm">Automated posting to Twitter, LinkedIn, Instagram</p>
-                </div>
-              </div>
-              
-              {/* Demo toggle button */}
-              <div className="text-center mt-8">
-                <button 
-                  onClick={() => setDemoMode(!demoMode)}
-                  className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 px-8 py-3 rounded-lg text-sm font-medium transition-all duration-300 shadow-lg"
-                >
-                  {demoMode ? "⬆️ Hide FlutterAI Tutorial" : "⬇️ Show FlutterAI Tutorial"}
-                </button>
-              </div>
-
-              {/* FlutterAI Interactive Tutorial Section - Shortened */}
-              {demoMode && (
-                <div className="mt-6 p-4 bg-gradient-to-r from-purple-900/30 to-blue-900/30 rounded-xl border border-purple-500/30">
-                  <div className="text-center mb-3">
-                    <h3 className="text-lg font-bold text-purple-300 mb-1">🤖 FlutterAI Tutorial</h3>
-                    <p className="text-gray-400 text-sm">Click below to start the interactive demo</p>
-                  </div>
-                  
-                  <div className="space-y-4" id="demo-section">
-                    {/* Tutorial Launch Button */}
-                    <div className="mb-4 text-center">
-                      <TutorialLaunchButton />
-                    </div>
-
-                    {/* Interactive Tutorial Container */}
-                    <div>
-                      <FlutterAIInteractiveTutorial />
-                    </div>
-                  </div>
-                </div>
-              )}
-            </CardContent>
-          </Card>
         </div>
 
         {/* Progress Bar */}
