@@ -120,11 +120,7 @@ export default function AdminGateway() {
     console.log("Showing authentication screen - user needs to login");
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 flex items-center justify-center p-4">
-        {/* DIAGNOSTIC - This should show the login form */}
-        <div className="mb-4 p-4 bg-green-500 text-white rounded">
-          <p>DIAGNOSTIC: You're seeing the LOGIN SCREEN - not the admin portal yet</p>
-          <p>Use password 'admin123' to authenticate and see the admin portal with cards</p>
-        </div>
+
         <Card className="w-full max-w-md bg-slate-800/50 border-blue-500/20">
           <CardHeader className="text-center">
             <Shield className="w-12 h-12 text-blue-400 mx-auto mb-4" />
@@ -223,19 +219,27 @@ export default function AdminGateway() {
           <p className="text-slate-300">Central hub for all administrative functions</p>
         </div>
 
-        {/* SIMPLE DIAGNOSTIC FIRST */}
-        <div className="mb-4 p-4 bg-red-500 text-white">
-          <p>DIAGNOSTIC: This red box should always appear before the cards</p>
-          <p>If you see this but not the yellow card below, there's a card rendering issue</p>
-        </div>
-        
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-6">
-          {/* SIMPLE TEST CARD */}
-          <div className="bg-yellow-500 p-4 rounded text-black">
-            <h2 className="font-bold">SIMPLE YELLOW TEST CARD</h2>
-            <p>Multi-Chain Intelligence would go here</p>
-            <p>Globe icon: 🌐</p>
-          </div>
+          {/* Multi-Chain Intelligence Dashboard */}
+          <Link href="/multi-chain-dashboard">
+            <Card className="bg-slate-800/50 border-cyan-500/20 hover:border-cyan-400/40 transition-all cursor-pointer group">
+              <CardHeader>
+                <Globe className="w-8 h-8 text-cyan-400 group-hover:text-cyan-300" />
+                <CardTitle className="text-white">Multi-Chain Intelligence</CardTitle>
+                <CardDescription className="text-slate-300">
+                  Revolutionary blockchain intelligence across 7 networks
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <ul className="text-sm text-slate-400 space-y-1">
+                  <li>• 7 Blockchain Networks</li>
+                  <li>• Real-time Market Data</li>
+                  <li>• Enterprise Intelligence</li>
+                  <li>• Cross-Chain Analytics</li>
+                </ul>
+              </CardContent>
+            </Card>
+          </Link>
           {/* Unified Admin Dashboard */}
           <Link href="/admin/dashboard">
             <Card className="bg-slate-800/50 border-blue-500/20 hover:border-blue-400/40 transition-all cursor-pointer group">
@@ -341,33 +345,10 @@ export default function AdminGateway() {
             </Card>
           </Link>
 
-          {/* Multi-Chain Intelligence */}
-          <Link href="/admin">
-            <Card className="bg-slate-800/50 border-cyan-500/20 hover:border-cyan-400/40 transition-all cursor-pointer group">
-              <CardHeader>
-                <Globe className="w-8 h-8 text-cyan-400 group-hover:text-cyan-300" />
-                <CardTitle className="text-white">Multi-Chain Intelligence</CardTitle>
-                <CardDescription className="text-slate-300">
-                  Revolutionary blockchain intelligence across 7 networks
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <ul className="text-sm text-slate-400 space-y-1">
-                  <li>• 7 Blockchain Networks</li>
-                  <li>• Real-time Market Data</li>
-                  <li>• Enterprise Intelligence</li>
-                  <li>• Cross-Chain Analytics</li>
-                </ul>
-              </CardContent>
-            </Card>
-          </Link>
+
         </div>
 
-        {/* TEST: Simple text to verify Multi-Chain card is being rendered */}
-        <div className="mt-8 p-4 bg-yellow-500 text-black">
-          <p>DEBUG: Multi-Chain Intelligence card should appear above this message as card #6</p>
-          <p>Total cards expected: 6 (Dashboard, FlutterAI, Access Control, Marketing & Growth, System Settings, Multi-Chain Intelligence)</p>
-        </div>
+
 
         <div className="mt-8 text-center">
           <p className="text-slate-400 text-sm">
