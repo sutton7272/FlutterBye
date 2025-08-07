@@ -18,10 +18,10 @@ import {
 export default function Create() {
   console.log("🚀 NEW FLUTTERBYE CREATION HUB LOADING 🚀");
   return (
-    <div className="min-h-screen pt-20 pb-12">
+    <div className="min-h-screen pt-20 pb-12" style={{backgroundColor: 'red'}}>
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12">
-          <h1 className="text-5xl font-bold mb-6 text-gradient">🚀 NEW Flutterbye Creation Hub 🚀</h1>
+          <h1 className="text-5xl font-bold mb-6 text-gradient" style={{color: 'yellow', fontSize: '60px'}}>THIS IS THE CREATE PAGE - NEW VERSION</h1>
           <p className="text-xl text-muted-foreground mb-8">Revolutionary blockchain creation platform featuring Flutterbye Coins and FlutterArt</p>
         </div>
 
