@@ -55,6 +55,7 @@ export default function Create() {
       features: ["27-character message", "Attach SOL value", "Perfect for gifts"],
       recommended: true,
       category: "retail",
+      route: "/greeting-cards",
       examples: ["Happy Birthday! $5 gift", "Coffee on me - enjoy!", "Thank you for everything"]
     },
     {
@@ -66,6 +67,7 @@ export default function Create() {
       features: ["FlutterAI wallet targeting", "Campaign analytics", "Bulk distribution"],
       recommended: true,
       category: "enterprise",
+      route: "/enterprise",
       examples: ["Try our 5% yield pool!", "New NFT drop preview", "Beta access unlocked!"]
     },
     {
