@@ -15,6 +15,7 @@ export default function Navbar() {
 
   // Primary navigation - core platform sections focused on launch products
   const allNavItems = [
+    { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard, description: "Portfolio & activity", featureId: "dashboard", priority: true },
     { href: "/create", label: "FlutterbyeMSG", icon: MessageSquare, description: "27-character message tokens with value", featureId: "mint", priority: true },
     { href: "/flutter-art", label: "FlutterArt", icon: Sparkles, description: "NFT message tokens & visual messages", featureId: "flutter_art", priority: true },
     { href: "/flutter-wave", label: "FlutterWave", icon: Zap, description: "SMS-to-blockchain emotional tokens", featureId: "flutter_wave", priority: true },
@@ -35,7 +36,7 @@ export default function Navbar() {
           return true;
         }
         // Show core features by default
-        if (["home", "mint", "marketplace", "flutterai", "flutter_wave", "flutter_art", "chat"].includes(item.featureId)) {
+        if (["home", "mint", "marketplace", "flutterai", "flutter_wave", "flutter_art", "chat", "dashboard"].includes(item.featureId)) {
           return true;
         }
         // If no featureId is specified, show the item by default
@@ -44,9 +45,8 @@ export default function Navbar() {
         return isFeatureEnabled(item.featureId);
       });
 
-  // Secondary navigation - business and enterprise features (Dashboard moved to first position)
+  // Secondary navigation - business and enterprise features
   const secondaryNavItems = [
-    { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard, description: "Portfolio & activity" },
     { href: "/chat", label: "Chat", icon: MessageSquare, description: "Real-time blockchain chat" },
     { href: "/trade", label: "Trade", icon: ArrowRightLeft, description: "Token marketplace & trading" },
     { href: "/activity", label: "Activity", icon: Activity, description: "Platform activity & analytics" },
