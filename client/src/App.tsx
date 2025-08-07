@@ -81,6 +81,7 @@ import NFTClaim from "@/pages/nft-claim";
 import AllOpportunities from "@/pages/AllOpportunities";
 import AdminAPIMonetization from "@/pages/admin-api-monetization";
 import CampaignBuilder from "@/pages/campaign-builder";
+import TestUpdate from "@/pages/test-update";
 import AIMarketingBot from "@/pages/ai-marketing-bot";
 import WalletTest from "@/pages/WalletTest";
 import ProductionDeployment from "@/pages/ProductionDeployment";
@@ -139,7 +140,7 @@ function Router() {
         <Route path="/campaign-builder" component={() => (
           <>
             <Navbar />
-            <CampaignBuilder />
+            <TestUpdate />
           </>
         )} />
         <Route path="/trade" component={() => (
