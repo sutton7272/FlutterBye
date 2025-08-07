@@ -26,7 +26,8 @@ import {
   TrendingUp,
   Award,
   Shield,
-  Quote
+  Quote,
+  Brain
 } from "lucide-react";
 import flutterbeyeLogoPath from "@assets/image_1754068877999.png";
 import Navbar from "@/components/navbar";
@@ -352,7 +353,54 @@ export default function LaunchCountdown() {
           </CardContent>
         </Card>
 
-        {/* Three Column Layout */}
+        {/* Hero Section with Action Buttons */}
+        <div className="text-center max-w-4xl mx-auto mb-12">
+          <div className="space-y-6">
+            <h2 className="text-3xl lg:text-4xl font-bold bg-gradient-to-r from-electric-blue via-circuit-teal to-electric-blue bg-clip-text text-transparent">
+              Transform Messages Into Valuable Tokens
+            </h2>
+            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+              Experience the revolutionary platform that combines AI-powered intelligence with tokenized communication
+            </p>
+            
+            {/* Quick Action Buttons */}
+            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+              <Button 
+                onClick={() => setLocation('/create')}
+                className="bg-gradient-to-r from-electric-blue to-circuit-teal hover:from-electric-blue/80 hover:to-circuit-teal/80 text-white px-8 py-3 text-lg font-semibold"
+              >
+                <Rocket className="w-5 h-5 mr-2" />
+                Start Creating Tokens
+              </Button>
+              <Button 
+                variant="outline"
+                onClick={() => setLocation('/flutterai')}
+                className="border-electric-blue text-electric-blue hover:bg-electric-blue hover:text-white px-8 py-3 text-lg"
+              >
+                <Brain className="w-5 h-5 mr-2" />
+                Explore FlutterAI
+              </Button>
+            </div>
+          </div>
+        </div>
+
+        {/* Interactive Tutorials Section */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-5xl mx-auto mb-12">
+          {/* FlutterAI Tutorial */}
+          <div className="max-w-full">
+            <FlutterAIInteractiveTutorial />
+          </div>
+
+          {/* Platform Tutorial */}
+          <div className="max-w-full">
+            <TutorialLaunchButton 
+              className="w-full" 
+              variant="default"
+            />
+          </div>
+        </div>
+
+        {/* Three Column Info Section */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 max-w-7xl mx-auto mb-8">
           {/* Left Column: VIP Signup */}
           <div>
@@ -444,30 +492,51 @@ export default function LaunchCountdown() {
             </Card>
           </div>
 
-          {/* Middle Column: Both Tutorials */}
-          <div className="space-y-4">
-            {/* Interactive Tutorial */}
-            <Card className="electric-frame">
-              <CardHeader className="pb-3">
-                <CardTitle className="text-gradient text-lg">Platform Tutorial</CardTitle>
+          {/* Middle Column: AI Marketing Revolution */}
+          <div>
+            <Card className="electric-frame h-full">
+              <CardHeader>
+                <CardTitle className="text-gradient flex items-center gap-2 text-lg">
+                  <Brain className="w-5 h-5" />
+                  AI Marketing Revolution
+                </CardTitle>
               </CardHeader>
-              <CardContent>
-                <div className="text-center">
-                  <p className="text-sm text-muted-foreground mb-4">
-                    Experience the FUTURE of token creation! See how easy it is to become "The Coinbase of Token Creation"!
-                  </p>
-                  <TutorialLaunchButton 
-                    className="bg-gradient-to-r from-electric-blue to-circuit-teal hover:from-electric-blue/80 hover:to-circuit-teal/80 text-white px-4 py-2 text-sm w-full" 
-                    variant="default"
-                  />
+              <CardContent className="space-y-4">
+                <p className="text-sm text-muted-foreground">
+                  Experience the world's most advanced crypto marketing platform powered by AI intelligence.
+                </p>
+                
+                <div className="space-y-3">
+                  <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-3">
+                    <h4 className="font-medium text-red-400 mb-2 text-sm">🚀 Revolutionary Features</h4>
+                    <ul className="text-xs text-muted-foreground space-y-1">
+                      <li>• AI wallet behavior analysis</li>
+                      <li>• Precision demographic targeting</li>
+                      <li>• Cross-chain intelligence (6 blockchains)</li>
+                      <li>• Real-time market insights</li>
+                    </ul>
+                  </div>
+
+                  <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-3">
+                    <h4 className="font-medium text-blue-400 mb-2 text-sm">💰 Enterprise Ready</h4>
+                    <ul className="text-xs text-muted-foreground space-y-1">
+                      <li>• $100K-$2M government contracts</li>
+                      <li>• Fortune 500 compliance tools</li>
+                      <li>• Bank-level security standards</li>
+                      <li>• White-label solutions</li>
+                    </ul>
+                  </div>
+
+                  <Button 
+                    onClick={() => setLocation('/flutterai')}
+                    className="w-full bg-gradient-to-r from-red-600 to-pink-600 hover:from-red-700 hover:to-pink-700 text-white"
+                  >
+                    <Sparkles className="w-4 h-4 mr-2" />
+                    Explore AI Platform
+                  </Button>
                 </div>
               </CardContent>
             </Card>
-
-            {/* FlutterAI Tutorial */}
-            <div className="max-w-full">
-              <FlutterAIInteractiveTutorial />
-            </div>
           </div>
 
           {/* Right Column: Early Access */}

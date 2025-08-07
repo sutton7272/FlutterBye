@@ -749,37 +749,78 @@ export function TutorialLaunchButton({ className = "", variant = "default" }: {
 }) {
   const [showTutorial, setShowTutorial] = useState(false);
 
+  if (showTutorial) {
+    return (
+      <div className="fixed inset-0 bg-slate-900/95 backdrop-blur-sm z-50 overflow-y-auto">
+        <div className="min-h-full p-4">
+          <div className="max-w-7xl mx-auto">
+            <div className="flex items-center justify-between mb-6 sticky top-4 bg-slate-900/90 backdrop-blur rounded-lg p-4 border border-electric-blue/30">
+              <h1 className="text-2xl font-bold text-gradient">Platform Interactive Tutorial</h1>
+              <Button
+                variant="ghost" 
+                onClick={() => setShowTutorial(false)}
+                className="text-gray-400 hover:text-white"
+              >
+                ✕ Close Tutorial
+              </Button>
+            </div>
+            <InteractiveTutorialContent />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <>
-      <Button
-        variant={variant}
-        onClick={() => setShowTutorial(true)}
-        className={`flex items-center gap-2 ${className}`}
-      >
-        <Play className="w-4 h-4" />
-        Interactive Tutorial
-      </Button>
-      
-      {/* Full-screen overlay */}
-      {showTutorial && (
-        <div className="fixed inset-0 bg-slate-900/95 backdrop-blur-sm z-50 overflow-y-auto">
-          <div className="min-h-full p-4">
-            <div className="max-w-7xl mx-auto">
-              <div className="flex items-center justify-between mb-6 sticky top-4 bg-slate-900/90 backdrop-blur rounded-lg p-4 border border-electric-blue/30">
-                <h1 className="text-2xl font-bold text-gradient">Platform Interactive Tutorial</h1>
-                <Button
-                  variant="ghost" 
-                  onClick={() => setShowTutorial(false)}
-                  className="text-gray-400 hover:text-white"
-                >
-                  ✕ Close Tutorial
-                </Button>
-              </div>
-              <InteractiveTutorialContent />
+    <Card className="electric-frame">
+      <CardHeader className="pb-3">
+        <CardTitle className="text-gradient text-lg flex items-center gap-2">
+          <Rocket className="w-5 h-5" />
+          Platform Tutorial
+        </CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className="space-y-4">
+          <p className="text-sm text-muted-foreground">
+            Experience the FUTURE of token creation! See how easy it is to become "The Coinbase of Token Creation"!
+          </p>
+          
+          {/* Compact preview showing first step */}
+          <div className="bg-slate-800/40 rounded-lg p-3 border border-electric-blue/20">
+            <div className="flex items-center gap-3 mb-2">
+              <Coins className="w-5 h-5 text-yellow-400" />
+              <span className="text-sm font-medium text-white">60-Second Token Creation</span>
+            </div>
+            <p className="text-xs text-muted-foreground">
+              REVOLUTIONARY simplicity! Create professional SPL tokens faster than ordering coffee...
+            </p>
+          </div>
+
+          <Button
+            onClick={() => setShowTutorial(true)}
+            className="w-full bg-gradient-to-r from-electric-blue to-circuit-teal hover:from-electric-blue/80 hover:to-circuit-teal/80 text-white flex items-center gap-2"
+          >
+            <Play className="w-4 h-4" />
+            Start Platform Demo
+          </Button>
+
+          {/* Quick stats */}
+          <div className="grid grid-cols-3 gap-2 text-center pt-2">
+            <div>
+              <div className="text-lg font-bold text-yellow-400">8</div>
+              <div className="text-xs text-gray-400">Features</div>
+            </div>
+            <div>
+              <div className="text-lg font-bold text-green-400">60s</div>
+              <div className="text-xs text-gray-400">Token Creation</div>
+            </div>
+            <div>
+              <div className="text-lg font-bold text-blue-400">∞</div>
+              <div className="text-xs text-gray-400">Possibilities</div>
             </div>
           </div>
         </div>
-      )}
-    </>
+      </CardContent>
+    </Card>
   );
 }
