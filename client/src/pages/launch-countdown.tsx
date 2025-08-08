@@ -593,9 +593,8 @@ export default function LaunchCountdown() {
           </div>
 
           {/* Right Column: VIP Waitlist */}
-          <div className="min-h-screen flex items-center justify-center relative overflow-hidden">
-            <div className="fixed inset-0 bg-gradient-to-br from-blue-900/20 via-purple-900/20 to-cyan-900/20 pointer-events-none" />
-            <Card className="electric-frame w-full max-w-md mx-4 relative overflow-hidden">
+          <div className="flex flex-col space-y-4">
+            <Card className="electric-frame relative overflow-hidden">
               <div className="absolute inset-0 bg-gradient-to-br from-cyan/5 via-blue/5 to-purple/5 pointer-events-none"></div>
               <CardHeader className="pb-3 relative">
                 <CardTitle className="text-gradient text-lg flex items-center gap-2">
