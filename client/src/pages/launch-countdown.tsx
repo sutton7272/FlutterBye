@@ -74,7 +74,7 @@ export default function LaunchCountdown() {
     });
 
     const [selectedContent, setSelectedContent] = useState<any>(null);
-  const [expandedContentId, setExpandedContentId] = useState<number | null>(null);
+  const [expandedItems, setExpandedItems] = useState<{[key: number]: boolean}>({});
 
     if (isLoading) {
       return (
@@ -106,7 +106,7 @@ export default function LaunchCountdown() {
           {latestContent && Array.isArray(latestContent) && latestContent.length > 0 ? (
             <div className="space-y-6 max-w-4xl mx-auto">
               {latestContent.slice(0, 3).map((content: any, index: number) => {
-                const isExpanded = expandedContentId === content.id;
+                const isExpanded = expandedItems[content.id] || false;
                 
                 // Check if content is truncated (ends with "...")
                 const hasMoreContent = content.content?.endsWith('...') || (content.content && content.content.length > 350);
@@ -119,15 +119,17 @@ export default function LaunchCountdown() {
                 const shouldShowReadMore = !isExpanded && hasMoreContent;
                 
                 // Debug logging
-                console.log(`Content ${content.id} state:`, { isExpanded, hasMoreContent, expandedContentId });
+                console.log(`Content ${content.id} render:`, { isExpanded });
                 
                 return (
                   <Card 
                     key={index} 
                     className="electric-frame bg-gradient-to-br from-cyan-500/20 to-blue-500/20 relative overflow-hidden cursor-pointer hover:from-cyan-500/30 hover:to-blue-500/30 transition-all duration-300"
                     onClick={() => {
-                      console.log('Card clicked for content:', content.id, 'isExpanded:', isExpanded);
-                      setExpandedContentId(isExpanded ? null : content.id);
+                      console.log('🎯 CARD CLICKED - Content ID:', content.id);
+                      const newState = !expandedItems[content.id];
+                      setExpandedItems(prev => ({ ...prev, [content.id]: newState }));
+                      console.log('📝 New expansion state:', newState);
                     }}
                   >
                     <div className="absolute inset-0 bg-gradient-to-r from-transparent via-cyan-400/10 to-transparent animate-pulse"></div>
@@ -158,20 +160,7 @@ export default function LaunchCountdown() {
                           {shouldShowReadMore && "..."}
                         </div>
                         
-                        {/* Simple working expansion system */}
-                        <div className="mt-4">
-                          <div 
-                            className="inline-block bg-cyan-500 hover:bg-cyan-600 text-white px-4 py-2 rounded cursor-pointer text-sm font-medium"
-                            onClick={() => {
-                              console.log('🔵 EXPAND BUTTON CLICKED - Content ID:', content.id);
-                              const newExpandedId = expandedContentId === content.id ? null : content.id;
-                              setExpandedContentId(newExpandedId);
-                              console.log('🔄 State changed to:', newExpandedId);
-                            }}
-                          >
-                            {isExpanded ? '▼ Show Less' : '▶ Read More'}
-                          </div>
-                        </div>
+
                       </div>
                       
                       <div className="flex items-center gap-4 text-xs text-muted-foreground">
