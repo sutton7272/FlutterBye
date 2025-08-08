@@ -182,18 +182,18 @@ export function CustodialWalletManagement() {
               Create Wallet
             </Button>
           </DialogTrigger>
-          <DialogContent className="bg-dark-navy/90 backdrop-blur-sm border-electric-blue/30 shadow-xl">
-            <DialogHeader className="bg-dark-navy/60 -mx-6 -mt-6 px-6 pt-6 pb-4 rounded-t-lg border-b border-electric-blue/20">
+          <DialogContent className="bg-black/30 backdrop-blur-sm border-2 border-electric-blue/50 shadow-xl shadow-electric-blue/20">
+            <DialogHeader className="bg-black/20 -mx-6 -mt-6 px-6 pt-6 pb-4 rounded-t-lg border-b border-electric-blue/30">
               <DialogTitle className="text-white">Create New Custodial Wallet</DialogTitle>
             </DialogHeader>
             <div className="space-y-4 pt-4">
               <div className="space-y-2">
                 <Label htmlFor="currency" className="text-gray-200 font-medium">Currency</Label>
                 <Select value={selectedCurrency} onValueChange={setSelectedCurrency}>
-                  <SelectTrigger className="bg-dark-navy/60 border-electric-blue/30 text-white backdrop-blur-sm">
+                  <SelectTrigger className="bg-black/20 backdrop-blur-sm border-2 border-electric-blue/40 text-white">
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent className="bg-dark-navy/90 border-electric-blue/30">
+                  <SelectContent className="bg-black/30 backdrop-blur-sm border-2 border-electric-blue/50">
                     <SelectItem value="SOL">SOL</SelectItem>
                     <SelectItem value="USDC">USDC</SelectItem>
                     <SelectItem value="FLBY">FLBY</SelectItem>

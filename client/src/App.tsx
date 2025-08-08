@@ -294,6 +294,12 @@ function Router() {
           </AdminRouteGuard>
         )} />
         
+        <Route path="/admin/custodial-wallet" component={() => (
+          <AdminRouteGuard>
+            <AdminCustodialWallet />
+          </AdminRouteGuard>
+        )} />
+        
         {/* Legacy Admin Route */}
         <Route path="/admin-legacy" component={() => (
           <>
@@ -757,12 +763,7 @@ function Router() {
             <AIMarketingBot />
           </>
         )} />
-        <Route path="/admin-custodial-wallet" component={() => (
-          <>
-            <Navbar />
-            <AdminCustodialWallet />
-          </>
-        )} />
+
         <Route component={NotFound} />
         </Switch>
         </div>
