@@ -74,6 +74,7 @@ export default function LaunchCountdown() {
     });
 
     const [selectedContent, setSelectedContent] = useState<any>(null);
+  const [expandedContentId, setExpandedContentId] = useState<number | null>(null);
 
     if (isLoading) {
       return (
@@ -104,35 +105,91 @@ export default function LaunchCountdown() {
           {/* Generated Content Display Only */}
           {latestContent && latestContent.length > 0 ? (
             <div className="space-y-6 max-w-4xl mx-auto">
-              {latestContent.slice(0, 3).map((content: any, index: number) => (
-                <Card key={index} className="electric-frame bg-gradient-to-br from-cyan-500/20 to-blue-500/20 relative overflow-hidden">
-                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-cyan-400/10 to-transparent animate-pulse"></div>
-                  <CardContent className="p-6 relative z-10">
-                    <div className="flex items-start justify-between mb-3">
-                      <Badge className="bg-gradient-to-r from-cyan-600 to-blue-600 text-white border-0 shadow-lg">
-                        {content.type || 'FlutterBlog'}
-                      </Badge>
-                      <span className="text-xs text-muted-foreground">{content.timestamp || 'Just now'}</span>
-                    </div>
-                    
-                    <h4 className="font-bold text-xl text-gradient mb-3 leading-tight">
-                      {content.title || content.topic || 'FlutterBlog Content'}
-                    </h4>
-                    
-                    <p className="text-muted-foreground text-sm leading-relaxed mb-4">
-                      {content.content?.slice(0, 300) || content.preview || 'Advanced AI-powered content generation system creating SEO-optimized blog posts with comprehensive metadata analysis...'}
-                      {(content.content?.length > 300 || content.preview?.length > 300) && '...'}
-                    </p>
-                    
-                    <div className="flex items-center gap-4 text-xs text-muted-foreground">
-                      {content.wordCount && <span className="flex items-center gap-1"><span className="text-cyan-400">📊</span> {content.wordCount} words</span>}
-                      {content.seoScore && <span className="flex items-center gap-1"><span className="text-green-400">🎯</span> SEO: {content.seoScore}%</span>}
-                      {content.readabilityScore && <span className="flex items-center gap-1"><span className="text-blue-400">📖</span> Readability: {content.readabilityScore}%</span>}
-                      <span className="text-electric-green font-semibold">✨ AI Optimized</span>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
+              {latestContent.slice(0, 3).map((content: any, index: number) => {
+                const isExpanded = expandedContentId === content.id;
+                const contentText = content.content || content.preview || 'Advanced AI-powered content generation system creating SEO-optimized blog posts with comprehensive metadata analysis...';
+                const shouldTruncate = contentText.length > 300 && !isExpanded;
+                
+                return (
+                  <Card 
+                    key={index} 
+                    className="electric-frame bg-gradient-to-br from-cyan-500/20 to-blue-500/20 relative overflow-hidden cursor-pointer hover:from-cyan-500/30 hover:to-blue-500/30 transition-all duration-300"
+                    onClick={() => setExpandedContentId(isExpanded ? null : content.id)}
+                  >
+                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-cyan-400/10 to-transparent animate-pulse"></div>
+                    <CardContent className="p-6 relative z-10">
+                      <div className="flex items-start justify-between mb-3">
+                        <Badge className="bg-gradient-to-r from-cyan-600 to-blue-600 text-white border-0 shadow-lg">
+                          {content.type || 'FlutterBlog'}
+                        </Badge>
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs text-muted-foreground">{content.timestamp || 'Just now'}</span>
+                          <Button variant="ghost" size="sm" className="h-6 w-6 p-0 hover:bg-cyan-500/20">
+                            {isExpanded ? (
+                              <span className="text-xs">−</span>
+                            ) : (
+                              <span className="text-xs">+</span>
+                            )}
+                          </Button>
+                        </div>
+                      </div>
+                      
+                      <h4 className="font-bold text-xl text-gradient mb-3 leading-tight">
+                        {content.title || content.topic || 'FlutterBlog Content'}
+                      </h4>
+                      
+                      <div className="text-muted-foreground text-sm leading-relaxed mb-4">
+                        {shouldTruncate ? (
+                          <>
+                            {contentText.slice(0, 300)}...
+                            <Button 
+                              variant="link" 
+                              size="sm" 
+                              className="p-0 ml-2 text-cyan-400 hover:text-cyan-300 text-sm"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setExpandedContentId(content.id);
+                              }}
+                            >
+                              Read More
+                            </Button>
+                          </>
+                        ) : (
+                          <div className="whitespace-pre-wrap">
+                            {contentText}
+                            {isExpanded && (
+                              <Button 
+                                variant="link" 
+                                size="sm" 
+                                className="p-0 ml-2 text-cyan-400 hover:text-cyan-300 text-sm"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setExpandedContentId(null);
+                                }}
+                              >
+                                Show Less
+                              </Button>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                      
+                      <div className="flex items-center gap-4 text-xs text-muted-foreground">
+                        {content.wordCount && <span className="flex items-center gap-1"><span className="text-cyan-400">📊</span> {content.wordCount} words</span>}
+                        {content.seoScore && <span className="flex items-center gap-1"><span className="text-green-400">🎯</span> SEO: {content.seoScore}%</span>}
+                        {content.readabilityScore && <span className="flex items-center gap-1"><span className="text-blue-400">📖</span> Readability: {content.readabilityScore}%</span>}
+                        <span className="text-electric-green font-semibold">✨ AI Optimized</span>
+                      </div>
+                      
+                      {!isExpanded && (
+                        <div className="mt-3 text-center">
+                          <span className="text-xs text-cyan-400/70">Click to read full article</span>
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
+                );
+              })}
             </div>
           ) : (
             <Card className="electric-frame max-w-2xl mx-auto bg-gradient-to-br from-cyan-500/20 to-blue-500/20 relative overflow-hidden">
