@@ -66,17 +66,7 @@ export default function Create() {
       category: "enterprise",
       examples: ["Try our 5% yield pool!", "New NFT drop preview", "Beta access unlocked!"]
     },
-    {
-      id: "quick-message",
-      title: "Quick Message",
-      description: "Simple 27-character token creation",
-      icon: MessageSquare,
-      color: "electric-blue",
-      features: ["Fast creation", "Basic targeting", "Instant deployment"],
-      recommended: false,
-      category: "basic",
-      examples: ["GM! Have a great day", "Thanks for the follow", "Welcome to crypto!"]
-    }
+
   ];
 
   const aiTools = [
