@@ -24,12 +24,12 @@ export function PerformanceDashboard() {
   const renderStatus = getRenderTimeStatus(metrics.renderTime);
 
   return (
-    <Card className="border-electric-blue/20">
+    <Card className="bg-slate-800/50 border border-electric-blue/30 hover:border-electric-blue/50 transition-all duration-300 electric-frame">
       <CardHeader className="pb-3">
-        <CardTitle className="flex items-center gap-2 text-sm">
+        <CardTitle className="flex items-center gap-2 text-sm text-white">
           <Monitor className="w-4 h-4 text-electric-blue" />
           Performance Monitor
-          <Badge variant={isOnline ? 'default' : 'destructive'} className="ml-auto">
+          <Badge variant={isOnline ? 'default' : 'destructive'} className="ml-auto bg-electric-blue/20 border border-electric-blue/40">
             {isOnline ? <Wifi className="w-3 h-3 mr-1" /> : <WifiOff className="w-3 h-3 mr-1" />}
             {isOnline ? 'Online' : 'Offline'}
           </Badge>
@@ -41,14 +41,14 @@ export function PerformanceDashboard() {
           <div className="flex items-center justify-between text-xs">
             <div className="flex items-center gap-1">
               <MemoryStick className="w-3 h-3 text-electric-green" />
-              <span>Memory Usage</span>
+              <span className="text-gray-200">Memory Usage</span>
             </div>
             <Badge variant={memoryStatus.variant} className="text-xs px-1 py-0">
               {memoryStatus.text}
             </Badge>
           </div>
           <Progress value={Math.min(metrics.memoryUsage, 100)} className="h-1" />
-          <div className="text-xs text-muted-foreground">
+          <div className="text-xs text-gray-300">
             {metrics.memoryUsage.toFixed(1)} MB
           </div>
         </div>
@@ -58,13 +58,13 @@ export function PerformanceDashboard() {
           <div className="flex items-center justify-between text-xs">
             <div className="flex items-center gap-1">
               <Zap className="w-3 h-3 text-electric-blue" />
-              <span>Render Time</span>
+              <span className="text-gray-200">Render Time</span>
             </div>
             <Badge variant={renderStatus.variant} className="text-xs px-1 py-0">
               {renderStatus.text}
             </Badge>
           </div>
-          <div className="text-xs text-muted-foreground">
+          <div className="text-xs text-gray-300">
             {metrics.renderTime.toFixed(0)}ms
           </div>
         </div>
@@ -74,9 +74,9 @@ export function PerformanceDashboard() {
           <div className="flex items-center justify-between text-xs">
             <div className="flex items-center gap-1">
               <Globe className="w-3 h-3 text-electric-green" />
-              <span>Network Requests</span>
+              <span className="text-gray-200">Network Requests</span>
             </div>
-            <span className="text-xs text-muted-foreground">
+            <span className="text-xs text-gray-300">
               {metrics.networkRequests}
             </span>
           </div>
@@ -88,7 +88,7 @@ export function PerformanceDashboard() {
             <div className="flex items-center justify-between text-xs">
               <div className="flex items-center gap-1">
                 <AlertTriangle className="w-3 h-3 text-red-500" />
-                <span>Errors</span>
+                <span className="text-gray-200">Errors</span>
               </div>
               <Badge variant="destructive" className="text-xs px-1 py-0">
                 {metrics.errorCount}
@@ -102,9 +102,9 @@ export function PerformanceDashboard() {
           <div className="flex items-center justify-between text-xs">
             <div className="flex items-center gap-1">
               <Activity className="w-3 h-3 text-electric-blue" />
-              <span>Page Load</span>
+              <span className="text-gray-200">Page Load</span>
             </div>
-            <span className="text-xs text-muted-foreground">
+            <span className="text-xs text-gray-300">
               {(metrics.loadTime / 1000).toFixed(1)}s
             </span>
           </div>

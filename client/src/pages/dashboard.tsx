@@ -317,10 +317,7 @@ export default function Dashboard() {
           </TabsContent>
         </Tabs>
 
-        {/* Voice Recording Component */}
-        <VoiceMessageRecorder onVoiceAttached={(voiceData) => {
-          console.log("Voice attached:", voiceData);
-        }} />
+
         
       </div>
       
