@@ -306,7 +306,7 @@ export default function FlutterBlogBot() {
           {/* Top Navigation Bar */}
           <div className="flex items-center justify-between">
             <Button
-              onClick={() => setLocation('/admin-unified')}
+              onClick={() => setLocation('/admin/unified')}
               variant="outline"
               className="flex items-center gap-2 bg-slate-800/50 border-slate-600 text-slate-300 hover:bg-slate-700"
             >
