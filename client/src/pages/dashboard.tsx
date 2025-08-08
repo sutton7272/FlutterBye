@@ -38,6 +38,7 @@ import { QuickAccessFAB } from "@/components/quick-access-fab";
 import { PersonalizedDashboard } from "@/components/PersonalizedDashboard";
 import { PerformanceDashboard } from "@/components/performance-dashboard";
 import ViralDashboard from "@/pages/viral-dashboard";
+import { ContextualChatButton } from "@/components/contextual-chat-button";
 
 interface DashboardStats {
   totalTokens: number;
@@ -117,10 +118,10 @@ export default function Dashboard() {
       featured: true
     },
     {
-      title: "Trade Assets",
-      description: "Buy, sell, and discover tokens",
-      icon: Users,
-      href: "/trade",
+      title: "FlutterWave",
+      description: "SMS-to-blockchain emotional tokens",
+      icon: Heart,
+      href: "/flutterwave",
       color: "electric-green"
     },
     {
@@ -131,10 +132,10 @@ export default function Dashboard() {
       color: "purple"
     },
     {
-      title: "Chat & Connect",
-      description: "Join blockchain conversations",
-      icon: MessageSquare,
-      href: "/chat",
+      title: "FlutterArt",
+      description: "Create and trade NFTs",
+      icon: Star,
+      href: "/flutterart",
       color: "teal"
     }
   ];
@@ -149,9 +150,12 @@ export default function Dashboard() {
         
         {/* Welcome Header */}
         <div className="text-center space-y-4">
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-electric-blue to-electric-green bg-clip-text text-transparent">
-            Welcome to Flutterbye
-          </h1>
+          <div className="flex items-center justify-center gap-4 flex-wrap">
+            <h1 className="text-4xl font-bold bg-gradient-to-r from-electric-blue to-electric-green bg-clip-text text-transparent">
+              Welcome to Flutterbye
+            </h1>
+            <ContextualChatButton context="dashboard" />
+          </div>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
             Your unified platform for tokenized messaging, AI-powered trading, and blockchain intelligence
           </p>
@@ -192,8 +196,12 @@ export default function Dashboard() {
 
         {/* Main Dashboard Content */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-5 bg-slate-800/50 border border-electric-blue/20">
+          <TabsList className="grid w-full grid-cols-6 bg-slate-800/50 border border-electric-blue/20">
             <TabsTrigger value="overview">Overview</TabsTrigger>
+            <TabsTrigger value="trade">
+              <Coins className="h-4 w-4 mr-2" />
+              Trade
+            </TabsTrigger>
             <TabsTrigger value="portfolio">Portfolio</TabsTrigger>
             <TabsTrigger value="activity">Activity</TabsTrigger>
             <TabsTrigger value="trending">
@@ -322,6 +330,77 @@ export default function Dashboard() {
 
           <TabsContent value="trending" className="space-y-6">
             <ViralDashboard />
+          </TabsContent>
+
+          <TabsContent value="trade" className="space-y-6">
+            {/* Trading Stats */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              {[
+                { label: "24h Volume", value: "2,847 SOL", change: "+12.3%", positive: true },
+                { label: "Active Traders", value: "1,249", change: "+8.7%", positive: true },
+                { label: "Total Listings", value: "15,847", change: "+5.2%", positive: true },
+                { label: "Avg Price", value: "0.24 SOL", change: "-2.1%", positive: false }
+              ].map((stat, index) => (
+                <Card key={index} className="bg-slate-800/40 border border-electric-blue/30 electric-frame">
+                  <CardContent className="pt-6">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-sm font-medium text-muted-foreground">{stat.label}</p>
+                        <p className="text-2xl font-bold text-white">{stat.value}</p>
+                      </div>
+                      <Badge variant={stat.positive ? "default" : "destructive"} className="ml-2">
+                        {stat.change}
+                      </Badge>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+
+            {/* Quick Trade Actions */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              {[
+                { title: "Buy Trending", description: "Browse hot tokens", icon: TrendingUp, color: "electric-blue" },
+                { title: "Sell Holdings", description: "List your tokens", icon: Wallet, color: "electric-green" },
+                { title: "Portfolio Review", description: "Check performance", icon: BarChart3, color: "purple" },
+                { title: "Market Analysis", description: "AI insights", icon: Eye, color: "teal" }
+              ].map((action, index) => (
+                <Card key={index} className="group hover:shadow-xl transition-all duration-300 cursor-pointer bg-slate-800/40 border border-electric-blue/30 hover:border-electric-blue/60 electric-frame">
+                  <CardContent className="pt-6">
+                    <div className="flex items-center space-x-4">
+                      <div className={`p-3 rounded-lg bg-${action.color === 'electric-blue' ? 'electric-blue' : action.color === 'electric-green' ? 'electric-green' : action.color === 'purple' ? 'purple-400' : 'teal-400'}/10 border border-${action.color === 'electric-blue' ? 'electric-blue' : action.color === 'electric-green' ? 'electric-green' : action.color === 'purple' ? 'purple-400' : 'teal-400'}/20`}>
+                        <action.icon className={`h-5 w-5 ${action.color === 'electric-blue' ? 'text-electric-blue' : action.color === 'electric-green' ? 'text-electric-green' : action.color === 'purple' ? 'text-purple-400' : 'text-teal-400'}`} />
+                      </div>
+                      <div>
+                        <h3 className="font-semibold text-white">{action.title}</h3>
+                        <p className="text-sm text-gray-300">{action.description}</p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+
+            {/* Embedded Marketplace */}
+            <Card className="bg-slate-800/40 border border-electric-blue/30 electric-frame">
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle className="text-xl text-white">Token Marketplace</CardTitle>
+                    <CardDescription>Buy and sell tokens directly from your dashboard</CardDescription>
+                  </div>
+                  <Button className="bg-gradient-to-r from-electric-blue to-electric-green hover:from-electric-blue/80 hover:to-electric-green/80">
+                    View Full Market
+                  </Button>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="text-center py-8">
+                  <p className="text-gray-400">Marketplace integration loading...</p>
+                  <p className="text-sm text-gray-500 mt-2">Trade functionality will be available here</p>
+                </div>
+              </CardContent>
+            </Card>
           </TabsContent>
 
           <TabsContent value="insights" className="space-y-6">

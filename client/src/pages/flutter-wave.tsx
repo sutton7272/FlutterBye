@@ -15,6 +15,7 @@ import {
   Zap,
   BarChart3
 } from "lucide-react";
+import { ContextualChatButton } from "@/components/contextual-chat-button";
 
 
 export default function FlutterWave() {
@@ -64,7 +65,7 @@ export default function FlutterWave() {
       <div className="container mx-auto px-4 py-6 space-y-8">
         {/* Header */}
         <div className="text-center space-y-4">
-          <div className="flex items-center justify-center gap-3">
+          <div className="flex items-center justify-center gap-3 flex-wrap">
             <Waves className="h-12 w-12 text-electric-blue animate-pulse" />
             <h1 className="text-5xl font-bold bg-gradient-to-r from-electric-blue via-purple to-electric-green bg-clip-text text-transparent">
               FlutterWave
@@ -72,6 +73,7 @@ export default function FlutterWave() {
             <Badge className="bg-gradient-to-r from-purple-600 to-blue-600 text-white font-bold">
               AI-POWERED
             </Badge>
+            <ContextualChatButton context="flutterwave" />
           </div>
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
             Revolutionary AI-Powered Butterfly Effect Messaging - Harness the quantum power of emotions 

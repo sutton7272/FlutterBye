@@ -13,6 +13,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { Sparkles, Plus, Coins, Clock, Users, Trophy } from "lucide-react";
+import { ContextualChatButton } from "@/components/contextual-chat-button";
 
 interface LimitedEditionSet {
   id: string;
@@ -161,9 +162,12 @@ export default function LimitedEdition() {
           <h1 className="text-5xl md:text-7xl font-black mb-6 bg-gradient-to-r from-electric-cyan via-cyber-purple to-neon-pink bg-clip-text text-transparent neon-text">
             LIMITED EDITION
           </h1>
-          <h2 className="text-3xl md:text-4xl font-bold mb-4 bg-gradient-to-r from-electric-blue to-electric-green bg-clip-text text-transparent">
-            Exclusive Token Collections
-          </h2>
+          <div className="flex items-center justify-center gap-4 flex-wrap mb-4">
+            <h2 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-electric-blue to-electric-green bg-clip-text text-transparent">
+              Exclusive Token Collections
+            </h2>
+            <ContextualChatButton context="flutterart" />
+          </div>
           <p className="text-xl text-gray-300 mb-12 max-w-3xl mx-auto leading-relaxed">
             Create exclusive token collections with predetermined quantities, special pricing, and unique rarity tiers
           </p>
