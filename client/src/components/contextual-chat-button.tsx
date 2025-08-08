@@ -61,9 +61,8 @@ export function ContextualChatButton({ context, className = "" }: ContextualChat
       >
         <config.icon className="h-4 w-4 mr-2" />
         {config.title}
-        <Badge variant="secondary" className="ml-2 text-xs">
-          <Users className="h-3 w-3 mr-1" />
-          12
+        <Badge variant="secondary" className="ml-2 text-xs bg-yellow-500/20 text-yellow-300 border-yellow-500/30">
+          Coming Soon
         </Badge>
       </Button>
     </Link>
