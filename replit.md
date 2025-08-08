@@ -18,9 +18,9 @@ Priority focus: Initial release strategy focusing on coin minting as the core en
 
 ## Recent Major Achievements (August 8, 2025)
 **CUSTODIAL WALLET ADMIN INTEGRATION - COMPLETE:** Added dedicated custodial wallet management card to the global admin dashboard for streamlined access:
-- Direct navigation link in Quick Access Management section
-- Integrated with main admin dashboard at `/admin` route
+- Direct navigation link added to global admin dashboard at `/admin/dashboard`
 - Professional electric-blue themed card design matching platform aesthetics
+- Features: Create Custodial Wallets, Monitor Wallet Balances, Transaction Security, Compliance Reporting
 - Seamless access to enterprise custodial wallet system ($2M-$10M ARR target)
 **SOLANA SMART CONTRACT ESCROW SYSTEM - COMPLETE:** Enterprise-grade blockchain escrow system implemented for high-value transactions ($200K-$2M). Complete smart contract infrastructure deployed:
 - Rust/Anchor-based smart contract with timeout protection

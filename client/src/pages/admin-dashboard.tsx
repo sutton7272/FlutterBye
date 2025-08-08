@@ -132,6 +132,20 @@ export default function AdminDashboard() {
         "Log Analysis",
         "Maintenance Tools"
       ]
+    },
+    {
+      id: "custodial",
+      title: "Custodial Wallets",
+      description: "Secure custodial wallet system for user value-attachment with recipient redemption",
+      icon: Wallet,
+      route: "/admin-custodial-wallet",
+      color: "electric-blue",
+      features: [
+        "Create Custodial Wallets",
+        "Monitor Wallet Balances",
+        "Transaction Security",
+        "Compliance Reporting"
+      ]
     }
   ];
 
