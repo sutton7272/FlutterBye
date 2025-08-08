@@ -93,10 +93,11 @@ export default function LaunchCountdown() {
         <div className="container mx-auto px-4">
           {/* Simple Header */}
           <div className="text-center mb-8">
-            <h2 className="text-2xl font-bold mb-2">
-              <span className="bg-gradient-to-r from-electric-blue via-electric-green to-electric-blue bg-clip-text text-transparent">
-                FlutterBlog Content
+            <h2 className="text-5xl font-bold mb-2 relative">
+              <span className="bg-gradient-to-r from-electric-blue via-electric-green to-electric-blue bg-clip-text text-transparent drop-shadow-2xl animate-pulse filter">
+                FLUTTERBLOG CONTENT
               </span>
+              <div className="absolute inset-0 bg-gradient-to-r from-electric-blue/20 via-electric-green/20 to-electric-blue/20 blur-xl -z-10 animate-pulse"></div>
             </h2>
           </div>
 
