@@ -307,11 +307,13 @@ export default function Home() {
 
             {/* Voice Messages */}
             <Link href="/voice">
-              <Card className="bg-gradient-to-br from-green-900/60 to-emerald-900/60 border-green-500/30 backdrop-blur-sm hover:border-green-400/60 transition-all duration-300 h-full cursor-pointer group">
-                <CardContent className="p-6 text-center">
-                  <Mic className="h-12 w-12 text-green-400 mx-auto mb-4 group-hover:scale-110 transition-transform" />
-                  <h3 className="font-bold text-xl mb-2">Voice Messages</h3>
-                  <p className="text-gray-400 text-sm">Record voice messages and turn them into valuable blockchain assets</p>
+              <Card className="bg-gradient-to-br from-green-900/60 to-emerald-900/60 border-green-500/30 backdrop-blur-sm hover:border-green-400/60 transition-all duration-300 h-full cursor-pointer group min-h-[240px]">
+                <CardContent className="p-6 text-center flex flex-col justify-between h-full">
+                  <div className="flex flex-col items-center flex-grow">
+                    <Mic className="h-12 w-12 text-green-400 mx-auto mb-4 group-hover:scale-110 transition-transform" />
+                    <h3 className="font-bold text-xl mb-2">Voice Messages</h3>
+                    <p className="text-gray-400 text-sm flex-grow">Record voice messages and turn them into valuable blockchain assets</p>
+                  </div>
                   <Badge className="mt-4 bg-green-500/20 text-green-300">Audio NFTs</Badge>
                 </CardContent>
               </Card>
@@ -343,11 +345,13 @@ export default function Home() {
 
             {/* Analytics */}
             <Link href="/analytics">
-              <Card className="bg-gradient-to-br from-indigo-900/60 to-purple-900/60 border-indigo-500/30 backdrop-blur-sm hover:border-indigo-400/60 transition-all duration-300 h-full cursor-pointer group">
-                <CardContent className="p-6 text-center">
-                  <TrendingUp className="h-12 w-12 text-indigo-400 mx-auto mb-4 group-hover:scale-110 transition-transform" />
-                  <h3 className="font-bold text-xl mb-2">Analytics</h3>
-                  <p className="text-gray-400 text-sm">Track performance, viral metrics, and user engagement</p>
+              <Card className="bg-gradient-to-br from-indigo-900/60 to-purple-900/60 border-indigo-500/30 backdrop-blur-sm hover:border-indigo-400/60 transition-all duration-300 h-full cursor-pointer group min-h-[240px]">
+                <CardContent className="p-6 text-center flex flex-col justify-between h-full">
+                  <div className="flex flex-col items-center flex-grow">
+                    <TrendingUp className="h-12 w-12 text-indigo-400 mx-auto mb-4 group-hover:scale-110 transition-transform" />
+                    <h3 className="font-bold text-xl mb-2">Analytics</h3>
+                    <p className="text-gray-400 text-sm flex-grow">Track performance, viral metrics, and user engagement</p>
+                  </div>
                   <Badge className="mt-4 bg-indigo-500/20 text-indigo-300">Insights</Badge>
                 </CardContent>
               </Card>
