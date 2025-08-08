@@ -3,7 +3,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { WalletConnect } from "@/components/wallet-connect";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { Menu, Home, Coins, Trophy, Users, MessageSquare, Settings, Sparkles, Zap, Heart, Building2, MapPin, Activity, Gift, Award, Star, Ticket, HelpCircle, LayoutDashboard, Brain, CreditCard, Stars, DollarSign, Code2, Rocket, ArrowRightLeft, Target, Shield } from "lucide-react";
+import { Menu, Home, Coins, Trophy, Users, MessageSquare, Settings, Sparkles, Zap, Heart, Building2, MapPin, Gift, Award, Star, Ticket, HelpCircle, LayoutDashboard, Brain, CreditCard, Stars, DollarSign, Code2, Rocket, Target, Shield } from "lucide-react";
 
 import { useFeatureToggles } from "@/hooks/useFeatureToggles";
 import { MobileNavigation } from "@/components/mobile-navigation";
@@ -44,11 +44,6 @@ export default function Navbar() {
         // Otherwise, check if the feature is enabled
         return isFeatureEnabled(item.featureId);
       });
-
-  // Secondary navigation - business and enterprise features (explore moved to info page)
-  const secondaryNavItems = [
-    { href: "/activity", label: "Activity", icon: Activity, description: "Platform activity & analytics" },
-  ];
 
   const isActive = (href: string) => location === href;
 
@@ -98,32 +93,7 @@ export default function Navbar() {
           ))}
         </nav>
 
-        {/* Secondary Navigation - Core Features */}
-        <nav className="hidden md:flex items-center ml-4 space-x-1 border-l border-border/30 pl-4">
-          {secondaryNavItems.map((item) => (
-            <Link key={item.href} href={item.href}>
-              <Button
-                variant={isActive(item.href) ? "default" : "ghost"}
-                size="sm"
-                className={`flex items-center gap-2 h-9 px-3 relative group ${
-                  isActive(item.href) 
-                    ? "bg-electric-blue text-white shadow-lg" 
-                    : "text-text-secondary hover:text-text-primary hover:bg-muted/50 transition-all duration-200"
-                }`}
-              >
-                <item.icon className="h-3.5 w-3.5" />
-                <span className="text-sm font-medium">{item.label}</span>
-                
-                {/* Tooltip */}
-                <div className="absolute bottom-full mb-2 left-1/2 transform -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none">
-                  <div className="bg-black/90 text-white text-xs rounded px-2 py-1 whitespace-nowrap">
-                    {item.description}
-                  </div>
-                </div>
-              </Button>
-            </Link>
-          ))}
-        </nav>
+
 
         {/* Trust Indicator */}
         <div className="hidden xl:flex ml-4 items-center gap-3">
