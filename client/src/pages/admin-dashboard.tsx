@@ -16,6 +16,7 @@ import {
   Home
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import Navbar from "@/components/navbar";
 
 const ADMIN_WALLETS_KEY = "flutter_admin_wallets";
 
@@ -106,9 +107,11 @@ export default function AdminDashboard() {
   ];
 
   return (
-    <div className="min-h-screen relative overflow-hidden">
-      {/* Animated Circuit Background */}
-      <div className="absolute inset-0 bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
+    <>
+      <Navbar />
+      <div className="min-h-screen relative overflow-hidden">
+        {/* Animated Circuit Background */}
+        <div className="absolute inset-0 bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
         {/* Circuit Pattern Overlay */}
         <div className="absolute inset-0 opacity-20">
           <div className="absolute top-20 left-20 w-64 h-64 border border-electric-blue/30 rounded-lg animate-pulse-slow" />
@@ -164,17 +167,6 @@ export default function AdminDashboard() {
                 </Badge>
               </div>
             )}
-            
-            {/* Return to Site Button */}
-            <Button
-              variant="outline"
-              onClick={() => setLocation("/")}
-              className="border-electric-blue/50 text-electric-blue hover:bg-electric-blue/10 hover:border-electric-blue/70 transition-all duration-300 relative overflow-hidden group"
-            >
-              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-electric-blue/5 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
-              <Home className="w-4 h-4 mr-2" />
-              Return to Site
-            </Button>
             
             <Button
               variant="outline"
@@ -328,6 +320,7 @@ export default function AdminDashboard() {
           </div>
         </div>
       </div>
-    </div>
+      </div>
+    </>
   );
 }
