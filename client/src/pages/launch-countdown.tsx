@@ -325,8 +325,8 @@ export default function LaunchCountdown() {
         <div className="text-center mb-8">
           <div className="relative inline-block mb-4">
             {/* Main FLUTTERBYE text */}
-            <h1 className="text-6xl font-bold mb-3 relative z-10">
-              <span className="bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent drop-shadow-2xl filter">
+            <h1 className="text-8xl font-bold mb-3 relative z-10">
+              <span className="bg-gradient-to-r from-cyan-300 via-green-400 to-cyan-500 bg-clip-text text-transparent drop-shadow-2xl filter animate-pulse">
                 FLUTTERBYE
               </span>
             </h1>
@@ -365,12 +365,53 @@ export default function LaunchCountdown() {
               
               {/* Butterfly 4 - Bottom Right Figure-8 */}
               <div className="absolute w-5 h-4 animate-butterfly-4">
-                <svg className="w-full h-full text-pink-400 drop-shadow-lg" viewBox="0 0 20 16" fill="currentColor">
+                <svg className="w-full h-full text-green-400 drop-shadow-lg" viewBox="0 0 20 16" fill="currentColor">
                   <path d="M3 8c0-1.8 1.8-3.6 3.6-3.6s3.6 1.8 3.6 3.6-1.8 3.6-3.6 3.6S3 9.8 3 8z" opacity="0.8"/>
                   <path d="M10 8c0-1.8 1.8-3.6 3.6-3.6s3.6 1.8 3.6 3.6-1.8 3.6-3.6 3.6S10 9.8 10 8z" opacity="0.8"/>
                   <circle cx="10" cy="8" r="0.7" className="text-white"/>
                 </svg>
-                <div className="absolute inset-0 bg-pink-400/30 rounded-full blur-sm animate-pulse delay-1500"></div>
+                <div className="absolute inset-0 bg-green-400/30 rounded-full blur-sm animate-pulse delay-1500"></div>
+              </div>
+
+              {/* Additional Butterflies for More Magic */}
+              {/* Butterfly 5 - Far Left Orbit */}
+              <div className="absolute w-4 h-3 animate-butterfly-5">
+                <svg className="w-full h-full text-cyan-500 drop-shadow-lg" viewBox="0 0 16 12" fill="currentColor">
+                  <path d="M2 6c0-1.2 1.2-2.4 2.4-2.4s2.4 1.2 2.4 2.4-1.2 2.4-2.4 2.4S2 7.2 2 6z" opacity="0.9"/>
+                  <path d="M7.2 6c0-1.2 1.2-2.4 2.4-2.4s2.4 1.2 2.4 2.4-1.2 2.4-2.4 2.4-2.4-1.2-2.4-2.4z" opacity="0.9"/>
+                  <circle cx="8" cy="6" r="0.6" className="text-white"/>
+                </svg>
+                <div className="absolute inset-0 bg-cyan-500/40 rounded-full blur-sm animate-pulse delay-2000"></div>
+              </div>
+
+              {/* Butterfly 6 - Far Right Spiral */}
+              <div className="absolute w-6 h-4 animate-butterfly-6">
+                <svg className="w-full h-full text-emerald-400 drop-shadow-lg" viewBox="0 0 24 16" fill="currentColor">
+                  <path d="M4 8c0-2 2-4 4-4s4 2 4 4-2 4-4 4-4-2-4-4z" opacity="0.9"/>
+                  <path d="M12 8c0-2 2-4 4-4s4 2 4 4-2 4-4 4-4-2-4-4z" opacity="0.9"/>
+                  <circle cx="12" cy="8" r="1" className="text-white"/>
+                </svg>
+                <div className="absolute inset-0 bg-emerald-400/40 rounded-full blur-sm animate-pulse delay-2500"></div>
+              </div>
+
+              {/* Butterfly 7 - Center Hover */}
+              <div className="absolute w-3 h-2 animate-butterfly-7">
+                <svg className="w-full h-full text-teal-400 drop-shadow-lg" viewBox="0 0 12 8" fill="currentColor">
+                  <path d="M1 4c0-0.8 0.8-1.6 1.6-1.6s1.6 0.8 1.6 1.6-0.8 1.6-1.6 1.6S1 4.8 1 4z" opacity="0.9"/>
+                  <path d="M5.8 4c0-0.8 0.8-1.6 1.6-1.6s1.6 0.8 1.6 1.6-0.8 1.6-1.6 1.6-1.6-0.8-1.6-1.6z" opacity="0.9"/>
+                  <circle cx="6" cy="4" r="0.4" className="text-white"/>
+                </svg>
+                <div className="absolute inset-0 bg-teal-400/40 rounded-full blur-sm animate-pulse delay-3000"></div>
+              </div>
+
+              {/* Butterfly 8 - Outer Orbit */}
+              <div className="absolute w-5 h-4 animate-butterfly-8">
+                <svg className="w-full h-full text-lime-400 drop-shadow-lg" viewBox="0 0 20 16" fill="currentColor">
+                  <path d="M3 8c0-1.8 1.8-3.6 3.6-3.6s3.6 1.8 3.6 3.6-1.8 3.6-3.6 3.6S3 9.8 3 8z" opacity="0.9"/>
+                  <path d="M10 8c0-1.8 1.8-3.6 3.6-3.6s3.6 1.8 3.6 3.6-1.8 3.6-3.6 3.6S10 9.8 10 8z" opacity="0.9"/>
+                  <circle cx="10" cy="8" r="0.7" className="text-white"/>
+                </svg>
+                <div className="absolute inset-0 bg-lime-400/40 rounded-full blur-sm animate-pulse delay-3500"></div>
               </div>
             </div>
           </div>
