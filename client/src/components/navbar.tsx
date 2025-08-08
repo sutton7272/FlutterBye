@@ -45,12 +45,11 @@ export default function Navbar() {
         return isFeatureEnabled(item.featureId);
       });
 
-  // Secondary navigation - business and enterprise features
+  // Secondary navigation - business and enterprise features (explore moved to info page)
   const secondaryNavItems = [
     { href: "/chat", label: "Chat", icon: MessageSquare, description: "Real-time blockchain chat" },
     { href: "/trade", label: "Trade", icon: ArrowRightLeft, description: "Token marketplace & trading" },
     { href: "/activity", label: "Activity", icon: Activity, description: "Platform activity & analytics" },
-    { href: "/explore", label: "Explore", icon: Star, description: "Discover trending content" },
   ];
 
   const isActive = (href: string) => location === href;

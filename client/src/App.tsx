@@ -232,12 +232,6 @@ function Router() {
             <Activity />
           </>
         )} />
-        <Route path="/explore" component={() => (
-          <>
-            <Navbar />
-            <Explore />
-          </>
-        )} />
         <Route path="/trending" component={() => (
           <>
             <Navbar />

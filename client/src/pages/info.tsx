@@ -1,11 +1,78 @@
+import { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { BookOpen, Map, Zap, Users, Coins, Trophy, Star, CheckCircle, Clock, AlertCircle, Target, Rocket, FileText, TrendingUp, Shield, Globe, Heart, MessageSquare, DollarSign, Building2, Gift, Sparkles, Ticket, UserPlus, Search } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { BookOpen, Map, Zap, Users, Coins, Trophy, Star, CheckCircle, Clock, AlertCircle, Target, Rocket, FileText, TrendingUp, Shield, Globe, Heart, MessageSquare, DollarSign, Building2, Gift, Sparkles, Ticket, UserPlus, Search, Filter, Eye, Share2, BarChart3, LineChart, PieChart, Activity } from "lucide-react";
+
+interface Token {
+  id: string;
+  message: string;
+  symbol: string;
+  mintAddress: string;
+  hasAttachedValue: boolean;
+  attachedValue: string;
+  currency: string;
+  escrowStatus: string;
+  imageUrl?: string;
+  isPublic: boolean;
+  createdAt: string;
+}
+
+interface DashboardStats {
+  totalTokens: number;
+  totalValueEscrowed: string;
+  totalRedemptions: number;
+  activeUsers: number;
+}
 
 export default function InfoPage() {
+  const [searchQuery, setSearchQuery] = useState('');
+  const [valueFilter, setValueFilter] = useState('all');
+
+  // Data fetching for explore functionality
+  const { data: publicTokens = [], isLoading: tokensLoading } = useQuery({
+    queryKey: ['/api/tokens/public'],
+  });
+
+  const { data: tokensWithValue = [], isLoading: valueTokensLoading } = useQuery({
+    queryKey: ['/api/tokens/with-value'],
+  });
+
+  const { data: stats, isLoading: statsLoading } = useQuery<DashboardStats>({
+    queryKey: ['/api/dashboard/stats'],
+  });
+
+  // Filter functions for explore functionality
+  const filteredPublicTokens = (publicTokens as Token[]).filter((token: Token) => {
+    const searchMatch = token.message.toLowerCase().includes(searchQuery.toLowerCase());
+    const valueMatch = valueFilter === 'all' || 
+      (valueFilter === 'with-value' && token.hasAttachedValue) ||
+      (valueFilter === 'no-value' && !token.hasAttachedValue);
+    return searchMatch && valueMatch;
+  });
+
+  const filteredValueTokens = (tokensWithValue as Token[]).filter((token: Token) => 
+    token.message.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  const getStatusBadge = (token: Token) => {
+    if (token.hasAttachedValue) {
+      switch (token.escrowStatus) {
+        case 'escrowed':
+          return <Badge className="bg-electric-green/20 text-electric-green border border-electric-green/30">💰 {token.attachedValue} {token.currency}</Badge>;
+        case 'redeemed':
+          return <Badge variant="outline">✅ Redeemed</Badge>;
+        default:
+          return <Badge variant="secondary">💎 Value Attached</Badge>;
+      }
+    }
+    return <Badge variant="outline">💬 Message Only</Badge>;
+  };
+
   return (
     <div className="min-h-screen pt-20 pb-12">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -605,56 +672,253 @@ export default function InfoPage() {
             </div>
           </TabsContent>
 
-          {/* Explore Tab */}
+          {/* Explore Tab - Full Functionality */}
           <TabsContent value="explore" className="space-y-6">
-            <Card className="glassmorphism">
+            {/* Search and Filter Controls */}
+            <Card className="bg-slate-800/40 border border-electric-blue/30 electric-frame">
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Search className="w-5 h-5" />
-                  Explore Tokens
+                <CardTitle className="flex items-center gap-3">
+                  <div className="p-2 rounded-lg bg-electric-blue/10 border border-electric-blue/20">
+                    <Search className="w-5 h-5 text-electric-blue" />
+                  </div>
+                  Explore & Discover Tokens
                 </CardTitle>
-                <CardDescription>
-                  Discover and browse tokens created by the community
+                <CardDescription className="text-gray-300">
+                  Browse community tokens, trending content, and valuable message tokens
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="text-center py-12">
-                  <Sparkles className="w-16 h-16 mx-auto text-blue-400 mb-4" />
-                  <h3 className="text-xl font-semibold mb-2">Token Discovery</h3>
-                  <p className="text-muted-foreground mb-6">
-                    Browse through thousands of unique tokens created by the Flutterbye community.
-                    Find tokens by category, value, or message content.
-                  </p>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-2xl mx-auto mb-6">
-                    <div className="border border-blue-500/20 bg-blue-500/5 rounded-lg p-4">
-                      <Heart className="w-8 h-8 mx-auto mb-2 text-blue-400" />
-                      <h4 className="font-medium text-blue-400 mb-2">Greeting Cards</h4>
-                      <p className="text-sm text-muted-foreground">Birthday wishes, thank you notes</p>
-                    </div>
-                    <div className="border border-green-500/20 bg-green-500/5 rounded-lg p-4">
-                      <Building2 className="w-8 h-8 mx-auto mb-2 text-green-400" />
-                      <h4 className="font-medium text-green-400 mb-2">Marketing</h4>
-                      <p className="text-sm text-muted-foreground">Promotional campaigns, rewards</p>
-                    </div>
-                    <div className="border border-purple-500/20 bg-purple-500/5 rounded-lg p-4">
-                      <Users className="w-8 h-8 mx-auto mb-2 text-purple-400" />
-                      <h4 className="font-medium text-purple-400 mb-2">Community</h4>
-                      <p className="text-sm text-muted-foreground">Memes, social messages</p>
-                    </div>
+                <div className="flex flex-col sm:flex-row gap-4 mb-6">
+                  <div className="flex-1">
+                    <Input
+                      placeholder="Search tokens by message content..."
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      className="bg-slate-700/50 border-electric-blue/30 text-white"
+                    />
                   </div>
-                  <div className="flex gap-4 justify-center">
-                    <Button>
-                      <Search className="w-4 h-4 mr-2" />
-                      Browse All Tokens
+                  <div className="flex gap-2">
+                    <Button
+                      variant={valueFilter === 'all' ? 'default' : 'outline'}
+                      onClick={() => setValueFilter('all')}
+                      size="sm"
+                    >
+                      All
                     </Button>
-                    <Button variant="outline">
-                      <Star className="w-4 h-4 mr-2" />
-                      Popular This Week
+                    <Button
+                      variant={valueFilter === 'with-value' ? 'default' : 'outline'}
+                      onClick={() => setValueFilter('with-value')}
+                      size="sm"
+                    >
+                      <DollarSign className="w-4 h-4 mr-1" />
+                      With Value
+                    </Button>
+                    <Button
+                      variant={valueFilter === 'no-value' ? 'default' : 'outline'}
+                      onClick={() => setValueFilter('no-value')}
+                      size="sm"
+                    >
+                      <MessageSquare className="w-4 h-4 mr-1" />
+                      Messages
                     </Button>
                   </div>
                 </div>
+
+                {/* Stats Overview */}
+                {stats && (
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                    <Card className="bg-slate-700/30 border border-electric-blue/20">
+                      <CardContent className="p-4 text-center">
+                        <div className="text-2xl font-bold text-electric-blue">{stats.totalTokens}</div>
+                        <div className="text-sm text-gray-400">Total Tokens</div>
+                      </CardContent>
+                    </Card>
+                    <Card className="bg-slate-700/30 border border-electric-green/20">
+                      <CardContent className="p-4 text-center">
+                        <div className="text-2xl font-bold text-electric-green">{stats.totalValueEscrowed}</div>
+                        <div className="text-sm text-gray-400">Value Escrowed</div>
+                      </CardContent>
+                    </Card>
+                    <Card className="bg-slate-700/30 border border-purple-400/20">
+                      <CardContent className="p-4 text-center">
+                        <div className="text-2xl font-bold text-purple-400">{stats.totalRedemptions}</div>
+                        <div className="text-sm text-gray-400">Redemptions</div>
+                      </CardContent>
+                    </Card>
+                    <Card className="bg-slate-700/30 border border-yellow-400/20">
+                      <CardContent className="p-4 text-center">
+                        <div className="text-2xl font-bold text-yellow-400">{stats.activeUsers}</div>
+                        <div className="text-sm text-gray-400">Active Users</div>
+                      </CardContent>
+                    </Card>
+                  </div>
+                )}
               </CardContent>
             </Card>
+
+            {/* Token Discovery Tabs */}
+            <Tabs defaultValue="public" className="space-y-4">
+              <div className="flex justify-center">
+                <TabsList className="bg-slate-800/50 border border-electric-blue/20">
+                  <TabsTrigger value="public">Public Tokens</TabsTrigger>
+                  <TabsTrigger value="valued">Tokens with Value</TabsTrigger>
+                  <TabsTrigger value="trending">Trending</TabsTrigger>
+                </TabsList>
+              </div>
+
+              {/* Public Tokens */}
+              <TabsContent value="public">
+                <Card className="bg-slate-800/40 border border-electric-blue/30 electric-frame">
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2 text-white">
+                      <Globe className="w-5 h-5 text-electric-blue" />
+                      Public Token Gallery
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    {tokensLoading ? (
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        {[...Array(6)].map((_, i) => (
+                          <div key={i} className="bg-slate-700/30 rounded-lg p-4 animate-pulse">
+                            <div className="h-4 bg-slate-600 rounded mb-2"></div>
+                            <div className="h-3 bg-slate-600 rounded w-3/4"></div>
+                          </div>
+                        ))}
+                      </div>
+                    ) : filteredPublicTokens.length > 0 ? (
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        {filteredPublicTokens.map((token) => (
+                          <Card key={token.id} className="bg-slate-700/50 border border-electric-blue/20 hover:border-electric-blue/40 transition-all duration-300">
+                            <CardContent className="p-4">
+                              <div className="flex items-start justify-between mb-3">
+                                <div className="flex-1">
+                                  <p className="font-medium text-white mb-1">{token.message}</p>
+                                  <p className="text-sm text-gray-400">{token.symbol}</p>
+                                </div>
+                                {token.imageUrl && (
+                                  <img src={token.imageUrl} alt="" className="w-10 h-10 rounded-lg" />
+                                )}
+                              </div>
+                              <div className="flex items-center justify-between">
+                                {getStatusBadge(token)}
+                                <div className="flex gap-1">
+                                  <Button size="sm" variant="ghost">
+                                    <Eye className="w-4 h-4" />
+                                  </Button>
+                                  <Button size="sm" variant="ghost">
+                                    <Share2 className="w-4 h-4" />
+                                  </Button>
+                                </div>
+                              </div>
+                            </CardContent>
+                          </Card>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="text-center py-12">
+                        <Search className="w-16 h-16 mx-auto text-gray-500 mb-4" />
+                        <h3 className="text-lg font-medium text-white mb-2">No tokens found</h3>
+                        <p className="text-gray-400">Try adjusting your search or filters</p>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              {/* Tokens with Value */}
+              <TabsContent value="valued">
+                <Card className="bg-slate-800/40 border border-electric-green/30 electric-frame">
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2 text-white">
+                      <DollarSign className="w-5 h-5 text-electric-green" />
+                      Tokens with Attached Value
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    {valueTokensLoading ? (
+                      <div className="space-y-4">
+                        {[...Array(4)].map((_, i) => (
+                          <div key={i} className="bg-slate-700/30 rounded-lg p-4 animate-pulse">
+                            <div className="h-4 bg-slate-600 rounded mb-2"></div>
+                            <div className="h-3 bg-slate-600 rounded w-1/2"></div>
+                          </div>
+                        ))}
+                      </div>
+                    ) : filteredValueTokens.length > 0 ? (
+                      <div className="space-y-4">
+                        {filteredValueTokens.map((token) => (
+                          <Card key={token.id} className="bg-slate-700/50 border border-electric-green/20 hover:border-electric-green/40 transition-all duration-300">
+                            <CardContent className="p-4">
+                              <div className="flex items-center justify-between">
+                                <div className="flex-1">
+                                  <p className="font-medium text-white mb-1">{token.message}</p>
+                                  <p className="text-sm text-gray-400">{token.symbol} • Created {new Date(token.createdAt).toLocaleDateString()}</p>
+                                </div>
+                                <div className="flex items-center gap-3">
+                                  {getStatusBadge(token)}
+                                  <div className="flex gap-1">
+                                    <Button size="sm" variant="ghost">
+                                      <Eye className="w-4 h-4" />
+                                    </Button>
+                                    {token.escrowStatus === 'escrowed' && (
+                                      <Button size="sm" className="bg-electric-green hover:bg-electric-green/80">
+                                        Redeem
+                                      </Button>
+                                    )}
+                                  </div>
+                                </div>
+                              </div>
+                            </CardContent>
+                          </Card>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="text-center py-12">
+                        <DollarSign className="w-16 h-16 mx-auto text-gray-500 mb-4" />
+                        <h3 className="text-lg font-medium text-white mb-2">No value tokens found</h3>
+                        <p className="text-gray-400">Check back later for tokens with attached value</p>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              {/* Trending */}
+              <TabsContent value="trending">
+                <Card className="bg-slate-800/40 border border-purple-400/30 electric-frame">
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2 text-white">
+                      <TrendingUp className="w-5 h-5 text-purple-400" />
+                      Trending Content
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-center py-12">
+                      <TrendingUp className="w-16 h-16 mx-auto text-purple-400 mb-4" />
+                      <h3 className="text-lg font-medium text-white mb-2">Trending Analysis</h3>
+                      <p className="text-gray-400 mb-6">Discover the most popular and viral tokens on the platform</p>
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-2xl mx-auto">
+                        <div className="border border-purple-400/20 bg-purple-400/5 rounded-lg p-4">
+                          <BarChart3 className="w-8 h-8 mx-auto mb-2 text-purple-400" />
+                          <h4 className="font-medium text-purple-400 mb-2">Most Viewed</h4>
+                          <p className="text-sm text-gray-400">Tokens with highest engagement</p>
+                        </div>
+                        <div className="border border-electric-blue/20 bg-electric-blue/5 rounded-lg p-4">
+                          <Rocket className="w-8 h-8 mx-auto mb-2 text-electric-blue" />
+                          <h4 className="font-medium text-electric-blue mb-2">Viral Growth</h4>
+                          <p className="text-sm text-gray-400">Fastest spreading messages</p>
+                        </div>
+                        <div className="border border-electric-green/20 bg-electric-green/5 rounded-lg p-4">
+                          <Trophy className="w-8 h-8 mx-auto mb-2 text-electric-green" />
+                          <h4 className="font-medium text-electric-green mb-2">High Value</h4>
+                          <p className="text-sm text-gray-400">Most valuable redemptions</p>
+                        </div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+            </Tabs>
           </TabsContent>
         </Tabs>
       </div>

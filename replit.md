@@ -46,6 +46,7 @@ Priority focus: Initial release strategy focusing on coin minting as the core en
   - Secondary: Dashboard, Enterprise
   - Chat moved to dashboard access (removed from main navigation)
   - Campaign Builder integrated with Create workflow
+  - Explore functionality moved as tab under Info page for better information organization
 
 ## System Architecture
 
