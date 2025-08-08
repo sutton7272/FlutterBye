@@ -392,7 +392,7 @@ export default function Mint({ tokenType }: MintProps = {}) {
     <div className="min-h-screen pt-16 pb-8">
       <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-6">
         <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold mb-4 text-gradient">Token Creation Center</h1>
+          <h1 className="text-4xl font-bold mb-4 text-gradient">Flutterbye Message Creation Center</h1>
           <p className="text-xl text-muted-foreground">Create individual tokens or limited edition collections</p>
         </div>
 
