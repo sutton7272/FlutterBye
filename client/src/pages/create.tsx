@@ -107,17 +107,17 @@ export default function Create() {
           <h1 className="text-4xl font-bold bg-gradient-to-r from-electric-blue to-electric-green bg-clip-text text-transparent">
             Create Message Tokens
           </h1>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+          <p className="text-lg text-gray-200 max-w-2xl mx-auto leading-relaxed">
             Create 27-character message tokens with redeemable value - perfect for digital greeting cards or targeted crypto marketing
           </p>
           <div className="flex items-center justify-center gap-4 mt-6">
-            <Badge variant="outline" className="text-electric-blue border-electric-blue">
+            <Badge variant="outline" className="text-electric-blue border-electric-blue bg-electric-blue/10">
               27 Characters Max
             </Badge>
-            <Badge variant="outline" className="text-electric-green border-electric-green">
+            <Badge variant="outline" className="text-electric-green border-electric-green bg-electric-green/10">
               Redeemable Value
             </Badge>
-            <Badge variant="outline" className="text-purple-400 border-purple-400">
+            <Badge variant="outline" className="text-purple-400 border-purple-400 bg-purple-400/10">
               FlutterAI Targeting
             </Badge>
           </div>
@@ -142,10 +142,10 @@ export default function Create() {
                           <option.icon className={`h-4 w-4 text-${option.color}`} />
                         </div>
                         <div>
-                          <h3 className="font-semibold text-sm group-hover:text-electric-blue transition-colors">
+                          <h3 className="font-semibold text-sm text-white group-hover:text-electric-blue transition-colors">
                             {option.title}
                           </h3>
-                          <p className="text-xs text-muted-foreground">{option.description}</p>
+                          <p className="text-xs text-gray-300">{option.description}</p>
                         </div>
                       </div>
                       <div className="flex items-center gap-2">
