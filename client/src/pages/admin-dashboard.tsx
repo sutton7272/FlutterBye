@@ -10,7 +10,9 @@ import {
   Zap, 
   Shield,
   LogOut,
-  Wallet
+  Wallet,
+  Target,
+  Wrench
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
@@ -71,26 +73,79 @@ export default function AdminDashboard() {
         "Performance Monitoring",
         "Security Controls"
       ]
+    },
+    {
+      id: "marketing",
+      title: "Marketing and Social Media",
+      description: "Social media management, campaign analytics, and viral growth tools",
+      icon: Target,
+      route: "/admin/marketing",
+      color: "electric-blue",
+      features: [
+        "Campaign Management",
+        "Social Media Analytics",
+        "Viral Growth Tracking",
+        "Engagement Metrics"
+      ]
+    },
+    {
+      id: "system",
+      title: "System Tools",
+      description: "System monitoring, maintenance tools, and technical administration",
+      icon: Wrench,
+      route: "/admin/system",
+      color: "electric-green",
+      features: [
+        "System Monitoring",
+        "Database Management",
+        "Log Analysis",
+        "Maintenance Tools"
+      ]
     }
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
-      {/* Background Effects */}
-      <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute -top-40 -right-40 w-80 h-80 bg-electric-blue/20 rounded-full blur-3xl"></div>
-        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-electric-green/20 rounded-full blur-3xl"></div>
+    <div className="min-h-screen relative overflow-hidden">
+      {/* Animated Circuit Background */}
+      <div className="absolute inset-0 bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
+        {/* Circuit Pattern Overlay */}
+        <div className="absolute inset-0 opacity-20">
+          <div className="absolute top-20 left-20 w-64 h-64 border border-electric-blue/30 rounded-lg animate-pulse-slow" />
+          <div className="absolute top-40 right-32 w-32 h-32 border border-electric-green/30 rounded-full animate-ping" style={{ animationDuration: '3s' }} />
+          <div className="absolute bottom-32 left-1/3 w-48 h-48 border border-electric-blue/20 rounded-lg rotate-45 animate-spin-slow" />
+          <div className="absolute top-1/2 right-20 w-40 h-40 border border-electric-green/25 rounded-full animate-pulse-slow" />
+          <div className="absolute bottom-20 right-1/3 w-28 h-28 border border-electric-blue/25 rounded-lg rotate-12 animate-pulse-slow" />
+        </div>
+        
+        {/* Animated Electrical Lines */}
+        <div className="absolute inset-0">
+          <div className="absolute top-1/4 left-0 w-full h-px bg-gradient-to-r from-transparent via-electric-blue/50 to-transparent animate-pulse" />
+          <div className="absolute top-3/4 left-0 w-full h-px bg-gradient-to-r from-transparent via-electric-green/50 to-transparent animate-pulse" style={{ animationDelay: '1s' }} />
+          <div className="absolute top-0 left-1/3 w-px h-full bg-gradient-to-b from-transparent via-electric-blue/30 to-transparent animate-pulse" style={{ animationDelay: '2s' }} />
+          <div className="absolute top-0 right-1/4 w-px h-full bg-gradient-to-b from-transparent via-electric-green/30 to-transparent animate-pulse" style={{ animationDelay: '0.5s' }} />
+        </div>
+        
+        {/* Background Glow Effects */}
+        <div className="absolute inset-0 overflow-hidden">
+          <div className="absolute -top-40 -right-40 w-80 h-80 bg-electric-blue/20 rounded-full blur-3xl animate-pulse-slow"></div>
+          <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-electric-green/20 rounded-full blur-3xl animate-pulse-slow" style={{ animationDelay: '1.5s' }}></div>
+          <div className="absolute top-1/2 -left-20 w-60 h-60 bg-electric-blue/15 rounded-full blur-2xl animate-pulse-slow" style={{ animationDelay: '2.5s' }}></div>
+          <div className="absolute bottom-1/4 right-10 w-40 h-40 bg-electric-green/15 rounded-full blur-xl animate-pulse-slow" style={{ animationDelay: '1s' }}></div>
+        </div>
       </div>
 
       {/* Header */}
-      <div className="relative z-10 p-6 border-b border-slate-800/50">
+      <div className="relative z-10 p-6 border-b border-electric-blue/30 backdrop-blur-sm bg-slate-950/50">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <div className="w-12 h-12 modern-gradient rounded-xl flex items-center justify-center">
-              <Shield className="w-6 h-6 text-white" />
+            <div className="p-3 bg-electric-blue/20 rounded-full border-2 border-electric-blue/50 relative">
+              <div className="absolute inset-0 bg-electric-blue/10 rounded-full animate-ping" />
+              <Shield className="w-8 h-8 text-electric-blue relative z-10" />
             </div>
             <div>
-              <h1 className="text-2xl font-bold text-white">Global Admin Dashboard</h1>
+              <h1 className="text-3xl font-bold bg-gradient-to-r from-electric-blue to-electric-green bg-clip-text text-transparent">
+                Global Admin Dashboard
+              </h1>
               <p className="text-text-secondary">Flutterbye Administration Center</p>
             </div>
           </div>
@@ -126,20 +181,25 @@ export default function AdminDashboard() {
         <div className="max-w-7xl mx-auto">
           {/* Welcome Section */}
           <div className="mb-8">
-            <Card className="glassmorphism border-electric-blue/30">
-              <CardContent className="p-6">
+            <Card className="relative bg-slate-800/40 backdrop-blur-sm border-2 border-electric-blue/30 shadow-2xl overflow-hidden">
+              {/* Animated Card Border */}
+              <div className="absolute inset-0 bg-gradient-to-r from-electric-blue/20 via-electric-green/10 to-electric-blue/20 opacity-50 animate-pulse" />
+              <div className="absolute inset-[2px] bg-slate-800/90 rounded-lg" />
+              
+              <CardContent className="relative p-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <h2 className="text-xl font-semibold text-white mb-2">
+                    <h2 className="text-xl font-semibold bg-gradient-to-r from-electric-blue to-electric-green bg-clip-text text-transparent mb-2">
                       Welcome to Admin Control Center
                     </h2>
                     <p className="text-text-secondary">
                       Manage all aspects of the Flutterbye platform from this central dashboard
                     </p>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <Zap className="w-5 h-5 text-electric-blue" />
-                    <span className="text-sm text-electric-blue font-medium">System Online</span>
+                  <div className="flex items-center gap-2 p-2 bg-electric-blue/20 rounded-lg border border-electric-blue/50 relative">
+                    <div className="absolute inset-0 bg-electric-blue/10 rounded-lg animate-ping" />
+                    <Zap className="w-5 h-5 text-electric-blue relative z-10" />
+                    <span className="text-sm text-electric-blue font-medium relative z-10">System Online</span>
                   </div>
                 </div>
               </CardContent>
@@ -155,25 +215,32 @@ export default function AdminDashboard() {
               const buttonGradient = card.color === "electric-blue" ? "bg-gradient-to-r from-electric-blue to-blue-500" : "bg-gradient-to-r from-electric-green to-green-500";
               
               return (
-                <Card key={card.id} className={`glassmorphism ${borderColor} hover:border-opacity-50 transition-all duration-300 group`}>
-                  <CardHeader className="pb-4">
+                <Card key={card.id} className={`relative bg-slate-800/40 backdrop-blur-sm border-2 ${borderColor} shadow-2xl overflow-hidden hover:border-opacity-70 transition-all duration-500 group`}>
+                  {/* Animated Card Border */}
+                  <div className={`absolute inset-0 bg-gradient-to-r ${card.color === "electric-blue" ? "from-electric-blue/20 via-electric-green/10 to-electric-blue/20" : "from-electric-green/20 via-electric-blue/10 to-electric-green/20"} opacity-50 animate-pulse`} />
+                  <div className="absolute inset-[2px] bg-slate-800/90 rounded-lg" />
+                  
+                  <CardHeader className="relative pb-4">
                     <div className="flex items-center gap-4">
-                      <div className={`w-12 h-12 ${buttonGradient} rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300`}>
-                        <IconComponent className="w-6 h-6 text-white" />
+                      <div className={`w-12 h-12 bg-${card.color}/20 rounded-xl flex items-center justify-center border-2 border-${card.color}/50 relative group-hover:scale-110 transition-transform duration-300`}>
+                        <div className={`absolute inset-0 bg-${card.color}/10 rounded-xl animate-ping`} />
+                        <IconComponent className={`w-6 h-6 ${iconColor} relative z-10`} />
                       </div>
                       <div>
-                        <CardTitle className="text-white text-lg">{card.title}</CardTitle>
+                        <CardTitle className={`bg-gradient-to-r ${card.color === "electric-blue" ? "from-electric-blue to-blue-400" : "from-electric-green to-green-400"} bg-clip-text text-transparent text-lg font-bold`}>
+                          {card.title}
+                        </CardTitle>
                         <p className="text-text-secondary text-sm mt-1">{card.description}</p>
                       </div>
                     </div>
                   </CardHeader>
 
-                  <CardContent className="space-y-4">
+                  <CardContent className="relative space-y-4">
                     {/* Features List */}
                     <div className="space-y-2">
                       {card.features.map((feature, index) => (
                         <div key={index} className="flex items-center gap-2">
-                          <div className={`w-1.5 h-1.5 rounded-full bg-gradient-to-r ${card.color === "electric-blue" ? "from-electric-blue to-blue-400" : "from-electric-green to-green-400"}`}></div>
+                          <div className={`w-1.5 h-1.5 rounded-full bg-gradient-to-r ${card.color === "electric-blue" ? "from-electric-blue to-blue-400" : "from-electric-green to-green-400"} animate-pulse`}></div>
                           <span className="text-sm text-slate-300">{feature}</span>
                         </div>
                       ))}
@@ -182,8 +249,9 @@ export default function AdminDashboard() {
                     {/* Action Button */}
                     <Button
                       onClick={() => setLocation(card.route)}
-                      className={`w-full ${buttonGradient} hover:opacity-90 transition-opacity duration-300`}
+                      className={`w-full ${buttonGradient} hover:opacity-90 transition-all duration-300 border-2 ${card.color === "electric-blue" ? "border-electric-blue/50 hover:border-electric-blue/70" : "border-electric-green/50 hover:border-electric-green/70"} relative overflow-hidden group`}
                     >
+                      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
                       Access {card.title}
                       <IconComponent className="w-4 h-4 ml-2" />
                     </Button>
@@ -195,10 +263,15 @@ export default function AdminDashboard() {
 
           {/* Quick Stats */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <Card className="glassmorphism border-slate-700/50">
-              <CardContent className="p-6">
+            <Card className="relative bg-slate-800/40 backdrop-blur-sm border-2 border-electric-blue/30 shadow-2xl overflow-hidden">
+              <div className="absolute inset-0 bg-gradient-to-r from-electric-blue/15 to-transparent opacity-50" />
+              <div className="absolute inset-[2px] bg-slate-800/90 rounded-lg" />
+              <CardContent className="relative p-6">
                 <div className="flex items-center gap-3">
-                  <Users className="w-8 h-8 text-electric-blue" />
+                  <div className="p-2 bg-electric-blue/20 rounded-lg border border-electric-blue/50 relative">
+                    <div className="absolute inset-0 bg-electric-blue/10 rounded-lg animate-ping" />
+                    <Users className="w-8 h-8 text-electric-blue relative z-10" />
+                  </div>
                   <div>
                     <p className="text-text-secondary text-sm">Platform Users</p>
                     <p className="text-2xl font-bold text-white">2,847</p>
@@ -207,10 +280,15 @@ export default function AdminDashboard() {
               </CardContent>
             </Card>
 
-            <Card className="glassmorphism border-slate-700/50">
-              <CardContent className="p-6">
+            <Card className="relative bg-slate-800/40 backdrop-blur-sm border-2 border-electric-green/30 shadow-2xl overflow-hidden">
+              <div className="absolute inset-0 bg-gradient-to-r from-electric-green/15 to-transparent opacity-50" />
+              <div className="absolute inset-[2px] bg-slate-800/90 rounded-lg" />
+              <CardContent className="relative p-6">
                 <div className="flex items-center gap-3">
-                  <BarChart3 className="w-8 h-8 text-electric-green" />
+                  <div className="p-2 bg-electric-green/20 rounded-lg border border-electric-green/50 relative">
+                    <div className="absolute inset-0 bg-electric-green/10 rounded-lg animate-ping" />
+                    <BarChart3 className="w-8 h-8 text-electric-green relative z-10" />
+                  </div>
                   <div>
                     <p className="text-text-secondary text-sm">Monthly Revenue</p>
                     <p className="text-2xl font-bold text-white">$47.2K</p>
@@ -219,10 +297,15 @@ export default function AdminDashboard() {
               </CardContent>
             </Card>
 
-            <Card className="glassmorphism border-slate-700/50">
-              <CardContent className="p-6">
+            <Card className="relative bg-slate-800/40 backdrop-blur-sm border-2 border-orange-400/30 shadow-2xl overflow-hidden">
+              <div className="absolute inset-0 bg-gradient-to-r from-orange-400/15 to-transparent opacity-50" />
+              <div className="absolute inset-[2px] bg-slate-800/90 rounded-lg" />
+              <CardContent className="relative p-6">
                 <div className="flex items-center gap-3">
-                  <Shield className="w-8 h-8 text-orange-400" />
+                  <div className="p-2 bg-orange-400/20 rounded-lg border border-orange-400/50 relative">
+                    <div className="absolute inset-0 bg-orange-400/10 rounded-lg animate-ping" />
+                    <Shield className="w-8 h-8 text-orange-400 relative z-10" />
+                  </div>
                   <div>
                     <p className="text-text-secondary text-sm">Security Status</p>
                     <p className="text-2xl font-bold text-white">Secure</p>
