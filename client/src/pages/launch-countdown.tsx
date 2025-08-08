@@ -680,150 +680,105 @@ export default function LaunchCountdown() {
                 )}
               </CardContent>
             </Card>
+
+            {/* Join Thousands of Early Adopters */}
+            <Card className="electric-frame mt-4">
+              <CardHeader>
+                <CardTitle className="text-gradient flex items-center gap-2 text-lg">
+                  <Award className="w-5 h-5" />
+                  Join Thousands of Early Adopters
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {/* Statistics */}
+                <div className="grid grid-cols-3 gap-2 text-center">
+                  <div className="space-y-1">
+                    <div className="text-lg font-bold text-cyan-400 transition-all duration-500">
+                      {signupCount.toLocaleString()}
+                    </div>
+                    <div className="text-xs text-muted-foreground">Early Access Signups</div>
+                  </div>
+                  <div className="space-y-1">
+                    <div className="text-lg font-bold text-green-400">500+</div>
+                    <div className="text-xs text-muted-foreground">Beta Testers</div>
+                  </div>
+                  <div className="space-y-1">
+                    <div className="text-lg font-bold text-purple-400">98%</div>
+                    <div className="text-xs text-muted-foreground">Satisfaction Rate</div>
+                  </div>
+                </div>
+
+                {/* Testimonials - Condensed */}
+                <div className="space-y-3">
+                  <div className="bg-muted/10 border border-muted/20 rounded-lg p-3">
+                    <div className="flex items-start gap-2">
+                      <Quote className="w-4 h-4 text-blue-400 mt-1 flex-shrink-0" />
+                      <div>
+                        <p className="text-xs text-muted-foreground mb-1">
+                          "Flutterbye revolutionizes messaging and value. Brilliant concept!"
+                        </p>
+                        <div className="flex items-center gap-2">
+                          <div className="w-4 h-4 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full"></div>
+                          <span className="text-xs font-medium">Sarah Chen</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="bg-muted/10 border border-muted/20 rounded-lg p-3">
+                    <div className="flex items-start gap-2">
+                      <Quote className="w-4 h-4 text-green-400 mt-1 flex-shrink-0" />
+                      <div>
+                        <p className="text-xs text-muted-foreground mb-1">
+                          "Multi-currency support and staking rewards are game-changing."
+                        </p>
+                        <div className="flex items-center gap-2">
+                          <div className="w-4 h-4 bg-gradient-to-r from-green-500 to-cyan-500 rounded-full"></div>
+                          <span className="text-xs font-medium">Alex Rodriguez</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Trust Indicators - Compact */}
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2">
+                    <Shield className="w-4 h-4 text-green-400" />
+                    <span className="text-xs">Audited smart contracts by CertiK</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <TrendingUp className="w-4 h-4 text-blue-400" />
+                    <span className="text-xs">Backed by leading Solana funds</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Award className="w-4 h-4 text-purple-400" />
+                    <span className="text-xs">Winner of Solana Global Hackathon 2024</span>
+                  </div>
+                </div>
+
+                {/* Urgency Elements - Compact */}
+                <div className="bg-gradient-to-r from-orange-500/10 to-red-500/10 border border-orange-500/20 rounded-lg p-3">
+                  <div className="flex items-center gap-2 mb-2">
+                    <div className="w-2 h-2 bg-orange-400 rounded-full animate-pulse"></div>
+                    <h4 className="font-medium text-orange-400 text-sm">Limited Early Access</h4>
+                  </div>
+                  <p className="text-xs text-muted-foreground mb-2">
+                    Only <span className="text-orange-400 font-medium">2,153 spots</span> remaining for exclusive benefits.
+                  </p>
+                  <div className="w-full bg-muted/20 rounded-full h-1.5">
+                    <div className="bg-gradient-to-r from-orange-400 to-red-400 h-1.5 rounded-full" style={{ width: '83.6%' }}></div>
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-1">83.6% of spots claimed</p>
+                </div>
+              </CardContent>
+            </Card>
           </div>
         </div>
 
         {/* Single Column Content Below Three Columns */}
         <div className="max-w-6xl mx-auto">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            {/* Social Proof Elements */}
-            <Card className="electric-frame">
-              <CardHeader>
-                <CardTitle className="text-gradient flex items-center gap-2">
-                  <Award className="w-6 h-6" />
-                  Join Thousands of Early Adopters
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-6">
-              {/* Statistics */}
-              <div className="grid grid-cols-3 gap-4 text-center">
-                <div className="space-y-2">
-                  <div className="text-2xl font-bold text-cyan-400 transition-all duration-500">
-                    {signupCount.toLocaleString()}
-                  </div>
-                  <div className="text-xs text-muted-foreground">Early Access Signups</div>
-                </div>
-                <div className="space-y-2">
-                  <div className="text-2xl font-bold text-green-400">500+</div>
-                  <div className="text-xs text-muted-foreground">Beta Testers</div>
-                </div>
-                <div className="space-y-2">
-                  <div className="text-2xl font-bold text-purple-400">98%</div>
-                  <div className="text-xs text-muted-foreground">Satisfaction Rate</div>
-                </div>
-              </div>
-
-              {/* Testimonials */}
-              <div className="space-y-4">
-                <div className="bg-muted/10 border border-muted/20 rounded-lg p-4">
-                  <div className="flex items-start gap-3">
-                    <Quote className="w-5 h-5 text-blue-400 mt-1 flex-shrink-0" />
-                    <div>
-                      <p className="text-sm text-muted-foreground mb-2">
-                        "Flutterbye revolutionizes how we think about messaging and value. The tokenized message concept is brilliant!"
-                      </p>
-                      <div className="flex items-center gap-2">
-                        <div className="w-6 h-6 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full"></div>
-                        <span className="text-xs font-medium">Sarah Chen</span>
-                        <span className="text-xs text-muted-foreground">Blockchain Developer</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="bg-muted/10 border border-muted/20 rounded-lg p-4">
-                  <div className="flex items-start gap-3">
-                    <Quote className="w-5 h-5 text-green-400 mt-1 flex-shrink-0" />
-                    <div>
-                      <p className="text-sm text-muted-foreground mb-2">
-                        "Been using the beta for 2 weeks. The multi-currency support and staking rewards are game-changing."
-                      </p>
-                      <div className="flex items-center gap-2">
-                        <div className="w-6 h-6 bg-gradient-to-r from-green-500 to-cyan-500 rounded-full"></div>
-                        <span className="text-xs font-medium">Alex Rodriguez</span>
-                        <span className="text-xs text-muted-foreground">DeFi Investor</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="bg-muted/10 border border-muted/20 rounded-lg p-4">
-                  <div className="flex items-start gap-3">
-                    <Quote className="w-5 h-5 text-purple-400 mt-1 flex-shrink-0" />
-                    <div>
-                      <p className="text-sm text-muted-foreground mb-2">
-                        "Finally, a platform that combines messaging with real utility. The enterprise features are exactly what we needed."
-                      </p>
-                      <div className="flex items-center gap-2">
-                        <div className="w-6 h-6 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full"></div>
-                        <span className="text-xs font-medium">Michael Kim</span>
-                        <span className="text-xs text-muted-foreground">Marketing Director</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Trust Indicators */}
-              <div className="space-y-3">
-                <div className="flex items-center gap-3">
-                  <Shield className="w-5 h-5 text-green-400" />
-                  <span className="text-sm">Audited smart contracts by CertiK</span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <TrendingUp className="w-5 h-5 text-blue-400" />
-                  <span className="text-sm">Backed by leading Solana ecosystem funds</span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <Award className="w-5 h-5 text-purple-400" />
-                  <span className="text-sm">Winner of Solana Global Hackathon 2024</span>
-                </div>
-              </div>
-
-              {/* Recent Activity */}
-              <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-4">
-                <h4 className="font-medium text-blue-400 mb-3 flex items-center gap-2">
-                  <Users className="w-4 h-4" />
-                  Recent Activity
-                  <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-                </h4>
-                <div className="space-y-2 text-sm">
-                  <div className="flex justify-between items-center animate-fade-in">
-                    <span className="text-muted-foreground">🔥 crypto_whale_2024 joined</span>
-                    <span className="text-xs text-muted-foreground">2 min ago</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-muted-foreground">🚀 defi_builder signed up</span>
-                    <span className="text-xs text-muted-foreground">5 min ago</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-muted-foreground">💎 solana_dev joined waitlist</span>
-                    <span className="text-xs text-muted-foreground">8 min ago</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-muted-foreground">⚡ web3_investor signed up</span>
-                    <span className="text-xs text-muted-foreground">12 min ago</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Urgency Elements */}
-              <div className="bg-gradient-to-r from-orange-500/10 to-red-500/10 border border-orange-500/20 rounded-lg p-4">
-                <div className="flex items-center gap-2 mb-2">
-                  <div className="w-3 h-3 bg-orange-400 rounded-full animate-pulse"></div>
-                  <h4 className="font-medium text-orange-400">Limited Early Access</h4>
-                </div>
-                <p className="text-sm text-muted-foreground mb-3">
-                  Only <span className="text-orange-400 font-medium">2,153 spots</span> remaining for exclusive early access benefits and FLBY token airdrops.
-                </p>
-                <div className="w-full bg-muted/20 rounded-full h-2">
-                  <div className="bg-gradient-to-r from-orange-400 to-red-400 h-2 rounded-full" style={{ width: '83.6%' }}></div>
-                </div>
-                <p className="text-xs text-muted-foreground mt-2">83.6% of early access spots claimed</p>
-              </div>
-            </CardContent>
-          </Card>
-
+          <div className="grid grid-cols-1 gap-8">
 
           </div>
         </div>
