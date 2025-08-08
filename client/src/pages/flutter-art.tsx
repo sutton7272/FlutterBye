@@ -45,6 +45,7 @@ import {
 import { Switch } from "@/components/ui/switch";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Separator } from "@/components/ui/separator";
+import { ContextualChatButton } from "@/components/contextual-chat-button";
 
 
 export default function FlutterArt() {
@@ -1011,6 +1012,10 @@ export default function FlutterArt() {
         </Card>
         )}
 
+        {/* Contextual Chat Button */}
+        <div className="fixed bottom-6 right-6 z-50">
+          <ContextualChatButton context="flutterart" />
+        </div>
       </div>
     </div>
   );

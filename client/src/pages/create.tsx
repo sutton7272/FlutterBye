@@ -303,6 +303,11 @@ export default function Create() {
             </Card>
           </TabsContent>
         </Tabs>
+
+        {/* Contextual Chat Button */}
+        <div className="fixed bottom-6 right-6 z-50">
+          <ContextualChatButton context="flutterbyemsg" />
+        </div>
       </div>
     </div>
   );

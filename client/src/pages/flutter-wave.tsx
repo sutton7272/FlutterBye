@@ -299,6 +299,11 @@ export default function FlutterWave() {
             </CardContent>
           </Card>
         </div>
+
+        {/* Contextual Chat Button */}
+        <div className="fixed bottom-6 right-6 z-50">
+          <ContextualChatButton context="flutterwave" />
+        </div>
       </div>
     </div>
   );
