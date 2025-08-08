@@ -19,7 +19,6 @@ export default function Navbar() {
     { href: "/create", label: "FlutterbyeMSG", icon: MessageSquare, description: "27-character message tokens with value", featureId: "mint", priority: true },
     { href: "/flutter-art", label: "FlutterArt", icon: Sparkles, description: "NFT message tokens & visual messages", featureId: "flutter_art", priority: true },
     { href: "/flutter-wave", label: "FlutterWave", icon: Zap, description: "SMS-to-blockchain emotional tokens", featureId: "flutter_wave", priority: true },
-    { href: "/flutterai", label: "FlutterAI", icon: Brain, description: "Wallet intelligence & targeting", special: true, featureId: "flutterai", priority: true },
     { href: "/redeem", label: "Redeem", icon: Gift, description: "Discover & redeem message tokens", featureId: "marketplace", priority: true },
     { href: "/info", label: "Info", icon: HelpCircle, description: "Platform info, tutorials & analytics", featureId: "info", priority: true },
     { href: "/enterprise-campaigns", label: "Marketing", icon: Target, description: "Enterprise marketing campaigns", featureId: "enterprise" },
@@ -36,7 +35,7 @@ export default function Navbar() {
           return true;
         }
         // Show core features by default
-        if (["home", "mint", "marketplace", "flutterai", "flutter_wave", "flutter_art", "chat", "dashboard", "info"].includes(item.featureId)) {
+        if (["home", "mint", "marketplace", "flutter_wave", "flutter_art", "chat", "dashboard", "info"].includes(item.featureId)) {
           return true;
         }
         // If no featureId is specified, show the item by default
