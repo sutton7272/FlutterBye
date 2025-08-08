@@ -64,17 +64,17 @@ export default function AdminDashboard() {
       ]
     },
     {
-      id: "unified",
-      title: "Unified Admin Dashboard", 
-      description: "Complete platform administration, analytics, and system management",
-      icon: Settings,
-      route: "/admin/dashboard-detailed",
+      id: "analytics",
+      title: "Analytics & Monitoring", 
+      description: "Real-time platform analytics, performance metrics, and system monitoring",
+      icon: BarChart3,
+      route: "/monitoring-dashboard",
       color: "electric-green",
       features: [
-        "User Management",
-        "Revenue Analytics",
-        "Performance Monitoring",
-        "Security Controls"
+        "Real-time Metrics",
+        "Performance Analytics",
+        "System Health Monitoring",
+        "Usage Statistics"
       ]
     },
     {
