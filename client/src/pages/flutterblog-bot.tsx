@@ -12,12 +12,14 @@ import { Progress } from "@/components/ui/progress";
 import { useToast } from "@/hooks/use-toast";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
-import { Bot, Calendar, Clock, FileText, Globe, BarChart3, Settings, Zap, Target, Sparkles, TrendingUp, Users, Brain, ArrowLeft, Wand2 } from "lucide-react";
+import { Bot, Calendar, Clock, FileText, Globe, BarChart3, Settings, Zap, Target, Sparkles, TrendingUp, Users, Brain, ArrowLeft, Wand2, Search, BookOpen, Copy, Download, Star, Eye, Edit } from "lucide-react";
 
 export default function FlutterBlogBot() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [isGenerating, setIsGenerating] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedContent, setSelectedContent] = useState<any>(null);
 
   // Blog generation form state
   const [blogForm, setBlogForm] = useState({
@@ -156,6 +158,44 @@ export default function FlutterBlogBot() {
         description: error.message || "Failed to create schedule",
         variant: "destructive",
       });
+    },
+  });
+
+  // Content operations mutations
+  const copyContentMutation = useMutation({
+    mutationFn: async (content: any) => {
+      // Copy selected content to a new blog form
+      setBlogForm({
+        topic: content.title,
+        tone: content.tone || "professional",
+        targetAudience: content.targetAudience || "general",
+        contentType: content.contentType || "blog",
+        keywords: content.keywords?.join(', ') || "",
+        wordCount: 1000,
+        includeFlutterByeIntegration: true
+      });
+      return content;
+    },
+    onSuccess: () => {
+      toast({
+        title: "Content Copied",
+        description: "Content has been copied to the generation form for reuse.",
+      });
+    },
+  });
+
+  const markFavoriteMutation = useMutation({
+    mutationFn: async (postId: string) => {
+      return await apiRequest("PATCH", `/api/blog/posts/${postId}`, {
+        isFavorite: true
+      });
+    },
+    onSuccess: () => {
+      toast({
+        title: "Added to Favorites",
+        description: "Content has been marked as favorite.",
+      });
+      queryClient.invalidateQueries({ queryKey: ["/api/blog/posts"] });
     },
   });
 
@@ -322,10 +362,14 @@ export default function FlutterBlogBot() {
         </div>
 
         <Tabs defaultValue="generate" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4 bg-slate-800/50 border border-slate-700">
+          <TabsList className="grid w-full grid-cols-5 bg-slate-800/50 border border-slate-700">
             <TabsTrigger value="generate" className="flex items-center gap-2">
               <Sparkles className="h-4 w-4" />
               Generate
+            </TabsTrigger>
+            <TabsTrigger value="content" className="flex items-center gap-2">
+              <FileText className="h-4 w-4" />
+              Content Library
             </TabsTrigger>
             <TabsTrigger value="schedule" className="flex items-center gap-2">
               <Calendar className="h-4 w-4" />
@@ -477,6 +521,245 @@ export default function FlutterBlogBot() {
                 </Button>
               </CardContent>
             </Card>
+          </TabsContent>
+
+          {/* Content Library Tab */}
+          <TabsContent value="content" className="space-y-6">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              {/* Search and Filters */}
+              <div className="lg:col-span-3">
+                <Card className="bg-slate-800/50 border-slate-700">
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2 text-cyan-400">
+                      <BookOpen className="h-5 w-5" />
+                      Content Library
+                    </CardTitle>
+                    <CardDescription>
+                      Search, save, and reuse your AI-generated content
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="flex gap-4 mb-6">
+                      <div className="relative flex-1">
+                        <Search className="absolute left-3 top-3 h-4 w-4 text-slate-400" />
+                        <Input
+                          placeholder="Search content by title, keywords, or topic..."
+                          value={searchQuery}
+                          onChange={(e) => setSearchQuery(e.target.value)}
+                          className="pl-10 bg-slate-900/50 border-slate-600"
+                        />
+                      </div>
+                      <Button
+                        variant="outline"
+                        className="bg-slate-700 border-slate-600 text-slate-300 hover:bg-slate-600"
+                      >
+                        <Search className="h-4 w-4 mr-2" />
+                        Search
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+
+              {/* Content Grid */}
+              <div className="lg:col-span-3">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {blogPosts
+                    .filter(post => 
+                      !searchQuery || 
+                      post.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                      post.content?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                      post.keywords?.some((k: string) => k.toLowerCase().includes(searchQuery.toLowerCase()))
+                    )
+                    .map((post: any) => (
+                    <Card key={post.id} className="bg-slate-800/50 border-slate-700 hover:border-cyan-500 transition-colors">
+                      <CardHeader className="pb-3">
+                        <div className="flex items-start justify-between">
+                          <div className="flex-1">
+                            <CardTitle className="text-sm font-medium text-cyan-400 line-clamp-2">
+                              {post.title}
+                            </CardTitle>
+                            <div className="flex items-center gap-2 mt-2">
+                              <Badge variant="outline" className="text-xs border-slate-600 text-slate-400">
+                                {post.tone}
+                              </Badge>
+                              <Badge variant="outline" className="text-xs border-slate-600 text-slate-400">
+                                {post.contentType}
+                              </Badge>
+                            </div>
+                          </div>
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={() => markFavoriteMutation.mutate(post.id)}
+                            className="text-slate-400 hover:text-yellow-400"
+                          >
+                            <Star className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </CardHeader>
+                      <CardContent className="pt-0">
+                        <p className="text-xs text-slate-400 line-clamp-3 mb-4">
+                          {post.excerpt || post.content?.substring(0, 120) + '...'}
+                        </p>
+                        
+                        {/* Content Stats */}
+                        <div className="grid grid-cols-3 gap-2 mb-4 text-center">
+                          <div className="bg-slate-900/50 rounded p-2">
+                            <div className="text-xs font-semibold text-green-400">{post.seoScore || 85}</div>
+                            <div className="text-xs text-slate-500">SEO Score</div>
+                          </div>
+                          <div className="bg-slate-900/50 rounded p-2">
+                            <div className="text-xs font-semibold text-blue-400">{post.readabilityScore || 78}</div>
+                            <div className="text-xs text-slate-500">Readability</div>
+                          </div>
+                          <div className="bg-slate-900/50 rounded p-2">
+                            <div className="text-xs font-semibold text-purple-400">{post.engagementPotential || 82}</div>
+                            <div className="text-xs text-slate-500">Engagement</div>
+                          </div>
+                        </div>
+
+                        {/* Keywords */}
+                        {post.keywords && post.keywords.length > 0 && (
+                          <div className="mb-4">
+                            <div className="text-xs text-slate-500 mb-1">Keywords:</div>
+                            <div className="flex flex-wrap gap-1">
+                              {post.keywords.slice(0, 3).map((keyword: string, index: number) => (
+                                <Badge key={index} variant="secondary" className="text-xs bg-slate-900 text-slate-400">
+                                  {keyword}
+                                </Badge>
+                              ))}
+                              {post.keywords.length > 3 && (
+                                <Badge variant="secondary" className="text-xs bg-slate-900 text-slate-400">
+                                  +{post.keywords.length - 3}
+                                </Badge>
+                              )}
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Action Buttons */}
+                        <div className="grid grid-cols-3 gap-2">
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => setSelectedContent(post)}
+                            className="text-xs bg-slate-700 border-slate-600 text-slate-300 hover:bg-slate-600"
+                          >
+                            <Eye className="h-3 w-3 mr-1" />
+                            View
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => copyContentMutation.mutate(post)}
+                            className="text-xs bg-slate-700 border-slate-600 text-slate-300 hover:bg-slate-600"
+                          >
+                            <Copy className="h-3 w-3 mr-1" />
+                            Reuse
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => {
+                              const content = `Title: ${post.title}\n\nContent:\n${post.content}`;
+                              navigator.clipboard.writeText(content);
+                              toast({
+                                title: "Content Copied",
+                                description: "Content has been copied to clipboard.",
+                              });
+                            }}
+                            className="text-xs bg-slate-700 border-slate-600 text-slate-300 hover:bg-slate-600"
+                          >
+                            <Download className="h-3 w-3 mr-1" />
+                            Export
+                          </Button>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+
+                {/* Empty State */}
+                {blogPosts.length === 0 && (
+                  <div className="text-center py-12">
+                    <FileText className="h-16 w-16 text-slate-600 mx-auto mb-4" />
+                    <h3 className="text-lg font-medium text-slate-400 mb-2">No Content Found</h3>
+                    <p className="text-slate-500 mb-4">Start by generating your first blog post using the Generate tab.</p>
+                    <Button
+                      onClick={() => window.location.hash = '#generate'}
+                      className="bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700"
+                    >
+                      <Sparkles className="h-4 w-4 mr-2" />
+                      Create Content
+                    </Button>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Content Preview Modal */}
+            {selectedContent && (
+              <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+                <Card className="bg-slate-800 border-slate-700 max-w-4xl w-full max-h-[80vh] overflow-y-auto">
+                  <CardHeader>
+                    <div className="flex items-center justify-between">
+                      <CardTitle className="text-cyan-400">{selectedContent.title}</CardTitle>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setSelectedContent(null)}
+                        className="text-slate-400 hover:text-white"
+                      >
+                        ✕
+                      </Button>
+                    </div>
+                    <div className="flex gap-2">
+                      <Badge variant="outline" className="border-slate-600 text-slate-400">
+                        {selectedContent.tone}
+                      </Badge>
+                      <Badge variant="outline" className="border-slate-600 text-slate-400">
+                        {selectedContent.contentType}
+                      </Badge>
+                      <Badge variant="outline" className="border-slate-600 text-slate-400">
+                        SEO: {selectedContent.seoScore || 85}
+                      </Badge>
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="prose prose-invert max-w-none">
+                      <div className="whitespace-pre-wrap text-slate-300">
+                        {selectedContent.content}
+                      </div>
+                    </div>
+                    <div className="flex gap-2 mt-6 pt-6 border-t border-slate-700">
+                      <Button
+                        onClick={() => copyContentMutation.mutate(selectedContent)}
+                        className="bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700"
+                      >
+                        <Edit className="h-4 w-4 mr-2" />
+                        Reuse This Content
+                      </Button>
+                      <Button
+                        variant="outline"
+                        onClick={() => {
+                          const content = `Title: ${selectedContent.title}\n\nContent:\n${selectedContent.content}`;
+                          navigator.clipboard.writeText(content);
+                          toast({
+                            title: "Content Copied",
+                            description: "Content has been copied to clipboard.",
+                          });
+                        }}
+                        className="border-slate-600 text-slate-300 hover:bg-slate-700"
+                      >
+                        <Copy className="h-4 w-4 mr-2" />
+                        Copy to Clipboard
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            )}
           </TabsContent>
 
           {/* Schedule Tab */}
