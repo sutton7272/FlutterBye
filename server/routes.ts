@@ -3,6 +3,7 @@ import { createServer, type Server } from "http";
 import { productionConfig } from "./production-config";
 import { mainNetService } from "./mainnet-config";
 import { flbyTokenMainNetService } from "./flby-token-mainnet";
+import { enterpriseWalletMainNetService } from "./enterprise-wallet-mainnet";
 import cors from 'cors';
 import { 
   globalRateLimit, 
@@ -8847,6 +8848,76 @@ export async function registerRoutes(app: Express): Promise<Server> {
         success: true,
         timestamp: new Date().toISOString(),
         discount
+      });
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        error: error.message,
+        timestamp: new Date().toISOString()
+      });
+    }
+  });
+
+  // Enterprise Wallet Management API - Phase 2
+  app.post("/api/enterprise/create-escrow-wallet", async (req, res) => {
+    try {
+      const { clientId, contractValue, requiredSignatures, authorities, escrowType, complianceLevel } = req.body;
+      
+      const config = {
+        walletId: `escrow-${Date.now()}`,
+        clientId,
+        contractValue,
+        requiredSignatures: requiredSignatures || 2,
+        authorities: authorities || [],
+        escrowType: escrowType || 'SOL',
+        releaseConditions: ['multi_signature_approval', 'compliance_verification'],
+        complianceLevel: complianceLevel || 'standard'
+      };
+
+      const result = await enterpriseWalletMainNetService.createEnterpriseEscrowWallet(config);
+      
+      res.json({
+        success: result.success,
+        timestamp: new Date().toISOString(),
+        wallet: result.success ? {
+          walletId: config.walletId,
+          walletAddress: result.walletAddress,
+          contractValue: config.contractValue,
+          escrowType: config.escrowType,
+          complianceLevel: config.complianceLevel
+        } : undefined,
+        error: result.error
+      });
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        error: error.message,
+        timestamp: new Date().toISOString()
+      });
+    }
+  });
+
+  // Enterprise Wallet Status API
+  app.get("/api/enterprise/wallet-status", (req, res) => {
+    try {
+      const status = enterpriseWalletMainNetService.getEnterpriseWalletsStatus();
+      
+      res.json({
+        success: true,
+        timestamp: new Date().toISOString(),
+        enterprise: {
+          totalWallets: status.totalWallets,
+          totalValue: status.totalValue,
+          activeContracts: status.activeContracts,
+          averageContractValue: status.averageContractValue,
+          tier: "Enterprise ($200K-$2M contracts)",
+          capabilities: [
+            "Multi-signature escrow",
+            "Compliance reporting", 
+            "Real-time monitoring",
+            "Automated fund release"
+          ]
+        }
       });
     } catch (error) {
       res.status(500).json({
