@@ -9452,7 +9452,104 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // =====================================
+  // Bundle 3: Advanced Analytics & Business Intelligence
+  // =====================================
+  
+  // Bundle 3 Analytics Dashboard (Separate namespace to avoid conflicts)
+  app.get('/api/bundle3/analytics/dashboard', async (req, res) => {
+    try {
+      const { analyticsService } = await import('./analytics-service.js');
+      const analytics = await analyticsService.generateAnalyticsDashboard();
+      
+      res.json({
+        success: true,
+        timestamp: new Date().toISOString(),
+        analytics,
+        platform: 'FlutterWave Analytics'
+      });
+    } catch (error) {
+      console.error('Analytics dashboard error:', error);
+      res.status(500).json({ 
+        success: false, 
+        error: 'Analytics generation failed',
+        timestamp: new Date().toISOString()
+      });
+    }
+  });
+
+  // Bundle 3 Business Intelligence Report
+  app.get('/api/bundle3/analytics/business-intelligence', async (req, res) => {
+    try {
+      const { analyticsService } = await import('./analytics-service.js');
+      const report = await analyticsService.generateBusinessIntelligenceReport();
+      
+      res.json({
+        success: true,
+        timestamp: new Date().toISOString(),
+        report,
+        platform: 'FlutterWave Business Intelligence'
+      });
+    } catch (error) {
+      console.error('Business intelligence error:', error);
+      res.status(500).json({ 
+        success: false, 
+        error: 'Business intelligence generation failed',
+        timestamp: new Date().toISOString()
+      });
+    }
+  });
+
+  // Bundle 3 Predictive Analytics
+  app.get('/api/bundle3/analytics/predictive', async (req, res) => {
+    try {
+      const { timeframe = '7d' } = req.query;
+      const { analyticsService } = await import('./analytics-service.js');
+      const predictions = await analyticsService.generatePredictiveAnalytics(timeframe as string);
+      
+      res.json({
+        success: true,
+        timestamp: new Date().toISOString(),
+        timeframe,
+        predictions,
+        platform: 'FlutterWave Predictive Analytics'
+      });
+    } catch (error) {
+      console.error('Predictive analytics error:', error);
+      res.status(500).json({ 
+        success: false, 
+        error: 'Predictive analytics failed',
+        timestamp: new Date().toISOString()
+      });
+    }
+  });
+
+  // Bundle 3 Real-time Analytics Update
+  app.post('/api/bundle3/analytics/update', async (req, res) => {
+    try {
+      const eventData = req.body;
+      const { analyticsService } = await import('./analytics-service.js');
+      await analyticsService.updateRealTimeMetrics(eventData);
+      
+      res.json({
+        success: true,
+        timestamp: new Date().toISOString(),
+        message: 'Analytics updated successfully',
+        platform: 'FlutterWave Real-time Analytics'
+      });
+    } catch (error) {
+      console.error('Real-time analytics update error:', error);
+      res.status(500).json({ 
+        success: false, 
+        error: 'Analytics update failed',
+        timestamp: new Date().toISOString()
+      });
+    }
+  });
+
+  // =====================================
   // Bundle 2: AI Enhancement Suite - Advanced AI SMS Processing
+  // =====================================
 
   // Quantum Emotion Analysis (127-Emotion Spectrum)
   app.post("/api/sms/quantum-emotion", async (req, res) => {
@@ -10318,6 +10415,104 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     }
   });
+
+  // =====================================
+  // Bundle 4: Automation & AI Orchestration
+  // =====================================
+  
+  // Automation Workflow Generator
+  app.post('/api/bundle4/automation/workflow', async (req, res) => {
+    try {
+      const { objective, constraints } = req.body;
+      const { automationService } = await import('./automation-service.js');
+      const workflow = await automationService.generateAutomationWorkflow(objective, constraints);
+      
+      res.json({
+        success: true,
+        timestamp: new Date().toISOString(),
+        workflow,
+        platform: 'FlutterWave Automation Engine'
+      });
+    } catch (error) {
+      console.error('Automation workflow error:', error);
+      res.status(500).json({ 
+        success: false, 
+        error: 'Automation workflow generation failed',
+        timestamp: new Date().toISOString()
+      });
+    }
+  });
+
+  // AI Task Orchestration
+  app.post('/api/bundle4/automation/orchestrate', async (req, res) => {
+    try {
+      const { tasks } = req.body;
+      const { automationService } = await import('./automation-service.js');
+      const orchestrationResult = await automationService.orchestrateAITasks(tasks || []);
+      
+      res.json({
+        success: true,
+        timestamp: new Date().toISOString(),
+        orchestration: orchestrationResult,
+        platform: 'FlutterWave AI Orchestration'
+      });
+    } catch (error) {
+      console.error('AI orchestration error:', error);
+      res.status(500).json({ 
+        success: false, 
+        error: 'AI orchestration failed',
+        timestamp: new Date().toISOString()
+      });
+    }
+  });
+
+  // Smart Campaign Generation
+  app.post('/api/bundle4/automation/smart-campaign', async (req, res) => {
+    try {
+      const { campaignObjective, targetMetrics } = req.body;
+      const { automationService } = await import('./automation-service.js');
+      const campaign = await automationService.generateSmartCampaign(campaignObjective, targetMetrics);
+      
+      res.json({
+        success: true,
+        timestamp: new Date().toISOString(),
+        campaign,
+        platform: 'FlutterWave Smart Campaign Engine'
+      });
+    } catch (error) {
+      console.error('Smart campaign error:', error);
+      res.status(500).json({ 
+        success: false, 
+        error: 'Smart campaign generation failed',
+        timestamp: new Date().toISOString()
+      });
+    }
+  });
+
+  // Automation Rule Execution
+  app.post('/api/bundle4/automation/execute-rules', async (req, res) => {
+    try {
+      const eventData = req.body;
+      const { automationService } = await import('./automation-service.js');
+      const execution = await automationService.executeAutomationRules(eventData);
+      
+      res.json({
+        success: true,
+        timestamp: new Date().toISOString(),
+        execution,
+        platform: 'FlutterWave Automation Rules Engine'
+      });
+    } catch (error) {
+      console.error('Automation rules execution error:', error);
+      res.status(500).json({ 
+        success: false, 
+        error: 'Automation rules execution failed',
+        timestamp: new Date().toISOString()
+      });
+    }
+  });
+
+  console.log('🤖 Bundle 4: Automation & AI Orchestration Engine ACTIVATED!');
 
   console.log('🎨 FlutterArt Advanced NFT API System Activated!');
   
