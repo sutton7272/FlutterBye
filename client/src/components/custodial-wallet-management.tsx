@@ -233,64 +233,64 @@ export function CustodialWalletManagement() {
 
       {/* Statistics Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-        <Card className="bg-dark-navy/80 backdrop-blur-sm border-electric-blue/30 shadow-lg">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-gray-300 flex items-center">
+        <Card className="bg-black/30 backdrop-blur-sm border-2 border-electric-blue/50 shadow-lg shadow-electric-blue/10">
+          <CardHeader className="pb-2 bg-black/20">
+            <CardTitle className="text-sm font-medium text-gray-200 flex items-center">
               <Wallet className="w-4 h-4 mr-2 text-electric-blue" />
               Total Wallets
             </CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="bg-black/15">
             <div className="text-2xl font-bold text-white">{statistics.totalWallets}</div>
           </CardContent>
         </Card>
 
-        <Card className="bg-dark-navy/80 backdrop-blur-sm border-electric-blue/30 shadow-lg">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-gray-300 flex items-center">
+        <Card className="bg-black/30 backdrop-blur-sm border-2 border-electric-blue/50 shadow-lg shadow-electric-blue/10">
+          <CardHeader className="pb-2 bg-black/20">
+            <CardTitle className="text-sm font-medium text-gray-200 flex items-center">
               <DollarSign className="w-4 h-4 mr-2 text-electric-green" />
               SOL Balance
             </CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="bg-black/15">
             <div className="text-2xl font-bold text-white">
               {statistics.totalBalance.SOL?.toFixed(4) || '0.0000'}
             </div>
           </CardContent>
         </Card>
 
-        <Card className="bg-dark-navy/80 backdrop-blur-sm border-electric-blue/30 shadow-lg">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-gray-300 flex items-center">
+        <Card className="bg-black/30 backdrop-blur-sm border-2 border-electric-blue/50 shadow-lg shadow-electric-blue/10">
+          <CardHeader className="pb-2 bg-black/20">
+            <CardTitle className="text-sm font-medium text-gray-200 flex items-center">
               <Activity className="w-4 h-4 mr-2 text-electric-blue" />
               Active Transactions
             </CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="bg-black/15">
             <div className="text-2xl font-bold text-white">{statistics.activeTransactions}</div>
           </CardContent>
         </Card>
 
-        <Card className="bg-dark-navy/80 backdrop-blur-sm border-electric-blue/30 shadow-lg">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-gray-300 flex items-center">
+        <Card className="bg-black/30 backdrop-blur-sm border-2 border-electric-blue/50 shadow-lg shadow-electric-blue/10">
+          <CardHeader className="pb-2 bg-black/20">
+            <CardTitle className="text-sm font-medium text-gray-200 flex items-center">
               <AlertTriangle className="w-4 h-4 mr-2 text-orange-400" />
               Security Alerts
             </CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="bg-black/15">
             <div className="text-2xl font-bold text-orange-400">{statistics.suspiciousActivities}</div>
           </CardContent>
         </Card>
 
-        <Card className="bg-dark-navy/80 backdrop-blur-sm border-electric-blue/30 shadow-lg">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-gray-300 flex items-center">
+        <Card className="bg-black/30 backdrop-blur-sm border-2 border-electric-blue/50 shadow-lg shadow-electric-blue/10">
+          <CardHeader className="pb-2 bg-black/20">
+            <CardTitle className="text-sm font-medium text-gray-200 flex items-center">
               <Shield className="w-4 h-4 mr-2 text-red-400" />
               Compliance Alerts
             </CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="bg-black/15">
             <div className="text-2xl font-bold text-red-400">{statistics.complianceAlerts}</div>
           </CardContent>
         </Card>
@@ -315,17 +315,17 @@ export function CustodialWalletManagement() {
 
         {/* Wallets Tab */}
         <TabsContent value="wallets" className="space-y-4">
-          <Card className="bg-dark-navy/80 backdrop-blur-sm border-electric-blue/30 shadow-lg">
-            <CardHeader className="bg-dark-navy/50 rounded-t-lg">
+          <Card className="bg-black/30 backdrop-blur-sm border-2 border-electric-blue/50 shadow-lg shadow-electric-blue/10">
+            <CardHeader className="bg-black/20 rounded-t-lg">
               <CardTitle className="text-white flex items-center">
                 <Wallet className="w-5 h-5 mr-2 text-electric-blue" />
                 Custodial Wallets
               </CardTitle>
-              <CardDescription className="text-gray-300">
+              <CardDescription className="text-gray-200">
                 Manage secure custodial wallets for user value attachment system
               </CardDescription>
             </CardHeader>
-            <CardContent className="bg-dark-navy/60">
+            <CardContent className="bg-black/15">
               {walletsLoading ? (
                 <div className="flex items-center justify-center py-8">
                   <RefreshCw className="w-6 h-6 animate-spin text-electric-blue" />
@@ -391,17 +391,17 @@ export function CustodialWalletManagement() {
 
         {/* Health Monitor Tab */}
         <TabsContent value="health" className="space-y-4">
-          <Card className="bg-dark-navy/50 border-electric-blue/20">
-            <CardHeader>
+          <Card className="bg-black/30 backdrop-blur-sm border-2 border-electric-blue/50 shadow-lg shadow-electric-blue/10">
+            <CardHeader className="bg-black/20 rounded-t-lg">
               <CardTitle className="text-white flex items-center">
-                <Shield className="w-5 h-5 mr-2" />
+                <Shield className="w-5 h-5 mr-2 text-electric-blue" />
                 Wallet Health Monitor
               </CardTitle>
-              <CardDescription className="text-gray-400">
+              <CardDescription className="text-gray-200">
                 Real-time health monitoring and diagnostics
               </CardDescription>
             </CardHeader>
-            <CardContent>
+            <CardContent className="bg-black/15">
               {healthLoading ? (
                 <div className="flex items-center justify-center py-8">
                   <RefreshCw className="w-6 h-6 animate-spin text-electric-blue" />
@@ -409,14 +409,14 @@ export function CustodialWalletManagement() {
               ) : (
                 <div className="space-y-4">
                   {healthData?.overallHealth ? (
-                    <Alert className="border-green-500/20 bg-green-500/10">
+                    <Alert className="border-green-400/40 bg-green-500/10 backdrop-blur-sm">
                       <CheckCircle className="w-4 h-4" />
                       <AlertDescription className="text-green-400">
                         All custodial wallets are healthy and operational
                       </AlertDescription>
                     </Alert>
                   ) : (
-                    <Alert className="border-red-500/20 bg-red-500/10">
+                    <Alert className="border-red-400/40 bg-red-500/10 backdrop-blur-sm">
                       <AlertTriangle className="w-4 h-4" />
                       <AlertDescription className="text-red-400">
                         Some wallets require attention
@@ -425,7 +425,7 @@ export function CustodialWalletManagement() {
                   )}
                   
                   {healthChecks.map((check: any) => (
-                    <div key={check.walletId} className="border border-gray-700 rounded-lg p-4">
+                    <div key={check.walletId} className="bg-black/25 backdrop-blur-sm border border-electric-blue/30 rounded-lg p-4">
                       <div className="flex items-center justify-between mb-2">
                         <div className="flex items-center space-x-2">
                           {check.isHealthy ? (
@@ -470,19 +470,19 @@ export function CustodialWalletManagement() {
 
         {/* Security Logs Tab */}
         <TabsContent value="security" className="space-y-4">
-          <Card className="bg-dark-navy/50 border-electric-blue/20">
-            <CardHeader>
+          <Card className="bg-black/30 backdrop-blur-sm border-2 border-electric-blue/50 shadow-lg shadow-electric-blue/10">
+            <CardHeader className="bg-black/20 rounded-t-lg">
               <CardTitle className="text-white flex items-center">
-                <Lock className="w-5 h-5 mr-2" />
+                <Lock className="w-5 h-5 mr-2 text-electric-blue" />
                 Security Monitoring
               </CardTitle>
-              <CardDescription className="text-gray-400 flex items-center justify-between">
+              <CardDescription className="text-gray-200 flex items-center justify-between">
                 <span>Real-time security events and compliance monitoring</span>
                 <Select value={securityFilter} onValueChange={setSecurityFilter}>
-                  <SelectTrigger className="w-32 bg-dark-navy/50 border-gray-600 text-white">
+                  <SelectTrigger className="w-32 bg-black/20 backdrop-blur-sm border-electric-blue/30 text-white">
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent className="bg-dark-navy border-gray-600">
+                  <SelectContent className="bg-dark-navy/90 border-electric-blue/30">
                     <SelectItem value="all">All Events</SelectItem>
                     <SelectItem value="critical">Critical</SelectItem>
                     <SelectItem value="high">High</SelectItem>
@@ -492,7 +492,7 @@ export function CustodialWalletManagement() {
                 </Select>
               </CardDescription>
             </CardHeader>
-            <CardContent>
+            <CardContent className="bg-black/15">
               {securityLoading ? (
                 <div className="flex items-center justify-center py-8">
                   <RefreshCw className="w-6 h-6 animate-spin text-electric-blue" />
@@ -501,7 +501,7 @@ export function CustodialWalletManagement() {
                 <ScrollArea className="h-96">
                   <div className="space-y-3">
                     {securityLogs.map((log) => (
-                      <div key={log.id} className="border border-gray-700 rounded-lg p-3">
+                      <div key={log.id} className="bg-black/25 backdrop-blur-sm border border-electric-blue/30 rounded-lg p-3">
                         <div className="flex items-center justify-between mb-2">
                           <div className="flex items-center space-x-2">
                             <Badge className={getSeverityColor(log.severity)}>
@@ -555,66 +555,66 @@ export function CustodialWalletManagement() {
         {/* Analytics Tab */}
         <TabsContent value="analytics" className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <Card className="bg-dark-navy/50 border-electric-blue/20">
-              <CardHeader>
+            <Card className="bg-black/30 backdrop-blur-sm border-2 border-electric-blue/50 shadow-lg shadow-electric-blue/10">
+              <CardHeader className="bg-black/20 rounded-t-lg">
                 <CardTitle className="text-white flex items-center">
-                  <TrendingUp className="w-5 h-5 mr-2" />
+                  <TrendingUp className="w-5 h-5 mr-2 text-electric-green" />
                   Revenue Analytics
                 </CardTitle>
-                <CardDescription className="text-gray-400">
+                <CardDescription className="text-gray-200">
                   Transaction fees and revenue tracking
                 </CardDescription>
               </CardHeader>
-              <CardContent>
+              <CardContent className="bg-black/15">
                 <div className="space-y-4">
                   <div className="text-center">
                     <div className="text-3xl font-bold text-green-400">$0.00</div>
-                    <div className="text-sm text-gray-400">Total Revenue (24h)</div>
+                    <div className="text-sm text-gray-300">Total Revenue (24h)</div>
                   </div>
                   
                   <div className="grid grid-cols-3 gap-4">
                     <div className="text-center">
                       <div className="text-lg font-semibold text-white">0</div>
-                      <div className="text-xs text-gray-400">Deposits</div>
+                      <div className="text-xs text-gray-300">Deposits</div>
                     </div>
                     <div className="text-center">
                       <div className="text-lg font-semibold text-white">0</div>
-                      <div className="text-xs text-gray-400">Redemptions</div>
+                      <div className="text-xs text-gray-300">Redemptions</div>
                     </div>
                     <div className="text-center">
                       <div className="text-lg font-semibold text-white">0</div>
-                      <div className="text-xs text-gray-400">Value Attachments</div>
+                      <div className="text-xs text-gray-300">Value Attachments</div>
                     </div>
                   </div>
                 </div>
               </CardContent>
             </Card>
 
-            <Card className="bg-dark-navy/50 border-electric-blue/20">
-              <CardHeader>
+            <Card className="bg-black/30 backdrop-blur-sm border-2 border-electric-blue/50 shadow-lg shadow-electric-blue/10">
+              <CardHeader className="bg-black/20 rounded-t-lg">
                 <CardTitle className="text-white flex items-center">
-                  <Users className="w-5 h-5 mr-2" />
+                  <Users className="w-5 h-5 mr-2 text-electric-blue" />
                   User Engagement
                 </CardTitle>
-                <CardDescription className="text-gray-400">
+                <CardDescription className="text-gray-200">
                   Active users and usage patterns
                 </CardDescription>
               </CardHeader>
-              <CardContent>
+              <CardContent className="bg-black/15">
                 <div className="space-y-4">
                   <div className="text-center">
                     <div className="text-3xl font-bold text-electric-blue">0</div>
-                    <div className="text-sm text-gray-400">Active Users (24h)</div>
+                    <div className="text-sm text-gray-300">Active Users (24h)</div>
                   </div>
                   
                   <div className="grid grid-cols-2 gap-4">
                     <div className="text-center">
                       <div className="text-lg font-semibold text-white">0</div>
-                      <div className="text-xs text-gray-400">New Users</div>
+                      <div className="text-xs text-gray-300">New Users</div>
                     </div>
                     <div className="text-center">
                       <div className="text-lg font-semibold text-white">0</div>
-                      <div className="text-xs text-gray-400">Returning Users</div>
+                      <div className="text-xs text-gray-300">Returning Users</div>
                     </div>
                   </div>
                 </div>
