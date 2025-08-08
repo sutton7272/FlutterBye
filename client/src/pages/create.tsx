@@ -199,21 +199,7 @@ export default function Create() {
               ))}
             </div>
 
-            {/* Quick Token Creation */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Zap className="h-5 w-5 text-electric-blue" />
-                  Quick Token Creation
-                </CardTitle>
-                <CardDescription>
-                  Create a token instantly with smart defaults
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Mint />
-              </CardContent>
-            </Card>
+
           </TabsContent>
 
           <TabsContent value="ai-tools" className="space-y-6">
@@ -291,7 +277,7 @@ export default function Create() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <VoiceMessageRecorder onVoiceRecord={(audioData) => {
+                <VoiceMessageRecorder onVoiceAttached={(audioData: { url: string; duration: number; type: 'voice' | 'music'; audioData?: string }) => {
                   console.log('Voice message recorded:', audioData);
                   // Handle the voice message attachment
                 }} />
