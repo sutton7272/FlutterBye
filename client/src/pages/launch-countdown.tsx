@@ -114,6 +114,15 @@ export default function LaunchCountdown() {
                 const hasFullContent = content.content && content.content.length > 500;
                 const shouldShowReadMore = !isExpanded && hasFullContent;
                 
+                // Debug logging
+                console.log(`Content ${content.id}:`, {
+                  hasContent: !!content.content,
+                  contentLength: content.content?.length,
+                  hasFullContent,
+                  shouldShowReadMore,
+                  isExpanded
+                });
+                
                 return (
                   <Card 
                     key={index} 
