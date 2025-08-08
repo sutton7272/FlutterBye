@@ -76,6 +76,32 @@ export default function LaunchCountdown() {
     const [currentContentIndex, setCurrentContentIndex] = useState(0);
     const [isExpanded, setIsExpanded] = useState(false);
 
+    // Add global functions for HTML buttons
+    useEffect(() => {
+      (window as any).flutterBlogPrevious = () => {
+        console.log('🔙 Previous clicked from HTML');
+        setCurrentContentIndex(prev => Math.max(0, prev - 1));
+        setIsExpanded(false);
+      };
+      
+      (window as any).flutterBlogNext = () => {
+        console.log('🔜 Next clicked from HTML');
+        setCurrentContentIndex(prev => Math.min(latestContent?.length - 1 || 0, prev + 1));
+        setIsExpanded(false);
+      };
+      
+      (window as any).flutterBlogToggle = () => {
+        console.log('🔄 Expand/Collapse clicked from HTML');
+        setIsExpanded(prev => !prev);
+      };
+      
+      return () => {
+        delete (window as any).flutterBlogPrevious;
+        delete (window as any).flutterBlogNext;
+        delete (window as any).flutterBlogToggle;
+      };
+    }, [latestContent]);
+
     if (isLoading) {
       return (
         <div className="border-t border-electric-blue/30 bg-gradient-to-r from-gray-900/80 via-electric-blue/10 to-purple-900/80 py-16 mt-16">
@@ -102,97 +128,83 @@ export default function LaunchCountdown() {
             </h2>
           </div>
 
-          {/* Generated Content Display Only */}
+          {/* Simple Working Display */}
           {latestContent && Array.isArray(latestContent) && latestContent.length > 0 ? (
-            <div className="max-w-4xl mx-auto">
-              {/* Navigation */}
-              <div className="flex items-center justify-between mb-6">
-                <div 
-                  className={`bg-cyan-500 hover:bg-cyan-600 text-white px-4 py-2 rounded transition-colors cursor-pointer select-none ${currentContentIndex === 0 ? 'opacity-50 cursor-not-allowed' : ''}`}
-                  onMouseDown={(e) => {
-                    e.preventDefault();
-                    if (currentContentIndex > 0) {
-                      console.log('🔙 Previous clicked');
-                      setCurrentContentIndex(currentContentIndex - 1);
-                      setIsExpanded(false);
-                    }
-                  }}
-                >
-                  ← Previous
+            <div className="max-w-4xl mx-auto" dangerouslySetInnerHTML={{
+              __html: `
+                <div class="flex items-center justify-between mb-6">
+                  <button 
+                    class="bg-cyan-500 hover:bg-cyan-600 text-white px-4 py-2 rounded transition-colors ${currentContentIndex === 0 ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}"
+                    onclick="window.flutterBlogPrevious()"
+                    ${currentContentIndex === 0 ? 'disabled' : ''}
+                  >
+                    ← Previous
+                  </button>
+                  
+                  <span class="text-cyan-400 font-medium">
+                    Article ${currentContentIndex + 1} of ${latestContent.length}
+                  </span>
+                  
+                  <button 
+                    class="bg-cyan-500 hover:bg-cyan-600 text-white px-4 py-2 rounded transition-colors ${currentContentIndex >= latestContent.length - 1 ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}"
+                    onclick="window.flutterBlogNext()"
+                    ${currentContentIndex >= latestContent.length - 1 ? 'disabled' : ''}
+                  >
+                    Next →
+                  </button>
                 </div>
-                
-                <span className="text-cyan-400 font-medium">
-                  Article {currentContentIndex + 1} of {latestContent.length}
-                </span>
-                
-                <div 
-                  className={`bg-cyan-500 hover:bg-cyan-600 text-white px-4 py-2 rounded transition-colors cursor-pointer select-none ${currentContentIndex >= latestContent.length - 1 ? 'opacity-50 cursor-not-allowed' : ''}`}
-                  onMouseDown={(e) => {
-                    e.preventDefault();
-                    if (currentContentIndex < latestContent.length - 1) {
-                      console.log('🔜 Next clicked');
-                      setCurrentContentIndex(currentContentIndex + 1);
-                      setIsExpanded(false);
-                    }
-                  }}
-                >
-                  Next →
-                </div>
-              </div>
 
-              {/* Current Article */}
-              {(() => {
-                const content = latestContent[currentContentIndex];
-                const fullContent = content.content || content.preview || 'Advanced AI-powered content generation...';
-                const showPreview = fullContent.length > 300 && !isExpanded;
-                const displayText = showPreview ? fullContent.slice(0, 300) + '...' : fullContent;
-                
-                return (
-                  <Card className="electric-frame bg-gradient-to-br from-cyan-500/20 to-blue-500/20 relative overflow-hidden">
-                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-cyan-400/10 to-transparent animate-pulse"></div>
-                    <CardContent className="p-8 relative z-10">
-                      <div className="flex items-start justify-between mb-4">
-                        <Badge className="bg-gradient-to-r from-cyan-600 to-blue-600 text-white border-0 shadow-lg">
-                          {content.type || 'FlutterBlog'}
-                        </Badge>
-                        <span className="text-sm text-muted-foreground">{content.timestamp || 'Just now'}</span>
-                      </div>
-                      
-                      <h2 className="font-bold text-2xl text-gradient mb-6 leading-tight">
-                        {content.title || content.topic || 'FlutterBlog Content'}
-                      </h2>
-                      
-                      <div className="text-muted-foreground leading-relaxed mb-6 text-base whitespace-pre-wrap">
-                        {displayText}
-                      </div>
-                      
-                      {/* Expand/Collapse Button */}
-                      {fullContent.length > 300 && (
-                        <div className="text-center mb-6">
-                          <div 
-                            className="inline-block bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white px-6 py-3 rounded-lg font-medium transition-all duration-300 shadow-lg cursor-pointer select-none"
-                            onMouseDown={(e) => {
-                              e.preventDefault();
-                              console.log('🔄 Expand/Collapse clicked:', !isExpanded);
-                              setIsExpanded(!isExpanded);
-                            }}
-                          >
-                            {isExpanded ? '▲ Show Less' : '▼ Read Full Article'}
+                <div class="electric-frame bg-gradient-to-br from-cyan-500/20 to-blue-500/20 relative overflow-hidden rounded-lg border border-cyan-500/30">
+                  <div class="absolute inset-0 bg-gradient-to-r from-transparent via-cyan-400/10 to-transparent animate-pulse"></div>
+                  <div class="p-8 relative z-10">
+                    <div class="flex items-start justify-between mb-4">
+                      <span class="bg-gradient-to-r from-cyan-600 to-blue-600 text-white px-3 py-1 rounded shadow-lg border-0 text-sm">
+                        ${latestContent[currentContentIndex].type || 'FlutterBlog'}
+                      </span>
+                      <span class="text-sm text-muted-foreground">${latestContent[currentContentIndex].timestamp || 'Just now'}</span>
+                    </div>
+                    
+                    <h2 class="font-bold text-2xl text-gradient mb-6 leading-tight">
+                      ${latestContent[currentContentIndex].title || latestContent[currentContentIndex].topic || 'FlutterBlog Content'}
+                    </h2>
+                    
+                    <div class="text-muted-foreground leading-relaxed mb-6 text-base whitespace-pre-wrap">
+                      ${(() => {
+                        const content = latestContent[currentContentIndex];
+                        const fullContent = content.content || content.preview || 'Advanced AI-powered content generation...';
+                        const showPreview = fullContent.length > 300 && !isExpanded;
+                        return showPreview ? fullContent.slice(0, 300) + '...' : fullContent;
+                      })()}
+                    </div>
+                    
+                    ${(() => {
+                      const content = latestContent[currentContentIndex];
+                      const fullContent = content.content || content.preview || 'Advanced AI-powered content generation...';
+                      if (fullContent.length > 300) {
+                        return `
+                          <div class="text-center mb-6">
+                            <button 
+                              class="inline-block bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white px-6 py-3 rounded-lg font-medium transition-all duration-300 shadow-lg cursor-pointer"
+                              onclick="window.flutterBlogToggle()"
+                            >
+                              ${isExpanded ? '▲ Show Less' : '▼ Read Full Article'}
+                            </button>
                           </div>
-                        </div>
-                      )}
-                      
-                      <div className="flex items-center gap-6 text-sm text-muted-foreground border-t border-cyan-500/20 pt-4">
-                        {content.wordCount && <span className="flex items-center gap-2"><span className="text-cyan-400">📊</span> {content.wordCount} words</span>}
-                        {content.seoScore && <span className="flex items-center gap-2"><span className="text-green-400">🎯</span> SEO: {content.seoScore}%</span>}
-                        {content.readabilityScore && <span className="flex items-center gap-2"><span className="text-blue-400">📖</span> Readability: {content.readabilityScore}%</span>}
-                        <span className="text-electric-green font-semibold">✨ AI Optimized</span>
-                      </div>
-                    </CardContent>
-                  </Card>
-                );
-              })()}
-            </div>
+                        `;
+                      }
+                      return '';
+                    })()}
+                    
+                    <div class="flex items-center gap-6 text-sm text-muted-foreground border-t border-cyan-500/20 pt-4">
+                      ${latestContent[currentContentIndex].wordCount ? `<span class="flex items-center gap-2"><span class="text-cyan-400">📊</span> ${latestContent[currentContentIndex].wordCount} words</span>` : ''}
+                      ${latestContent[currentContentIndex].seoScore ? `<span class="flex items-center gap-2"><span class="text-green-400">🎯</span> SEO: ${latestContent[currentContentIndex].seoScore}%</span>` : ''}
+                      ${latestContent[currentContentIndex].readabilityScore ? `<span class="flex items-center gap-2"><span class="text-blue-400">📖</span> Readability: ${latestContent[currentContentIndex].readabilityScore}%</span>` : ''}
+                      <span class="text-electric-green font-semibold">✨ AI Optimized</span>
+                    </div>
+                  </div>
+                </div>
+              `
+            }} />
           ) : (
             <Card className="electric-frame max-w-2xl mx-auto bg-gradient-to-br from-cyan-500/20 to-blue-500/20 relative overflow-hidden">
               <div className="absolute inset-0 bg-gradient-to-r from-transparent via-cyan-400/10 to-transparent animate-pulse"></div>
