@@ -107,21 +107,12 @@ export default function LaunchCountdown() {
             <div className="space-y-6 max-w-4xl mx-auto">
               {latestContent.slice(0, 3).map((content: any, index: number) => {
                 const isExpanded = expandedContentId === content.id;
-                // Show more preview text (first 500 chars) when collapsed, full content when expanded
-                const previewText = content.content?.slice(0, 500) || content.preview || 'Advanced AI-powered content generation...';
+                // Show preview text (first 300 chars) when collapsed, full content when expanded
+                const previewText = content.content?.slice(0, 300) || content.preview || 'Advanced AI-powered content generation...';
                 const fullText = content.content || content.preview || 'Advanced AI-powered content generation...';
                 const contentText = isExpanded ? fullText : previewText;
-                const hasFullContent = content.content && content.content.length > 500;
+                const hasFullContent = content.content && content.content.length > 300;
                 const shouldShowReadMore = !isExpanded && hasFullContent;
-                
-                // Debug logging
-                console.log(`Content ${content.id}:`, {
-                  hasContent: !!content.content,
-                  contentLength: content.content?.length,
-                  hasFullContent,
-                  shouldShowReadMore,
-                  isExpanded
-                });
                 
                 return (
                   <Card 
@@ -195,7 +186,7 @@ export default function LaunchCountdown() {
                         <span className="text-electric-green font-semibold">✨ AI Optimized</span>
                       </div>
                       
-                      {!isExpanded && hasFullContent && (
+                      {shouldShowReadMore && (
                         <div className="mt-3 text-center">
                           <span className="text-xs text-cyan-400/70">Click to read full article</span>
                         </div>
