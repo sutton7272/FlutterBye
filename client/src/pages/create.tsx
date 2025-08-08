@@ -38,6 +38,8 @@ export default function Create() {
         return "/mint/voice";
       case "multimedia":
         return "/mint/multimedia";
+      case "targeted-marketing":
+        return "/campaign-builder";
       default:
         return "/mint";
     }
