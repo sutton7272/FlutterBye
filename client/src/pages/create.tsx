@@ -199,17 +199,8 @@ export default function Create() {
               ))}
             </div>
 
-            {/* Quick Token Creation */}
+            {/* Token Creation */}
             <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Zap className="h-5 w-5 text-electric-blue" />
-                  Quick Token Creation
-                </CardTitle>
-                <CardDescription>
-                  Create a token instantly with smart defaults
-                </CardDescription>
-              </CardHeader>
               <CardContent>
                 <Mint />
               </CardContent>
