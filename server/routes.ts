@@ -6296,6 +6296,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Register Solana blockchain integration routes
   registerSolanaRoutes(app);
   registerEscrowRoutes(app);
+  
+  // Register escrow profits routes
+  const escrowProfitsRoutes = (await import('./routes-escrow-profits')).default;
+  app.use('/api/escrow', escrowProfitsRoutes);
+  
   // Register production monitoring endpoints
   registerProductionEndpoints(app, monitoring);
 

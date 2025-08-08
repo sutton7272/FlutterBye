@@ -105,6 +105,7 @@ import { WalletProvider } from "@/components/wallet-adapter";
 import { TestImage } from "@/components/test-image";
 import AdminGateway from "@/pages/admin-gateway";
 import AdminDashboard from "@/pages/admin-dashboard";
+import AdminEscrow from "@/pages/admin-escrow";
 import { AdminRouteGuard } from "@/components/admin-route-guard";
 function Router() {
   return (
@@ -283,6 +284,12 @@ function Router() {
           <AdminRouteGuard>
             <Navbar />
             <UnifiedAdminDashboard />
+          </AdminRouteGuard>
+        )} />
+        
+        <Route path="/admin/escrow" component={() => (
+          <AdminRouteGuard>
+            <AdminEscrow />
           </AdminRouteGuard>
         )} />
         

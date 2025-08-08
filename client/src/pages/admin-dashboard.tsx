@@ -50,6 +50,20 @@ export default function AdminDashboard() {
 
   const adminCards = [
     {
+      id: "escrow",
+      title: "Escrow Wallet Management",
+      description: "Enterprise escrow contracts and profit withdrawal system",
+      icon: Shield,
+      route: "/admin/escrow",
+      color: "electric-blue",
+      features: [
+        "Create Escrow Contracts",
+        "Monitor Active Contracts",
+        "Withdraw Accumulated Profits",
+        "Enterprise Security"
+      ]
+    },
+    {
       id: "flutterai",
       title: "FlutterAI Intelligence",
       description: "AI-powered wallet analytics, scoring, and marketing intelligence platform",
