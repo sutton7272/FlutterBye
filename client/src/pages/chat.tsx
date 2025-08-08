@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useLocation } from 'wouter';
 import { apiRequest } from '@/lib/queryClient';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -70,7 +71,12 @@ const MOCK_WALLET = "4xY2D8F3nQ9sM1pR6tZ5bV7wX0aH8cJ2kL4mN7oP9qS3uT";
 // const userWallet = publicKey?.toBase58() || null;
 
 export function Chat() {
-  const [selectedRoom, setSelectedRoom] = useState<string>('general');
+  // Get room from URL parameters
+  const [location] = useLocation();
+  const urlParams = new URLSearchParams(location.split('?')[1] || '');
+  const roomFromUrl = urlParams.get('room') || 'general';
+  
+  const [selectedRoom, setSelectedRoom] = useState<string>(roomFromUrl);
   const [message, setMessage] = useState('');
   const [socket, setSocket] = useState<WebSocket | null>(null);
   const [messages, setMessages] = useState<WebSocketMessage[]>([]);
@@ -107,6 +113,15 @@ export function Chat() {
   const messageInputRef = useRef<HTMLTextAreaElement>(null);
   const queryClient = useQueryClient();
   const { toast } = useToast();
+
+  // Handle URL parameter changes for room selection
+  useEffect(() => {
+    const urlParams = new URLSearchParams(location.split('?')[1] || '');
+    const roomFromUrl = urlParams.get('room') || 'general';
+    if (roomFromUrl !== selectedRoom) {
+      setSelectedRoom(roomFromUrl);
+    }
+  }, [location, selectedRoom]);
 
   // Mobile detection
   useEffect(() => {
