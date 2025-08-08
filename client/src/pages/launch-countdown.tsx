@@ -95,7 +95,7 @@ export default function LaunchCountdown() {
           <div className="text-center mb-8">
             <h2 className="text-2xl font-bold mb-2">
               <span className="bg-gradient-to-r from-electric-blue via-electric-green to-electric-blue bg-clip-text text-transparent">
-                AI-Generated Content
+                FlutterBlog Content
               </span>
             </h2>
           </div>
@@ -104,42 +104,46 @@ export default function LaunchCountdown() {
           {latestContent && latestContent.length > 0 ? (
             <div className="space-y-6 max-w-4xl mx-auto">
               {latestContent.slice(0, 3).map((content: any, index: number) => (
-                <Card key={index} className="bg-gradient-to-r from-gray-900/80 to-electric-blue/10 border-electric-blue/20 backdrop-blur-sm">
-                  <CardContent className="p-6">
+                <Card key={index} className="electric-frame bg-gradient-to-br from-cyan-500/20 to-blue-500/20 relative overflow-hidden">
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-cyan-400/10 to-transparent animate-pulse"></div>
+                  <CardContent className="p-6 relative z-10">
                     <div className="flex items-start justify-between mb-3">
-                      <Badge className="bg-electric-blue/20 text-electric-blue border-electric-blue/30">
-                        {content.type || 'AI Generated'}
+                      <Badge className="bg-gradient-to-r from-cyan-600 to-blue-600 text-white border-0 shadow-lg">
+                        {content.type || 'FlutterBlog'}
                       </Badge>
-                      <span className="text-xs text-gray-400">{content.timestamp || 'Just now'}</span>
+                      <span className="text-xs text-muted-foreground">{content.timestamp || 'Just now'}</span>
                     </div>
                     
-                    <h4 className="font-bold text-lg text-white mb-3 leading-tight">
-                      {content.title || content.topic || 'AI-Generated Content'}
+                    <h4 className="font-bold text-xl text-gradient mb-3 leading-tight">
+                      {content.title || content.topic || 'FlutterBlog Content'}
                     </h4>
                     
-                    <p className="text-gray-300 text-sm leading-relaxed mb-4">
+                    <p className="text-muted-foreground text-sm leading-relaxed mb-4">
                       {content.content?.slice(0, 300) || content.preview || 'Advanced AI-powered content generation system creating SEO-optimized blog posts with comprehensive metadata analysis...'}
                       {(content.content?.length > 300 || content.preview?.length > 300) && '...'}
                     </p>
                     
-                    <div className="flex items-center gap-4 text-xs text-gray-400">
-                      {content.wordCount && <span>📊 {content.wordCount} words</span>}
-                      {content.seoScore && <span>🎯 SEO: {content.seoScore}%</span>}
-                      {content.readabilityScore && <span>📖 Readability: {content.readabilityScore}%</span>}
-                      <span className="text-electric-green">✨ AI Optimized</span>
+                    <div className="flex items-center gap-4 text-xs text-muted-foreground">
+                      {content.wordCount && <span className="flex items-center gap-1"><span className="text-cyan-400">📊</span> {content.wordCount} words</span>}
+                      {content.seoScore && <span className="flex items-center gap-1"><span className="text-green-400">🎯</span> SEO: {content.seoScore}%</span>}
+                      {content.readabilityScore && <span className="flex items-center gap-1"><span className="text-blue-400">📖</span> Readability: {content.readabilityScore}%</span>}
+                      <span className="text-electric-green font-semibold">✨ AI Optimized</span>
                     </div>
                   </CardContent>
                 </Card>
               ))}
             </div>
           ) : (
-            <div className="text-center max-w-2xl mx-auto">
-              <Bot className="h-16 w-16 text-electric-blue mx-auto mb-4" />
-              <h3 className="text-lg font-bold text-white mb-2">AI Content System Online</h3>
-              <p className="text-gray-400">
-                FlutterBlog Bot ready to generate SEO-optimized content with 60-70% cost reduction
-              </p>
-            </div>
+            <Card className="electric-frame max-w-2xl mx-auto bg-gradient-to-br from-cyan-500/20 to-blue-500/20 relative overflow-hidden">
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-cyan-400/10 to-transparent animate-pulse"></div>
+              <CardContent className="p-8 text-center relative z-10">
+                <Bot className="h-16 w-16 text-electric-blue mx-auto mb-4" />
+                <h3 className="text-lg font-bold text-gradient mb-2">FlutterBlog System Online</h3>
+                <p className="text-muted-foreground">
+                  FlutterBlog Bot ready to generate SEO-optimized content with 60-70% cost reduction
+                </p>
+              </CardContent>
+            </Card>
           )}
         </div>
       </div>
