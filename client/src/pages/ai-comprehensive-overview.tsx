@@ -28,9 +28,10 @@ import {
   Cpu,
   Wand2,
   Gauge,
-  DollarSign
+  DollarSign,
+  Home
 } from 'lucide-react';
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
 import { AISEOOptimizer } from '@/components/ai-seo-optimizer';
 import { LivingAIInterfaceEnhanced } from '@/components/living-ai-interface-enhanced';
 import { NextGenerationAIFeatures } from '@/components/next-generation-ai-features';
@@ -50,6 +51,7 @@ interface AIFeature {
 }
 
 export default function AIComprehensiveOverview() {
+  const [, setLocation] = useLocation();
   const [aiFeatures, setAIFeatures] = useState<AIFeature[]>([
     {
       name: 'Blockchain AI Integration',
@@ -364,10 +366,18 @@ export default function AIComprehensiveOverview() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
-        <div className="container mx-auto p-6">
+      <div className="min-h-screen bg-dark-navy relative overflow-hidden">
+        {/* Animated electric circuit background */}
+        <div className="absolute inset-0 opacity-40">
+          <div className="absolute top-20 left-20 w-96 h-96 border border-electric-blue/30 rounded-full animate-pulse-slow"></div>
+          <div className="absolute top-40 right-32 w-64 h-64 border border-electric-green/40 rounded-full animate-pulse-slower"></div>
+          <div className="absolute bottom-40 left-1/3 w-80 h-80 border border-electric-blue/20 rounded-full animate-pulse-slow"></div>
+          <div className="circuit-lines"></div>
+        </div>
+        
+        <div className="container mx-auto p-6 relative z-10">
           <div className="flex items-center justify-center h-64">
-            <div className="text-xl text-white">Loading AI Overview...</div>
+            <div className="text-xl text-white animate-pulse">Loading AI Overview...</div>
           </div>
         </div>
       </div>
@@ -375,16 +385,53 @@ export default function AIComprehensiveOverview() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
-      <div className="container mx-auto p-6">
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold text-white mb-4 flex items-center gap-3">
-            <Brain className="w-10 h-10 text-blue-400" />
-            AI Comprehensive Overview
-          </h1>
-          <p className="text-lg text-gray-300">
-            World's first truly living AI ecosystem - Every feature enhanced by artificial intelligence
-          </p>
+    <div className="min-h-screen bg-dark-navy relative overflow-hidden">
+      {/* Animated electric circuit background */}
+      <div className="absolute inset-0 opacity-40">
+        <div className="absolute top-20 left-20 w-96 h-96 border border-electric-blue/30 rounded-full animate-pulse-slow"></div>
+        <div className="absolute top-40 right-32 w-64 h-64 border border-electric-green/40 rounded-full animate-pulse-slower"></div>
+        <div className="absolute bottom-40 left-1/3 w-80 h-80 border border-electric-blue/20 rounded-full animate-pulse-slow"></div>
+        <div className="absolute bottom-20 right-20 w-72 h-72 border border-electric-green/25 rounded-full animate-pulse-slower"></div>
+        <div className="circuit-lines"></div>
+        <div className="electric-grid"></div>
+      </div>
+
+      {/* Circuit flow gradients */}
+      <div className="absolute inset-0 bg-gradient-to-br from-electric-blue/5 via-transparent to-electric-green/5"></div>
+      
+      <div className="container mx-auto p-6 relative z-10">
+        {/* Header with electric styling */}
+        <div className="mb-8 relative">
+          <div className="absolute -inset-4 bg-gradient-to-r from-electric-blue/10 to-electric-green/10 rounded-lg animate-pulse-slow blur-lg"></div>
+          <div className="relative bg-slate-800/30 backdrop-blur-sm border border-electric-blue/30 rounded-lg p-6">
+            <div className="flex justify-between items-start mb-4">
+              <div className="flex items-center gap-3">
+                <div className="relative">
+                  <Brain className="w-10 h-10 text-electric-blue animate-pulse" />
+                  <div className="absolute inset-0 w-10 h-10 border border-electric-blue/50 rounded animate-spin-slow"></div>
+                </div>
+                <h1 className="text-4xl font-bold">
+                  <span className="bg-gradient-to-r from-electric-blue to-electric-green bg-clip-text text-transparent">
+                    AI Comprehensive Overview
+                  </span>
+                </h1>
+              </div>
+              
+              {/* Return to Site Button */}
+              <Button
+                variant="outline"
+                onClick={() => setLocation("/")}
+                className="border-electric-blue/50 text-electric-blue hover:bg-electric-blue/10 hover:border-electric-blue/70 transition-all duration-300 relative overflow-hidden group"
+              >
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-electric-blue/5 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
+                <Home className="w-4 h-4 mr-2" />
+                Return to Site
+              </Button>
+            </div>
+            <p className="text-lg text-slate-300">
+              World's first truly living AI ecosystem - Every feature enhanced by artificial intelligence
+            </p>
+          </div>
         </div>
 
         {/* AI Credits Display & Payment Integration */}
@@ -393,33 +440,36 @@ export default function AIComprehensiveOverview() {
             <AICreditDisplay userId="demo-user" />
           </div>
           <div>
-            <Card className="bg-gradient-to-r from-purple-900/50 to-blue-900/50 border-purple-500/30">
+            <Card className="bg-slate-800/30 backdrop-blur-sm border-electric-blue/50 hover:border-electric-green/50 transition-all duration-300 relative overflow-hidden group">
+              {/* Electric glow effect */}
+              <div className="absolute inset-0 bg-gradient-to-r from-electric-blue/5 to-electric-green/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
               <CardHeader>
-                <CardTitle className="text-white flex items-center gap-2">
-                  <DollarSign className="w-5 h-5 text-green-400" />
+                <CardTitle className="text-white flex items-center gap-2 relative z-10">
+                  <DollarSign className="w-5 h-5 text-electric-green animate-pulse" />
                   AI Power Plans
                 </CardTitle>
               </CardHeader>
-              <CardContent>
+              <CardContent className="relative z-10">
                 <div className="space-y-3">
                   <div className="text-sm text-slate-300">
                     Unlock advanced AI features with our credit system
                   </div>
                   <div className="grid grid-cols-2 gap-2">
-                    <div className="text-center p-2 bg-black/20 rounded">
-                      <div className="text-lg font-bold text-blue-400">$4.99</div>
+                    <div className="text-center p-2 bg-slate-800/50 border border-electric-blue/30 rounded hover:border-electric-blue/50 transition-colors">
+                      <div className="text-lg font-bold text-electric-blue">$4.99</div>
                       <div className="text-xs text-slate-400">100 Credits</div>
                     </div>
-                    <div className="text-center p-2 bg-black/20 rounded">
-                      <div className="text-lg font-bold text-green-400">$14.99</div>
+                    <div className="text-center p-2 bg-slate-800/50 border border-electric-green/30 rounded hover:border-electric-green/50 transition-colors">
+                      <div className="text-lg font-bold text-electric-green">$14.99</div>
                       <div className="text-xs text-slate-400">500 Credits</div>
                     </div>
                   </div>
                   <Button 
-                    className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700"
+                    className="w-full bg-gradient-to-r from-electric-blue to-electric-green hover:shadow-lg hover:shadow-electric-blue/25 transition-all duration-300 relative overflow-hidden group"
                     onClick={() => window.location.href = '/ai-payments'}
                   >
-                    <Zap className="w-4 h-4 mr-2" />
+                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
+                    <Zap className="w-4 h-4 mr-2 animate-pulse" />
                     Buy AI Credits
                   </Button>
                 </div>
@@ -429,47 +479,63 @@ export default function AIComprehensiveOverview() {
         </div>
 
         {/* AI Coverage Summary */}
-        <Card className="mb-8 bg-black/20 border-purple-500/30">
+        <Card className="mb-8 bg-slate-800/30 backdrop-blur-sm border-electric-blue/50 relative overflow-hidden group">
+          {/* Electric pulse animation */}
+          <div className="absolute inset-0 border-2 border-electric-blue/20 rounded-lg animate-pulse-slow"></div>
+          <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-electric-blue/50 to-transparent animate-pulse"></div>
+          
           <CardHeader>
-            <CardTitle className="text-white flex items-center gap-2">
-              <BarChart3 className="w-6 h-6 text-green-400" />
-              Platform AI Coverage
+            <CardTitle className="text-white flex items-center gap-2 relative z-10">
+              <BarChart3 className="w-6 h-6 text-electric-green animate-pulse" />
+              <span className="bg-gradient-to-r from-electric-blue to-electric-green bg-clip-text text-transparent">
+                Platform AI Coverage
+              </span>
             </CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="relative z-10">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div className="text-center">
-                <div className="text-4xl font-bold text-green-400 mb-2">100%</div>
-                <div className="text-white">Platform Coverage</div>
-                <div className="text-sm text-gray-400">Every major feature AI-enhanced</div>
+              <div className="text-center relative">
+                <div className="absolute -inset-2 bg-electric-green/10 rounded-lg blur-sm"></div>
+                <div className="relative bg-slate-800/50 border border-electric-green/30 rounded-lg p-4">
+                  <div className="text-4xl font-bold text-electric-green mb-2 animate-pulse">100%</div>
+                  <div className="text-white">Platform Coverage</div>
+                  <div className="text-sm text-slate-400">Every major feature AI-enhanced</div>
+                </div>
               </div>
-              <div className="text-center">
-                <div className="text-4xl font-bold text-blue-400 mb-2">9</div>
-                <div className="text-white">AI Systems Active</div>
-                <div className="text-sm text-gray-400">Revolutionary capabilities deployed</div>
+              <div className="text-center relative">
+                <div className="absolute -inset-2 bg-electric-blue/10 rounded-lg blur-sm"></div>
+                <div className="relative bg-slate-800/50 border border-electric-blue/30 rounded-lg p-4">
+                  <div className="text-4xl font-bold text-electric-blue mb-2 animate-pulse">9</div>
+                  <div className="text-white">AI Systems Active</div>
+                  <div className="text-sm text-slate-400">Revolutionary capabilities deployed</div>
+                </div>
               </div>
-              <div className="text-center">
-                <div className="text-4xl font-bold text-purple-400 mb-2">$0.002</div>
-                <div className="text-white">Cost Per Interaction</div>
-                <div className="text-sm text-gray-400">Extremely cost-effective</div>
+              <div className="text-center relative">
+                <div className="absolute -inset-2 bg-purple-400/10 rounded-lg blur-sm"></div>
+                <div className="relative bg-slate-800/50 border border-purple-400/30 rounded-lg p-4">
+                  <div className="text-4xl font-bold text-purple-400 mb-2 animate-pulse">$0.002</div>
+                  <div className="text-white">Cost Per Interaction</div>
+                  <div className="text-sm text-slate-400">Extremely cost-effective</div>
+                </div>
               </div>
             </div>
           </CardContent>
         </Card>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-8 bg-black/20 border-purple-500/30">
-            <TabsTrigger value="next-gen" className="text-white flex items-center gap-1">
+          <TabsList className="grid w-full grid-cols-8 bg-slate-800/40 backdrop-blur-sm border border-electric-blue/30 rounded-lg p-1 relative overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-r from-electric-blue/10 to-electric-green/10 animate-pulse-slow"></div>
+            <TabsTrigger value="next-gen" className="text-slate-300 hover:text-white data-[state=active]:text-white data-[state=active]:bg-electric-blue/20 data-[state=active]:border-electric-blue/50 flex items-center gap-1 relative z-10 transition-all duration-300">
               <DollarSign className="w-3 h-3" />
               Next-Gen
             </TabsTrigger>
-            <TabsTrigger value="features" className="text-white">AI Features</TabsTrigger>
-            <TabsTrigger value="living" className="text-white">Living AI</TabsTrigger>
-            <TabsTrigger value="conversation" className="text-white">AI Chat</TabsTrigger>
-            <TabsTrigger value="showcase" className="text-white">AI Demos</TabsTrigger>
-            <TabsTrigger value="admin" className="text-white">Admin AI</TabsTrigger>
-            <TabsTrigger value="seo" className="text-white">SEO Tools</TabsTrigger>
-            <TabsTrigger value="future" className="text-white">Future</TabsTrigger>
+            <TabsTrigger value="features" className="text-slate-300 hover:text-white data-[state=active]:text-white data-[state=active]:bg-electric-blue/20 data-[state=active]:border-electric-blue/50 relative z-10 transition-all duration-300">AI Features</TabsTrigger>
+            <TabsTrigger value="living" className="text-slate-300 hover:text-white data-[state=active]:text-white data-[state=active]:bg-electric-blue/20 data-[state=active]:border-electric-blue/50 relative z-10 transition-all duration-300">Living AI</TabsTrigger>
+            <TabsTrigger value="conversation" className="text-slate-300 hover:text-white data-[state=active]:text-white data-[state=active]:bg-electric-blue/20 data-[state=active]:border-electric-blue/50 relative z-10 transition-all duration-300">AI Chat</TabsTrigger>
+            <TabsTrigger value="showcase" className="text-slate-300 hover:text-white data-[state=active]:text-white data-[state=active]:bg-electric-blue/20 data-[state=active]:border-electric-blue/50 relative z-10 transition-all duration-300">AI Demos</TabsTrigger>
+            <TabsTrigger value="admin" className="text-slate-300 hover:text-white data-[state=active]:text-white data-[state=active]:bg-electric-blue/20 data-[state=active]:border-electric-blue/50 relative z-10 transition-all duration-300">Admin AI</TabsTrigger>
+            <TabsTrigger value="seo" className="text-slate-300 hover:text-white data-[state=active]:text-white data-[state=active]:bg-electric-blue/20 data-[state=active]:border-electric-blue/50 relative z-10 transition-all duration-300">SEO Tools</TabsTrigger>
+            <TabsTrigger value="future" className="text-slate-300 hover:text-white data-[state=active]:text-white data-[state=active]:bg-electric-blue/20 data-[state=active]:border-electric-blue/50 relative z-10 transition-all duration-300">Future</TabsTrigger>
           </TabsList>
 
           <TabsContent value="next-gen" className="space-y-4">
