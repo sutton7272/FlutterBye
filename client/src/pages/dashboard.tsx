@@ -157,29 +157,31 @@ export default function Dashboard() {
           </p>
         </div>
 
-        {/* Quick Actions */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        {/* Quick Actions - Enhanced */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {quickActions.map((action) => (
             <Link key={action.href} href={action.href}>
-              <Card className="group hover:shadow-lg transition-all duration-300 cursor-pointer h-full border-electric-blue/20 hover:border-electric-blue/40">
-                <CardHeader className="pb-3">
-                  <div className="flex items-center justify-between">
-                    <action.icon className={`h-8 w-8 text-${action.color} group-hover:scale-110 transition-transform`} />
+              <Card className="group hover:shadow-xl transition-all duration-300 cursor-pointer h-full bg-slate-800/40 border border-electric-blue/30 hover:border-electric-blue/60 electric-frame">
+                <CardHeader className="pb-4">
+                  <div className="flex items-center justify-between mb-3">
+                    <div className={`p-3 rounded-lg bg-${action.color === 'electric-blue' ? 'electric-blue' : action.color === 'electric-green' ? 'electric-green' : action.color === 'purple' ? 'purple-400' : 'teal-400'}/10 group-hover:bg-${action.color === 'electric-blue' ? 'electric-blue' : action.color === 'electric-green' ? 'electric-green' : action.color === 'purple' ? 'purple-400' : 'teal-400'}/20 transition-colors border border-${action.color === 'electric-blue' ? 'electric-blue' : action.color === 'electric-green' ? 'electric-green' : action.color === 'purple' ? 'purple-400' : 'teal-400'}/20`}>
+                      <action.icon className={`h-6 w-6 ${action.color === 'electric-blue' ? 'text-electric-blue' : action.color === 'electric-green' ? 'text-electric-green' : action.color === 'purple' ? 'text-purple-400' : 'text-teal-400'} group-hover:scale-110 transition-transform`} />
+                    </div>
                     {action.featured && (
-                      <Badge className="bg-gradient-to-r from-yellow-400 to-orange-400 text-black font-bold">
+                      <Badge className="bg-gradient-to-r from-electric-blue to-electric-green text-white font-bold animate-pulse">
                         HOT
                       </Badge>
                     )}
                   </div>
-                  <CardTitle className="text-lg group-hover:text-electric-blue transition-colors">
+                  <CardTitle className="text-lg text-white group-hover:text-electric-blue transition-colors">
                     {action.title}
                   </CardTitle>
-                  <CardDescription className="text-sm">
+                  <CardDescription className="text-sm text-gray-300">
                     {action.description}
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <Button variant="ghost" size="sm" className="w-full group-hover:bg-electric-blue/10">
+                  <Button className="w-full bg-gradient-to-r from-slate-700 to-slate-600 hover:from-electric-blue hover:to-electric-green transition-all duration-300 text-white border-0">
                     Get Started <ArrowRight className="ml-2 h-4 w-4" />
                   </Button>
                 </CardContent>
@@ -202,12 +204,14 @@ export default function Dashboard() {
           </TabsList>
 
           <TabsContent value="overview" className="space-y-6">
-            {/* Stats Overview */}
+            {/* Stats Overview - Enhanced */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-              <Card className="bg-slate-800/30 border border-electric-blue/20 hover:border-electric-blue/40 transition-all duration-300">
+              <Card className="bg-slate-800/40 border border-electric-blue/30 hover:border-electric-blue/60 transition-all duration-300 electric-frame">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                   <CardTitle className="text-sm font-medium text-white">Total Tokens</CardTitle>
-                  <Coins className="h-4 w-4 text-electric-blue" />
+                  <div className="p-1 rounded bg-electric-blue/10 border border-electric-blue/20">
+                    <Coins className="h-4 w-4 text-electric-blue" />
+                  </div>
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold text-white">{stats?.totalTokens || 0}</div>
@@ -215,10 +219,12 @@ export default function Dashboard() {
                 </CardContent>
               </Card>
               
-              <Card className="bg-slate-800/30 border border-electric-green/20 hover:border-electric-green/40 transition-all duration-300">
+              <Card className="bg-slate-800/40 border border-electric-green/30 hover:border-electric-green/60 transition-all duration-300 electric-frame">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                   <CardTitle className="text-sm font-medium text-white">Portfolio Value</CardTitle>
-                  <TrendingUp className="h-4 w-4 text-electric-green" />
+                  <div className="p-1 rounded bg-electric-green/10 border border-electric-green/20">
+                    <TrendingUp className="h-4 w-4 text-electric-green" />
+                  </div>
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold text-white">{stats?.totalValue || '$0.00'}</div>
@@ -226,10 +232,12 @@ export default function Dashboard() {
                 </CardContent>
               </Card>
               
-              <Card className="bg-slate-800/30 border border-purple-400/20 hover:border-purple-400/40 transition-all duration-300">
+              <Card className="bg-slate-800/40 border border-purple-400/30 hover:border-purple-400/60 transition-all duration-300 electric-frame">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                   <CardTitle className="text-sm font-medium text-white">Active Chats</CardTitle>
-                  <MessageSquare className="h-4 w-4 text-purple-400" />
+                  <div className="p-1 rounded bg-purple-400/10 border border-purple-400/20">
+                    <MessageSquare className="h-4 w-4 text-purple-400" />
+                  </div>
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold text-white">{stats?.activeChats || 0}</div>
@@ -237,10 +245,12 @@ export default function Dashboard() {
                 </CardContent>
               </Card>
               
-              <Card className="bg-slate-800/30 border border-yellow-400/20 hover:border-yellow-400/40 transition-all duration-300">
+              <Card className="bg-slate-800/40 border border-yellow-400/30 hover:border-yellow-400/60 transition-all duration-300 electric-frame">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                   <CardTitle className="text-sm font-medium text-white">Viral Score</CardTitle>
-                  <Zap className="h-4 w-4 text-yellow-400" />
+                  <div className="p-1 rounded bg-yellow-400/10 border border-yellow-400/20">
+                    <Zap className="h-4 w-4 text-yellow-400" />
+                  </div>
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold text-white">{stats?.viralScore || 0}</div>
@@ -265,10 +275,12 @@ export default function Dashboard() {
           </TabsContent>
 
           <TabsContent value="activity" className="space-y-6">
-            <Card className="bg-slate-800/30 border border-electric-blue/20">
+            <Card className="bg-slate-800/40 border border-electric-blue/30 electric-frame">
               <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-white">
-                  <Activity className="h-5 w-5 text-electric-blue" />
+                <CardTitle className="flex items-center gap-3 text-white">
+                  <div className="p-2 rounded-lg bg-electric-blue/10 border border-electric-blue/20">
+                    <Activity className="h-5 w-5 text-electric-blue" />
+                  </div>
                   Recent Activity
                 </CardTitle>
                 <CardDescription className="text-gray-300">
@@ -279,25 +291,27 @@ export default function Dashboard() {
                 {stats?.recentActivity && stats.recentActivity.length > 0 ? (
                   <div className="space-y-4">
                     {stats.recentActivity.map((activity) => (
-                      <div key={activity.id} className="flex items-center justify-between p-3 rounded-lg bg-muted/50">
+                      <div key={activity.id} className="flex items-center justify-between p-3 rounded-lg bg-slate-700/50 border border-electric-blue/10 hover:border-electric-blue/30 transition-all duration-300">
                         <div className="flex items-center gap-3">
-                          <div className="w-2 h-2 bg-electric-blue rounded-full"></div>
+                          <div className="w-2 h-2 bg-electric-blue rounded-full animate-pulse"></div>
                           <div>
-                            <p className="font-medium">{activity.message}</p>
-                            <p className="text-sm text-muted-foreground">{activity.timestamp}</p>
+                            <p className="font-medium text-white">{activity.message}</p>
+                            <p className="text-sm text-gray-400">{activity.timestamp}</p>
                           </div>
                         </div>
                         {activity.amount && (
-                          <Badge variant="outline">+{activity.amount} SOL</Badge>
+                          <Badge className="bg-electric-green/10 text-electric-green border border-electric-green/30">+{activity.amount} SOL</Badge>
                         )}
                       </div>
                     ))}
                   </div>
                 ) : (
                   <div className="text-center py-8">
-                    <Activity className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                    <p className="text-muted-foreground">No recent activity</p>
-                    <Button asChild className="mt-4">
+                    <div className="p-4 rounded-full bg-electric-blue/10 border border-electric-blue/20 w-fit mx-auto mb-4">
+                      <Activity className="h-12 w-12 text-electric-blue" />
+                    </div>
+                    <p className="text-gray-300 mb-4">No recent activity</p>
+                    <Button asChild className="bg-gradient-to-r from-electric-blue to-electric-green hover:from-electric-blue hover:to-electric-green">
                       <Link href="/create">Create your first token</Link>
                     </Button>
                   </div>

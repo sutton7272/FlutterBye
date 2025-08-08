@@ -60,17 +60,21 @@ export function MobileNavigation() {
   };
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 bg-background/95 backdrop-blur-sm border-t border-border z-40 md:hidden">
-      <div className="grid grid-cols-4 gap-1 p-2">
+    <div className="fixed bottom-0 left-0 right-0 bg-slate-900/95 backdrop-blur-sm border-t border-electric-blue/20 z-40 md:hidden electric-frame">
+      <div className="grid grid-cols-4 gap-1 p-3">
         {visibleItems.map((item) => (
           <Link key={item.href} href={item.href}>
             <Button
               variant="ghost"
               size="sm"
-              className={`w-full h-14 flex-col gap-1 relative ${
+              className={`w-full h-16 flex-col gap-1 relative transition-all duration-300 ${
                 isActive(item.href) 
-                  ? "bg-electric-blue/10 text-electric-blue" 
-                  : "text-muted-foreground hover:text-foreground"
+                  ? "bg-electric-blue/20 text-electric-blue border border-electric-blue/30 shadow-lg" 
+                  : item.special
+                  ? "text-purple-400 hover:text-purple-300 hover:bg-purple-400/10"
+                  : item.highlight
+                  ? "text-electric-green hover:text-electric-green hover:bg-electric-green/10"
+                  : "text-gray-400 hover:text-white hover:bg-slate-800/50"
               }`}
             >
               {/* Highlight indicators */}

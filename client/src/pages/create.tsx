@@ -131,35 +131,55 @@ export default function Create() {
           </TabsList>
 
           <TabsContent value="tokens" className="space-y-6">
-            {/* Compact Creation Options */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+            {/* Enhanced Creation Options */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
               {creationOptions.map((option) => (
-                <Card key={option.id} className="group hover:shadow-md transition-all duration-300 cursor-pointer bg-slate-800/30 border border-electric-blue/20">
-                  <CardContent className="p-4">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        <div className={`p-2 rounded-lg bg-${option.color}/10 group-hover:bg-${option.color}/20 transition-colors`}>
-                          <option.icon className={`h-4 w-4 text-${option.color}`} />
+                <Card key={option.id} className="group hover:shadow-lg transition-all duration-300 cursor-pointer bg-slate-800/40 border border-electric-blue/30 hover:border-electric-blue/60 electric-frame">
+                  <CardContent className="p-6">
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-4">
+                          <div className={`p-3 rounded-lg bg-${option.color === 'electric-green' ? 'electric-green' : 'purple-400'}/10 group-hover:bg-${option.color === 'electric-green' ? 'electric-green' : 'purple-400'}/20 transition-colors border border-${option.color === 'electric-green' ? 'electric-green' : 'purple-400'}/20`}>
+                            <option.icon className={`h-5 w-5 ${option.color === 'electric-green' ? 'text-electric-green' : 'text-purple-400'}`} />
+                          </div>
+                          <div>
+                            <h3 className="font-semibold text-lg text-white group-hover:text-electric-blue transition-colors">
+                              {option.title}
+                            </h3>
+                            <p className="text-sm text-gray-300">{option.description}</p>
+                          </div>
                         </div>
-                        <div>
-                          <h3 className="font-semibold text-sm text-white group-hover:text-electric-blue transition-colors">
-                            {option.title}
-                          </h3>
-                          <p className="text-xs text-gray-300">{option.description}</p>
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-2">
                         {option.recommended && (
-                          <Badge className="bg-gradient-to-r from-electric-blue to-electric-green text-white text-xs px-2 py-1">
-                            RECOMMENDED
+                          <Badge className="bg-gradient-to-r from-electric-blue to-electric-green text-white text-xs px-2 py-1 animate-pulse">
+                            POPULAR
                           </Badge>
                         )}
-                        <Link href={getCreationRoute(option.id)}>
-                          <Button size="sm" variant={option.recommended ? "default" : "outline"}>
-                            Create <ArrowRight className="ml-1 h-3 w-3" />
-                          </Button>
-                        </Link>
                       </div>
+                      
+                      {/* Features List */}
+                      <div className="flex flex-wrap gap-2">
+                        {option.features.map((feature, idx) => (
+                          <Badge key={idx} variant="outline" className="text-gray-300 border-gray-600 bg-slate-700/50 text-xs">
+                            {feature}
+                          </Badge>
+                        ))}
+                      </div>
+
+                      {/* Examples */}
+                      <div className="text-xs text-gray-400">
+                        <p className="font-medium">Examples:</p>
+                        <ul className="list-disc list-inside space-y-1 mt-1">
+                          {option.examples.slice(0, 2).map((example, idx) => (
+                            <li key={idx}>"{example}"</li>
+                          ))}
+                        </ul>
+                      </div>
+
+                      <Link href={getCreationRoute(option.id)}>
+                        <Button className="w-full group-hover:from-electric-blue group-hover:to-electric-green bg-gradient-to-r from-slate-700 to-slate-600 hover:from-electric-blue hover:to-electric-green transition-all duration-300">
+                          Create {option.title} <ArrowRight className="ml-2 h-4 w-4" />
+                        </Button>
+                      </Link>
                     </div>
                   </CardContent>
                 </Card>
@@ -173,25 +193,30 @@ export default function Create() {
           </TabsContent>
 
           <TabsContent value="ai-tools" className="space-y-6">
+            <div className="text-center mb-6">
+              <h2 className="text-2xl font-bold text-white mb-2">AI-Powered Tools</h2>
+              <p className="text-gray-300">Enhance your message tokens with advanced AI capabilities</p>
+            </div>
+            
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {aiTools.map((tool) => (
                 <Link key={tool.href} href={tool.href}>
-                  <Card className="group hover:shadow-lg transition-all duration-300 cursor-pointer h-full">
-                    <CardHeader>
-                      <div className="flex items-center gap-3">
-                        <div className="p-3 rounded-lg bg-purple/10 group-hover:bg-purple/20 transition-colors">
-                          <tool.icon className="h-6 w-6 text-purple" />
+                  <Card className="group hover:shadow-xl transition-all duration-300 cursor-pointer h-full bg-slate-800/40 border border-purple-400/30 hover:border-purple-400/60 electric-frame">
+                    <CardHeader className="pb-4">
+                      <div className="flex items-center gap-4">
+                        <div className="p-3 rounded-lg bg-purple-400/10 group-hover:bg-purple-400/20 transition-colors border border-purple-400/20">
+                          <tool.icon className="h-6 w-6 text-purple-400" />
                         </div>
                         <div>
-                          <CardTitle className="group-hover:text-electric-blue transition-colors">
+                          <CardTitle className="text-white group-hover:text-electric-blue transition-colors text-lg">
                             {tool.title}
                           </CardTitle>
-                          <CardDescription>{tool.description}</CardDescription>
+                          <CardDescription className="text-gray-300">{tool.description}</CardDescription>
                         </div>
                       </div>
                     </CardHeader>
                     <CardContent>
-                      <Button variant="outline" className="w-full group-hover:bg-purple/10">
+                      <Button className="w-full bg-gradient-to-r from-purple-600 to-purple-400 hover:from-purple-500 hover:to-purple-300 text-white border-0 transition-all duration-300">
                         Launch Tool <ArrowRight className="ml-2 h-4 w-4" />
                       </Button>
                     </CardContent>
@@ -202,48 +227,67 @@ export default function Create() {
           </TabsContent>
 
           <TabsContent value="advanced" className="space-y-6">
+            <div className="text-center mb-6">
+              <h2 className="text-2xl font-bold text-white mb-2">Advanced Creation Tools</h2>
+              <p className="text-gray-300">Unlock powerful features for sophisticated token creation</p>
+            </div>
+            
             {/* Advanced Creation Tools */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               <Link href="/collaborative-creation">
-                <Card className="group hover:shadow-lg transition-all duration-300 cursor-pointer">
-                  <CardHeader>
-                    <Users className="h-8 w-8 text-electric-green mb-2" />
-                    <CardTitle>Collaborative Creation</CardTitle>
-                    <CardDescription>Create tokens with multiple contributors</CardDescription>
+                <Card className="group hover:shadow-xl transition-all duration-300 cursor-pointer h-full bg-slate-800/40 border border-electric-green/30 hover:border-electric-green/60 electric-frame">
+                  <CardHeader className="text-center space-y-4">
+                    <div className="mx-auto p-3 rounded-lg bg-electric-green/10 group-hover:bg-electric-green/20 transition-colors border border-electric-green/20 w-fit">
+                      <Users className="h-8 w-8 text-electric-green" />
+                    </div>
+                    <div>
+                      <CardTitle className="text-white group-hover:text-electric-green transition-colors">Collaborative Creation</CardTitle>
+                      <CardDescription className="text-gray-300">Create tokens with multiple contributors</CardDescription>
+                    </div>
                   </CardHeader>
                 </Card>
               </Link>
 
               <Link href="/limited-edition">
-                <Card className="group hover:shadow-lg transition-all duration-300 cursor-pointer">
-                  <CardHeader>
-                    <Star className="h-8 w-8 text-yellow-400 mb-2" />
-                    <CardTitle>Limited Edition Sets</CardTitle>
-                    <CardDescription>Create exclusive token collections</CardDescription>
+                <Card className="group hover:shadow-xl transition-all duration-300 cursor-pointer h-full bg-slate-800/40 border border-yellow-400/30 hover:border-yellow-400/60 electric-frame">
+                  <CardHeader className="text-center space-y-4">
+                    <div className="mx-auto p-3 rounded-lg bg-yellow-400/10 group-hover:bg-yellow-400/20 transition-colors border border-yellow-400/20 w-fit">
+                      <Star className="h-8 w-8 text-yellow-400" />
+                    </div>
+                    <div>
+                      <CardTitle className="text-white group-hover:text-yellow-400 transition-colors">Limited Edition Sets</CardTitle>
+                      <CardDescription className="text-gray-300">Create exclusive token collections</CardDescription>
+                    </div>
                   </CardHeader>
                 </Card>
               </Link>
 
               <Link href="/message-nfts">
-                <Card className="group hover:shadow-lg transition-all duration-300 cursor-pointer">
-                  <CardHeader>
-                    <Palette className="h-8 w-8 text-pink-400 mb-2" />
-                    <CardTitle>NFT Messages</CardTitle>
-                    <CardDescription>Create artistic message NFTs</CardDescription>
+                <Card className="group hover:shadow-xl transition-all duration-300 cursor-pointer h-full bg-slate-800/40 border border-pink-400/30 hover:border-pink-400/60 electric-frame">
+                  <CardHeader className="text-center space-y-4">
+                    <div className="mx-auto p-3 rounded-lg bg-pink-400/10 group-hover:bg-pink-400/20 transition-colors border border-pink-400/20 w-fit">
+                      <Palette className="h-8 w-8 text-pink-400" />
+                    </div>
+                    <div>
+                      <CardTitle className="text-white group-hover:text-pink-400 transition-colors">NFT Messages</CardTitle>
+                      <CardDescription className="text-gray-300">Create artistic message NFTs</CardDescription>
+                    </div>
                   </CardHeader>
                 </Card>
               </Link>
             </div>
 
-            {/* Voice Recording */}
-            <Card>
+            {/* Voice Recording - Enhanced */}
+            <Card className="bg-slate-800/40 border border-electric-green/30 electric-frame">
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Mic className="h-5 w-5 text-electric-green" />
+                <CardTitle className="flex items-center gap-3 text-white">
+                  <div className="p-2 rounded-lg bg-electric-green/10 border border-electric-green/20">
+                    <Mic className="h-5 w-5 text-electric-green" />
+                  </div>
                   Voice Message Creator
                 </CardTitle>
-                <CardDescription>
-                  Record emotional voice messages and turn them into tokens
+                <CardDescription className="text-gray-300">
+                  Record emotional voice messages and turn them into blockchain tokens
                 </CardDescription>
               </CardHeader>
               <CardContent>
