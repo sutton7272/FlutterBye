@@ -123,6 +123,7 @@ export default function LaunchCountdown() {
                     key={index} 
                     className="electric-frame bg-gradient-to-br from-cyan-500/20 to-blue-500/20 relative overflow-hidden cursor-pointer hover:from-cyan-500/30 hover:to-blue-500/30 transition-all duration-300"
                     onClick={() => {
+                      console.log('Card clicked for content:', content.id, 'isExpanded:', isExpanded);
                       setExpandedContentId(isExpanded ? null : content.id);
                     }}
                   >
@@ -162,19 +163,21 @@ export default function LaunchCountdown() {
                             className="p-0 text-cyan-400 hover:text-cyan-300 text-sm mt-2"
                             onClick={(e) => {
                               e.stopPropagation();
+                              console.log('Read More clicked for content:', content.id);
                               setExpandedContentId(content.id);
                             }}
                           >
                             Read More →
                           </Button>
                         )}
-                        {isExpanded && hasFullContent && (
+                        {isExpanded && hasMoreContent && (
                           <Button 
                             variant="link" 
                             size="sm" 
                             className="p-0 text-cyan-400 hover:text-cyan-300 text-sm mt-2"
                             onClick={(e) => {
                               e.stopPropagation();
+                              console.log('Show Less clicked');
                               setExpandedContentId(null);
                             }}
                           >
@@ -767,12 +770,12 @@ export default function LaunchCountdown() {
 
                   {/* CTA Button */}
                   <div className="pt-2">
-                    <TutorialLaunchButton 
+                    <Button 
                       className="bg-gradient-to-r from-electric-blue to-circuit-teal hover:from-electric-blue/80 hover:to-circuit-teal/80 text-white px-4 py-2 text-sm w-full flex items-center justify-center gap-2 shadow-lg"
                     >
                       <Play className="w-4 h-4" />
                       Start Interactive Demo
-                    </TutorialLaunchButton>
+                    </Button>
                   </div>
 
                   {/* Stats */}
