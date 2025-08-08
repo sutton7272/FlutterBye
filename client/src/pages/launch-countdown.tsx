@@ -36,7 +36,7 @@ import {
 import flutterbeyeLogoPath from "@assets/image_1754068877999.png";
 import Navbar from "@/components/navbar";
 
-import { TutorialLaunchButton } from "@/components/interactive-tutorial";
+
 import { FlutterAIInteractiveTutorial } from "@/components/flutterai-interactive-tutorial";
 
 interface TimeLeft {
@@ -117,6 +117,15 @@ export default function LaunchCountdown() {
                 const contentText = isExpanded ? fullText : previewText;
                 
                 const shouldShowReadMore = !isExpanded && hasMoreContent;
+                
+                // Debug state information
+                console.log(`Content ${content.id} state:`, {
+                  isExpanded,
+                  hasMoreContent,
+                  shouldShowReadMore,
+                  expandedContentId,
+                  contentLength: content.content?.length
+                });
                 
                 return (
                   <Card 
