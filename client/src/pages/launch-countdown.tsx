@@ -354,8 +354,14 @@ export default function LaunchCountdown() {
 
         {/* Three Column Layout */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 max-w-7xl mx-auto mb-8">
-          {/* Left Column: VIP Signup */}
-          <div>
+          {/* Left Column: FlutterAI Tutorial + VIP Signup */}
+          <div className="space-y-4">
+            {/* FlutterAI Tutorial */}
+            <div className="max-w-full">
+              <FlutterAIInteractiveTutorial />
+            </div>
+
+            {/* VIP Signup */}
             <Card className="electric-frame">
               <CardHeader>
                 <CardTitle className="text-gradient flex items-center gap-2 text-lg">
@@ -444,9 +450,9 @@ export default function LaunchCountdown() {
             </Card>
           </div>
 
-          {/* Middle Column: Both Tutorials */}
-          <div className="space-y-4">
-            {/* Interactive Tutorial */}
+          {/* Middle Column: Platform Tutorial */}
+          <div>
+            {/* Platform Tutorial */}
             <Card className="electric-frame relative overflow-hidden">
               <div className="absolute inset-0 bg-gradient-to-br from-electric-blue/5 via-purple/5 to-electric-green/5 pointer-events-none"></div>
               <CardHeader className="pb-3 relative">
@@ -538,11 +544,6 @@ export default function LaunchCountdown() {
                 </div>
               </CardContent>
             </Card>
-
-            {/* FlutterAI Tutorial */}
-            <div className="max-w-full">
-              <FlutterAIInteractiveTutorial />
-            </div>
           </div>
 
           {/* Right Column: Early Access */}
