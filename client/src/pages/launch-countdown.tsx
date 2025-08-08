@@ -107,12 +107,16 @@ export default function LaunchCountdown() {
             <div className="space-y-6 max-w-4xl mx-auto">
               {latestContent.slice(0, 3).map((content: any, index: number) => {
                 const isExpanded = expandedContentId === content.id;
-                // Show preview text (first 300 chars) when collapsed, full content when expanded
-                const previewText = content.content?.slice(0, 300) || content.preview || 'Advanced AI-powered content generation...';
+                
+                // Check if content is truncated (ends with "...")
+                const hasMoreContent = content.content?.endsWith('...') || (content.content && content.content.length > 350);
+                
+                // Show preview text (first 350 chars) when collapsed, full content when expanded
+                const previewText = content.content?.slice(0, 350) || content.preview || 'Advanced AI-powered content generation...';
                 const fullText = content.content || content.preview || 'Advanced AI-powered content generation...';
                 const contentText = isExpanded ? fullText : previewText;
-                const hasFullContent = content.content && content.content.length > 300;
-                const shouldShowReadMore = !isExpanded && hasFullContent;
+                
+                const shouldShowReadMore = !isExpanded && hasMoreContent;
                 
                 return (
                   <Card 
