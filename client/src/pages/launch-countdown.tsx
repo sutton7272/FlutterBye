@@ -89,7 +89,7 @@ export default function LaunchCountdown() {
     }
 
     return (
-      <div className="border-t border-electric-blue/30 bg-gradient-to-r from-gray-900/80 via-electric-blue/10 to-purple-900/80 py-12 mt-16">
+      <div className="border-t border-electric-blue/30 py-12 mt-16">
         <div className="container mx-auto px-4">
           {/* Simple Header */}
           <div className="text-center mb-8">
