@@ -73,8 +73,8 @@ export default function LaunchCountdown() {
       queryKey: ['/api/ai/advanced-stats']
     });
 
-    const [selectedContent, setSelectedContent] = useState<any>(null);
-  const [expandedItems, setExpandedItems] = useState<{[key: number]: boolean}>({});
+    const [currentContentIndex, setCurrentContentIndex] = useState(0);
+    const [isExpanded, setIsExpanded] = useState(false);
 
     if (isLoading) {
       return (
@@ -104,83 +104,89 @@ export default function LaunchCountdown() {
 
           {/* Generated Content Display Only */}
           {latestContent && Array.isArray(latestContent) && latestContent.length > 0 ? (
-            <div className="space-y-6 max-w-4xl mx-auto">
-              {latestContent.slice(0, 3).map((content: any, index: number) => {
-                const isExpanded = expandedItems[content.id] || false;
+            <div className="max-w-4xl mx-auto">
+              {/* Navigation */}
+              <div className="flex items-center justify-between mb-6">
+                <button 
+                  className="bg-cyan-500 hover:bg-cyan-600 text-white px-4 py-2 rounded disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  onClick={() => {
+                    console.log('🔙 Previous clicked');
+                    setCurrentContentIndex(Math.max(0, currentContentIndex - 1));
+                    setIsExpanded(false);
+                  }}
+                  disabled={currentContentIndex === 0}
+                >
+                  ← Previous
+                </button>
                 
-                // Check if content is truncated (ends with "...")
-                const hasMoreContent = content.content?.endsWith('...') || (content.content && content.content.length > 350);
+                <span className="text-cyan-400 font-medium">
+                  Article {currentContentIndex + 1} of {latestContent.length}
+                </span>
                 
-                // Show preview text (first 350 chars) when collapsed, full content when expanded
-                const previewText = content.content?.slice(0, 350) || content.preview || 'Advanced AI-powered content generation...';
-                const fullText = content.content || content.preview || 'Advanced AI-powered content generation...';
-                const contentText = isExpanded ? fullText : previewText;
-                
-                const shouldShowReadMore = !isExpanded && hasMoreContent;
-                
-                // Debug logging
-                console.log(`Content ${content.id} render:`, { isExpanded });
+                <button 
+                  className="bg-cyan-500 hover:bg-cyan-600 text-white px-4 py-2 rounded disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  onClick={() => {
+                    console.log('🔜 Next clicked');
+                    setCurrentContentIndex(Math.min(latestContent.length - 1, currentContentIndex + 1));
+                    setIsExpanded(false);
+                  }}
+                  disabled={currentContentIndex >= latestContent.length - 1}
+                >
+                  Next →
+                </button>
+              </div>
+
+              {/* Current Article */}
+              {(() => {
+                const content = latestContent[currentContentIndex];
+                const fullContent = content.content || content.preview || 'Advanced AI-powered content generation...';
+                const showPreview = fullContent.length > 300 && !isExpanded;
+                const displayText = showPreview ? fullContent.slice(0, 300) + '...' : fullContent;
                 
                 return (
-                  <Card 
-                    key={index} 
-                    className="electric-frame bg-gradient-to-br from-cyan-500/20 to-blue-500/20 relative overflow-hidden cursor-pointer hover:from-cyan-500/30 hover:to-blue-500/30 transition-all duration-300"
-                    onClick={() => {
-                      console.log('🎯 CARD CLICKED - Content ID:', content.id);
-                      const newState = !expandedItems[content.id];
-                      setExpandedItems(prev => ({ ...prev, [content.id]: newState }));
-                      console.log('📝 New expansion state:', newState);
-                    }}
-                  >
+                  <Card className="electric-frame bg-gradient-to-br from-cyan-500/20 to-blue-500/20 relative overflow-hidden">
                     <div className="absolute inset-0 bg-gradient-to-r from-transparent via-cyan-400/10 to-transparent animate-pulse"></div>
-                    <CardContent className="p-6 relative z-10">
-                      <div className="flex items-start justify-between mb-3">
+                    <CardContent className="p-8 relative z-10">
+                      <div className="flex items-start justify-between mb-4">
                         <Badge className="bg-gradient-to-r from-cyan-600 to-blue-600 text-white border-0 shadow-lg">
                           {content.type || 'FlutterBlog'}
                         </Badge>
-                        <div className="flex items-center gap-2">
-                          <span className="text-xs text-muted-foreground">{content.timestamp || 'Just now'}</span>
-                          <Button variant="ghost" size="sm" className="h-6 w-6 p-0 hover:bg-cyan-500/20">
-                            {isExpanded ? (
-                              <span className="text-xs">−</span>
-                            ) : (
-                              <span className="text-xs">+</span>
-                            )}
-                          </Button>
-                        </div>
+                        <span className="text-sm text-muted-foreground">{content.timestamp || 'Just now'}</span>
                       </div>
                       
-                      <h4 className="font-bold text-xl text-gradient mb-3 leading-tight">
+                      <h2 className="font-bold text-2xl text-gradient mb-6 leading-tight">
                         {content.title || content.topic || 'FlutterBlog Content'}
-                      </h4>
+                      </h2>
                       
-                      <div className="text-muted-foreground text-sm leading-relaxed mb-4">
-                        <div className="whitespace-pre-wrap">
-                          {contentText}
-                          {shouldShowReadMore && "..."}
-                        </div>
-                        
-
+                      <div className="text-muted-foreground leading-relaxed mb-6 text-base whitespace-pre-wrap">
+                        {displayText}
                       </div>
                       
-                      <div className="flex items-center gap-4 text-xs text-muted-foreground">
-                        {content.wordCount && <span className="flex items-center gap-1"><span className="text-cyan-400">📊</span> {content.wordCount} words</span>}
-                        {content.seoScore && <span className="flex items-center gap-1"><span className="text-green-400">🎯</span> SEO: {content.seoScore}%</span>}
-                        {content.readabilityScore && <span className="flex items-center gap-1"><span className="text-blue-400">📖</span> Readability: {content.readabilityScore}%</span>}
-                        <span className="text-electric-green font-semibold">✨ AI Optimized</span>
-                      </div>
-                      
-
-                      
-                      {shouldShowReadMore && (
-                        <div className="mt-3 text-center">
-                          <span className="text-xs text-cyan-400/70">Click to read full article</span>
+                      {/* Expand/Collapse Button */}
+                      {fullContent.length > 300 && (
+                        <div className="text-center mb-6">
+                          <button 
+                            className="bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white px-6 py-3 rounded-lg font-medium transition-all duration-300 shadow-lg"
+                            onClick={() => {
+                              console.log('🔄 Expand/Collapse clicked:', !isExpanded);
+                              setIsExpanded(!isExpanded);
+                            }}
+                          >
+                            {isExpanded ? '▲ Show Less' : '▼ Read Full Article'}
+                          </button>
                         </div>
                       )}
+                      
+                      <div className="flex items-center gap-6 text-sm text-muted-foreground border-t border-cyan-500/20 pt-4">
+                        {content.wordCount && <span className="flex items-center gap-2"><span className="text-cyan-400">📊</span> {content.wordCount} words</span>}
+                        {content.seoScore && <span className="flex items-center gap-2"><span className="text-green-400">🎯</span> SEO: {content.seoScore}%</span>}
+                        {content.readabilityScore && <span className="flex items-center gap-2"><span className="text-blue-400">📖</span> Readability: {content.readabilityScore}%</span>}
+                        <span className="text-electric-green font-semibold">✨ AI Optimized</span>
+                      </div>
                     </CardContent>
                   </Card>
                 );
-              })}
+              })()}
             </div>
           ) : (
             <Card className="electric-frame max-w-2xl mx-auto bg-gradient-to-br from-cyan-500/20 to-blue-500/20 relative overflow-hidden">
