@@ -1,6 +1,8 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { productionConfig } from "./production-config";
+import { mainNetService } from "./mainnet-config";
+import { flbyTokenMainNetService } from "./flby-token-mainnet";
 import cors from 'cors';
 import { 
   globalRateLimit, 
@@ -8764,6 +8766,94 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ discount, tier, flbyBalance });
     } catch (error) {
       res.status(500).json({ error: 'Failed to calculate fee discount' });
+    }
+  });
+
+  // Priority #7: Enhanced MainNet Configuration API
+  app.get("/api/mainnet/configuration", async (req, res) => {
+    try {
+      const [connectionTest, walletValidation, productionReadiness] = await Promise.all([
+        mainNetService.validateMainNetConnection(),
+        mainNetService.validateProductionWallets(),
+        mainNetService.getProductionReadinessScore()
+      ]);
+
+      res.json({
+        success: true,
+        timestamp: new Date().toISOString(),
+        mainnet: {
+          connection: connectionTest,
+          wallets: walletValidation,
+          readinessScore: productionReadiness.score,
+          recommendations: productionReadiness.recommendations
+        },
+        network: connectionTest.success ? await mainNetService.getNetworkStatus() : null
+      });
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        error: error.message,
+        timestamp: new Date().toISOString()
+      });
+    }
+  });
+
+  // FLBY Token Deployment Readiness API
+  app.get("/api/flby-token/deployment-readiness", async (req, res) => {
+    try {
+      const readiness = await flbyTokenMainNetService.validateDeploymentReadiness();
+      
+      res.json({
+        success: true,
+        timestamp: new Date().toISOString(),
+        deployment: readiness,
+        tokenConfig: {
+          name: "Flutterbye",
+          symbol: "FLBY",
+          totalSupply: "1,000,000,000",
+          decimals: 9,
+          distribution: {
+            public: "40% (400M tokens)",
+            team: "20% (200M tokens)", 
+            ecosystem: "25% (250M tokens)",
+            treasury: "15% (150M tokens)"
+          }
+        }
+      });
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        error: error.message,
+        timestamp: new Date().toISOString()
+      });
+    }
+  });
+
+  // Enhanced FLBY Fee Discount Calculator API
+  app.post("/api/flby-token/calculate-discount", async (req, res) => {
+    try {
+      const { flbyBalance, originalFee } = req.body;
+      
+      if (typeof flbyBalance !== 'number' || typeof originalFee !== 'number') {
+        return res.status(400).json({
+          success: false,
+          error: "flbyBalance and originalFee must be numbers"
+        });
+      }
+
+      const discount = flbyTokenMainNetService.applyFLBYDiscount(originalFee, flbyBalance);
+      
+      res.json({
+        success: true,
+        timestamp: new Date().toISOString(),
+        discount
+      });
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        error: error.message,
+        timestamp: new Date().toISOString()
+      });
     }
   });
 
