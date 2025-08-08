@@ -725,41 +725,6 @@ export default function LaunchCountdown() {
                       <span>💰 FLBY rewards</span>
                       <span>🚀 Early launch</span>
                     </div>
-
-                    {/* Additional padding to match other columns */}
-                    <div className="space-y-3 pt-4">
-                      <div className="bg-gradient-to-r from-cyan-500/10 to-blue-500/10 border border-cyan-500/20 rounded-lg p-3">
-                        <div className="flex items-center gap-2 mb-2">
-                          <div className="w-2 h-2 bg-cyan-400 rounded-full animate-pulse"></div>
-                          <h4 className="font-medium text-cyan-400 text-sm">Priority Access</h4>
-                        </div>
-                        <p className="text-xs text-muted-foreground">
-                          VIP members get first access to all new features and revenue opportunities.
-                        </p>
-                      </div>
-                      
-                      <div className="bg-slate-900/50 rounded-lg p-3 border border-slate-700">
-                        <h5 className="text-xs font-semibold text-white mb-2">Platform Readiness:</h5>
-                        <div className="grid grid-cols-2 gap-2 text-xs">
-                          <div className="flex items-center gap-1">
-                            <div className="w-2 h-2 bg-green-400 rounded-full"></div>
-                            <span className="text-muted-foreground">Core Platform</span>
-                          </div>
-                          <div className="flex items-center gap-1">
-                            <div className="w-2 h-2 bg-green-400 rounded-full"></div>
-                            <span className="text-muted-foreground">AI Intelligence</span>
-                          </div>
-                          <div className="flex items-center gap-1">
-                            <div className="w-2 h-2 bg-green-400 rounded-full"></div>
-                            <span className="text-muted-foreground">Blockchain</span>
-                          </div>
-                          <div className="flex items-center gap-1">
-                            <div className="w-2 h-2 bg-yellow-400 rounded-full"></div>
-                            <span className="text-muted-foreground">Enterprise</span>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
                   </div>
                 )}
               </CardContent>
@@ -854,44 +819,6 @@ export default function LaunchCountdown() {
                     <div className="bg-gradient-to-r from-orange-400 to-red-400 h-1.5 rounded-full" style={{ width: '83.6%' }}></div>
                   </div>
                   <p className="text-xs text-muted-foreground mt-1">83.6% of spots claimed</p>
-                </div>
-
-                {/* Recent Activity - Compact */}
-                <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-3">
-                  <h4 className="font-medium text-blue-400 mb-2 flex items-center gap-2 text-sm">
-                    <Users className="w-3 h-3" />
-                    Live Activity
-                    <div className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse"></div>
-                  </h4>
-                  <div className="space-y-1.5 text-xs">
-                    <div className="flex justify-between items-center">
-                      <span className="text-muted-foreground">🔥 crypto_whale joined</span>
-                      <span className="text-xs text-muted-foreground">2m</span>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-muted-foreground">🚀 defi_builder signed up</span>
-                      <span className="text-xs text-muted-foreground">5m</span>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-muted-foreground">💎 web3_dev joined</span>
-                      <span className="text-xs text-muted-foreground">8m</span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Community Stats */}
-                <div className="bg-slate-900/50 rounded-lg p-3 border border-slate-700">
-                  <h5 className="text-xs font-semibold text-white mb-2">Community Growth:</h5>
-                  <div className="grid grid-cols-2 gap-2 text-xs">
-                    <div className="text-center">
-                      <div className="text-sm font-bold text-cyan-400">+347</div>
-                      <div className="text-muted-foreground">Today</div>
-                    </div>
-                    <div className="text-center">
-                      <div className="text-sm font-bold text-green-400">2.1K</div>
-                      <div className="text-muted-foreground">This Week</div>
-                    </div>
-                  </div>
                 </div>
               </CardContent>
             </Card>
