@@ -411,6 +411,24 @@ export default function LaunchCountdown() {
           </CardContent>
         </Card>
 
+        {/* Progress Bar */}
+        <div className="max-w-4xl mx-auto mt-8 mb-8">
+          <div className="bg-muted/20 rounded-full h-2 overflow-hidden electric-frame">
+            <div 
+              className="h-full bg-gradient-to-r from-cyan-500 via-blue-500 to-purple-500 transition-all duration-1000 ease-out"
+              style={{
+                width: `${Math.max(0, Math.min(100, 
+                  100 - ((launchDate.getTime() - new Date().getTime()) / (30 * 24 * 60 * 60 * 1000)) * 100
+                ))}%`
+              }}
+            />
+          </div>
+          <div className="flex justify-between text-xs text-muted-foreground mt-2">
+            <span>Pre-Launch Started</span>
+            <span>Launch Day</span>
+          </div>
+        </div>
+
         {/* Header */}
         <div className="text-center mb-8">
           <div className="relative inline-block mb-4">
@@ -1004,23 +1022,7 @@ export default function LaunchCountdown() {
           </div>
         </div>
 
-        {/* Progress Bar */}
-        <div className="max-w-4xl mx-auto mt-12">
-          <div className="bg-muted/20 rounded-full h-2 overflow-hidden electric-frame">
-            <div 
-              className="h-full bg-gradient-to-r from-cyan-500 via-blue-500 to-purple-500 transition-all duration-1000 ease-out"
-              style={{
-                width: `${Math.max(0, Math.min(100, 
-                  100 - ((launchDate.getTime() - new Date().getTime()) / (30 * 24 * 60 * 60 * 1000)) * 100
-                ))}%`
-              }}
-            />
-          </div>
-          <div className="flex justify-between text-xs text-muted-foreground mt-2">
-            <span>Pre-Launch Started</span>
-            <span>Launch Day</span>
-          </div>
-        </div>
+
 
         {/* AI-Generated Content Showcase */}
         <AIContentShowcase />
