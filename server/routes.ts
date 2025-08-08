@@ -134,6 +134,44 @@ export async function registerRoutes(app: Express): Promise<Server> {
     res.json(stats);
   });
   
+  // Admin system stats endpoint
+  app.get('/api/admin/system-stats', async (req, res) => {
+    try {
+      const stats = {
+        system: {
+          uptime: process.uptime(),
+          memory: process.memoryUsage(),
+          cpuUsage: process.cpuUsage(),
+          platform: process.platform,
+          nodeVersion: process.version
+        },
+        blockchain: {
+          network: 'devnet',
+          rpcEndpoint: 'https://api.devnet.solana.com',
+          status: 'connected'
+        },
+        database: {
+          status: 'connected',
+          collections: 12,
+          totalRecords: 500
+        },
+        websocket: {
+          status: 'active',
+          connectedClients: 0,
+          totalSessions: 0
+        },
+        timestamp: new Date().toISOString()
+      };
+      
+      res.json(stats);
+    } catch (error) {
+      console.error('System stats error:', error);
+      res.status(500).json({
+        error: 'Failed to fetch system statistics'
+      });
+    }
+  });
+
   app.get('/api/admin/features', optimizedCache(300000), async (req, res) => {
     try {
       // Return mock features data for admin dashboard

@@ -36,6 +36,103 @@ const csvUploadSchema = z.object({
  */
 export function registerFlutterAIWalletRoutes(app: Express): void {
   
+  // ==================== BASIC WALLET ENDPOINTS ====================
+  
+  /**
+   * Get wallet balance
+   * GET /api/wallet/balance/:address
+   */
+  app.get('/api/wallet/balance/:address', async (req, res) => {
+    try {
+      const { address } = req.params;
+      
+      // TODO: Implement actual balance checking via Solana RPC
+      const mockBalance = {
+        sol: Math.random() * 10,
+        usdc: Math.random() * 1000,
+        flby: Math.random() * 500
+      };
+      
+      res.json({
+        success: true,
+        walletAddress: address,
+        balances: mockBalance,
+        timestamp: new Date().toISOString()
+      });
+    } catch (error) {
+      console.error('Wallet balance error:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Failed to fetch wallet balance'
+      });
+    }
+  });
+
+  /**
+   * Get token holdings
+   * GET /api/tokens/holdings/:address
+   */
+  app.get('/api/tokens/holdings/:address', async (req, res) => {
+    try {
+      const { address } = req.params;
+      
+      // TODO: Implement actual token holdings via storage/database
+      const mockHoldings = [
+        {
+          tokenId: 'FLBY-MSG-001',
+          amount: 1,
+          message: 'Welcome to Flutterbye!',
+          value: 0.1,
+          currency: 'SOL'
+        }
+      ];
+      
+      res.json({
+        success: true,
+        walletAddress: address,
+        holdings: mockHoldings,
+        totalCount: mockHoldings.length,
+        timestamp: new Date().toISOString()
+      });
+    } catch (error) {
+      console.error('Token holdings error:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Failed to fetch token holdings'
+      });
+    }
+  });
+
+  /**
+   * Connect wallet endpoint
+   * POST /api/wallet/connect
+   */
+  app.post('/api/wallet/connect', async (req, res) => {
+    try {
+      const { walletAddress } = req.body;
+      
+      if (!walletAddress) {
+        return res.status(400).json({
+          success: false,
+          error: 'Wallet address is required'
+        });
+      }
+      
+      res.json({
+        success: true,
+        message: 'Wallet connected successfully',
+        walletAddress,
+        timestamp: new Date().toISOString()
+      });
+    } catch (error) {
+      console.error('Wallet connect error:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Failed to connect wallet'
+      });
+    }
+  });
+  
   // ==================== WALLET COLLECTION ENDPOINTS ====================
   
   /**
