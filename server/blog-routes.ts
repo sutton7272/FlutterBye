@@ -6,6 +6,7 @@ import { blogService } from "./openai-blog-service";
 import type { BlogGenerationRequest } from "./openai-blog-service";
 import { databaseOptimizer } from "./database-optimizer";
 import { aiCostOptimizer } from "./ai-cost-optimizer";
+import { fastCache, responseTimeMonitor } from "./performance-optimizer";
 
 /**
  * Blog API Routes for FlutterBlog Bot System
@@ -15,42 +16,41 @@ export function registerBlogRoutes(app: Express) {
   // ================== BLOG POSTS CRUD ==================
   
   /**
-   * Get all blog posts with pagination and filtering - OPTIMIZED
+   * Get all blog posts with pagination and filtering - PERFORMANCE OPTIMIZED
    */
-  app.get("/api/blog/posts", async (req, res) => {
+  app.get("/api/blog/posts", fastCache(30000), responseTimeMonitor, async (req, res) => {
     try {
-      const limit = Math.min(parseInt(req.query.limit as string) || 10, 50);
+      const start = Date.now();
+      const limit = Math.min(parseInt(req.query.limit as string) || 10, 20); // Reduced limit
       const offset = parseInt(req.query.offset as string) || 0;
       const status = req.query.status as string || undefined;
       
-      // Build query with optional filters
-      let query = db.select().from(blogPosts);
-      
-      if (status) {
-        query = query.where(eq(blogPosts.status, status));
-      }
-      
-      const posts = await query
+      // Simplified query for better performance
+      const posts = await db
+        .select({
+          id: blogPosts.id,
+          title: blogPosts.title,
+          content: sql<string>`SUBSTR(${blogPosts.content}, 1, 500)`, // Limit content for performance
+          excerpt: blogPosts.excerpt,
+          status: blogPosts.status,
+          createdAt: blogPosts.createdAt,
+          tone: blogPosts.tone,
+          contentType: blogPosts.contentType,
+          keywords: blogPosts.keywords,
+          seoScore: blogPosts.seoScore,
+          readabilityScore: blogPosts.readabilityScore,
+          engagementPotential: blogPosts.engagementPotential
+        })
+        .from(blogPosts)
+        .where(status ? eq(blogPosts.status, status) : undefined)
         .orderBy(desc(blogPosts.createdAt))
-        .limit(limit)
-        .offset(offset);
+        .limit(limit);
       
-      // Get total count for pagination
-      const totalQuery = db.select({ count: sql<number>`count(*)` }).from(blogPosts);
-      if (status) {
-        totalQuery.where(eq(blogPosts.status, status));
-      }
-      const [{ count: total }] = await totalQuery;
+      const responseTime = Date.now() - start;
+      res.setHeader('X-Response-Time', `${responseTime}ms`);
+      res.setHeader('Cache-Control', 'public, max-age=60'); // Cache for 1 minute
       
-      res.json({ 
-        posts,
-        pagination: {
-          total,
-          limit,
-          offset,
-          hasMore: offset + limit < total
-        }
-      });
+      res.json({ posts });
     } catch (error) {
       console.error("Error fetching blog posts:", error);
       res.status(500).json({ error: "Failed to fetch blog posts" });

@@ -71,6 +71,7 @@ import flutterAIPricingRoutes, { apiRateLimitMiddleware } from "./flutterai-pric
 import { flutterAIAutoCollection } from './flutterai-auto-collection';
 import { Connection, Keypair, LAMPORTS_PER_SOL, PublicKey, Transaction, SystemProgram } from '@solana/web3.js';
 import bs58 from 'bs58';
+import { devNetService, performDevNetHealthCheck, DEVNET_CONFIG } from './devnet-config';
 import { enterpriseApiHandlers } from "./enterprise-api";
 import { governmentApiHandlers } from "./government-api";
 import { aiMarketingService } from "./ai-marketing-service";
@@ -223,6 +224,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
       version: '1.0.0',
       realTimeMetrics: metrics
     });
+  });
+
+  // DevNet blockchain health check
+  app.get('/api/devnet/health', async (req, res) => {
+    try {
+      const healthCheck = await performDevNetHealthCheck();
+      const config = devNetService.getConfig();
+      
+      res.json({
+        blockchain: 'solana-devnet',
+        config: {
+          endpoint: config.rpcEndpoint,
+          commitment: config.commitment,
+          environment: config.environment
+        },
+        health: healthCheck,
+        timestamp: new Date().toISOString()
+      });
+    } catch (error) {
+      console.error('DevNet health check failed:', error);
+      res.status(500).json({
+        blockchain: 'solana-devnet',
+        status: 'error',
+        error: error instanceof Error ? error.message : 'Unknown error'
+      });
+    }
   });
 
   // NFT Pricing Management API Endpoints
@@ -5305,84 +5332,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
   process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
   process.on('SIGINT', () => gracefulShutdown('SIGINT'));
   
-  // Setup Real-time Intelligence WebSocket Engine
+  // Setup Real-time Intelligence Engine (background processing only)
   try {
     const { realTimeIntelligenceEngine } = await import('./real-time-intelligence-engine');
-    realTimeIntelligenceEngine.setupWebSocketServer(httpServer);
+    // Skip WebSocket setup to avoid conflict with FlutterbeyeWebSocketServer
     realTimeIntelligenceEngine.startContinuousProcessing();
-    console.log("🚀 Real-time Intelligence Engine with WebSocket streaming activated");
+    console.log("🚀 Real-time Intelligence Engine background processing activated");
   } catch (error) {
     console.warn("⚠️ Real-time Intelligence Engine not available:", error.message);
   }
   
-  // WebSocket server for real-time heatmap data and chat
-  const { WebSocketServer, WebSocket } = await import('ws');
-  const wss = new WebSocketServer({ server: httpServer, path: '/ws' });
-  wss.on('connection', (ws, request) => {
-    const url = new URL(request.url!, `http://${request.headers.host}`);
-    const isChat = url.pathname === '/ws' && url.searchParams.has('wallet');
-    
-    if (isChat) {
-      // Handle chat connection
-      console.log('Client connected to chat WebSocket');
-      chatService.handleWebSocketConnection(ws, request);
-    } else {
-      // Handle heatmap connection
-      console.log('Client connected to heatmap WebSocket');
-    
-    // Send initial data
-    ws.send(JSON.stringify({
-      type: 'init',
-      data: {
-        nodes: [],
-        connections: [],
-        stats: {
-          activeNodes: 0,
-          totalVolume: 0,
-          peakActivity: 0,
-          networkDensity: 0
-        }
-      }
-    }));
-    // Simulate real-time transaction data
-    const interval = setInterval(() => {
-      if (ws.readyState === WebSocket.OPEN) {
-        const transactionTypes = ['mint', 'transfer', 'redeem', 'sms'];
-        const messages = [
-          'thinking of you always',
-          'good morning sunshine', 
-          'StakeForRewards',
-          'HodlTillMoon',
-          'sorry about yesterday',
-          'you got this champ',
-          'BullMarketVibes',
-          'happy birthday friend'
-        ];
-        ws.send(JSON.stringify({
-          type: 'transaction',
-          data: {
-            id: `tx_${Date.now()}_${Math.random()}`,
-            type: transactionTypes[Math.floor(Math.random() * transactionTypes.length)],
-            message: messages[Math.floor(Math.random() * messages.length)],
-            value: Math.floor(Math.random() * 200) + 1,
-            walletAddress: generateRandomWallet(),
-            timestamp: new Date().toISOString(),
-            x: Math.random() * 800,
-            y: Math.random() * 400
-          }
-        }));
-      }
-    }, 2000 + Math.random() * 3000);
-    ws.on('close', () => {
-      console.log('Client disconnected from heatmap WebSocket');
-      clearInterval(interval);
-    });
-    ws.on('error', (error) => {
-      console.error('WebSocket error:', error);
-      clearInterval(interval);
-    });
-    }
-  });
+  // Initialize comprehensive WebSocket server for real-time intelligence
+  const wsServer = new FlutterbeyeWebSocketServer(httpServer);
+  
+  // Store WebSocket server reference for broadcasting
+  (app as any).wsServer = wsServer;
   function generateRandomWallet(): string {
     const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz123456789';
     const start = Array.from({length: 4}, () => chars[Math.floor(Math.random() * chars.length)]).join('');
@@ -9430,11 +9394,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     console.warn("⚠️ Blog Content Scheduler initialization failed:", error);
   }
   
-  // Initialize WebSocket server for real-time updates
-  const wsServer = new FlutterbeyeWebSocketServer(httpServer);
-  
-  // Store WebSocket server reference for broadcasting
-  (httpServer as any).wsServer = wsServer;
+  // WebSocket server already initialized above - reuse reference
   console.log('📡 Real-time WebSocket intelligence system activated!');
   
   // Graceful shutdown handler for blog scheduler

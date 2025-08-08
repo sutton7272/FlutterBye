@@ -11,8 +11,16 @@ import {
 } from '@solana/spl-token';
 // Note: Buffer polyfill handled by build system
 
-// Solana DevNet RPC endpoint
-const SOLANA_RPC_URL = 'https://api.devnet.solana.com';
+// Solana DevNet Configuration - Production Ready
+const DEVNET_CONFIG = {
+  rpcUrl: 'https://api.devnet.solana.com',
+  wsUrl: 'wss://api.devnet.solana.com',
+  commitment: 'confirmed' as const,
+  network: 'devnet' as const,
+  explorerUrl: 'https://explorer.solana.com'
+};
+
+const SOLANA_RPC_URL = DEVNET_CONFIG.rpcUrl;
 
 export interface TokenCreationParams {
   message: string;
@@ -32,7 +40,41 @@ export class SolanaService {
   private connection: Connection;
 
   constructor() {
-    this.connection = new Connection(SOLANA_RPC_URL, 'confirmed');
+    this.connection = new Connection(SOLANA_RPC_URL, DEVNET_CONFIG.commitment);
+  }
+
+  // Get DevNet configuration
+  getDevNetConfig() {
+    return DEVNET_CONFIG;
+  }
+
+  // Verify DevNet connectivity
+  async verifyDevNetConnection(): Promise<{ 
+    connected: boolean; 
+    latency: number; 
+    slot: number;
+    network: string;
+  }> {
+    try {
+      const start = Date.now();
+      const slot = await this.connection.getSlot();
+      const latency = Date.now() - start;
+      
+      return {
+        connected: slot > 0,
+        latency,
+        slot,
+        network: DEVNET_CONFIG.network
+      };
+    } catch (error) {
+      console.error('DevNet connection failed:', error);
+      return {
+        connected: false,
+        latency: -1,
+        slot: -1,
+        network: DEVNET_CONFIG.network
+      };
+    }
   }
 
   // Check if wallet address is valid format
