@@ -294,6 +294,13 @@ function Router() {
           </AdminRouteGuard>
         )} />
         
+        <Route path="/admin/escrow" component={() => (
+          <AdminRouteGuard>
+            <Navbar />
+            <EscrowManagementDashboard />
+          </AdminRouteGuard>
+        )} />
+        
         {/* Legacy Admin Route */}
         <Route path="/admin-legacy" component={() => (
           <>
