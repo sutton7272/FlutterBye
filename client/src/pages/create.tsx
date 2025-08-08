@@ -109,7 +109,6 @@ export default function Create() {
             <h1 className="text-4xl font-bold bg-gradient-to-r from-electric-blue to-electric-green bg-clip-text text-transparent">
               Create Message Tokens
             </h1>
-            <ContextualChatButton context="flutterbyemsg" />
           </div>
           <p className="text-lg text-gray-200 max-w-2xl mx-auto leading-relaxed">
             Create 27-character message tokens with redeemable value - perfect for digital greeting cards or targeted crypto marketing
