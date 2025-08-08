@@ -167,11 +167,9 @@ export default function Create() {
             </div>
 
             {/* Main Flutterbye Message Creation Center */}
-            <Card className="border-2 border-electric-blue/20 shadow-lg">
-              <CardContent>
-                <Mint />
-              </CardContent>
-            </Card>
+            <div className="bg-transparent">
+              <Mint />
+            </div>
           </TabsContent>
 
           <TabsContent value="ai-tools" className="space-y-6">
