@@ -333,7 +333,7 @@ export function CustodialWalletManagement() {
               ) : (
                 <div className="space-y-4">
                   {wallets.map((wallet) => (
-                    <div key={wallet.id} className="bg-dark-navy/70 border border-electric-blue/20 rounded-lg p-4 backdrop-blur-sm">
+                    <div key={wallet.id} className="bg-black/25 backdrop-blur-sm border-2 border-electric-blue/40 rounded-lg p-4 shadow-md shadow-electric-blue/5">
                       <div className="flex items-center justify-between mb-2">
                         <div className="flex items-center space-x-3">
                           <Badge className={getStatusColor(wallet.status)}>
@@ -346,33 +346,33 @@ export function CustodialWalletManagement() {
                             {wallet.isHotWallet ? "Hot" : "Cold"}
                           </Badge>
                         </div>
-                        <div className="text-sm text-gray-400">
+                        <div className="text-sm text-gray-300">
                           Created {new Date(wallet.createdAt).toLocaleDateString()}
                         </div>
                       </div>
                       
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-3">
                         <div>
-                          <Label className="text-xs text-gray-400">Wallet Address</Label>
+                          <Label className="text-xs text-gray-300">Wallet Address</Label>
                           <div className="text-sm font-mono text-white truncate">
                             {wallet.walletAddress}
                           </div>
                         </div>
                         <div>
-                          <Label className="text-xs text-gray-400">Available Balance</Label>
+                          <Label className="text-xs text-gray-300">Available Balance</Label>
                           <div className="text-sm font-semibold text-green-400">
                             {formatCurrency(wallet.balance, wallet.currency)}
                           </div>
                         </div>
                         <div>
-                          <Label className="text-xs text-gray-400">Reserved Balance</Label>
+                          <Label className="text-xs text-gray-300">Reserved Balance</Label>
                           <div className="text-sm font-semibold text-yellow-400">
                             {formatCurrency(wallet.reservedBalance, wallet.currency)}
                           </div>
                         </div>
                       </div>
                       
-                      <div className="text-xs text-gray-500">
+                      <div className="text-xs text-gray-400">
                         Last health check: {new Date(wallet.lastHealthCheck).toLocaleString()}
                       </div>
                     </div>
@@ -425,7 +425,7 @@ export function CustodialWalletManagement() {
                   )}
                   
                   {healthChecks.map((check: any) => (
-                    <div key={check.walletId} className="bg-black/25 backdrop-blur-sm border border-electric-blue/30 rounded-lg p-4">
+                    <div key={check.walletId} className="bg-black/25 backdrop-blur-sm border-2 border-electric-blue/40 rounded-lg p-4 shadow-md shadow-electric-blue/5">
                       <div className="flex items-center justify-between mb-2">
                         <div className="flex items-center space-x-2">
                           {check.isHealthy ? (
@@ -442,7 +442,7 @@ export function CustodialWalletManagement() {
                         </Badge>
                       </div>
                       
-                      <div className="text-sm text-gray-300 mb-2">
+                      <div className="text-sm text-gray-200 mb-2">
                         Current Balance: {formatCurrency(check.currentBalance, check.currency)}
                       </div>
                       
@@ -457,7 +457,7 @@ export function CustodialWalletManagement() {
                         </div>
                       )}
                       
-                      <div className="text-xs text-gray-500 mt-2">
+                      <div className="text-xs text-gray-400 mt-2">
                         Last checked: {new Date(check.lastHealthCheck).toLocaleString()}
                       </div>
                     </div>
@@ -501,7 +501,7 @@ export function CustodialWalletManagement() {
                 <ScrollArea className="h-96">
                   <div className="space-y-3">
                     {securityLogs.map((log) => (
-                      <div key={log.id} className="bg-black/25 backdrop-blur-sm border border-electric-blue/30 rounded-lg p-3">
+                      <div key={log.id} className="bg-black/25 backdrop-blur-sm border-2 border-electric-blue/40 rounded-lg p-3 shadow-md shadow-electric-blue/5">
                         <div className="flex items-center justify-between mb-2">
                           <div className="flex items-center space-x-2">
                             <Badge className={getSeverityColor(log.severity)}>
@@ -511,23 +511,23 @@ export function CustodialWalletManagement() {
                               {log.eventType.replace(/_/g, ' ').toUpperCase()}
                             </span>
                           </div>
-                          <div className="text-xs text-gray-400">
+                          <div className="text-xs text-gray-300">
                             {new Date(log.createdAt).toLocaleString()}
                           </div>
                         </div>
                         
-                        <div className="text-sm text-gray-300 mb-2">
+                        <div className="text-sm text-gray-200 mb-2">
                           User ID: {log.userId || 'N/A'}
                         </div>
                         
                         {log.ipAddress && (
-                          <div className="text-xs text-gray-400 mb-1">
+                          <div className="text-xs text-gray-300 mb-1">
                             IP: {log.ipAddress} {log.location && `| ${log.location}`}
                           </div>
                         )}
                         
                         {log.details && (
-                          <div className="text-xs text-gray-500 bg-gray-800/50 p-2 rounded mt-2">
+                          <div className="text-xs text-gray-300 bg-black/20 backdrop-blur-sm p-2 rounded mt-2 border border-electric-blue/20">
                             {JSON.stringify(log.details, null, 2)}
                           </div>
                         )}
