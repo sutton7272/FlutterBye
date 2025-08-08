@@ -528,6 +528,68 @@ export default function LaunchCountdown() {
                 </div>
               </CardContent>
             </Card>
+
+            {/* What is Flutterbye */}
+            <Card className="electric-frame mt-4">
+              <CardHeader>
+                <CardTitle className="text-gradient text-lg">What is Flutterbye?</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-4">
+                  <div className="flex items-start gap-3">
+                    <Zap className="w-5 h-5 text-yellow-400 mt-1" />
+                    <div>
+                      <h4 className="font-medium text-sm">Tokenized Messaging</h4>
+                      <p className="text-xs text-muted-foreground">
+                        Turn your 27-character messages into valuable SPL tokens on Solana
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start gap-3">
+                    <Coins className="w-5 h-5 text-green-400 mt-1" />
+                    <div>
+                      <h4 className="font-medium text-sm">Value Attachment</h4>
+                      <p className="text-xs text-muted-foreground">
+                        Attach real value to your messages - turn words into wealth
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start gap-3">
+                    <Users className="w-5 h-5 text-blue-400 mt-1" />
+                    <div>
+                      <h4 className="font-medium text-sm">Viral Distribution</h4>
+                      <p className="text-xs text-muted-foreground">
+                        Share tokens with specific wallets, create viral campaigns
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start gap-3">
+                    <Wallet className="w-5 h-5 text-purple-400 mt-1" />
+                    <div>
+                      <h4 className="font-medium text-sm">FLBY Token Economy</h4>
+                      <p className="text-xs text-muted-foreground">
+                        Stake, govern, and earn with our native FLBY token ecosystem
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-muted/20 rounded-lg p-3 mt-4">
+                  <h4 className="font-medium text-cyan-400 mb-2 text-sm">Revolutionary Features Coming:</h4>
+                  <ul className="text-xs text-muted-foreground space-y-1">
+                    <li>• SMS-to-blockchain integration</li>
+                    <li>• AI-powered emotion analysis</li>
+                    <li>• Enterprise marketing campaigns</li>
+                    <li>• Greeting cards with scheduled delivery</li>
+                    <li>• Real-time chat with tokenized rewards</li>
+                    <li>• Comprehensive staking and governance</li>
+                  </ul>
+                </div>
+              </CardContent>
+            </Card>
           </div>
 
           {/* Right Column: VIP Waitlist */}
@@ -762,67 +824,7 @@ export default function LaunchCountdown() {
             </CardContent>
           </Card>
 
-          {/* What is Flutterbye */}
-          <Card className="electric-frame">
-            <CardHeader>
-              <CardTitle className="text-gradient">What is Flutterbye?</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-4">
-                <div className="flex items-start gap-3">
-                  <Zap className="w-5 h-5 text-yellow-400 mt-1" />
-                  <div>
-                    <h4 className="font-medium">Tokenized Messaging</h4>
-                    <p className="text-sm text-muted-foreground">
-                      Turn your 27-character messages into valuable SPL tokens on Solana
-                    </p>
-                  </div>
-                </div>
 
-                <div className="flex items-start gap-3">
-                  <Coins className="w-5 h-5 text-green-400 mt-1" />
-                  <div>
-                    <h4 className="font-medium">Value Attachment</h4>
-                    <p className="text-sm text-muted-foreground">
-                      Attach real value to your messages - turn words into wealth
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-3">
-                  <Users className="w-5 h-5 text-blue-400 mt-1" />
-                  <div>
-                    <h4 className="font-medium">Viral Distribution</h4>
-                    <p className="text-sm text-muted-foreground">
-                      Share tokens with specific wallets, create viral campaigns
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-3">
-                  <Wallet className="w-5 h-5 text-purple-400 mt-1" />
-                  <div>
-                    <h4 className="font-medium">FLBY Token Economy</h4>
-                    <p className="text-sm text-muted-foreground">
-                      Stake, govern, and earn with our native FLBY token ecosystem
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="bg-muted/20 rounded-lg p-4 mt-6">
-                <h4 className="font-medium text-cyan-400 mb-2">Revolutionary Features Coming:</h4>
-                <ul className="text-sm text-muted-foreground space-y-1">
-                  <li>• SMS-to-blockchain integration</li>
-                  <li>• AI-powered emotion analysis</li>
-                  <li>• Enterprise marketing campaigns</li>
-                  <li>• Greeting cards with scheduled delivery</li>
-                  <li>• Real-time chat with tokenized rewards</li>
-                  <li>• Comprehensive staking and governance</li>
-                </ul>
-              </div>
-            </CardContent>
-          </Card>
           </div>
         </div>
 
