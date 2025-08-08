@@ -82,27 +82,55 @@ export default function AdminGateway() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center p-4">
-      {/* Background Effects */}
-      <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute -top-40 -right-40 w-80 h-80 bg-electric-blue/20 rounded-full blur-3xl"></div>
-        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-electric-green/20 rounded-full blur-3xl"></div>
+    <div className="min-h-screen relative overflow-hidden">
+      {/* Animated Circuit Background */}
+      <div className="absolute inset-0 bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
+        {/* Circuit Pattern Overlay */}
+        <div className="absolute inset-0 opacity-20">
+          <div className="absolute top-20 left-20 w-64 h-64 border border-electric-blue/30 rounded-lg animate-pulse-slow" />
+          <div className="absolute top-40 right-32 w-32 h-32 border border-electric-green/30 rounded-full animate-ping" style={{ animationDuration: '3s' }} />
+          <div className="absolute bottom-32 left-1/3 w-48 h-48 border border-electric-blue/20 rounded-lg rotate-45 animate-spin-slow" />
+        </div>
+        
+        {/* Animated Electrical Lines */}
+        <div className="absolute inset-0">
+          <div className="absolute top-1/4 left-0 w-full h-px bg-gradient-to-r from-transparent via-electric-blue/50 to-transparent animate-pulse" />
+          <div className="absolute top-3/4 left-0 w-full h-px bg-gradient-to-r from-transparent via-electric-green/50 to-transparent animate-pulse" style={{ animationDelay: '1s' }} />
+          <div className="absolute top-0 left-1/3 w-px h-full bg-gradient-to-b from-transparent via-electric-blue/30 to-transparent animate-pulse" style={{ animationDelay: '2s' }} />
+          <div className="absolute top-0 right-1/4 w-px h-full bg-gradient-to-b from-transparent via-electric-green/30 to-transparent animate-pulse" style={{ animationDelay: '0.5s' }} />
+        </div>
+        
+        {/* Background Glow Effects */}
+        <div className="absolute inset-0 overflow-hidden">
+          <div className="absolute -top-40 -right-40 w-80 h-80 bg-electric-blue/20 rounded-full blur-3xl animate-pulse-slow"></div>
+          <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-electric-green/20 rounded-full blur-3xl animate-pulse-slow" style={{ animationDelay: '1.5s' }}></div>
+        </div>
       </div>
 
-      <Card className="w-full max-w-md glassmorphism border-electric-blue/30 relative z-10">
-        <CardHeader className="text-center space-y-4">
-          <div className="w-16 h-16 mx-auto modern-gradient rounded-2xl flex items-center justify-center">
-            <Shield className="w-8 h-8 text-white" />
-          </div>
-          <div>
-            <CardTitle className="text-2xl font-bold text-white">Admin Gateway</CardTitle>
-            <p className="text-text-secondary mt-2">
-              Secure access to Flutterbye administration
-            </p>
-          </div>
-        </CardHeader>
+      <div className="relative z-10 min-h-screen flex items-center justify-center p-4">
+        <Card className="w-full max-w-md bg-slate-800/40 backdrop-blur-sm border-2 border-electric-blue/30 shadow-2xl relative overflow-hidden">
+          {/* Animated Card Border */}
+          <div className="absolute inset-0 bg-gradient-to-r from-electric-blue/20 via-electric-green/20 to-electric-blue/20 opacity-50 animate-pulse" />
+          <div className="absolute inset-[2px] bg-slate-800/90 rounded-lg" />
+          <CardHeader className="relative text-center space-y-4">
+            <div className="flex justify-center">
+              <div className="p-3 bg-electric-blue/20 rounded-full border-2 border-electric-blue/50 relative">
+                <div className="absolute inset-0 bg-electric-blue/10 rounded-full animate-ping" />
+                <Shield className="w-8 h-8 text-electric-blue relative z-10" />
+              </div>
+            </div>
+            
+            <div>
+              <CardTitle className="text-2xl font-bold bg-gradient-to-r from-electric-blue to-electric-green bg-clip-text text-transparent">
+                Admin Gateway
+              </CardTitle>
+              <p className="text-text-secondary mt-2">
+                Secure access to Flutterbye administration
+              </p>
+            </div>
+          </CardHeader>
 
-        <CardContent className="space-y-6">
+          <CardContent className="relative space-y-6">
           {/* Wallet Status */}
           <div className="flex items-center gap-3 p-3 bg-slate-800/50 rounded-lg border border-slate-700/50">
             <Wallet className="w-5 h-5 text-electric-blue" />
@@ -175,8 +203,9 @@ export default function AdminGateway() {
             <p>Secure admin access with wallet persistence</p>
             <p className="mt-1">All access attempts are logged and monitored</p>
           </div>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 }
