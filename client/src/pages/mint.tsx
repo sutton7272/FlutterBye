@@ -389,14 +389,14 @@ export default function Mint({ tokenType }: MintProps = {}) {
   const remainingChars = 27 - message.length;
 
   return (
-    <div className="min-h-screen pt-20 pb-12">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-12">
+    <div className="min-h-screen pt-16 pb-8">
+      <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-6">
+        <div className="text-center mb-8">
           <h1 className="text-4xl font-bold mb-4 text-gradient">Token Creation Center</h1>
           <p className="text-xl text-muted-foreground">Create individual tokens or limited edition collections</p>
         </div>
 
-        <Tabs defaultValue="individual" className="space-y-6">
+        <Tabs defaultValue="individual" className="space-y-4">
           <TabsList className="grid w-full grid-cols-3 bg-slate-800/50">
             <TabsTrigger value="individual" className="flex items-center gap-2">
               <Coins className="w-4 h-4" />
@@ -451,10 +451,10 @@ export default function Mint({ tokenType }: MintProps = {}) {
                   )}
                 </div>
 
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <div className="grid grid-cols-1 xl:grid-cols-4 gap-6">
           {/* Minting Form */}
-          <Card id="mint-form" className="premium-card electric-frame lg:col-span-2">
-            <CardContent className="p-8">
+          <Card id="mint-form" className="premium-card electric-frame xl:col-span-3">
+            <CardContent className="p-6">
               <h3 className="text-2xl font-bold mb-6 text-gradient">Create Your Message Token</h3>
               <div className="mb-6 p-4 bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-800 rounded-lg">
                 <h4 className="font-semibold text-blue-700 dark:text-blue-300 mb-2">Message Structure</h4>
