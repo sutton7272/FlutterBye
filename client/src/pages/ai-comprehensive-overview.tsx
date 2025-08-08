@@ -39,6 +39,7 @@ import { AIConversation } from '@/components/ai-conversation';
 import { AIEnhancementButton } from '@/components/ai-enhancement-button';
 import { useAIContent } from '@/hooks/useAIContent';
 import { useAIAdmin } from '@/hooks/useAIAdmin';
+import cosmicBackgroundPath from "@assets/image_1754257352191.png";
 
 interface AIFeature {
   name: string;
@@ -366,13 +367,55 @@ export default function AIComprehensiveOverview() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-dark-navy relative overflow-hidden">
-        {/* Animated electric circuit background */}
-        <div className="absolute inset-0 opacity-40">
-          <div className="absolute top-20 left-20 w-96 h-96 border border-electric-blue/30 rounded-full animate-pulse-slow"></div>
-          <div className="absolute top-40 right-32 w-64 h-64 border border-electric-green/40 rounded-full animate-pulse-slower"></div>
-          <div className="absolute bottom-40 left-1/3 w-80 h-80 border border-electric-blue/20 rounded-full animate-pulse-slow"></div>
-          <div className="circuit-lines"></div>
+      <div 
+        className="min-h-screen relative overflow-hidden bg-cover bg-center bg-no-repeat" 
+        style={{
+          backgroundImage: `url(${cosmicBackgroundPath})`,
+          backgroundAttachment: 'fixed'
+        }}
+      >
+        {/* Dark overlay for better text readability */}
+        <div className="absolute inset-0 bg-black/40 backdrop-blur-[1px]"></div>
+        
+        {/* Cosmic Butterfly Animations */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          {/* Flying Butterflies */}
+          {[...Array(6)].map((_, i) => (
+            <div
+              key={i}
+              className="absolute"
+              style={{
+                left: `${15 + (i * 15)}%`,
+                top: `${25 + (i * 10)}%`,
+                animation: `butterfly-flight-${(i % 4) + 1} ${20 + (i * 3)}s infinite linear`,
+                animationDelay: `${i * 2}s`
+              }}
+            >
+              <div className="w-6 h-6 relative">
+                {/* Butterfly Wings */}
+                <div className="absolute inset-0">
+                  <div 
+                    className="absolute w-3 h-4 bg-gradient-to-br from-electric-blue/70 to-electric-green/70 rounded-full transform -rotate-12 animate-wing-flutter"
+                    style={{ 
+                      top: '0px', 
+                      left: '0px',
+                      animationDelay: `${i * 0.2}s`,
+                      filter: 'drop-shadow(0 0 6px rgba(0, 212, 255, 0.6))'
+                    }}
+                  />
+                  <div 
+                    className="absolute w-3 h-4 bg-gradient-to-bl from-electric-green/70 to-electric-blue/70 rounded-full transform rotate-12 animate-wing-flutter" 
+                    style={{ 
+                      top: '0px', 
+                      right: '0px',
+                      animationDelay: `${i * 0.2 + 0.1}s`,
+                      filter: 'drop-shadow(0 0 6px rgba(0, 255, 136, 0.6))'
+                    }}
+                  />
+                </div>
+              </div>
+            </div>
+          ))}
         </div>
         
         <div className="container mx-auto p-6 relative z-10">
@@ -385,19 +428,90 @@ export default function AIComprehensiveOverview() {
   }
 
   return (
-    <div className="min-h-screen bg-dark-navy relative overflow-hidden">
-      {/* Animated electric circuit background */}
-      <div className="absolute inset-0 opacity-40">
-        <div className="absolute top-20 left-20 w-96 h-96 border border-electric-blue/30 rounded-full animate-pulse-slow"></div>
-        <div className="absolute top-40 right-32 w-64 h-64 border border-electric-green/40 rounded-full animate-pulse-slower"></div>
-        <div className="absolute bottom-40 left-1/3 w-80 h-80 border border-electric-blue/20 rounded-full animate-pulse-slow"></div>
-        <div className="absolute bottom-20 right-20 w-72 h-72 border border-electric-green/25 rounded-full animate-pulse-slower"></div>
-        <div className="circuit-lines"></div>
-        <div className="electric-grid"></div>
+    <div 
+      className="min-h-screen relative overflow-hidden bg-cover bg-center bg-no-repeat" 
+      style={{
+        backgroundImage: `url(${cosmicBackgroundPath})`,
+        backgroundAttachment: 'fixed'
+      }}
+    >
+      {/* Dark overlay for better text readability */}
+      <div className="absolute inset-0 bg-black/40 backdrop-blur-[1px]"></div>
+      
+      {/* Cosmic Butterfly Animations */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        {/* Flying Butterflies */}
+        {[...Array(10)].map((_, i) => (
+          <div
+            key={i}
+            className="absolute"
+            style={{
+              left: `${10 + (i * 12)}%`,
+              top: `${15 + (i * 8)}%`,
+              animation: `butterfly-flight-${(i % 4) + 1} ${20 + (i * 3)}s infinite linear`,
+              animationDelay: `${i * 2}s`
+            }}
+          >
+            <div className="w-6 h-6 relative">
+              {/* Butterfly Wings */}
+              <div className="absolute inset-0">
+                <div 
+                  className="absolute w-3 h-4 bg-gradient-to-br from-electric-blue/70 to-electric-green/70 rounded-full transform -rotate-12 animate-wing-flutter"
+                  style={{ 
+                    top: '0px', 
+                    left: '0px',
+                    animationDelay: `${i * 0.2}s`,
+                    filter: 'drop-shadow(0 0 6px rgba(0, 212, 255, 0.6))'
+                  }}
+                />
+                <div 
+                  className="absolute w-3 h-4 bg-gradient-to-bl from-electric-green/70 to-electric-blue/70 rounded-full transform rotate-12 animate-wing-flutter" 
+                  style={{ 
+                    top: '0px', 
+                    right: '0px',
+                    animationDelay: `${i * 0.2 + 0.1}s`,
+                    filter: 'drop-shadow(0 0 6px rgba(0, 255, 136, 0.6))'
+                  }}
+                />
+                <div 
+                  className="absolute w-2 h-3 bg-gradient-to-br from-electric-blue/60 to-electric-green/60 rounded-full transform -rotate-6 animate-wing-flutter" 
+                  style={{ 
+                    bottom: '2px', 
+                    left: '2px',
+                    animationDelay: `${i * 0.2}s`,
+                    filter: 'drop-shadow(0 0 4px rgba(0, 212, 255, 0.4))'
+                  }}
+                />
+                <div 
+                  className="absolute w-2 h-3 bg-gradient-to-bl from-electric-green/60 to-electric-blue/60 rounded-full transform rotate-6 animate-wing-flutter" 
+                  style={{ 
+                    bottom: '2px', 
+                    right: '2px',
+                    animationDelay: `${i * 0.2 + 0.1}s`,
+                    filter: 'drop-shadow(0 0 4px rgba(0, 255, 136, 0.4))'
+                  }}
+                />
+                {/* Butterfly Body */}
+                <div 
+                  className="absolute w-0.5 h-5 bg-gradient-to-b from-electric-blue to-electric-green rounded-full"
+                  style={{ 
+                    top: '0px', 
+                    left: '50%', 
+                    transform: 'translateX(-50%)',
+                    filter: 'drop-shadow(0 0 3px rgba(136, 255, 136, 0.8))'
+                  }}
+                />
+              </div>
+            </div>
+          </div>
+        ))}
+        
+        {/* Additional Electric Circuit Overlays for AI Theme */}
+        <div className="absolute inset-0 opacity-30">
+          <div className="absolute top-20 left-20 w-64 h-64 border border-electric-blue/20 rounded-lg animate-pulse-slow" />
+          <div className="absolute bottom-32 right-32 w-48 h-48 border border-electric-green/20 rounded-lg rotate-45 animate-pulse-slow" />
+        </div>
       </div>
-
-      {/* Circuit flow gradients */}
-      <div className="absolute inset-0 bg-gradient-to-br from-electric-blue/5 via-transparent to-electric-green/5"></div>
       
       <div className="container mx-auto p-6 relative z-10">
         {/* Header with electric styling */}
