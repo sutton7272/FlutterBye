@@ -870,6 +870,169 @@ export function registerBlogRoutes(app: Express) {
     }
   });
 
+  // =====================================================
+  // BUNDLE 5: Advanced Automation & AI Orchestration API Routes
+  // =====================================================
+
+  /**
+   * Multi-language content generation and localization
+   */
+  app.post("/api/blog/multi-language-content", async (req, res) => {
+    try {
+      const { content, targetLanguages, culturalAdaptation } = req.body;
+      
+      if (!content || !targetLanguages) {
+        return res.status(400).json({ error: "Content and target languages are required" });
+      }
+      
+      const localization = await blogService.generateMultiLanguageContent(
+        content,
+        targetLanguages,
+        culturalAdaptation !== false
+      );
+      
+      res.json({
+        localization,
+        originalContent: content.substring(0, 200) + "...",
+        targetLanguages,
+        culturalAdaptation: culturalAdaptation !== false,
+        localizedAt: new Date().toISOString()
+      });
+    } catch (error) {
+      console.error("Error generating multi-language content:", error);
+      res.status(500).json({ error: "Failed to generate multi-language content" });
+    }
+  });
+
+  /**
+   * Advanced content automation workflows
+   */
+  app.post("/api/blog/automation-workflow", async (req, res) => {
+    try {
+      const { contentGoals, targetMetrics, automationLevel } = req.body;
+      
+      if (!contentGoals || !automationLevel) {
+        return res.status(400).json({ error: "Content goals and automation level are required" });
+      }
+      
+      const workflow = await blogService.createAutomationWorkflow(
+        contentGoals,
+        targetMetrics || {},
+        automationLevel
+      );
+      
+      res.json({
+        workflow,
+        contentGoals,
+        automationLevel,
+        createdAt: new Date().toISOString()
+      });
+    } catch (error) {
+      console.error("Error creating automation workflow:", error);
+      res.status(500).json({ error: "Failed to create automation workflow" });
+    }
+  });
+
+  /**
+   * AI-powered content quality assurance
+   */
+  app.post("/api/blog/quality-assurance", async (req, res) => {
+    try {
+      const { content, brandGuidelines, targetAudience } = req.body;
+      
+      if (!content || !targetAudience) {
+        return res.status(400).json({ error: "Content and target audience are required" });
+      }
+      
+      const qa = await blogService.performQualityAssurance(
+        content,
+        brandGuidelines || {},
+        targetAudience
+      );
+      
+      res.json({
+        qa,
+        originalContent: content.substring(0, 200) + "...",
+        targetAudience,
+        analyzedAt: new Date().toISOString()
+      });
+    } catch (error) {
+      console.error("Error performing quality assurance:", error);
+      res.status(500).json({ error: "Failed to perform quality assurance" });
+    }
+  });
+
+  /**
+   * Advanced analytics integration and reporting
+   */
+  app.post("/api/blog/advanced-analytics", async (req, res) => {
+    try {
+      const { comparisonPeriod, goals } = req.body;
+      
+      // Get actual performance data from database
+      const posts = await db.select().from(blogPosts).limit(100);
+      const analytics = await db.select().from(blogAnalytics).limit(100);
+      
+      const performanceData = posts.map(post => ({
+        id: post.id,
+        title: post.title,
+        views: 0, // Would be populated from analytics
+        engagement: post.engagementPotential || 0,
+        seoScore: post.seoScore || 0,
+        publishedAt: post.publishedAt
+      }));
+      
+      const advancedAnalytics = await blogService.generateAdvancedAnalytics(
+        performanceData,
+        comparisonPeriod || 'monthly',
+        goals || ['increase engagement', 'improve SEO', 'grow audience']
+      );
+      
+      res.json({
+        analytics: advancedAnalytics,
+        dataPoints: performanceData.length,
+        comparisonPeriod: comparisonPeriod || 'monthly',
+        goals: goals || ['increase engagement', 'improve SEO'],
+        generatedAt: new Date().toISOString()
+      });
+    } catch (error) {
+      console.error("Error generating advanced analytics:", error);
+      res.status(500).json({ error: "Failed to generate advanced analytics" });
+    }
+  });
+
+  /**
+   * AI orchestration for complex content campaigns
+   */
+  app.post("/api/blog/campaign-orchestration", async (req, res) => {
+    try {
+      const { campaignObjectives, timeline, budget, channels } = req.body;
+      
+      if (!campaignObjectives || !timeline) {
+        return res.status(400).json({ error: "Campaign objectives and timeline are required" });
+      }
+      
+      const orchestration = await blogService.orchestrateContentCampaign(
+        campaignObjectives,
+        timeline,
+        budget || 1000,
+        channels || ['blog', 'social', 'email']
+      );
+      
+      res.json({
+        campaign: orchestration,
+        campaignObjectives,
+        timeline,
+        budget: budget || 1000,
+        channels: channels || ['blog', 'social', 'email'],
+        orchestratedAt: new Date().toISOString()
+      });
+    } catch (error) {
+      console.error("Error orchestrating content campaign:", error);
+      res.status(500).json({ error: "Failed to orchestrate content campaign" });
+    }
+  });
+
   // ================== BLOG ANALYTICS ==================
   
   /**
