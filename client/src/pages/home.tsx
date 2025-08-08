@@ -306,18 +306,19 @@ export default function Home() {
             </Link>
 
             {/* Voice Messages */}
-            <Link href="/voice">
-              <Card className="bg-gradient-to-br from-green-900/60 to-emerald-900/60 border-green-500/30 backdrop-blur-sm hover:border-green-400/60 transition-all duration-300 h-full cursor-pointer group min-h-[240px]">
-                <CardContent className="p-6 text-center flex flex-col justify-between h-full">
-                  <div className="flex flex-col items-center flex-grow">
+            <div className="min-h-screen flex items-center justify-center relative overflow-hidden">
+              <div className="fixed inset-0 bg-gradient-to-br from-blue-900/20 via-purple-900/20 to-cyan-900/20 pointer-events-none" />
+              <Link href="/voice">
+                <Card className="electric-frame w-full max-w-md mx-4 bg-gradient-to-br from-green-900/60 to-emerald-900/60 border-green-500/30 backdrop-blur-sm hover:border-green-400/60 transition-all duration-300 cursor-pointer group">
+                  <CardContent className="p-6 text-center">
                     <Mic className="h-12 w-12 text-green-400 mx-auto mb-4 group-hover:scale-110 transition-transform" />
                     <h3 className="font-bold text-xl mb-2">Voice Messages</h3>
-                    <p className="text-gray-400 text-sm flex-grow">Record voice messages and turn them into valuable blockchain assets</p>
-                  </div>
-                  <Badge className="mt-4 bg-green-500/20 text-green-300">Audio NFTs</Badge>
-                </CardContent>
-              </Card>
-            </Link>
+                    <p className="text-gray-400 text-sm">Record voice messages and turn them into valuable blockchain assets</p>
+                    <Badge className="mt-4 bg-green-500/20 text-green-300">Audio NFTs</Badge>
+                  </CardContent>
+                </Card>
+              </Link>
+            </div>
 
             {/* Limited Edition */}
             <Link href="/limited-edition">
