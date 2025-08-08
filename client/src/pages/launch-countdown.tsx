@@ -165,9 +165,10 @@ export default function LaunchCountdown() {
                           <Button 
                             variant="link" 
                             size="sm" 
-                            className="p-0 text-cyan-400 hover:text-cyan-300 text-sm mt-2"
+                            className="p-2 text-cyan-400 hover:text-cyan-300 text-sm mt-2 relative z-50 cursor-pointer border border-cyan-400/30 rounded"
                             onClick={(e) => {
                               e.stopPropagation();
+                              e.preventDefault();
                               console.log('🔵 READ MORE CLICKED - Content ID:', content.id);
                               setExpandedContentId(content.id);
                             }}
@@ -179,9 +180,10 @@ export default function LaunchCountdown() {
                           <Button 
                             variant="link" 
                             size="sm" 
-                            className="p-0 text-cyan-400 hover:text-cyan-300 text-sm mt-2"
+                            className="p-2 text-cyan-400 hover:text-cyan-300 text-sm mt-2 relative z-50 cursor-pointer border border-cyan-400/30 rounded"
                             onClick={(e) => {
                               e.stopPropagation();
+                              e.preventDefault();
                               console.log('🔴 SHOW LESS CLICKED');
                               setExpandedContentId(null);
                             }}
@@ -197,6 +199,17 @@ export default function LaunchCountdown() {
                         {content.readabilityScore && <span className="flex items-center gap-1"><span className="text-blue-400">📖</span> Readability: {content.readabilityScore}%</span>}
                         <span className="text-electric-green font-semibold">✨ AI Optimized</span>
                       </div>
+                      
+                      {/* Test button to verify clicks work */}
+                      <Button 
+                        className="mt-4 bg-red-500 hover:bg-red-600 text-white px-4 py-2"
+                        onClick={() => {
+                          console.log('🟥 TEST BUTTON CLICKED - This proves clicks work!');
+                          alert('Test button clicked - this proves the click system works!');
+                        }}
+                      >
+                        Test Click (Red Button)
+                      </Button>
                       
                       {shouldShowReadMore && (
                         <div className="mt-3 text-center">
