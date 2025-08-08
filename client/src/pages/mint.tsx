@@ -402,13 +402,19 @@ export default function Mint({ tokenType }: MintProps = {}) {
               <Coins className="w-4 h-4" />
               Individual Token
             </TabsTrigger>
-            <TabsTrigger value="limited" className="flex items-center gap-2">
+            <TabsTrigger value="limited" className="flex items-center gap-2 relative">
               <Star className="w-4 h-4" />
               Limited Edition
+              <span className="absolute -top-1 -right-1 px-2 py-0.5 text-xs font-bold bg-red-500 text-white rounded-full animate-pulse shadow-lg shadow-red-500/50">
+                Coming Soon
+              </span>
             </TabsTrigger>
-            <TabsTrigger value="collaborative" className="flex items-center gap-2">
+            <TabsTrigger value="collaborative" className="flex items-center gap-2 relative">
               <Users className="w-4 h-4" />
               🚀 Collaborative Mode
+              <span className="absolute -top-1 -right-1 px-2 py-0.5 text-xs font-bold bg-red-500 text-white rounded-full animate-pulse shadow-lg shadow-red-500/50">
+                Coming Soon
+              </span>
             </TabsTrigger>
           </TabsList>
 
