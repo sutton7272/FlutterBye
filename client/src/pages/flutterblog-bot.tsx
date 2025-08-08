@@ -120,23 +120,26 @@ export default function FlutterBlogBot() {
     },
   });
 
-  // Fetch blog posts
-  const { data: blogPosts = [] } = useQuery({
+  // Fetch blog posts - FIXED DATA EXTRACTION
+  const { data: postsResponse, isLoading: postsLoading, error: postsError } = useQuery({
     queryKey: ["/api/blog/posts"],
     retry: false
-  }) as { data: any[] };
+  });
+  const blogPosts = postsResponse?.posts || [];
 
-  // Fetch schedules
-  const { data: schedules = [] } = useQuery({
+  // Fetch schedules - FIXED DATA EXTRACTION
+  const { data: schedulesResponse, isLoading: schedulesLoading, error: schedulesError } = useQuery({
     queryKey: ["/api/blog/schedules"],
     retry: false
-  }) as { data: any[] };
+  });
+  const schedules = schedulesResponse?.schedules || [];
 
-  // Fetch analytics
-  const { data: analytics = {} } = useQuery({
+  // Fetch analytics - FIXED DATA EXTRACTION
+  const { data: analyticsResponse, isLoading: analyticsLoading, error: analyticsError } = useQuery({
     queryKey: ["/api/blog/analytics"],
     retry: false
-  }) as { data: any };
+  });
+  const analytics = analyticsResponse?.summary || {};
 
   const handleGenerateBlog = () => {
     if (!blogForm.topic) {
@@ -163,6 +166,35 @@ export default function FlutterBlogBot() {
     }
     createScheduleMutation.mutate(scheduleForm);
   };
+
+  // Show loading state while data is loading
+  if (postsLoading || schedulesLoading || analyticsLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-950 via-blue-950 to-slate-900 p-6 flex items-center justify-center">
+        <div className="text-center space-y-4">
+          <Bot className="h-16 w-16 text-blue-400 animate-pulse mx-auto" />
+          <h2 className="text-2xl font-bold text-white">Loading FlutterBlog Bot...</h2>
+          <p className="text-slate-400">Initializing AI content system</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Show error state if critical data fails to load
+  if (postsError || schedulesError || analyticsError) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-950 via-blue-950 to-slate-900 p-6 flex items-center justify-center">
+        <div className="text-center space-y-4">
+          <Bot className="h-16 w-16 text-red-400 mx-auto" />
+          <h2 className="text-2xl font-bold text-white">FlutterBlog Bot Error</h2>
+          <p className="text-slate-400">Failed to load system data. Please refresh the page.</p>
+          <Button onClick={() => window.location.reload()} className="bg-blue-600 hover:bg-blue-700">
+            Refresh Page
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-950 via-blue-950 to-slate-900 p-6">

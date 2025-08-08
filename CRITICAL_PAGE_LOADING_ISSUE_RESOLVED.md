@@ -90,15 +90,28 @@ LIMIT 20
 ## 🔧 TECHNICAL SOLUTION DETAILS
 
 ### **Root Cause Analysis**
-1. **Drizzle ORM Issue**: Field mapping errors in SELECT queries
-2. **Schema Mismatch**: Database column names not matching ORM expectations
+1. **Backend Issue**: Drizzle ORM field mapping errors in SELECT queries causing 500 errors
+2. **Frontend Issue**: Incorrect data destructuring - trying to access wrapped API responses as direct arrays
 3. **Connection Caching**: Stale database connections persisting bad state
+4. **Error Propagation**: React component crashes due to undefined data access patterns
 
 ### **Comprehensive Fix Strategy**
-1. **Immediate**: Raw SQL bypass for failing endpoint
-2. **System**: Complete workflow restart to reset connections
-3. **Performance**: Maintained all optimization improvements
-4. **Monitoring**: Enhanced error tracking for future prevention
+1. **Backend Fix**: Raw SQL bypass for failing schedules endpoint (`/api/blog/schedules`)
+2. **Frontend Fix**: Proper data extraction from API response objects (`postsResponse?.posts || []`)
+3. **Error Handling**: Added loading states and error boundaries to prevent crashes
+4. **System Reset**: Complete workflow restart to reset connections
+5. **Performance**: Maintained all optimization improvements (60-90% speed gains)
+6. **Monitoring**: Enhanced error tracking for future prevention
+
+### **Data Structure Fix**
+```javascript
+// BEFORE (Causing crashes):
+const { data: blogPosts = [] } = useQuery(...)  // Trying to access wrapped data as direct array
+
+// AFTER (Working correctly):
+const { data: postsResponse } = useQuery(...)
+const blogPosts = postsResponse?.posts || []  // Properly extracting from response object
+```
 
 ---
 
