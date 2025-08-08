@@ -110,11 +110,22 @@ export default function LaunchCountdown() {
                 const contentText = content.content || content.preview || 'Advanced AI-powered content generation system creating SEO-optimized blog posts with comprehensive metadata analysis...';
                 const shouldTruncate = contentText.length > 300 && !isExpanded;
                 
+                console.log('Content:', { 
+                  id: content.id, 
+                  expandedContentId, 
+                  isExpanded, 
+                  contentLength: contentText.length,
+                  shouldTruncate 
+                });
+                
                 return (
                   <Card 
                     key={index} 
                     className="electric-frame bg-gradient-to-br from-cyan-500/20 to-blue-500/20 relative overflow-hidden cursor-pointer hover:from-cyan-500/30 hover:to-blue-500/30 transition-all duration-300"
-                    onClick={() => setExpandedContentId(isExpanded ? null : content.id)}
+                    onClick={() => {
+                      console.log('Card clicked:', { contentId: content.id, currentExpanded: expandedContentId, isExpanded });
+                      setExpandedContentId(isExpanded ? null : content.id);
+                    }}
                   >
                     <div className="absolute inset-0 bg-gradient-to-r from-transparent via-cyan-400/10 to-transparent animate-pulse"></div>
                     <CardContent className="p-6 relative z-10">
@@ -148,6 +159,7 @@ export default function LaunchCountdown() {
                               className="p-0 ml-2 text-cyan-400 hover:text-cyan-300 text-sm"
                               onClick={(e) => {
                                 e.stopPropagation();
+                                console.log('Read More clicked:', content.id);
                                 setExpandedContentId(content.id);
                               }}
                             >
@@ -164,6 +176,7 @@ export default function LaunchCountdown() {
                                 className="p-0 ml-2 text-cyan-400 hover:text-cyan-300 text-sm"
                                 onClick={(e) => {
                                   e.stopPropagation();
+                                  console.log('Show Less clicked');
                                   setExpandedContentId(null);
                                 }}
                               >
