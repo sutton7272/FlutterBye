@@ -438,6 +438,131 @@ export function registerBlogRoutes(app: Express) {
     }
   });
   
+  // =====================================================
+  // BUNDLE 2 AI ENHANCEMENT: Advanced API Routes
+  // =====================================================
+
+  /**
+   * Advanced competitive analysis endpoint
+   */
+  app.post("/api/blog/analyze-competition", async (req, res) => {
+    try {
+      const { topic, competitors } = req.body;
+      
+      if (!topic) {
+        return res.status(400).json({ error: "Topic is required" });
+      }
+      
+      const analysis = await blogService.analyzeCompetitorContent(topic, competitors || []);
+      
+      res.json({ 
+        topic,
+        analysis,
+        generatedAt: new Date().toISOString()
+      });
+    } catch (error) {
+      console.error("Error analyzing competition:", error);
+      res.status(500).json({ error: "Failed to analyze competition" });
+    }
+  });
+
+  /**
+   * AI-powered content trend prediction
+   */
+  app.post("/api/blog/predict-trends", async (req, res) => {
+    try {
+      const { industry } = req.body;
+      
+      const predictions = await blogService.predictContentTrends(industry || 'blockchain');
+      
+      res.json({
+        industry: industry || 'blockchain',
+        predictions,
+        generatedAt: new Date().toISOString(),
+        validUntil: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString() // 7 days
+      });
+    } catch (error) {
+      console.error("Error predicting trends:", error);
+      res.status(500).json({ error: "Failed to predict content trends" });
+    }
+  });
+
+  /**
+   * AI content performance prediction
+   */
+  app.post("/api/blog/predict-performance", async (req, res) => {
+    try {
+      const { content, targetAudience } = req.body;
+      
+      if (!content || !targetAudience) {
+        return res.status(400).json({ error: "Content and target audience are required" });
+      }
+      
+      const prediction = await blogService.predictContentPerformance(content, targetAudience);
+      
+      res.json({
+        prediction,
+        targetAudience,
+        analyzedAt: new Date().toISOString()
+      });
+    } catch (error) {
+      console.error("Error predicting performance:", error);
+      res.status(500).json({ error: "Failed to predict content performance" });
+    }
+  });
+
+  /**
+   * Advanced SEO keyword research
+   */
+  app.post("/api/blog/advanced-keywords", async (req, res) => {
+    try {
+      const { topic, competitionLevel } = req.body;
+      
+      if (!topic) {
+        return res.status(400).json({ error: "Topic is required" });
+      }
+      
+      const keywords = await blogService.generateAdvancedKeywords(
+        topic, 
+        competitionLevel || 'medium'
+      );
+      
+      res.json({
+        topic,
+        competitionLevel: competitionLevel || 'medium',
+        keywords,
+        generatedAt: new Date().toISOString()
+      });
+    } catch (error) {
+      console.error("Error generating keywords:", error);
+      res.status(500).json({ error: "Failed to generate advanced keywords" });
+    }
+  });
+
+  /**
+   * A/B testing title variations generator  
+   */
+  app.post("/api/blog/ab-title-variations", async (req, res) => {
+    try {
+      const { title, count } = req.body;
+      
+      if (!title) {
+        return res.status(400).json({ error: "Title is required" });
+      }
+      
+      const variations = await blogService.generateTitleVariations(title, count || 5);
+      
+      res.json({
+        originalTitle: title,
+        variations,
+        generatedAt: new Date().toISOString()
+      });
+    } catch (error) {
+      console.error("Error generating title variations:", error);
+      res.status(500).json({ error: "Failed to generate title variations" });
+    }
+  });
+
   // ================== BLOG ANALYTICS ==================
   
   /**

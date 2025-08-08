@@ -5,6 +5,10 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
+// =====================================================
+// BUNDLE 2 AI ENHANCEMENT: Advanced Analytics & Intelligence
+// =====================================================
+
 export interface BlogGenerationRequest {
   topic: string;
   tone?: 'professional' | 'casual' | 'technical' | 'educational' | 'persuasive';
@@ -387,6 +391,211 @@ Provide the enhanced version that incorporates all requested improvements while 
       console.error('Error enhancing content:', error);
       return content; // Return original if enhancement fails
     }
+  }
+  // =====================================================
+  // BUNDLE 2 AI ENHANCEMENT: Advanced Intelligence Features
+  // =====================================================
+
+  /**
+   * Advanced competitive analysis using AI
+   */
+  async analyzeCompetitorContent(topic: string, competitors: string[] = []): Promise<{
+    competitorGaps: string[];
+    uniqueAngles: string[];
+    contentStrategy: string[];
+    differentiationPoints: string[];
+  }> {
+    const competitorContext = competitors.length > 0 
+      ? `Competitors in this space: ${competitors.join(', ')}`
+      : 'Analyze general market competition for this topic.';
+    
+    const response = await openai.chat.completions.create({
+      model: "gpt-4o",
+      messages: [
+        {
+          role: "system",
+          content: `You are an expert content strategist and competitive analyst. Provide comprehensive competitive analysis for content creation. Focus on identifying gaps in existing content and unique positioning opportunities. Respond in JSON format.`
+        },
+        {
+          role: "user", 
+          content: `Analyze the competitive landscape for content about "${topic}". ${competitorContext}
+          
+          Provide analysis in this JSON format:
+          {
+            "competitorGaps": ["gap1", "gap2", "gap3"],
+            "uniqueAngles": ["angle1", "angle2", "angle3"],
+            "contentStrategy": ["strategy1", "strategy2", "strategy3"],
+            "differentiationPoints": ["point1", "point2", "point3"]
+          }`
+        }
+      ],
+      response_format: { type: "json_object" },
+    });
+
+    return JSON.parse(response.choices[0].message.content || '{}');
+  }
+
+  /**
+   * AI-powered content trend prediction
+   */
+  async predictContentTrends(industry: string = 'blockchain'): Promise<{
+    emergingTrends: string[];
+    futureTopics: string[];
+    marketOpportunities: string[];
+    riskFactors: string[];
+  }> {
+    const response = await openai.chat.completions.create({
+      model: "gpt-4o",
+      messages: [
+        {
+          role: "system",
+          content: `You are a trend prediction expert with deep knowledge of content marketing and industry dynamics. Analyze current market signals to predict future content opportunities and risks.`
+        },
+        {
+          role: "user",
+          content: `Predict content trends for the ${industry} industry over the next 6-12 months. Consider:
+          - Current market dynamics
+          - Technological developments
+          - Consumer behavior changes
+          - Regulatory environment
+          
+          Respond in JSON format:
+          {
+            "emergingTrends": ["trend1", "trend2", "trend3"],
+            "futureTopics": ["topic1", "topic2", "topic3"],
+            "marketOpportunities": ["opportunity1", "opportunity2"],
+            "riskFactors": ["risk1", "risk2"]
+          }`
+        }
+      ],
+      response_format: { type: "json_object" },
+    });
+
+    return JSON.parse(response.choices[0].message.content || '{}');
+  }
+
+  /**
+   * AI-driven content performance prediction
+   */
+  async predictContentPerformance(content: string, targetAudience: string): Promise<{
+    viralPotential: number;
+    engagementScore: number;
+    shareabilityFactor: number;
+    retentionPrediction: number;
+    optimizationTips: string[];
+  }> {
+    const response = await openai.chat.completions.create({
+      model: "gpt-4o",
+      messages: [
+        {
+          role: "system",
+          content: `You are a content performance analyst with expertise in predicting viral content and engagement metrics. Analyze content and provide detailed performance predictions.`
+        },
+        {
+          role: "user",
+          content: `Analyze this content and predict its performance for target audience: ${targetAudience}
+
+          Content to analyze:
+          "${content.substring(0, 1000)}..."
+
+          Provide predictions in JSON format:
+          {
+            "viralPotential": 85,
+            "engagementScore": 92,
+            "shareabilityFactor": 78,
+            "retentionPrediction": 88,
+            "optimizationTips": ["tip1", "tip2", "tip3"]
+          }
+
+          Scores should be 0-100. Base predictions on content quality, relevance, emotional appeal, and shareability factors.`
+        }
+      ],
+      response_format: { type: "json_object" },
+    });
+
+    return JSON.parse(response.choices[0].message.content || '{}');
+  }
+
+  /**
+   * Advanced SEO keyword intelligence
+   */
+  async generateAdvancedKeywords(topic: string, competitionLevel: 'low' | 'medium' | 'high' = 'medium'): Promise<{
+    primaryKeywords: string[];
+    longTailKeywords: string[];
+    semanticKeywords: string[];
+    questionKeywords: string[];
+    competitorKeywords: string[];
+  }> {
+    const response = await openai.chat.completions.create({
+      model: "gpt-4o",
+      messages: [
+        {
+          role: "system",
+          content: `You are an expert SEO strategist with deep knowledge of keyword research and semantic search optimization.`
+        },
+        {
+          role: "user",
+          content: `Generate comprehensive keyword strategy for "${topic}" with ${competitionLevel} competition level.
+          
+          Include:
+          - Primary keywords (5-7 main terms)
+          - Long-tail keywords (10+ specific phrases)
+          - Semantic keywords (related concepts)
+          - Question-based keywords (what people ask)
+          - Competitor advantage keywords
+          
+          Response in JSON format:
+          {
+            "primaryKeywords": ["keyword1", "keyword2"],
+            "longTailKeywords": ["long tail 1", "long tail 2"],
+            "semanticKeywords": ["semantic1", "semantic2"],
+            "questionKeywords": ["question1", "question2"],
+            "competitorKeywords": ["competitor keyword1", "competitor keyword2"]
+          }`
+        }
+      ],
+      response_format: { type: "json_object" },
+    });
+
+    return JSON.parse(response.choices[0].message.content || '{}');
+  }
+
+  /**
+   * AI-powered A/B testing title generation
+   */
+  async generateTitleVariations(originalTitle: string, count: number = 5): Promise<{
+    variations: string[];
+    recommendedTest: string[];
+  }> {
+    const response = await openai.chat.completions.create({
+      model: "gpt-4o",
+      messages: [
+        {
+          role: "system",
+          content: `You are a marketing expert specializing in A/B testing for content titles. Generate compelling variations that test different psychological triggers and value propositions.`
+        },
+        {
+          role: "user",
+          content: `Generate ${count} A/B testing variations for this title: "${originalTitle}"
+          
+          Each variation should test different approaches:
+          - Emotional vs logical appeal
+          - Question vs statement format
+          - Benefit-focused vs feature-focused
+          - Urgency vs curiosity
+          - Number-driven vs concept-driven
+          
+          Response in JSON format:
+          {
+            "variations": ["variation1", "variation2", "variation3"],
+            "recommendedTest": ["Best variation for testing A", "Best variation for testing B"]
+          }`
+        }
+      ],
+      response_format: { type: "json_object" },
+    });
+
+    return JSON.parse(response.choices[0].message.content || '{}');
   }
 }
 
