@@ -73,7 +73,6 @@ export default function FlutterWave() {
             <Badge className="bg-gradient-to-r from-purple-600 to-blue-600 text-white font-bold">
               AI-POWERED
             </Badge>
-            <ContextualChatButton context="flutterwave" />
           </div>
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
             Revolutionary AI-Powered Butterfly Effect Messaging - Harness the quantum power of emotions 
