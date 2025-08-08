@@ -145,29 +145,7 @@ export default function Navbar() {
                 </Link>
               ))}
               
-              {/* Divider */}
-              <div className="border-t border-border/30 my-2" />
-              
-              {/* Secondary Navigation in Mobile */}
-              {secondaryNavItems.map((item) => (
-                <Link key={item.href} href={item.href}>
-                  <Button
-                    variant={isActive(item.href) ? "default" : "ghost"}
-                    className={`w-full justify-start h-12 ${
-                      isActive(item.href) 
-                        ? "bg-electric-blue text-white" 
-                        : "text-text-secondary hover:text-text-primary hover:bg-muted"
-                    }`}
-                    onClick={() => setIsOpen(false)}
-                  >
-                    <item.icon className="h-5 w-5 mr-3" />
-                    <div className="flex flex-col items-start">
-                      <span className="font-medium">{item.label}</span>
-                      <span className="text-xs opacity-70">{item.description}</span>
-                    </div>
-                  </Button>
-                </Link>
-              ))}
+
             </nav>
           </SheetContent>
         </Sheet>
