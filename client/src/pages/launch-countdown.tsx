@@ -107,33 +107,37 @@ export default function LaunchCountdown() {
             <div className="max-w-4xl mx-auto">
               {/* Navigation */}
               <div className="flex items-center justify-between mb-6">
-                <button 
-                  className="bg-cyan-500 hover:bg-cyan-600 text-white px-4 py-2 rounded disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                  onClick={() => {
-                    console.log('🔙 Previous clicked');
-                    setCurrentContentIndex(Math.max(0, currentContentIndex - 1));
-                    setIsExpanded(false);
+                <div 
+                  className={`bg-cyan-500 hover:bg-cyan-600 text-white px-4 py-2 rounded transition-colors cursor-pointer select-none ${currentContentIndex === 0 ? 'opacity-50 cursor-not-allowed' : ''}`}
+                  onMouseDown={(e) => {
+                    e.preventDefault();
+                    if (currentContentIndex > 0) {
+                      console.log('🔙 Previous clicked');
+                      setCurrentContentIndex(currentContentIndex - 1);
+                      setIsExpanded(false);
+                    }
                   }}
-                  disabled={currentContentIndex === 0}
                 >
                   ← Previous
-                </button>
+                </div>
                 
                 <span className="text-cyan-400 font-medium">
                   Article {currentContentIndex + 1} of {latestContent.length}
                 </span>
                 
-                <button 
-                  className="bg-cyan-500 hover:bg-cyan-600 text-white px-4 py-2 rounded disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                  onClick={() => {
-                    console.log('🔜 Next clicked');
-                    setCurrentContentIndex(Math.min(latestContent.length - 1, currentContentIndex + 1));
-                    setIsExpanded(false);
+                <div 
+                  className={`bg-cyan-500 hover:bg-cyan-600 text-white px-4 py-2 rounded transition-colors cursor-pointer select-none ${currentContentIndex >= latestContent.length - 1 ? 'opacity-50 cursor-not-allowed' : ''}`}
+                  onMouseDown={(e) => {
+                    e.preventDefault();
+                    if (currentContentIndex < latestContent.length - 1) {
+                      console.log('🔜 Next clicked');
+                      setCurrentContentIndex(currentContentIndex + 1);
+                      setIsExpanded(false);
+                    }
                   }}
-                  disabled={currentContentIndex >= latestContent.length - 1}
                 >
                   Next →
-                </button>
+                </div>
               </div>
 
               {/* Current Article */}
@@ -165,15 +169,16 @@ export default function LaunchCountdown() {
                       {/* Expand/Collapse Button */}
                       {fullContent.length > 300 && (
                         <div className="text-center mb-6">
-                          <button 
-                            className="bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white px-6 py-3 rounded-lg font-medium transition-all duration-300 shadow-lg"
-                            onClick={() => {
+                          <div 
+                            className="inline-block bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white px-6 py-3 rounded-lg font-medium transition-all duration-300 shadow-lg cursor-pointer select-none"
+                            onMouseDown={(e) => {
+                              e.preventDefault();
                               console.log('🔄 Expand/Collapse clicked:', !isExpanded);
                               setIsExpanded(!isExpanded);
                             }}
                           >
                             {isExpanded ? '▲ Show Less' : '▼ Read Full Article'}
-                          </button>
+                          </div>
                         </div>
                       )}
                       
