@@ -594,21 +594,29 @@ export default function LaunchCountdown() {
 
           {/* Right Column: VIP Waitlist */}
           <div>
-            <Card className="electric-frame">
-              <CardHeader>
-                <CardTitle className="text-gradient flex items-center gap-2 text-lg">
-                  <Mail className="w-5 h-5" />
+            <Card className="electric-frame relative overflow-hidden">
+              <div className="absolute inset-0 bg-gradient-to-br from-cyan/5 via-blue/5 to-purple/5 pointer-events-none"></div>
+              <CardHeader className="pb-3 relative">
+                <CardTitle className="text-gradient text-lg flex items-center gap-2">
+                  <div className="p-2 rounded-lg bg-gradient-to-br from-cyan/20 to-blue/20">
+                    <Mail className="w-4 h-4 text-cyan-400" />
+                  </div>
                   Join VIP Waitlist
+                  <Badge className="bg-cyan/20 text-cyan-400 text-xs ml-auto">
+                    Exclusive
+                  </Badge>
                 </CardTitle>
               </CardHeader>
-              <CardContent>
+              <CardContent className="relative">
                 {submitted ? (
-                  <div className="text-center py-6">
-                    <CheckCircle className="w-12 h-12 mx-auto mb-3 text-green-400" />
-                    <h3 className="text-lg font-bold mb-2 text-green-400">You're In!</h3>
-                    <p className="text-sm text-muted-foreground mb-3">
-                      Welcome to the exclusive VIP list. You'll be among the first to access Flutterbye.
-                    </p>
+                  <div className="text-center space-y-4">
+                    <CheckCircle className="w-12 h-12 mx-auto text-green-400" />
+                    <div>
+                      <h3 className="text-lg font-bold mb-2 text-green-400">You're In!</h3>
+                      <p className="text-sm text-muted-foreground mb-3">
+                        Welcome to the exclusive VIP list. You'll be among the first to access Flutterbye.
+                      </p>
+                    </div>
                     <div className="bg-green-500/10 border border-green-500/20 rounded-lg p-3">
                       <h4 className="font-medium text-green-400 mb-2 text-sm">What's Next?</h4>
                       <ul className="text-xs text-muted-foreground space-y-1">
@@ -618,63 +626,104 @@ export default function LaunchCountdown() {
                         <li>• Beta testing privileges</li>
                       </ul>
                     </div>
+                    
+                    {/* Additional padding to match Platform Tutorial height */}
+                    <div className="space-y-3 pt-4">
+                      <div className="text-center">
+                        <h4 className="text-sm font-semibold text-white mb-2">
+                          🎯 VIP Access Benefits
+                        </h4>
+                        <p className="text-xs text-muted-foreground">
+                          Exclusive early access to the revolutionary crypto marketing platform
+                        </p>
+                      </div>
+                      
+                      <div className="bg-slate-900/50 rounded-lg p-3 border border-slate-700">
+                        <h5 className="text-xs font-semibold text-white mb-2">Your VIP Status:</h5>
+                        <ul className="text-xs text-muted-foreground space-y-1">
+                          <li>• Priority platform access</li>
+                          <li>• Exclusive FLBY token rewards</li>
+                          <li>• Beta testing participation</li>
+                          <li>• VIP community membership</li>
+                        </ul>
+                      </div>
+                    </div>
                   </div>
                 ) : (
                   <div className="space-y-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="email" className="text-sm">Email Address *</Label>
-                      <Input
-                        id="email"
-                        type="email"
-                        placeholder="your@email.com"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        required
-                        className="bg-slate-800/80 border-slate-600 text-white placeholder:text-slate-400 focus:border-cyan-400 focus:ring-cyan-400/20 text-sm"
-                      />
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <Label htmlFor="wallet" className="text-sm">Wallet Address (Optional)</Label>
-                      <Input
-                        id="wallet"
-                        placeholder="Solana wallet address"
-                        value={walletAddress}
-                        onChange={(e) => setWalletAddress(e.target.value)}
-                        className="bg-slate-800/80 border-slate-600 text-white placeholder:text-slate-400 focus:border-cyan-400 focus:ring-cyan-400/20 text-sm"
-                      />
-                      <p className="text-xs text-muted-foreground">
-                        💰 For FLBY token airdrops
+                    <div className="text-center">
+                      <h4 className="text-sm font-semibold text-white mb-2">
+                        🚀 Join the Elite Early Access Program
+                      </h4>
+                      <p className="text-xs text-muted-foreground mb-3">
+                        Get exclusive access to the "Google Ads of Crypto" platform before public launch
                       </p>
                     </div>
 
-                    <Button 
-                      type="button" 
-                      className="w-full bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 hover:to-blue-700 text-white font-semibold py-2 text-sm"
-                      disabled={signupMutation.isPending || !email}
-                      onClick={handleSignup}
-                    >
-                      {signupMutation.isPending ? (
-                        <>
-                          <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2"></div>
-                          Joining...
-                        </>
-                      ) : (
-                        <>
-                          <Mail className="w-4 h-4 mr-2" />
-                          Join VIP Waitlist
-                        </>
-                      )}
-                    </Button>
+                    <div className="space-y-3">
+                      <div>
+                        <Label htmlFor="email" className="text-sm">Email Address *</Label>
+                        <Input
+                          id="email"
+                          type="email"
+                          placeholder="your@email.com"
+                          value={email}
+                          onChange={(e) => setEmail(e.target.value)}
+                          required
+                          className="bg-slate-800/80 border-slate-600 text-white placeholder:text-slate-400 focus:border-cyan-400 focus:ring-cyan-400/20 text-sm"
+                        />
+                      </div>
+                      
+                      <div>
+                        <Label htmlFor="wallet" className="text-sm">Wallet Address (Optional)</Label>
+                        <Input
+                          id="wallet"
+                          placeholder="Solana wallet address"
+                          value={walletAddress}
+                          onChange={(e) => setWalletAddress(e.target.value)}
+                          className="bg-slate-800/80 border-slate-600 text-white placeholder:text-slate-400 focus:border-cyan-400 focus:ring-cyan-400/20 text-sm"
+                        />
+                        <p className="text-xs text-muted-foreground mt-1">
+                          💰 For FLBY token airdrops
+                        </p>
+                      </div>
 
-                    <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-3">
-                      <h4 className="font-medium text-blue-400 mb-2 text-sm">VIP Benefits</h4>
+                      <Button 
+                        type="button" 
+                        className="w-full bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 hover:to-blue-700 text-white font-semibold py-2 text-sm"
+                        disabled={signupMutation.isPending || !email}
+                        onClick={handleSignup}
+                      >
+                        {signupMutation.isPending ? (
+                          <>
+                            <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2"></div>
+                            Joining...
+                          </>
+                        ) : (
+                          <>
+                            <Mail className="w-4 h-4 mr-2" />
+                            Join VIP Waitlist
+                          </>
+                        )}
+                      </Button>
+                    </div>
+
+                    <div className="bg-slate-900/50 rounded-lg p-3 border border-slate-700">
+                      <h5 className="text-xs font-semibold text-white mb-2">VIP Exclusive Benefits:</h5>
                       <ul className="text-xs text-muted-foreground space-y-1">
-                        <li>• Early access before launch</li>
-                        <li>• Exclusive FLBY airdrops</li>
-                        <li>• Beta testing privileges</li>
-                        <li>• VIP community access</li>
+                        <li>• First access to crypto marketing tools</li>
+                        <li>• Exclusive FLBY token airdrops</li>
+                        <li>• Beta testing privileges & feedback priority</li>
+                        <li>• VIP community access & networking</li>
+                        <li>• Early revenue generation opportunities</li>
                       </ul>
+                    </div>
+
+                    {/* Stats to match Platform Tutorial */}
+                    <div className="flex justify-center gap-4 text-xs text-muted-foreground pt-2 border-t border-slate-700">
+                      <span>🎯 VIP access</span>
+                      <span>💰 FLBY rewards</span>
+                      <span>🚀 Early launch</span>
                     </div>
                   </div>
                 )}
