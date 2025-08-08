@@ -47,8 +47,6 @@ export default function Navbar() {
 
   // Secondary navigation - business and enterprise features (explore moved to info page)
   const secondaryNavItems = [
-    { href: "/chat", label: "Chat", icon: MessageSquare, description: "Real-time blockchain chat" },
-    { href: "/trade", label: "Trade", icon: ArrowRightLeft, description: "Token marketplace & trading" },
     { href: "/activity", label: "Activity", icon: Activity, description: "Platform activity & analytics" },
   ];
 
