@@ -817,6 +817,216 @@ Provide the enhanced version that incorporates all requested improvements while 
 
     return JSON.parse(response.choices[0].message.content || '{}');
   }
+
+  // =====================================================
+  // BUNDLE 4: Enterprise Intelligence & Automation
+  // =====================================================
+
+  /**
+   * Advanced business intelligence analytics
+   */
+  async generateBusinessIntelligence(contentData: any[], performanceMetrics: any): Promise<{
+    marketInsights: string[];
+    competitiveAdvantage: string[];
+    growthOpportunities: string[];
+    riskAssessment: string[];
+    strategicRecommendations: string[];
+    roiProjections: any[];
+  }> {
+    const response = await openai.chat.completions.create({
+      model: "gpt-4o",
+      messages: [
+        {
+          role: "system",
+          content: `You are a senior business intelligence analyst with expertise in content marketing, competitive analysis, and strategic planning. Provide comprehensive business insights.`
+        },
+        {
+          role: "user",
+          content: `Analyze this business data and provide strategic intelligence:
+          
+          Content Performance Data:
+          ${JSON.stringify(contentData, null, 2)}
+          
+          Performance Metrics:
+          ${JSON.stringify(performanceMetrics, null, 2)}
+          
+          Generate comprehensive business intelligence in JSON format:
+          {
+            "marketInsights": ["insight1", "insight2", "insight3"],
+            "competitiveAdvantage": ["advantage1", "advantage2"],
+            "growthOpportunities": ["opportunity1", "opportunity2"],
+            "riskAssessment": ["risk1", "risk2"],
+            "strategicRecommendations": ["recommendation1", "recommendation2"],
+            "roiProjections": [{"timeframe": "3 months", "projection": "25% increase"}]
+          }`
+        }
+      ],
+      response_format: { type: "json_object" },
+    });
+
+    return JSON.parse(response.choices[0].message.content || '{}');
+  }
+
+  /**
+   * Automated workflow optimization
+   */
+  async optimizeContentWorkflow(currentWorkflow: any, bottlenecks: string[]): Promise<{
+    optimizedWorkflow: any[];
+    efficiencyGains: string[];
+    automationOpportunities: string[];
+    resourceOptimization: string[];
+    timelinePredictions: any[];
+  }> {
+    const response = await openai.chat.completions.create({
+      model: "gpt-4o",
+      messages: [
+        {
+          role: "system",
+          content: `You are a workflow optimization expert specializing in content production and automation. Design efficient, scalable workflows.`
+        },
+        {
+          role: "user",
+          content: `Optimize this content workflow:
+          
+          Current Workflow: ${JSON.stringify(currentWorkflow, null, 2)}
+          Identified Bottlenecks: ${bottlenecks.join(', ')}
+          
+          Provide optimization plan in JSON format:
+          {
+            "optimizedWorkflow": [{"step": "...", "duration": "...", "automation": "..."}],
+            "efficiencyGains": ["gain1", "gain2"],
+            "automationOpportunities": ["automation1", "automation2"],
+            "resourceOptimization": ["optimization1", "optimization2"],
+            "timelinePredictions": [{"metric": "...", "improvement": "..."}]
+          }`
+        }
+      ],
+      response_format: { type: "json_object" },
+    });
+
+    return JSON.parse(response.choices[0].message.content || '{}');
+  }
+
+  /**
+   * Predictive analytics for content performance
+   */
+  async predictFuturePerformance(historicalData: any[], marketTrends: string[]): Promise<{
+    performanceForecast: any[];
+    trendAnalysis: string[];
+    seasonalityFactors: string[];
+    recommendedActions: string[];
+    confidenceScores: any[];
+  }> {
+    const response = await openai.chat.completions.create({
+      model: "gpt-4o",
+      messages: [
+        {
+          role: "system",
+          content: `You are a predictive analytics expert with deep expertise in content marketing trends and performance forecasting.`
+        },
+        {
+          role: "user",
+          content: `Predict future content performance based on:
+          
+          Historical Data: ${JSON.stringify(historicalData.slice(0, 10), null, 2)}
+          Market Trends: ${marketTrends.join(', ')}
+          
+          Generate predictions in JSON format:
+          {
+            "performanceForecast": [{"period": "Q1 2025", "expectedViews": 50000, "confidence": 85}],
+            "trendAnalysis": ["trend1", "trend2"],
+            "seasonalityFactors": ["factor1", "factor2"],
+            "recommendedActions": ["action1", "action2"],
+            "confidenceScores": [{"metric": "views", "confidence": 92}]
+          }`
+        }
+      ],
+      response_format: { type: "json_object" },
+    });
+
+    return JSON.parse(response.choices[0].message.content || '{}');
+  }
+
+  /**
+   * Advanced competitor intelligence
+   */
+  async analyzeCompetitorStrategy(competitors: string[], industry: string): Promise<{
+    competitorProfiles: any[];
+    marketPositioning: string[];
+    contentGaps: string[];
+    opportunityMatrix: any[];
+    strategicInsights: string[];
+  }> {
+    const response = await openai.chat.completions.create({
+      model: "gpt-4o",
+      messages: [
+        {
+          role: "system",
+          content: `You are a competitive intelligence analyst with expertise in market analysis and strategic positioning in the ${industry} industry.`
+        },
+        {
+          role: "user",
+          content: `Analyze competitive landscape for:
+          
+          Competitors: ${competitors.join(', ')}
+          Industry: ${industry}
+          
+          Provide competitive intelligence in JSON format:
+          {
+            "competitorProfiles": [{"name": "...", "strengths": ["..."], "weaknesses": ["..."]}],
+            "marketPositioning": ["positioning1", "positioning2"],
+            "contentGaps": ["gap1", "gap2"],
+            "opportunityMatrix": [{"opportunity": "...", "effort": "low", "impact": "high"}],
+            "strategicInsights": ["insight1", "insight2"]
+          }`
+        }
+      ],
+      response_format: { type: "json_object" },
+    });
+
+    return JSON.parse(response.choices[0].message.content || '{}');
+  }
+
+  /**
+   * Automated reporting and insights generation
+   */
+  async generateExecutiveSummary(analyticsData: any, timeframe: string): Promise<{
+    executiveSummary: string;
+    keyMetrics: any[];
+    criticalInsights: string[];
+    actionItems: any[];
+    nextSteps: string[];
+    riskFactors: string[];
+  }> {
+    const response = await openai.chat.completions.create({
+      model: "gpt-4o",
+      messages: [
+        {
+          role: "system",
+          content: `You are a senior business analyst creating executive-level reports. Focus on strategic insights and actionable recommendations.`
+        },
+        {
+          role: "user",
+          content: `Generate executive summary for ${timeframe}:
+          
+          Analytics Data: ${JSON.stringify(analyticsData, null, 2)}
+          
+          Create executive report in JSON format:
+          {
+            "executiveSummary": "Comprehensive overview paragraph...",
+            "keyMetrics": [{"metric": "Growth Rate", "value": "25%", "trend": "up"}],
+            "criticalInsights": ["insight1", "insight2"],
+            "actionItems": [{"action": "...", "priority": "high", "timeline": "immediate"}],
+            "nextSteps": ["step1", "step2"],
+            "riskFactors": ["risk1", "risk2"]
+          }`
+        }
+      ],
+      response_format: { type: "json_object" },
+    });
+
+    return JSON.parse(response.choices[0].message.content || '{}');
+  }
 }
 
 // Export singleton instance

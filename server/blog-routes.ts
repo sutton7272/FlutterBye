@@ -709,6 +709,167 @@ export function registerBlogRoutes(app: Express) {
     }
   });
 
+  // =====================================================
+  // BUNDLE 4: Enterprise Intelligence & Automation API Routes
+  // =====================================================
+
+  /**
+   * Advanced business intelligence analytics
+   */
+  app.post("/api/blog/business-intelligence", async (req, res) => {
+    try {
+      const posts = await db.select().from(blogPosts).limit(100);
+      const analytics = await db.select().from(blogAnalytics).limit(50);
+      
+      const performanceMetrics = {
+        totalPosts: posts.length,
+        avgReadabilityScore: posts.reduce((sum, p) => sum + (p.readabilityScore || 0), 0) / posts.length,
+        avgSeoScore: posts.reduce((sum, p) => sum + (p.seoScore || 0), 0) / posts.length,
+        totalViews: analytics.reduce((sum, a) => sum + (a.views || 0), 0)
+      };
+      
+      const intelligence = await blogService.generateBusinessIntelligence(
+        posts.slice(0, 20),
+        performanceMetrics
+      );
+      
+      res.json({
+        intelligence,
+        performanceMetrics,
+        dataPoints: posts.length,
+        generatedAt: new Date().toISOString()
+      });
+    } catch (error) {
+      console.error("Error generating business intelligence:", error);
+      res.status(500).json({ error: "Failed to generate business intelligence" });
+    }
+  });
+
+  /**
+   * Automated workflow optimization
+   */
+  app.post("/api/blog/optimize-workflow", async (req, res) => {
+    try {
+      const { currentWorkflow, bottlenecks } = req.body;
+      
+      if (!currentWorkflow) {
+        return res.status(400).json({ error: "Current workflow is required" });
+      }
+      
+      const optimization = await blogService.optimizeContentWorkflow(
+        currentWorkflow,
+        bottlenecks || []
+      );
+      
+      res.json({
+        optimization,
+        originalWorkflow: currentWorkflow,
+        optimizedAt: new Date().toISOString()
+      });
+    } catch (error) {
+      console.error("Error optimizing workflow:", error);
+      res.status(500).json({ error: "Failed to optimize workflow" });
+    }
+  });
+
+  /**
+   * Predictive analytics for content performance
+   */
+  app.post("/api/blog/predict-future-performance", async (req, res) => {
+    try {
+      const posts = await db.select().from(blogPosts).limit(50);
+      const analytics = await db.select().from(blogAnalytics).limit(100);
+      
+      const { marketTrends } = req.body;
+      
+      const historicalData = posts.map(post => ({
+        title: post.title,
+        views: 0, // Would be populated from analytics
+        engagement: post.engagementPotential || 0,
+        publishedAt: post.publishedAt
+      }));
+      
+      const predictions = await blogService.predictFuturePerformance(
+        historicalData,
+        marketTrends || ['AI adoption', 'blockchain growth', 'crypto regulation']
+      );
+      
+      res.json({
+        predictions,
+        historicalDataPoints: historicalData.length,
+        marketTrends: marketTrends || ['AI adoption', 'blockchain growth'],
+        forecastedAt: new Date().toISOString()
+      });
+    } catch (error) {
+      console.error("Error predicting future performance:", error);
+      res.status(500).json({ error: "Failed to predict future performance" });
+    }
+  });
+
+  /**
+   * Advanced competitor intelligence
+   */
+  app.post("/api/blog/competitor-intelligence", async (req, res) => {
+    try {
+      const { competitors, industry } = req.body;
+      
+      if (!competitors || !industry) {
+        return res.status(400).json({ error: "Competitors and industry are required" });
+      }
+      
+      const intelligence = await blogService.analyzeCompetitorStrategy(
+        competitors,
+        industry
+      );
+      
+      res.json({
+        intelligence,
+        competitors,
+        industry,
+        analyzedAt: new Date().toISOString()
+      });
+    } catch (error) {
+      console.error("Error analyzing competitor intelligence:", error);
+      res.status(500).json({ error: "Failed to analyze competitor intelligence" });
+    }
+  });
+
+  /**
+   * Automated executive summary generation
+   */
+  app.post("/api/blog/executive-summary", async (req, res) => {
+    try {
+      const { timeframe } = req.body;
+      
+      const posts = await db.select().from(blogPosts).limit(100);
+      const analytics = await db.select().from(blogAnalytics).limit(50);
+      
+      const analyticsData = {
+        totalPosts: posts.length,
+        publishedPosts: posts.filter(p => p.status === 'published').length,
+        avgReadabilityScore: posts.reduce((sum, p) => sum + (p.readabilityScore || 0), 0) / posts.length,
+        avgSeoScore: posts.reduce((sum, p) => sum + (p.seoScore || 0), 0) / posts.length,
+        totalViews: analytics.reduce((sum, a) => sum + (a.views || 0), 0),
+        totalShares: analytics.reduce((sum, a) => sum + (a.shares || 0), 0)
+      };
+      
+      const summary = await blogService.generateExecutiveSummary(
+        analyticsData,
+        timeframe || 'monthly'
+      );
+      
+      res.json({
+        summary,
+        analyticsData,
+        timeframe: timeframe || 'monthly',
+        generatedAt: new Date().toISOString()
+      });
+    } catch (error) {
+      console.error("Error generating executive summary:", error);
+      res.status(500).json({ error: "Failed to generate executive summary" });
+    }
+  });
+
   // ================== BLOG ANALYTICS ==================
   
   /**
