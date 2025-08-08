@@ -68,7 +68,7 @@ export default function AdminDashboard() {
       title: "Unified Admin Dashboard", 
       description: "Complete platform administration, analytics, and system management",
       icon: Settings,
-      route: "/admin/unified",
+      route: "/admin/dashboard-detailed",
       color: "electric-green",
       features: [
         "User Management",

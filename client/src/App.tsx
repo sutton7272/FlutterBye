@@ -292,6 +292,13 @@ function Router() {
           </AdminRouteGuard>
         )} />
         
+        <Route path="/admin/dashboard-detailed" component={() => (
+          <AdminRouteGuard>
+            <Navbar />
+            <AdminUnifiedDashboard />
+          </AdminRouteGuard>
+        )} />
+        
         <Route path="/admin/escrow-management" component={() => (
           <AdminRouteGuard>
             <Navbar />
