@@ -118,9 +118,17 @@ export default function LaunchCountdown() {
                 
                 const shouldShowReadMore = !isExpanded && hasMoreContent;
                 
-                // Simple debug - only log once per render cycle
-                if (index === 0) {
-                  console.log('Current expandedContentId:', expandedContentId);
+                // Debug for this specific content item
+                if (content.id === 1) {
+                  console.log(`Content ${content.id} debug:`, {
+                    isExpanded,
+                    hasMoreContent,
+                    shouldShowReadMore,
+                    expandedContentId,
+                    contentLength: content.content?.length || 0,
+                    previewLength: previewText.length,
+                    fullLength: fullText.length
+                  });
                 }
                 
                 return (
@@ -160,37 +168,39 @@ export default function LaunchCountdown() {
                           {shouldShowReadMore && "..."}
                         </div>
                         
-                        {/* Read More/Show Less buttons */}
-                        {shouldShowReadMore && (
-                          <Button 
-                            variant="link" 
-                            size="sm" 
-                            className="p-2 text-cyan-400 hover:text-cyan-300 text-sm mt-2 relative z-50 cursor-pointer border border-cyan-400/30 rounded"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              e.preventDefault();
-                              console.log('🔵 READ MORE CLICKED - Content ID:', content.id);
-                              setExpandedContentId(content.id);
-                            }}
-                          >
-                            Read More →
-                          </Button>
-                        )}
-                        {isExpanded && hasMoreContent && (
-                          <Button 
-                            variant="link" 
-                            size="sm" 
-                            className="p-2 text-cyan-400 hover:text-cyan-300 text-sm mt-2 relative z-50 cursor-pointer border border-cyan-400/30 rounded"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              e.preventDefault();
-                              console.log('🔴 SHOW LESS CLICKED');
-                              setExpandedContentId(null);
-                            }}
-                          >
-                            ← Show Less
-                          </Button>
-                        )}
+                        {/* Read More/Show Less buttons - Simplified logic */}
+                        <div className="mt-2">
+                          {!isExpanded && hasMoreContent && (
+                            <Button 
+                              variant="outline"
+                              size="sm" 
+                              className="bg-cyan-500/20 border-cyan-400 text-cyan-400 hover:bg-cyan-500/30 hover:text-cyan-300 px-4 py-2"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                e.preventDefault();
+                                console.log('🔵 READ MORE CLICKED - Content ID:', content.id);
+                                setExpandedContentId(content.id);
+                              }}
+                            >
+                              Read More →
+                            </Button>
+                          )}
+                          {isExpanded && (
+                            <Button 
+                              variant="outline"
+                              size="sm" 
+                              className="bg-cyan-500/20 border-cyan-400 text-cyan-400 hover:bg-cyan-500/30 hover:text-cyan-300 px-4 py-2"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                e.preventDefault();
+                                console.log('🔴 SHOW LESS CLICKED');
+                                setExpandedContentId(null);
+                              }}
+                            >
+                              ← Show Less
+                            </Button>
+                          )}
+                        </div>
                       </div>
                       
                       <div className="flex items-center gap-4 text-xs text-muted-foreground">
@@ -200,16 +210,7 @@ export default function LaunchCountdown() {
                         <span className="text-electric-green font-semibold">✨ AI Optimized</span>
                       </div>
                       
-                      {/* Test button to verify clicks work */}
-                      <Button 
-                        className="mt-4 bg-red-500 hover:bg-red-600 text-white px-4 py-2"
-                        onClick={() => {
-                          console.log('🟥 TEST BUTTON CLICKED - This proves clicks work!');
-                          alert('Test button clicked - this proves the click system works!');
-                        }}
-                      >
-                        Test Click (Red Button)
-                      </Button>
+
                       
                       {shouldShowReadMore && (
                         <div className="mt-3 text-center">
