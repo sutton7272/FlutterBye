@@ -597,6 +597,226 @@ Provide the enhanced version that incorporates all requested improvements while 
 
     return JSON.parse(response.choices[0].message.content || '{}');
   }
+
+  // =====================================================
+  // BUNDLE 3: Advanced Analytics & Automation
+  // =====================================================
+
+  /**
+   * Advanced content analytics with performance insights
+   */
+  async analyzeContentPerformance(posts: any[]): Promise<{
+    topPerformers: any[];
+    underperformers: any[];
+    contentTrends: string[];
+    recommendations: string[];
+    optimizationOpportunities: string[];
+  }> {
+    const postsData = posts.map(post => ({
+      title: post.title,
+      views: post.viewCount || 0,
+      shares: post.shareCount || 0,
+      readabilityScore: post.readabilityScore || 0,
+      seoScore: post.seoScore || 0,
+      engagementPotential: post.engagementPotential || 0
+    }));
+
+    const response = await openai.chat.completions.create({
+      model: "gpt-4o",
+      messages: [
+        {
+          role: "system",
+          content: `You are an advanced content analytics expert. Analyze blog post performance data and provide comprehensive insights for optimization.`
+        },
+        {
+          role: "user",
+          content: `Analyze this blog content performance data:
+          
+          ${JSON.stringify(postsData, null, 2)}
+          
+          Provide detailed analytics in JSON format:
+          {
+            "topPerformers": [{"title": "...", "reason": "..."}],
+            "underperformers": [{"title": "...", "issues": "..."}],
+            "contentTrends": ["trend1", "trend2", "trend3"],
+            "recommendations": ["recommendation1", "recommendation2"],
+            "optimizationOpportunities": ["opportunity1", "opportunity2"]
+          }`
+        }
+      ],
+      response_format: { type: "json_object" },
+    });
+
+    return JSON.parse(response.choices[0].message.content || '{}');
+  }
+
+  /**
+   * Automated content strategy generation
+   */
+  async generateContentStrategy(businessGoals: string[], targetAudience: string, timeframe: number = 30): Promise<{
+    contentPillars: string[];
+    contentCalendar: any[];
+    distributionStrategy: string[];
+    keywordTargets: string[];
+    competitiveAdvantage: string[];
+  }> {
+    const response = await openai.chat.completions.create({
+      model: "gpt-4o",
+      messages: [
+        {
+          role: "system",
+          content: `You are a strategic content marketing expert. Create comprehensive content strategies that align with business objectives and audience needs.`
+        },
+        {
+          role: "user",
+          content: `Create a ${timeframe}-day content strategy for:
+          
+          Business Goals: ${businessGoals.join(', ')}
+          Target Audience: ${targetAudience}
+          
+          Generate strategy in JSON format:
+          {
+            "contentPillars": ["pillar1", "pillar2", "pillar3"],
+            "contentCalendar": [
+              {"week": 1, "topics": ["topic1", "topic2"], "focus": "pillar"},
+              {"week": 2, "topics": ["topic3", "topic4"], "focus": "pillar"}
+            ],
+            "distributionStrategy": ["channel1", "channel2"],
+            "keywordTargets": ["keyword1", "keyword2"],
+            "competitiveAdvantage": ["advantage1", "advantage2"]
+          }`
+        }
+      ],
+      response_format: { type: "json_object" },
+    });
+
+    return JSON.parse(response.choices[0].message.content || '{}');
+  }
+
+  /**
+   * AI-powered content personalization engine
+   */
+  async personalizeContent(content: string, audienceSegment: string, personalityType: string): Promise<{
+    personalizedContent: string;
+    toneAdjustments: string[];
+    callToAction: string;
+    engagementHooks: string[];
+  }> {
+    const response = await openai.chat.completions.create({
+      model: "gpt-4o",
+      messages: [
+        {
+          role: "system",
+          content: `You are a content personalization expert. Adapt content to specific audience segments and personality types for maximum engagement.`
+        },
+        {
+          role: "user",
+          content: `Personalize this content for:
+          Audience Segment: ${audienceSegment}
+          Personality Type: ${personalityType}
+          
+          Original Content:
+          ${content}
+          
+          Return personalization in JSON format:
+          {
+            "personalizedContent": "adapted content here",
+            "toneAdjustments": ["adjustment1", "adjustment2"],
+            "callToAction": "personalized CTA",
+            "engagementHooks": ["hook1", "hook2"]
+          }`
+        }
+      ],
+      response_format: { type: "json_object" },
+    });
+
+    return JSON.parse(response.choices[0].message.content || '{}');
+  }
+
+  /**
+   * Advanced SEO content optimization with real-time suggestions
+   */
+  async optimizeForSEO(content: string, targetKeywords: string[], competitionLevel: string): Promise<{
+    optimizedContent: string;
+    seoScore: number;
+    improvements: string[];
+    keywordDensity: any[];
+    metaOptimizations: any;
+    structureRecommendations: string[];
+  }> {
+    const response = await openai.chat.completions.create({
+      model: "gpt-4o",
+      messages: [
+        {
+          role: "system",
+          content: `You are an advanced SEO optimization expert. Enhance content for maximum search engine visibility while maintaining readability and engagement.`
+        },
+        {
+          role: "user",
+          content: `Optimize this content for SEO:
+          
+          Target Keywords: ${targetKeywords.join(', ')}
+          Competition Level: ${competitionLevel}
+          
+          Content to optimize:
+          ${content.substring(0, 1500)}...
+          
+          Return optimization in JSON format:
+          {
+            "optimizedContent": "SEO-optimized content",
+            "seoScore": 85,
+            "improvements": ["improvement1", "improvement2"],
+            "keywordDensity": [{"keyword": "term", "density": 2.5}],
+            "metaOptimizations": {"title": "...", "description": "..."},
+            "structureRecommendations": ["recommendation1", "recommendation2"]
+          }`
+        }
+      ],
+      response_format: { type: "json_object" },
+    });
+
+    return JSON.parse(response.choices[0].message.content || '{}');
+  }
+
+  /**
+   * Automated content distribution recommendations
+   */
+  async generateDistributionPlan(content: string, businessType: string, goals: string[]): Promise<{
+    primaryChannels: string[];
+    secondaryChannels: string[];
+    timingStrategy: any[];
+    contentAdaptations: any[];
+    trackingMetrics: string[];
+  }> {
+    const response = await openai.chat.completions.create({
+      model: "gpt-4o",
+      messages: [
+        {
+          role: "system",
+          content: `You are a content distribution strategist. Create comprehensive multi-channel distribution plans that maximize reach and engagement.`
+        },
+        {
+          role: "user",
+          content: `Create distribution plan for:
+          Business Type: ${businessType}
+          Goals: ${goals.join(', ')}
+          Content Preview: ${content.substring(0, 300)}...
+          
+          Generate plan in JSON format:
+          {
+            "primaryChannels": ["channel1", "channel2"],
+            "secondaryChannels": ["channel3", "channel4"],
+            "timingStrategy": [{"channel": "...", "bestTimes": ["..."]}],
+            "contentAdaptations": [{"channel": "...", "adaptation": "..."}],
+            "trackingMetrics": ["metric1", "metric2"]
+          }`
+        }
+      ],
+      response_format: { type: "json_object" },
+    });
+
+    return JSON.parse(response.choices[0].message.content || '{}');
+  }
 }
 
 // Export singleton instance

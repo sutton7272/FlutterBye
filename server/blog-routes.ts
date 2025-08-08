@@ -563,6 +563,152 @@ export function registerBlogRoutes(app: Express) {
     }
   });
 
+  // =====================================================
+  // BUNDLE 3: Advanced Analytics & Automation API Routes
+  // =====================================================
+
+  /**
+   * Advanced content performance analytics
+   */
+  app.post("/api/blog/analyze-performance", async (req, res) => {
+    try {
+      const posts = await db.select().from(blogPosts).limit(50);
+      
+      const analysis = await blogService.analyzeContentPerformance(posts);
+      
+      res.json({
+        analysis,
+        totalPosts: posts.length,
+        analyzedAt: new Date().toISOString()
+      });
+    } catch (error) {
+      console.error("Error analyzing content performance:", error);
+      res.status(500).json({ error: "Failed to analyze content performance" });
+    }
+  });
+
+  /**
+   * Automated content strategy generation
+   */
+  app.post("/api/blog/generate-strategy", async (req, res) => {
+    try {
+      const { businessGoals, targetAudience, timeframe } = req.body;
+      
+      if (!businessGoals || !targetAudience) {
+        return res.status(400).json({ error: "Business goals and target audience are required" });
+      }
+      
+      const strategy = await blogService.generateContentStrategy(
+        businessGoals,
+        targetAudience,
+        timeframe || 30
+      );
+      
+      res.json({
+        strategy,
+        businessGoals,
+        targetAudience,
+        timeframe: timeframe || 30,
+        generatedAt: new Date().toISOString()
+      });
+    } catch (error) {
+      console.error("Error generating content strategy:", error);
+      res.status(500).json({ error: "Failed to generate content strategy" });
+    }
+  });
+
+  /**
+   * AI-powered content personalization
+   */
+  app.post("/api/blog/personalize-content", async (req, res) => {
+    try {
+      const { content, audienceSegment, personalityType } = req.body;
+      
+      if (!content || !audienceSegment || !personalityType) {
+        return res.status(400).json({ 
+          error: "Content, audience segment, and personality type are required" 
+        });
+      }
+      
+      const personalized = await blogService.personalizeContent(
+        content,
+        audienceSegment,
+        personalityType
+      );
+      
+      res.json({
+        personalized,
+        originalContent: content.substring(0, 200) + "...",
+        audienceSegment,
+        personalityType,
+        processedAt: new Date().toISOString()
+      });
+    } catch (error) {
+      console.error("Error personalizing content:", error);
+      res.status(500).json({ error: "Failed to personalize content" });
+    }
+  });
+
+  /**
+   * Advanced SEO optimization engine
+   */
+  app.post("/api/blog/optimize-seo", async (req, res) => {
+    try {
+      const { content, targetKeywords, competitionLevel } = req.body;
+      
+      if (!content || !targetKeywords) {
+        return res.status(400).json({ error: "Content and target keywords are required" });
+      }
+      
+      const optimization = await blogService.optimizeForSEO(
+        content,
+        targetKeywords,
+        competitionLevel || 'medium'
+      );
+      
+      res.json({
+        optimization,
+        targetKeywords,
+        competitionLevel: competitionLevel || 'medium',
+        optimizedAt: new Date().toISOString()
+      });
+    } catch (error) {
+      console.error("Error optimizing for SEO:", error);
+      res.status(500).json({ error: "Failed to optimize for SEO" });
+    }
+  });
+
+  /**
+   * Automated distribution planning
+   */
+  app.post("/api/blog/distribution-plan", async (req, res) => {
+    try {
+      const { content, businessType, goals } = req.body;
+      
+      if (!content || !businessType || !goals) {
+        return res.status(400).json({ 
+          error: "Content, business type, and goals are required" 
+        });
+      }
+      
+      const plan = await blogService.generateDistributionPlan(
+        content,
+        businessType,
+        goals
+      );
+      
+      res.json({
+        plan,
+        businessType,
+        goals,
+        generatedAt: new Date().toISOString()
+      });
+    } catch (error) {
+      console.error("Error generating distribution plan:", error);
+      res.status(500).json({ error: "Failed to generate distribution plan" });
+    }
+  });
+
   // ================== BLOG ANALYTICS ==================
   
   /**
