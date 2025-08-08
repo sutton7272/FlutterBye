@@ -568,10 +568,192 @@ export const analysisQueue = pgTable("analysis_queue", {
   completedAt: timestamp("completed_at"),
 });
 
+// Blog System Tables
+export const blogCategories = pgTable("blog_categories", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  name: text("name").notNull().unique(),
+  slug: text("slug").notNull().unique(),
+  description: text("description"),
+  color: text("color").default("#6366f1"), // Hex color for category
+  isActive: boolean("is_active").default(true),
+  sortOrder: integer("sort_order").default(0),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const blogPosts = pgTable("blog_posts", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  title: text("title").notNull(),
+  slug: text("slug").notNull().unique(),
+  excerpt: text("excerpt"),
+  content: text("content").notNull(),
+  metaDescription: text("meta_description"),
+  keywords: json("keywords").$type<string[]>(),
+  featuredImage: text("featured_image"),
+  
+  // Content Generation Settings
+  tone: text("tone").default("professional"), // professional, casual, technical, educational, persuasive
+  targetAudience: text("target_audience").default("general"), // beginners, intermediate, experts, general
+  contentType: text("content_type").default("blog"), // blog, tutorial, guide, analysis, opinion
+  
+  // AI Analysis Results
+  readabilityScore: integer("readability_score"),
+  seoScore: integer("seo_score"),
+  engagementPotential: integer("engagement_potential"),
+  aiRecommendations: json("ai_recommendations").$type<string[]>(),
+  
+  // SEO Optimization
+  seoTitle: text("seo_title"),
+  internalLinks: json("internal_links").$type<string[]>(),
+  headingStructure: json("heading_structure").$type<string[]>(),
+  
+  // Publishing
+  status: text("status").default("draft"), // draft, scheduled, published, archived
+  publishedAt: timestamp("published_at"),
+  scheduledAt: timestamp("scheduled_at"),
+  
+  // Analytics
+  viewCount: integer("view_count").default(0),
+  shareCount: integer("share_count").default(0),
+  avgReadTime: integer("avg_read_time"), // in seconds
+  
+  // Relationships
+  categoryId: varchar("category_id").references(() => blogCategories.id),
+  authorId: varchar("author_id").references(() => users.id),
+  
+  // AI Generation Metadata
+  generatedByAI: boolean("generated_by_ai").default(false),
+  aiPrompt: text("ai_prompt"),
+  aiModel: text("ai_model").default("gpt-4o"),
+  aiGeneratedAt: timestamp("ai_generated_at"),
+  
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const blogSchedules = pgTable("blog_schedules", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  name: text("name").notNull(),
+  isActive: boolean("is_active").default(true),
+  
+  // Frequency Settings
+  frequency: text("frequency").notNull(), // daily, weekly, bi-weekly, monthly, custom
+  customCronExpression: text("custom_cron_expression"), // For custom schedules
+  
+  // Content Settings
+  preferredCategories: json("preferred_categories").$type<string[]>(),
+  defaultTone: text("default_tone").default("professional"),
+  defaultTargetAudience: text("default_target_audience").default("general"),
+  defaultContentType: text("default_content_type").default("blog"),
+  wordCountRange: json("word_count_range").$type<{min: number, max: number}>(),
+  
+  // AI Topic Generation
+  topicCategories: json("topic_categories").$type<string[]>(),
+  includeFlutterByeIntegration: boolean("include_flutterbye_integration").default(true),
+  keywordFocus: json("keyword_focus").$type<string[]>(),
+  
+  // Auto Publishing
+  autoPublish: boolean("auto_publish").default(false),
+  requiresApproval: boolean("requires_approval").default(true),
+  
+  // Statistics
+  postsGenerated: integer("posts_generated").default(0),
+  postsPublished: integer("posts_published").default(0),
+  lastRunAt: timestamp("last_run_at"),
+  nextRunAt: timestamp("next_run_at"),
+  
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const blogAnalytics = pgTable("blog_analytics", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  postId: varchar("post_id").references(() => blogPosts.id).notNull(),
+  
+  // Daily Metrics
+  date: timestamp("date").notNull(),
+  views: integer("views").default(0),
+  uniqueViews: integer("unique_views").default(0),
+  shares: integer("shares").default(0),
+  avgReadTime: integer("avg_read_time").default(0),
+  bounceRate: decimal("bounce_rate", { precision: 5, scale: 2 }).default("0"),
+  
+  // SEO Metrics
+  organicViews: integer("organic_views").default(0),
+  searchImpressions: integer("search_impressions").default(0),
+  searchClicks: integer("search_clicks").default(0),
+  avgPosition: decimal("avg_position", { precision: 4, scale: 1 }),
+  
+  // Engagement Metrics
+  socialShares: json("social_shares").$type<{platform: string, count: number}[]>(),
+  commentCount: integer("comment_count").default(0),
+  
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const blogTitleVariations = pgTable("blog_title_variations", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  postId: varchar("post_id").references(() => blogPosts.id).notNull(),
+  title: text("title").notNull(),
+  isActive: boolean("is_active").default(false),
+  
+  // A/B Testing Results
+  impressions: integer("impressions").default(0),
+  clicks: integer("clicks").default(0),
+  ctr: decimal("ctr", { precision: 5, scale: 2 }).default("0"), // Click-through rate
+  
+  generatedAt: timestamp("generated_at").defaultNow(),
+});
+
 // Insert schemas
 export const insertUserSchema = createInsertSchema(users).omit({
   id: true,
   createdAt: true,
+});
+
+export const insertBlogCategorySchema = createInsertSchema(blogCategories, {
+  name: z.string().min(1).max(100),
+  slug: z.string().min(1).max(100),
+  description: z.string().max(500).optional(),
+  color: z.string().regex(/^#[0-9A-Fa-f]{6}$/).optional()
+}).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertBlogPostSchema = createInsertSchema(blogPosts, {
+  title: z.string().min(1).max(200),
+  slug: z.string().min(1).max(200),
+  content: z.string().min(1),
+  excerpt: z.string().max(500).optional(),
+  metaDescription: z.string().max(160).optional(),
+  tone: z.enum(['professional', 'casual', 'technical', 'educational', 'persuasive']).optional(),
+  targetAudience: z.enum(['beginners', 'intermediate', 'experts', 'general']).optional(),
+  contentType: z.enum(['blog', 'tutorial', 'guide', 'analysis', 'opinion']).optional(),
+  status: z.enum(['draft', 'scheduled', 'published', 'archived']).optional()
+}).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+  viewCount: true,
+  shareCount: true,
+});
+
+export const insertBlogScheduleSchema = createInsertSchema(blogSchedules, {
+  name: z.string().min(1).max(100),
+  frequency: z.enum(['daily', 'weekly', 'bi-weekly', 'monthly', 'custom']),
+  defaultTone: z.enum(['professional', 'casual', 'technical', 'educational', 'persuasive']).optional(),
+  defaultTargetAudience: z.enum(['beginners', 'intermediate', 'experts', 'general']).optional(),
+  defaultContentType: z.enum(['blog', 'tutorial', 'guide', 'analysis', 'opinion']).optional()
+}).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+  postsGenerated: true,
+  postsPublished: true,
+  lastRunAt: true,
+  nextRunAt: true,
 });
 
 export const insertTokenSchema = createInsertSchema(tokens, {

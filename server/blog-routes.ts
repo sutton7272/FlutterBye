@@ -1,0 +1,539 @@
+import type { Express } from "express";
+import { db } from "./db";
+import { blogPosts, blogCategories, blogSchedules, blogAnalytics, blogTitleVariations } from "@shared/schema";
+import { eq, desc, and, sql, like } from "drizzle-orm";
+import { blogService } from "./openai-blog-service";
+import type { BlogGenerationRequest } from "./openai-blog-service";
+
+/**
+ * Blog API Routes for FlutterBlog Bot System
+ */
+export function registerBlogRoutes(app: Express) {
+  
+  // ================== BLOG POSTS CRUD ==================
+  
+  /**
+   * Get all blog posts with pagination and filtering
+   */
+  app.get("/api/blog/posts", async (req, res) => {
+    try {
+      const page = parseInt(req.query.page as string) || 1;
+      const limit = parseInt(req.query.limit as string) || 10;
+      const status = req.query.status as string;
+      const categoryId = req.query.categoryId as string;
+      const search = req.query.search as string;
+      
+      const offset = (page - 1) * limit;
+      
+      let whereConditions = [];
+      if (status) whereConditions.push(eq(blogPosts.status, status));
+      if (categoryId) whereConditions.push(eq(blogPosts.categoryId, categoryId));
+      if (search) whereConditions.push(like(blogPosts.title, `%${search}%`));
+      
+      const posts = await db
+        .select()
+        .from(blogPosts)
+        .where(whereConditions.length > 0 ? and(...whereConditions) : undefined)
+        .orderBy(desc(blogPosts.createdAt))
+        .limit(limit)
+        .offset(offset);
+      
+      const totalCount = await db
+        .select({ count: sql<number>`count(*)` })
+        .from(blogPosts)
+        .where(whereConditions.length > 0 ? and(...whereConditions) : undefined);
+      
+      res.json({
+        posts,
+        pagination: {
+          page,
+          limit,
+          total: totalCount[0].count,
+          totalPages: Math.ceil(totalCount[0].count / limit)
+        }
+      });
+    } catch (error) {
+      console.error("Error fetching blog posts:", error);
+      res.status(500).json({ error: "Failed to fetch blog posts" });
+    }
+  });
+  
+  /**
+   * Get published blog posts for public display (landing page)
+   */
+  app.get("/api/blog/published", async (req, res) => {
+    try {
+      const limit = parseInt(req.query.limit as string) || 5;
+      
+      const posts = await db
+        .select({
+          id: blogPosts.id,
+          title: blogPosts.title,
+          slug: blogPosts.slug,
+          excerpt: blogPosts.excerpt,
+          featuredImage: blogPosts.featuredImage,
+          publishedAt: blogPosts.publishedAt,
+          viewCount: blogPosts.viewCount,
+          avgReadTime: blogPosts.avgReadTime
+        })
+        .from(blogPosts)
+        .where(eq(blogPosts.status, 'published'))
+        .orderBy(desc(blogPosts.publishedAt))
+        .limit(limit);
+      
+      res.json({ posts });
+    } catch (error) {
+      console.error("Error fetching published blog posts:", error);
+      res.status(500).json({ error: "Failed to fetch published blog posts" });
+    }
+  });
+  
+  /**
+   * Get single blog post by slug
+   */
+  app.get("/api/blog/posts/:slug", async (req, res) => {
+    try {
+      const { slug } = req.params;
+      
+      const post = await db
+        .select()
+        .from(blogPosts)
+        .where(eq(blogPosts.slug, slug))
+        .limit(1);
+      
+      if (!post.length) {
+        return res.status(404).json({ error: "Blog post not found" });
+      }
+      
+      // Increment view count
+      await db
+        .update(blogPosts)
+        .set({ viewCount: sql`${blogPosts.viewCount} + 1` })
+        .where(eq(blogPosts.id, post[0].id));
+      
+      res.json({ post: post[0] });
+    } catch (error) {
+      console.error("Error fetching blog post:", error);
+      res.status(500).json({ error: "Failed to fetch blog post" });
+    }
+  });
+  
+  /**
+   * Create new blog post
+   */
+  app.post("/api/blog/posts", async (req, res) => {
+    try {
+      const postData = req.body;
+      
+      // Generate slug from title if not provided
+      if (!postData.slug) {
+        postData.slug = postData.title
+          .toLowerCase()
+          .replace(/[^a-z0-9]+/g, '-')
+          .replace(/^-|-$/g, '');
+      }
+      
+      const [newPost] = await db
+        .insert(blogPosts)
+        .values(postData)
+        .returning();
+      
+      res.status(201).json({ post: newPost });
+    } catch (error) {
+      console.error("Error creating blog post:", error);
+      res.status(500).json({ error: "Failed to create blog post" });
+    }
+  });
+  
+  /**
+   * Update blog post
+   */
+  app.put("/api/blog/posts/:id", async (req, res) => {
+    try {
+      const { id } = req.params;
+      const updateData = { ...req.body, updatedAt: new Date() };
+      
+      const [updatedPost] = await db
+        .update(blogPosts)
+        .set(updateData)
+        .where(eq(blogPosts.id, id))
+        .returning();
+      
+      if (!updatedPost) {
+        return res.status(404).json({ error: "Blog post not found" });
+      }
+      
+      res.json({ post: updatedPost });
+    } catch (error) {
+      console.error("Error updating blog post:", error);
+      res.status(500).json({ error: "Failed to update blog post" });
+    }
+  });
+  
+  /**
+   * Delete blog post
+   */
+  app.delete("/api/blog/posts/:id", async (req, res) => {
+    try {
+      const { id } = req.params;
+      
+      await db.delete(blogPosts).where(eq(blogPosts.id, id));
+      
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error deleting blog post:", error);
+      res.status(500).json({ error: "Failed to delete blog post" });
+    }
+  });
+  
+  // ================== AI CONTENT GENERATION ==================
+  
+  /**
+   * Generate blog content using AI
+   */
+  app.post("/api/blog/generate", async (req, res) => {
+    try {
+      const request: BlogGenerationRequest = req.body;
+      
+      if (!request.topic) {
+        return res.status(400).json({ error: "Topic is required" });
+      }
+      
+      // Generate content using OpenAI
+      const result = await blogService.generateBlogContent(request);
+      
+      // Generate SEO optimization
+      const seoOptimization = await blogService.optimizeForSEO(
+        result.content, 
+        request.keywords?.[0] || request.topic
+      );
+      
+      // Analyze content quality
+      const analysis = await blogService.analyzeContent(result.content);
+      
+      // Create slug from title
+      const slug = result.title
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-|-$/g, '');
+      
+      // Create draft blog post
+      const [newPost] = await db.insert(blogPosts).values({
+        title: result.title,
+        slug: slug,
+        excerpt: result.excerpt,
+        content: result.content,
+        metaDescription: seoOptimization.metaDescription,
+        keywords: seoOptimization.keywords,
+        tone: request.tone,
+        targetAudience: request.targetAudience,
+        contentType: request.contentType,
+        readabilityScore: analysis.readabilityScore,
+        seoScore: analysis.seoScore,
+        engagementPotential: analysis.engagementPotential,
+        aiRecommendations: analysis.recommendations,
+        seoTitle: seoOptimization.title,
+        internalLinks: seoOptimization.internalLinkSuggestions,
+        headingStructure: seoOptimization.headings,
+        generatedByAI: true,
+        aiPrompt: JSON.stringify(request),
+        aiModel: "gpt-4o",
+        aiGeneratedAt: new Date(),
+        status: "draft"
+      }).returning();
+      
+      res.json({
+        post: newPost,
+        analysis,
+        seoOptimization
+      });
+    } catch (error) {
+      console.error("Error generating blog content:", error);
+      res.status(500).json({ error: "Failed to generate blog content" });
+    }
+  });
+  
+  /**
+   * Generate title variations for A/B testing
+   */
+  app.post("/api/blog/generate-titles", async (req, res) => {
+    try {
+      const { topic, keyword, count = 5 } = req.body;
+      
+      if (!topic || !keyword) {
+        return res.status(400).json({ error: "Topic and keyword are required" });
+      }
+      
+      const titles = await blogService.generateTitleVariations(topic, keyword, count);
+      
+      res.json({ titles });
+    } catch (error) {
+      console.error("Error generating title variations:", error);
+      res.status(500).json({ error: "Failed to generate title variations" });
+    }
+  });
+  
+  /**
+   * Get trending topic suggestions
+   */
+  app.get("/api/blog/trending-topics", async (req, res) => {
+    try {
+      const category = req.query.category as string || 'blockchain';
+      
+      const topics = await blogService.suggestTrendingTopics(category);
+      
+      res.json({ topics });
+    } catch (error) {
+      console.error("Error getting trending topics:", error);
+      res.status(500).json({ error: "Failed to get trending topics" });
+    }
+  });
+  
+  /**
+   * Enhance existing blog content
+   */
+  app.post("/api/blog/enhance/:id", async (req, res) => {
+    try {
+      const { id } = req.params;
+      const { improvements } = req.body;
+      
+      if (!improvements || !Array.isArray(improvements)) {
+        return res.status(400).json({ error: "Improvements array is required" });
+      }
+      
+      // Get current post
+      const post = await db.select().from(blogPosts).where(eq(blogPosts.id, id)).limit(1);
+      
+      if (!post.length) {
+        return res.status(404).json({ error: "Blog post not found" });
+      }
+      
+      // Enhance content
+      const enhancedContent = await blogService.enhanceContent(post[0].content, improvements);
+      
+      // Update post with enhanced content
+      const [updatedPost] = await db
+        .update(blogPosts)
+        .set({ 
+          content: enhancedContent,
+          updatedAt: new Date()
+        })
+        .where(eq(blogPosts.id, id))
+        .returning();
+      
+      res.json({ post: updatedPost });
+    } catch (error) {
+      console.error("Error enhancing blog content:", error);
+      res.status(500).json({ error: "Failed to enhance blog content" });
+    }
+  });
+  
+  // ================== BLOG CATEGORIES ==================
+  
+  /**
+   * Get all blog categories
+   */
+  app.get("/api/blog/categories", async (req, res) => {
+    try {
+      const categories = await db
+        .select()
+        .from(blogCategories)
+        .where(eq(blogCategories.isActive, true))
+        .orderBy(blogCategories.sortOrder, blogCategories.name);
+      
+      res.json({ categories });
+    } catch (error) {
+      console.error("Error fetching blog categories:", error);
+      res.status(500).json({ error: "Failed to fetch blog categories" });
+    }
+  });
+  
+  /**
+   * Create new blog category
+   */
+  app.post("/api/blog/categories", async (req, res) => {
+    try {
+      const categoryData = req.body;
+      
+      // Generate slug if not provided
+      if (!categoryData.slug) {
+        categoryData.slug = categoryData.name
+          .toLowerCase()
+          .replace(/[^a-z0-9]+/g, '-')
+          .replace(/^-|-$/g, '');
+      }
+      
+      const [newCategory] = await db
+        .insert(blogCategories)
+        .values(categoryData)
+        .returning();
+      
+      res.status(201).json({ category: newCategory });
+    } catch (error) {
+      console.error("Error creating blog category:", error);
+      res.status(500).json({ error: "Failed to create blog category" });
+    }
+  });
+  
+  // ================== BLOG SCHEDULES ==================
+  
+  /**
+   * Get all blog schedules
+   */
+  app.get("/api/blog/schedules", async (req, res) => {
+    try {
+      const schedules = await db
+        .select()
+        .from(blogSchedules)
+        .orderBy(desc(blogSchedules.createdAt));
+      
+      res.json({ schedules });
+    } catch (error) {
+      console.error("Error fetching blog schedules:", error);
+      res.status(500).json({ error: "Failed to fetch blog schedules" });
+    }
+  });
+  
+  /**
+   * Create new blog schedule
+   */
+  app.post("/api/blog/schedules", async (req, res) => {
+    try {
+      const scheduleData = req.body;
+      
+      const [newSchedule] = await db
+        .insert(blogSchedules)
+        .values(scheduleData)
+        .returning();
+      
+      res.status(201).json({ schedule: newSchedule });
+    } catch (error) {
+      console.error("Error creating blog schedule:", error);
+      res.status(500).json({ error: "Failed to create blog schedule" });
+    }
+  });
+  
+  /**
+   * Update blog schedule
+   */
+  app.put("/api/blog/schedules/:id", async (req, res) => {
+    try {
+      const { id } = req.params;
+      const updateData = { ...req.body, updatedAt: new Date() };
+      
+      const [updatedSchedule] = await db
+        .update(blogSchedules)
+        .set(updateData)
+        .where(eq(blogSchedules.id, id))
+        .returning();
+      
+      if (!updatedSchedule) {
+        return res.status(404).json({ error: "Blog schedule not found" });
+      }
+      
+      res.json({ schedule: updatedSchedule });
+    } catch (error) {
+      console.error("Error updating blog schedule:", error);
+      res.status(500).json({ error: "Failed to update blog schedule" });
+    }
+  });
+  
+  // ================== BLOG ANALYTICS ==================
+  
+  /**
+   * Get blog analytics dashboard data
+   */
+  app.get("/api/blog/analytics", async (req, res) => {
+    try {
+      const days = parseInt(req.query.days as string) || 30;
+      const endDate = new Date();
+      const startDate = new Date();
+      startDate.setDate(startDate.getDate() - days);
+      
+      // Get total posts stats
+      const totalPosts = await db
+        .select({ count: sql<number>`count(*)` })
+        .from(blogPosts);
+      
+      const publishedPosts = await db
+        .select({ count: sql<number>`count(*)` })
+        .from(blogPosts)
+        .where(eq(blogPosts.status, 'published'));
+      
+      // Get recent analytics
+      const recentAnalytics = await db
+        .select()
+        .from(blogAnalytics)
+        .where(
+          and(
+            sql`${blogAnalytics.date} >= ${startDate}`,
+            sql`${blogAnalytics.date} <= ${endDate}`
+          )
+        )
+        .orderBy(desc(blogAnalytics.date));
+      
+      // Aggregate analytics data
+      const totalViews = recentAnalytics.reduce((sum, record) => sum + (record.views || 0), 0);
+      const totalShares = recentAnalytics.reduce((sum, record) => sum + (record.shares || 0), 0);
+      const avgReadTime = recentAnalytics.length > 0 
+        ? Math.round(recentAnalytics.reduce((sum, record) => sum + (record.avgReadTime || 0), 0) / recentAnalytics.length)
+        : 0;
+      
+      res.json({
+        summary: {
+          totalPosts: totalPosts[0].count,
+          publishedPosts: publishedPosts[0].count,
+          totalViews,
+          totalShares,
+          avgReadTime
+        },
+        analytics: recentAnalytics
+      });
+    } catch (error) {
+      console.error("Error fetching blog analytics:", error);
+      res.status(500).json({ error: "Failed to fetch blog analytics" });
+    }
+  });
+  
+  /**
+   * Get blog statistics for admin dashboard
+   */
+  app.get("/api/blog/stats", async (req, res) => {
+    try {
+      const totalPosts = await db
+        .select({ count: sql<number>`count(*)` })
+        .from(blogPosts);
+      
+      const publishedPosts = await db
+        .select({ count: sql<number>`count(*)` })
+        .from(blogPosts)
+        .where(eq(blogPosts.status, 'published'));
+      
+      const draftPosts = await db
+        .select({ count: sql<number>`count(*)` })
+        .from(blogPosts)
+        .where(eq(blogPosts.status, 'draft'));
+      
+      const aiGeneratedPosts = await db
+        .select({ count: sql<number>`count(*)` })
+        .from(blogPosts)
+        .where(eq(blogPosts.generatedByAI, true));
+      
+      const activeSchedules = await db
+        .select({ count: sql<number>`count(*)` })
+        .from(blogSchedules)
+        .where(eq(blogSchedules.isActive, true));
+      
+      res.json({
+        totalPosts: totalPosts[0].count,
+        publishedPosts: publishedPosts[0].count,
+        draftPosts: draftPosts[0].count,
+        aiGeneratedPosts: aiGeneratedPosts[0].count,
+        activeSchedules: activeSchedules[0].count
+      });
+    } catch (error) {
+      console.error("Error fetching blog stats:", error);
+      res.status(500).json({ error: "Failed to fetch blog stats" });
+    }
+  });
+}

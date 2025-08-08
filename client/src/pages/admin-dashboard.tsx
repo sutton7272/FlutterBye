@@ -92,6 +92,20 @@ export default function AdminDashboard() {
       ]
     },
     {
+      id: "flutterblog",
+      title: "FlutterBlog Bot",
+      description: "AI-powered SEO content creation system with automated blog generation",
+      icon: Brain,
+      route: "/admin/flutterblog-bot",
+      color: "electric-blue",
+      features: [
+        "AI Content Generation",
+        "SEO Optimization",
+        "Automated Scheduling", 
+        "Performance Analytics"
+      ]
+    },
+    {
       id: "system",
       title: "System Tools",
       description: "System monitoring, maintenance tools, and technical administration",

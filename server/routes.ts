@@ -80,6 +80,8 @@ import { flbyTokenDeployment } from "./flby-token-deployment";
 import { websocketOptimization } from "./websocket-optimization";
 import { productionRateLimiting } from "./production-rate-limiting";
 import { finalSecurityAudit } from "./final-security-audit";
+import { registerBlogRoutes } from "./blog-routes";
+import { blogScheduler } from "./blog-content-scheduler";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Trust proxy for rate limiting
@@ -9144,12 +9146,35 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   console.log('🎨 FlutterArt Advanced NFT API System Activated!');
   
+  // Register Blog Routes
+  registerBlogRoutes(app);
+  console.log("📝 FlutterBlog Bot routes registered");
+
+  // Initialize Blog Content Scheduler
+  try {
+    await blogScheduler.initialize();
+    console.log("🤖 Blog Content Scheduler activated");
+  } catch (error) {
+    console.warn("⚠️ Blog Content Scheduler initialization failed:", error);
+  }
+  
   // Initialize WebSocket server for real-time updates
   const wsServer = new FlutterbeyeWebSocketServer(httpServer);
   
   // Store WebSocket server reference for broadcasting
   (httpServer as any).wsServer = wsServer;
   console.log('📡 Real-time WebSocket intelligence system activated!');
+  
+  // Graceful shutdown handler for blog scheduler
+  process.on('SIGTERM', () => {
+    console.log('SIGTERM received, shutting down gracefully...');
+    blogScheduler.shutdown();
+  });
+
+  process.on('SIGINT', () => {
+    console.log('SIGINT received, shutting down gracefully...');
+    blogScheduler.shutdown();
+  });
   
   return httpServer;
 }

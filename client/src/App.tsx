@@ -73,6 +73,7 @@ import MessageNFTCreator from "@/pages/message-nft-creator";
 import NFTClaim from "@/pages/nft-claim";
 import AllOpportunities from "@/pages/AllOpportunities";
 import AdminAPIMonetization from "@/pages/admin-api-monetization";
+import FlutterBlogBot from "@/pages/flutterblog-bot";
 import CampaignBuilder from "@/pages/campaign-builder";
 import AIMarketingBot from "@/pages/ai-marketing-bot";
 import WalletTest from "@/pages/WalletTest";
@@ -578,6 +579,13 @@ function Router() {
           window.location.href = '/admin-unified?tab=api';
           return null;
         }} />
+        
+        <Route path="/admin/flutterblog-bot" component={() => (
+          <>
+            <FlutterBlogBot />
+          </>
+        )} />
+        
         <Route path="/revolutionary-ai" component={() => {
           const RevolutionaryAIShowcase = lazy(() => import('./pages/revolutionary-ai-showcase'));
           return (
