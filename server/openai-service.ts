@@ -6,7 +6,7 @@ if (!process.env.OPENAI_API_KEY) {
   console.warn("⚠️ OPENAI_API_KEY not found. AI features will use fallback responses.");
 }
 
-const openai = new OpenAI({ 
+export const openai = new OpenAI({ 
   apiKey: process.env.OPENAI_API_KEY || "fallback"
 });
 
