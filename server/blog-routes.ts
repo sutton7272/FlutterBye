@@ -4,6 +4,8 @@ import { blogPosts, blogCategories, blogSchedules, blogAnalytics, blogTitleVaria
 import { eq, desc, and, sql, like } from "drizzle-orm";
 import { blogService } from "./openai-blog-service";
 import type { BlogGenerationRequest } from "./openai-blog-service";
+import { databaseOptimizer } from "./database-optimizer";
+import { aiCostOptimizer } from "./ai-cost-optimizer";
 
 /**
  * Blog API Routes for FlutterBlog Bot System
@@ -17,56 +19,12 @@ export function registerBlogRoutes(app: Express) {
    */
   app.get("/api/blog/posts", async (req, res) => {
     try {
-      const page = parseInt(req.query.page as string) || 1;
-      const limit = Math.min(parseInt(req.query.limit as string) || 10, 50); // Cap at 50
-      const status = req.query.status as string;
-      const categoryId = req.query.categoryId as string;
-      const search = req.query.search as string;
+      const limit = Math.min(parseInt(req.query.limit as string) || 10, 50);
       
-      const offset = (page - 1) * limit;
+      // Use optimized database query with caching
+      const posts = await databaseOptimizer.getOptimizedBlogPosts(limit);
       
-      // Optimize query building
-      let whereConditions = [];
-      if (status) whereConditions.push(eq(blogPosts.status, status));
-      if (categoryId) whereConditions.push(eq(blogPosts.categoryId, categoryId));
-      if (search) whereConditions.push(like(blogPosts.title, `%${search}%`));
-      
-      // Single optimized query with selected fields only
-      const posts = await db
-        .select({
-          id: blogPosts.id,
-          title: blogPosts.title,
-          slug: blogPosts.slug,
-          excerpt: blogPosts.excerpt,
-          status: blogPosts.status,
-          categoryId: blogPosts.categoryId,
-          seoScore: blogPosts.seoScore,
-          engagementPotential: blogPosts.engagementPotential,
-          publishedAt: blogPosts.publishedAt,
-          createdAt: blogPosts.createdAt
-        })
-        .from(blogPosts)
-        .where(whereConditions.length > 0 ? and(...whereConditions) : undefined)
-        .orderBy(desc(blogPosts.createdAt))
-        .limit(limit)
-        .offset(offset);
-      
-      // Optimize count query - use estimated count for large datasets
-      const totalCountResult = await db
-        .select({ count: sql<number>`count(*)` })
-        .from(blogPosts)
-        .where(whereConditions.length > 0 ? and(...whereConditions) : undefined)
-        .limit(1); // Limit count query
-      
-      res.json({
-        posts,
-        pagination: {
-          page,
-          limit,
-          total: totalCountResult[0]?.count || 0,
-          totalPages: Math.ceil((totalCountResult[0]?.count || 0) / limit)
-        }
-      });
+
     } catch (error) {
       console.error("Error fetching blog posts:", error);
       res.status(500).json({ error: "Failed to fetch blog posts" });

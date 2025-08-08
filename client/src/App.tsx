@@ -75,6 +75,7 @@ import AllOpportunities from "@/pages/AllOpportunities";
 import AdminAPIMonetization from "@/pages/admin-api-monetization";
 import FlutterBlogBot from "@/pages/flutterblog-bot";
 import MonitoringDashboard from "@/pages/monitoring-dashboard";
+import FlutterBlogPerformance from "@/pages/FlutterBlog-Performance";
 import CampaignBuilder from "@/pages/campaign-builder";
 import AIMarketingBot from "@/pages/ai-marketing-bot";
 import WalletTest from "@/pages/WalletTest";
@@ -595,6 +596,11 @@ function Router() {
         <Route path="/admin/monitoring" component={() => (
           <>
             <MonitoringDashboard />
+          </>
+        )} />
+        <Route path="/admin/blog-performance" component={() => (
+          <>
+            <FlutterBlogPerformance />
           </>
         )} />
         
