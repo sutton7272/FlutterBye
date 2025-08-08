@@ -190,7 +190,7 @@ export default function Dashboard() {
 
         {/* Main Dashboard Content */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-5">
+          <TabsList className="grid w-full grid-cols-5 bg-slate-800/50 border border-electric-blue/20">
             <TabsTrigger value="overview">Overview</TabsTrigger>
             <TabsTrigger value="portfolio">Portfolio</TabsTrigger>
             <TabsTrigger value="activity">Activity</TabsTrigger>
@@ -204,47 +204,47 @@ export default function Dashboard() {
           <TabsContent value="overview" className="space-y-6">
             {/* Stats Overview */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-              <Card>
+              <Card className="bg-slate-800/30 border border-electric-blue/20 hover:border-electric-blue/40 transition-all duration-300">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Total Tokens</CardTitle>
-                  <Coins className="h-4 w-4 text-muted-foreground" />
+                  <CardTitle className="text-sm font-medium text-white">Total Tokens</CardTitle>
+                  <Coins className="h-4 w-4 text-electric-blue" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">{stats?.totalTokens || 0}</div>
-                  <p className="text-xs text-muted-foreground">Created by you</p>
+                  <div className="text-2xl font-bold text-white">{stats?.totalTokens || 0}</div>
+                  <p className="text-xs text-gray-300">Created by you</p>
                 </CardContent>
               </Card>
               
-              <Card>
+              <Card className="bg-slate-800/30 border border-electric-green/20 hover:border-electric-green/40 transition-all duration-300">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Portfolio Value</CardTitle>
-                  <TrendingUp className="h-4 w-4 text-muted-foreground" />
+                  <CardTitle className="text-sm font-medium text-white">Portfolio Value</CardTitle>
+                  <TrendingUp className="h-4 w-4 text-electric-green" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">{stats?.totalValue || '$0.00'}</div>
-                  <p className="text-xs text-muted-foreground">Total holdings</p>
+                  <div className="text-2xl font-bold text-white">{stats?.totalValue || '$0.00'}</div>
+                  <p className="text-xs text-gray-300">Total holdings</p>
                 </CardContent>
               </Card>
               
-              <Card>
+              <Card className="bg-slate-800/30 border border-purple-400/20 hover:border-purple-400/40 transition-all duration-300">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Active Chats</CardTitle>
-                  <MessageSquare className="h-4 w-4 text-muted-foreground" />
+                  <CardTitle className="text-sm font-medium text-white">Active Chats</CardTitle>
+                  <MessageSquare className="h-4 w-4 text-purple-400" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">{stats?.activeChats || 0}</div>
-                  <p className="text-xs text-muted-foreground">Conversations</p>
+                  <div className="text-2xl font-bold text-white">{stats?.activeChats || 0}</div>
+                  <p className="text-xs text-gray-300">Conversations</p>
                 </CardContent>
               </Card>
               
-              <Card>
+              <Card className="bg-slate-800/30 border border-yellow-400/20 hover:border-yellow-400/40 transition-all duration-300">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Viral Score</CardTitle>
-                  <Zap className="h-4 w-4 text-muted-foreground" />
+                  <CardTitle className="text-sm font-medium text-white">Viral Score</CardTitle>
+                  <Zap className="h-4 w-4 text-yellow-400" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">{stats?.viralScore || 0}</div>
-                  <p className="text-xs text-muted-foreground">Growth potential</p>
+                  <div className="text-2xl font-bold text-white">{stats?.viralScore || 0}</div>
+                  <p className="text-xs text-gray-300">Growth potential</p>
                 </CardContent>
               </Card>
 
@@ -265,13 +265,13 @@ export default function Dashboard() {
           </TabsContent>
 
           <TabsContent value="activity" className="space-y-6">
-            <Card>
+            <Card className="bg-slate-800/30 border border-electric-blue/20">
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Activity className="h-5 w-5" />
+                <CardTitle className="flex items-center gap-2 text-white">
+                  <Activity className="h-5 w-5 text-electric-blue" />
                   Recent Activity
                 </CardTitle>
-                <CardDescription>
+                <CardDescription className="text-gray-300">
                   Your latest transactions and interactions
                 </CardDescription>
               </CardHeader>
