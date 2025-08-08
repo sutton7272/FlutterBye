@@ -64,7 +64,7 @@ import SearchPage from "@/pages/search";
 import AdminFreeCodes from "@/pages/admin-free-codes";
 import AdminPricing from "@/pages/admin-pricing";
 import AdminDefaultImage from "@/pages/admin-default-image";
-import UnifiedAdminDashboard from "@/pages/admin-unified";
+import AdminUnifiedDashboard from "@/pages/admin-unified";
 import EscrowManagementDashboard from "@/pages/admin-escrow-management";
 import TokenHolderMapPage from "@/pages/token-holder-map";
 import CollaborativeCreation from "@/pages/collaborative-creation";
@@ -289,7 +289,7 @@ function Router() {
         <Route path="/admin/unified" component={() => (
           <AdminRouteGuard>
             <Navbar />
-            <UnifiedAdminDashboard />
+            <AdminUnifiedDashboard />
           </AdminRouteGuard>
         )} />
         
