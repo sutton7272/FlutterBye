@@ -13,10 +13,12 @@ import { useToast } from "@/hooks/use-toast";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { Bot, Calendar, Clock, FileText, Globe, BarChart3, Settings, Zap, Target, Sparkles, TrendingUp, Users, Brain, ArrowLeft, Wand2, Search, BookOpen, Copy, Download, Star, Eye, Edit } from "lucide-react";
+import { useLocation } from "wouter";
 
 export default function FlutterBlogBot() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const [location, setLocation] = useLocation();
   const [isGenerating, setIsGenerating] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedContent, setSelectedContent] = useState<any>(null);
@@ -304,7 +306,7 @@ export default function FlutterBlogBot() {
           {/* Top Navigation Bar */}
           <div className="flex items-center justify-between">
             <Button
-              onClick={() => window.location.href = '/admin-unified'}
+              onClick={() => setLocation('/admin-unified')}
               variant="outline"
               className="flex items-center gap-2 bg-slate-800/50 border-slate-600 text-slate-300 hover:bg-slate-700"
             >
