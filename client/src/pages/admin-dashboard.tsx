@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import Navbar from "@/components/navbar";
+import cosmicBackgroundPath from "@assets/image_1754257352191.png";
 
 const ADMIN_WALLETS_KEY = "flutter_admin_wallets";
 
@@ -109,34 +110,90 @@ export default function AdminDashboard() {
   return (
     <>
       <Navbar />
-      <div className="min-h-screen relative overflow-hidden">
-        {/* Animated Circuit Background */}
-        <div className="absolute inset-0 bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
-        {/* Circuit Pattern Overlay */}
-        <div className="absolute inset-0 opacity-20">
-          <div className="absolute top-20 left-20 w-64 h-64 border border-electric-blue/30 rounded-lg animate-pulse-slow" />
-          <div className="absolute top-40 right-32 w-32 h-32 border border-electric-green/30 rounded-full animate-ping" style={{ animationDuration: '3s' }} />
-          <div className="absolute bottom-32 left-1/3 w-48 h-48 border border-electric-blue/20 rounded-lg rotate-45 animate-spin-slow" />
-          <div className="absolute top-1/2 right-20 w-40 h-40 border border-electric-green/25 rounded-full animate-pulse-slow" />
-          <div className="absolute bottom-20 right-1/3 w-28 h-28 border border-electric-blue/25 rounded-lg rotate-12 animate-pulse-slow" />
-        </div>
+      <div 
+        className="min-h-screen relative overflow-hidden bg-cover bg-center bg-no-repeat" 
+        style={{
+          backgroundImage: `url(${cosmicBackgroundPath})`,
+          backgroundAttachment: 'fixed'
+        }}
+      >
+        {/* Dark overlay for better text readability */}
+        <div className="absolute inset-0 bg-black/40 backdrop-blur-[1px]"></div>
         
-        {/* Animated Electrical Lines */}
-        <div className="absolute inset-0">
-          <div className="absolute top-1/4 left-0 w-full h-px bg-gradient-to-r from-transparent via-electric-blue/50 to-transparent animate-pulse" />
-          <div className="absolute top-3/4 left-0 w-full h-px bg-gradient-to-r from-transparent via-electric-green/50 to-transparent animate-pulse" style={{ animationDelay: '1s' }} />
-          <div className="absolute top-0 left-1/3 w-px h-full bg-gradient-to-b from-transparent via-electric-blue/30 to-transparent animate-pulse" style={{ animationDelay: '2s' }} />
-          <div className="absolute top-0 right-1/4 w-px h-full bg-gradient-to-b from-transparent via-electric-green/30 to-transparent animate-pulse" style={{ animationDelay: '0.5s' }} />
+        {/* Cosmic Butterfly Animations */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          {/* Flying Butterflies */}
+          {[...Array(8)].map((_, i) => (
+            <div
+              key={i}
+              className="absolute"
+              style={{
+                left: `${10 + (i * 15)}%`,
+                top: `${20 + (i * 8)}%`,
+                animation: `butterfly-flight-${(i % 4) + 1} ${20 + (i * 3)}s infinite linear`,
+                animationDelay: `${i * 2}s`
+              }}
+            >
+              <div className="w-6 h-6 relative">
+                {/* Butterfly Wings */}
+                <div className="absolute inset-0">
+                  <div 
+                    className="absolute w-3 h-4 bg-gradient-to-br from-electric-blue/70 to-electric-green/70 rounded-full transform -rotate-12 animate-wing-flutter"
+                    style={{ 
+                      top: '0px', 
+                      left: '0px',
+                      animationDelay: `${i * 0.2}s`,
+                      filter: 'drop-shadow(0 0 6px rgba(0, 212, 255, 0.6))'
+                    }}
+                  />
+                  <div 
+                    className="absolute w-3 h-4 bg-gradient-to-bl from-electric-green/70 to-electric-blue/70 rounded-full transform rotate-12 animate-wing-flutter" 
+                    style={{ 
+                      top: '0px', 
+                      right: '0px',
+                      animationDelay: `${i * 0.2 + 0.1}s`,
+                      filter: 'drop-shadow(0 0 6px rgba(0, 255, 136, 0.6))'
+                    }}
+                  />
+                  <div 
+                    className="absolute w-2 h-3 bg-gradient-to-br from-electric-blue/60 to-electric-green/60 rounded-full transform -rotate-6 animate-wing-flutter" 
+                    style={{ 
+                      bottom: '2px', 
+                      left: '2px',
+                      animationDelay: `${i * 0.2}s`,
+                      filter: 'drop-shadow(0 0 4px rgba(0, 212, 255, 0.4))'
+                    }}
+                  />
+                  <div 
+                    className="absolute w-2 h-3 bg-gradient-to-bl from-electric-green/60 to-electric-blue/60 rounded-full transform rotate-6 animate-wing-flutter" 
+                    style={{ 
+                      bottom: '2px', 
+                      right: '2px',
+                      animationDelay: `${i * 0.2 + 0.1}s`,
+                      filter: 'drop-shadow(0 0 4px rgba(0, 255, 136, 0.4))'
+                    }}
+                  />
+                  {/* Butterfly Body */}
+                  <div 
+                    className="absolute w-0.5 h-5 bg-gradient-to-b from-electric-blue to-electric-green rounded-full"
+                    style={{ 
+                      top: '0px', 
+                      left: '50%', 
+                      transform: 'translateX(-50%)',
+                      filter: 'drop-shadow(0 0 3px rgba(136, 255, 136, 0.8))'
+                    }}
+                  />
+                </div>
+              </div>
+            </div>
+          ))}
+          
+          {/* Additional Electric Circuit Overlays for Admin Theme */}
+          <div className="absolute inset-0 opacity-30">
+            <div className="absolute top-20 left-20 w-64 h-64 border border-electric-blue/20 rounded-lg animate-pulse-slow" />
+            <div className="absolute bottom-32 right-32 w-48 h-48 border border-electric-green/20 rounded-lg rotate-45 animate-pulse-slow" />
+          </div>
         </div>
-        
-        {/* Background Glow Effects */}
-        <div className="absolute inset-0 overflow-hidden">
-          <div className="absolute -top-40 -right-40 w-80 h-80 bg-electric-blue/20 rounded-full blur-3xl animate-pulse-slow"></div>
-          <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-electric-green/20 rounded-full blur-3xl animate-pulse-slow" style={{ animationDelay: '1.5s' }}></div>
-          <div className="absolute top-1/2 -left-20 w-60 h-60 bg-electric-blue/15 rounded-full blur-2xl animate-pulse-slow" style={{ animationDelay: '2.5s' }}></div>
-          <div className="absolute bottom-1/4 right-10 w-40 h-40 bg-electric-green/15 rounded-full blur-xl animate-pulse-slow" style={{ animationDelay: '1s' }}></div>
-        </div>
-      </div>
 
       {/* Header */}
       <div className="relative z-10 p-6 border-b border-electric-blue/30 backdrop-blur-sm bg-slate-950/50">

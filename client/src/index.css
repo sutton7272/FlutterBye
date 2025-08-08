@@ -911,6 +911,15 @@
   }
 }
 
+@keyframes wing-flutter {
+  0%, 100% { 
+    transform: rotate(0deg) scale(1); 
+  }
+  50% { 
+    transform: rotate(20deg) scale(0.9); 
+  }
+}
+
 @keyframes pulse-electric {
   0%, 100% { 
     box-shadow: 
