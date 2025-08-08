@@ -353,16 +353,16 @@ export default function LaunchCountdown() {
         </Card>
 
         {/* Three Column Layout */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 max-w-7xl mx-auto mb-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 max-w-7xl mx-auto mb-8 items-stretch">
           {/* Left Column: FlutterAI Tutorial + Early Access */}
-          <div className="space-y-4">
+          <div className="space-y-4 flex flex-col">
             {/* FlutterAI Tutorial */}
             <div className="max-w-full">
               <FlutterAIInteractiveTutorial />
             </div>
 
             {/* Early Access */}
-            <Card className="electric-frame">
+            <Card className="electric-frame flex-grow">
               <CardHeader>
                 <CardTitle className="text-gradient flex items-center gap-2 text-lg">
                   <Key className="w-5 h-5" />
@@ -435,7 +435,7 @@ export default function LaunchCountdown() {
           </div>
 
           {/* Middle Column: Platform Tutorial */}
-          <div>
+          <div className="flex flex-col space-y-4">
             {/* Platform Tutorial */}
             <Card className="electric-frame relative overflow-hidden">
               <div className="absolute inset-0 bg-gradient-to-br from-electric-blue/5 via-purple/5 to-electric-green/5 pointer-events-none"></div>
@@ -530,7 +530,7 @@ export default function LaunchCountdown() {
             </Card>
 
             {/* What is Flutterbye */}
-            <Card className="electric-frame mt-4">
+            <Card className="electric-frame mt-4 flex-grow">
               <CardHeader>
                 <CardTitle className="text-gradient text-lg">What is Flutterbye?</CardTitle>
               </CardHeader>
@@ -593,7 +593,7 @@ export default function LaunchCountdown() {
           </div>
 
           {/* Right Column: VIP Waitlist */}
-          <div>
+          <div className="flex flex-col space-y-4">
             <Card className="electric-frame relative overflow-hidden">
               <div className="absolute inset-0 bg-gradient-to-br from-cyan/5 via-blue/5 to-purple/5 pointer-events-none"></div>
               <CardHeader className="pb-3 relative">
@@ -731,7 +731,7 @@ export default function LaunchCountdown() {
             </Card>
 
             {/* Join Thousands of Early Adopters */}
-            <Card className="electric-frame mt-4">
+            <Card className="electric-frame mt-4 flex-grow">
               <CardHeader>
                 <CardTitle className="text-gradient flex items-center gap-2 text-lg">
                   <Award className="w-5 h-5" />
