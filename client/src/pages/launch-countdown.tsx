@@ -107,16 +107,10 @@ export default function LaunchCountdown() {
             <div className="space-y-6 max-w-4xl mx-auto">
               {latestContent.slice(0, 3).map((content: any, index: number) => {
                 const isExpanded = expandedContentId === content.id;
-                const contentText = content.content || content.preview || 'Advanced AI-powered content generation system creating SEO-optimized blog posts with comprehensive metadata analysis...';
-                const shouldTruncate = contentText.length > 300 && !isExpanded;
-                
-                console.log('Content:', { 
-                  id: content.id, 
-                  expandedContentId, 
-                  isExpanded, 
-                  contentLength: contentText.length,
-                  shouldTruncate 
-                });
+                // Use full content when expanded, preview when collapsed
+                const contentText = isExpanded ? (content.content || content.preview || 'Advanced AI-powered content generation...') : (content.preview || content.content?.slice(0, 300) || 'Advanced AI-powered content generation...');
+                const hasFullContent = content.content && content.content.length > 300;
+                const shouldShowReadMore = !isExpanded && hasFullContent;
                 
                 return (
                   <Card 
@@ -150,41 +144,38 @@ export default function LaunchCountdown() {
                       </h4>
                       
                       <div className="text-muted-foreground text-sm leading-relaxed mb-4">
-                        {shouldTruncate ? (
-                          <>
-                            {contentText.slice(0, 300)}...
-                            <Button 
-                              variant="link" 
-                              size="sm" 
-                              className="p-0 ml-2 text-cyan-400 hover:text-cyan-300 text-sm"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                console.log('Read More clicked:', content.id);
-                                setExpandedContentId(content.id);
-                              }}
-                            >
-                              Read More
-                            </Button>
-                          </>
-                        ) : (
-                          <div className="whitespace-pre-wrap">
-                            {contentText}
-                            {isExpanded && (
+                        <div className="whitespace-pre-wrap">
+                          {contentText}
+                          {shouldShowReadMore && (
+                            <>
+                              ...
                               <Button 
                                 variant="link" 
                                 size="sm" 
                                 className="p-0 ml-2 text-cyan-400 hover:text-cyan-300 text-sm"
                                 onClick={(e) => {
                                   e.stopPropagation();
-                                  console.log('Show Less clicked');
-                                  setExpandedContentId(null);
+                                  setExpandedContentId(content.id);
                                 }}
                               >
-                                Show Less
+                                Read More
                               </Button>
-                            )}
-                          </div>
-                        )}
+                            </>
+                          )}
+                          {isExpanded && hasFullContent && (
+                            <Button 
+                              variant="link" 
+                              size="sm" 
+                              className="p-0 ml-2 text-cyan-400 hover:text-cyan-300 text-sm"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setExpandedContentId(null);
+                              }}
+                            >
+                              Show Less
+                            </Button>
+                          )}
+                        </div>
                       </div>
                       
                       <div className="flex items-center gap-4 text-xs text-muted-foreground">
@@ -194,7 +185,7 @@ export default function LaunchCountdown() {
                         <span className="text-electric-green font-semibold">✨ AI Optimized</span>
                       </div>
                       
-                      {!isExpanded && (
+                      {!isExpanded && hasFullContent && (
                         <div className="mt-3 text-center">
                           <span className="text-xs text-cyan-400/70">Click to read full article</span>
                         </div>
