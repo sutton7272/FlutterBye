@@ -19,6 +19,14 @@ const cancelEscrowSchema = z.object({
   escrowId: z.string().min(1).max(50),
 });
 
+const transferFundsSchema = z.object({
+  fromWalletId: z.string().min(1),
+  toAddress: z.string().min(32).max(44),
+  amount: z.number().positive(),
+  currency: z.enum(["SOL", "USDC", "FLBY"]).default("SOL"),
+  memo: z.string().max(100).optional(),
+});
+
 export function registerEscrowRoutes(app: Express) {
   
   /**
@@ -346,6 +354,59 @@ export function registerEscrowRoutes(app: Express) {
       res.status(500).json({
         success: false,
         error: "Failed to get escrow statistics",
+        details: error.message,
+      });
+    }
+  });
+
+  /**
+   * Transfer profits from platform wallet
+   * POST /api/escrow/transfer-profits
+   */
+  app.post("/api/escrow/transfer-profits", async (req: Request, res: Response) => {
+    try {
+      const validatedData = transferFundsSchema.parse(req.body);
+      
+      const escrowService = getEscrowContractService();
+      
+      // Transfer funds from platform wallet to specified address
+      const result = await escrowService.transferProfits({
+        fromWalletId: validatedData.fromWalletId,
+        toAddress: validatedData.toAddress,
+        amount: validatedData.amount,
+        currency: validatedData.currency,
+        memo: validatedData.memo,
+      });
+
+      res.json({
+        success: true,
+        message: "Profit transfer completed successfully",
+        data: {
+          signature: result.signature,
+          fromWallet: validatedData.fromWalletId,
+          toAddress: validatedData.toAddress,
+          amount: validatedData.amount,
+          currency: validatedData.currency,
+          memo: validatedData.memo,
+          txnId: result.txnId,
+        },
+        timestamp: new Date().toISOString(),
+      });
+
+    } catch (error: any) {
+      console.error("Error transferring profits:", error);
+      
+      if (error.name === 'ZodError') {
+        return res.status(400).json({
+          success: false,
+          error: "Invalid transfer data",
+          details: error.errors,
+        });
+      }
+
+      res.status(500).json({
+        success: false,
+        error: "Failed to transfer profits",
         details: error.message,
       });
     }

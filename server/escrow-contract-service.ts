@@ -18,6 +18,14 @@ export interface CreateEscrowParams {
   mintAddress: string;
 }
 
+export interface TransferProfitsParams {
+  fromWalletId: string;
+  toAddress: string;
+  amount: number;
+  currency: string;
+  memo?: string;
+}
+
 export interface EscrowInfo {
   escrowId: string;
   authority: string;
@@ -376,6 +384,36 @@ export class EscrowContractService {
     } catch (error) {
       console.error('❌ Error getting vault balance:', error);
       return 0;
+    }
+  }
+
+  /**
+   * Transfer profits from platform wallet to external address
+   */
+  async transferProfits(params: TransferProfitsParams): Promise<{ signature: string; txnId: string }> {
+    try {
+      const { fromWalletId, toAddress, amount, currency, memo } = params;
+      
+      // For development, simulate the transfer with a mock transaction
+      // In production, this would interact with the actual Solana blockchain
+      const mockSignature = `mock_transfer_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+      const txnId = `TXN_${Date.now()}`;
+      
+      console.log(`💰 Transferring ${amount} ${currency} from wallet ${fromWalletId} to ${toAddress}`);
+      console.log(`📝 Memo: ${memo || 'No memo'}`);
+      console.log(`📧 Mock signature: ${mockSignature}`);
+      
+      // Simulate blockchain delay
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      return {
+        signature: mockSignature,
+        txnId,
+      };
+
+    } catch (error) {
+      console.error('❌ Error transferring profits:', error);
+      throw error;
     }
   }
 }

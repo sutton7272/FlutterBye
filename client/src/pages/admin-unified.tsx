@@ -66,8 +66,287 @@ const escrowFormSchema = z.object({
   description: z.string().min(1, "Description is required"),
 });
 
+const transferProfitsSchema = z.object({
+  fromWalletId: z.string().min(1, "Please select a wallet"),
+  toAddress: z.string().min(32, "Valid Solana address required").max(44, "Invalid address length"),
+  amount: z.number().min(0.001, "Minimum amount is 0.001").max(1000000, "Maximum amount is 1,000,000"),
+  currency: z.enum(["SOL", "USDC", "FLBY"]).default("SOL"),
+  memo: z.string().max(100, "Memo too long").optional(),
+});
+
 type WalletFormData = z.infer<typeof walletFormSchema>;
 type EscrowFormData = z.infer<typeof escrowFormSchema>;
+type TransferProfitsData = z.infer<typeof transferProfitsSchema>;
+
+// Transfer Profits Form Component
+function TransferProfitsForm({ wallets }: { wallets: any[] }) {
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+  
+  const form = useForm<TransferProfitsData>({
+    resolver: zodResolver(transferProfitsSchema),
+    defaultValues: {
+      fromWalletId: "",
+      toAddress: "",
+      amount: 0,
+      currency: "SOL",
+      memo: "",
+    },
+  });
+
+  const transferMutation = useMutation({
+    mutationFn: async (data: TransferProfitsData) => {
+      const response = await apiRequest("POST", "/api/escrow/transfer-profits", data);
+      return response.json();
+    },
+    onSuccess: (result) => {
+      toast({
+        title: "Transfer Successful",
+        description: `Transferred ${form.getValues().amount} ${form.getValues().currency} successfully`,
+      });
+      form.reset();
+      queryClient.invalidateQueries({ queryKey: ['/api/escrow/wallets'] });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Transfer Failed",
+        description: error.message || "Failed to transfer profits",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const onSubmit = (data: TransferProfitsData) => {
+    transferMutation.mutate(data);
+  };
+
+  const selectedWallet = wallets.find(w => w.id === form.watch("fromWalletId"));
+
+  return (
+    <div className="space-y-6">
+      {/* Wallet Balance Overview */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {wallets.map((wallet) => (
+          <Card key={wallet.id} className="bg-slate-700 border-slate-600">
+            <CardContent className="p-4">
+              <div className="flex justify-between items-center">
+                <div>
+                  <p className="text-sm text-slate-400">{wallet.name}</p>
+                  <p className="text-lg font-semibold text-white">
+                    {wallet.solBalance.toFixed(4)} SOL
+                  </p>
+                  <p className="text-sm text-slate-400">
+                    ${(wallet.solBalance * 150).toFixed(2)} USD
+                  </p>
+                </div>
+                <Badge 
+                  variant={wallet.type === 'escrow' ? 'default' : 'secondary'}
+                  className="text-xs"
+                >
+                  {wallet.type}
+                </Badge>
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+
+      {/* Transfer Form */}
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Source Wallet Selection */}
+            <FormField
+              control={form.control}
+              name="fromWalletId"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-white">Source Wallet</FormLabel>
+                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <FormControl>
+                      <SelectTrigger className="bg-slate-700 border-slate-600 text-white">
+                        <SelectValue placeholder="Select wallet to transfer from" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent className="bg-slate-700 border-slate-600">
+                      {wallets.map((wallet) => (
+                        <SelectItem key={wallet.id} value={wallet.id}>
+                          {wallet.name} ({wallet.solBalance.toFixed(4)} SOL)
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            {/* Currency Selection */}
+            <FormField
+              control={form.control}
+              name="currency"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-white">Currency</FormLabel>
+                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <FormControl>
+                      <SelectTrigger className="bg-slate-700 border-slate-600 text-white">
+                        <SelectValue />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent className="bg-slate-700 border-slate-600">
+                      <SelectItem value="SOL">SOL</SelectItem>
+                      <SelectItem value="USDC">USDC</SelectItem>
+                      <SelectItem value="FLBY">FLBY</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+
+          {/* Destination Address */}
+          <FormField
+            control={form.control}
+            name="toAddress"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="text-white">Destination Address</FormLabel>
+                <FormControl>
+                  <Input
+                    {...field}
+                    placeholder="Enter Solana wallet address (32-44 characters)"
+                    className="bg-slate-700 border-slate-600 text-white placeholder-slate-400"
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          {/* Amount */}
+          <FormField
+            control={form.control}
+            name="amount"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="text-white">
+                  Amount {form.watch("currency")}
+                  {selectedWallet && (
+                    <span className="text-slate-400 ml-2">
+                      (Available: {selectedWallet.solBalance.toFixed(4)} SOL)
+                    </span>
+                  )}
+                </FormLabel>
+                <FormControl>
+                  <Input
+                    {...field}
+                    type="number"
+                    step="0.001"
+                    min="0.001"
+                    max={selectedWallet?.solBalance || 1000000}
+                    placeholder="0.001"
+                    className="bg-slate-700 border-slate-600 text-white placeholder-slate-400"
+                    onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          {/* Memo */}
+          <FormField
+            control={form.control}
+            name="memo"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="text-white">Memo (Optional)</FormLabel>
+                <FormControl>
+                  <Input
+                    {...field}
+                    placeholder="Add a note for this transfer (max 100 characters)"
+                    maxLength={100}
+                    className="bg-slate-700 border-slate-600 text-white placeholder-slate-400"
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          {/* Transfer Summary */}
+          {form.watch("fromWalletId") && form.watch("toAddress") && form.watch("amount") && (
+            <Card className="bg-slate-700 border-slate-600">
+              <CardHeader>
+                <CardTitle className="text-white text-sm">Transfer Summary</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-2">
+                <div className="flex justify-between text-sm">
+                  <span className="text-slate-400">From:</span>
+                  <span className="text-white">{selectedWallet?.name}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-slate-400">To:</span>
+                  <span className="text-white font-mono">{form.watch("toAddress").slice(0, 8)}...{form.watch("toAddress").slice(-8)}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-slate-400">Amount:</span>
+                  <span className="text-white">{form.watch("amount")} {form.watch("currency")}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-slate-400">USD Value:</span>
+                  <span className="text-white">${(form.watch("amount") * 150).toFixed(2)}</span>
+                </div>
+                {form.watch("memo") && (
+                  <div className="flex justify-between text-sm">
+                    <span className="text-slate-400">Memo:</span>
+                    <span className="text-white">{form.watch("memo")}</span>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Submit Button */}
+          <Button
+            type="submit"
+            disabled={transferMutation.isPending || !form.formState.isValid}
+            className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+          >
+            {transferMutation.isPending ? (
+              <>
+                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
+                Transferring...
+              </>
+            ) : (
+              <>
+                <DollarSign className="w-4 h-4 mr-2" />
+                Transfer Profits
+              </>
+            )}
+          </Button>
+        </form>
+      </Form>
+
+      {/* Transfer History Placeholder */}
+      <Card className="bg-slate-700 border-slate-600">
+        <CardHeader>
+          <CardTitle className="text-white">Recent Transfers</CardTitle>
+          <CardDescription className="text-slate-400">
+            Latest profit transfers from platform wallets
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <p className="text-slate-400 text-center py-4">
+            No recent transfers found. Transfer history will appear here.
+          </p>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
 
 function AdminUnifiedDashboard() {
   const { toast } = useToast();
@@ -156,7 +435,7 @@ function AdminUnifiedDashboard() {
 
         {/* Main Content Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-4 bg-slate-800 border border-slate-600">
+          <TabsList className="grid w-full grid-cols-5 bg-slate-800 border border-slate-600">
             <TabsTrigger value="platform-wallets" className="text-white">
               <Wallet className="w-4 h-4 mr-2" />
               Platform Wallets
@@ -168,6 +447,10 @@ function AdminUnifiedDashboard() {
             <TabsTrigger value="create-escrow" className="text-white">
               <Plus className="w-4 h-4 mr-2" />
               Create New
+            </TabsTrigger>
+            <TabsTrigger value="transfer-profits" className="text-white">
+              <DollarSign className="w-4 h-4 mr-2" />
+              Transfer Profits
             </TabsTrigger>
             <TabsTrigger value="expired-escrows" className="text-white">
               <Clock className="w-4 h-4 mr-2" />
@@ -325,6 +608,21 @@ function AdminUnifiedDashboard() {
                   onSubmit={createEscrowMutation.mutate}
                   isLoading={createEscrowMutation.isPending}
                 />
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Transfer Profits Tab */}
+          <TabsContent value="transfer-profits">
+            <Card className="bg-slate-800 border-slate-600">
+              <CardHeader>
+                <CardTitle className="text-white">Transfer Wallet Profits</CardTitle>
+                <CardDescription className="text-slate-400">
+                  Transfer accumulated profits from platform wallets to external addresses
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <TransferProfitsForm wallets={wallets} />
               </CardContent>
             </Card>
           </TabsContent>
