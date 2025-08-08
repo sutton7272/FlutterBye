@@ -1,24 +1,29 @@
-import { cn } from "@/lib/utils";
+/**
+ * Loading Spinner Component
+ * Optimized loading state with electric theme
+ */
 
-interface LoadingSpinnerProps {
-  size?: "sm" | "md" | "lg";
-  className?: string;
-}
-
-export function LoadingSpinner({ size = "md", className }: LoadingSpinnerProps) {
-  const sizeClasses = {
-    sm: "w-4 h-4",
-    md: "w-6 h-6", 
-    lg: "w-8 h-8"
-  };
-
+export function LoadingSpinner() {
   return (
-    <div
-      className={cn(
-        "animate-spin rounded-full border-2 border-gray-300 border-t-blue-500",
-        sizeClasses[size],
-        className
-      )}
-    />
+    <div className="flex items-center justify-center min-h-screen bg-ultra-dark">
+      <div className="relative">
+        {/* Electric Butterfly Loading */}
+        <div className="w-16 h-16 border-4 border-electric-blue/30 rounded-full animate-spin">
+          <div className="absolute inset-2 border-4 border-electric-green border-t-transparent rounded-full animate-spin duration-1000"></div>
+        </div>
+        
+        {/* Pulsing glow effect */}
+        <div className="absolute inset-0 w-16 h-16 border-4 border-electric-blue/20 rounded-full animate-ping"></div>
+        
+        {/* Loading text */}
+        <div className="mt-4 text-center">
+          <div className="text-electric-blue text-sm font-medium animate-pulse">
+            Initializing Flutterbye...
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }
+
+export default LoadingSpinner;

@@ -5,6 +5,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { EarlyAccessGate } from "@/components/early-access-gate";
 import { useState, useEffect, lazy, Suspense } from "react";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { LoadingSpinner } from "@/components/loading-spinner";
 import NotFound from "@/pages/not-found";
 
 // New Simplified Pages

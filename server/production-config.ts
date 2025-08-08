@@ -1,135 +1,125 @@
-// Production Configuration and Environment Validation
-import { z } from 'zod';
+/**
+ * Production Configuration Service
+ * Validates and configures production environment settings
+ */
 
-// Environment validation schema
-const envSchema = z.object({
-  NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
-  PORT: z.string().default('5000'),
-  DATABASE_URL: z.string().min(1, 'DATABASE_URL is required'),
-  JWT_SECRET: z.string().optional(),
-  OPENAI_API_KEY: z.string().optional(),
-  // Add other required environment variables
-});
-
-// Validate environment variables
-export const validateEnvironment = () => {
-  try {
-    const env = envSchema.parse(process.env);
-    console.log('✅ Environment validation passed');
-    return env;
-  } catch (error) {
-    console.error('❌ Environment validation failed:', error);
-    if (error instanceof z.ZodError) {
-      error.errors.forEach(err => {
-        console.error(`- ${err.path.join('.')}: ${err.message}`);
-      });
-    }
-    process.exit(1);
-  }
-};
-
-// Production configuration
-export const productionConfig = {
-  // Server configuration
-  server: {
-    port: parseInt(process.env.PORT || '5000'),
-    host: process.env.HOST || '0.0.0.0',
-    timeout: 30000,
-    keepAliveTimeout: 5000,
-  },
-  
-  // Security configuration
-  security: {
-    rateLimiting: {
-      windowMs: 15 * 60 * 1000, // 15 minutes
-      maxRequests: 1000,
-      skipSuccessfulRequests: false,
-    },
-    cors: {
-      maxAge: 86400, // 24 hours
-      credentials: true,
-    },
-    headers: {
-      hsts: true,
-      noSniff: true,
-      xssProtection: true,
-    },
-  },
-  
-  // Performance configuration
-  performance: {
-    compression: {
-      level: 6,
-      threshold: 1024,
-    },
-    caching: {
-      defaultTTL: 300000, // 5 minutes
-      maxEntries: 1000,
-    },
-    memory: {
-      maxHeapSize: 512, // MB
-      gcThreshold: 300, // MB
-    },
-  },
-  
-  // Monitoring configuration
-  monitoring: {
-    healthCheck: {
-      interval: 30000, // 30 seconds
-      timeout: 5000,
-    },
-    metrics: {
-      retention: 24 * 60 * 60 * 1000, // 24 hours
-      aggregationInterval: 60000, // 1 minute
-    },
-    alerts: {
-      errorRate: 0.05, // 5%
-      responseTime: 1000, // 1 second
-      memoryUsage: 400, // MB
-    },
-  },
-  
-  // Database configuration
+export interface ProductionConfig {
   database: {
-    pool: {
-      min: 2,
-      max: 20,
-      idle: 30000,
-      acquire: 60000,
-    },
-    query: {
-      timeout: 30000,
-      maxRetries: 3,
-    },
-  },
-};
-
-// Feature flags for production
-export const featureFlags = {
-  enableMetrics: process.env.ENABLE_METRICS !== 'false',
-  enableAuditLogs: process.env.ENABLE_AUDIT_LOGS !== 'false',
-  enableHealthChecks: process.env.ENABLE_HEALTH_CHECKS !== 'false',
-  enableCaching: process.env.ENABLE_CACHING !== 'false',
-  enableRateLimiting: process.env.ENABLE_RATE_LIMITING !== 'false',
-};
-
-// Logging configuration
-export const loggingConfig = {
-  level: process.env.LOG_LEVEL || 'info',
-  format: process.env.NODE_ENV === 'production' ? 'json' : 'pretty',
-  maxFiles: 10,
-  maxSize: '10m',
-};
-
-// Export configuration based on environment
-export const getConfig = () => {
-  const env = validateEnvironment();
-  
-  return {
-    ...productionConfig,
-    env,
-    isDevelopment: env.NODE_ENV === 'development',
-    isProduction: env.NODE_ENV === 'production',
-    isTest: env.NODE_ENV === 'test',
+    url: string;
+    maxConnections: number;
+    connectionTimeout: number;
   };
-};
+  solana: {
+    network: 'devnet' | 'mainnet-beta';
+    rpcUrl: string;
+    commitment: 'processed' | 'confirmed' | 'finalized';
+  };
+  security: {
+    corsOrigins: string[];
+    rateLimitPerMinute: number;
+    sessionSecret: string;
+  };
+  monitoring: {
+    enabled: boolean;
+    logLevel: 'error' | 'warn' | 'info' | 'debug';
+    metricsCollection: boolean;
+  };
+}
+
+export class ProductionConfigService {
+  private config: ProductionConfig;
+
+  constructor() {
+    this.config = this.loadConfiguration();
+    this.validateConfiguration();
+  }
+
+  private loadConfiguration(): ProductionConfig {
+    return {
+      database: {
+        url: process.env.DATABASE_URL || '',
+        maxConnections: parseInt(process.env.DB_MAX_CONNECTIONS || '20'),
+        connectionTimeout: parseInt(process.env.DB_CONNECTION_TIMEOUT || '30000'),
+      },
+      solana: {
+        network: (process.env.SOLANA_NETWORK as 'devnet' | 'mainnet-beta') || 'devnet',
+        rpcUrl: process.env.SOLANA_RPC_URL || 'https://api.devnet.solana.com',
+        commitment: (process.env.SOLANA_COMMITMENT as 'processed' | 'confirmed' | 'finalized') || 'confirmed',
+      },
+      security: {
+        corsOrigins: process.env.CORS_ORIGINS?.split(',') || ['http://localhost:5000'],
+        rateLimitPerMinute: parseInt(process.env.RATE_LIMIT_PER_MINUTE || '100'),
+        sessionSecret: process.env.SESSION_SECRET || 'dev-secret-change-in-production',
+      },
+      monitoring: {
+        enabled: process.env.NODE_ENV === 'production',
+        logLevel: (process.env.LOG_LEVEL as 'error' | 'warn' | 'info' | 'debug') || 'info',
+        metricsCollection: process.env.ENABLE_METRICS === 'true',
+      }
+    };
+  }
+
+  private validateConfiguration(): void {
+    const errors: string[] = [];
+
+    // Database validation
+    if (!this.config.database.url) {
+      errors.push('DATABASE_URL is required');
+    }
+
+    // Solana validation
+    if (!this.config.solana.rpcUrl) {
+      errors.push('SOLANA_RPC_URL is required');
+    }
+
+    // Security validation
+    if (process.env.NODE_ENV === 'production') {
+      if (this.config.security.sessionSecret === 'dev-secret-change-in-production') {
+        errors.push('SESSION_SECRET must be set for production');
+      }
+      if (this.config.security.corsOrigins.includes('http://localhost:5000')) {
+        console.warn('⚠️ WARNING: localhost CORS origin detected in production');
+      }
+    }
+
+    if (errors.length > 0) {
+      throw new Error(`Configuration validation failed:\n${errors.join('\n')}`);
+    }
+  }
+
+  public getConfig(): ProductionConfig {
+    return { ...this.config };
+  }
+
+  public isDevelopment(): boolean {
+    return process.env.NODE_ENV !== 'production';
+  }
+
+  public isProduction(): boolean {
+    return process.env.NODE_ENV === 'production';
+  }
+
+  public getHealthStatus() {
+    return {
+      environment: process.env.NODE_ENV || 'development',
+      database: {
+        connected: !!this.config.database.url,
+        maxConnections: this.config.database.maxConnections,
+      },
+      solana: {
+        network: this.config.solana.network,
+        rpcEndpoint: this.config.solana.rpcUrl,
+      },
+      security: {
+        corsConfigured: this.config.security.corsOrigins.length > 0,
+        rateLimitEnabled: this.config.security.rateLimitPerMinute > 0,
+      },
+      monitoring: {
+        enabled: this.config.monitoring.enabled,
+        logLevel: this.config.monitoring.logLevel,
+      }
+    };
+  }
+}
+
+export const productionConfig = new ProductionConfigService();

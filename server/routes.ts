@@ -1,5 +1,6 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
+import { productionConfig } from "./production-config";
 import cors from 'cors';
 import { 
   globalRateLimit, 

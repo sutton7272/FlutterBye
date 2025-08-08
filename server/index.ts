@@ -1,8 +1,30 @@
 import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
-
 const app = express();
+
+// Performance headers middleware
+app.use((req, res, next) => {
+  // Security headers for production
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('X-Frame-Options', 'DENY');
+  res.setHeader('X-XSS-Protection', '1; mode=block');
+  res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+  
+  // Performance headers
+  res.setHeader('X-DNS-Prefetch-Control', 'on');
+  res.setHeader('X-Powered-By', 'Flutterbye Enterprise');
+  
+  // Cache control for static assets
+  if (req.url.match(/\.(js|css|png|jpg|jpeg|gif|svg|ico|woff|woff2|ttf|eot)$/)) {
+    res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+  } else if (req.url.match(/\.(html|json)$/)) {
+    res.setHeader('Cache-Control', 'public, max-age=3600');
+  }
+  
+  next();
+});
+
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: false, limit: '50mb' }));
 
