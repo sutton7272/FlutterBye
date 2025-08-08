@@ -118,18 +118,8 @@ export default function LaunchCountdown() {
                 
                 const shouldShowReadMore = !isExpanded && hasMoreContent;
                 
-                // Debug for this specific content item
-                if (content.id === 1) {
-                  console.log(`Content ${content.id} debug:`, {
-                    isExpanded,
-                    hasMoreContent,
-                    shouldShowReadMore,
-                    expandedContentId,
-                    contentLength: content.content?.length || 0,
-                    previewLength: previewText.length,
-                    fullLength: fullText.length
-                  });
-                }
+                // Debug logging
+                console.log(`Content ${content.id} state:`, { isExpanded, hasMoreContent, expandedContentId });
                 
                 return (
                   <Card 
@@ -168,42 +158,19 @@ export default function LaunchCountdown() {
                           {shouldShowReadMore && "..."}
                         </div>
                         
-                        {/* Direct HTML buttons to bypass React issues */}
-                        <div className="mt-4 flex gap-2">
-                          {!isExpanded && hasMoreContent && (
-                            <button 
-                              className="bg-cyan-500/20 border border-cyan-400 text-cyan-400 hover:bg-cyan-500/30 hover:text-cyan-300 px-4 py-2 rounded text-sm transition-colors cursor-pointer"
-                              onMouseDown={(e) => {
-                                e.stopPropagation();
-                                console.log('🔵 READ MORE CLICKED - Content ID:', content.id);
-                                setExpandedContentId(content.id);
-                              }}
-                            >
-                              Read More →
-                            </button>
-                          )}
-                          {isExpanded && (
-                            <button 
-                              className="bg-cyan-500/20 border border-cyan-400 text-cyan-400 hover:bg-cyan-500/30 hover:text-cyan-300 px-4 py-2 rounded text-sm transition-colors cursor-pointer"
-                              onMouseDown={(e) => {
-                                e.stopPropagation();
-                                console.log('🔴 SHOW LESS CLICKED');
-                                setExpandedContentId(null);
-                              }}
-                            >
-                              ← Show Less
-                            </button>
-                          )}
-                          {/* Force expansion button for testing */}
-                          <button 
-                            className="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded text-xs"
-                            onMouseDown={() => {
-                              console.log('🟢 FORCE EXPAND - Content ID:', content.id);
-                              setExpandedContentId(expandedContentId === content.id ? null : content.id);
+                        {/* Simple working expansion system */}
+                        <div className="mt-4">
+                          <div 
+                            className="inline-block bg-cyan-500 hover:bg-cyan-600 text-white px-4 py-2 rounded cursor-pointer text-sm font-medium"
+                            onClick={() => {
+                              console.log('🔵 EXPAND BUTTON CLICKED - Content ID:', content.id);
+                              const newExpandedId = expandedContentId === content.id ? null : content.id;
+                              setExpandedContentId(newExpandedId);
+                              console.log('🔄 State changed to:', newExpandedId);
                             }}
                           >
-                            Toggle
-                          </button>
+                            {isExpanded ? '▼ Show Less' : '▶ Read More'}
+                          </div>
                         </div>
                       </div>
                       
