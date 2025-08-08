@@ -99,6 +99,9 @@ import { ThemeProvider } from "@/components/theme-provider";
 
 import { WalletProvider } from "@/components/wallet-adapter";
 import { TestImage } from "@/components/test-image";
+import AdminGateway from "@/pages/admin-gateway";
+import AdminDashboard from "@/pages/admin-dashboard";
+import { AdminRouteGuard } from "@/components/admin-route-guard";
 function Router() {
   return (
     <ErrorBoundary>
@@ -255,20 +258,31 @@ function Router() {
             <SearchPage />
           </>
         )} />
-        <Route path="/admin" component={() => (
-          <>
-            <Navbar />
-            <Admin />
-          </>
+        {/* Admin Gateway - Password Protected Entry Point */}
+        <Route path="/admin" component={AdminGateway} />
+        
+        {/* Protected Admin Routes */}
+        <Route path="/admin/dashboard" component={() => (
+          <AdminRouteGuard>
+            <AdminDashboard />
+          </AdminRouteGuard>
         )} />
         
-        {/* Admin routes should use the new admin page structure */}
-        <Route path="/admin-unified" component={() => (
-          <>
+        <Route path="/admin/flutterai" component={() => (
+          <AdminRouteGuard>
+            <Navbar />
+            <FlutterAIDashboard />
+          </AdminRouteGuard>
+        )} />
+        
+        <Route path="/admin/unified" component={() => (
+          <AdminRouteGuard>
             <Navbar />
             <UnifiedAdminDashboard />
-          </>
+          </AdminRouteGuard>
         )} />
+        
+        {/* Legacy Admin Route */}
         <Route path="/admin-legacy" component={() => (
           <>
             <Navbar />
