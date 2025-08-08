@@ -292,9 +292,9 @@ function Router() {
           </AdminRouteGuard>
         )} />
         
-        <Route path="/monitoring-dashboard" component={() => (
+        <Route path="/admin/dashboard-detailed" component={() => (
           <AdminRouteGuard>
-            <MonitoringDashboard />
+            <AdminUnifiedDashboard />
           </AdminRouteGuard>
         )} />
         
