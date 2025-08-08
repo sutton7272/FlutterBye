@@ -729,10 +729,8 @@ export default function LaunchCountdown() {
                 )}
               </CardContent>
             </Card>
-          </div>
 
-          {/* Join Thousands of Early Adopters */}
-          <div className="flex flex-col space-y-4">
+            {/* Join Thousands of Early Adopters */}
             <Card className="electric-frame flex-grow">
               <CardHeader>
                 <CardTitle className="text-gradient flex items-center gap-2 text-lg">
