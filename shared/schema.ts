@@ -1,5 +1,5 @@
 import { sql } from "drizzle-orm";
-import { pgTable, text, varchar, integer, decimal, timestamp, boolean, json, jsonb } from "drizzle-orm/pg-core";
+import { pgTable, text, varchar, integer, decimal, timestamp, boolean, json, jsonb, unique } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { relations } from "drizzle-orm";
 import { z } from "zod";
@@ -1390,3 +1390,134 @@ export const insertWalletIntelligenceSchema = createInsertSchema(walletIntellige
 
 export type WalletIntelligence = typeof walletIntelligence.$inferSelect;
 export type InsertWalletIntelligence = z.infer<typeof insertWalletIntelligenceSchema>;
+
+// Secure Custodial Wallet System Tables
+export const custodialWallets = pgTable("custodial_wallets", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  currency: varchar("currency").notNull(), // SOL, USDC, FLBY
+  walletAddress: varchar("wallet_address").notNull().unique(),
+  privateKeyEncrypted: text("private_key_encrypted").notNull(), // AES encrypted
+  isHotWallet: boolean("is_hot_wallet").notNull().default(true),
+  balance: decimal("balance", { precision: 18, scale: 9 }).notNull().default("0"),
+  reservedBalance: decimal("reserved_balance", { precision: 18, scale: 9 }).notNull().default("0"), // Funds pending redemption
+  status: varchar("status").notNull().default("active"), // active, maintenance, suspended
+  lastHealthCheck: timestamp("last_health_check").defaultNow(),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const userWalletBalances = pgTable("user_wallet_balances", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").references(() => users.id).notNull(),
+  currency: varchar("currency").notNull(), // SOL, USDC, FLBY
+  availableBalance: decimal("available_balance", { precision: 18, scale: 9 }).notNull().default("0"),
+  pendingBalance: decimal("pending_balance", { precision: 18, scale: 9 }).notNull().default("0"), // Funds pending confirmation
+  reservedBalance: decimal("reserved_balance", { precision: 18, scale: 9 }).notNull().default("0"), // Funds attached to products
+  totalDeposited: decimal("total_deposited", { precision: 18, scale: 9 }).notNull().default("0"),
+  totalWithdrawn: decimal("total_withdrawn", { precision: 18, scale: 9 }).notNull().default("0"),
+  totalFeesEarned: decimal("total_fees_earned", { precision: 18, scale: 9 }).notNull().default("0"), // FLBY rewards
+  lastActivity: timestamp("last_activity").defaultNow(),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+}, (table) => ({
+  userCurrencyUnique: unique().on(table.userId, table.currency),
+}));
+
+export const valueAttachments = pgTable("value_attachments", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").references(() => users.id).notNull(),
+  productId: varchar("product_id").notNull(), // Product/message/token ID
+  productType: varchar("product_type").notNull(), // 'message', 'token', 'nft', 'campaign'
+  amount: decimal("amount", { precision: 18, scale: 9 }).notNull(),
+  currency: varchar("currency").notNull(), // SOL, USDC, FLBY
+  recipientAddress: varchar("recipient_address"), // Who can redeem
+  recipientUserId: varchar("recipient_user_id").references(() => users.id),
+  expiresAt: timestamp("expires_at"), // Optional expiration
+  message: text("message"), // Optional message with value
+  status: varchar("status").notNull().default("active"), // active, redeemed, expired, cancelled
+  redemptionCode: varchar("redemption_code").unique(), // Unique code for redemption
+  redeemedAt: timestamp("redeemed_at"),
+  redeemedBy: varchar("redeemed_by").references(() => users.id),
+  transactionHash: varchar("transaction_hash"), // Blockchain transaction
+  feeAmount: decimal("fee_amount", { precision: 18, scale: 9 }).notNull().default("0"),
+  feeCurrency: varchar("fee_currency").notNull().default("FLBY"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const custodialWalletTransactions = pgTable("custodial_wallet_transactions", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").references(() => users.id).notNull(),
+  transactionType: varchar("transaction_type").notNull(), // deposit, withdrawal, value_attach, redemption, fee
+  amount: decimal("amount", { precision: 18, scale: 9 }).notNull(),
+  currency: varchar("currency").notNull(),
+  fromAddress: varchar("from_address"),
+  toAddress: varchar("to_address"),
+  transactionHash: varchar("transaction_hash").unique(),
+  status: varchar("status").notNull().default("pending"), // pending, confirmed, failed, cancelled
+  confirmations: integer("confirmations").default(0),
+  feeAmount: decimal("fee_amount", { precision: 18, scale: 9 }).notNull().default("0"),
+  feeCurrency: varchar("fee_currency").notNull().default("FLBY"),
+  blockHeight: integer("block_height"),
+  metadata: jsonb("metadata"), // Additional transaction data
+  failureReason: text("failure_reason"),
+  processedAt: timestamp("processed_at"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const walletSecurityLogs = pgTable("wallet_security_logs", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").references(() => users.id),
+  eventType: varchar("event_type").notNull(), // login_attempt, withdrawal_request, suspicious_activity, fraud_detected
+  severity: varchar("severity").notNull(), // low, medium, high, critical
+  ipAddress: varchar("ip_address"),
+  userAgent: text("user_agent"),
+  location: varchar("location"),
+  details: jsonb("details"),
+  actionTaken: varchar("action_taken"), // none, blocked, flagged, account_suspended
+  resolvedAt: timestamp("resolved_at"),
+  resolvedBy: varchar("resolved_by"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Custodial Wallet System Types and Schemas
+export type CustodialWallet = typeof custodialWallets.$inferSelect;
+export type InsertCustodialWallet = typeof custodialWallets.$inferInsert;
+export type UserWalletBalance = typeof userWalletBalances.$inferSelect;
+export type InsertUserWalletBalance = typeof userWalletBalances.$inferInsert;
+export type ValueAttachment = typeof valueAttachments.$inferSelect;
+export type InsertValueAttachment = typeof valueAttachments.$inferInsert;
+export type CustodialWalletTransaction = typeof custodialWalletTransactions.$inferSelect;
+export type InsertCustodialWalletTransaction = typeof custodialWalletTransactions.$inferInsert;
+export type WalletSecurityLog = typeof walletSecurityLogs.$inferSelect;
+export type InsertWalletSecurityLog = typeof walletSecurityLogs.$inferInsert;
+
+export const insertCustodialWalletSchema = createInsertSchema(custodialWallets).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertUserWalletBalanceSchema = createInsertSchema(userWalletBalances).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertValueAttachmentSchema = createInsertSchema(valueAttachments).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertCustodialWalletTransactionSchema = createInsertSchema(custodialWalletTransactions).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertWalletSecurityLogSchema = createInsertSchema(walletSecurityLogs).omit({
+  id: true,
+  createdAt: true,
+});

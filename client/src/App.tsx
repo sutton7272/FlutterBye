@@ -64,6 +64,7 @@ import SearchPage from "@/pages/search";
 import AdminFreeCodes from "@/pages/admin-free-codes";
 import AdminPricing from "@/pages/admin-pricing";
 import AdminDefaultImage from "@/pages/admin-default-image";
+import AdminCustodialWallet from "@/pages/admin-custodial-wallet";
 import UnifiedAdminDashboard from "@/pages/admin-unified";
 import TokenHolderMapPage from "@/pages/token-holder-map";
 import CollaborativeCreation from "@/pages/collaborative-creation";
@@ -754,6 +755,12 @@ function Router() {
           <>
             <Navbar />
             <AIMarketingBot />
+          </>
+        )} />
+        <Route path="/admin-custodial-wallet" component={() => (
+          <>
+            <Navbar />
+            <AdminCustodialWallet />
           </>
         )} />
         <Route component={NotFound} />

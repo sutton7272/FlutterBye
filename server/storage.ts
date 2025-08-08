@@ -51,11 +51,26 @@ import {
   type InsertAnalysisQueue,
   type EscrowFeeConfig,
   type InsertEscrowFeeConfig,
+  type CustodialWallet,
+  type InsertCustodialWallet,
+  type UserWalletBalance,
+  type InsertUserWalletBalance,
+  type ValueAttachment,
+  type InsertValueAttachment,
+  type CustodialWalletTransaction,
+  type InsertCustodialWalletTransaction,
+  type WalletSecurityLog,
+  type InsertWalletSecurityLog,
   pricingTiers,
   walletIntelligence,
   walletBatches,
   analysisQueue,
   escrowFeeConfigs,
+  custodialWallets,
+  userWalletBalances,
+  valueAttachments,
+  custodialWalletTransactions,
+  walletSecurityLogs,
 } from "@shared/schema";
 
 // Storage interface for both in-memory and database implementations
@@ -242,6 +257,44 @@ export interface IStorage {
   getEscrowFeeConfig(currency: string): Promise<EscrowFeeConfig | undefined>;
   updateEscrowFeeConfig(currency: string, config: Partial<EscrowFeeConfig>): Promise<EscrowFeeConfig>;
   getAllEscrowFeeConfigs(): Promise<EscrowFeeConfig[]>;
+  
+  // Secure Custodial Wallet Operations
+  createCustodialWallet(wallet: InsertCustodialWallet): Promise<CustodialWallet>;
+  getCustodialWallet(id: string): Promise<CustodialWallet | undefined>;
+  getCustodialWalletByAddress(walletAddress: string): Promise<CustodialWallet | undefined>;
+  getAllCustodialWallets(): Promise<CustodialWallet[]>;
+  getCustodialWalletsByCurrency(currency: string): Promise<CustodialWallet[]>;
+  updateCustodialWalletBalance(id: string, balance: string, reservedBalance: string): Promise<CustodialWallet>;
+  updateCustodialWalletStatus(id: string, status: string): Promise<CustodialWallet>;
+  
+  // User Wallet Balance Operations
+  getUserWalletBalance(userId: string, currency: string): Promise<UserWalletBalance | undefined>;
+  getAllUserWalletBalances(userId: string): Promise<UserWalletBalance[]>;
+  createUserWalletBalance(balance: InsertUserWalletBalance): Promise<UserWalletBalance>;
+  updateUserWalletBalance(userId: string, currency: string, updates: Partial<UserWalletBalance>): Promise<UserWalletBalance>;
+  transferUserBalance(fromUserId: string, toUserId: string, currency: string, amount: string): Promise<void>;
+  
+  // Value Attachment Operations
+  createValueAttachment(attachment: InsertValueAttachment): Promise<ValueAttachment>;
+  getValueAttachment(id: string): Promise<ValueAttachment | undefined>;
+  getValueAttachmentByCode(redemptionCode: string): Promise<ValueAttachment | undefined>;
+  getUserValueAttachments(userId: string): Promise<ValueAttachment[]>;
+  getProductValueAttachments(productId: string, productType: string): Promise<ValueAttachment[]>;
+  updateValueAttachmentStatus(id: string, status: string): Promise<ValueAttachment>;
+  redeemValueAttachment(id: string, redeemedBy: string): Promise<ValueAttachment>;
+  expireValueAttachments(): Promise<number>; // Returns count of expired attachments
+  
+  // Custodial Wallet Transaction Operations
+  createCustodialWalletTransaction(transaction: InsertCustodialWalletTransaction): Promise<CustodialWalletTransaction>;
+  getCustodialWalletTransaction(id: string): Promise<CustodialWalletTransaction | undefined>;
+  getUserCustodialTransactions(userId: string, limit?: number): Promise<CustodialWalletTransaction[]>;
+  getAllCustodialTransactions(limit?: number, offset?: number): Promise<CustodialWalletTransaction[]>;
+  updateCustodialTransactionStatus(id: string, status: string, transactionHash?: string): Promise<CustodialWalletTransaction>;
+  
+  // Wallet Security Log Operations
+  createSecurityLog(log: InsertWalletSecurityLog): Promise<WalletSecurityLog>;
+  getSecurityLogs(userId?: string, severity?: string, limit?: number): Promise<WalletSecurityLog[]>;
+  resolveSecurityLog(id: string, resolvedBy: string, actionTaken: string): Promise<WalletSecurityLog>;
 }
 
 // In-memory storage implementation

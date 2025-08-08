@@ -38,6 +38,7 @@ import { authenticateWallet, requireAdmin, requirePermission, requireSuperAdmin 
 import { chatService } from "./chat-service";
 import { registerSolanaRoutes } from "./routes-solana";
 import { registerEscrowRoutes } from "./routes-escrow";
+import { registerCustodialWalletRoutes } from "./routes-custodial-wallet";
 import { productionAuth } from "./production-auth";
 import { realTimeMonitor } from "./real-time-monitor";
 import { transactionMonitor } from "./transaction-monitor";
@@ -6296,6 +6297,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Register Solana blockchain integration routes
   registerSolanaRoutes(app);
   registerEscrowRoutes(app);
+  registerCustodialWalletRoutes(app, storage);
   
   // Register escrow profits routes
   const escrowProfitsRoutes = (await import('./routes-escrow-profits')).default;
