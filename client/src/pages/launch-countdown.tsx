@@ -251,37 +251,6 @@ export default function LaunchCountdown() {
       </div>
 
       <div className={`container mx-auto px-4 relative z-10 ${hasAccess ? 'pt-24 pb-8' : 'py-8'}`}>
-        {/* Header */}
-        <div className="text-center mb-8">
-          <img 
-            src={flutterbeyeLogoPath} 
-            alt="Flutterbye Logo" 
-            className="w-24 h-24 mx-auto mb-4 rounded-full electric-frame"
-          />
-          <h1 className="text-4xl font-bold mb-3">
-            <span className="bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent">
-              FLUTTERBYE
-            </span>
-          </h1>
-          <p className="text-lg text-gray-300 mb-4">
-            The Future of Communication is Coming
-          </p>
-          <div className="flex justify-center gap-2 mb-6">
-            <Badge variant="secondary" className="bg-cyan-500/20 text-cyan-400 border-cyan-500/30">
-              <Rocket className="w-3 h-3 mr-1" />
-              Pre-Launch
-            </Badge>
-            <Badge variant="secondary" className="bg-green-500/20 text-green-400 border-green-500/30">
-              <Gift className="w-3 h-3 mr-1" />
-              Early Access
-            </Badge>
-            <Badge variant="secondary" className="bg-purple-500/20 text-purple-400 border-purple-500/30">
-              <Star className="w-3 h-3 mr-1" />
-              Exclusive Airdrops
-            </Badge>
-          </div>
-        </div>
-
         {/* Countdown Timer - Top of Page */}
         <Card className="electric-frame max-w-4xl mx-auto mb-8">
           <CardHeader className="pb-3">
@@ -351,6 +320,37 @@ export default function LaunchCountdown() {
             </div>
           </CardContent>
         </Card>
+
+        {/* Header */}
+        <div className="text-center mb-8">
+          <img 
+            src={flutterbeyeLogoPath} 
+            alt="Flutterbye Logo" 
+            className="w-24 h-24 mx-auto mb-4 rounded-full electric-frame"
+          />
+          <h1 className="text-4xl font-bold mb-3">
+            <span className="bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent">
+              FLUTTERBYE
+            </span>
+          </h1>
+          <p className="text-lg text-gray-300 mb-4">
+            The Future of Communication is Coming
+          </p>
+          <div className="flex justify-center gap-2 mb-6">
+            <Badge variant="secondary" className="bg-cyan-500/20 text-cyan-400 border-cyan-500/30">
+              <Rocket className="w-3 h-3 mr-1" />
+              Pre-Launch
+            </Badge>
+            <Badge variant="secondary" className="bg-green-500/20 text-green-400 border-green-500/30">
+              <Gift className="w-3 h-3 mr-1" />
+              Early Access
+            </Badge>
+            <Badge variant="secondary" className="bg-purple-500/20 text-purple-400 border-purple-500/30">
+              <Star className="w-3 h-3 mr-1" />
+              Exclusive Airdrops
+            </Badge>
+          </div>
+        </div>
 
         {/* Three Column Layout */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 max-w-7xl mx-auto mb-8 items-stretch">
