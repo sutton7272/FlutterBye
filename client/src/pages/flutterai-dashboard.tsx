@@ -1134,66 +1134,29 @@ export default function FlutterAIDashboard() {
           </div>
         )}
 
-        {/* Main Dashboard Tabs */}
-        <Tabs defaultValue="intelligence" className="space-y-6">
-          {/* Primary Tabs - Most Important Features */}
-          <TabsList className="grid w-full grid-cols-6 bg-slate-800/50 mb-4">
-            <TabsTrigger value="intelligence" className="data-[state=active]:bg-purple-600">
-              <Star className="h-4 w-4 mr-2" />
-              Intelligence
-            </TabsTrigger>
-            <TabsTrigger value="enterprise" className="data-[state=active]:bg-green-600">
-              <Globe className="h-4 w-4 mr-2" />
-              Enterprise
-            </TabsTrigger>
-            <TabsTrigger value="advanced-analytics" className="data-[state=active]:bg-purple-600">
-              <BarChart3 className="h-4 w-4 mr-2" />
-              Analytics
-            </TabsTrigger>
-            <TabsTrigger value="group-analysis" className="data-[state=active]:bg-purple-600">
-              <Users className="h-4 w-4 mr-2" />
-              Group Analysis
-            </TabsTrigger>
-            <TabsTrigger value="pricing" className="data-[state=active]:bg-purple-600">
-              <DollarSign className="h-4 w-4 mr-2" />
-              Pricing
-            </TabsTrigger>
-            <TabsTrigger value="real-time" className="data-[state=active]:bg-purple-600">
-              <Activity className="h-4 w-4 mr-2" />
-              Real-time
-            </TabsTrigger>
-          </TabsList>
-
-          {/* Secondary Tabs - Additional Features */}
-          <TabsList className="grid w-full grid-cols-6 bg-slate-800/30 mb-6">
-            <TabsTrigger value="collection" className="data-[state=active]:bg-purple-600">
-              <Upload className="h-4 w-4 mr-2" />
-              Collection
-            </TabsTrigger>
-            <TabsTrigger value="analysis" className="data-[state=active]:bg-purple-600">
+        {/* Streamlined Core FlutterAI Dashboard - 4 Essential Tabs */}
+        <Tabs defaultValue="overview" className="space-y-6">
+          <TabsList className="grid w-full grid-cols-4 bg-slate-800/50 mb-6">
+            <TabsTrigger value="overview" className="data-[state=active]:bg-purple-600">
               <Brain className="h-4 w-4 mr-2" />
-              Analysis
+              Intelligence Overview
             </TabsTrigger>
-            <TabsTrigger value="wallets" className="data-[state=active]:bg-purple-600">
-              <Wallet className="h-4 w-4 mr-2" />
-              Wallets
+            <TabsTrigger value="collection" className="data-[state=active]:bg-blue-600">
+              <Upload className="h-4 w-4 mr-2" />
+              Collection & Scoring
             </TabsTrigger>
-            <TabsTrigger value="batches" className="data-[state=active]:bg-purple-600">
-              <FileText className="h-4 w-4 mr-2" />
-              Batches
-            </TabsTrigger>
-            <TabsTrigger value="reports" className="data-[state=active]:bg-purple-600">
+            <TabsTrigger value="analytics" className="data-[state=active]:bg-green-600">
               <BarChart3 className="h-4 w-4 mr-2" />
-              Reports
+              Analytics & Insights
             </TabsTrigger>
-            <TabsTrigger value="marketing-bot" className="data-[state=active]:bg-purple-600">
-              <Bot className="h-4 w-4 mr-2" />
-              Marketing Bot
+            <TabsTrigger value="settings" className="data-[state=active]:bg-orange-600">
+              <Settings className="h-4 w-4 mr-2" />
+              Settings
             </TabsTrigger>
           </TabsList>
 
-          {/* Revolutionary Social Credit Intelligence Tab */}
-          <TabsContent value="intelligence" className="space-y-6">
+          {/* 1. INTELLIGENCE OVERVIEW TAB - Core Wallet Intelligence Dashboard */}
+          <TabsContent value="overview" className="space-y-6">
             <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
               
               {/* Intelligence Analytics */}
@@ -1625,7 +1588,7 @@ export default function FlutterAIDashboard() {
             </Card>
           </TabsContent>
 
-          {/* Collection Tab */}
+          {/* 2. COLLECTION & SCORING TAB - Wallet Collection and AI Scoring */}
           <TabsContent value="collection" className="space-y-6">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               
@@ -1633,55 +1596,45 @@ export default function FlutterAIDashboard() {
               <Card className="bg-slate-800/50 border-purple-500/20">
                 <CardHeader>
                   <CardTitle className="text-white flex items-center gap-2">
-                    <Wallet className="h-5 w-5 text-purple-400" />
+                    <Wallet className="h-5 w-5 text-blue-400" />
                     Manual Wallet Entry
                   </CardTitle>
-                  <CardDescription className="text-purple-200">
-                    Add individual wallet addresses for analysis
+                  <CardDescription className="text-blue-200">
+                    Add individual wallet addresses for AI scoring analysis
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div>
-                    <Label htmlFor="manual-wallet" className="text-purple-200">Wallet Address</Label>
+                    <Label htmlFor="manual-wallet" className="text-blue-200">Wallet Address</Label>
                     <Input
                       id="manual-wallet"
                       value={manualWallet}
                       onChange={(e) => setManualWallet(e.target.value)}
                       placeholder="Enter Solana wallet address..."
-                      className="bg-slate-700 border-purple-500/20 text-white"
+                      className="bg-slate-700 border-blue-500/20 text-white"
                     />
                   </div>
                   <div>
-                    <Label htmlFor="manual-tags" className="text-purple-200">Tags (comma-separated)</Label>
+                    <Label htmlFor="manual-tags" className="text-blue-200">Tags (comma-separated)</Label>
                     <Input
                       id="manual-tags"
                       value={manualTags}
                       onChange={(e) => setManualTags(e.target.value)}
                       placeholder="e.g., high-value, suspicious, whale"
-                      className="bg-slate-700 border-purple-500/20 text-white"
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="manual-notes" className="text-purple-200">Notes</Label>
-                    <Input
-                      id="manual-notes"
-                      value={manualNotes}
-                      onChange={(e) => setManualNotes(e.target.value)}
-                      placeholder="Additional notes about this wallet..."
-                      className="bg-slate-700 border-purple-500/20 text-white"
+                      className="bg-slate-700 border-blue-500/20 text-white"
                     />
                   </div>
                   <Button
                     onClick={handleManualEntry}
                     disabled={manualEntryMutation.isPending}
-                    className="w-full bg-purple-600 hover:bg-purple-700"
+                    className="w-full bg-blue-600 hover:bg-blue-700"
                   >
                     {manualEntryMutation.isPending ? (
                       <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
                     ) : (
                       <Wallet className="h-4 w-4 mr-2" />
                     )}
-                    Add Wallet
+                    Add & Score Wallet
                   </Button>
                 </CardContent>
               </Card>
@@ -1690,415 +1643,318 @@ export default function FlutterAIDashboard() {
               <Card className="bg-slate-800/50 border-purple-500/20">
                 <CardHeader>
                   <CardTitle className="text-white flex items-center gap-2">
-                    <Upload className="h-5 w-5 text-purple-400" />
+                    <Upload className="h-5 w-5 text-blue-400" />
                     Bulk CSV Upload
                   </CardTitle>
-                  <CardDescription className="text-purple-200">
-                    Upload multiple wallet addresses from CSV file
+                  <CardDescription className="text-blue-200">
+                    Upload multiple wallet addresses for batch AI scoring
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div>
-                    <Label htmlFor="batch-name" className="text-purple-200">Batch Name</Label>
+                    <Label htmlFor="batch-name" className="text-blue-200">Batch Name</Label>
                     <Input
                       id="batch-name"
                       value={batchName}
                       onChange={(e) => setBatchName(e.target.value)}
                       placeholder="Enter batch name..."
-                      className="bg-slate-700 border-purple-500/20 text-white"
+                      className="bg-slate-700 border-blue-500/20 text-white"
                     />
                   </div>
                   <div>
-                    <Label htmlFor="csv-file" className="text-purple-200">CSV File</Label>
+                    <Label htmlFor="csv-file" className="text-blue-200">CSV File</Label>
                     <Input
                       id="csv-file"
                       type="file"
                       accept=".csv"
                       onChange={(e) => setCsvFile(e.target.files?.[0] || null)}
-                      className="bg-slate-700 border-purple-500/20 text-white"
+                      className="bg-slate-700 border-blue-500/20 text-white"
                     />
                   </div>
-                  <Alert className="bg-slate-700/50 border-purple-500/20">
-                    <AlertTriangle className="h-4 w-4 text-yellow-400" />
-                    <AlertDescription className="text-purple-200">
-                      CSV format: First column should contain wallet addresses. Headers will be automatically detected.
-                    </AlertDescription>
-                  </Alert>
                   <Button
                     onClick={handleCsvUpload}
                     disabled={csvUploadMutation.isPending || !csvFile || !batchName}
-                    className="w-full bg-purple-600 hover:bg-purple-700"
+                    className="w-full bg-blue-600 hover:bg-blue-700"
                   >
                     {csvUploadMutation.isPending ? (
                       <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
                     ) : (
                       <Upload className="h-4 w-4 mr-2" />
                     )}
-                    Upload CSV
+                    Upload & Score CSV
                   </Button>
                 </CardContent>
               </Card>
             </div>
 
-            {/* Token Holder Collection */}
+            {/* Token Holder Collection with AI Scoring */}
             <FlutterAITokenCollector />
 
-            {/* Automatic Collection Status */}
+            {/* AI Scoring Engine Status */}
             <Card className="bg-slate-800/50 border-purple-500/20">
               <CardHeader>
                 <CardTitle className="text-white flex items-center gap-2">
-                  <Globe className="h-5 w-5 text-purple-400" />
-                  Automatic Collection Status
+                  <Brain className="h-5 w-5 text-blue-400" />
+                  AI Scoring Engine
                 </CardTitle>
-                <CardDescription className="text-purple-200">
-                  Real-time wallet collection from FlutterBye and PerpeTrader connections
+                <CardDescription className="text-blue-200">
+                  Real-time wallet intelligence scoring with advanced AI analysis
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="flex items-center justify-between p-4 bg-slate-700/50 rounded-lg">
-                    <div className="flex items-center gap-3">
-                      <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
-                      <span className="text-white font-medium">FlutterBye Webhook</span>
-                    </div>
-                    <Badge variant="default" className="bg-green-600">Active</Badge>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="text-center p-4 bg-slate-700/50 rounded-lg">
+                    <Brain className="h-8 w-8 text-purple-400 mx-auto mb-2" />
+                    <div className="text-lg font-bold text-white">Social Credit</div>
+                    <div className="text-sm text-purple-300">0-1000 point scale</div>
                   </div>
-                  <div className="flex items-center justify-between p-4 bg-slate-700/50 rounded-lg">
-                    <div className="flex items-center gap-3">
-                      <div className="w-3 h-3 bg-blue-500 rounded-full animate-pulse"></div>
-                      <span className="text-white font-medium">PerpeTrader Webhook</span>
-                    </div>
-                    <Badge variant="default" className="bg-blue-600">Active</Badge>
+                  <div className="text-center p-4 bg-slate-700/50 rounded-lg">
+                    <Shield className="h-8 w-8 text-yellow-400 mx-auto mb-2" />
+                    <div className="text-lg font-bold text-white">Risk Analysis</div>
+                    <div className="text-sm text-purple-300">4-tier classification</div>
+                  </div>
+                  <div className="text-center p-4 bg-slate-700/50 rounded-lg">
+                    <TrendingUp className="h-8 w-8 text-green-400 mx-auto mb-2" />
+                    <div className="text-lg font-bold text-white">Behavior</div>
+                    <div className="text-sm text-purple-300">Pattern recognition</div>
                   </div>
                 </div>
               </CardContent>
             </Card>
           </TabsContent>
 
-          {/* Analysis Tab */}
-          <TabsContent value="analysis">
+          {/* 3. ANALYTICS & INSIGHTS TAB - Consolidated Analytics Dashboard */}
+          <TabsContent value="analytics" className="space-y-6">
+            
+            {/* Advanced Analytics Dashboard */}
+            <AdvancedAnalyticsDashboard />
+
+            {/* Additional Analytics Insights */}
             <Card className="bg-slate-800/50 border-purple-500/20">
               <CardHeader>
                 <CardTitle className="text-white flex items-center gap-2">
-                  <Brain className="h-5 w-5 text-purple-400" />
-                  AI Analysis Engine
+                  <Brain className="h-5 w-5 text-green-400" />
+                  AI Behavioral Insights
                 </CardTitle>
-                <CardDescription className="text-purple-200">
-                  Advanced AI-powered wallet intelligence and social credit scoring
+                <CardDescription className="text-green-200">
+                  Advanced behavioral pattern analysis and marketing intelligence
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                   <div className="text-center p-6 bg-slate-700/50 rounded-lg">
-                    <Brain className="h-12 w-12 text-purple-400 mx-auto mb-4" />
-                    <h3 className="text-lg font-bold text-white mb-2">Social Credit Scoring</h3>
-                    <p className="text-purple-200 text-sm">
-                      0-1000 point scoring system based on trading behavior, portfolio quality, and activity patterns
-                    </p>
-                  </div>
-                  <div className="text-center p-6 bg-slate-700/50 rounded-lg">
-                    <Shield className="h-12 w-12 text-yellow-400 mx-auto mb-4" />
-                    <h3 className="text-lg font-bold text-white mb-2">Risk Assessment</h3>
-                    <p className="text-purple-200 text-sm">
-                      Multi-level risk classification from low to critical based on behavioral analysis
-                    </p>
-                  </div>
-                  <div className="text-center p-6 bg-slate-700/50 rounded-lg">
                     <TrendingUp className="h-12 w-12 text-green-400 mx-auto mb-4" />
-                    <h3 className="text-lg font-bold text-white mb-2">Behavioral Patterns</h3>
-                    <p className="text-purple-200 text-sm">
-                      Trading volume, DeFi engagement, liquidity management, and portfolio diversity analysis
+                    <h3 className="text-lg font-bold text-white mb-2">Trading Patterns</h3>
+                    <p className="text-green-200 text-sm">
+                      Volume analysis, frequency patterns, and timing behavior for precise marketing targeting
+                    </p>
+                  </div>
+                  <div className="text-center p-6 bg-slate-700/50 rounded-lg">
+                    <Users className="h-12 w-12 text-blue-400 mx-auto mb-4" />
+                    <h3 className="text-lg font-bold text-white mb-2">Social Influence</h3>
+                    <p className="text-green-200 text-sm">
+                      Network analysis, influence scores, and community engagement for viral marketing potential
+                    </p>
+                  </div>
+                  <div className="text-center p-6 bg-slate-700/50 rounded-lg">
+                    <Target className="h-12 w-12 text-purple-400 mx-auto mb-4" />
+                    <h3 className="text-lg font-bold text-white mb-2">Marketing Segments</h3>
+                    <p className="text-green-200 text-sm">
+                      AI-powered segmentation for precision targeting and campaign optimization
                     </p>
                   </div>
                 </div>
               </CardContent>
             </Card>
-          </TabsContent>
 
-          {/* Wallets Tab */}
-          <TabsContent value="wallets" className="space-y-6">
-            <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
-              <div className="flex gap-2">
-                <Button
-                  variant={selectedRiskLevel === '' ? 'default' : 'outline'}
-                  onClick={() => setSelectedRiskLevel('')}
-                  className="bg-purple-600 hover:bg-purple-700"
-                >
-                  All Risks
-                </Button>
-                <Button
-                  variant={selectedRiskLevel === 'low' ? 'default' : 'outline'}
-                  onClick={() => setSelectedRiskLevel('low')}
-                  className="bg-green-600 hover:bg-green-700"
-                >
-                  Low Risk
-                </Button>
-                <Button
-                  variant={selectedRiskLevel === 'medium' ? 'default' : 'outline'}
-                  onClick={() => setSelectedRiskLevel('medium')}
-                  className="bg-yellow-600 hover:bg-yellow-700"
-                >
-                  Medium Risk
-                </Button>
-                <Button
-                  variant={selectedRiskLevel === 'high' ? 'default' : 'outline'}
-                  onClick={() => setSelectedRiskLevel('high')}
-                  className="bg-red-600 hover:bg-red-700"
-                >
-                  High Risk
-                </Button>
-              </div>
-              <Button
-                onClick={() => handleExport('csv')}
-                variant="outline"
-                className="border-purple-500 text-purple-300 hover:bg-purple-600"
-              >
-                <Download className="h-4 w-4 mr-2" />
-                Export CSV
-              </Button>
-            </div>
-
-            <Card className="bg-slate-800/50 border-purple-500/20">
-              <CardHeader>
-                <CardTitle className="text-white">Wallet Intelligence Database</CardTitle>
-                <CardDescription className="text-purple-200">
-                  {walletsLoading ? 'Loading...' : `${walletIntelligence?.data?.length || 0} wallets found`}
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                {walletsLoading ? (
-                  <div className="flex items-center justify-center py-8">
-                    <RefreshCw className="h-8 w-8 animate-spin text-purple-400" />
-                  </div>
-                ) : (
-                  <div className="space-y-4 max-h-96 overflow-y-auto">
-                    {walletIntelligence?.data?.map((wallet: any) => (
-                      <div
-                        key={wallet.walletAddress}
-                        className="p-4 bg-slate-700/50 rounded-lg border border-purple-500/10"
-                      >
-                        <div className="flex items-center justify-between mb-2">
-                          <div className="flex items-center gap-2">
-                            <code className="text-purple-300 text-sm font-mono">
-                              {wallet.walletAddress.slice(0, 8)}...{wallet.walletAddress.slice(-8)}
-                            </code>
-                            <Badge 
-                              variant={getRiskVariant(wallet.riskLevel)}
-                              className={`${getRiskColor(wallet.riskLevel)} text-white`}
-                            >
-                              {wallet.riskLevel.toUpperCase()}
-                            </Badge>
-                          </div>
-                          <div className="text-right">
-                            <div className="text-2xl font-bold text-white">
-                              {wallet.socialCreditScore}
-                            </div>
-                            <div className="text-xs text-purple-300">Credit Score</div>
-                          </div>
-                        </div>
-                        
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-                          <div>
-                            <div className="text-purple-200">Trading</div>
-                            <div className="text-white font-medium">{wallet.tradingBehaviorScore}/100</div>
-                          </div>
-                          <div>
-                            <div className="text-purple-200">Portfolio</div>
-                            <div className="text-white font-medium">{wallet.portfolioQualityScore}/100</div>
-                          </div>
-                          <div>
-                            <div className="text-purple-200">Liquidity</div>
-                            <div className="text-white font-medium">{wallet.liquidityScore}/100</div>
-                          </div>
-                          <div>
-                            <div className="text-purple-200">Activity</div>
-                            <div className="text-white font-medium">{wallet.activityScore}/100</div>
-                          </div>
-                        </div>
-                        
-                        <div className="mt-3 flex items-center justify-between text-xs text-purple-300">
-                          <span>Source: {wallet.collectionSource.replace('_', ' ')}</span>
-                          <span>
-                            {wallet.lastAnalyzed 
-                              ? `Analyzed ${new Date(wallet.lastAnalyzed).toLocaleDateString()}`
-                              : 'Analysis pending'
-                            }
-                          </span>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          {/* Batches Tab */}
-          <TabsContent value="batches">
+            {/* Real-time Intelligence Integration */}
             <Card className="bg-slate-800/50 border-purple-500/20">
               <CardHeader>
                 <CardTitle className="text-white flex items-center gap-2">
-                  <FileText className="h-5 w-5 text-purple-400" />
-                  Upload Batches
+                  <Activity className="h-5 w-5 text-green-400" />
+                  Real-time Intelligence Stream
                 </CardTitle>
-                <CardDescription className="text-purple-200">
-                  Track and manage CSV upload batches
+                <CardDescription className="text-green-200">
+                  Live wallet activity and market intelligence updates
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="space-y-4">
-                  {batches?.batches?.map((batch: any) => (
-                    <div
-                      key={batch.id}
-                      className="p-4 bg-slate-700/50 rounded-lg border border-purple-500/10"
-                    >
-                      <div className="flex items-center justify-between mb-2">
-                        <h3 className="text-lg font-semibold text-white">{batch.batchName}</h3>
-                        <Badge variant="outline" className="border-purple-500 text-purple-300">
-                          {batch.fileName}
-                        </Badge>
-                      </div>
-                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-                        <div>
-                          <div className="text-purple-200">Total Wallets</div>
-                          <div className="text-white font-medium">{batch.totalWallets}</div>
-                        </div>
-                        <div>
-                          <div className="text-purple-200">Processed</div>
-                          <div className="text-white font-medium">{batch.processedWallets || 0}</div>
-                        </div>
-                        <div>
-                          <div className="text-purple-200">Uploaded By</div>
-                          <div className="text-white font-medium">{batch.uploadedBy}</div>
-                        </div>
-                        <div>
-                          <div className="text-purple-200">Date</div>
-                          <div className="text-white font-medium">
-                            {new Date(batch.createdAt).toLocaleDateString()}
-                          </div>
-                        </div>
-                      </div>
-                      <Progress 
-                        value={(batch.processedWallets / batch.totalWallets) * 100} 
-                        className="mt-3"
-                      />
-                    </div>
-                  ))}
-                </div>
+                <RealTimeIntelligenceDashboard />
               </CardContent>
             </Card>
           </TabsContent>
 
-          {/* Reports Tab */}
-          <TabsContent value="reports">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <Card className="bg-slate-800/50 border-purple-500/20">
-                <CardHeader>
-                  <CardTitle className="text-white flex items-center gap-2">
-                    <BarChart3 className="h-5 w-5 text-purple-400" />
-                    System Analytics
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  {intelligenceStats && (
-                    <div className="space-y-6">
-                      <div>
-                        <h4 className="text-purple-200 mb-3">Collection Sources</h4>
-                        <div className="space-y-2">
-                          {Object.entries(intelligenceStats.stats.bySource).map(([source, count]) => (
-                            <div key={source} className="flex justify-between items-center">
-                              <span className="text-white capitalize">{source.replace('_', ' ')}</span>
-                              <Badge variant="outline" className="border-purple-500 text-purple-300">
-                                {count as any}
-                              </Badge>
-                            </div>
-                          ))}
-                        </div>
+          {/* 4. SETTINGS TAB - Configuration and Technical Settings */}
+          <TabsContent value="settings" className="space-y-6">
+            
+            {/* Core Configuration */}
+            <Card className="bg-slate-800/50 border-purple-500/20">
+              <CardHeader>
+                <CardTitle className="text-white flex items-center gap-2">
+                  <Settings className="h-5 w-5 text-orange-400" />
+                  FlutterAI Configuration
+                </CardTitle>
+                <CardDescription className="text-orange-200">
+                  Configure wallet intelligence settings and AI parameters
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-4">
+                    <h4 className="text-white font-medium">Scoring Parameters</h4>
+                    <div className="space-y-3">
+                      <div className="flex justify-between items-center">
+                        <Label className="text-orange-200">Social Credit Weight</Label>
+                        <Badge className="bg-orange-600">0.4</Badge>
                       </div>
-                      
-                      <div>
-                        <h4 className="text-purple-200 mb-3">Risk Distribution</h4>
-                        <div className="space-y-2">
-                          {Object.entries(intelligenceStats.stats.byRiskLevel).map(([level, count]) => (
-                            <div key={level} className="flex justify-between items-center">
-                              <span className="text-white capitalize">{level}</span>
-                              <Badge 
-                                variant={getRiskVariant(level) as any}
-                                className={`${getRiskColor(level)} text-white`}
-                              >
-                                {count as any}
-                              </Badge>
-                            </div>
-                          ))}
-                        </div>
+                      <div className="flex justify-between items-center">
+                        <Label className="text-orange-200">Risk Assessment Weight</Label>
+                        <Badge className="bg-orange-600">0.3</Badge>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <Label className="text-orange-200">Behavior Pattern Weight</Label>
+                        <Badge className="bg-orange-600">0.3</Badge>
                       </div>
                     </div>
-                  )}
-                </CardContent>
-              </Card>
-              
-              <Card className="bg-slate-800/50 border-purple-500/20">
-                <CardHeader>
-                  <CardTitle className="text-white flex items-center gap-2">
-                    <Download className="h-5 w-5 text-purple-400" />
-                    Data Export
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="grid grid-cols-2 gap-3">
-                    <Button
-                      onClick={() => handleExport('csv')}
-                      variant="outline"
-                      className="border-purple-500 text-purple-300 hover:bg-purple-600"
-                    >
-                      <FileText className="h-4 w-4 mr-2" />
-                      Export CSV
-                    </Button>
-                    <Button
-                      onClick={() => handleExport('json')}
-                      variant="outline"
-                      className="border-purple-500 text-purple-300 hover:bg-purple-600"
-                    >
-                      <Database className="h-4 w-4 mr-2" />
-                      Export JSON
-                    </Button>
                   </div>
-                  
-                  <Alert className="bg-slate-700/50 border-purple-500/20">
-                    <Lock className="h-4 w-4 text-purple-400" />
-                    <AlertDescription className="text-purple-200">
-                      Exported data includes wallet addresses, scores, risk levels, and analysis metadata.
-                      Handle with appropriate security measures.
-                    </AlertDescription>
-                  </Alert>
-                </CardContent>
-              </Card>
-            </div>
-          </TabsContent>
+                  <div className="space-y-4">
+                    <h4 className="text-white font-medium">Collection Settings</h4>
+                    <div className="space-y-3">
+                      <div className="flex justify-between items-center">
+                        <Label className="text-orange-200">Auto-Collection</Label>
+                        <Badge className="bg-green-600">Enabled</Badge>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <Label className="text-orange-200">Batch Processing</Label>
+                        <Badge className="bg-green-600">Enabled</Badge>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <Label className="text-orange-200">Real-time Updates</Label>
+                        <Badge className="bg-green-600">Active</Badge>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
 
-          {/* Advanced Analytics Tab */}
-          <TabsContent value="advanced-analytics" className="space-y-6">
-            <AdvancedAnalyticsDashboard />
-          </TabsContent>
+            {/* API Configuration */}
+            <Card className="bg-slate-800/50 border-purple-500/20">
+              <CardHeader>
+                <CardTitle className="text-white flex items-center gap-2">
+                  <Globe className="h-5 w-5 text-orange-400" />
+                  API Integration Settings
+                </CardTitle>
+                <CardDescription className="text-orange-200">
+                  External service configurations and webhook settings
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <h4 className="text-white font-medium mb-3">Active Webhooks</h4>
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between p-3 bg-slate-700/50 rounded-lg">
+                        <span className="text-white">FlutterBye Integration</span>
+                        <Badge className="bg-green-600">Active</Badge>
+                      </div>
+                      <div className="flex items-center justify-between p-3 bg-slate-700/50 rounded-lg">
+                        <span className="text-white">PerpeTrader Integration</span>
+                        <Badge className="bg-green-600">Active</Badge>
+                      </div>
+                    </div>
+                  </div>
+                  <div>
+                    <h4 className="text-white font-medium mb-3">Processing Queue</h4>
+                    <div className="space-y-2">
+                      <div className="flex justify-between items-center">
+                        <span className="text-orange-200">Queue Size</span>
+                        <Badge className="bg-blue-600">{intelligenceStats?.stats.analysisStats.queued || 0}</Badge>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className="text-orange-200">Processing Rate</span>
+                        <Badge className="bg-blue-600">~50/min</Badge>
+                      </div>
+                      <Button
+                        onClick={() => processQueueMutation.mutate()}
+                        disabled={processQueueMutation.isPending}
+                        className="w-full bg-orange-600 hover:bg-orange-700"
+                      >
+                        {processQueueMutation.isPending ? (
+                          <RefreshCw className="h-3 w-3 animate-spin mr-2" />
+                        ) : (
+                          <Zap className="h-3 w-3 mr-2" />
+                        )}
+                        Process Queue
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
 
-          {/* Real-time Intelligence Tab */}
-          <TabsContent value="real-time" className="space-y-6">
-            <RealTimeIntelligenceDashboard />
-          </TabsContent>
-
-          {/* Enterprise Features Tab */}
-          <TabsContent value="enterprise" className="space-y-6">
-            <EnterpriseDashboard />
-          </TabsContent>
-
-          {/* Group Analysis Tab */}
-          <TabsContent value="group-analysis" className="space-y-6">
-            <FlutterAIGroupAnalysis />
-          </TabsContent>
-
-          {/* AI Marketing Bot Tab */}
-          <TabsContent value="marketing-bot" className="space-y-6">
-            <AIMarketingBotContent />
+            {/* Data Export and Management */}
+            <Card className="bg-slate-800/50 border-purple-500/20">
+              <CardHeader>
+                <CardTitle className="text-white flex items-center gap-2">
+                  <Download className="h-5 w-5 text-orange-400" />
+                  Data Export & Management
+                </CardTitle>
+                <CardDescription className="text-orange-200">
+                  Export wallet intelligence data and manage system backups
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <h4 className="text-white font-medium mb-3">Export Options</h4>
+                    <div className="space-y-2">
+                      <Button
+                        onClick={() => handleExport('csv')}
+                        variant="outline"
+                        className="w-full border-orange-500 text-orange-300 hover:bg-orange-600"
+                      >
+                        <FileText className="h-4 w-4 mr-2" />
+                        Export CSV
+                      </Button>
+                      <Button
+                        onClick={() => handleExport('json')}
+                        variant="outline"
+                        className="w-full border-orange-500 text-orange-300 hover:bg-orange-600"
+                      >
+                        <Database className="h-4 w-4 mr-2" />
+                        Export JSON
+                      </Button>
+                    </div>
+                  </div>
+                  <div>
+                    <h4 className="text-white font-medium mb-3">Database Statistics</h4>
+                    {intelligenceStats && (
+                      <div className="space-y-2">
+                        <div className="flex justify-between items-center">
+                          <span className="text-orange-200">Total Wallets</span>
+                          <Badge className="bg-blue-600">{intelligenceStats.stats.totalWallets.toLocaleString()}</Badge>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-orange-200">Analyzed</span>
+                          <Badge className="bg-green-600">{intelligenceStats.stats.analysisStats.completed}</Badge>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-orange-200">Avg Score</span>
+                          <Badge className="bg-purple-600">{Math.round(intelligenceStats.avgSocialCreditScore || 0)}/1000</Badge>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+                <Alert className="bg-slate-700/50 border-orange-500/20 mt-4">
+                  <Lock className="h-4 w-4 text-orange-400" />
+                  <AlertDescription className="text-orange-200">
+                    Exported data includes sensitive wallet intelligence. Handle with appropriate security measures.
+                  </AlertDescription>
+                </Alert>
+              </CardContent>
+            </Card>
           </TabsContent>
         </Tabs>
       </div>
