@@ -288,8 +288,7 @@ function Router() {
         
         <Route path="/admin/unified" component={() => (
           <AdminRouteGuard>
-            <Navbar />
-            <AdminUnifiedDashboard />
+            <AdminDashboard />
           </AdminRouteGuard>
         )} />
         
