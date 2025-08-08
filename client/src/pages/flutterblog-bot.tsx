@@ -12,7 +12,7 @@ import { Progress } from "@/components/ui/progress";
 import { useToast } from "@/hooks/use-toast";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
-import { Bot, Calendar, Clock, FileText, Globe, BarChart3, Settings, Zap, Target, Sparkles, TrendingUp, Users, Brain } from "lucide-react";
+import { Bot, Calendar, Clock, FileText, Globe, BarChart3, Settings, Zap, Target, Sparkles, TrendingUp, Users, Brain, ArrowLeft, Wand2 } from "lucide-react";
 
 export default function FlutterBlogBot() {
   const { toast } = useToast();
@@ -69,6 +69,45 @@ export default function FlutterBlogBot() {
       toast({
         title: "Generation Failed",
         description: error.message || "Failed to generate blog content",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Instant content creation mutation
+  const instantCreateMutation = useMutation({
+    mutationFn: async () => {
+      const instantTopics = [
+        "Revolutionary AI-Powered Blockchain Communication",
+        "The Future of Web3 Messaging with FlutterBye",
+        "Tokenized Messaging: Transforming Digital Communication",
+        "AI-Enhanced Crypto Marketing Strategies",
+        "Blockchain Intelligence for Enterprise Growth"
+      ];
+      
+      const randomTopic = instantTopics[Math.floor(Math.random() * instantTopics.length)];
+      
+      return await apiRequest("POST", "/api/blog/generate", {
+        topic: randomTopic,
+        tone: "professional",
+        targetAudience: "crypto-enthusiasts",
+        contentType: "blog",
+        keywords: ["blockchain", "AI", "Web3", "FlutterBye", "tokenization"],
+        wordCount: 1200,
+        includeFlutterByeIntegration: true
+      });
+    },
+    onSuccess: () => {
+      toast({
+        title: "Instant Content Created!",
+        description: "AI-generated blog post created with trending topic and SEO optimization.",
+      });
+      queryClient.invalidateQueries({ queryKey: ["/api/blog/posts"] });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Instant Creation Failed",
+        description: error.message || "Failed to create instant content",
         variant: "destructive",
       });
     },
@@ -220,31 +259,64 @@ export default function FlutterBlogBot() {
       </div>
 
       <div className="relative z-10 max-w-7xl mx-auto space-y-8">
-        {/* Header */}
-        <div className="text-center space-y-4">
-          <div className="flex items-center justify-center gap-3">
-            <Bot className="h-12 w-12 text-blue-400 animate-pulse" />
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">
-              FlutterBlog Bot
-            </h1>
+        {/* Header with Navigation */}
+        <div className="space-y-4">
+          {/* Top Navigation Bar */}
+          <div className="flex items-center justify-between">
+            <Button
+              onClick={() => window.location.href = '/admin-unified'}
+              variant="outline"
+              className="flex items-center gap-2 bg-slate-800/50 border-slate-600 text-slate-300 hover:bg-slate-700"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              Back to Admin Dashboard
+            </Button>
+            
+            <Button
+              onClick={() => instantCreateMutation.mutate()}
+              disabled={instantCreateMutation.isPending}
+              className="flex items-center gap-2 bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white font-semibold px-6 py-2 shadow-lg"
+            >
+              {instantCreateMutation.isPending ? (
+                <>
+                  <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                  Creating...
+                </>
+              ) : (
+                <>
+                  <Wand2 className="h-4 w-4" />
+                  Instant Create Content
+                </>
+              )}
+            </Button>
           </div>
-          <p className="text-xl text-slate-300 max-w-3xl mx-auto">
-            AI-Powered SEO Content Creation System - Maximum OpenAI Integration for Automated Blog Generation
-          </p>
-          
-          {/* Real-time Stats */}
-          <div className="flex justify-center gap-6 mt-6">
-            <div className="text-center">
-              <div className="text-2xl font-bold text-blue-400">{blogPosts.length || 0}</div>
-              <div className="text-sm text-slate-400">Blog Posts</div>
+
+          {/* Main Header */}
+          <div className="text-center space-y-4">
+            <div className="flex items-center justify-center gap-3">
+              <Bot className="h-12 w-12 text-blue-400 animate-pulse" />
+              <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">
+                FlutterBlog Bot
+              </h1>
             </div>
-            <div className="text-center">
-              <div className="text-2xl font-bold text-green-400">{schedules.length || 0}</div>
-              <div className="text-sm text-slate-400">Active Schedules</div>
-            </div>
-            <div className="text-center">
-              <div className="text-2xl font-bold text-purple-400">{analytics?.totalViews || 0}</div>
-              <div className="text-sm text-slate-400">Total Views</div>
+            <p className="text-xl text-slate-300 max-w-3xl mx-auto">
+              AI-Powered SEO Content Creation System - Maximum OpenAI Integration for Automated Blog Generation
+            </p>
+            
+            {/* Real-time Stats */}
+            <div className="flex justify-center gap-6 mt-6">
+              <div className="text-center">
+                <div className="text-2xl font-bold text-blue-400">{blogPosts.length || 0}</div>
+                <div className="text-sm text-slate-400">Blog Posts</div>
+              </div>
+              <div className="text-center">
+                <div className="text-2xl font-bold text-green-400">{schedules.length || 0}</div>
+                <div className="text-sm text-slate-400">Active Schedules</div>
+              </div>
+              <div className="text-center">
+                <div className="text-2xl font-bold text-purple-400">{analytics?.totalViews || 0}</div>
+                <div className="text-sm text-slate-400">Total Views</div>
+              </div>
             </div>
           </div>
         </div>
