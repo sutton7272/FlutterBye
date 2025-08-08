@@ -65,6 +65,7 @@ import AdminFreeCodes from "@/pages/admin-free-codes";
 import AdminPricing from "@/pages/admin-pricing";
 import AdminDefaultImage from "@/pages/admin-default-image";
 import AdminUnifiedDashboard from "@/pages/admin-unified";
+import AdminUnifiedNewDashboard from "@/pages/admin-unified-new";
 import EscrowManagementDashboard from "@/pages/admin-escrow-management";
 import TokenHolderMapPage from "@/pages/token-holder-map";
 import CollaborativeCreation from "@/pages/collaborative-creation";
@@ -294,7 +295,7 @@ function Router() {
         
         <Route path="/admin/dashboard-detailed" component={() => (
           <AdminRouteGuard>
-            <AdminUnifiedDashboard />
+            <AdminUnifiedNewDashboard />
           </AdminRouteGuard>
         )} />
         

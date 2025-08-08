@@ -2,10 +2,11 @@ import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
+import { useLocation } from "wouter";
+import Navbar from "@/components/navbar";
 
 // Icons
 import { 
@@ -20,7 +21,16 @@ import {
   TrendingUp,
   Database,
   Bell,
-  Monitor
+  Monitor,
+  Target,
+  Brain,
+  Eye,
+  Zap,
+  Activity,
+  Lock,
+  PieChart,
+  CheckCircle,
+  AlertTriangle
 } from "lucide-react";
 
 function AdminUnifiedDashboard() {
