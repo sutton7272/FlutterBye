@@ -68,7 +68,7 @@ export default function AdminDashboard() {
       title: "Unified Admin Dashboard", 
       description: "Complete platform administration, analytics, and system management",
       icon: Settings,
-      route: "/admin/dashboard-detailed",
+      route: "/admin/unified",
       color: "electric-green",
       features: [
         "User Management",
@@ -117,20 +117,6 @@ export default function AdminDashboard() {
         "Database Management",
         "Log Analysis",
         "Maintenance Tools"
-      ]
-    },
-    {
-      id: "escrow",
-      title: "Escrow Management",
-      description: "Enterprise-grade smart contract escrow system for high-value transactions",
-      icon: Shield,
-      route: "/admin/escrow",
-      color: "electric-blue",
-      features: [
-        "Multi-signature wallets",
-        "Timeout protection",
-        "Enterprise contracts ($200K-$2M)",
-        "Compliance reporting"
       ]
     }
   ];

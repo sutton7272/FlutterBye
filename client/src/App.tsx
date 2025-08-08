@@ -64,9 +64,7 @@ import SearchPage from "@/pages/search";
 import AdminFreeCodes from "@/pages/admin-free-codes";
 import AdminPricing from "@/pages/admin-pricing";
 import AdminDefaultImage from "@/pages/admin-default-image";
-import AdminUnifiedDashboard from "@/pages/admin-unified";
-import AdminUnifiedNewDashboard from "@/pages/admin-unified-new";
-import EscrowManagementDashboard from "@/pages/admin-escrow-management";
+import UnifiedAdminDashboard from "@/pages/admin-unified";
 import TokenHolderMapPage from "@/pages/token-holder-map";
 import CollaborativeCreation from "@/pages/collaborative-creation";
 import FlutterAIDashboard from "@/pages/flutterai-dashboard";
@@ -125,12 +123,6 @@ function Router() {
         
         {/* Simplified Routes with navbar - unified navigation structure */}
         <Route path="/dashboard" component={() => (
-          <>
-            <Navbar />
-            <Home />
-          </>
-        )} />
-        <Route path="/dashboard-advanced" component={() => (
           <>
             <Navbar />
             <Dashboard />
@@ -289,27 +281,8 @@ function Router() {
         
         <Route path="/admin/unified" component={() => (
           <AdminRouteGuard>
-            <AdminDashboard />
-          </AdminRouteGuard>
-        )} />
-        
-        <Route path="/admin/dashboard-detailed" component={() => (
-          <AdminRouteGuard>
-            <AdminUnifiedNewDashboard />
-          </AdminRouteGuard>
-        )} />
-        
-        <Route path="/admin/escrow-management" component={() => (
-          <AdminRouteGuard>
             <Navbar />
-            <EscrowManagementDashboard />
-          </AdminRouteGuard>
-        )} />
-        
-        <Route path="/admin/escrow" component={() => (
-          <AdminRouteGuard>
-            <Navbar />
-            <EscrowManagementDashboard />
+            <UnifiedAdminDashboard />
           </AdminRouteGuard>
         )} />
         
