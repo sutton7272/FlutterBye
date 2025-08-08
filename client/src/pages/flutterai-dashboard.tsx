@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import cosmicBackgroundPath from "@assets/image_1754257352191.png";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -928,8 +929,92 @@ export default function FlutterAIDashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 p-6">
-      <div className="max-w-7xl mx-auto space-y-6">
+    <div 
+      className="min-h-screen p-6 relative overflow-hidden bg-cover bg-center bg-no-repeat" 
+      style={{
+        backgroundImage: `url(${cosmicBackgroundPath})`,
+        backgroundAttachment: 'fixed'
+      }}
+    >
+      {/* Dark overlay for better text readability */}
+      <div className="absolute inset-0 bg-black/40 backdrop-blur-[1px]"></div>
+      
+      {/* Cosmic Butterfly Animations */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        {/* Flying Butterflies */}
+        {[...Array(8)].map((_, i) => (
+          <div
+            key={i}
+            className="absolute"
+            style={{
+              left: `${10 + (i * 15)}%`,
+              top: `${20 + (i * 8)}%`,
+              animation: `butterfly-flight-${(i % 4) + 1} ${25 + (i * 4)}s infinite linear`,
+              animationDelay: `${i * 3}s`
+            }}
+          >
+            <div className="w-5 h-5 relative">
+              {/* Butterfly Wings */}
+              <div className="absolute inset-0">
+                <div 
+                  className="absolute w-2.5 h-3 bg-gradient-to-br from-purple-400/80 to-blue-400/80 rounded-full transform -rotate-12 animate-wing-flutter"
+                  style={{ 
+                    top: '0px', 
+                    left: '0px',
+                    animationDelay: `${i * 0.3}s`,
+                    filter: 'drop-shadow(0 0 4px rgba(147, 51, 234, 0.7))'
+                  }}
+                />
+                <div 
+                  className="absolute w-2.5 h-3 bg-gradient-to-bl from-blue-400/80 to-purple-400/80 rounded-full transform rotate-12 animate-wing-flutter" 
+                  style={{ 
+                    top: '0px', 
+                    right: '0px',
+                    animationDelay: `${i * 0.3 + 0.15}s`,
+                    filter: 'drop-shadow(0 0 4px rgba(59, 130, 246, 0.7))'
+                  }}
+                />
+                <div 
+                  className="absolute w-2 h-2.5 bg-gradient-to-br from-purple-300/70 to-blue-300/70 rounded-full transform -rotate-6 animate-wing-flutter" 
+                  style={{ 
+                    bottom: '1px', 
+                    left: '1px',
+                    animationDelay: `${i * 0.3}s`,
+                    filter: 'drop-shadow(0 0 3px rgba(147, 51, 234, 0.5))'
+                  }}
+                />
+                <div 
+                  className="absolute w-2 h-2.5 bg-gradient-to-bl from-blue-300/70 to-purple-300/70 rounded-full transform rotate-6 animate-wing-flutter" 
+                  style={{ 
+                    bottom: '1px', 
+                    right: '1px',
+                    animationDelay: `${i * 0.3 + 0.15}s`,
+                    filter: 'drop-shadow(0 0 3px rgba(59, 130, 246, 0.5))'
+                  }}
+                />
+                {/* Butterfly Body */}
+                <div 
+                  className="absolute w-0.5 h-4 bg-gradient-to-b from-purple-400 to-blue-400 rounded-full"
+                  style={{ 
+                    top: '0px', 
+                    left: '50%', 
+                    transform: 'translateX(-50%)',
+                    filter: 'drop-shadow(0 0 2px rgba(147, 197, 253, 0.8))'
+                  }}
+                />
+              </div>
+            </div>
+          </div>
+        ))}
+        
+        {/* AI Circuit Overlays for Intelligence Theme */}
+        <div className="absolute inset-0 opacity-20">
+          <div className="absolute top-32 left-32 w-48 h-48 border border-purple-400/30 rounded-lg animate-pulse-slow" />
+          <div className="absolute bottom-40 right-40 w-40 h-40 border border-blue-400/30 rounded-full rotate-45 animate-pulse-slow" />
+          <div className="absolute top-1/2 left-1/4 w-32 h-32 border border-purple-300/20 rounded-lg rotate-12 animate-pulse-slow" />
+        </div>
+      </div>
+      <div className="max-w-7xl mx-auto space-y-6 relative z-10">
         
         {/* Header */}
         <div className="text-center space-y-4">
