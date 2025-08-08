@@ -118,14 +118,10 @@ export default function LaunchCountdown() {
                 
                 const shouldShowReadMore = !isExpanded && hasMoreContent;
                 
-                // Debug state information
-                console.log(`Content ${content.id} state:`, {
-                  isExpanded,
-                  hasMoreContent,
-                  shouldShowReadMore,
-                  expandedContentId,
-                  contentLength: content.content?.length
-                });
+                // Simple debug - only log once per render cycle
+                if (index === 0) {
+                  console.log('Current expandedContentId:', expandedContentId);
+                }
                 
                 return (
                   <Card 
@@ -172,7 +168,7 @@ export default function LaunchCountdown() {
                             className="p-0 text-cyan-400 hover:text-cyan-300 text-sm mt-2"
                             onClick={(e) => {
                               e.stopPropagation();
-                              console.log('Read More clicked for content:', content.id);
+                              console.log('🔵 READ MORE CLICKED - Content ID:', content.id);
                               setExpandedContentId(content.id);
                             }}
                           >
@@ -186,7 +182,7 @@ export default function LaunchCountdown() {
                             className="p-0 text-cyan-400 hover:text-cyan-300 text-sm mt-2"
                             onClick={(e) => {
                               e.stopPropagation();
-                              console.log('Show Less clicked');
+                              console.log('🔴 SHOW LESS CLICKED');
                               setExpandedContentId(null);
                             }}
                           >
