@@ -321,7 +321,6 @@ export default function Dashboard() {
             <h1 className="text-4xl font-bold bg-gradient-to-r from-electric-blue to-electric-green bg-clip-text text-transparent">
               Welcome to Flutterbye
             </h1>
-            <ContextualChatButton context="dashboard" />
           </div>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
             Your unified platform for tokenized messaging, AI-powered trading, and blockchain intelligence
@@ -841,6 +840,11 @@ export default function Dashboard() {
       
       {/* Quick Access FAB for mobile */}
       <QuickAccessFAB />
+
+      {/* Contextual Chat Button - Bottom Right Position */}
+      <div className="fixed bottom-6 right-6 z-40">
+        <ContextualChatButton context="dashboard" />
+      </div>
 
       {/* Buy NFT Dialog */}
       <AlertDialog open={showBuyDialog} onOpenChange={setShowBuyDialog}>
