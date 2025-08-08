@@ -93,14 +93,28 @@ export const fastCache = (ttlMs: number = 60000) => {
 export const responseTimeMonitor = (req: Request, res: Response, next: NextFunction) => {
   const start = Date.now();
   
+  // Set header before response starts
   res.on('finish', () => {
     const duration = Date.now() - start;
-    res.setHeader('X-Response-Time', `${duration}ms`);
     
     if (duration > 100) {
       console.warn(`🚨 Slow response: ${req.method} ${req.originalUrl} - ${duration}ms`);
     }
   });
+  
+  // Set the header early, before any response is sent
+  const originalSend = res.send;
+  res.send = function(body) {
+    const duration = Date.now() - start;
+    try {
+      if (!res.headersSent) {
+        res.setHeader('X-Response-Time', `${duration}ms`);
+      }
+    } catch (e) {
+      // Ignore header setting errors
+    }
+    return originalSend.call(this, body);
+  };
   
   next();
 };
