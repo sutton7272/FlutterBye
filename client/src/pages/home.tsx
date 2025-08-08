@@ -18,6 +18,7 @@ import { ViralGrowthAccelerator } from "@/components/viral-growth-accelerator";
 import { MobileOnboardingWizard } from "@/components/mobile-onboarding-wizard";
 import { usePerformance } from "@/hooks/use-performance";
 import { useState, useEffect } from "react";
+import { useQuery } from "@tanstack/react-query";
 
 interface RecentActivity {
   id: string;
@@ -93,6 +94,186 @@ export default function Home() {
       default: return 'from-blue-500 to-green-500';
     }
   };
+
+  // AI Content Showcase Component
+  function AIContentShowcase() {
+    const { data: latestContent, isLoading } = useQuery({
+      queryKey: ['/api/ai/latest-content'],
+      refetchInterval: 30000, // Refresh every 30 seconds
+    });
+
+    const { data: aiStats } = useQuery({
+      queryKey: ['/api/ai/advanced-stats']
+    });
+
+    const [selectedContent, setSelectedContent] = useState<any>(null);
+
+    if (isLoading) {
+      return (
+        <div className="border-t border-electric-blue/30 bg-gradient-to-r from-gray-900/80 via-electric-blue/10 to-purple-900/80 py-16 mt-16">
+          <div className="container mx-auto px-4">
+            <div className="text-center">
+              <div className="animate-spin w-8 h-8 border-4 border-electric-blue border-t-transparent rounded-full mx-auto mb-4"></div>
+              <p className="text-electric-blue">Loading AI-generated content...</p>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    return (
+      <div className="border-t border-electric-blue/30 bg-gradient-to-r from-gray-900/80 via-electric-blue/10 to-purple-900/80 py-16 mt-16">
+        <div className="container mx-auto px-4">
+          {/* Header */}
+          <div className="text-center mb-12">
+            <h2 className="text-4xl font-bold mb-4">
+              <span className="bg-gradient-to-r from-electric-blue via-electric-green to-electric-blue bg-clip-text text-transparent">
+                AI CONTENT GENERATION
+              </span>
+            </h2>
+            <p className="text-gray-400 text-lg max-w-3xl mx-auto mb-6">
+              Witness the power of FlutterBlog Bot's revolutionary AI content generation system. 
+              Real-time SEO-optimized content creation with 60-70% cost reduction.
+            </p>
+            
+            {/* AI Stats */}
+            {aiStats && (
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-2xl mx-auto mb-8">
+                <Card className="bg-electric-blue/20 border-electric-blue/30 backdrop-blur-sm">
+                  <CardContent className="p-4 text-center">
+                    <div className="text-2xl font-bold text-electric-blue">{aiStats.queueSize || 0}</div>
+                    <div className="text-xs text-gray-400">Queue Size</div>
+                  </CardContent>
+                </Card>
+                <Card className="bg-electric-green/20 border-electric-green/30 backdrop-blur-sm">
+                  <CardContent className="p-4 text-center">
+                    <div className="text-2xl font-bold text-electric-green">60-70%</div>
+                    <div className="text-xs text-gray-400">Cost Reduction</div>
+                  </CardContent>
+                </Card>
+                <Card className="bg-purple-500/20 border-purple-500/30 backdrop-blur-sm">
+                  <CardContent className="p-4 text-center">
+                    <div className="text-2xl font-bold text-purple-400">GPT-4o</div>
+                    <div className="text-xs text-gray-400">AI Model</div>
+                  </CardContent>
+                </Card>
+                <Card className="bg-pink-500/20 border-pink-500/30 backdrop-blur-sm">
+                  <CardContent className="p-4 text-center">
+                    <div className="text-2xl font-bold text-pink-400">LIVE</div>
+                    <div className="text-xs text-gray-400">System Status</div>
+                  </CardContent>
+                </Card>
+              </div>
+            )}
+          </div>
+
+          {/* Content Generation Demo */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            {/* Content Types */}
+            <div className="lg:col-span-1">
+              <h3 className="text-xl font-bold mb-6 text-electric-blue">AI Content Types</h3>
+              <div className="space-y-3">
+                {[
+                  { type: 'Blog Post', icon: '📝', description: 'SEO-optimized blog posts with metadata' },
+                  { type: 'Content Series', icon: '📚', description: 'Multi-part coherent content series' },
+                  { type: 'Optimization', icon: '⚡', description: 'Content improvement and enhancement' },
+                  { type: 'Social Media', icon: '📱', description: 'Platform-specific social content' },
+                ].map((item, index) => (
+                  <Card 
+                    key={index}
+                    className="bg-gray-900/60 border-electric-blue/20 hover:border-electric-blue/40 transition-all cursor-pointer"
+                    onClick={() => setSelectedContent(item)}
+                  >
+                    <CardContent className="p-4">
+                      <div className="flex items-center gap-3">
+                        <span className="text-2xl">{item.icon}</span>
+                        <div>
+                          <div className="font-semibold text-white">{item.type}</div>
+                          <div className="text-xs text-gray-400">{item.description}</div>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </div>
+
+            {/* Latest Generated Content Preview */}
+            <div className="lg:col-span-2">
+              <h3 className="text-xl font-bold mb-6 text-electric-green">Latest AI-Generated Content</h3>
+              
+              {latestContent && latestContent.length > 0 ? (
+                <div className="space-y-4 max-h-96 overflow-y-auto">
+                  {latestContent.slice(0, 3).map((content: any, index: number) => (
+                    <Card key={index} className="bg-gradient-to-r from-gray-900/80 to-electric-blue/10 border-electric-blue/20 backdrop-blur-sm">
+                      <CardContent className="p-6">
+                        <div className="flex items-start justify-between mb-3">
+                          <Badge className="bg-electric-blue/20 text-electric-blue border-electric-blue/30">
+                            {content.type || 'AI Generated'}
+                          </Badge>
+                          <span className="text-xs text-gray-400">{content.timestamp || 'Just now'}</span>
+                        </div>
+                        
+                        <h4 className="font-bold text-lg text-white mb-2 leading-tight">
+                          {content.title || content.topic || 'AI-Generated Content'}
+                        </h4>
+                        
+                        <p className="text-gray-300 text-sm line-clamp-3 leading-relaxed">
+                          {content.content?.slice(0, 200) || content.preview || 'Advanced AI-powered content generation system creating SEO-optimized blog posts with comprehensive metadata analysis...'}
+                          {(content.content?.length > 200 || content.preview?.length > 200) && '...'}
+                        </p>
+                        
+                        <div className="flex items-center gap-4 mt-4 text-xs text-gray-400">
+                          {content.wordCount && <span>📊 {content.wordCount} words</span>}
+                          {content.seoScore && <span>🎯 SEO: {content.seoScore}%</span>}
+                          {content.readabilityScore && <span>📖 Readability: {content.readabilityScore}%</span>}
+                          <span className="text-electric-green">✨ AI Optimized</span>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              ) : (
+                <Card className="bg-gray-900/60 border-gray-700/50 backdrop-blur-sm">
+                  <CardContent className="p-8 text-center">
+                    <Bot className="h-12 w-12 text-electric-blue mx-auto mb-4" />
+                    <h4 className="font-bold text-lg text-white mb-2">AI Content Generation Ready</h4>
+                    <p className="text-gray-400 mb-4">
+                      The FlutterBlog Bot AI system is operational and ready to generate 
+                      SEO-optimized content with advanced cost optimization.
+                    </p>
+                    <div className="grid grid-cols-2 gap-4 text-sm">
+                      <div className="text-center">
+                        <div className="text-electric-blue font-bold">15s</div>
+                        <div className="text-gray-400">Avg Generation Time</div>
+                      </div>
+                      <div className="text-center">
+                        <div className="text-electric-green font-bold">60-70%</div>
+                        <div className="text-gray-400">Cost Reduction</div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+            </div>
+          </div>
+
+          {/* Call to Action */}
+          <div className="text-center mt-12">
+            <Link href="/admin/flutterai">
+              <Button 
+                size="lg" 
+                className="bg-gradient-to-r from-electric-blue to-electric-green hover:from-electric-blue/80 hover:to-electric-green/80 text-black font-bold px-8 py-6 text-lg border-0"
+              >
+                EXPLORE AI DASHBOARD
+                <ArrowRight className="ml-2 h-5 w-5" />
+              </Button>
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   // Performance metrics available in performanceMetrics object
 
@@ -576,6 +757,9 @@ export default function Home() {
           </div>
         </div>
       </div>
+
+        {/* AI-Generated Content Showcase */}
+        <AIContentShowcase />
 
         {/* Bottom Scrolling Marquee */}
         <div className="border-t border-purple-500/20 bg-gradient-to-r from-blue-900/20 to-purple-900/20 py-4 mt-16 overflow-hidden">

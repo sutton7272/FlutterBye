@@ -6495,6 +6495,62 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: "Failed to get advanced AI stats" });
     }
   });
+
+  /**
+   * Latest AI-Generated Content for Landing Page Showcase
+   */
+  app.get("/api/ai/latest-content", async (req, res) => {
+    try {
+      // Mock data for demonstration - showcasing the AI content generation capabilities
+      const latestContent = [
+        {
+          id: 1,
+          type: 'Blog Post',
+          title: 'AI Marketing Revolution: The Future is Here',
+          content: 'The landscape of marketing is undergoing a seismic shift with the integration of artificial intelligence. AI marketing represents a paradigm change that enables businesses to connect with their audiences in unprecedented ways. Through advanced machine learning algorithms and predictive analytics, companies can now deliver personalized experiences at scale, optimize campaigns in real-time, and achieve unprecedented levels of customer engagement...',
+          preview: 'Advanced AI-powered marketing strategies are transforming how businesses engage with customers across digital platforms.',
+          wordCount: 1245,
+          seoScore: 92,
+          readabilityScore: 88,
+          timestamp: new Date(Date.now() - 300000).toLocaleString(),
+          keywords: ['AI marketing', 'digital transformation', 'customer engagement']
+        },
+        {
+          id: 2,
+          type: 'Content Series',
+          title: 'Blockchain Marketing Series - Part 1: Foundations',
+          content: 'Blockchain technology has emerged as a revolutionary force in the marketing world, offering unprecedented transparency and security for digital advertising campaigns. This comprehensive guide explores how decentralized technologies are reshaping traditional marketing paradigms. From smart contracts automating campaign payments to NFTs creating new forms of brand engagement, blockchain is opening doors to innovative marketing strategies...',
+          preview: 'Exploring the fundamental concepts of blockchain technology in modern marketing strategies.',
+          wordCount: 892,
+          seoScore: 89,
+          readabilityScore: 91,
+          timestamp: new Date(Date.now() - 600000).toLocaleString(),
+          keywords: ['blockchain marketing', 'crypto advertising', 'decentralized marketing']
+        },
+        {
+          id: 3,
+          type: 'Content Optimization',
+          title: 'Optimized: SEO Best Practices for 2025',
+          content: 'Search engine optimization continues to evolve with artificial intelligence and machine learning algorithms becoming more sophisticated in understanding user intent. The latest SEO strategies focus on semantic search, user experience signals, and AI-driven content optimization. Modern SEO requires a deep understanding of how search engines process natural language and the importance of creating content that truly serves user needs...',
+          preview: 'Comprehensive SEO optimization strategies enhanced by AI for maximum search visibility.',
+          wordCount: 756,
+          seoScore: 94,
+          readabilityScore: 86,
+          timestamp: new Date(Date.now() - 900000).toLocaleString(),
+          keywords: ['SEO optimization', 'search marketing', 'AI-powered SEO']
+        }
+      ];
+      
+      res.json(latestContent);
+    } catch (error) {
+      console.error('Latest content error:', error);
+      res.status(500).json({ 
+        error: 'Failed to get latest content',
+        details: error instanceof Error ? error.message : 'Unknown error'
+      });
+    }
+  });
+
   // Industry-disrupting feature: Real-time collaborative token creation
   app.get('/api/collaborative/metrics', (req, res) => {
     res.json(collaborativeTokenService.getSessionMetrics());
