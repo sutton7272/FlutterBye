@@ -1,0 +1,19 @@
+[package]
+name = "flutterbye-escrow"
+version = "0.1.0"
+description = "Flutterbye Enterprise Escrow Smart Contract"
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib", "lib"]
+
+[dependencies]
+anchor-lang = "0.29.0"
+anchor-spl = "0.29.0"
+solana-program = "1.17.0"
+
+[features]
+no-entrypoint = []
+no-idl = []
+default = []
+cpi = ["no-entrypoint"]

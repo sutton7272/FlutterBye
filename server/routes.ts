@@ -37,6 +37,7 @@ import { DefaultTokenImageService } from "./default-token-image";
 import { authenticateWallet, requireAdmin, requirePermission, requireSuperAdmin } from "./admin-middleware";
 import { chatService } from "./chat-service";
 import { registerSolanaRoutes } from "./routes-solana";
+import { registerEscrowRoutes } from "./routes-escrow";
 import { productionAuth } from "./production-auth";
 import { realTimeMonitor } from "./real-time-monitor";
 import { transactionMonitor } from "./transaction-monitor";
@@ -6294,6 +6295,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   // Register Solana blockchain integration routes
   registerSolanaRoutes(app);
+  registerEscrowRoutes(app);
   // Register production monitoring endpoints
   registerProductionEndpoints(app, monitoring);
 
