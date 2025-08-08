@@ -103,13 +103,15 @@ export default function LaunchCountdown() {
           </div>
 
           {/* Generated Content Display Only */}
-          {latestContent && latestContent.length > 0 ? (
+          {latestContent && Array.isArray(latestContent) && latestContent.length > 0 ? (
             <div className="space-y-6 max-w-4xl mx-auto">
               {latestContent.slice(0, 3).map((content: any, index: number) => {
                 const isExpanded = expandedContentId === content.id;
-                // Use full content when expanded, preview when collapsed
-                const contentText = isExpanded ? (content.content || content.preview || 'Advanced AI-powered content generation...') : (content.preview || content.content?.slice(0, 300) || 'Advanced AI-powered content generation...');
-                const hasFullContent = content.content && content.content.length > 300;
+                // Show more preview text (first 500 chars) when collapsed, full content when expanded
+                const previewText = content.content?.slice(0, 500) || content.preview || 'Advanced AI-powered content generation...';
+                const fullText = content.content || content.preview || 'Advanced AI-powered content generation...';
+                const contentText = isExpanded ? fullText : previewText;
+                const hasFullContent = content.content && content.content.length > 500;
                 const shouldShowReadMore = !isExpanded && hasFullContent;
                 
                 return (
@@ -117,7 +119,6 @@ export default function LaunchCountdown() {
                     key={index} 
                     className="electric-frame bg-gradient-to-br from-cyan-500/20 to-blue-500/20 relative overflow-hidden cursor-pointer hover:from-cyan-500/30 hover:to-blue-500/30 transition-all duration-300"
                     onClick={() => {
-                      console.log('Card clicked:', { contentId: content.id, currentExpanded: expandedContentId, isExpanded });
                       setExpandedContentId(isExpanded ? null : content.id);
                     }}
                   >
@@ -146,36 +147,36 @@ export default function LaunchCountdown() {
                       <div className="text-muted-foreground text-sm leading-relaxed mb-4">
                         <div className="whitespace-pre-wrap">
                           {contentText}
-                          {shouldShowReadMore && (
-                            <>
-                              ...
-                              <Button 
-                                variant="link" 
-                                size="sm" 
-                                className="p-0 ml-2 text-cyan-400 hover:text-cyan-300 text-sm"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  setExpandedContentId(content.id);
-                                }}
-                              >
-                                Read More
-                              </Button>
-                            </>
-                          )}
-                          {isExpanded && hasFullContent && (
-                            <Button 
-                              variant="link" 
-                              size="sm" 
-                              className="p-0 ml-2 text-cyan-400 hover:text-cyan-300 text-sm"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                setExpandedContentId(null);
-                              }}
-                            >
-                              Show Less
-                            </Button>
-                          )}
+                          {shouldShowReadMore && "..."}
                         </div>
+                        
+                        {/* Read More/Show Less buttons */}
+                        {shouldShowReadMore && (
+                          <Button 
+                            variant="link" 
+                            size="sm" 
+                            className="p-0 text-cyan-400 hover:text-cyan-300 text-sm mt-2"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setExpandedContentId(content.id);
+                            }}
+                          >
+                            Read More →
+                          </Button>
+                        )}
+                        {isExpanded && hasFullContent && (
+                          <Button 
+                            variant="link" 
+                            size="sm" 
+                            className="p-0 text-cyan-400 hover:text-cyan-300 text-sm mt-2"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setExpandedContentId(null);
+                            }}
+                          >
+                            ← Show Less
+                          </Button>
+                        )}
                       </div>
                       
                       <div className="flex items-center gap-4 text-xs text-muted-foreground">
@@ -763,8 +764,7 @@ export default function LaunchCountdown() {
                   {/* CTA Button */}
                   <div className="pt-2">
                     <TutorialLaunchButton 
-                      className="bg-gradient-to-r from-electric-blue to-circuit-teal hover:from-electric-blue/80 hover:to-circuit-teal/80 text-white px-4 py-2 text-sm w-full flex items-center justify-center gap-2 shadow-lg" 
-                      variant="default"
+                      className="bg-gradient-to-r from-electric-blue to-circuit-teal hover:from-electric-blue/80 hover:to-circuit-teal/80 text-white px-4 py-2 text-sm w-full flex items-center justify-center gap-2 shadow-lg"
                     >
                       <Play className="w-4 h-4" />
                       Start Interactive Demo
