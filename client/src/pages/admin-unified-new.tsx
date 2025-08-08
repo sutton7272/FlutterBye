@@ -52,42 +52,84 @@ function AdminUnifiedDashboard() {
       title: "Adjust Pricing", 
       icon: DollarSign, 
       color: "from-yellow-500 to-orange-500",
-      onClick: () => setLocation("/admin/pricing") 
+      onClick: () => {
+        setLocation("/admin/pricing");
+        toast({
+          title: "Navigating to Pricing",
+          description: "Opening pricing management dashboard...",
+          duration: 2000,
+        });
+      }
     },
     { 
       id: "users", 
       title: "Manage Users", 
       icon: Users, 
       color: "from-purple-500 to-pink-500",
-      onClick: () => setLocation("/admin/users") 
+      onClick: () => {
+        setLocation("/admin/users");
+        toast({
+          title: "Navigating to Users",
+          description: "Opening user management dashboard...",
+          duration: 2000,
+        });
+      }
     },
     { 
       id: "security", 
       title: "Security", 
       icon: Shield, 
       color: "from-red-500 to-rose-500",
-      onClick: () => setLocation("/admin/security") 
+      onClick: () => {
+        setLocation("/admin/security");
+        toast({
+          title: "Navigating to Security",
+          description: "Opening security management dashboard...",
+          duration: 2000,
+        });
+      }
     },
     { 
       id: "revenue", 
       title: "Revenue", 
       icon: TrendingUp, 
       color: "from-green-500 to-emerald-500",
-      onClick: () => setLocation("/admin/revenue") 
+      onClick: () => {
+        setLocation("/admin/revenue");
+        toast({
+          title: "Navigating to Revenue",
+          description: "Opening revenue analytics dashboard...",
+          duration: 2000,
+        });
+      }
     },
     { 
       id: "performance", 
       title: "Performance", 
       icon: Activity, 
       color: "from-blue-500 to-cyan-500",
-      onClick: () => setLocation("/admin/performance") 
+      onClick: () => {
+        setLocation("/monitoring-dashboard");
+        toast({
+          title: "Navigating to Performance",
+          description: "Opening performance monitoring dashboard...",
+          duration: 2000,
+        });
+      }
     },
     { 
       id: "system", 
       title: "System", 
       icon: Settings, 
       color: "from-slate-500 to-gray-500",
-      onClick: () => setLocation("/admin/system") 
+      onClick: () => {
+        setLocation("/admin/system");
+        toast({
+          title: "Navigating to System",
+          description: "Opening system administration dashboard...",
+          duration: 2000,
+        });
+      }
     }
   ];
 
@@ -198,6 +240,53 @@ function AdminUnifiedDashboard() {
                           className={`relative bg-slate-800/60 backdrop-blur-sm border-2 ${
                             item.active ? 'border-blue-500/50' : 'border-slate-600/30'
                           } shadow-lg cursor-pointer hover:border-blue-400/70 transition-all duration-300 group`}
+                          onClick={() => {
+                            const routes = {
+                              'overview': '/admin/unified',
+                              'settings': '/admin/system',
+                              'users': '/admin/users',
+                              'tokens': '/admin/tokens',
+                              'analytics': '/monitoring-dashboard',
+                              'sealing': '/admin/security',
+                              'system': '/admin/system',
+                              'ai-pricing': '/admin/pricing',
+                              'pricing': '/admin/pricing',
+                              'ai-price': '/admin/pricing',
+                              'auto-opt': '/admin/auto-optimization',
+                              'codes': '/admin/free-codes',
+                              'viral': '/admin/viral',
+                              'live': '/admin/live',
+                              'revenue': '/admin/revenue',
+                              'security': '/admin/security'
+                            };
+                            const route = routes[item.id as keyof typeof routes];
+                            const titles = {
+                              'overview': 'Admin Overview',
+                              'settings': 'System Settings',
+                              'users': 'User Management',
+                              'tokens': 'Token Management',
+                              'analytics': 'Analytics Dashboard',
+                              'sealing': 'Security Center',
+                              'system': 'System Administration',
+                              'ai-pricing': 'AI Pricing Controls',
+                              'pricing': 'Pricing Management',
+                              'ai-price': 'AI Price Analytics',
+                              'auto-opt': 'Auto-Optimization',
+                              'codes': 'Free Codes Management',
+                              'viral': 'Viral Marketing',
+                              'live': 'Live Monitoring',
+                              'revenue': 'Revenue Analytics',
+                              'security': 'Security Management'
+                            };
+                            if (route) {
+                              setLocation(route);
+                              toast({
+                                title: `Opening ${titles[item.id as keyof typeof titles]}`,
+                                description: `Navigating to ${item.title} dashboard...`,
+                                duration: 2000,
+                              });
+                            }
+                          }}
                         >
                           <CardContent className="p-3">
                             <div className="flex flex-col items-center gap-2 text-center">
