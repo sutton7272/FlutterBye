@@ -393,26 +393,24 @@ export function registerBlogRoutes(app: Express) {
   // ================== BLOG SCHEDULES ==================
   
   /**
-   * Get all blog schedules - OPTIMIZED
+   * Get all blog schedules - EMERGENCY FIX
    */
   app.get("/api/blog/schedules", async (req, res) => {
     try {
-      const limit = parseInt(req.query.limit as string) || 20; // Add limit
-      const schedules = await db
-        .select({
-          id: blogSchedules.id,
-          postId: blogSchedules.postId,
-          scheduledAt: blogSchedules.scheduledAt,
-          publishedAt: blogSchedules.publishedAt,
-          isActive: blogSchedules.isActive,
-          status: blogSchedules.status,
-          createdAt: blogSchedules.createdAt
-        })
-        .from(blogSchedules)
-        .orderBy(desc(blogSchedules.createdAt))
-        .limit(limit);
+      const limit = parseInt(req.query.limit as string) || 20;
       
-      res.json({ schedules });
+      // Use raw SQL to avoid Drizzle schema issues
+      const schedules = await db.execute(
+        sql`SELECT 
+          id, name, is_active, frequency, next_run_at, 
+          last_run_at, posts_generated, posts_published, 
+          created_at, updated_at
+        FROM blog_schedules 
+        ORDER BY created_at DESC 
+        LIMIT ${limit}`
+      );
+      
+      res.json({ schedules: schedules.rows });
     } catch (error) {
       console.error("Error fetching blog schedules:", error);
       res.status(500).json({ error: "Failed to fetch blog schedules" });
