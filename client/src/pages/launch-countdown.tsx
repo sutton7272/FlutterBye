@@ -260,41 +260,41 @@ export default function LaunchCountdown() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-center">
-              <div className="bg-gradient-to-br from-cyan-500/20 to-blue-500/20 rounded-lg p-4 electric-frame relative overflow-hidden">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-center">
+              <div className="bg-gradient-to-br from-cyan-500/20 to-blue-500/20 rounded-lg p-3 electric-frame relative overflow-hidden">
                 <div className="absolute inset-0 bg-gradient-to-r from-transparent via-cyan-400/10 to-transparent animate-pulse"></div>
                 <div className="relative z-10">
-                  <div className="text-3xl font-bold text-cyan-400 mb-1 font-mono tabular-nums">
+                  <div className="text-2xl font-bold text-cyan-400 mb-1 font-mono tabular-nums">
                     {timeLeft.days.toString().padStart(2, '0')}
                   </div>
                   <div className="text-xs text-muted-foreground font-semibold tracking-wider">DAYS</div>
                 </div>
               </div>
               
-              <div className="bg-gradient-to-br from-blue-500/20 to-purple-500/20 rounded-lg p-4 electric-frame relative overflow-hidden">
+              <div className="bg-gradient-to-br from-blue-500/20 to-purple-500/20 rounded-lg p-3 electric-frame relative overflow-hidden">
                 <div className="absolute inset-0 bg-gradient-to-r from-transparent via-blue-400/10 to-transparent animate-pulse delay-300"></div>
                 <div className="relative z-10">
-                  <div className="text-3xl font-bold text-blue-400 mb-1 font-mono tabular-nums">
+                  <div className="text-2xl font-bold text-blue-400 mb-1 font-mono tabular-nums">
                     {timeLeft.hours.toString().padStart(2, '0')}
                   </div>
                   <div className="text-xs text-muted-foreground font-semibold tracking-wider">HOURS</div>
                 </div>
               </div>
               
-              <div className="bg-gradient-to-br from-purple-500/20 to-pink-500/20 rounded-lg p-4 electric-frame relative overflow-hidden">
+              <div className="bg-gradient-to-br from-purple-500/20 to-pink-500/20 rounded-lg p-3 electric-frame relative overflow-hidden">
                 <div className="absolute inset-0 bg-gradient-to-r from-transparent via-purple-400/10 to-transparent animate-pulse delay-700"></div>
                 <div className="relative z-10">
-                  <div className="text-3xl font-bold text-purple-400 mb-1 font-mono tabular-nums">
+                  <div className="text-2xl font-bold text-purple-400 mb-1 font-mono tabular-nums">
                     {timeLeft.minutes.toString().padStart(2, '0')}
                   </div>
                   <div className="text-xs text-muted-foreground font-semibold tracking-wider">MINUTES</div>
                 </div>
               </div>
               
-              <div className="bg-gradient-to-br from-pink-500/20 to-cyan-500/20 rounded-lg p-4 electric-frame relative overflow-hidden">
+              <div className="bg-gradient-to-br from-pink-500/20 to-cyan-500/20 rounded-lg p-3 electric-frame relative overflow-hidden">
                 <div className="absolute inset-0 bg-gradient-to-r from-transparent via-pink-400/10 to-transparent animate-pulse delay-1000"></div>
                 <div className="relative z-10">
-                  <div className={`text-3xl font-bold mb-1 font-mono tabular-nums transition-colors duration-300 ${
+                  <div className={`text-2xl font-bold mb-1 font-mono tabular-nums transition-colors duration-300 ${
                     timeLeft.seconds % 2 === 0 ? 'text-pink-400' : 'text-pink-300'
                   }`}>
                     {timeLeft.seconds.toString().padStart(2, '0')}
