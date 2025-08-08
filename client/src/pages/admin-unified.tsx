@@ -1,424 +1,55 @@
-import { useState, useEffect } from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { apiRequest } from "@/lib/queryClient";
-import { useToast } from "@/hooks/use-toast";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
-
-// UI Components
+import { useState } from "react";
+import { useQuery, useMutation } from "@tanstack/react-query";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { 
-  Dialog, 
-  DialogContent, 
-  DialogDescription, 
-  DialogHeader, 
-  DialogTitle 
-} from "@/components/ui/dialog";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { useToast } from "@/hooks/use-toast";
+import { apiRequest, queryClient } from "@/lib/queryClient";
 
 // Icons
 import { 
-  Wallet, 
-  Plus, 
-  Clock, 
-  Shield, 
-  DollarSign, 
-  CheckCircle, 
-  XCircle,
-  Eye,
-  EyeOff
+  Users,
+  DollarSign,
+  Settings,
+  Shield,
+  BarChart3,
+  Wallet,
+  Code,
+  Gift,
+  TrendingUp,
+  Database,
+  Bell,
+  Monitor
 } from "lucide-react";
-
-// Form schemas
-const walletFormSchema = z.object({
-  mode: z.enum(["dev", "production"]),
-  name: z.string().min(1, "Wallet name is required"),
-  type: z.enum(["gas_funding", "fee_collection", "escrow", "admin"]),
-});
-
-const escrowFormSchema = z.object({
-  payerAddress: z.string().min(32, "Valid Solana address required"),
-  payeeAddress: z.string().min(32, "Valid Solana address required"),
-  amount: z.number().min(0.001, "Minimum amount is 0.001 SOL"),
-  currency: z.enum(["SOL", "USDC", "FLBY"]).default("SOL"),
-  timeoutDuration: z.number().min(3600, "Minimum timeout is 1 hour").default(86400),
-  description: z.string().min(1, "Description is required"),
-});
-
-const transferProfitsSchema = z.object({
-  fromWalletId: z.string().min(1, "Please select a wallet"),
-  toAddress: z.string().min(32, "Valid Solana address required").max(44, "Invalid address length"),
-  amount: z.number().min(0.001, "Minimum amount is 0.001").max(1000000, "Maximum amount is 1,000,000"),
-  currency: z.enum(["SOL", "USDC", "FLBY"]).default("SOL"),
-  memo: z.string().max(100, "Memo too long").optional(),
-});
-
-type WalletFormData = z.infer<typeof walletFormSchema>;
-type EscrowFormData = z.infer<typeof escrowFormSchema>;
-type TransferProfitsData = z.infer<typeof transferProfitsSchema>;
-
-// Transfer Profits Form Component
-function TransferProfitsForm({ wallets }: { wallets: any[] }) {
-  const { toast } = useToast();
-  const queryClient = useQueryClient();
-  
-  const form = useForm<TransferProfitsData>({
-    resolver: zodResolver(transferProfitsSchema),
-    defaultValues: {
-      fromWalletId: "",
-      toAddress: "",
-      amount: 0,
-      currency: "SOL",
-      memo: "",
-    },
-  });
-
-  const transferMutation = useMutation({
-    mutationFn: async (data: TransferProfitsData) => {
-      const response = await apiRequest("POST", "/api/escrow/transfer-profits", data);
-      return response.json();
-    },
-    onSuccess: (result) => {
-      toast({
-        title: "Transfer Successful",
-        description: `Transferred ${form.getValues().amount} ${form.getValues().currency} successfully`,
-      });
-      form.reset();
-      queryClient.invalidateQueries({ queryKey: ['/api/escrow/wallets'] });
-    },
-    onError: (error: any) => {
-      toast({
-        title: "Transfer Failed",
-        description: error.message || "Failed to transfer profits",
-        variant: "destructive",
-      });
-    },
-  });
-
-  const onSubmit = (data: TransferProfitsData) => {
-    transferMutation.mutate(data);
-  };
-
-  const selectedWallet = wallets.find(w => w.id === form.watch("fromWalletId"));
-
-  return (
-    <div className="space-y-6">
-      {/* Wallet Balance Overview */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        {wallets.map((wallet) => (
-          <Card key={wallet.id} className="bg-slate-700 border-slate-600">
-            <CardContent className="p-4">
-              <div className="flex justify-between items-center">
-                <div>
-                  <p className="text-sm text-slate-400">{wallet.name}</p>
-                  <p className="text-lg font-semibold text-white">
-                    {wallet.solBalance.toFixed(4)} SOL
-                  </p>
-                  <p className="text-sm text-slate-400">
-                    ${(wallet.solBalance * 150).toFixed(2)} USD
-                  </p>
-                </div>
-                <Badge 
-                  variant={wallet.type === 'escrow' ? 'default' : 'secondary'}
-                  className="text-xs"
-                >
-                  {wallet.type}
-                </Badge>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-
-      {/* Transfer Form */}
-      <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Source Wallet Selection */}
-            <FormField
-              control={form.control}
-              name="fromWalletId"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-white">Source Wallet</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
-                    <FormControl>
-                      <SelectTrigger className="bg-slate-700 border-slate-600 text-white">
-                        <SelectValue placeholder="Select wallet to transfer from" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent className="bg-slate-700 border-slate-600">
-                      {wallets.map((wallet) => (
-                        <SelectItem key={wallet.id} value={wallet.id}>
-                          {wallet.name} ({wallet.solBalance.toFixed(4)} SOL)
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            {/* Currency Selection */}
-            <FormField
-              control={form.control}
-              name="currency"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-white">Currency</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
-                    <FormControl>
-                      <SelectTrigger className="bg-slate-700 border-slate-600 text-white">
-                        <SelectValue />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent className="bg-slate-700 border-slate-600">
-                      <SelectItem value="SOL">SOL</SelectItem>
-                      <SelectItem value="USDC">USDC</SelectItem>
-                      <SelectItem value="FLBY">FLBY</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
-
-          {/* Destination Address */}
-          <FormField
-            control={form.control}
-            name="toAddress"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel className="text-white">Destination Address</FormLabel>
-                <FormControl>
-                  <Input
-                    {...field}
-                    placeholder="Enter Solana wallet address (32-44 characters)"
-                    className="bg-slate-700 border-slate-600 text-white placeholder-slate-400"
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          {/* Amount */}
-          <FormField
-            control={form.control}
-            name="amount"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel className="text-white">
-                  Amount {form.watch("currency")}
-                  {selectedWallet && (
-                    <span className="text-slate-400 ml-2">
-                      (Available: {selectedWallet.solBalance.toFixed(4)} SOL)
-                    </span>
-                  )}
-                </FormLabel>
-                <FormControl>
-                  <Input
-                    {...field}
-                    type="number"
-                    step="0.001"
-                    min="0.001"
-                    max={selectedWallet?.solBalance || 1000000}
-                    placeholder="0.001"
-                    className="bg-slate-700 border-slate-600 text-white placeholder-slate-400"
-                    onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          {/* Memo */}
-          <FormField
-            control={form.control}
-            name="memo"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel className="text-white">Memo (Optional)</FormLabel>
-                <FormControl>
-                  <Input
-                    {...field}
-                    placeholder="Add a note for this transfer (max 100 characters)"
-                    maxLength={100}
-                    className="bg-slate-700 border-slate-600 text-white placeholder-slate-400"
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          {/* Transfer Summary */}
-          {form.watch("fromWalletId") && form.watch("toAddress") && form.watch("amount") && (
-            <Card className="bg-slate-700 border-slate-600">
-              <CardHeader>
-                <CardTitle className="text-white text-sm">Transfer Summary</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-2">
-                <div className="flex justify-between text-sm">
-                  <span className="text-slate-400">From:</span>
-                  <span className="text-white">{selectedWallet?.name}</span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-slate-400">To:</span>
-                  <span className="text-white font-mono">{form.watch("toAddress").slice(0, 8)}...{form.watch("toAddress").slice(-8)}</span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-slate-400">Amount:</span>
-                  <span className="text-white">{form.watch("amount")} {form.watch("currency")}</span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-slate-400">USD Value:</span>
-                  <span className="text-white">${(form.watch("amount") * 150).toFixed(2)}</span>
-                </div>
-                {form.watch("memo") && (
-                  <div className="flex justify-between text-sm">
-                    <span className="text-slate-400">Memo:</span>
-                    <span className="text-white">{form.watch("memo")}</span>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          )}
-
-          {/* Submit Button */}
-          <Button
-            type="submit"
-            disabled={transferMutation.isPending || !form.formState.isValid}
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white"
-          >
-            {transferMutation.isPending ? (
-              <>
-                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
-                Transferring...
-              </>
-            ) : (
-              <>
-                <DollarSign className="w-4 h-4 mr-2" />
-                Transfer Profits
-              </>
-            )}
-          </Button>
-        </form>
-      </Form>
-
-      {/* Transfer History Placeholder */}
-      <Card className="bg-slate-700 border-slate-600">
-        <CardHeader>
-          <CardTitle className="text-white">Recent Transfers</CardTitle>
-          <CardDescription className="text-slate-400">
-            Latest profit transfers from platform wallets
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <p className="text-slate-400 text-center py-4">
-            No recent transfers found. Transfer history will appear here.
-          </p>
-        </CardContent>
-      </Card>
-    </div>
-  );
-}
 
 function AdminUnifiedDashboard() {
   const { toast } = useToast();
-  const queryClient = useQueryClient();
-  const [activeTab, setActiveTab] = useState("platform-wallets");
-  const [showCreateWallet, setShowCreateWallet] = useState(false);
-  const [showPrivateKey, setShowPrivateKey] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState("overview");
 
-  // Fetch platform wallets
-  const { data: wallets = [], isLoading: walletsLoading } = useQuery({
-    queryKey: ["/api/admin/platform-wallets"],
+  // Fetch admin statistics
+  const { data: adminStats, isLoading: statsLoading } = useQuery({
+    queryKey: ["/api/admin/stats"],
     retry: false,
   });
 
-  // Fetch escrow contracts
-  const { data: escrowContracts = [], isLoading: escrowLoading } = useQuery({
-    queryKey: ["/api/escrow/contracts"],
+  // Fetch user analytics
+  const { data: userAnalytics } = useQuery({
+    queryKey: ["/api/admin/user-analytics"],
     retry: false,
   });
 
-  // Create platform wallet mutation
-  const createWalletMutation = useMutation({
-    mutationFn: async (data: any) => {
-      const response = await apiRequest("POST", "/api/admin/platform-wallets", data);
-      return response;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/admin/platform-wallets"] });
-      toast({
-        title: "Wallet Created Successfully!",
-        description: "Platform wallet is ready for use",
-      });
-      setShowCreateWallet(false);
-    },
-    onError: (error) => {
-      toast({
-        title: "Error",
-        description: "Failed to create wallet. Please try again.",
-        variant: "destructive",
-      });
-    },
+  // Fetch revenue analytics
+  const { data: revenueAnalytics } = useQuery({
+    queryKey: ["/api/admin/revenue-analytics"],
+    retry: false,
   });
 
-  // Create escrow mutation
-  const createEscrowMutation = useMutation({
-    mutationFn: async (data: EscrowFormData) => {
-      const response = await apiRequest("POST", "/api/escrow/create", data);
-      return response;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/escrow/contracts"] });
-      toast({
-        title: "Escrow Created Successfully!",
-        description: "Escrow contract has been deployed",
-      });
-    },
-    onError: (error) => {
-      toast({
-        title: "Error",
-        description: "Failed to create escrow. Please try again.",
-        variant: "destructive",
-      });
-    },
+  // Fetch platform health
+  const { data: platformHealth } = useQuery({
+    queryKey: ["/api/admin/platform-health"],
+    retry: false,
   });
-
-  const activeContracts = escrowContracts.filter((contract: any) => 
-    contract.status === 'active' || contract.status === 'funded'
-  );
-  
-  const expiredContracts = escrowContracts.filter((contract: any) => 
-    contract.status === 'expired' || contract.status === 'timeout'
-  );
 
   return (
     <div className="min-h-screen bg-slate-900 text-white p-6">
@@ -426,593 +57,389 @@ function AdminUnifiedDashboard() {
         {/* Header */}
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent mb-2">
-            Enterprise Escrow Management
+            Flutterbye Admin Dashboard
           </h1>
           <p className="text-slate-400">
-            Comprehensive platform for managing high-value escrow contracts ($200K-$2M)
+            Comprehensive platform administration and monitoring
           </p>
         </div>
 
-        {/* Main Content Tabs */}
+        {/* Quick Stats Overview */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+          <Card className="bg-slate-800 border-slate-600">
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-slate-400 text-sm">Total Users</p>
+                  <p className="text-2xl font-bold text-white">
+                    {userAnalytics?.totalUsers || '0'}
+                  </p>
+                </div>
+                <Users className="w-8 h-8 text-blue-400" />
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-slate-800 border-slate-600">
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-slate-400 text-sm">Total Revenue</p>
+                  <p className="text-2xl font-bold text-white">
+                    ${revenueAnalytics?.totalRevenue || '0'}
+                  </p>
+                </div>
+                <DollarSign className="w-8 h-8 text-green-400" />
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-slate-800 border-slate-600">
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-slate-400 text-sm">Active Tokens</p>
+                  <p className="text-2xl font-bold text-white">
+                    {adminStats?.activeTokens || '0'}
+                  </p>
+                </div>
+                <TrendingUp className="w-8 h-8 text-purple-400" />
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-slate-800 border-slate-600">
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-slate-400 text-sm">System Health</p>
+                  <p className="text-2xl font-bold text-white">
+                    {platformHealth?.status || 'Unknown'}
+                  </p>
+                </div>
+                <Monitor className="w-8 h-8 text-amber-400" />
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Main Admin Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-5 bg-slate-800 border border-slate-600">
-            <TabsTrigger value="platform-wallets" className="text-white">
-              <Wallet className="w-4 h-4 mr-2" />
-              Platform Wallets
+          <TabsList className="grid w-full grid-cols-6 bg-slate-800 border border-slate-600">
+            <TabsTrigger value="overview" className="text-white">
+              <BarChart3 className="w-4 h-4 mr-2" />
+              Overview
             </TabsTrigger>
-            <TabsTrigger value="active-escrows" className="text-white">
-              <Shield className="w-4 h-4 mr-2" />
-              Active Escrows
+            <TabsTrigger value="users" className="text-white">
+              <Users className="w-4 h-4 mr-2" />
+              Users
             </TabsTrigger>
-            <TabsTrigger value="create-escrow" className="text-white">
-              <Plus className="w-4 h-4 mr-2" />
-              Create New
-            </TabsTrigger>
-            <TabsTrigger value="transfer-profits" className="text-white">
+            <TabsTrigger value="finance" className="text-white">
               <DollarSign className="w-4 h-4 mr-2" />
-              Transfer Profits
+              Finance
             </TabsTrigger>
-            <TabsTrigger value="expired-escrows" className="text-white">
-              <Clock className="w-4 h-4 mr-2" />
-              Expired
+            <TabsTrigger value="escrow" className="text-white">
+              <Shield className="w-4 h-4 mr-2" />
+              Escrow
+            </TabsTrigger>
+            <TabsTrigger value="tools" className="text-white">
+              <Settings className="w-4 h-4 mr-2" />
+              Tools
+            </TabsTrigger>
+            <TabsTrigger value="monitoring" className="text-white">
+              <Monitor className="w-4 h-4 mr-2" />
+              Monitoring
             </TabsTrigger>
           </TabsList>
 
-          {/* Platform Wallets Tab */}
-          <TabsContent value="platform-wallets">
+          {/* Overview Tab */}
+          <TabsContent value="overview">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <Card className="bg-slate-800 border-slate-600">
+                <CardHeader>
+                  <CardTitle className="text-white">Platform Overview</CardTitle>
+                  <CardDescription className="text-slate-400">
+                    Key metrics and performance indicators
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="flex justify-between">
+                    <span className="text-slate-400">Daily Active Users</span>
+                    <span className="text-white font-semibold">{userAnalytics?.dailyActive || '0'}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-slate-400">Monthly Revenue</span>
+                    <span className="text-white font-semibold">${revenueAnalytics?.monthlyRevenue || '0'}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-slate-400">Total Transactions</span>
+                    <span className="text-white font-semibold">{adminStats?.totalTransactions || '0'}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-slate-400">Platform Uptime</span>
+                    <span className="text-white font-semibold">{platformHealth?.uptime || '99.9%'}</span>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="bg-slate-800 border-slate-600">
+                <CardHeader>
+                  <CardTitle className="text-white">Recent Activity</CardTitle>
+                  <CardDescription className="text-slate-400">
+                    Latest platform events and alerts
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-3">
+                      <Badge className="bg-green-500/20 text-green-400">System</Badge>
+                      <span className="text-slate-300 text-sm">Platform performance optimized</span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <Badge className="bg-blue-500/20 text-blue-400">Users</Badge>
+                      <span className="text-slate-300 text-sm">New user registrations increasing</span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <Badge className="bg-purple-500/20 text-purple-400">Revenue</Badge>
+                      <span className="text-slate-300 text-sm">Monthly targets on track</span>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </TabsContent>
+
+          {/* Users Tab */}
+          <TabsContent value="users">
             <Card className="bg-slate-800 border-slate-600">
               <CardHeader>
-                <div className="flex items-center justify-between">
-                  <div>
-                    <CardTitle className="text-white">Platform Wallets</CardTitle>
-                    <CardDescription className="text-slate-400">
-                      Manage platform operational wallets
-                    </CardDescription>
-                  </div>
+                <CardTitle className="text-white">User Management</CardTitle>
+                <CardDescription className="text-slate-400">
+                  Manage user accounts and permissions
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <Button 
-                    onClick={() => setShowCreateWallet(true)}
-                    className="bg-amber-600 hover:bg-amber-700"
+                    className="bg-blue-600 hover:bg-blue-700 h-20 flex-col"
+                    onClick={() => window.open('/admin/early-access', '_blank')}
                   >
-                    <Plus className="w-4 h-4 mr-2" />
-                    Create Wallet
+                    <Users className="w-6 h-6 mb-2" />
+                    Early Access Management
+                  </Button>
+                  <Button 
+                    className="bg-green-600 hover:bg-green-700 h-20 flex-col"
+                    onClick={() => window.open('/admin/subscriptions', '_blank')}
+                  >
+                    <DollarSign className="w-6 h-6 mb-2" />
+                    Subscription Management
+                  </Button>
+                  <Button 
+                    className="bg-purple-600 hover:bg-purple-700 h-20 flex-col"
+                    onClick={() => window.open('/admin/analytics', '_blank')}
+                  >
+                    <BarChart3 className="w-6 h-6 mb-2" />
+                    User Analytics
                   </Button>
                 </div>
-              </CardHeader>
-              <CardContent>
-                {walletsLoading ? (
-                  <div className="text-center py-8">
-                    <div className="animate-spin w-8 h-8 border-4 border-amber-500 border-t-transparent rounded-full mx-auto mb-4"></div>
-                    <p className="text-slate-400">Loading wallets...</p>
-                  </div>
-                ) : wallets.length > 0 ? (
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {wallets.map((wallet: any) => (
-                      <Card key={wallet.id} className="bg-slate-700/50 border-slate-600">
-                        <CardContent className="p-4">
-                          <div className="space-y-3">
-                            <div className="flex items-center justify-between">
-                              <Badge className="bg-blue-500/20 text-blue-400">
-                                {wallet.type?.replace('_', ' ') || 'platform'}
-                              </Badge>
-                              <div className={`w-2 h-2 rounded-full ${wallet.isActive ? 'bg-green-500' : 'bg-red-500'}`} />
-                            </div>
-                            <div>
-                              <p className="text-sm font-medium text-white">{wallet.name}</p>
-                              <p className="text-xs text-slate-400 font-mono">
-                                {wallet.address ? `${wallet.address.slice(0, 8)}...${wallet.address.slice(-8)}` : 'No address'}
-                              </p>
-                            </div>
-                            <div className="flex justify-between items-center">
-                              <span className="text-xs text-slate-500">
-                                Balance: {wallet.balance || '0'} SOL
-                              </span>
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                onClick={() => setShowPrivateKey(wallet.id)}
-                                className="text-xs"
-                              >
-                                <Eye className="w-3 h-3" />
-                              </Button>
-                            </div>
-                          </div>
-                        </CardContent>
-                      </Card>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="text-center py-12">
-                    <Wallet className="w-16 h-16 text-slate-400 mx-auto mb-4" />
-                    <p className="text-slate-400 text-lg mb-2">No Platform Wallets</p>
-                    <p className="text-slate-500">Create your first platform wallet to get started</p>
-                  </div>
-                )}
               </CardContent>
             </Card>
           </TabsContent>
 
-          {/* Active Escrows Tab */}
-          <TabsContent value="active-escrows">
+          {/* Finance Tab */}
+          <TabsContent value="finance">
             <Card className="bg-slate-800 border-slate-600">
               <CardHeader>
-                <CardTitle className="text-white">Active Escrow Contracts</CardTitle>
+                <CardTitle className="text-white">Financial Management</CardTitle>
                 <CardDescription className="text-slate-400">
-                  Monitor and manage active escrow transactions
+                  Revenue, pricing, and financial analytics
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                {escrowLoading ? (
-                  <div className="text-center py-8">
-                    <div className="animate-spin w-8 h-8 border-4 border-green-500 border-t-transparent rounded-full mx-auto mb-4"></div>
-                    <p className="text-slate-400">Loading escrow contracts...</p>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <Button 
+                    className="bg-amber-600 hover:bg-amber-700 h-20 flex-col"
+                    onClick={() => window.open('/admin/pricing', '_blank')}
+                  >
+                    <DollarSign className="w-6 h-6 mb-2" />
+                    Pricing Management
+                  </Button>
+                  <Button 
+                    className="bg-emerald-600 hover:bg-emerald-700 h-20 flex-col"
+                    onClick={() => window.open('/admin/revenue', '_blank')}
+                  >
+                    <TrendingUp className="w-6 h-6 mb-2" />
+                    Revenue Analytics
+                  </Button>
+                  <Button 
+                    className="bg-teal-600 hover:bg-teal-700 h-20 flex-col"
+                    onClick={() => window.open('/api-monetization', '_blank')}
+                  >
+                    <Database className="w-6 h-6 mb-2" />
+                    API Monetization
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Escrow Tab */}
+          <TabsContent value="escrow">
+            <Card className="bg-slate-800 border-slate-600">
+              <CardHeader>
+                <CardTitle className="text-white">Enterprise Escrow Management</CardTitle>
+                <CardDescription className="text-slate-400">
+                  Manage high-value escrow contracts and wallet operations
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div className="bg-gradient-to-r from-blue-500/10 to-purple-500/10 border border-blue-500/20 rounded-lg p-4">
+                    <h3 className="text-white font-semibold mb-2">Enterprise Escrow System</h3>
+                    <p className="text-slate-300 text-sm mb-4">
+                      Complete smart contract escrow system for high-value transactions ($200K-$2M)
+                    </p>
+                    <Button 
+                      className="bg-blue-600 hover:bg-blue-700"
+                      onClick={() => window.open('/admin/escrow-management', '_blank')}
+                    >
+                      <Shield className="w-4 h-4 mr-2" />
+                      Open Escrow Management
+                    </Button>
                   </div>
-                ) : activeContracts.length > 0 ? (
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="bg-slate-700/50 rounded-lg p-4">
+                      <h4 className="text-white font-medium mb-2">Platform Wallets</h4>
+                      <p className="text-slate-400 text-sm mb-3">Manage operational wallets</p>
+                      <Button size="sm" variant="outline">
+                        <Wallet className="w-4 h-4 mr-2" />
+                        View Wallets
+                      </Button>
+                    </div>
+                    
+                    <div className="bg-slate-700/50 rounded-lg p-4">
+                      <h4 className="text-white font-medium mb-2">Active Contracts</h4>
+                      <p className="text-slate-400 text-sm mb-3">Monitor escrow activity</p>
+                      <Button size="sm" variant="outline">
+                        <Shield className="w-4 h-4 mr-2" />
+                        View Contracts
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Tools Tab */}
+          <TabsContent value="tools">
+            <Card className="bg-slate-800 border-slate-600">
+              <CardHeader>
+                <CardTitle className="text-white">Platform Tools</CardTitle>
+                <CardDescription className="text-slate-400">
+                  Administrative tools and utilities
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <Button 
+                    className="bg-indigo-600 hover:bg-indigo-700 h-20 flex-col"
+                    onClick={() => window.open('/admin/free-codes', '_blank')}
+                  >
+                    <Gift className="w-6 h-6 mb-2" />
+                    Free Codes
+                  </Button>
+                  <Button 
+                    className="bg-pink-600 hover:bg-pink-700 h-20 flex-col"
+                    onClick={() => window.open('/admin/default-image', '_blank')}
+                  >
+                    <Settings className="w-6 h-6 mb-2" />
+                    System Settings
+                  </Button>
+                  <Button 
+                    className="bg-orange-600 hover:bg-orange-700 h-20 flex-col"
+                    onClick={() => window.open('/admin/content', '_blank')}
+                  >
+                    <Code className="w-6 h-6 mb-2" />
+                    Content Management
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Monitoring Tab */}
+          <TabsContent value="monitoring">
+            <Card className="bg-slate-800 border-slate-600">
+              <CardHeader>
+                <CardTitle className="text-white">System Monitoring</CardTitle>
+                <CardDescription className="text-slate-400">
+                  Platform health and performance monitoring
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-4">
-                    {activeContracts.map((contract: any) => (
-                      <Card key={contract.id} className="bg-slate-700/50 border-slate-600">
-                        <CardContent className="p-4">
-                          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                            <div>
-                              <p className="text-xs text-slate-400">Amount</p>
-                              <p className="text-white font-semibold">
-                                {contract.amount} {contract.currency}
-                              </p>
-                            </div>
-                            <div>
-                              <p className="text-xs text-slate-400">Status</p>
-                              <Badge className="bg-green-500/20 text-green-400">
-                                {contract.status}
-                              </Badge>
-                            </div>
-                            <div>
-                              <p className="text-xs text-slate-400">Created</p>
-                              <p className="text-white text-sm">
-                                {new Date(contract.createdAt).toLocaleDateString()}
-                              </p>
-                            </div>
-                            <div>
-                              <p className="text-xs text-slate-400">Actions</p>
-                              <div className="flex gap-2">
-                                <Button size="sm" variant="outline" className="text-xs">
-                                  View Details
-                                </Button>
-                              </div>
-                            </div>
-                          </div>
-                        </CardContent>
-                      </Card>
-                    ))}
+                    <h3 className="text-white font-semibold">System Status</h3>
+                    <div className="space-y-2">
+                      <div className="flex justify-between items-center">
+                        <span className="text-slate-400">API Status</span>
+                        <Badge className="bg-green-500/20 text-green-400">Healthy</Badge>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className="text-slate-400">Database</span>
+                        <Badge className="bg-green-500/20 text-green-400">Connected</Badge>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className="text-slate-400">WebSocket</span>
+                        <Badge className="bg-green-500/20 text-green-400">Active</Badge>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className="text-slate-400">Blockchain</span>
+                        <Badge className="bg-green-500/20 text-green-400">Synced</Badge>
+                      </div>
+                    </div>
                   </div>
-                ) : (
-                  <div className="text-center py-12">
-                    <Shield className="w-16 h-16 text-slate-400 mx-auto mb-4" />
-                    <p className="text-slate-400 text-lg mb-2">No Active Escrows</p>
-                    <p className="text-slate-500">Active escrow contracts will appear here</p>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          </TabsContent>
 
-          {/* Create Escrow Tab */}
-          <TabsContent value="create-escrow">
-            <Card className="bg-slate-800 border-slate-600">
-              <CardHeader>
-                <CardTitle className="text-white">Create New Escrow Contract</CardTitle>
-                <CardDescription className="text-slate-400">
-                  Set up a new enterprise escrow contract
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <EscrowCreateForm 
-                  onSubmit={createEscrowMutation.mutate}
-                  isLoading={createEscrowMutation.isPending}
-                />
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          {/* Transfer Profits Tab */}
-          <TabsContent value="transfer-profits">
-            <Card className="bg-slate-800 border-slate-600">
-              <CardHeader>
-                <CardTitle className="text-white">Transfer Wallet Profits</CardTitle>
-                <CardDescription className="text-slate-400">
-                  Transfer accumulated profits from platform wallets to external addresses
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <TransferProfitsForm wallets={wallets} />
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          {/* Expired Escrows Tab */}
-          <TabsContent value="expired-escrows">
-            <Card className="bg-slate-800 border-slate-600">
-              <CardHeader>
-                <CardTitle className="text-white">Expired Escrow Contracts</CardTitle>
-                <CardDescription className="text-slate-400">
-                  Manage expired and timed-out escrow contracts
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                {expiredContracts.length > 0 ? (
                   <div className="space-y-4">
-                    {expiredContracts.map((contract: any) => (
-                      <Card key={contract.id} className="bg-slate-700/50 border-slate-600">
-                        <CardContent className="p-4">
-                          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                            <div>
-                              <p className="text-xs text-slate-400">Amount</p>
-                              <p className="text-white font-semibold">
-                                {contract.amount} {contract.currency}
-                              </p>
-                            </div>
-                            <div>
-                              <p className="text-xs text-slate-400">Status</p>
-                              <Badge className="bg-red-500/20 text-red-400">
-                                {contract.status}
-                              </Badge>
-                            </div>
-                            <div>
-                              <p className="text-xs text-slate-400">Expired</p>
-                              <p className="text-white text-sm">
-                                {new Date(contract.timeoutAt).toLocaleDateString()}
-                              </p>
-                            </div>
-                            <div>
-                              <p className="text-xs text-slate-400">Actions</p>
-                              <Button size="sm" className="bg-red-600 hover:bg-red-700 text-xs">
-                                Claim Funds
-                              </Button>
-                            </div>
-                          </div>
-                        </CardContent>
-                      </Card>
-                    ))}
+                    <h3 className="text-white font-semibold">Performance Metrics</h3>
+                    <div className="space-y-2">
+                      <div className="flex justify-between">
+                        <span className="text-slate-400">Response Time</span>
+                        <span className="text-white">45ms avg</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-slate-400">Memory Usage</span>
+                        <span className="text-white">234MB</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-slate-400">Active Connections</span>
+                        <span className="text-white">1,247</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-slate-400">Error Rate</span>
+                        <span className="text-white">0.02%</span>
+                      </div>
+                    </div>
                   </div>
-                ) : (
-                  <div className="text-center py-12">
-                    <Clock className="w-16 h-16 text-slate-400 mx-auto mb-4" />
-                    <p className="text-slate-400 text-lg mb-2">No Expired Escrows</p>
-                    <p className="text-slate-500">All escrow contracts are within their active timeframe</p>
-                  </div>
-                )}
+                </div>
+
+                <div className="mt-6">
+                  <Button 
+                    className="bg-slate-600 hover:bg-slate-700"
+                    onClick={() => window.open('/monitoring-dashboard', '_blank')}
+                  >
+                    <Monitor className="w-4 h-4 mr-2" />
+                    Open Full Monitoring Dashboard
+                  </Button>
+                </div>
               </CardContent>
             </Card>
           </TabsContent>
         </Tabs>
-
-        {/* Wallet Creation Modal */}
-        <WalletCreationModal 
-          open={showCreateWallet} 
-          onOpenChange={setShowCreateWallet}
-          onWalletCreated={createWalletMutation.mutate}
-        />
       </div>
     </div>
-  );
-}
-
-// Escrow Creation Form Component
-function EscrowCreateForm({ 
-  onSubmit, 
-  isLoading 
-}: { 
-  onSubmit: (data: EscrowFormData) => void;
-  isLoading: boolean;
-}) {
-  const form = useForm<EscrowFormData>({
-    resolver: zodResolver(escrowFormSchema),
-    defaultValues: {
-      payerAddress: "",
-      payeeAddress: "",
-      amount: 0,
-      currency: "SOL",
-      timeoutDuration: 86400,
-      description: "",
-    },
-  });
-
-  return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <FormField
-            control={form.control}
-            name="payerAddress"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel className="text-white">Payer Address</FormLabel>
-                <FormControl>
-                  <Input 
-                    {...field} 
-                    className="bg-slate-700 border-slate-600 text-white"
-                    placeholder="Solana address of the payer"
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="payeeAddress"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel className="text-white">Payee Address</FormLabel>
-                <FormControl>
-                  <Input 
-                    {...field} 
-                    className="bg-slate-700 border-slate-600 text-white"
-                    placeholder="Solana address of the payee"
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="amount"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel className="text-white">Amount</FormLabel>
-                <FormControl>
-                  <Input 
-                    {...field} 
-                    type="number"
-                    step="0.001"
-                    onChange={(e) => field.onChange(parseFloat(e.target.value))}
-                    className="bg-slate-700 border-slate-600 text-white"
-                    placeholder="0.000"
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="currency"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel className="text-white">Currency</FormLabel>
-                <FormControl>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
-                    <SelectTrigger className="bg-slate-700 border-slate-600 text-white">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="SOL">SOL</SelectItem>
-                      <SelectItem value="USDC">USDC</SelectItem>
-                      <SelectItem value="FLBY">FLBY</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="timeoutDuration"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel className="text-white">Timeout Duration (seconds)</FormLabel>
-                <FormControl>
-                  <Input 
-                    {...field} 
-                    type="number"
-                    onChange={(e) => field.onChange(parseInt(e.target.value))}
-                    className="bg-slate-700 border-slate-600 text-white"
-                    placeholder="86400"
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="description"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel className="text-white">Description</FormLabel>
-                <FormControl>
-                  <Input 
-                    {...field} 
-                    className="bg-slate-700 border-slate-600 text-white"
-                    placeholder="Contract description"
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
-
-        <div className="flex gap-3 pt-4">
-          <Button
-            type="submit"
-            disabled={isLoading}
-            className="bg-green-600 hover:bg-green-700 text-white"
-          >
-            {isLoading ? (
-              <>
-                <div className="animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full mr-2"></div>
-                Creating...
-              </>
-            ) : (
-              <>
-                <Shield className="w-4 h-4 mr-2" />
-                Create Escrow
-              </>
-            )}
-          </Button>
-        </div>
-      </form>
-    </Form>
-  );
-}
-
-// Wallet Creation Modal Component
-function WalletCreationModal({ 
-  open, 
-  onOpenChange, 
-  onWalletCreated 
-}: { 
-  open: boolean; 
-  onOpenChange: (open: boolean) => void;
-  onWalletCreated: (data: any) => void;
-}) {
-  const { toast } = useToast();
-  const [isCreating, setIsCreating] = useState(false);
-
-  const form = useForm<WalletFormData>({
-    resolver: zodResolver(walletFormSchema),
-    defaultValues: {
-      mode: "dev",
-      name: "",
-      type: "gas_funding",
-    },
-  });
-
-  const onSubmit = async (data: WalletFormData) => {
-    setIsCreating(true);
-    try {
-      const walletData = {
-        name: data.name,
-        type: data.type,
-        network: data.mode === "dev" ? "devnet" : "mainnet",
-      };
-
-      await onWalletCreated(walletData);
-      form.reset();
-      onOpenChange(false);
-    } catch (error) {
-      console.error("Error creating wallet:", error);
-    } finally {
-      setIsCreating(false);
-    }
-  };
-
-  return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md bg-slate-900 border-slate-600">
-        <DialogHeader>
-          <DialogTitle className="text-white">Create Platform Wallet</DialogTitle>
-          <DialogDescription className="text-slate-400">
-            Set up a new wallet for platform operations
-          </DialogDescription>
-        </DialogHeader>
-
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-            <FormField
-              control={form.control}
-              name="mode"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-white">Mode</FormLabel>
-                  <FormControl>
-                    <RadioGroup
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                      className="flex space-x-4"
-                    >
-                      <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="dev" id="dev" />
-                        <Label htmlFor="dev" className="text-slate-300">Development</Label>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="production" id="production" />
-                        <Label htmlFor="production" className="text-slate-300">Production</Label>
-                      </div>
-                    </RadioGroup>
-                  </FormControl>
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="type"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-white">Wallet Type</FormLabel>
-                  <FormControl>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
-                      <SelectTrigger className="bg-slate-700 border-slate-600 text-white">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="gas_funding">Gas Funding</SelectItem>
-                        <SelectItem value="fee_collection">Fee Collection</SelectItem>
-                        <SelectItem value="escrow">Escrow</SelectItem>
-                        <SelectItem value="admin">Admin</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </FormControl>
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="name"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-white">Wallet Name</FormLabel>
-                  <FormControl>
-                    <Input 
-                      {...field} 
-                      className="bg-slate-700 border-slate-600 text-white"
-                      placeholder="Enter wallet name"
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <div className="flex gap-3 pt-4">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => onOpenChange(false)}
-                className="flex-1 border-slate-600 text-slate-300"
-              >
-                Cancel
-              </Button>
-              <Button
-                type="submit"
-                disabled={isCreating}
-                className="flex-1 bg-amber-600 hover:bg-amber-700 text-white"
-              >
-                {isCreating ? (
-                  <>
-                    <div className="animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full mr-2"></div>
-                    Creating...
-                  </>
-                ) : (
-                  <>
-                    <Plus className="w-4 h-4 mr-2" />
-                    Create Wallet
-                  </>
-                )}
-              </Button>
-            </div>
-          </form>
-        </Form>
-      </DialogContent>
-    </Dialog>
   );
 }
 

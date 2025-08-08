@@ -65,6 +65,7 @@ import AdminFreeCodes from "@/pages/admin-free-codes";
 import AdminPricing from "@/pages/admin-pricing";
 import AdminDefaultImage from "@/pages/admin-default-image";
 import UnifiedAdminDashboard from "@/pages/admin-unified";
+import EscrowManagementDashboard from "@/pages/admin-escrow-management";
 import TokenHolderMapPage from "@/pages/token-holder-map";
 import CollaborativeCreation from "@/pages/collaborative-creation";
 import FlutterAIDashboard from "@/pages/flutterai-dashboard";
@@ -283,6 +284,13 @@ function Router() {
           <AdminRouteGuard>
             <Navbar />
             <UnifiedAdminDashboard />
+          </AdminRouteGuard>
+        )} />
+        
+        <Route path="/admin/escrow-management" component={() => (
+          <AdminRouteGuard>
+            <Navbar />
+            <EscrowManagementDashboard />
           </AdminRouteGuard>
         )} />
         
