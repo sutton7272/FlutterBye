@@ -186,15 +186,6 @@ export default function Create() {
                           Create {option.title} <ArrowRight className="ml-2 h-4 w-4" />
                         </Button>
                       </Link>
-                      
-                      {option.category === "enterprise" && (
-                        <Link href="/campaign-builder">
-                          <Button variant="outline" size="sm" className="w-full text-xs">
-                            <Brain className="h-3 w-3 mr-1" />
-                            Advanced Campaign Builder
-                          </Button>
-                        </Link>
-                      )}
                     </div>
                   </CardContent>
                 </Card>
