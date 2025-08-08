@@ -74,6 +74,7 @@ import NFTClaim from "@/pages/nft-claim";
 import AllOpportunities from "@/pages/AllOpportunities";
 import AdminAPIMonetization from "@/pages/admin-api-monetization";
 import FlutterBlogBot from "@/pages/flutterblog-bot";
+import MonitoringDashboard from "@/pages/monitoring-dashboard";
 import CampaignBuilder from "@/pages/campaign-builder";
 import AIMarketingBot from "@/pages/ai-marketing-bot";
 import WalletTest from "@/pages/WalletTest";
@@ -583,6 +584,17 @@ function Router() {
         <Route path="/admin/flutterblog-bot" component={() => (
           <>
             <FlutterBlogBot />
+          </>
+        )} />
+        <Route path="/monitoring" component={() => (
+          <>
+            <Navbar />
+            <MonitoringDashboard />
+          </>
+        )} />
+        <Route path="/admin/monitoring" component={() => (
+          <>
+            <MonitoringDashboard />
           </>
         )} />
         

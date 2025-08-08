@@ -82,6 +82,7 @@ import { productionRateLimiting } from "./production-rate-limiting";
 import { finalSecurityAudit } from "./final-security-audit";
 import { registerBlogRoutes } from "./blog-routes";
 import { blogScheduler } from "./blog-content-scheduler";
+import { registerMonitoringRoutes } from "./monitoring-routes";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Trust proxy for rate limiting
@@ -9148,6 +9149,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // Register Blog Routes
   registerBlogRoutes(app);
+  
+  // Phase 1: Monitoring & Stability System
+  registerMonitoringRoutes(app);
+  console.log("🔍 Phase 1: Monitoring & Stability System activated!");
   console.log("📝 FlutterBlog Bot routes registered");
 
   // Initialize Blog Content Scheduler
