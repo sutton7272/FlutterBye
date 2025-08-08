@@ -182,18 +182,18 @@ export function CustodialWalletManagement() {
               Create Wallet
             </Button>
           </DialogTrigger>
-          <DialogContent className="bg-dark-navy border-electric-blue/20">
-            <DialogHeader>
+          <DialogContent className="bg-dark-navy/90 backdrop-blur-sm border-electric-blue/30 shadow-xl">
+            <DialogHeader className="bg-dark-navy/60 -mx-6 -mt-6 px-6 pt-6 pb-4 rounded-t-lg border-b border-electric-blue/20">
               <DialogTitle className="text-white">Create New Custodial Wallet</DialogTitle>
             </DialogHeader>
-            <div className="space-y-4">
+            <div className="space-y-4 pt-4">
               <div className="space-y-2">
-                <Label htmlFor="currency" className="text-gray-300">Currency</Label>
+                <Label htmlFor="currency" className="text-gray-200 font-medium">Currency</Label>
                 <Select value={selectedCurrency} onValueChange={setSelectedCurrency}>
-                  <SelectTrigger className="bg-dark-navy/50 border-gray-600 text-white">
+                  <SelectTrigger className="bg-dark-navy/60 border-electric-blue/30 text-white backdrop-blur-sm">
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent className="bg-dark-navy border-gray-600">
+                  <SelectContent className="bg-dark-navy/90 border-electric-blue/30">
                     <SelectItem value="SOL">SOL</SelectItem>
                     <SelectItem value="USDC">USDC</SelectItem>
                     <SelectItem value="FLBY">FLBY</SelectItem>
@@ -233,10 +233,10 @@ export function CustodialWalletManagement() {
 
       {/* Statistics Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-        <Card className="bg-dark-navy/50 border-electric-blue/20">
+        <Card className="bg-dark-navy/80 backdrop-blur-sm border-electric-blue/30 shadow-lg">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-gray-400 flex items-center">
-              <Wallet className="w-4 h-4 mr-2" />
+            <CardTitle className="text-sm font-medium text-gray-300 flex items-center">
+              <Wallet className="w-4 h-4 mr-2 text-electric-blue" />
               Total Wallets
             </CardTitle>
           </CardHeader>
@@ -245,10 +245,10 @@ export function CustodialWalletManagement() {
           </CardContent>
         </Card>
 
-        <Card className="bg-dark-navy/50 border-electric-blue/20">
+        <Card className="bg-dark-navy/80 backdrop-blur-sm border-electric-blue/30 shadow-lg">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-gray-400 flex items-center">
-              <DollarSign className="w-4 h-4 mr-2" />
+            <CardTitle className="text-sm font-medium text-gray-300 flex items-center">
+              <DollarSign className="w-4 h-4 mr-2 text-electric-green" />
               SOL Balance
             </CardTitle>
           </CardHeader>
@@ -259,10 +259,10 @@ export function CustodialWalletManagement() {
           </CardContent>
         </Card>
 
-        <Card className="bg-dark-navy/50 border-electric-blue/20">
+        <Card className="bg-dark-navy/80 backdrop-blur-sm border-electric-blue/30 shadow-lg">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-gray-400 flex items-center">
-              <Activity className="w-4 h-4 mr-2" />
+            <CardTitle className="text-sm font-medium text-gray-300 flex items-center">
+              <Activity className="w-4 h-4 mr-2 text-electric-blue" />
               Active Transactions
             </CardTitle>
           </CardHeader>
@@ -271,10 +271,10 @@ export function CustodialWalletManagement() {
           </CardContent>
         </Card>
 
-        <Card className="bg-dark-navy/50 border-electric-blue/20">
+        <Card className="bg-dark-navy/80 backdrop-blur-sm border-electric-blue/30 shadow-lg">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-gray-400 flex items-center">
-              <AlertTriangle className="w-4 h-4 mr-2" />
+            <CardTitle className="text-sm font-medium text-gray-300 flex items-center">
+              <AlertTriangle className="w-4 h-4 mr-2 text-orange-400" />
               Security Alerts
             </CardTitle>
           </CardHeader>
@@ -283,10 +283,10 @@ export function CustodialWalletManagement() {
           </CardContent>
         </Card>
 
-        <Card className="bg-dark-navy/50 border-electric-blue/20">
+        <Card className="bg-dark-navy/80 backdrop-blur-sm border-electric-blue/30 shadow-lg">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-gray-400 flex items-center">
-              <Shield className="w-4 h-4 mr-2" />
+            <CardTitle className="text-sm font-medium text-gray-300 flex items-center">
+              <Shield className="w-4 h-4 mr-2 text-red-400" />
               Compliance Alerts
             </CardTitle>
           </CardHeader>
@@ -315,17 +315,17 @@ export function CustodialWalletManagement() {
 
         {/* Wallets Tab */}
         <TabsContent value="wallets" className="space-y-4">
-          <Card className="bg-dark-navy/50 border-electric-blue/20">
-            <CardHeader>
+          <Card className="bg-dark-navy/80 backdrop-blur-sm border-electric-blue/30 shadow-lg">
+            <CardHeader className="bg-dark-navy/50 rounded-t-lg">
               <CardTitle className="text-white flex items-center">
-                <Wallet className="w-5 h-5 mr-2" />
+                <Wallet className="w-5 h-5 mr-2 text-electric-blue" />
                 Custodial Wallets
               </CardTitle>
-              <CardDescription className="text-gray-400">
+              <CardDescription className="text-gray-300">
                 Manage secure custodial wallets for user value attachment system
               </CardDescription>
             </CardHeader>
-            <CardContent>
+            <CardContent className="bg-dark-navy/60">
               {walletsLoading ? (
                 <div className="flex items-center justify-center py-8">
                   <RefreshCw className="w-6 h-6 animate-spin text-electric-blue" />
@@ -333,7 +333,7 @@ export function CustodialWalletManagement() {
               ) : (
                 <div className="space-y-4">
                   {wallets.map((wallet) => (
-                    <div key={wallet.id} className="border border-gray-700 rounded-lg p-4">
+                    <div key={wallet.id} className="bg-dark-navy/70 border border-electric-blue/20 rounded-lg p-4 backdrop-blur-sm">
                       <div className="flex items-center justify-between mb-2">
                         <div className="flex items-center space-x-3">
                           <Badge className={getStatusColor(wallet.status)}>
