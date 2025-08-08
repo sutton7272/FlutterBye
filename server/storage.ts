@@ -49,10 +49,13 @@ import {
   type InsertWalletBatch,
   type AnalysisQueue,
   type InsertAnalysisQueue,
+  type EscrowFeeConfig,
+  type InsertEscrowFeeConfig,
   pricingTiers,
   walletIntelligence,
   walletBatches,
   analysisQueue,
+  escrowFeeConfigs,
 } from "@shared/schema";
 
 // Storage interface for both in-memory and database implementations
@@ -234,6 +237,11 @@ export interface IStorage {
   burnFlutterArtNFT(nftId: string, burnerAddress: string): Promise<any>;
   getUserFlutterArtNFTs(walletAddress: string, status?: string): Promise<any[]>;
   getFlutterArtAnalytics(creatorId: string): Promise<any>;
+
+  // Escrow Fee Configuration management
+  getEscrowFeeConfig(currency: string): Promise<EscrowFeeConfig | undefined>;
+  updateEscrowFeeConfig(currency: string, config: Partial<EscrowFeeConfig>): Promise<EscrowFeeConfig>;
+  getAllEscrowFeeConfigs(): Promise<EscrowFeeConfig[]>;
 }
 
 // In-memory storage implementation
@@ -265,6 +273,7 @@ export class MemStorage implements IStorage {
   private walletIntelligenceData = new Map<string, any>(); // Comprehensive intelligence storage
   private walletBatches: Map<string, WalletBatch> = new Map();
   private analysisQueue: Map<string, AnalysisQueue> = new Map();
+  private escrowFeeConfigs: Map<string, EscrowFeeConfig> = new Map();
   
   // FlutterArt NFT Storage
   private flutterArtCollections: Map<string, any> = new Map();
@@ -272,6 +281,7 @@ export class MemStorage implements IStorage {
 
   constructor() {
     this.initializeTestData();
+    this.initializeDefaultEscrowFees();
   }
 
   private initializeTestData() {
@@ -340,6 +350,54 @@ export class MemStorage implements IStorage {
     };
 
     this.systemSettings.set("default_token_image", defaultTokenImageSetting);
+  }
+
+  private initializeDefaultEscrowFees() {
+    // Initialize default escrow fee configurations for all supported currencies
+    const defaultConfigs = [
+      {
+        id: randomUUID(),
+        currency: "SOL",
+        depositFeePercentage: "0.500", // 0.5%
+        withdrawalFeePercentage: "0.500", // 0.5%
+        minimumDepositFee: "0.001", // 0.001 SOL
+        minimumWithdrawalFee: "0.001",
+        maximumDepositFee: "1.000", // 1 SOL max
+        maximumWithdrawalFee: "1.000",
+        updatedAt: new Date(),
+        updatedBy: "system"
+      },
+      {
+        id: randomUUID(),
+        currency: "USDC",
+        depositFeePercentage: "0.500", // 0.5%
+        withdrawalFeePercentage: "0.500", // 0.5%
+        minimumDepositFee: "0.10", // $0.10 USDC
+        minimumWithdrawalFee: "0.10",
+        maximumDepositFee: "100.00", // $100 USDC max
+        maximumWithdrawalFee: "100.00",
+        updatedAt: new Date(),
+        updatedBy: "system"
+      },
+      {
+        id: randomUUID(),
+        currency: "FLBY",
+        depositFeePercentage: "0.250", // 0.25% (reduced for native token)
+        withdrawalFeePercentage: "0.250", // 0.25%
+        minimumDepositFee: "1.0", // 1 FLBY
+        minimumWithdrawalFee: "1.0",
+        maximumDepositFee: "1000.0", // 1000 FLBY max
+        maximumWithdrawalFee: "1000.0",
+        updatedAt: new Date(),
+        updatedBy: "system"
+      }
+    ];
+
+    defaultConfigs.forEach(config => {
+      this.escrowFeeConfigs.set(config.currency, config as EscrowFeeConfig);
+    });
+
+    console.log(`Initialized escrow fee configs for: ${defaultConfigs.map(c => c.currency).join(', ')}`);
   }
 
   // User operations
@@ -1948,6 +2006,31 @@ export class MemStorage implements IStorage {
       qrCodeUsage: collections.filter(c => c.generateQR).length,
       timeLockUsage: collections.filter(c => c.timeLockEnabled).length
     };
+  }
+
+  // Escrow Fee Configuration Operations
+  async getEscrowFeeConfig(currency: string): Promise<EscrowFeeConfig | undefined> {
+    return this.escrowFeeConfigs.get(currency);
+  }
+
+  async updateEscrowFeeConfig(currency: string, config: Partial<EscrowFeeConfig>): Promise<EscrowFeeConfig> {
+    const existingConfig = this.escrowFeeConfigs.get(currency);
+    if (!existingConfig) {
+      throw new Error(`Escrow fee config not found for currency: ${currency}`);
+    }
+
+    const updatedConfig: EscrowFeeConfig = {
+      ...existingConfig,
+      ...config,
+      updatedAt: new Date(),
+    };
+
+    this.escrowFeeConfigs.set(currency, updatedConfig);
+    return updatedConfig;
+  }
+
+  async getAllEscrowFeeConfigs(): Promise<EscrowFeeConfig[]> {
+    return Array.from(this.escrowFeeConfigs.values());
   }
 }
 

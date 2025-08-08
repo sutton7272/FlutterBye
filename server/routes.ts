@@ -6301,6 +6301,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   const escrowProfitsRoutes = (await import('./routes-escrow-profits')).default;
   app.use('/api/escrow', escrowProfitsRoutes);
   
+  // Register escrow fee configuration routes
+  const escrowFeeConfigRoutes = (await import('./routes-escrow-fee-config')).default;
+  app.use('/api/escrow-fees', escrowFeeConfigRoutes);
+  
   // Register production monitoring endpoints
   registerProductionEndpoints(app, monitoring);
 

@@ -11,7 +11,7 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { useToast } from '@/hooks/use-toast';
-import { Shield, Wallet, TrendingUp, AlertCircle, DollarSign, Users, Settings, RefreshCw, Eye, Download, Upload } from 'lucide-react';
+import { Shield, Wallet, TrendingUp, AlertCircle, DollarSign, Users, Settings, RefreshCw, Eye, Download, Upload, Sliders } from 'lucide-react';
 
 interface EscrowStats {
   totalEscrows: number;
@@ -38,6 +38,19 @@ interface EscrowContract {
   fees: number;
 }
 
+interface EscrowFeeConfig {
+  id: string;
+  currency: string;
+  depositFeePercentage: string;
+  withdrawalFeePercentage: string;
+  minimumDepositFee: string;
+  minimumWithdrawalFee: string;
+  maximumDepositFee: string;
+  maximumWithdrawalFee: string;
+  updatedAt: string;
+  updatedBy?: string;
+}
+
 export function EscrowWalletManagement() {
   const [stats, setStats] = useState<EscrowStats | null>(null);
   const [contracts, setContracts] = useState<EscrowContract[]>([]);
@@ -52,11 +65,18 @@ export function EscrowWalletManagement() {
     mintAddress: 'So11111111111111111111111111111111111111112', // SOL
     escrowId: ''
   });
+  const [feeConfigs, setFeeConfigs] = useState<EscrowFeeConfig[]>([]);
+  const [editingFeeConfig, setEditingFeeConfig] = useState<EscrowFeeConfig | null>(null);
+  const [isFeeDialogOpen, setIsFeeDialogOpen] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
     fetchEscrowData();
-    const interval = setInterval(fetchEscrowData, 30000); // Refresh every 30 seconds
+    fetchFeeConfigs();
+    const interval = setInterval(() => {
+      fetchEscrowData();
+      fetchFeeConfigs();
+    }, 30000); // Refresh every 30 seconds
     return () => clearInterval(interval);
   }, []);
 
@@ -156,6 +176,61 @@ export function EscrowWalletManagement() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const fetchFeeConfigs = async () => {
+    try {
+      const response = await fetch('/api/escrow-fees/configs');
+      const data = await response.json();
+      if (data.success) {
+        setFeeConfigs(data.data);
+      }
+    } catch (error) {
+      console.error('Error fetching fee configs:', error);
+    }
+  };
+
+  const handleUpdateFeeConfig = async (feeConfig: EscrowFeeConfig) => {
+    setLoading(true);
+    try {
+      const response = await fetch(`/api/escrow-fees/configs/${feeConfig.currency}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          depositFeePercentage: feeConfig.depositFeePercentage,
+          withdrawalFeePercentage: feeConfig.withdrawalFeePercentage,
+          minimumDepositFee: feeConfig.minimumDepositFee,
+          minimumWithdrawalFee: feeConfig.minimumWithdrawalFee,
+          maximumDepositFee: feeConfig.maximumDepositFee,
+          maximumWithdrawalFee: feeConfig.maximumWithdrawalFee
+        })
+      });
+
+      const result = await response.json();
+      if (result.success) {
+        toast({
+          title: "Fee Configuration Updated",
+          description: `${feeConfig.currency} escrow fees updated successfully`,
+        });
+        fetchFeeConfigs(); // Refresh data
+        setIsFeeDialogOpen(false);
+        setEditingFeeConfig(null);
+      } else {
+        throw new Error(result.message || 'Failed to update fee configuration');
+      }
+    } catch (error: any) {
+      toast({
+        title: "Update Failed",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
+    setLoading(false);
+  };
+
+  const openFeeEditDialog = (feeConfig: EscrowFeeConfig) => {
+    setEditingFeeConfig({ ...feeConfig });
+    setIsFeeDialogOpen(true);
   };
 
   const handleWithdrawProfits = async () => {
@@ -330,6 +405,7 @@ export function EscrowWalletManagement() {
           <TabsTrigger value="create">Create Escrow</TabsTrigger>
           <TabsTrigger value="withdraw">Withdraw Profits</TabsTrigger>
           <TabsTrigger value="contracts">Active Contracts</TabsTrigger>
+          <TabsTrigger value="fees">Fee Configuration</TabsTrigger>
         </TabsList>
 
         <TabsContent value="overview">
@@ -673,7 +749,205 @@ export function EscrowWalletManagement() {
             </CardContent>
           </Card>
         </TabsContent>
+
+        <TabsContent value="fees">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center space-x-2">
+                <Sliders className="h-5 w-5" />
+                <span>Fee Configuration</span>
+              </CardTitle>
+              <CardDescription>
+                Configure escrow deposit and withdrawal fees for each currency
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {feeConfigs.length > 0 ? (
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Currency</TableHead>
+                        <TableHead>Deposit Fee</TableHead>
+                        <TableHead>Withdrawal Fee</TableHead>
+                        <TableHead>Min Fees</TableHead>
+                        <TableHead>Max Fees</TableHead>
+                        <TableHead>Actions</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {feeConfigs.map((config) => (
+                        <TableRow key={config.currency}>
+                          <TableCell>
+                            <Badge variant="outline">{config.currency}</Badge>
+                          </TableCell>
+                          <TableCell>{config.depositFeePercentage}%</TableCell>
+                          <TableCell>{config.withdrawalFeePercentage}%</TableCell>
+                          <TableCell>
+                            {config.minimumDepositFee} / {config.minimumWithdrawalFee}
+                          </TableCell>
+                          <TableCell>
+                            {config.maximumDepositFee} / {config.maximumWithdrawalFee}
+                          </TableCell>
+                          <TableCell>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => openFeeEditDialog(config)}
+                              disabled={loading}
+                            >
+                              <Settings className="h-4 w-4 mr-1" />
+                              Edit
+                            </Button>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                ) : (
+                  <Alert>
+                    <DollarSign className="h-4 w-4" />
+                    <AlertTitle>No Fee Configurations Found</AlertTitle>
+                    <AlertDescription>
+                      Fee configurations will be automatically created when you process your first transactions.
+                    </AlertDescription>
+                  </Alert>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
       </Tabs>
+
+      {/* Fee Configuration Dialog */}
+      {editingFeeConfig && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <Card className="w-full max-w-md mx-4">
+            <CardHeader>
+              <CardTitle>Edit {editingFeeConfig.currency} Fees</CardTitle>
+              <CardDescription>
+                Update escrow fee configuration for {editingFeeConfig.currency}
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="depositFeePercentage">Deposit Fee (%)</Label>
+                  <Input
+                    id="depositFeePercentage"
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    max="100"
+                    value={editingFeeConfig.depositFeePercentage}
+                    onChange={(e) => setEditingFeeConfig({
+                      ...editingFeeConfig,
+                      depositFeePercentage: e.target.value
+                    })}
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="withdrawalFeePercentage">Withdrawal Fee (%)</Label>
+                  <Input
+                    id="withdrawalFeePercentage"
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    max="100"
+                    value={editingFeeConfig.withdrawalFeePercentage}
+                    onChange={(e) => setEditingFeeConfig({
+                      ...editingFeeConfig,
+                      withdrawalFeePercentage: e.target.value
+                    })}
+                  />
+                </div>
+              </div>
+              
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="minimumDepositFee">Min Deposit Fee</Label>
+                  <Input
+                    id="minimumDepositFee"
+                    type="number"
+                    step="0.000001"
+                    min="0"
+                    value={editingFeeConfig.minimumDepositFee}
+                    onChange={(e) => setEditingFeeConfig({
+                      ...editingFeeConfig,
+                      minimumDepositFee: e.target.value
+                    })}
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="minimumWithdrawalFee">Min Withdrawal Fee</Label>
+                  <Input
+                    id="minimumWithdrawalFee"
+                    type="number"
+                    step="0.000001"
+                    min="0"
+                    value={editingFeeConfig.minimumWithdrawalFee}
+                    onChange={(e) => setEditingFeeConfig({
+                      ...editingFeeConfig,
+                      minimumWithdrawalFee: e.target.value
+                    })}
+                  />
+                </div>
+              </div>
+              
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="maximumDepositFee">Max Deposit Fee</Label>
+                  <Input
+                    id="maximumDepositFee"
+                    type="number"
+                    step="0.000001"
+                    min="0"
+                    value={editingFeeConfig.maximumDepositFee}
+                    onChange={(e) => setEditingFeeConfig({
+                      ...editingFeeConfig,
+                      maximumDepositFee: e.target.value
+                    })}
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="maximumWithdrawalFee">Max Withdrawal Fee</Label>
+                  <Input
+                    id="maximumWithdrawalFee"
+                    type="number"
+                    step="0.000001"
+                    min="0"
+                    value={editingFeeConfig.maximumWithdrawalFee}
+                    onChange={(e) => setEditingFeeConfig({
+                      ...editingFeeConfig,
+                      maximumWithdrawalFee: e.target.value
+                    })}
+                  />
+                </div>
+              </div>
+            </CardContent>
+            <CardContent>
+              <div className="flex justify-end space-x-2">
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setIsFeeDialogOpen(false);
+                    setEditingFeeConfig(null);
+                  }}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  onClick={() => handleUpdateFeeConfig(editingFeeConfig)}
+                  disabled={loading}
+                >
+                  {loading ? <RefreshCw className="h-4 w-4 animate-spin mr-2" /> : null}
+                  Save Changes
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
     </div>
   );
 }

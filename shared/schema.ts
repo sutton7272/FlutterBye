@@ -507,6 +507,20 @@ export const systemSettings = pgTable("system_settings", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
+// Escrow Fee Configuration table
+export const escrowFeeConfigs = pgTable("escrow_fee_configs", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  currency: text("currency").notNull().unique(), // SOL, USDC, FLBY
+  depositFeePercentage: decimal("deposit_fee_percentage", { precision: 5, scale: 3 }).notNull(), // 0.500 for 0.5%
+  withdrawalFeePercentage: decimal("withdrawal_fee_percentage", { precision: 5, scale: 3 }).notNull(),
+  minimumDepositFee: decimal("minimum_deposit_fee", { precision: 18, scale: 9 }).notNull(),
+  minimumWithdrawalFee: decimal("minimum_withdrawal_fee", { precision: 18, scale: 9 }).notNull(),
+  maximumDepositFee: decimal("maximum_deposit_fee", { precision: 18, scale: 9 }).notNull(),
+  maximumWithdrawalFee: decimal("maximum_withdrawal_fee", { precision: 18, scale: 9 }).notNull(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+  updatedBy: varchar("updated_by").references(() => users.id),
+});
+
 // NOTE: walletIntelligence schema moved to comprehensive version below to avoid duplicates
 
 // Batch Upload Tracking
@@ -943,9 +957,18 @@ export type Analytics = typeof analytics.$inferSelect;
 export type SystemSetting = typeof systemSettings.$inferSelect;
 export type InsertSystemSetting = typeof systemSettings.$inferInsert;
 
+// Escrow Fee Config types
+export type EscrowFeeConfig = typeof escrowFeeConfigs.$inferSelect;
+export type InsertEscrowFeeConfig = typeof escrowFeeConfigs.$inferInsert;
+
 export const insertSystemSettingSchema = createInsertSchema(systemSettings).omit({
   id: true,
   createdAt: true,
+  updatedAt: true,
+});
+
+export const insertEscrowFeeConfigSchema = createInsertSchema(escrowFeeConfigs).omit({
+  id: true,
   updatedAt: true,
 });
 export type InsertAnalytics = z.infer<typeof insertAnalyticsSchema>;
