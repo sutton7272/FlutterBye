@@ -20,11 +20,37 @@ export function registerBlogRoutes(app: Express) {
   app.get("/api/blog/posts", async (req, res) => {
     try {
       const limit = Math.min(parseInt(req.query.limit as string) || 10, 50);
+      const offset = parseInt(req.query.offset as string) || 0;
+      const status = req.query.status as string || undefined;
       
-      // Use optimized database query with caching
-      const posts = await databaseOptimizer.getOptimizedBlogPosts(limit);
+      // Build query with optional filters
+      let query = db.select().from(blogPosts);
       
-
+      if (status) {
+        query = query.where(eq(blogPosts.status, status));
+      }
+      
+      const posts = await query
+        .orderBy(desc(blogPosts.createdAt))
+        .limit(limit)
+        .offset(offset);
+      
+      // Get total count for pagination
+      const totalQuery = db.select({ count: sql<number>`count(*)` }).from(blogPosts);
+      if (status) {
+        totalQuery.where(eq(blogPosts.status, status));
+      }
+      const [{ count: total }] = await totalQuery;
+      
+      res.json({ 
+        posts,
+        pagination: {
+          total,
+          limit,
+          offset,
+          hasMore: offset + limit < total
+        }
+      });
     } catch (error) {
       console.error("Error fetching blog posts:", error);
       res.status(500).json({ error: "Failed to fetch blog posts" });

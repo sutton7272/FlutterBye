@@ -571,6 +571,12 @@ function Router() {
             <FlutterAIDashboard />
           </>
         )} />
+        <Route path="/flutterblog-bot" component={() => (
+          <>
+            <Navbar />
+            <FlutterBlogBot />
+          </>
+        )} />
         <Route path="/all-opportunities" component={() => (
           <>
             <Navbar />
