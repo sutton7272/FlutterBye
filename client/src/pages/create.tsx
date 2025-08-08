@@ -124,7 +124,7 @@ export default function Create() {
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-3">
+          <TabsList className="grid w-full grid-cols-3 bg-slate-800/50 border border-electric-blue/20">
             <TabsTrigger value="tokens">Token Creation</TabsTrigger>
             <TabsTrigger value="ai-tools">AI Tools</TabsTrigger>
             <TabsTrigger value="advanced">Advanced</TabsTrigger>
@@ -134,7 +134,7 @@ export default function Create() {
             {/* Compact Creation Options */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
               {creationOptions.map((option) => (
-                <Card key={option.id} className="group hover:shadow-md transition-all duration-300 cursor-pointer">
+                <Card key={option.id} className="group hover:shadow-md transition-all duration-300 cursor-pointer bg-slate-800/30 border border-electric-blue/20">
                   <CardContent className="p-4">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-3">
