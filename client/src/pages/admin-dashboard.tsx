@@ -12,7 +12,8 @@ import {
   LogOut,
   Wallet,
   Target,
-  Wrench
+  Wrench,
+  Home
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
@@ -163,6 +164,17 @@ export default function AdminDashboard() {
                 </Badge>
               </div>
             )}
+            
+            {/* Return to Site Button */}
+            <Button
+              variant="outline"
+              onClick={() => setLocation("/")}
+              className="border-electric-blue/50 text-electric-blue hover:bg-electric-blue/10 hover:border-electric-blue/70 transition-all duration-300 relative overflow-hidden group"
+            >
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-electric-blue/5 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
+              <Home className="w-4 h-4 mr-2" />
+              Return to Site
+            </Button>
             
             <Button
               variant="outline"
