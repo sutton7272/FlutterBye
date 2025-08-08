@@ -153,10 +153,7 @@ export default function Dashboard() {
   // Buy NFT mutation
   const buyNFTMutation = useMutation({
     mutationFn: async (nftId: string) => {
-      const response = await apiRequest(`/api/marketplace/buy/${nftId}`, {
-        method: 'POST',
-        body: JSON.stringify({ buyerId: 'demo-buyer' })
-      });
+      const response = await apiRequest('POST', `/api/marketplace/buy/${nftId}`, { buyerId: 'demo-buyer' });
       return response;
     },
     onSuccess: (data: any) => {
@@ -181,10 +178,7 @@ export default function Dashboard() {
   // Burn NFT mutation
   const burnNFTMutation = useMutation({
     mutationFn: async (nftId: string) => {
-      const response = await apiRequest(`/api/marketplace/burn/${nftId}`, {
-        method: 'POST',
-        body: JSON.stringify({ burnerId: 'demo-burner' })
-      });
+      const response = await apiRequest('POST', `/api/marketplace/burn/${nftId}`, { burnerId: 'demo-burner' });
       return response;
     },
     onSuccess: (data: any) => {
@@ -241,7 +235,7 @@ export default function Dashboard() {
     return true;
   });
 
-  const nftListings = nftData?.nfts || [];
+  const nftListings = (nftData as any)?.nfts || [];
 
   const getRarityColor = (rarity?: string) => {
     switch (rarity?.toLowerCase()) {

@@ -126,6 +126,12 @@ function Router() {
         <Route path="/dashboard" component={() => (
           <>
             <Navbar />
+            <Home />
+          </>
+        )} />
+        <Route path="/dashboard-advanced" component={() => (
+          <>
+            <Navbar />
             <Dashboard />
           </>
         )} />

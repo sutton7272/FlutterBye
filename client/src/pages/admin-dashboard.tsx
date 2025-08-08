@@ -118,6 +118,20 @@ export default function AdminDashboard() {
         "Log Analysis",
         "Maintenance Tools"
       ]
+    },
+    {
+      id: "escrow",
+      title: "Escrow Management",
+      description: "Enterprise-grade smart contract escrow system for high-value transactions",
+      icon: Shield,
+      route: "/admin/escrow",
+      color: "electric-blue",
+      features: [
+        "Multi-signature wallets",
+        "Timeout protection",
+        "Enterprise contracts ($200K-$2M)",
+        "Compliance reporting"
+      ]
     }
   ];
 
