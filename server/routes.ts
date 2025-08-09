@@ -4713,6 +4713,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Register FlutterAI routes
   app.use("/api/flutterai", flutterAIRoutes);
   
+  // Advanced Analytics Dashboard 2.0 - Enterprise Intelligence Platform
+  const advancedAnalyticsRoutes = (await import("./advanced-analytics-dashboard")).default;
+  app.use("/api/advanced-analytics", advancedAnalyticsRoutes);
+  console.log("📊 Advanced Analytics Dashboard 2.0 activated - Enterprise Intelligence Platform ready!");
+  
   // PHASE 1: Revolutionary 1-1000 Scoring Intelligence Routes
   app.use("/api/phase1", phase1IntelligenceRoutes);
   console.log("🚀 PHASE 1: Revolutionary 1-1000 scoring intelligence routes activated!");

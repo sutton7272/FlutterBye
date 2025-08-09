@@ -77,6 +77,7 @@ import TokenHolderMapPage from "@/pages/token-holder-map";
 import CollaborativeCreation from "@/pages/collaborative-creation";
 import FlutterAIDashboard from "@/pages/flutterai-dashboard";
 import EnterpriseDashboard from "@/pages/enterprise-dashboard";
+import AdvancedAnalytics from "@/pages/advanced-analytics";
 import ViralDashboard from "@/pages/viral-dashboard";
 import MessageNFTCreator from "@/pages/message-nft-creator";
 import Phase1Dashboard from "@/pages/phase1-dashboard";
@@ -481,6 +482,12 @@ function Router() {
           <>
             <Navbar />
             <EnterpriseDashboard />
+          </>
+        )} />
+        <Route path="/advanced-analytics" component={() => (
+          <>
+            <Navbar />
+            <AdvancedAnalytics />
           </>
         )} />
         <Route path="/enterprise-sales" component={() => (
