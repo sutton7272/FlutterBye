@@ -807,23 +807,25 @@ export default function Home() {
         {/* Test Modal Component */}
         <SimpleTestModal />
         
-        {/* Direct inline test button */}
+        {/* Direct inline test button - MOVED TO TOP OF PAGE */}
         <div style={{
           position: 'fixed',
-          top: '100px',
-          right: '10px',
-          zIndex: 10000,
-          backgroundColor: 'yellow',
-          padding: '20px',
-          color: 'black',
-          fontSize: '18px',
-          border: '3px solid red',
-          cursor: 'pointer'
+          top: '20px',
+          left: '20px',
+          zIndex: 999999,
+          backgroundColor: 'red',
+          padding: '30px',
+          color: 'white',
+          fontSize: '24px',
+          border: '5px solid yellow',
+          cursor: 'pointer',
+          borderRadius: '10px',
+          fontWeight: 'bold'
         }} onClick={() => {
           console.log("INLINE BUTTON CLICKED!");
-          alert("Inline button works!");
+          alert("This button works! Now we can test modals.");
         }}>
-          INLINE TEST
+          CLICK ME - TEST BUTTON
         </div>
         
       </div>

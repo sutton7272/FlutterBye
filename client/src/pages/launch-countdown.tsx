@@ -47,6 +47,7 @@ interface TimeLeft {
 }
 
 export default function LaunchCountdown() {
+  console.log("LaunchCountdown component loading...");
   const [timeLeft, setTimeLeft] = useState<TimeLeft>({ days: 0, hours: 0, minutes: 0, seconds: 0 });
   const [email, setEmail] = useState("");
   const [walletAddress, setWalletAddress] = useState("");
@@ -319,6 +320,27 @@ export default function LaunchCountdown() {
   // Main Launch Countdown & Waitlist (for authorized users)
   return (
     <div className="min-h-screen text-white relative overflow-hidden">
+      {/* TEST BUTTON FOR MODAL DEBUGGING */}
+      <div style={{
+        position: 'fixed',
+        top: '20px',
+        right: '20px',
+        zIndex: 999999,
+        backgroundColor: 'red',
+        padding: '20px',
+        color: 'white',
+        fontSize: '20px',
+        border: '3px solid yellow',
+        cursor: 'pointer',
+        borderRadius: '10px',
+        fontWeight: 'bold'
+      }} onClick={() => {
+        console.log("LAUNCH PAGE BUTTON CLICKED!");
+        alert("Test button on launch page works! Modals should work now.");
+      }}>
+        TEST BUTTON
+      </div>
+      
       {/* Show navbar if access is granted */}
       {hasAccess && (
         <>
