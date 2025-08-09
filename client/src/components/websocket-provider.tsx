@@ -61,6 +61,7 @@ export function WebSocketProvider({ children }: WebSocketProviderProps) {
         }));
       } catch (error) {
         console.error('❌ Error sending connection message:', error);
+        // Don't throw - just log and continue
       }
     };
 
@@ -73,8 +74,13 @@ export function WebSocketProvider({ children }: WebSocketProviderProps) {
         // Handle heartbeat messages separately to avoid spam
         if (data.type === 'heartbeat') {
           // Respond with pong to keep connection alive
-          if (ws.readyState === WebSocket.OPEN) {
-            ws.send(JSON.stringify({ type: 'pong', timestamp: new Date().toISOString() }));
+          try {
+            if (ws.readyState === WebSocket.OPEN) {
+              ws.send(JSON.stringify({ type: 'pong', timestamp: new Date().toISOString() }));
+            }
+          } catch (error) {
+            console.error('❌ Error sending pong:', error);
+            // Don't throw - just log and continue
           }
           return;
         }
@@ -117,6 +123,7 @@ export function WebSocketProvider({ children }: WebSocketProviderProps) {
       if (!isMountedRef.current) return;
       console.error('❌ WebSocket error:', error);
       setConnectionStatus('error');
+      // Don't throw - WebSocket errors are handled by onclose
     };
 
     return ws;
