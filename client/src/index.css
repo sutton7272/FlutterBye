@@ -872,45 +872,42 @@
 
   /* Electric LED Coming Soon Badge */
   .glow-red {
-    background: linear-gradient(45deg, #ff0040, #ff1555, #ff0040) !important;
+    background: linear-gradient(45deg, #dc2626, #ef4444, #dc2626) !important;
     text-shadow: 
-      0 0 5px #ff0040,
-      0 0 10px #ff0040,
-      0 0 15px #ff0040,
-      0 0 20px #ff0040 !important;
+      0 0 3px #dc2626,
+      0 0 6px #dc2626,
+      0 0 9px #dc2626 !important;
     box-shadow: 
-      0 0 10px #ff0040,
-      0 0 20px #ff0040,
-      0 0 30px #ff0040,
-      inset 0 0 10px rgba(255, 0, 64, 0.3) !important;
-    border: 1px solid #ff0040 !important;
-    animation: ledPulse 1.5s ease-in-out infinite !important;
+      0 0 6px #dc2626,
+      0 0 12px #dc2626,
+      0 0 18px rgba(220, 38, 38, 0.4),
+      inset 0 0 6px rgba(220, 38, 38, 0.2) !important;
+    border: 1px solid #dc2626 !important;
+    animation: ledPulse 2.5s ease-in-out infinite !important;
   }
 
   @keyframes ledPulse {
     0%, 100% {
       box-shadow: 
-        0 0 10px #ff0040,
-        0 0 20px #ff0040,
-        0 0 30px #ff0040,
-        inset 0 0 10px rgba(255, 0, 64, 0.3);
+        0 0 6px #dc2626,
+        0 0 12px #dc2626,
+        0 0 18px rgba(220, 38, 38, 0.4),
+        inset 0 0 6px rgba(220, 38, 38, 0.2);
       text-shadow: 
-        0 0 5px #ff0040,
-        0 0 10px #ff0040,
-        0 0 15px #ff0040,
-        0 0 20px #ff0040;
+        0 0 3px #dc2626,
+        0 0 6px #dc2626,
+        0 0 9px #dc2626;
     }
     50% {
       box-shadow: 
-        0 0 15px #ff0040,
-        0 0 30px #ff0040,
-        0 0 45px #ff0040,
-        inset 0 0 15px rgba(255, 0, 64, 0.5);
+        0 0 8px #dc2626,
+        0 0 16px #dc2626,
+        0 0 24px rgba(220, 38, 38, 0.5),
+        inset 0 0 8px rgba(220, 38, 38, 0.3);
       text-shadow: 
-        0 0 8px #ff0040,
-        0 0 15px #ff0040,
-        0 0 25px #ff0040,
-        0 0 35px #ff0040;
+        0 0 4px #dc2626,
+        0 0 8px #dc2626,
+        0 0 12px #dc2626;
     }
   }
 
