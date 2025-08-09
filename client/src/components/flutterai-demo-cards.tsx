@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Link } from "wouter";
+import { FlutterAIInteractiveDemo } from "./flutterai-interactive-demo";
 import { 
   Play, 
   Pause, 
@@ -213,8 +214,12 @@ function DemoCard({
 
 export function FlutterAIDemoCards() {
   const [activeDemos, setActiveDemos] = useState<string[]>([]);
+  const [isDemoOpen, setIsDemoOpen] = useState(false);
 
   const handleStartDemo = (demoName: string) => {
+    if (demoName === "AI Intelligence") {
+      setIsDemoOpen(true);
+    }
     setActiveDemos(prev => [...prev, demoName]);
   };
 
@@ -345,6 +350,12 @@ export function FlutterAIDemoCards() {
           </div>
         </CardContent>
       </Card>
+
+      {/* Interactive Demo Modal */}
+      <FlutterAIInteractiveDemo 
+        isOpen={isDemoOpen}
+        onClose={() => setIsDemoOpen(false)}
+      />
     </div>
   );
 }
