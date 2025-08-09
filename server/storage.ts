@@ -418,6 +418,15 @@ export class MemStorage implements IStorage {
     this.initializeDefaultSystemSettings();
 
     console.log(`Storage initialized with redemption codes: [${testCodes.map(c => `'${c.code} (${c.type})'`).join(', ')}]`);
+    
+    // Add demo users
+    this.initializeDemoUsers();
+    
+    // Add demo tokens
+    this.initializeDemoTokens();
+    
+    // Add demo wallet intelligence data
+    this.initializeDemoWalletIntelligence();
   }
 
   private initializeDefaultSystemSettings() {
@@ -483,6 +492,159 @@ export class MemStorage implements IStorage {
     });
 
     console.log(`Initialized escrow fee configs for: ${defaultConfigs.map(c => c.currency).join(', ')}`);
+  }
+
+  private initializeDemoUsers() {
+    const demoUsers = [
+      {
+        id: randomUUID(),
+        walletAddress: "9ixLmNcGMN7YBZ84bgPAgtJEXafdDMYuzmvGbeKTtzR",
+        username: "crypto_pioneer",
+        credits: "500.00",
+        isActive: true,
+        createdAt: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000), // 30 days ago
+        updatedAt: new Date()
+      },
+      {
+        id: randomUUID(),
+        walletAddress: "DdDovYp6pmESuc6BTCAayKrFTPWs5dCgwnBDNJeb4Rhr",
+        username: "blockchain_enthusiast",
+        credits: "750.00",
+        isActive: true,
+        createdAt: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000), // 15 days ago
+        updatedAt: new Date()
+      },
+      {
+        id: randomUUID(),
+        walletAddress: "5KWqJnWaZQR9jkN7YBZ84bgPAgtJEXafdDMYuzmvGb",
+        username: "flutter_trader",
+        credits: "1200.00",
+        isActive: true,
+        createdAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000), // 7 days ago
+        updatedAt: new Date()
+      }
+    ];
+
+    demoUsers.forEach(user => {
+      this.users.set(user.id, user as User);
+    });
+  }
+
+  private initializeDemoTokens() {
+    const demoTokens = [
+      {
+        id: randomUUID(),
+        creator: "9ixLmNcGMN7YBZ84bgPAgtJEXafdDMYuzmvGbeKTtzR",
+        message: "Welcome to FlutterBye! 🦋 Experience the future of emotional blockchain messaging",
+        mintAddress: "TokenMint1234567890abcdef1234567890abcdef12345",
+        totalSupply: "1000000",
+        decimals: 6,
+        valuePerToken: "0.025",
+        currency: "SOL",
+        isPublic: true,
+        hasAttachedValue: true,
+        createdAt: new Date(Date.now() - 24 * 60 * 60 * 1000), // 1 day ago
+        updatedAt: new Date()
+      },
+      {
+        id: randomUUID(),
+        creator: "DdDovYp6pmESuc6BTCAayKrFTPWs5dCgwnBDNJeb4Rhr",
+        message: "Sending love and positive vibes to everyone! 💕✨",
+        mintAddress: "TokenMint2345678901bcdef2345678901bcdef23456",
+        totalSupply: "500000",
+        decimals: 6,
+        valuePerToken: "0.050",
+        currency: "SOL",
+        isPublic: true,
+        hasAttachedValue: true,
+        createdAt: new Date(Date.now() - 12 * 60 * 60 * 1000), // 12 hours ago
+        updatedAt: new Date()
+      },
+      {
+        id: randomUUID(),
+        creator: "5KWqJnWaZQR9jkN7YBZ84bgPAgtJEXafdDMYuzmvGb",
+        message: "Revolutionary AI-powered token with FlutterAI intelligence! 🚀🤖",
+        mintAddress: "TokenMint3456789012cdef3456789012cdef34567",
+        totalSupply: "2000000",
+        decimals: 6,
+        valuePerToken: "0.100",
+        currency: "SOL",
+        isPublic: true,
+        hasAttachedValue: true,
+        createdAt: new Date(Date.now() - 6 * 60 * 60 * 1000), // 6 hours ago
+        updatedAt: new Date()
+      }
+    ];
+
+    demoTokens.forEach(token => {
+      this.tokens.set(token.id, token as Token);
+    });
+  }
+
+  private initializeDemoWalletIntelligence() {
+    const demoWalletData = [
+      {
+        id: randomUUID(),
+        walletAddress: "9ixLmNcGMN7YBZ84bgPAgtJEXafdDMYuzmvGbeKTtzR",
+        overallScore: 842,
+        riskLevel: "LOW",
+        wealthScore: 78,
+        activityScore: 89,
+        diversificationScore: 72,
+        stabilityScore: 91,
+        innovationScore: 68,
+        totalTransactions: 1247,
+        totalVolume: "45.67",
+        portfolioValue: "3450.89",
+        firstSeenDate: new Date(Date.now() - 120 * 24 * 60 * 60 * 1000), // 120 days ago
+        lastAnalyzed: new Date(),
+        crossChainActivity: { solana: true, ethereum: false, polygon: true },
+        riskFactors: ["high_frequency_trading"],
+        strengths: ["consistent_activity", "diversified_portfolio", "long_term_holder"]
+      },
+      {
+        id: randomUUID(),
+        walletAddress: "DdDovYp6pmESuc6BTCAayKrFTPWs5dCgwnBDNJeb4Rhr",
+        overallScore: 756,
+        riskLevel: "MEDIUM",
+        wealthScore: 65,
+        activityScore: 78,
+        diversificationScore: 82,
+        stabilityScore: 69,
+        innovationScore: 85,
+        totalTransactions: 892,
+        totalVolume: "23.45",
+        portfolioValue: "1890.34",
+        firstSeenDate: new Date(Date.now() - 85 * 24 * 60 * 60 * 1000), // 85 days ago
+        lastAnalyzed: new Date(),
+        crossChainActivity: { solana: true, ethereum: true, polygon: false },
+        riskFactors: ["new_wallet"],
+        strengths: ["early_adopter", "tech_savvy", "active_trader"]
+      },
+      {
+        id: randomUUID(),
+        walletAddress: "5KWqJnWaZQR9jkN7YBZ84bgPAgtJEXafdDMYuzmvGb",
+        overallScore: 923,
+        riskLevel: "LOW",
+        wealthScore: 94,
+        activityScore: 87,
+        diversificationScore: 91,
+        stabilityScore: 96,
+        innovationScore: 78,
+        totalTransactions: 2156,
+        totalVolume: "127.89",
+        portfolioValue: "8750.23",
+        firstSeenDate: new Date(Date.now() - 200 * 24 * 60 * 60 * 1000), // 200 days ago
+        lastAnalyzed: new Date(),
+        crossChainActivity: { solana: true, ethereum: true, polygon: true },
+        riskFactors: [],
+        strengths: ["whale_status", "diamond_hands", "ecosystem_pioneer", "institutional_grade"]
+      }
+    ];
+
+    demoWalletData.forEach(wallet => {
+      this.walletIntelligenceData.set(wallet.walletAddress, wallet);
+    });
   }
 
   // User operations
