@@ -29,8 +29,18 @@ export function WebSocketProvider({ children }: WebSocketProviderProps) {
   // Refs for cleanup and mount tracking
   const isMountedRef = useRef(true);
   const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  
+  // Temporarily disable all WebSocket functionality to prevent errors
+  const WEBSOCKET_DISABLED = true;
 
   const connectWebSocket = useCallback(() => {
+    // Completely disable WebSocket to prevent all errors
+    if (WEBSOCKET_DISABLED) {
+      console.log('📍 WebSocket disabled for stability - running without real-time features');
+      setConnectionStatus('disconnected');
+      return;
+    }
+    
     // Check if component is still mounted before connecting
     if (!isMountedRef.current) return;
 

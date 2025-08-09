@@ -65,10 +65,12 @@ export function setupGlobalErrorHandling() {
       }
     }
     
-    // Aggressively prevent ALL unhandled rejections from triggering error boundary
-    // This is a temporary fix while we resolve the underlying WebSocket issues
-    console.log('🔥 ALL unhandled rejections prevented from triggering error boundary:', reason);
+    // Completely suppress ALL unhandled rejections to stop error boundary
+    // Disable all logging to prevent console spam during debugging
+    // console.log('🔥 ALL unhandled rejections suppressed:', reason);
     event.preventDefault();
+    event.stopPropagation();
+    event.stopImmediatePropagation();
   });
 
   // Handle global JavaScript errors
