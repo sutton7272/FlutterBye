@@ -305,14 +305,20 @@ export function FlutterinaFloatingChatbox() {
             <div className="flex space-x-2">
               <Textarea
                 value={message}
-                onChange={(e) => setMessage(e.target.value)}
+                onChange={(e) => {
+                  console.log('Message changed:', e.target.value);
+                  setMessage(e.target.value);
+                }}
                 onKeyDown={handleKeyPress}
                 placeholder="Ask Skye anything about Flutterbye..."
                 className="flex-1 min-h-[40px] max-h-[100px] text-sm resize-none"
                 disabled={sendMessageMutation.isPending}
               />
               <Button
-                onClick={handleSendMessage}
+                onClick={() => {
+                  console.log('Send button clicked!', message);
+                  handleSendMessage();
+                }}
                 disabled={!message.trim() || sendMessageMutation.isPending}
                 className="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600"
               >

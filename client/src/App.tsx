@@ -5,6 +5,8 @@ import { Toaster } from "@/components/ui/toaster";
 import { EarlyAccessGate } from "@/components/early-access-gate";
 import { FlutterinaFloatingChatbox } from "@/components/flutterina-chatbox";
 import { SkyeTestChatbox } from "@/components/skye-test-chatbox";
+import { MinimalChatTest } from "@/components/minimal-chat-test";
+import { SkyeChatFinal } from "@/components/skye-chat-final";
 import { useState, useEffect, lazy, Suspense } from "react";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { LoadingSpinner } from "@/components/loading-spinner";
@@ -859,8 +861,8 @@ function App() {
               <PWAInstallPrompt />
               <PWANotificationPrompt />
               <CommandPalette />
-              <FlutterinaFloatingChatbox />
-              <SkyeTestChatbox />
+              <SkyeChatFinal />
+              <MinimalChatTest />
               <Router />
             </TooltipProvider>
           </WebSocketProvider>
