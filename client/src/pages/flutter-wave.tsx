@@ -26,6 +26,9 @@ import {
 } from "lucide-react";
 import { ContextualChatButton } from "@/components/contextual-chat-button";
 import { VoiceMessageRecorder } from '@/components/voice-message-recorder';
+import { SMSCampaignManager } from '@/components/sms-campaign-manager';
+import { EnhancedAnalyticsDashboard } from '@/components/enhanced-analytics-dashboard';
+import { MessageTemplatesLibrary } from '@/components/message-templates-library';
 
 
 export default function FlutterWave() {
@@ -182,27 +185,27 @@ export default function FlutterWave() {
               <TabsList className="grid w-full grid-cols-6">
                 <TabsTrigger value="composer" className="flex items-center gap-2">
                   <MessageSquare className="h-4 w-4" />
-                  Neural Composer
+                  SMS Composer
                 </TabsTrigger>
-                <TabsTrigger value="threads" className="flex items-center gap-2">
-                  <Sparkles className="h-4 w-4" />
-                  Quantum Threads
+                <TabsTrigger value="campaigns" className="flex items-center gap-2">
+                  <Users className="h-4 w-4" />
+                  Campaign Manager
                 </TabsTrigger>
-                <TabsTrigger value="capsules" className="flex items-center gap-2">
-                  <Zap className="h-4 w-4" />
-                  Time Capsules
+                <TabsTrigger value="templates" className="flex items-center gap-2">
+                  <Heart className="h-4 w-4" />
+                  Templates Library
                 </TabsTrigger>
-                <TabsTrigger value="exchange" className="flex items-center gap-2">
+                <TabsTrigger value="analytics" className="flex items-center gap-2">
                   <BarChart3 className="h-4 w-4" />
-                  Emotion Exchange
+                  Analytics
                 </TabsTrigger>
                 <TabsTrigger value="avatars" className="flex items-center gap-2">
-                  <Heart className="h-4 w-4" />
-                  AI Avatars
+                  <Sparkles className="h-4 w-4" />
+                  AI Features
                 </TabsTrigger>
                 <TabsTrigger value="pulse" className="flex items-center gap-2">
                   <Globe className="h-4 w-4" />
-                  Global Pulse
+                  Global Network
                 </TabsTrigger>
               </TabsList>
 
@@ -488,92 +491,35 @@ export default function FlutterWave() {
                 </div>
               </TabsContent>
 
-              <TabsContent value="threads" className="mt-6">
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <Sparkles className="h-5 w-5 text-yellow-400" />
-                      Quantum Message Threads
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="text-center p-8">
-                      <TrendingUp className="h-16 w-16 text-electric-green mx-auto mb-4" />
-                      <h3 className="text-xl font-semibold mb-2">Multi-Dimensional Conversations</h3>
-                      <p className="text-muted-foreground mb-6">
-                        Experience conversations that evolve across multiple emotional dimensions
-                      </p>
-                      <Button className="bg-electric-green hover:bg-electric-green/80">
-                        Explore Threads
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
+              <TabsContent value="campaigns" className="mt-6">
+                <SMSCampaignManager />
               </TabsContent>
 
-              <TabsContent value="capsules" className="mt-6">
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <Zap className="h-5 w-5 text-green-400" />
-                      Temporal Message Capsules
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="text-center p-8">
-                      <Zap className="h-16 w-16 text-green-400 mx-auto mb-4" />
-                      <h3 className="text-xl font-semibold mb-2">Time-Locked Emotions</h3>
-                      <p className="text-muted-foreground mb-6">
-                        Send messages through time with AI-powered optimal delivery timing
-                      </p>
-                      <Button className="bg-green-400 hover:bg-green-400/80 text-black">
-                        Create Capsule
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
+              <TabsContent value="templates" className="mt-6">
+                <MessageTemplatesLibrary />
               </TabsContent>
 
-              <TabsContent value="exchange" className="mt-6">
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <BarChart3 className="h-5 w-5 text-orange-400" />
-                      Emotional Market Exchange
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="text-center p-8">
-                      <BarChart3 className="h-16 w-16 text-orange-400 mx-auto mb-4" />
-                      <h3 className="text-xl font-semibold mb-2">Monetize Emotional Intelligence</h3>
-                      <p className="text-muted-foreground mb-6">
-                        Trade emotional insights and participate in the attention economy
-                      </p>
-                      <Button className="bg-orange-400 hover:bg-orange-400/80 text-black">
-                        Enter Exchange
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
+              <TabsContent value="analytics" className="mt-6">
+                <EnhancedAnalyticsDashboard />
               </TabsContent>
 
               <TabsContent value="avatars" className="mt-6">
                 <Card>
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
-                      <Heart className="h-5 w-5 text-red-400" />
-                      AI Avatar Companions (ARIA v2.0)
+                      <Sparkles className="h-5 w-5 text-purple-400" />
+                      AI-Powered Features
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <div className="text-center p-8">
-                      <Heart className="h-16 w-16 text-red-400 mx-auto mb-4" />
-                      <h3 className="text-xl font-semibold mb-2">Intelligent Companions</h3>
+                      <Sparkles className="h-16 w-16 text-purple-400 mx-auto mb-4" />
+                      <h3 className="text-xl font-semibold mb-2">Advanced AI Features</h3>
                       <p className="text-muted-foreground mb-6">
-                        Interact with advanced AI avatars that understand and respond to emotions
+                        Discover cutting-edge AI capabilities for emotional messaging
                       </p>
-                      <Button className="bg-red-400 hover:bg-red-400/80 text-white">
-                        Meet ARIA
+                      <Button className="bg-purple-400 hover:bg-purple-400/80 text-white">
+                        Explore AI Features
                       </Button>
                     </div>
                   </CardContent>
@@ -585,18 +531,18 @@ export default function FlutterWave() {
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
                       <Globe className="h-5 w-5 text-blue-400" />
-                      Global Butterfly Effect Tracking
+                      Global SMS Network
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <div className="text-center p-8">
                       <Globe className="h-16 w-16 text-blue-400 mx-auto mb-4" />
-                      <h3 className="text-xl font-semibold mb-2">Worldwide Emotional Waves</h3>
+                      <h3 className="text-xl font-semibold mb-2">Worldwide SMS Network</h3>
                       <p className="text-muted-foreground mb-6">
-                        Monitor how emotions ripple across the global FlutterWave network
+                        Monitor global SMS delivery and emotional token distribution
                       </p>
                       <Button className="bg-blue-400 hover:bg-blue-400/80 text-white">
-                        View Global Pulse
+                        View Network Status
                       </Button>
                     </div>
                   </CardContent>

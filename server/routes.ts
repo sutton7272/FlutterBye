@@ -10813,6 +10813,98 @@ export async function registerRoutes(app: Express): Promise<Server> {
     console.log('SIGINT received, shutting down gracefully...');
     blogScheduler.shutdown();
   });
+
+  // SMS Campaign Management Routes
+  const { smsCampaignService } = await import("./sms-campaign-service");
+
+  // Campaign routes
+  app.get("/api/sms/campaigns", async (req, res) => {
+    try {
+      const campaigns = await smsCampaignService.getAllCampaigns();
+      res.json(campaigns);
+    } catch (error) {
+      console.error("Error fetching campaigns:", error);
+      res.status(500).json({ error: "Failed to fetch campaigns" });
+    }
+  });
+
+  app.post("/api/sms/campaigns", async (req, res) => {
+    try {
+      const campaign = await smsCampaignService.createCampaign(req.body);
+      res.json(campaign);
+    } catch (error) {
+      console.error("Error creating campaign:", error);
+      res.status(500).json({ error: "Failed to create campaign" });
+    }
+  });
+
+  app.post("/api/sms/campaigns/:id/launch", async (req, res) => {
+    try {
+      const campaign = await smsCampaignService.launchCampaign(req.params.id);
+      if (!campaign) {
+        return res.status(404).json({ error: "Campaign not found" });
+      }
+      res.json(campaign);
+    } catch (error) {
+      console.error("Error launching campaign:", error);
+      res.status(500).json({ error: "Failed to launch campaign" });
+    }
+  });
+
+  // Contact routes
+  app.get("/api/sms/contacts", async (req, res) => {
+    try {
+      const contacts = await smsCampaignService.getAllContacts();
+      res.json(contacts);
+    } catch (error) {
+      console.error("Error fetching contacts:", error);
+      res.status(500).json({ error: "Failed to fetch contacts" });
+    }
+  });
+
+  app.post("/api/sms/contacts", async (req, res) => {
+    try {
+      const contact = await smsCampaignService.addContact(req.body);
+      res.json(contact);
+    } catch (error) {
+      console.error("Error adding contact:", error);
+      res.status(500).json({ error: "Failed to add contact" });
+    }
+  });
+
+  // Template routes
+  app.get("/api/sms/templates", async (req, res) => {
+    try {
+      const templates = await smsCampaignService.getAllTemplates();
+      res.json(templates);
+    } catch (error) {
+      console.error("Error fetching templates:", error);
+      res.status(500).json({ error: "Failed to fetch templates" });
+    }
+  });
+
+  app.post("/api/sms/templates", async (req, res) => {
+    try {
+      const template = await smsCampaignService.createTemplate(req.body);
+      res.json(template);
+    } catch (error) {
+      console.error("Error creating template:", error);
+      res.status(500).json({ error: "Failed to create template" });
+    }
+  });
+
+  // Analytics routes
+  app.get("/api/analytics/sms-dashboard", async (req, res) => {
+    try {
+      const analytics = await smsCampaignService.getCampaignAnalytics();
+      res.json(analytics);
+    } catch (error) {
+      console.error("Error fetching SMS analytics:", error);
+      res.status(500).json({ error: "Failed to fetch analytics" });
+    }
+  });
+
+  console.log("📱 SMS Campaign Management System activated!");
   
   return httpServer;
 }
