@@ -52,7 +52,7 @@ import { MobileOnboardingWizard } from "@/components/mobile-onboarding-wizard";
 import { WalletConnectionWizard } from "@/components/wallet-connection-wizard";
 import { QuickAccessFAB } from "@/components/quick-access-fab";
 import { PersonalizedDashboard } from "@/components/PersonalizedDashboard";
-import { PerformanceDashboard } from "@/components/performance-dashboard";
+import PerformanceDashboard from "@/components/performance-dashboard";
 import ViralDashboard from "@/pages/viral-dashboard";
 import { ContextualChatButton } from "@/components/contextual-chat-button";
 

@@ -1,5 +1,5 @@
 import { AdvancedSearch } from "@/components/advanced-search";
-import { PerformanceDashboard } from "@/components/performance-dashboard";
+import PerformanceDashboard from "@/components/performance-dashboard";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { 
   Search, 

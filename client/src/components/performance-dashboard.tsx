@@ -390,3 +390,4 @@ function PerformanceDashboard() {
 }
 
 export default PerformanceDashboard;
+export { PerformanceDashboard };
