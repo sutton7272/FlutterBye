@@ -53,15 +53,76 @@ export default function Navbar() {
         {/* Logo */}
         <div className="mr-8 flex items-center">
           <Link href="/" className="flex items-center space-x-3">
-            <div className="w-9 h-9 rounded-xl flex items-center justify-center p-1">
-              <img 
-                src="/butterfly-logo.png" 
-                alt="Flutterbye Butterfly Logo" 
-                className="w-full h-full object-contain"
+            <div className="w-9 h-9 rounded-xl flex items-center justify-center">
+              <svg 
+                width="32" 
+                height="26" 
+                viewBox="0 0 100 80" 
+                className="butterfly-logo"
                 style={{
-                  filter: 'drop-shadow(0 0 8px #00bfff) drop-shadow(0 0 16px #00ffcc)',
+                  filter: 'drop-shadow(0 0 6px #00bfff) drop-shadow(0 0 12px #00ffcc)',
                 }}
-              />
+              >
+                {/* Central body line */}
+                <line x1="50" y1="15" x2="50" y2="65" stroke="#00bfff" strokeWidth="2" opacity="1" />
+                <circle cx="50" cy="40" r="2" fill="#00bfff" opacity="1" />
+                
+                {/* Upper wings - symmetric triangular shapes */}
+                <path 
+                  d="M50 40 L20 15 L10 25 L25 35 L50 40" 
+                  fill="none" 
+                  stroke="#00bfff" 
+                  strokeWidth="1.5" 
+                  opacity="0.9"
+                />
+                <path 
+                  d="M50 40 L80 15 L90 25 L75 35 L50 40" 
+                  fill="none" 
+                  stroke="#00bfff" 
+                  strokeWidth="1.5" 
+                  opacity="0.9"
+                />
+                
+                {/* Lower wings - rounded triangular shapes */}
+                <path 
+                  d="M50 40 L25 55 L15 70 L30 75 L50 40" 
+                  fill="none" 
+                  stroke="#00ffcc" 
+                  strokeWidth="1.5" 
+                  opacity="0.9"
+                />
+                <path 
+                  d="M50 40 L75 55 L85 70 L70 75 L50 40" 
+                  fill="none" 
+                  stroke="#00ffcc" 
+                  strokeWidth="1.5" 
+                  opacity="0.9"
+                />
+                
+                {/* Internal wing network - triangular mesh */}
+                <line x1="50" y1="40" x2="20" y2="15" stroke="#00bfff" strokeWidth="0.8" opacity="0.7" />
+                <line x1="50" y1="40" x2="80" y2="15" stroke="#00bfff" strokeWidth="0.8" opacity="0.7" />
+                <line x1="50" y1="40" x2="25" y2="55" stroke="#00ffcc" strokeWidth="0.8" opacity="0.7" />
+                <line x1="50" y1="40" x2="75" y2="55" stroke="#00ffcc" strokeWidth="0.8" opacity="0.7" />
+                
+                {/* Cross connections */}
+                <line x1="25" y1="35" x2="35" y2="30" stroke="#00bfff" strokeWidth="0.5" opacity="0.6" />
+                <line x1="75" y1="35" x2="65" y2="30" stroke="#00bfff" strokeWidth="0.5" opacity="0.6" />
+                <line x1="30" y1="75" x2="40" y2="60" stroke="#00ffcc" strokeWidth="0.5" opacity="0.6" />
+                <line x1="70" y1="75" x2="60" y2="60" stroke="#00ffcc" strokeWidth="0.5" opacity="0.6" />
+                
+                {/* Node points at key intersections */}
+                <circle cx="20" cy="15" r="1.5" fill="#00bfff" opacity="0.9" />
+                <circle cx="80" cy="15" r="1.5" fill="#00bfff" opacity="0.9" />
+                <circle cx="25" cy="55" r="1.5" fill="#00ffcc" opacity="0.9" />
+                <circle cx="75" cy="55" r="1.5" fill="#00ffcc" opacity="0.9" />
+                
+                {/* Wing tip nodes */}
+                <circle cx="10" cy="25" r="1" fill="#00bfff" opacity="0.8" />
+                <circle cx="90" cy="25" r="1" fill="#00bfff" opacity="0.8" />
+                <circle cx="15" cy="70" r="1" fill="#00ffcc" opacity="0.8" />
+                <circle cx="85" cy="70" r="1" fill="#00ffcc" opacity="0.8" />
+              </svg>
             </div>
             <span className="hidden font-bold text-xl sm:inline-block text-white">
               Flutterbye
