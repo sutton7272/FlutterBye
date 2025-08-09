@@ -126,7 +126,10 @@ import AdminEscrow from "@/pages/admin-escrow";
 import { AdminRouteGuard } from "@/components/admin-route-guard";
 function Router() {
   return (
-    <ErrorBoundary>
+    <ErrorBoundary onError={(error, errorInfo) => {
+      console.error('🚨 Router ErrorBoundary triggered:', error);
+      console.error('🚨 Router Error Info:', errorInfo);
+    }}>
       <div className="dark min-h-screen flex flex-col bg-transparent">
         <div className="flex-1 bg-transparent">
           <Switch>

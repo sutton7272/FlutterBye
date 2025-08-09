@@ -24,7 +24,11 @@ export class ErrorBoundary extends Component<Props, State> {
   }
 
   public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    console.error('ErrorBoundary caught an error:', error, errorInfo);
+    console.error('🚨 ErrorBoundary caught an error:', error);
+    console.error('🚨 Error stack:', error.stack);
+    console.error('🚨 Component stack:', errorInfo.componentStack);
+    console.error('🚨 Error info:', errorInfo);
+    
     this.props.onError?.(error, errorInfo);
     
     // Log to monitoring service in production

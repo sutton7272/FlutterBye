@@ -8,6 +8,8 @@ export function setupGlobalErrorHandling() {
   // Handle unhandled promise rejections
   window.addEventListener('unhandledrejection', (event) => {
     console.warn('🚨 Unhandled promise rejection caught:', event.reason);
+    console.warn('🚨 Promise rejection stack:', event.reason?.stack);
+    console.warn('🚨 Promise rejection details:', JSON.stringify(event.reason, null, 2));
     
     // Check if it's a navigation-related error that we can safely ignore
     const reason = event.reason;
