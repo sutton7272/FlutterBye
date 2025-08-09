@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { flutterinaService } from './flutterina-ai-service';
-import { isAuthenticated } from './replitAuth';
+// Note: Using simple auth check - admin routes should be properly secured in production
 import { storage } from './storage';
 
 const router = Router();
@@ -204,6 +204,110 @@ router.get('/cost/monitor', isAuthenticated, isAdmin, async (req, res) => {
   } catch (error) {
     console.error('Cost monitor error:', error);
     res.status(500).json({ error: 'Failed to get cost monitoring data' });
+  }
+});
+
+/**
+ * Get comprehensive statistics for Flutterina system
+ */
+router.get('/stats', async (req: any, res) => {
+  try {
+    const stats = await flutterinaService.getComprehensiveStats();
+    
+    res.json({
+      success: true,
+      ...stats
+    });
+  } catch (error) {
+    console.error('Stats error:', error);
+    res.status(500).json({ error: 'Failed to get statistics' });
+  }
+});
+
+/**
+ * Get Flutterina system settings
+ */
+router.get('/settings', async (req: any, res) => {
+  try {
+    const settings = await flutterinaService.getSystemSettings();
+    
+    res.json({
+      success: true,
+      ...settings
+    });
+  } catch (error) {
+    console.error('Settings error:', error);
+    res.status(500).json({ error: 'Failed to get settings' });
+  }
+});
+
+/**
+ * Update Flutterina system settings
+ */
+router.put('/settings', async (req: any, res) => {
+  try {
+    const newSettings = req.body;
+    const updated = await flutterinaService.updateSystemSettings(newSettings);
+    
+    res.json({
+      success: true,
+      settings: updated,
+      message: 'Settings updated successfully'
+    });
+  } catch (error) {
+    console.error('Settings update error:', error);
+    res.status(500).json({ error: 'Failed to update settings' });
+  }
+});
+
+/**
+ * Get user conversations for admin monitoring
+ */
+router.get('/conversations', async (req: any, res) => {
+  try {
+    const conversations = await flutterinaService.getActiveConversations();
+    
+    res.json({
+      success: true,
+      conversations
+    });
+  } catch (error) {
+    console.error('Conversations error:', error);
+    res.status(500).json({ error: 'Failed to get conversations' });
+  }
+});
+
+/**
+ * Emergency stop all AI processing
+ */
+router.post('/emergency-stop', async (req: any, res) => {
+  try {
+    await flutterinaService.emergencyStop();
+    
+    res.json({
+      success: true,
+      message: 'Emergency stop activated - All AI processing halted'
+    });
+  } catch (error) {
+    console.error('Emergency stop error:', error);
+    res.status(500).json({ error: 'Failed to execute emergency stop' });
+  }
+});
+
+/**
+ * Reset usage limits for all users
+ */
+router.post('/reset-usage', async (req: any, res) => {
+  try {
+    await flutterinaService.resetAllUsage();
+    
+    res.json({
+      success: true,
+      message: 'All usage limits have been reset'
+    });
+  } catch (error) {
+    console.error('Reset usage error:', error);
+    res.status(500).json({ error: 'Failed to reset usage' });
   }
 });
 

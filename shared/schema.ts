@@ -1121,6 +1121,16 @@ export type RedeemableCode = typeof redeemableCodes.$inferSelect;
 export type InsertRedeemableCode = z.infer<typeof insertRedeemableCodeSchema>;
 
 export type CodeRedemption = typeof codeRedemptions.$inferSelect;
+
+// Flutterina AI Chat System Types
+export type FlutterinaConversation = typeof flutterinaConversations.$inferSelect;
+export type InsertFlutterinaConversation = typeof flutterinaConversations.$inferInsert;
+
+export type FlutterinaMessage = typeof flutterinaMessages.$inferSelect;
+export type InsertFlutterinaMessage = typeof flutterinaMessages.$inferInsert;
+
+export type FlutterinaPersonalityProfile = typeof flutterinaPersonalityProfiles.$inferSelect;
+export type InsertFlutterinaPersonalityProfile = typeof flutterinaPersonalityProfiles.$inferInsert;
 // Voice messages table for production voice functionality
 export const voiceMessages = pgTable("voice_messages", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),

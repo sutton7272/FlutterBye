@@ -17,6 +17,7 @@ import AdvancedAnalyticsDashboard from '@/components/advanced-analytics-dashboar
 import EnterpriseDashboard from '@/components/enterprise-dashboard';
 import RealTimeIntelligenceDashboard from '@/components/real-time-intelligence-dashboard';
 import { SolviturBrandBadge } from '@/components/solvitur-brand-badge';
+import { FlutterinaAdminPanel } from '@/components/flutterina-admin-panel';
 import { 
   Brain, 
   Wallet, 
@@ -1134,9 +1135,9 @@ export default function FlutterAIDashboard() {
           </div>
         )}
 
-        {/* Streamlined Core FlutterAI Dashboard - 4 Essential Tabs */}
+        {/* Enhanced FlutterAI Dashboard - 5 Essential Tabs */}
         <Tabs defaultValue="overview" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4 bg-slate-800/50 mb-6">
+          <TabsList className="grid w-full grid-cols-5 bg-slate-800/50 mb-6">
             <TabsTrigger value="overview" className="data-[state=active]:bg-purple-600">
               <Brain className="h-4 w-4 mr-2" />
               Intelligence Overview
@@ -1148,6 +1149,10 @@ export default function FlutterAIDashboard() {
             <TabsTrigger value="analytics" className="data-[state=active]:bg-green-600">
               <BarChart3 className="h-4 w-4 mr-2" />
               Analytics & Insights
+            </TabsTrigger>
+            <TabsTrigger value="flutterina" className="data-[state=active]:bg-pink-600">
+              <MessageSquare className="h-4 w-4 mr-2" />
+              Flutterina AI
             </TabsTrigger>
             <TabsTrigger value="settings" className="data-[state=active]:bg-orange-600">
               <Settings className="h-4 w-4 mr-2" />
@@ -1955,6 +1960,11 @@ export default function FlutterAIDashboard() {
                 </Alert>
               </CardContent>
             </Card>
+          </TabsContent>
+
+          {/* 5. FLUTTERINA AI MANAGEMENT TAB */}
+          <TabsContent value="flutterina" className="space-y-6">
+            <FlutterinaAdminPanel />
           </TabsContent>
         </Tabs>
       </div>
