@@ -3,80 +3,84 @@ import React from 'react';
 const GeometricButterfly = ({ color, size }: { color: string; size: number }) => (
   <svg 
     width={size} 
-    height={size * 0.75} 
-    viewBox="0 0 120 90" 
+    height={size * 0.8} 
+    viewBox="0 0 100 80" 
     className="geometric-butterfly"
     style={{
-      filter: `drop-shadow(0 0 ${size/10}px ${color}) drop-shadow(0 0 ${size/6}px ${color})`,
+      filter: `drop-shadow(0 0 ${size/8}px ${color}) drop-shadow(0 0 ${size/5}px ${color})`,
     }}
   >
-    {/* Butterfly body */}
-    <line x1="60" y1="20" x2="60" y2="70" stroke={color} strokeWidth="2" opacity="0.9" />
-    <circle cx="60" cy="45" r="1.5" fill={color} opacity="1" />
+    {/* Central body line */}
+    <line x1="50" y1="15" x2="50" y2="65" stroke={color} strokeWidth="1.5" opacity="1" />
+    <circle cx="50" cy="40" r="1.5" fill={color} opacity="1" />
     
-    {/* Upper left wing - wireframe outline */}
+    {/* Upper wings - symmetric triangular shapes */}
     <path 
-      d="M60 45 L40 25 L25 30 L15 20 L20 10 L35 15 L45 20 L60 45" 
+      d="M50 40 L20 15 L10 25 L25 35 L50 40" 
       fill="none" 
       stroke={color} 
-      strokeWidth="1.2" 
+      strokeWidth="1" 
+      opacity="0.9"
+    />
+    <path 
+      d="M50 40 L80 15 L90 25 L75 35 L50 40" 
+      fill="none" 
+      stroke={color} 
+      strokeWidth="1" 
       opacity="0.9"
     />
     
-    {/* Upper right wing - wireframe outline */}
+    {/* Lower wings - rounded triangular shapes */}
     <path 
-      d="M60 45 L80 25 L95 30 L105 20 L100 10 L85 15 L75 20 L60 45" 
+      d="M50 40 L25 55 L15 70 L30 75 L50 40" 
       fill="none" 
       stroke={color} 
-      strokeWidth="1.2" 
+      strokeWidth="1" 
+      opacity="0.9"
+    />
+    <path 
+      d="M50 40 L75 55 L85 70 L70 75 L50 40" 
+      fill="none" 
+      stroke={color} 
+      strokeWidth="1" 
       opacity="0.9"
     />
     
-    {/* Lower left wing - wireframe outline */}
-    <path 
-      d="M60 45 L45 60 L35 75 L20 70 L15 80 L30 85 L50 75 L60 45" 
-      fill="none" 
-      stroke={color} 
-      strokeWidth="1.2" 
-      opacity="0.9"
-    />
+    {/* Internal wing network - triangular mesh */}
+    <line x1="50" y1="40" x2="20" y2="15" stroke={color} strokeWidth="0.5" opacity="0.7" />
+    <line x1="50" y1="40" x2="80" y2="15" stroke={color} strokeWidth="0.5" opacity="0.7" />
+    <line x1="50" y1="40" x2="25" y2="55" stroke={color} strokeWidth="0.5" opacity="0.7" />
+    <line x1="50" y1="40" x2="75" y2="55" stroke={color} strokeWidth="0.5" opacity="0.7" />
     
-    {/* Lower right wing - wireframe outline */}
-    <path 
-      d="M60 45 L75 60 L85 75 L100 70 L105 80 L90 85 L70 75 L60 45" 
-      fill="none" 
-      stroke={color} 
-      strokeWidth="1.2" 
-      opacity="0.9"
-    />
+    {/* Wing triangulation mesh */}
+    <line x1="20" y1="15" x2="25" y2="35" stroke={color} strokeWidth="0.3" opacity="0.5" />
+    <line x1="80" y1="15" x2="75" y2="35" stroke={color} strokeWidth="0.3" opacity="0.5" />
+    <line x1="25" y1="55" x2="30" y2="75" stroke={color} strokeWidth="0.3" opacity="0.5" />
+    <line x1="75" y1="55" x2="70" y2="75" stroke={color} strokeWidth="0.3" opacity="0.5" />
     
-    {/* Internal wing structure - geometric mesh */}
-    <line x1="60" y1="45" x2="30" y2="25" stroke={color} strokeWidth="0.6" opacity="0.6" />
-    <line x1="60" y1="45" x2="90" y2="25" stroke={color} strokeWidth="0.6" opacity="0.6" />
-    <line x1="60" y1="45" x2="40" y2="65" stroke={color} strokeWidth="0.6" opacity="0.6" />
-    <line x1="60" y1="45" x2="80" y2="65" stroke={color} strokeWidth="0.6" opacity="0.6" />
+    {/* Cross connections */}
+    <line x1="25" y1="35" x2="35" y2="30" stroke={color} strokeWidth="0.3" opacity="0.4" />
+    <line x1="75" y1="35" x2="65" y2="30" stroke={color} strokeWidth="0.3" opacity="0.4" />
+    <line x1="30" y1="75" x2="40" y2="60" stroke={color} strokeWidth="0.3" opacity="0.4" />
+    <line x1="70" y1="75" x2="60" y2="60" stroke={color} strokeWidth="0.3" opacity="0.4" />
     
-    {/* Additional geometric mesh lines */}
-    <line x1="30" y1="25" x2="45" y2="35" stroke={color} strokeWidth="0.4" opacity="0.5" />
-    <line x1="90" y1="25" x2="75" y2="35" stroke={color} strokeWidth="0.4" opacity="0.5" />
-    <line x1="40" y1="65" x2="50" y2="55" stroke={color} strokeWidth="0.4" opacity="0.5" />
-    <line x1="80" y1="65" x2="70" y2="55" stroke={color} strokeWidth="0.4" opacity="0.5" />
-    
-    {/* Connection nodes/dots */}
-    <circle cx="30" cy="25" r="1.2" fill={color} opacity="0.8" />
-    <circle cx="90" cy="25" r="1.2" fill={color} opacity="0.8" />
-    <circle cx="40" cy="65" r="1.2" fill={color} opacity="0.8" />
-    <circle cx="80" cy="65" r="1.2" fill={color} opacity="0.8" />
-    <circle cx="25" cy="30" r="0.8" fill={color} opacity="0.6" />
-    <circle cx="95" cy="30" r="0.8" fill={color} opacity="0.6" />
-    <circle cx="35" cy="75" r="0.8" fill={color} opacity="0.6" />
-    <circle cx="85" cy="75" r="0.8" fill={color} opacity="0.6" />
+    {/* Node points at key intersections */}
+    <circle cx="20" cy="15" r="1" fill={color} opacity="0.9" />
+    <circle cx="80" cy="15" r="1" fill={color} opacity="0.9" />
+    <circle cx="25" cy="55" r="1" fill={color} opacity="0.9" />
+    <circle cx="75" cy="55" r="1" fill={color} opacity="0.9" />
     
     {/* Wing tip nodes */}
-    <circle cx="20" cy="10" r="1" fill={color} opacity="0.7" />
-    <circle cx="100" cy="10" r="1" fill={color} opacity="0.7" />
-    <circle cx="15" cy="80" r="1" fill={color} opacity="0.7" />
-    <circle cx="105" cy="80" r="1" fill={color} opacity="0.7" />
+    <circle cx="10" cy="25" r="0.8" fill={color} opacity="0.7" />
+    <circle cx="90" cy="25" r="0.8" fill={color} opacity="0.7" />
+    <circle cx="15" cy="70" r="0.8" fill={color} opacity="0.7" />
+    <circle cx="85" cy="70" r="0.8" fill={color} opacity="0.7" />
+    
+    {/* Inner connection nodes */}
+    <circle cx="25" cy="35" r="0.6" fill={color} opacity="0.6" />
+    <circle cx="75" cy="35" r="0.6" fill={color} opacity="0.6" />
+    <circle cx="30" cy="75" r="0.6" fill={color} opacity="0.6" />
+    <circle cx="70" cy="75" r="0.6" fill={color} opacity="0.6" />
   </svg>
 );
 
