@@ -48,9 +48,18 @@ export function setupGlobalErrorHandling() {
       if (reason.message && (
         reason.message.includes('WebSocket') ||
         reason.message.includes('Failed to construct') ||
-        reason.message.includes('SyntaxError')
+        reason.message.includes('SyntaxError') ||
+        reason.message.includes('NetworkError') ||
+        reason.message.includes('Connection refused')
       )) {
-        console.log('📍 WebSocket error caught and handled');
+        console.log('📍 WebSocket/Network error caught and handled');
+        event.preventDefault();
+        return;
+      }
+
+      // Generic unhandled rejections without specific error messages
+      if (!reason.message || reason.message === 'undefined' || reason.message === '') {
+        console.log('📍 Generic unhandled rejection caught');
         event.preventDefault();
         return;
       }
