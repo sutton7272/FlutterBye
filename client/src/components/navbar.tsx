@@ -55,7 +55,7 @@ export default function Navbar() {
           <Link href="/" className="flex items-center space-x-3">
             <div className="w-9 h-9 rounded-xl flex items-center justify-center p-1">
               <img 
-                src="/attached_assets/image_1754701087171.png" 
+                src="/butterfly-logo.png" 
                 alt="Flutterbye Butterfly Logo" 
                 className="w-full h-full object-contain"
                 style={{
@@ -79,14 +79,11 @@ export default function Navbar() {
                 className={`flex items-center gap-2 h-10 px-4 relative group ${
                   isActive(item.href) 
                     ? "modern-gradient text-white shadow-lg" 
-                    : item.special
-                    ? "bg-gradient-to-r from-purple-600/20 to-blue-600/20 text-purple-200 border border-purple-500/30 hover:from-purple-600/30 hover:to-blue-600/30 hover:text-white transition-all duration-300"
                     : "text-text-secondary hover:text-text-primary hover:bg-muted/50 transition-all duration-200"
                 }`}
               >
                 <item.icon className="h-4 w-4" />
                 <span className="font-medium">{item.label}</span>
-                {item.special && <span className="text-xs bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent font-bold">AI</span>}
                 
                 {/* Tooltip */}
                 <div className="absolute bottom-full mb-2 left-1/2 transform -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none">
