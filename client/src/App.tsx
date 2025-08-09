@@ -13,6 +13,7 @@ import { SkyeChatbot } from "@/components/skye-chatbot";
 import { useState, useEffect, lazy, Suspense } from "react";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { LoadingSpinner } from "@/components/loading-spinner";
+import { SuspenseWrapper } from "@/components/suspense-wrapper";
 import NotFound from "@/pages/not-found";
 
 // Lazy loaded pages for better performance
@@ -142,13 +143,17 @@ function Router() {
         <Route path="/dashboard" component={() => (
           <>
             <Navbar />
-            <Dashboard />
+            <Suspense fallback={<LoadingSpinner />}>
+              <Dashboard />
+            </Suspense>
           </>
         )} />
         <Route path="/create" component={() => (
           <>
             <Navbar />
-            <Create />
+            <Suspense fallback={<LoadingSpinner />}>
+              <Create />
+            </Suspense>
           </>
         )} />
         <Route path="/campaign-builder" component={() => (
@@ -160,19 +165,25 @@ function Router() {
         <Route path="/trade" component={() => (
           <>
             <Navbar />
-            <Trade />
+            <Suspense fallback={<LoadingSpinner />}>
+              <Trade />
+            </Suspense>
           </>
         )} />
         <Route path="/flutterai" component={() => (
           <>
             <Navbar />
-            <FlutterAIDashboard />
+            <SuspenseWrapper>
+              <FlutterAIDashboard />
+            </SuspenseWrapper>
           </>
         )} />
         <Route path="/flutter-wave" component={() => (
           <>
             <Navbar />
-            <FlutterWave />
+            <SuspenseWrapper>
+              <FlutterWave />
+            </SuspenseWrapper>
           </>
         )} />
         <Route path="/flutter-art" component={() => (
