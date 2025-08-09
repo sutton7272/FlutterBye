@@ -288,7 +288,7 @@ export default function Dashboard() {
       title: "FlutterWave",
       description: "SMS-to-blockchain emotional tokens",
       icon: Heart,
-      href: "/flutterwave",
+      href: "/flutter-wave",
       color: "electric-green"
     },
     {
