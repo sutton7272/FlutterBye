@@ -1156,8 +1156,8 @@ export default function FlutterAIDashboard() {
               Skye AI Knowledge
             </TabsTrigger>
             <TabsTrigger value="flutterina" className="data-[state=active]:bg-pink-600">
-              <MessageSquare className="h-4 w-4 mr-2" />
-              Flutterina AI
+              <Settings className="h-4 w-4 mr-2" />
+              Skye AI Settings
             </TabsTrigger>
             <TabsTrigger value="settings" className="data-[state=active]:bg-orange-600">
               <Settings className="h-4 w-4 mr-2" />
