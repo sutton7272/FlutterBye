@@ -106,6 +106,7 @@ import { createCompressionMiddleware, createPerformanceMiddleware, performanceMo
 import { aiEnhancementEngine } from "./ai-enhancement-engine";
 import { responseCache, queryOptimizer, aiOptimizer } from "./performance-optimizer";
 import { registerEnhancedIntelligenceRoutes } from "./enhanced-intelligence-routes";
+import { registerCostEffectiveAIRoutes } from "./cost-effective-ai-routes";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Trust proxy for rate limiting
@@ -4694,6 +4695,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // ENHANCED INTELLIGENCE ROUTES WITH PERFORMANCE OPTIMIZATION
   registerEnhancedIntelligenceRoutes(app);
+  
+  // COST-EFFECTIVE AI FEATURES
+  registerCostEffectiveAIRoutes(app);
   
   registerFlutterAIWalletRoutes(app);
   

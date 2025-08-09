@@ -24,6 +24,7 @@ export default function Navbar() {
     { href: "/enterprise-campaigns", label: "Marketing", icon: Target, description: "Enterprise marketing campaigns", featureId: "enterprise" },
     { href: "/intelligence", label: "AI Hub", icon: Brain, description: "AI intelligence and analytics", featureId: "intelligence" },
     { href: "/admin/performance", label: "Performance", icon: Activity, description: "Performance optimization dashboard", featureId: "performance" },
+    { href: "/admin/cost-effective-ai", label: "AI Tools", icon: Brain, description: "Cost-effective AI features", featureId: "ai_tools" },
     { href: "/admin", label: "Admin", icon: Settings, description: "Platform management", featureId: "admin_panel" },
   ];
 

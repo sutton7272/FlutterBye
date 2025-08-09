@@ -79,6 +79,7 @@ import Phase3Dashboard from "@/pages/phase3-dashboard";
 import Phase4Dashboard from "@/pages/phase4-dashboard";
 import PerformanceDashboard from "@/components/performance-dashboard";
 import AIEnhancedDashboard from "@/components/ai-enhanced-dashboard";
+import CostEffectiveAIPanel from "@/components/cost-effective-ai-panel";
 import NFTClaim from "@/pages/nft-claim";
 import AllOpportunities from "@/pages/AllOpportunities";
 import AdminAPIMonetization from "@/pages/admin-api-monetization";
@@ -328,6 +329,13 @@ function Router() {
           <AdminRouteGuard>
             <Navbar />
             <AIEnhancedDashboard />
+          </AdminRouteGuard>
+        )} />
+        
+        <Route path="/admin/cost-effective-ai" component={() => (
+          <AdminRouteGuard>
+            <Navbar />
+            <CostEffectiveAIPanel />
           </AdminRouteGuard>
         )} />
         
