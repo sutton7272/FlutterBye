@@ -1235,6 +1235,74 @@ export type InsertFlutterinaMessage = z.infer<typeof insertFlutterinaMessageSche
 
 export type FlutterinaPersonalityProfile = typeof flutterinaPersonalityProfiles.$inferSelect;
 export type InsertFlutterinaPersonalityProfile = z.infer<typeof insertFlutterinaPersonalityProfileSchema>;
+
+// Skye Knowledge Management System
+export const skyeKnowledgeBase = pgTable("skye_knowledge_base", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  category: text("category").notNull(), // "platform_facts", "user_relationships", "company_history", "technical_details"
+  title: text("title").notNull(),
+  content: text("content").notNull(),
+  priority: integer("priority").default(1), // 1-5, higher priority overrides general AI knowledge
+  isTruth: boolean("is_truth").default(false), // Mark as "truth" for critical facts
+  tags: json("tags").$type<string[]>().default([]),
+  isActive: boolean("is_active").default(true),
+  createdBy: varchar("created_by").references(() => users.id),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+  lastUsed: timestamp("last_used"),
+  usageCount: integer("usage_count").default(0)
+});
+
+export const skyePersonalitySettings = pgTable("skye_personality_settings", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  settingKey: text("setting_key").notNull().unique(),
+  settingValue: json("setting_value"),
+  description: text("description"),
+  category: text("category").default("general"), // "communication", "behavior", "responses", "relationships"
+  isActive: boolean("is_active").default(true),
+  updatedBy: varchar("updated_by").references(() => users.id),
+  updatedAt: timestamp("updated_at").defaultNow()
+});
+
+export const skyeConversationAnalysis = pgTable("skye_conversation_analysis", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  conversationId: varchar("conversation_id"),
+  detectedTopics: json("detected_topics").$type<string[]>(),
+  sentimentScore: decimal("sentiment_score", { precision: 3, scale: 2 }), // -1.0 to 1.0
+  knowledgeGaps: json("knowledge_gaps").$type<string[]>(), // Topics Skye couldn't answer well
+  suggestedKnowledge: json("suggested_knowledge").$type<Array<{topic: string, context: string}>>(),
+  userSatisfaction: integer("user_satisfaction"), // 1-5 rating
+  responseQuality: decimal("response_quality", { precision: 3, scale: 2 }), // 0-1 score
+  analyzedAt: timestamp("analyzed_at").defaultNow()
+});
+
+// Knowledge Base Insert Schemas
+export const insertSkyeKnowledgeBaseSchema = createInsertSchema(skyeKnowledgeBase).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+  lastUsed: true,
+  usageCount: true
+});
+
+export const insertSkyePersonalitySettingsSchema = createInsertSchema(skyePersonalitySettings).omit({
+  id: true,
+  updatedAt: true
+});
+
+export const insertSkyeConversationAnalysisSchema = createInsertSchema(skyeConversationAnalysis).omit({
+  id: true,
+  analyzedAt: true
+});
+
+// Knowledge Base Types
+export type SkyeKnowledgeBase = typeof skyeKnowledgeBase.$inferSelect;
+export type InsertSkyeKnowledgeBase = z.infer<typeof insertSkyeKnowledgeBaseSchema>;
+export type SkyePersonalitySettings = typeof skyePersonalitySettings.$inferSelect;
+export type InsertSkyePersonalitySettings = z.infer<typeof insertSkyePersonalitySettingsSchema>;
+export type SkyeConversationAnalysis = typeof skyeConversationAnalysis.$inferSelect;
+export type InsertSkyeConversationAnalysis = z.infer<typeof insertSkyeConversationAnalysisSchema>;
+
 export type UserBadge = typeof userBadges.$inferSelect;
 
 export const insertRewardTransactionSchema = createInsertSchema(rewardTransactions).omit({ id: true, createdAt: true });

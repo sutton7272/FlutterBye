@@ -68,6 +68,7 @@ import { registerFlutterAIWalletRoutes } from "./flutterai-wallet-routes";
 import { registerEnterpriseWalletRoutes } from "./enterprise-wallet-routes";
 import { registerFlutterinaRoutes } from "./flutterina-routes";
 import flutterinaAdminRoutes from "./flutterina-admin-routes";
+import skyeKnowledgeRoutes from "./skye-knowledge-routes";
 import { 
   analyzeWallet,
   getWalletIntelligence,

@@ -14,6 +14,7 @@ import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { useAdminAuth } from "@/hooks/use-admin-auth";
 import { AdminPricingManagement } from "@/components/admin-pricing-management";
+import { SkyeKnowledgeAdmin } from "@/components/skye-knowledge-admin";
 
 import { 
   Settings, 
@@ -445,6 +446,10 @@ export default function AdminDashboard() {
             <TabsTrigger value="logs" className="flex items-center gap-2 pulse-border hover:text-electric-green transition-all">
               <Activity className="w-4 h-4" />
               <span className="hidden sm:inline">Logs</span>
+            </TabsTrigger>
+            <TabsTrigger value="skye" className="flex items-center gap-2 pulse-border hover:text-purple-400 transition-all">
+              <Brain className="w-4 h-4" />
+              <span className="hidden sm:inline">Skye AI</span>
             </TabsTrigger>
             <TabsTrigger value="api-monetization" className="flex items-center gap-2 pulse-border hover:text-electric-green transition-all">
               <DollarSign className="w-4 h-4" />
@@ -1369,6 +1374,11 @@ export default function AdminDashboard() {
                 </Table>
               </CardContent>
             </Card>
+          </TabsContent>
+
+          {/* Skye AI Knowledge Management Tab */}
+          <TabsContent value="skye" className="space-y-6">
+            <SkyeKnowledgeAdmin />
           </TabsContent>
 
           {/* Codes Management Tab */}
