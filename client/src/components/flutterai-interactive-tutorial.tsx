@@ -121,7 +121,7 @@ export function FlutterAIInteractiveTutorial() {
     }
   ];
 
-  // Demo slides for popup
+  // Enhanced demo slides (expanded to 8 slides)
   const demoSlides: DemoSlide[] = [
     {
       id: "wallet",
@@ -175,6 +175,62 @@ export function FlutterAIInteractiveTutorial() {
         "Vulnerability scanning",
         "Risk assessment",
         "Security recommendations"
+      ],
+      demoAction: () => securityScanMutation.mutate(),
+      resultKey: "security"
+    },
+    {
+      id: "portfolio",
+      title: "💼 Portfolio Intelligence AI",
+      description: "Advanced portfolio analysis that optimizes your holdings, predicts performance, and suggests strategic rebalancing.",
+      features: [
+        "Portfolio composition analysis",
+        "Risk-adjusted returns optimization",
+        "Diversification recommendations",
+        "Performance prediction modeling",
+        "Strategic rebalancing suggestions"
+      ],
+      demoAction: () => walletAnalysisMutation.mutate(),
+      resultKey: "wallet"
+    },
+    {
+      id: "defi",
+      title: "🌊 DeFi Yield Intelligence",
+      description: "Discover the highest yielding opportunities across all DeFi protocols with risk assessment and APY predictions.",
+      features: [
+        "Cross-protocol yield farming",
+        "Impermanent loss calculations",
+        "APY prediction algorithms",
+        "Liquidity pool analysis",
+        "Smart contract risk scoring"
+      ],
+      demoAction: () => marketIntelligenceMutation.mutate(),
+      resultKey: "market"
+    },
+    {
+      id: "social",
+      title: "🌐 Social Intelligence Engine",
+      description: "Harness the power of social sentiment to predict market movements and viral content opportunities.",
+      features: [
+        "Social sentiment aggregation",
+        "Influencer impact analysis",
+        "Viral prediction algorithms",
+        "Community health scoring",
+        "Trend emergence detection"
+      ],
+      demoAction: () => contentOptimizationMutation.mutate(),
+      resultKey: "content"
+    },
+    {
+      id: "quantum",
+      title: "⚡ Quantum Analytics Engine",
+      description: "Next-generation AI that processes millions of data points to predict market movements with unprecedented accuracy.",
+      features: [
+        "Quantum computing integration",
+        "Multi-dimensional analysis",
+        "Predictive model ensemble",
+        "Real-time probability calculations",
+        "Cross-chain correlation mapping"
       ],
       demoAction: () => securityScanMutation.mutate(),
       resultKey: "security"
@@ -251,8 +307,8 @@ export function FlutterAIInteractiveTutorial() {
             tradingFrequency: "Moderate (3-5 trades/week)"
           }
         },
-        achievements: [...prev.achievements, "Wallet Whisperer"],
-        totalScore: prev.totalScore + 500
+        achievements: [...prev.achievements, "Wallet Whisperer", "Portfolio Master"],
+        totalScore: prev.totalScore + 750
       }));
     },
     onError: () => {
@@ -304,8 +360,8 @@ export function FlutterAIInteractiveTutorial() {
             }
           }
         },
-        achievements: [...prev.achievements, "Content Alchemist"],
-        totalScore: prev.totalScore + 350
+        achievements: [...prev.achievements, "Content Alchemist", "Social Sentinel"],
+        totalScore: prev.totalScore + 550
       }));
     },
     onError: () => {
@@ -357,8 +413,8 @@ export function FlutterAIInteractiveTutorial() {
             }
           }
         },
-        achievements: [...prev.achievements, "Market Prophet"],
-        totalScore: prev.totalScore + 420
+        achievements: [...prev.achievements, "Market Prophet", "DeFi Navigator"],
+        totalScore: prev.totalScore + 650
       }));
     },
     onError: () => {
@@ -413,8 +469,8 @@ export function FlutterAIInteractiveTutorial() {
             compliance: ["SOC 2", "ISO 27001", "GDPR Compliant"]
           }
         },
-        achievements: [...prev.achievements, "Security Guardian"],
-        totalScore: prev.totalScore + 280
+        achievements: [...prev.achievements, "Security Guardian", "Quantum Analyst"],
+        totalScore: prev.totalScore + 480
       }));
     },
     onError: () => {
@@ -490,7 +546,7 @@ export function FlutterAIInteractiveTutorial() {
     });
   };
 
-  // Achievement system
+  // Enhanced achievement system for 8 slides
   const getAchievementIcon = (achievement: string) => {
     switch (achievement) {
       case "Demo Explorer": return <Star className="w-4 h-4" />;
@@ -499,6 +555,12 @@ export function FlutterAIInteractiveTutorial() {
       case "Content Alchemist": return <Sparkles className="w-4 h-4" />;
       case "Market Prophet": return <TrendingUp className="w-4 h-4" />;
       case "Security Guardian": return <Shield className="w-4 h-4" />;
+      case "Portfolio Master": return <PieChart className="w-4 h-4" />;
+      case "DeFi Navigator": return <Activity className="w-4 h-4" />;
+      case "Social Sentinel": return <Users className="w-4 h-4" />;
+      case "Quantum Analyst": return <Zap className="w-4 h-4" />;
+      case "Master of AI": return <Crown className="w-4 h-4" />;
+      case "Demo Champion": return <Gem className="w-4 h-4" />;
       default: return <Trophy className="w-4 h-4" />;
     }
   };
@@ -526,7 +588,7 @@ export function FlutterAIInteractiveTutorial() {
                   FlutterAI: The Future is HERE!
                 </div>
                 <div className="text-sm text-gray-400 flex items-center gap-2">
-                4 AI demos
+                8 AI demos
                 <div className="flex items-center gap-1">
                   <Trophy className="w-3 h-3 text-yellow-400" />
                   <span className="text-yellow-400 font-bold">{tutorialState.totalScore}</span>
@@ -602,7 +664,7 @@ export function FlutterAIInteractiveTutorial() {
               </Progress>
               <div className="flex items-center justify-between mt-2">
                 <p className="text-xs text-gray-400">
-                  {tutorialState.completedDemos.length} of 4 AI demos completed
+                  {tutorialState.completedDemos.length} of 8 AI demos completed
                 </p>
                 <div className="flex items-center gap-1">
                   <Crown className="w-3 h-3 text-yellow-400" />
@@ -1008,18 +1070,82 @@ export function FlutterAIInteractiveTutorial() {
               )}
 
               {/* Progress & Navigation */}
-              <div className="flex items-center justify-between">
-                <div className="flex-1">
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm font-semibold">Demo Progress</span>
-                    <span className="text-sm text-cyan-400">{tutorialState.currentSlide + 1}/{demoSlides.length}</span>
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex-1">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-sm font-semibold">Demo Progress</span>
+                      <span className="text-sm text-cyan-400">{tutorialState.currentSlide + 1}/{demoSlides.length}</span>
+                    </div>
+                    <Progress value={((tutorialState.currentSlide + 1) / demoSlides.length) * 100} className="h-2" />
                   </div>
-                  <Progress value={((tutorialState.currentSlide + 1) / demoSlides.length) * 100} className="h-2" />
                 </div>
                 
-                <div className="ml-4">
+                {/* Navigation Buttons */}
+                <div className="flex items-center justify-between">
                   <Button 
-                    onClick={nextSlide}
+                    onClick={() => {
+                      if (tutorialState.currentSlide > 0) {
+                        setTutorialState(prev => ({ 
+                          ...prev, 
+                          currentSlide: prev.currentSlide - 1
+                        }));
+                      }
+                    }}
+                    variant="outline"
+                    disabled={tutorialState.currentSlide === 0}
+                    className="border-slate-600 text-slate-300 hover:bg-slate-800"
+                  >
+                    <ChevronRight className="w-4 h-4 mr-1 rotate-180" />
+                    Previous
+                  </Button>
+
+                  <div className="flex items-center gap-1">
+                    {Array.from({ length: demoSlides.length }, (_, i) => (
+                      <div
+                        key={i}
+                        className={`w-2 h-2 rounded-full transition-all duration-300 ${
+                          i <= tutorialState.currentSlide 
+                            ? 'bg-cyan-400' 
+                            : 'bg-slate-600'
+                        }`}
+                      />
+                    ))}
+                  </div>
+                  
+                  <Button 
+                    onClick={() => {
+                      if (tutorialState.currentSlide < demoSlides.length - 1) {
+                        const nextSlideIndex = tutorialState.currentSlide + 1;
+                        setTutorialState(prev => ({ 
+                          ...prev, 
+                          currentSlide: nextSlideIndex 
+                        }));
+                        
+                        // Run the demo for the next slide if not already completed
+                        const nextSlide = demoSlides[nextSlideIndex];
+                        if (!tutorialState.results[nextSlide.resultKey]) {
+                          setTimeout(() => {
+                            nextSlide.demoAction();
+                          }, 500);
+                        }
+                      } else {
+                        // Demo completed
+                        setTutorialState(prev => ({ 
+                          ...prev, 
+                          showPopup: false,
+                          isRunning: false,
+                          progress: 100,
+                          achievements: [...prev.achievements, "Master of AI", "Demo Champion"],
+                          totalScore: prev.totalScore + 1000
+                        }));
+                        toast({
+                          title: "🎉 Demo Complete!",
+                          description: "All 8 FlutterAI intelligence demos completed successfully!",
+                          duration: 4000
+                        });
+                      }
+                    }}
                     className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600"
                   >
                     {tutorialState.currentSlide < demoSlides.length - 1 ? (
@@ -1027,7 +1153,9 @@ export function FlutterAIInteractiveTutorial() {
                         Next Demo <ChevronRight className="w-4 h-4 ml-1" />
                       </>
                     ) : (
-                      'Complete Demo'
+                      <>
+                        Complete Demo <Trophy className="w-4 h-4 ml-1" />
+                      </>
                     )}
                   </Button>
                 </div>
