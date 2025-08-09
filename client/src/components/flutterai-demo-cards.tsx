@@ -4,8 +4,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Link } from "wouter";
-import { useEffect } from "react";
-import { FlutterAIInteractiveDemo } from "./flutterai-interactive-demo";
+
+import { SimpleDemoModal } from "./simple-demo-modal";
 import { 
   Play, 
   Pause, 
@@ -365,8 +365,8 @@ export function FlutterAIDemoCards() {
         </CardContent>
       </Card>
 
-      {/* Interactive Demo Modal */}
-      <FlutterAIInteractiveDemo 
+      {/* Simple Demo Modal */}
+      <SimpleDemoModal 
         isOpen={isDemoOpen}
         onClose={() => {
           console.log("Closing demo modal");

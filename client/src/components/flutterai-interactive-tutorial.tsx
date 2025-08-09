@@ -210,11 +210,8 @@ export function FlutterAIInteractiveTutorial() {
         }, 2000);
       }
     } catch (error) {
-      toast({
-        title: "Demo Error",
-        description: "Using simulated data for demonstration",
-        variant: "default",
-      });
+      // Disabled demo error to prevent interference
+      console.log("Tutorial demo disabled");
       
       // Use mock data for demo purposes
       const mockData = generateMockData(step.category);
