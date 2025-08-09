@@ -121,7 +121,7 @@ export function registerCustodialWalletRoutes(app: Express, storage: IStorage) {
       console.error("Deposit error:", error);
       res.status(400).json({ 
         success: false, 
-        error: error.message || "Failed to process deposit" 
+        error: (error as Error).message || "Failed to process deposit" 
       });
     }
   });
@@ -228,7 +228,7 @@ export function registerCustodialWalletRoutes(app: Express, storage: IStorage) {
       console.error("Value attachment error:", error);
       res.status(400).json({ 
         success: false, 
-        error: error.message || "Failed to attach value" 
+        error: (error as Error).message || "Failed to attach value" 
       });
     }
   });
@@ -381,7 +381,7 @@ export function registerCustodialWalletRoutes(app: Express, storage: IStorage) {
       console.error("Redemption error:", error);
       res.status(400).json({ 
         success: false, 
-        error: error.message || "Failed to redeem value" 
+        error: (error as Error).message || "Failed to redeem value" 
       });
     }
   });
