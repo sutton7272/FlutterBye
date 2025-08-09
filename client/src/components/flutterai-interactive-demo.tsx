@@ -180,20 +180,56 @@ export function FlutterAIInteractiveDemo({ isOpen, onClose }: FlutterAIInteracti
 
   return (
     <div 
-      className="fixed inset-0 bg-black/90 backdrop-blur-sm z-[9999] flex items-center justify-center p-4" 
-      style={{ zIndex: 9999, position: 'fixed', top: 0, left: 0, right: 0, bottom: 0 }}
+      className="fixed inset-0 flex items-center justify-center p-4" 
+      style={{ 
+        zIndex: 999999, 
+        position: 'fixed', 
+        top: 0, 
+        left: 0, 
+        right: 0, 
+        bottom: 0,
+        backgroundColor: 'rgba(255, 0, 0, 0.9)'
+      }}
       onClick={(e) => e.stopPropagation()}
     >
-      <Card className={`w-full max-w-4xl max-h-[90vh] overflow-auto bg-gradient-to-br ${currentSlideData.color} border-electric-blue/30 shadow-2xl`}>
+      {/* TEST: Simple red box to see if modal appears */}
+      <div style={{
+        width: '90%',
+        height: '90%',
+        backgroundColor: 'red',
+        border: '5px solid white',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        flexDirection: 'column',
+        gap: '20px'
+      }}>
+        <h1 style={{color: 'white', fontSize: '2rem'}}>TEST MODAL IS WORKING!</h1>
+        <p style={{color: 'white'}}>Current slide: {currentSlide + 1}</p>
+        <button 
+          onClick={onClose}
+          style={{
+            padding: '10px 20px',
+            fontSize: '1rem',
+            backgroundColor: 'white',
+            color: 'black',
+            border: 'none',
+            borderRadius: '5px',
+            cursor: 'pointer'
+          }}
+        >
+          CLOSE TEST MODAL
+        </button>
+      <div className={`w-full max-w-4xl max-h-[90vh] overflow-auto bg-gradient-to-br ${currentSlideData.color} border-2 border-electric-blue rounded-lg shadow-2xl`}>
         {/* Header */}
-        <CardHeader className="border-b border-white/10">
+        <div className="p-6 border-b border-white/10">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="flex items-center gap-2">
                 {currentSlideData.icon}
-                <CardTitle className="text-white text-xl">
+                <h2 className="text-white text-xl font-bold">
                   FlutterAI Demo: {currentSlideData.title}
-                </CardTitle>
+                </h2>
               </div>
               <Badge className="bg-electric-blue/20 text-electric-blue border-electric-blue/30">
                 {currentSlide + 1} of {demoSlides.length}
@@ -222,10 +258,10 @@ export function FlutterAIInteractiveDemo({ isOpen, onClose }: FlutterAIInteracti
               Slide {currentSlide + 1}: {currentSlideData.title}
             </div>
           </div>
-        </CardHeader>
+        </div>
 
         {/* Content */}
-        <CardContent className="p-8 space-y-6">
+        <div className="p-8 space-y-6">
           {/* Slide Content */}
           <div className="text-center space-y-4">
             <h2 className="text-3xl font-bold text-white">{currentSlideData.title}</h2>
@@ -246,17 +282,15 @@ export function FlutterAIInteractiveDemo({ isOpen, onClose }: FlutterAIInteracti
           </div>
 
           {/* Preview */}
-          <Card className="bg-black/40 border-white/10">
-            <CardContent className="p-6">
-              <h3 className="text-white font-semibold mb-3 flex items-center gap-2">
-                <div className="w-2 h-2 rounded-full bg-electric-green animate-pulse"></div>
-                Live Demo Preview
-              </h3>
-              <pre className="text-gray-300 text-sm font-mono whitespace-pre-wrap leading-relaxed">
-                {currentSlideData.preview}
-              </pre>
-            </CardContent>
-          </Card>
+          <div className="bg-black/40 border border-white/10 rounded-lg p-6">
+            <h3 className="text-white font-semibold mb-3 flex items-center gap-2">
+              <div className="w-2 h-2 rounded-full bg-electric-green animate-pulse"></div>
+              Live Demo Preview
+            </h3>
+            <pre className="text-gray-300 text-sm font-mono whitespace-pre-wrap leading-relaxed">
+              {currentSlideData.preview}
+            </pre>
+          </div>
 
           {/* Controls */}
           <div className="flex items-center justify-between">
@@ -317,8 +351,7 @@ export function FlutterAIInteractiveDemo({ isOpen, onClose }: FlutterAIInteracti
               />
             ))}
           </div>
-        </CardContent>
-      </Card>
+      </div>
     </div>
   );
 }
