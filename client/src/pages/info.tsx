@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Input } from "@/components/ui/input";
-import { BookOpen, Map, Zap, Users, Coins, Trophy, Star, CheckCircle, Clock, AlertCircle, Target, Rocket, FileText, TrendingUp, Shield, Globe, Heart, MessageSquare, DollarSign, Building2, Gift, Sparkles, Ticket, UserPlus, Search, Filter, Eye, Share2, BarChart3, LineChart, PieChart, Activity } from "lucide-react";
+import { BookOpen, Map, Zap, Users, Coins, Trophy, Star, CheckCircle, Clock, AlertCircle, Target, Rocket, FileText, TrendingUp, Shield, Globe, Heart, MessageSquare, DollarSign, Building2, Gift, Sparkles, Ticket, UserPlus, Search, Filter, Eye, Share2, BarChart3, LineChart, PieChart, Activity, Brain, Lock } from "lucide-react";
 
 interface Token {
   id: string;
