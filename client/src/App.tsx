@@ -9,6 +9,7 @@ import { MinimalChatTest } from "@/components/minimal-chat-test";
 import { SkyeChatFinal } from "@/components/skye-chat-final";
 import { WorkingChat } from "@/components/working-chat";
 import { DebugChat } from "@/components/debug-chat";
+import { SkyeChatbot } from "@/components/skye-chatbot";
 import { useState, useEffect, lazy, Suspense } from "react";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { LoadingSpinner } from "@/components/loading-spinner";
@@ -863,7 +864,7 @@ function App() {
               <PWAInstallPrompt />
               <PWANotificationPrompt />
               <CommandPalette />
-              <DebugChat />
+              <SkyeChatbot />
               <Router />
             </TooltipProvider>
           </WebSocketProvider>
