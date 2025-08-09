@@ -150,7 +150,10 @@ function DemoCard({
 
         {/* Action Button */}
         <Button
-          onClick={handleStart}
+          onClick={() => {
+            console.log("Button clicked, starting:", title); // Debug log
+            handleStart();
+          }}
           disabled={isRunning}
           className="w-full bg-gradient-to-r from-electric-blue to-electric-green hover:from-electric-blue/80 hover:to-electric-green/80 text-black font-bold py-3"
         >
@@ -217,11 +220,16 @@ export function FlutterAIDemoCards() {
   const [isDemoOpen, setIsDemoOpen] = useState(false);
 
   const handleStartDemo = (demoName: string) => {
+    console.log("Starting demo:", demoName); // Debug log
     if (demoName === "AI Intelligence") {
       setIsDemoOpen(true);
+      console.log("Demo modal should open now, isDemoOpen:", true); // Debug log
     }
     setActiveDemos(prev => [...prev, demoName]);
   };
+
+  // Debug: Log state changes
+  console.log("FlutterAIDemoCards render - isDemoOpen:", isDemoOpen);
 
   const aiIntelligenceDemo = {
     title: "AI Intelligence Demo",

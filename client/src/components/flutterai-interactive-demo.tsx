@@ -116,6 +116,9 @@ export function FlutterAIInteractiveDemo({ isOpen, onClose }: FlutterAIInteracti
   const [progress, setProgress] = useState(0);
   const [autoPlay, setAutoPlay] = useState(false);
 
+  // Debug: Log when component mounts and props change
+  console.log("FlutterAIInteractiveDemo component - isOpen:", isOpen, "currentSlide:", currentSlide);
+
   useEffect(() => {
     if (autoPlay && isPlaying) {
       const timer = setInterval(() => {
@@ -169,13 +172,19 @@ export function FlutterAIInteractiveDemo({ isOpen, onClose }: FlutterAIInteracti
     setAutoPlay(false);
   };
 
+  console.log("Demo modal isOpen:", isOpen); // Debug log
+  
   if (!isOpen) return null;
 
   const currentSlideData = demoSlides[currentSlide];
 
   return (
-    <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <Card className={`w-full max-w-4xl max-h-[90vh] overflow-hidden bg-gradient-to-br ${currentSlideData.color} border-electric-blue/30 backdrop-blur-sm`}>
+    <div 
+      className="fixed inset-0 bg-black/90 backdrop-blur-sm z-[9999] flex items-center justify-center p-4" 
+      style={{ zIndex: 9999, position: 'fixed', top: 0, left: 0, right: 0, bottom: 0 }}
+      onClick={(e) => e.stopPropagation()}
+    >
+      <Card className={`w-full max-w-4xl max-h-[90vh] overflow-auto bg-gradient-to-br ${currentSlideData.color} border-electric-blue/30 shadow-2xl`}>
         {/* Header */}
         <CardHeader className="border-b border-white/10">
           <div className="flex items-center justify-between">
