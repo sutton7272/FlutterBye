@@ -101,6 +101,7 @@ import { PWAInstallPrompt, PWANotificationPrompt } from "@/components/pwa-featur
 import { CommandPalette } from "@/components/command-palette";
 import { WebSocketProvider } from "@/components/websocket-provider";
 import { ThemeProvider } from "@/components/theme-provider";
+import { FlyingButterflies } from "@/components/flying-butterflies";
 
 import { WalletProvider } from "@/components/wallet-adapter";
 import { TestImage } from "@/components/test-image";
@@ -794,6 +795,8 @@ function App() {
         <WalletProvider>
           <WebSocketProvider>
             <TooltipProvider>
+              {/* Global Flying Butterflies Background for All Pages */}
+              <FlyingButterflies />
               <Toaster />
               <PWAInstallPrompt />
               <PWANotificationPrompt />
