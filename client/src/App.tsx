@@ -114,7 +114,7 @@ import { PersonalizedDashboard } from "@/components/PersonalizedDashboard";
 import { ErrorBoundary } from "@/components/error-boundary";
 import { PWAInstallPrompt, PWANotificationPrompt } from "@/components/pwa-features";
 import { CommandPalette } from "@/components/command-palette";
-import { WebSocketProvider } from "@/components/websocket-provider";
+import { WebSocketProvider } from "@/components/websocket-provider-disabled";
 import { ThemeProvider } from "@/components/theme-provider";
 import { FlyingButterflies } from "@/components/flying-butterflies";
 
