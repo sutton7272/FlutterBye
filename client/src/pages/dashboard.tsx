@@ -302,7 +302,7 @@ export default function Dashboard() {
       title: "FlutterArt",
       description: "Create and trade NFTs",
       icon: Star,
-      href: "/flutterart",
+      href: "/flutter-art",
       color: "teal"
     }
   ];
