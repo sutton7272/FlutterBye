@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
+import { createContext, useContext, useEffect, useState, ReactNode, useRef, useCallback } from 'react';
 
 interface WebSocketContextType {
   socket: WebSocket | null;
@@ -25,8 +25,15 @@ export function WebSocketProvider({ children }: WebSocketProviderProps) {
   const [connectionStatus, setConnectionStatus] = useState<'connecting' | 'connected' | 'disconnected' | 'error'>('disconnected');
   const [lastMessage, setLastMessage] = useState<any>(null);
   const [reconnectAttempts, setReconnectAttempts] = useState(0);
+  
+  // Refs for cleanup and mount tracking
+  const isMountedRef = useRef(true);
+  const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  const connectWebSocket = () => {
+  const connectWebSocket = useCallback(() => {
+    // Check if component is still mounted before connecting
+    if (!isMountedRef.current) return;
+
     const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
     const wsUrl = `${protocol}//${window.location.host}/ws`;
     
@@ -36,27 +43,39 @@ export function WebSocketProvider({ children }: WebSocketProviderProps) {
     const ws = new WebSocket(wsUrl);
     
     ws.onopen = () => {
+      if (!isMountedRef.current) {
+        ws.close();
+        return;
+      }
       console.log('✅ WebSocket connected');
       setConnectionStatus('connected');
       setSocket(ws);
       setReconnectAttempts(0); // Reset reconnect attempts on successful connection
       
       // Send initial connection message
-      ws.send(JSON.stringify({
-        type: 'connection',
-        timestamp: new Date().toISOString(),
-        clientId: `client_${Date.now()}`
-      }));
+      try {
+        ws.send(JSON.stringify({
+          type: 'connection',
+          timestamp: new Date().toISOString(),
+          clientId: `client_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+        }));
+      } catch (error) {
+        console.error('❌ Error sending connection message:', error);
+      }
     };
 
     ws.onmessage = (event) => {
+      if (!isMountedRef.current) return;
+      
       try {
         const data = JSON.parse(event.data);
         
         // Handle heartbeat messages separately to avoid spam
         if (data.type === 'heartbeat') {
           // Respond with pong to keep connection alive
-          ws.send(JSON.stringify({ type: 'pong', timestamp: new Date().toISOString() }));
+          if (ws.readyState === WebSocket.OPEN) {
+            ws.send(JSON.stringify({ type: 'pong', timestamp: new Date().toISOString() }));
+          }
           return;
         }
         
@@ -68,19 +87,26 @@ export function WebSocketProvider({ children }: WebSocketProviderProps) {
     };
 
     ws.onclose = (event) => {
+      if (!isMountedRef.current) return;
+      
       console.log('🔌 WebSocket disconnected:', event.code, event.reason);
       setConnectionStatus('disconnected');
       setSocket(null);
       
-      // Only attempt reconnection if not intentionally closed and under max attempts
-      if (event.code !== 1000 && reconnectAttempts < 5) {
+      // Only attempt reconnection if not intentionally closed, under max attempts, and component is still mounted
+      if (event.code !== 1000 && reconnectAttempts < 5 && isMountedRef.current) {
         const delay = Math.min(1000 * Math.pow(2, reconnectAttempts), 30000); // Exponential backoff, max 30s
         console.log(`🔄 Reconnecting in ${delay}ms (attempt ${reconnectAttempts + 1}/5)`);
         
-        setTimeout(() => {
-          setReconnectAttempts(prev => prev + 1);
-          connectWebSocket();
+        const timeoutId = setTimeout(() => {
+          if (isMountedRef.current) {
+            setReconnectAttempts(prev => prev + 1);
+            connectWebSocket();
+          }
         }, delay);
+        
+        // Store timeout ID for cleanup
+        reconnectTimeoutRef.current = timeoutId;
       } else if (reconnectAttempts >= 5) {
         console.log('❌ Max reconnection attempts reached');
         setConnectionStatus('error');
@@ -88,19 +114,30 @@ export function WebSocketProvider({ children }: WebSocketProviderProps) {
     };
 
     ws.onerror = (error) => {
+      if (!isMountedRef.current) return;
       console.error('❌ WebSocket error:', error);
       setConnectionStatus('error');
     };
 
     return ws;
-  };
+  }, [reconnectAttempts]);
 
   useEffect(() => {
-    const ws = connectWebSocket();
+    isMountedRef.current = true;
+    connectWebSocket();
     
     return () => {
-      if (ws && ws.readyState === WebSocket.OPEN) {
-        ws.close(1000, 'Component unmounting'); // Normal closure
+      isMountedRef.current = false;
+      
+      // Clear any pending reconnection timeout
+      if (reconnectTimeoutRef.current) {
+        clearTimeout(reconnectTimeoutRef.current);
+        reconnectTimeoutRef.current = null;
+      }
+      
+      // Close WebSocket if still open
+      if (socket && socket.readyState === WebSocket.OPEN) {
+        socket.close(1000, 'Component unmounting'); // Normal closure
       }
     };
   }, []); // Only connect once on mount

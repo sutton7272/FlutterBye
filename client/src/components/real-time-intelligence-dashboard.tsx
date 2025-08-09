@@ -94,11 +94,16 @@ export default function RealTimeIntelligenceDashboard() {
   });
 
   // WebSocket connection
+  const isMountedRef = useRef(true);
+  
   useEffect(() => {
+    isMountedRef.current = true;
     connectWebSocket();
     return () => {
+      isMountedRef.current = false;
       if (wsRef.current) {
-        wsRef.current.close();
+        wsRef.current.close(1000, 'Component unmounting');
+        wsRef.current = null;
       }
     };
   }, []);
@@ -111,6 +116,10 @@ export default function RealTimeIntelligenceDashboard() {
       wsRef.current = new WebSocket(wsUrl);
       
       wsRef.current.onopen = () => {
+        if (!isMountedRef.current) {
+          wsRef.current?.close();
+          return;
+        }
         setIsConnected(true);
         setIsStreaming(true);
         toast({
@@ -121,17 +130,32 @@ export default function RealTimeIntelligenceDashboard() {
       };
       
       wsRef.current.onmessage = (event) => {
-        const message = JSON.parse(event.data);
-        handleWebSocketMessage(message);
+        if (!isMountedRef.current) return;
+        try {
+          const message = JSON.parse(event.data);
+          handleWebSocketMessage(message);
+        } catch (error) {
+          console.error('Error parsing WebSocket message:', error);
+        }
       };
       
-      wsRef.current.onclose = () => {
+      wsRef.current.onclose = (event) => {
+        if (!isMountedRef.current) return;
         setIsConnected(false);
         setIsStreaming(false);
-        setTimeout(connectWebSocket, 5000); // Reconnect after 5 seconds
+        
+        // Only reconnect if not intentionally closed and component is still mounted
+        if (event.code !== 1000 && isMountedRef.current) {
+          setTimeout(() => {
+            if (isMountedRef.current) {
+              connectWebSocket();
+            }
+          }, 5000); // Reconnect after 5 seconds
+        }
       };
       
       wsRef.current.onerror = (error) => {
+        if (!isMountedRef.current) return;
         console.error('WebSocket error:', error);
         setIsConnected(false);
         setIsStreaming(false);
