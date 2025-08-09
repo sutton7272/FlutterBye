@@ -39,6 +39,7 @@ import Navbar from "@/components/navbar";
 
 import { FlutterAIInteractiveTutorial } from "@/components/flutterai-interactive-tutorial";
 import { FlutterAIInteractiveDemo } from "@/components/flutterai-interactive-demo";
+import { FlutterAIAnimatedTutorial } from "@/components/flutterai-animated-tutorial";
 
 interface TimeLeft {
   days: number;
@@ -321,8 +322,8 @@ export default function LaunchCountdown() {
   // Main Launch Countdown & Waitlist (for authorized users)
   return (
     <div className="min-h-screen text-white relative overflow-hidden">
-      {/* FlutterAI Interactive Demo */}
-      <FlutterAIInteractiveDemo />
+      {/* FlutterAI Animated Tutorial - matches the uploaded design */}
+      <FlutterAIAnimatedTutorial />
       
       {/* Show navbar if access is granted */}
       {hasAccess && (
