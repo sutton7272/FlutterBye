@@ -1276,6 +1276,122 @@ export const skyeConversationAnalysis = pgTable("skye_conversation_analysis", {
   analyzedAt: timestamp("analyzed_at").defaultNow()
 });
 
+// Enhanced Memory System for Skye
+export const skyeUserMemory = pgTable("skye_user_memory", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").references(() => users.id),
+  walletAddress: text("wallet_address"),
+  
+  // User Profile Memory
+  preferredName: text("preferred_name"),
+  communicationStyle: text("communication_style"), // formal, casual, technical, friendly
+  interests: json("interests").$type<string[]>(),
+  goals: json("goals").$type<string[]>(),
+  
+  // Behavioral Patterns
+  typicalQuestions: json("typical_questions").$type<string[]>(),
+  preferredTopics: json("preferred_topics").$type<string[]>(),
+  avoidedTopics: json("avoided_topics").$type<string[]>(),
+  responsePreferences: json("response_preferences").$type<{
+    length: 'short' | 'medium' | 'detailed',
+    tone: 'professional' | 'friendly' | 'casual',
+    includeExamples: boolean,
+    includeAnalysis: boolean
+  }>(),
+  
+  // Relationship Memory
+  trustLevel: integer("trust_level").default(5), // 1-10
+  conversationHistory: json("conversation_history").$type<Array<{
+    date: string,
+    summary: string,
+    topics: string[],
+    mood: string,
+    keyOutcomes: string[]
+  }>>(),
+  
+  // Learning Adaptations
+  personalizedInsights: json("personalized_insights").$type<Array<{
+    insight: string,
+    confidence: number,
+    source: string,
+    validated: boolean
+  }>>(),
+  
+  lastInteraction: timestamp("last_interaction").defaultNow(),
+  totalInteractions: integer("total_interactions").default(0),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Emotional Intelligence System
+export const skyeEmotionalAnalysis = pgTable("skye_emotional_analysis", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").references(() => users.id),
+  conversationId: varchar("conversation_id"),
+  
+  // Real-time Emotional State
+  detectedEmotion: text("detected_emotion"), // happy, frustrated, excited, confused, worried, etc.
+  emotionConfidence: decimal("emotion_confidence", { precision: 3, scale: 2 }), // 0.00 to 1.00
+  emotionIntensity: integer("emotion_intensity"), // 1-10
+  
+  // Sentiment Analysis
+  sentimentScore: decimal("sentiment_score", { precision: 3, scale: 2 }), // -1.00 to 1.00
+  sentimentLabel: text("sentiment_label"), // very_negative, negative, neutral, positive, very_positive
+  
+  // Context Analysis
+  userMessage: text("user_message"),
+  messageLength: integer("message_length"),
+  responseTime: integer("response_time"), // seconds between messages
+  
+  // Mood Tracking
+  overallMood: text("overall_mood"), // session mood assessment
+  moodTrend: text("mood_trend"), // improving, declining, stable
+  stressIndicators: json("stress_indicators").$type<string[]>(),
+  
+  // Empathetic Response Data
+  recommendedApproach: text("recommended_approach"), // supportive, analytical, encouraging, etc.
+  adaptedPersonality: json("adapted_personality").$type<{
+    warmth: number, // 1-10
+    formality: number, // 1-10
+    enthusiasm: number, // 1-10
+    supportiveness: number // 1-10
+  }>(),
+  
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Enhanced Conversation Threading
+export const skyeConversationThreads = pgTable("skye_conversation_threads", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").references(() => users.id),
+  
+  // Thread Metadata
+  title: text("title"), // Auto-generated topic summary
+  category: text("category"), // wallet_analysis, learning, support, planning, etc.
+  priority: integer("priority").default(5), // 1-10
+  
+  // Context Preservation
+  context: json("context").$type<{
+    mainTopics: string[],
+    keyDecisions: string[],
+    unresolved: string[],
+    followUpNeeded: string[]
+  }>(),
+  
+  // Thread State
+  status: text("status").default("active"), // active, paused, completed, archived
+  lastMessage: text("last_message"),
+  messageCount: integer("message_count").default(0),
+  
+  // Relationship to Other Systems
+  relatedWallets: json("related_wallets").$type<string[]>(),
+  relatedKnowledge: json("related_knowledge").$type<string[]>(),
+  
+  startedAt: timestamp("started_at").defaultNow(),
+  lastActivity: timestamp("last_activity").defaultNow(),
+  completedAt: timestamp("completed_at"),
+});
+
 // Knowledge Base Insert Schemas
 export const insertSkyeKnowledgeBaseSchema = createInsertSchema(skyeKnowledgeBase).omit({
   id: true,
@@ -1295,6 +1411,26 @@ export const insertSkyeConversationAnalysisSchema = createInsertSchema(skyeConve
   analyzedAt: true
 });
 
+export const insertSkyeUserMemorySchema = createInsertSchema(skyeUserMemory).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+  lastInteraction: true,
+  totalInteractions: true
+});
+
+export const insertSkyeEmotionalAnalysisSchema = createInsertSchema(skyeEmotionalAnalysis).omit({
+  id: true,
+  createdAt: true
+});
+
+export const insertSkyeConversationThreadsSchema = createInsertSchema(skyeConversationThreads).omit({
+  id: true,
+  startedAt: true,
+  lastActivity: true,
+  completedAt: true
+});
+
 // Knowledge Base Types
 export type SkyeKnowledgeBase = typeof skyeKnowledgeBase.$inferSelect;
 export type InsertSkyeKnowledgeBase = z.infer<typeof insertSkyeKnowledgeBaseSchema>;
@@ -1302,6 +1438,14 @@ export type SkyePersonalitySettings = typeof skyePersonalitySettings.$inferSelec
 export type InsertSkyePersonalitySettings = z.infer<typeof insertSkyePersonalitySettingsSchema>;
 export type SkyeConversationAnalysis = typeof skyeConversationAnalysis.$inferSelect;
 export type InsertSkyeConversationAnalysis = z.infer<typeof insertSkyeConversationAnalysisSchema>;
+
+// Enhanced Memory & Emotional Intelligence Types
+export type SkyeUserMemory = typeof skyeUserMemory.$inferSelect;
+export type InsertSkyeUserMemory = z.infer<typeof insertSkyeUserMemorySchema>;
+export type SkyeEmotionalAnalysis = typeof skyeEmotionalAnalysis.$inferSelect;
+export type InsertSkyeEmotionalAnalysis = z.infer<typeof insertSkyeEmotionalAnalysisSchema>;
+export type SkyeConversationThreads = typeof skyeConversationThreads.$inferSelect;
+export type InsertSkyeConversationThreads = z.infer<typeof insertSkyeConversationThreadsSchema>;
 
 export type UserBadge = typeof userBadges.$inferSelect;
 

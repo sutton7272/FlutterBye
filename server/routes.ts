@@ -69,6 +69,7 @@ import { registerEnterpriseWalletRoutes } from "./enterprise-wallet-routes";
 import { registerFlutterinaRoutes } from "./flutterina-routes";
 import flutterinaAdminRoutes from "./flutterina-admin-routes";
 import skyeKnowledgeRoutes from "./skye-knowledge-routes";
+import { registerSkyeEnhancedRoutes } from "./skye-enhanced-routes";
 import { 
   analyzeWallet,
   getWalletIntelligence,
@@ -6363,7 +6364,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   registerSolanaRoutes(app);
   registerEscrowRoutes(app);
   registerCustodialWalletRoutes(app, storage);
-  registerFlutterinaRoutes(app);
+  registerFlutterinaRoutes(app)
+  
+  // Enhanced Skye AI with Memory & Emotional Intelligence
+  registerSkyeEnhancedRoutes(app);
   
   // Register escrow profits routes
   const escrowProfitsRoutes = (await import('./routes-escrow-profits')).default;

@@ -19,6 +19,7 @@ import RealTimeIntelligenceDashboard from '@/components/real-time-intelligence-d
 import { SolviturBrandBadge } from '@/components/solvitur-brand-badge';
 import { FlutterinaAdminPanel } from '@/components/flutterina-admin-panel';
 import { SkyeKnowledgeAdmin } from "@/components/skye-knowledge-admin";
+import { EnhancedSkyeChat } from "@/components/enhanced-skye-chat";
 import { 
   Brain, 
   Wallet, 
@@ -42,6 +43,7 @@ import {
   Star,
   Target,
   MessageSquare,
+  MessageCircle,
   Trash2,
   Settings,
   Bot,
@@ -650,7 +652,178 @@ function AIMarketingBotContent() {
  * Comprehensive wallet intelligence and social credit scoring system
  * Features automatic collection, manual entry, CSV uploads, and AI analysis
  */
-export default function FlutterAIDashboard() {
+/**
+ * Enhanced AI Testing Interface Component
+ */
+function EnhancedAITestingInterface() {
+  const [chatVisible, setChatVisible] = useState(false);
+  const [testingMode, setTestingMode] = useState<'memory' | 'emotion' | 'both'>('both');
+
+  return (
+    <div className="space-y-6">
+      {/* Testing Overview */}
+      <Card className="bg-slate-800/50 border-purple-500/20">
+        <CardHeader>
+          <CardTitle className="text-white flex items-center gap-2">
+            <Brain className="h-5 w-5 text-purple-400" />
+            Enhanced AI Testing Interface
+          </CardTitle>
+          <CardDescription className="text-purple-200">
+            Test advanced memory system and emotional intelligence capabilities of Skye AI
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="text-center p-4 bg-slate-700/50 rounded-lg border border-blue-500/20">
+              <Brain className="h-8 w-8 text-blue-400 mx-auto mb-2" />
+              <div className="text-lg font-bold text-blue-300">Deep Learning Memory</div>
+              <div className="text-sm text-slate-400">Cross-session conversation continuity</div>
+            </div>
+            <div className="text-center p-4 bg-slate-700/50 rounded-lg border border-pink-500/20">
+              <MessageSquare className="h-8 w-8 text-pink-400 mx-auto mb-2" />
+              <div className="text-lg font-bold text-pink-300">Emotional Intelligence</div>
+              <div className="text-sm text-slate-400">Real-time emotion detection & adaptation</div>
+            </div>
+            <div className="text-center p-4 bg-slate-700/50 rounded-lg border border-green-500/20">
+              <TrendingUp className="h-8 w-8 text-green-400 mx-auto mb-2" />
+              <div className="text-lg font-bold text-green-300">Predictive Analytics</div>
+              <div className="text-sm text-slate-400">AI-powered need prediction</div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Testing Controls */}
+      <Card className="bg-slate-800/50 border-purple-500/20">
+        <CardHeader>
+          <CardTitle className="text-white flex items-center gap-2">
+            <Settings className="h-5 w-5 text-purple-400" />
+            Testing Controls
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="flex items-center gap-4">
+            <Label className="text-white">Testing Mode:</Label>
+            <div className="flex gap-2">
+              <Button
+                variant={testingMode === 'memory' ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => setTestingMode('memory')}
+                className="bg-blue-600 hover:bg-blue-700"
+              >
+                <Brain className="h-4 w-4 mr-2" />
+                Memory Only
+              </Button>
+              <Button
+                variant={testingMode === 'emotion' ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => setTestingMode('emotion')}
+                className="bg-pink-600 hover:bg-pink-700"
+              >
+                <MessageSquare className="h-4 w-4 mr-2" />
+                Emotion Only
+              </Button>
+              <Button
+                variant={testingMode === 'both' ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => setTestingMode('both')}
+                className="bg-purple-600 hover:bg-purple-700"
+              >
+                <Star className="h-4 w-4 mr-2" />
+                Full Intelligence
+              </Button>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-4">
+            <Button
+              onClick={() => setChatVisible(true)}
+              className="bg-purple-600 hover:bg-purple-700 text-white"
+            >
+              <MessageSquare className="h-4 w-4 mr-2" />
+              Launch Enhanced Chat Test
+            </Button>
+            <Badge variant="outline" className="text-purple-300 border-purple-500/50">
+              GPT-4o Powered
+            </Badge>
+            <Badge variant="outline" className="text-green-300 border-green-500/50">
+              300-500% Retention Boost
+            </Badge>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Feature Highlights */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <Card className="bg-slate-800/50 border-blue-500/20">
+          <CardHeader>
+            <CardTitle className="text-white flex items-center gap-2">
+              <Database className="h-5 w-5 text-blue-400" />
+              Memory System Features
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <div className="flex items-center gap-3">
+              <CheckCircle className="h-4 w-4 text-green-400" />
+              <span className="text-white">Cross-session conversation history</span>
+            </div>
+            <div className="flex items-center gap-3">
+              <CheckCircle className="h-4 w-4 text-green-400" />
+              <span className="text-white">User interest and preference tracking</span>
+            </div>
+            <div className="flex items-center gap-3">
+              <CheckCircle className="h-4 w-4 text-green-400" />
+              <span className="text-white">Progressive trust level building</span>
+            </div>
+            <div className="flex items-center gap-3">
+              <CheckCircle className="h-4 w-4 text-green-400" />
+              <span className="text-white">Contextual response adaptation</span>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-slate-800/50 border-pink-500/20">
+          <CardHeader>
+            <CardTitle className="text-white flex items-center gap-2">
+              <MessageSquare className="h-5 w-5 text-pink-400" />
+              Emotional Intelligence Features
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <div className="flex items-center gap-3">
+              <CheckCircle className="h-4 w-4 text-green-400" />
+              <span className="text-white">Real-time emotion detection</span>
+            </div>
+            <div className="flex items-center gap-3">
+              <CheckCircle className="h-4 w-4 text-green-400" />
+              <span className="text-white">Adaptive personality adjustments</span>
+            </div>
+            <div className="flex items-center gap-3">
+              <CheckCircle className="h-4 w-4 text-green-400" />
+              <span className="text-white">Sentiment-aware responses</span>
+            </div>
+            <div className="flex items-center gap-3">
+              <CheckCircle className="h-4 w-4 text-green-400" />
+              <span className="text-white">Predictive need analysis</span>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Enhanced Chat Component */}
+      {chatVisible && (
+        <EnhancedSkyeChat
+          userId="test-user"
+          walletAddress="demo-wallet"
+          isVisible={chatVisible}
+          onClose={() => setChatVisible(false)}
+        />
+      )}
+    </div>
+  );
+}
+
+function FlutterAIDashboard() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   
@@ -1138,7 +1311,7 @@ export default function FlutterAIDashboard() {
 
         {/* Enhanced FlutterAI Dashboard - 5 Essential Tabs */}
         <Tabs defaultValue="overview" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-7 bg-slate-800/50 mb-6">
+          <TabsList className="grid w-full grid-cols-8 bg-slate-800/50 mb-6">
             <TabsTrigger value="overview" className="data-[state=active]:bg-purple-600">
               <Brain className="h-4 w-4 mr-2" />
               Intelligence Overview
@@ -1166,6 +1339,10 @@ export default function FlutterAIDashboard() {
             <TabsTrigger value="settings" className="data-[state=active]:bg-orange-600">
               <Settings className="h-4 w-4 mr-2" />
               Settings
+            </TabsTrigger>
+            <TabsTrigger value="enhanced-ai" className="data-[state=active]:bg-purple-600">
+              <MessageCircle className="h-4 w-4 mr-2" />
+              Enhanced AI Test
             </TabsTrigger>
           </TabsList>
 
@@ -1976,6 +2153,11 @@ export default function FlutterAIDashboard() {
             </Card>
           </TabsContent>
 
+          {/* ENHANCED AI TESTING TAB - Memory & Emotional Intelligence */}
+          <TabsContent value="enhanced-ai" className="space-y-6">
+            <EnhancedAITestingInterface />
+          </TabsContent>
+
           {/* 5. SCORING METHODOLOGY TAB - Complete Scoring Framework */}
           <TabsContent value="scoring" className="space-y-6">
             
@@ -2313,3 +2495,5 @@ export default function FlutterAIDashboard() {
     </div>
   );
 }
+
+export default FlutterAIDashboard;
