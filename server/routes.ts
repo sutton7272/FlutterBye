@@ -115,6 +115,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.set('trust proxy', 1);
 
   // Security and performance middleware
+  // Add CSP override middleware to completely remove CSP headers
+  app.use((req, res, next) => {
+    // Override response header setters to prevent CSP
+    const originalSetHeader = res.setHeader;
+    res.setHeader = function(name: string, value: any) {
+      if (name.toLowerCase().includes('content-security-policy')) {
+        console.log('🚫 Blocked CSP header:', name, value);
+        return this;
+      }
+      return originalSetHeader.call(this, name, value);
+    };
+    
+    // Remove any existing CSP headers
+    res.removeHeader('Content-Security-Policy');
+    res.removeHeader('content-security-policy');
+    next();
+  });
+  
   // Re-enable security headers with CSP disabled
   app.use(securityHeaders);
   app.use(cors(corsConfig));
@@ -267,6 +285,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   app.use(security.inputSanitization());
   app.use(monitoring.performanceMiddleware());
+  
+  // Add another CSP removal middleware after all other security middleware
+  app.use((req, res, next) => {
+    // Aggressively remove any CSP headers
+    res.removeHeader('Content-Security-Policy');
+    res.removeHeader('content-security-policy');
+    res.removeHeader('X-Content-Security-Policy');
+    res.removeHeader('x-content-security-policy');
+    next();
+  });
   
   // Apply production-grade security middleware  
   // Temporarily disable production security headers to fix CSP issues

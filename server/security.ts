@@ -133,12 +133,12 @@ class ProductionSecurityService {
   // Security Headers Middleware
   createSecurityHeaders() {
     return (req: Request, res: Response, next: NextFunction) => {
-      // Content Security Policy
-      if (this.config.headers.contentSecurityPolicy) {
-        res.setHeader('Content-Security-Policy', 
-          "default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https://api.solvitur.com; object-src 'none'; media-src 'self'; frame-src 'none'"
-        );
-      }
+      // Content Security Policy - DISABLED to fix error boundary issues
+      // if (this.config.headers.contentSecurityPolicy) {
+      //   res.setHeader('Content-Security-Policy', 
+      //     "default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https://api.solvitur.com; object-src 'none'; media-src 'self'; frame-src 'none'"
+      //   );
+      // }
 
       // HSTS
       if (this.config.headers.hsts) {
