@@ -14,7 +14,7 @@ export const users = pgTable("users", {
   role: text("role").default("user"), // 'user', 'admin', 'super_admin'
   isAdmin: boolean("is_admin").default(false),
   adminPermissions: json("admin_permissions").$type<string[]>(), // ['dashboard', 'users', 'wallet_management', 'settings']
-  adminAddedBy: varchar("admin_added_by").references(() => users.id),
+  adminAddedBy: varchar("admin_added_by"),
   adminAddedAt: timestamp("admin_added_at"),
   createdAt: timestamp("created_at").defaultNow(),
 });
@@ -1226,15 +1226,15 @@ export type Badge = typeof badges.$inferSelect;
 export const insertUserBadgeSchema = createInsertSchema(userBadges).omit({ id: true, earnedAt: true });
 export type InsertUserBadge = z.infer<typeof insertUserBadgeSchema>;
 
-// Flutterina AI System Types - Consolidated  
-export type FlutterinaConversation = typeof flutterinaConversations.$inferSelect;
-export type InsertFlutterinaConversation = z.infer<typeof insertFlutterinaConversationSchema>;
+// Skye AI System Types - Fixed references to use existing schema  
+export type SkyeConversation = typeof skyeConversations.$inferSelect;
+export type InsertSkyeConversation = z.infer<typeof insertSkyeConversationSchema>;
 
-export type FlutterinaMessage = typeof flutterinaMessages.$inferSelect;
-export type InsertFlutterinaMessage = z.infer<typeof insertFlutterinaMessageSchema>;
+export type SkyeMessage = typeof skyeMessages.$inferSelect;
+export type InsertSkyeMessage = z.infer<typeof insertSkyeMessageSchema>;
 
-export type FlutterinaPersonalityProfile = typeof flutterinaPersonalityProfiles.$inferSelect;
-export type InsertFlutterinaPersonalityProfile = z.infer<typeof insertFlutterinaPersonalityProfileSchema>;
+export type SkyePersonalityProfile = typeof skyePersonalityProfiles.$inferSelect;
+export type InsertSkyePersonalityProfile = z.infer<typeof insertSkyePersonalityProfileSchema>;
 
 // Skye Knowledge Management System
 export const skyeKnowledgeBase = pgTable("skye_knowledge_base", {
