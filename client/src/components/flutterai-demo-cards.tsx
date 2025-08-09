@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Link } from "wouter";
+import { useEffect } from "react";
 import { FlutterAIInteractiveDemo } from "./flutterai-interactive-demo";
 import { 
   Play, 
@@ -230,6 +231,11 @@ export function FlutterAIDemoCards() {
 
   // Debug: Log state changes
   console.log("FlutterAIDemoCards render - isDemoOpen:", isDemoOpen);
+  
+  // Force modal to show for testing
+  useEffect(() => {
+    console.log("isDemoOpen changed to:", isDemoOpen);
+  }, [isDemoOpen]);
 
   const aiIntelligenceDemo = {
     title: "AI Intelligence Demo",
@@ -362,8 +368,32 @@ export function FlutterAIDemoCards() {
       {/* Interactive Demo Modal */}
       <FlutterAIInteractiveDemo 
         isOpen={isDemoOpen}
-        onClose={() => setIsDemoOpen(false)}
+        onClose={() => {
+          console.log("Closing demo modal");
+          setIsDemoOpen(false);
+        }}
       />
+      
+      {/* Force show modal button for testing */}
+      <button 
+        onClick={() => {
+          console.log("Force showing modal");
+          setIsDemoOpen(true);
+        }}
+        style={{
+          position: 'fixed',
+          top: '10px',
+          right: '10px',
+          zIndex: 1000,
+          padding: '10px',
+          backgroundColor: 'red',
+          color: 'white',
+          border: 'none',
+          cursor: 'pointer'
+        }}
+      >
+        FORCE SHOW MODAL
+      </button>
     </div>
   );
 }

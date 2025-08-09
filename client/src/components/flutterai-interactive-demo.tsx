@@ -118,6 +118,14 @@ export function FlutterAIInteractiveDemo({ isOpen, onClose }: FlutterAIInteracti
 
   // Debug: Log when component mounts and props change
   console.log("FlutterAIInteractiveDemo component - isOpen:", isOpen, "currentSlide:", currentSlide);
+  
+  // Force return early to test
+  if (!isOpen) {
+    console.log("Modal not open, returning null");
+    return null;
+  }
+  
+  console.log("Modal should render now!");
 
   useEffect(() => {
     if (autoPlay && isPlaying) {
@@ -174,8 +182,6 @@ export function FlutterAIInteractiveDemo({ isOpen, onClose }: FlutterAIInteracti
 
   console.log("Demo modal isOpen:", isOpen); // Debug log
   
-  if (!isOpen) return null;
-
   const currentSlideData = demoSlides[currentSlide];
 
   return (
