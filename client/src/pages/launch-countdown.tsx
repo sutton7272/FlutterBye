@@ -40,6 +40,7 @@ import Navbar from "@/components/navbar";
 import { FlutterAIInteractiveTutorial } from "@/components/flutterai-interactive-tutorial";
 import { FlutterAIInteractiveDemo } from "@/components/flutterai-interactive-demo";
 import { FlutterAIAnimatedTutorial } from "@/components/flutterai-animated-tutorial";
+import { InteractiveTutorial } from "@/components/interactive-tutorial";
 
 interface TimeLeft {
   days: number;
@@ -703,14 +704,9 @@ export default function LaunchCountdown() {
                     </ul>
                   </div>
 
-                  {/* CTA Button */}
+                  {/* Interactive Demo Button */}
                   <div className="pt-2">
-                    <Button 
-                      className="bg-gradient-to-r from-electric-blue to-circuit-teal hover:from-electric-blue/80 hover:to-circuit-teal/80 text-white px-4 py-2 text-sm w-full flex items-center justify-center gap-2 shadow-lg"
-                    >
-                      <Play className="w-4 h-4" />
-                      Start Interactive Demo
-                    </Button>
+                    <InteractiveTutorial />
                   </div>
 
                   {/* Stats */}

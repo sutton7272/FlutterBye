@@ -2,7 +2,10 @@ import { useState, useCallback } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Play, Loader2, Sparkles, Coins, DollarSign, Users, TrendingUp, Gift, Crown, Zap, MessageSquare, Calculator, Award, BarChart3, Brain } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Progress } from "@/components/ui/progress";
+import { useToast } from "@/hooks/use-toast";
+import { Play, Loader2, Sparkles, Coins, DollarSign, Users, TrendingUp, Gift, Crown, Zap, MessageSquare, Calculator, Award, BarChart3, Brain, ChevronRight, Trophy, Star, Wallet, Shield, PieChart, Activity, CheckCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface TutorialStep {
@@ -159,58 +162,144 @@ const CATEGORY_LABELS = {
   trading: 'Trading & Growth'
 };
 
-function InteractiveTutorialContent() {
-  const [currentStepIndex, setCurrentStepIndex] = useState(0);
-  const [completedSteps, setCompletedSteps] = useState<Set<number>>(new Set());
-  const [loadingSteps, setLoadingSteps] = useState<Set<number>>(new Set());
-  const [stepResults, setStepResults] = useState<Record<number, any>>({});
+interface TutorialState {
+  showPopup: boolean;
+  currentSlide: number;
+  isRunning: boolean;
+  progress: number;
+  completedSteps: Set<number>;
+  loadingSteps: Set<number>;
+  stepResults: Record<number, any>;
+  achievements: string[];
+  totalScore: number;
+  animatingProgress: boolean;
+}
 
-  const currentStep = TUTORIAL_STEPS[currentStepIndex];
+function InteractiveTutorialContent() {
+  const { toast } = useToast();
+  const [tutorialState, setTutorialState] = useState<TutorialState>({
+    showPopup: false,
+    currentSlide: 0,
+    isRunning: false,
+    progress: 0,
+    completedSteps: new Set(),
+    loadingSteps: new Set(),
+    stepResults: {},
+    achievements: ["Tutorial Explorer", "Platform Pioneer"],
+    totalScore: 2450,
+    animatingProgress: false
+  });
+
+  const currentStep = TUTORIAL_STEPS[tutorialState.currentSlide];
 
   const runDemo = useCallback(async (step: TutorialStep) => {
-    if (loadingSteps.has(step.id)) return;
+    if (tutorialState.loadingSteps.has(step.id)) return;
 
-    setLoadingSteps(prev => new Set([...Array.from(prev), step.id]));
+    setTutorialState(prev => ({
+      ...prev,
+      loadingSteps: new Set([...Array.from(prev.loadingSteps), step.id]),
+      animatingProgress: true
+    }));
 
     try {
+      // AI thinking simulation
       await new Promise(resolve => setTimeout(resolve, 1500 + Math.random() * 1000));
       const result = await step.demo();
       
-      setStepResults(prev => ({ ...prev, [step.id]: result }));
-      setCompletedSteps(prev => new Set([...Array.from(prev), step.id]));
+      setTutorialState(prev => ({
+        ...prev,
+        stepResults: { ...prev.stepResults, [step.id]: result },
+        completedSteps: new Set([...Array.from(prev.completedSteps), step.id]),
+        progress: Math.min(prev.progress + (100 / TUTORIAL_STEPS.length), 100),
+        totalScore: prev.totalScore + (step.category === 'token' ? 500 : step.category === 'value' ? 350 : step.category === 'economy' ? 420 : 280),
+        achievements: [...prev.achievements, getStepAchievement(step)]
+      }));
+
+      // Success feedback
+      toast({
+        title: "✅ Demo Complete!",
+        description: `${step.title} completed successfully!`,
+        duration: 2000
+      });
     } catch (error) {
       console.error(`Demo failed for step ${step.id}:`, error);
     } finally {
-      setLoadingSteps(prev => {
-        const newSet = new Set(prev);
-        newSet.delete(step.id);
-        return newSet;
+      setTutorialState(prev => {
+        const newLoadingSteps = new Set(prev.loadingSteps);
+        newLoadingSteps.delete(step.id);
+        return {
+          ...prev,
+          loadingSteps: newLoadingSteps,
+          animatingProgress: false
+        };
       });
     }
-  }, [loadingSteps]);
+  }, [tutorialState.loadingSteps, toast]);
 
-  const nextStep = () => {
-    if (currentStepIndex < TUTORIAL_STEPS.length - 1) {
-      setCurrentStepIndex(prev => prev + 1);
+  const getStepAchievement = (step: TutorialStep): string => {
+    const achievements = {
+      1: "Token Creator",
+      2: "Value Attacher", 
+      3: "Pricing Guru",
+      4: "FLBY Master",
+      5: "Staking Pro",
+      6: "Trading Expert",
+      7: "Growth Hacker",
+      8: "Launch Specialist"
+    };
+    return achievements[step.id] || "Platform Explorer";
+  };
+
+  const startInteractiveTutorial = () => {
+    setTutorialState(prev => ({
+      ...prev,
+      showPopup: true,
+      isRunning: true,
+      currentSlide: 0,
+      progress: 0
+    }));
+
+    // Auto-run first demo
+    setTimeout(() => {
+      runDemo(TUTORIAL_STEPS[0]);
+    }, 1000);
+  };
+
+  const nextSlide = () => {
+    if (tutorialState.currentSlide < TUTORIAL_STEPS.length - 1) {
+      setTutorialState(prev => ({
+        ...prev,
+        currentSlide: prev.currentSlide + 1
+      }));
+      
+      // Auto-run demo for new slide
+      const nextStep = TUTORIAL_STEPS[tutorialState.currentSlide + 1];
+      if (nextStep) {
+        setTimeout(() => runDemo(nextStep), 800);
+      }
     }
   };
 
-  const prevStep = () => {
-    if (currentStepIndex > 0) {
-      setCurrentStepIndex(prev => prev - 1);
+  const prevSlide = () => {
+    if (tutorialState.currentSlide > 0) {
+      setTutorialState(prev => ({
+        ...prev,
+        currentSlide: prev.currentSlide - 1
+      }));
     }
   };
 
-  const goToStep = (index: number) => {
-    if (index >= 0 && index < TUTORIAL_STEPS.length) {
-      setCurrentStepIndex(index);
-    }
+  const closeDemo = () => {
+    setTutorialState(prev => ({
+      ...prev,
+      showPopup: false,
+      isRunning: false
+    }));
   };
 
-  const progress = ((currentStepIndex + 1) / TUTORIAL_STEPS.length) * 100;
-  const isLoading = loadingSteps.has(currentStep.id);
-  const isCompleted = completedSteps.has(currentStep.id);
-  const result = stepResults[currentStep.id];
+  const isLoading = tutorialState.loadingSteps.has(currentStep.id);
+  const isCompleted = tutorialState.completedSteps.has(currentStep.id);
+  const result = tutorialState.stepResults[currentStep.id];
 
   const renderStepResult = (result: any, category: string, stepId: number) => {
     switch (category) {
@@ -420,231 +509,216 @@ function InteractiveTutorialContent() {
   };
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6">
-      {/* Header with Progress */}
-      <Card className="electric-frame bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900">
-        <CardHeader className="text-center pb-4">
-          <CardTitle className="text-2xl font-bold bg-gradient-to-r from-electric-blue to-purple-400 bg-clip-text text-transparent mb-2">
-            🚀 Platform Interactive Tutorial
-          </CardTitle>
-          <p className="text-gray-300 text-sm">
-            Step {currentStepIndex + 1} of {TUTORIAL_STEPS.length} • {Math.round(progress)}% Complete
-          </p>
-          <div className="w-full bg-slate-800 rounded-full h-2 mt-3">
-            <div 
-              className="bg-gradient-to-r from-electric-blue to-purple-400 h-2 rounded-full transition-all duration-500"
-              style={{ width: `${progress}%` }}
-            />
-          </div>
-        </CardHeader>
-      </Card>
+    <>
+      <Button 
+        onClick={startInteractiveTutorial}
+        className="bg-gradient-to-r from-electric-blue to-circuit-teal hover:from-electric-blue/80 hover:to-circuit-teal/80 text-white px-4 py-2 text-sm w-full flex items-center justify-center gap-2 shadow-lg"
+      >
+        <Play className="w-4 h-4" />
+        Start Interactive Demo
+      </Button>
 
-      {/* Current Step Display */}
-      <Card className={cn(
-        "electric-frame border-2 min-h-[500px]",
-        CATEGORY_COLORS[currentStep.category]
-      )}>
-        <CardHeader>
-          <div className="flex items-start gap-4 mb-4">
-            <div className={cn(
-              "w-16 h-16 rounded-xl flex items-center justify-center transition-all duration-300",
-              isCompleted ? "bg-green-500" : 
-              isLoading ? "bg-electric-blue animate-pulse" :
-              "bg-slate-700/50"
-            )}>
-              {isLoading ? (
-                <Loader2 className="w-8 h-8 text-white animate-spin" />
-              ) : (
-                currentStep.icon
-              )}
+      <Dialog open={tutorialState.showPopup} onOpenChange={closeDemo}>
+        <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto bg-slate-900 border-2 border-electric-blue/30">
+          <DialogHeader className="space-y-4 pb-6 border-b border-slate-700">
+            <div className="flex items-center justify-between">
+              <DialogTitle className="text-2xl font-bold text-gradient flex items-center gap-3">
+                <div className="p-2 rounded-lg bg-gradient-to-br from-electric-blue/20 to-purple/20">
+                  <Sparkles className="w-6 h-6 text-electric-blue" />
+                </div>
+                Platform Tutorial Demo
+              </DialogTitle>
+              <Badge className="bg-electric-green/20 text-electric-green font-medium">
+                Slide {tutorialState.currentSlide + 1} of {TUTORIAL_STEPS.length}
+              </Badge>
             </div>
-            <div className="flex-1">
-              <CardTitle className="text-xl font-bold text-white mb-3 leading-tight">
-                {currentStep.title}
-              </CardTitle>
-              <p className="text-gray-300 leading-relaxed mb-4">
-                {currentStep.description}
-              </p>
-              <div className="flex items-center gap-4">
-                <Badge 
-                  variant="outline" 
-                  className={cn(
-                    "text-sm font-medium",
-                    CATEGORY_COLORS[currentStep.category]
-                  )}
-                >
-                  {CATEGORY_LABELS[currentStep.category]}
-                </Badge>
-                <Button
-                  onClick={() => runDemo(currentStep)}
-                  disabled={isLoading}
-                  className={cn(
-                    "transition-all duration-200",
-                    isCompleted 
-                      ? "bg-green-600 hover:bg-green-500 text-white"
-                      : isLoading
-                      ? "bg-electric-blue/50 cursor-not-allowed"
-                      : "bg-electric-blue hover:bg-electric-blue/80 text-white"
-                  )}
-                >
-                  {isLoading ? (
-                    <>
-                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                      Running Demo...
-                    </>
-                  ) : isCompleted ? (
-                    <>
-                      ✅ Demo Complete
-                    </>
-                  ) : (
-                    <>
-                      <Play className="w-4 h-4 mr-2" />
-                      Try This Demo
-                    </>
-                  )}
-                </Button>
+            
+            {/* Progress Bar */}
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-gray-400">Progress</span>
+                <div className="flex items-center gap-2">
+                  <Trophy className="w-4 h-4 text-yellow-400" />
+                  <span className="text-yellow-400 font-semibold">{tutorialState.totalScore}</span>
+                </div>
               </div>
+              <Progress 
+                value={tutorialState.progress} 
+                className="h-2 bg-slate-800 [&>div]:bg-gradient-to-r [&>div]:from-electric-blue [&>div]:to-circuit-teal [&>div]:transition-all [&>div]:duration-1000"
+              />
             </div>
-          </div>
-        </CardHeader>
-
-        {(isLoading || result) && (
-          <CardContent className="pt-0">
-            <div className={cn(
-              "p-6 rounded-lg border-2 transition-all duration-500",
-              isLoading ? "border-electric-blue/30 bg-electric-blue/10" : 
-              "border-green-400/30 bg-green-400/10"
+          </DialogHeader>
+          
+          <div className="space-y-6 py-6">
+            {/* Current Step */}
+            <Card className={cn(
+              "electric-frame border-2 min-h-[400px]",
+              CATEGORY_COLORS[currentStep.category]
             )}>
-              {isLoading ? (
-                <div className="space-y-4">
-                  <div className="flex items-center gap-3">
-                    <Loader2 className="w-5 h-5 text-electric-blue animate-spin" />
-                    <span className="text-electric-blue font-medium">
-                      {currentStep.interactionType === 'click' ? 'Processing your request...' :
-                       currentStep.interactionType === 'type' ? 'Analyzing your input...' :
-                       currentStep.interactionType === 'watch' ? 'Monitoring systems...' :
-                       'Running advanced analysis...'}
-                    </span>
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <CardTitle className="text-xl font-bold text-white flex items-center gap-3">
+                    <div className={cn(
+                      "w-12 h-12 rounded-xl flex items-center justify-center transition-all duration-300",
+                      isCompleted ? "bg-green-500" : 
+                      isLoading ? "bg-electric-blue animate-pulse" :
+                      "bg-slate-700/50"
+                    )}>
+                      {isLoading ? (
+                        <Loader2 className="w-6 h-6 text-white animate-spin" />
+                      ) : isCompleted ? (
+                        <CheckCircle className="w-6 h-6 text-white" />
+                      ) : (
+                        currentStep.icon
+                      )}
+                    </div>
+                    <div>
+                      <h3 className="text-lg">{currentStep.title}</h3>
+                      <Badge variant="secondary" className={cn(
+                        "mt-1 text-xs",
+                        `bg-${currentStep.category === 'token' ? 'yellow' : 
+                          currentStep.category === 'value' ? 'green' : 
+                          currentStep.category === 'economy' ? 'purple' : 'blue'}-500/20`
+                      )}>
+                        {CATEGORY_LABELS[currentStep.category]}
+                      </Badge>
+                    </div>
+                  </CardTitle>
+                  <Button
+                    onClick={() => runDemo(currentStep)}
+                    disabled={isLoading || isCompleted}
+                    className="bg-gradient-to-r from-electric-blue to-circuit-teal hover:from-electric-blue/80 hover:to-circuit-teal/80"
+                  >
+                    {isLoading ? (
+                      <>
+                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                        Running Demo...
+                      </>
+                    ) : isCompleted ? (
+                      <>
+                        <CheckCircle className="w-4 h-4 mr-2" />
+                        Completed
+                      </>
+                    ) : (
+                      <>
+                        <Play className="w-4 h-4 mr-2" />
+                        Run Demo
+                      </>
+                    )}
+                  </Button>
+                </div>
+                <p className="text-gray-300 leading-relaxed mt-4">
+                  {currentStep.description}
+                </p>
+              </CardHeader>
+
+              {(isLoading || result) && (
+                <CardContent className="pt-0">
+                  <div className={cn(
+                    "p-6 rounded-lg border-2 transition-all duration-500",
+                    isLoading ? "border-electric-blue/30 bg-electric-blue/10" : 
+                    "border-green-400/30 bg-green-400/10"
+                  )}>
+                    {isLoading ? (
+                      <div className="space-y-4">
+                        <div className="flex items-center gap-3">
+                          <Loader2 className="w-5 h-5 text-electric-blue animate-spin" />
+                          <span className="text-electric-blue font-medium">
+                            {currentStep.interactionType === 'click' ? 'Processing your request...' :
+                             currentStep.interactionType === 'type' ? 'Analyzing your input...' :
+                             currentStep.interactionType === 'watch' ? 'Monitoring systems...' :
+                             'Running advanced analysis...'}
+                          </span>
+                        </div>
+                        <p className="text-gray-400 text-sm leading-relaxed">
+                          {currentStep.expectedResult}
+                        </p>
+                      </div>
+                    ) : (
+                      <div className="space-y-4">
+                        <h4 className="text-green-400 font-semibold text-lg mb-3">🎉 Demo Results</h4>
+                        {renderStepResult(result, currentStep.category, currentStep.id)}
+                      </div>
+                    )}
                   </div>
-                  <p className="text-gray-400 text-sm leading-relaxed">
-                    {currentStep.expectedResult}
-                  </p>
-                </div>
+                </CardContent>
+              )}
+            </Card>
+
+            {/* Navigation */}
+            <div className="flex items-center justify-between bg-slate-800/50 backdrop-blur rounded-lg p-4 border border-electric-blue/30">
+              <Button
+                variant="outline"
+                onClick={prevSlide}
+                disabled={tutorialState.currentSlide === 0}
+                className="flex items-center gap-2"
+              >
+                ← Previous
+              </Button>
+
+              {/* Slide Indicators */}
+              <div className="flex items-center gap-2">
+                {TUTORIAL_STEPS.map((_, index) => (
+                  <div
+                    key={index}
+                    className={cn(
+                      "w-3 h-3 rounded-full transition-all duration-200",
+                      index === tutorialState.currentSlide ? "bg-electric-blue scale-110" :
+                      tutorialState.completedSteps.has(TUTORIAL_STEPS[index].id) ? "bg-green-500" :
+                      "bg-slate-600"
+                    )}
+                  />
+                ))}
+              </div>
+
+              {tutorialState.currentSlide < TUTORIAL_STEPS.length - 1 ? (
+                <Button
+                  onClick={nextSlide}
+                  className="flex items-center gap-2 bg-gradient-to-r from-electric-blue to-circuit-teal"
+                >
+                  Next <ChevronRight className="w-4 h-4" />
+                </Button>
               ) : (
-                <div className="space-y-4">
-                  <h4 className="text-green-400 font-semibold text-lg mb-3">🎉 Demo Results</h4>
-                  {renderStepResult(result, currentStep.category, currentStep.id)}
-                </div>
+                <Button
+                  className="flex items-center gap-2 bg-gradient-to-r from-green-600 to-emerald-600"
+                >
+                  <Star className="w-4 h-4" />
+                  Complete!
+                </Button>
               )}
             </div>
-          </CardContent>
-        )}
-      </Card>
 
-      {/* Navigation Controls */}
-      <div className="flex items-center justify-between bg-slate-800/50 backdrop-blur rounded-lg p-4 border border-electric-blue/30">
-        <Button
-          variant="outline"
-          onClick={prevStep}
-          disabled={currentStepIndex === 0}
-          className="flex items-center gap-2"
-        >
-          ← Previous
-        </Button>
-
-        {/* Step Dots */}
-        <div className="flex items-center gap-2">
-          {TUTORIAL_STEPS.map((_, index) => (
-            <button
-              key={index}
-              onClick={() => goToStep(index)}
-              className={cn(
-                "w-3 h-3 rounded-full transition-all duration-200",
-                index === currentStepIndex ? "bg-electric-blue" :
-                completedSteps.has(TUTORIAL_STEPS[index].id) ? "bg-green-500" :
-                "bg-slate-600 hover:bg-slate-500"
-              )}
-            />
-          ))}
-        </div>
-
-        {currentStepIndex < TUTORIAL_STEPS.length - 1 ? (
-          <Button
-            onClick={nextStep}
-            className="flex items-center gap-2 bg-gradient-to-r from-electric-blue to-circuit-teal"
-          >
-            Next →
-          </Button>
-        ) : (
-          <Button
-            className="flex items-center gap-2 bg-gradient-to-r from-green-600 to-emerald-600"
-          >
-            <Zap className="w-4 h-4" />
-            Get Started!
-          </Button>
-        )}
-      </div>
-
-      {/* Completion Message */}
-      {completedSteps.size === TUTORIAL_STEPS.length && (
-        <Card className="electric-frame bg-gradient-to-r from-green-900/20 to-emerald-900/20 border-green-400/30">
-          <CardHeader className="text-center">
-            <CardTitle className="text-xl text-green-400 mb-2">
-              🎉 Tutorial Mastered!
-            </CardTitle>
-            <p className="text-gray-300">
-              You've completed all demos! Ready to start creating your own tokens?
-            </p>
-          </CardHeader>
-        </Card>
-      )}
-    </div>
+            {/* Achievements Panel */}
+            {tutorialState.achievements.length > 2 && (
+              <Card className="electric-frame bg-gradient-to-r from-yellow-900/20 to-orange-900/20 border-yellow-400/30">
+                <CardHeader>
+                  <CardTitle className="text-yellow-400 flex items-center gap-2">
+                    <Trophy className="w-5 h-5" />
+                    Achievements Unlocked
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex flex-wrap gap-2">
+                    {tutorialState.achievements.map((achievement, index) => (
+                      <Badge key={index} className="bg-yellow-500/20 text-yellow-400 border-yellow-400/30">
+                        🏆 {achievement}
+                      </Badge>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 }
 
-// Export for backward compatibility with old dialog-based interface
+// Export main component
 export function InteractiveTutorial() {
   return <InteractiveTutorialContent />;
 }
 
-// Tutorial Launch Button Component  
-export function TutorialLaunchButton({ className = "", variant = "default" }: { 
-  className?: string;
-  variant?: "default" | "outline" | "ghost";
-}) {
-  const [showTutorial, setShowTutorial] = useState(false);
-
-  return (
-    <>
-      <Button
-        variant={variant}
-        onClick={() => setShowTutorial(true)}
-        className={`flex items-center gap-2 ${className}`}
-      >
-        <Play className="w-4 h-4" />
-        Interactive Tutorial
-      </Button>
-      
-      {/* Full-screen overlay */}
-      {showTutorial && (
-        <div className="fixed inset-0 bg-slate-900/95 backdrop-blur-sm z-50 overflow-y-auto">
-          <div className="min-h-full p-4">
-            <div className="max-w-7xl mx-auto">
-              <div className="flex items-center justify-between mb-6 sticky top-4 bg-slate-900/90 backdrop-blur rounded-lg p-4 border border-electric-blue/30">
-                <h1 className="text-2xl font-bold text-gradient">Platform Interactive Tutorial</h1>
-                <Button
-                  variant="ghost" 
-                  onClick={() => setShowTutorial(false)}
-                  className="text-gray-400 hover:text-white"
-                >
-                  ✕ Close Tutorial
-                </Button>
-              </div>
-              <InteractiveTutorialContent />
-            </div>
-          </div>
-        </div>
-      )}
-    </>
-  );
-}
+// Default export
+export default InteractiveTutorial;
