@@ -196,6 +196,17 @@ export function CustodialWalletManagement() {
           <h2 className="text-2xl font-bold text-white">Secure Custodial Wallet Management</h2>
           <p className="text-gray-400">Production-ready wallet infrastructure for user value attachment</p>
         </div>
+        
+        {/* Security Information Panel */}
+        <div className="max-w-md">
+          <Alert className="border-electric-blue/30 bg-electric-blue/10 backdrop-blur-sm">
+            <Shield className="w-4 h-4" />
+            <AlertDescription className="text-electric-blue text-sm">
+              <strong>Bank-Grade Security:</strong> Private keys are encrypted using AES-256 and never displayed. 
+              Only encrypted backups available for disaster recovery.
+            </AlertDescription>
+          </Alert>
+        </div>
         <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
           <DialogTrigger asChild>
             <Button className="bg-electric-blue hover:bg-electric-blue/80">
@@ -409,7 +420,7 @@ export function CustodialWalletManagement() {
                         </div>
                       </div>
                       
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-3">
+                      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-3">
                         <div>
                           <Label className="text-xs text-gray-300">Wallet Address</Label>
                           <div className="text-sm font-mono text-white truncate">
@@ -426,6 +437,13 @@ export function CustodialWalletManagement() {
                           <Label className="text-xs text-gray-300">Reserved Balance</Label>
                           <div className="text-sm font-semibold text-yellow-400">
                             {formatCurrency(wallet.reservedBalance, wallet.currency)}
+                          </div>
+                        </div>
+                        <div>
+                          <Label className="text-xs text-gray-300">Security Status</Label>
+                          <div className="flex items-center space-x-2">
+                            <Lock className="w-3 h-3 text-electric-blue" />
+                            <span className="text-xs text-electric-blue">Encrypted</span>
                           </div>
                         </div>
                       </div>
