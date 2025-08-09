@@ -5,6 +5,7 @@
 
 import { lazy, Suspense, useEffect } from "react";
 import { LoadingSpinner } from "./loading-spinner";
+import { FlyingButterflies } from "./flying-butterflies";
 
 // Lazy load heavy components
 const HeavyTooltip = lazy(() => import("./ui/tooltip").then(module => ({ default: module.TooltipProvider })));
@@ -30,9 +31,12 @@ export function OptimizedLayout({ children }: OptimizedLayoutProps) {
 
   return (
     <div className="min-h-screen bg-background">
+      {/* Global Flying Butterflies Background */}
+      <FlyingButterflies />
+      
       <Suspense fallback={<LoadingSpinner />}>
         <HeavyTooltip>
-          <div className="relative">
+          <div className="relative z-10">
             {children}
           </div>
           <HeavyToaster />

@@ -45,6 +45,12 @@
 }
 
 /* Electric Butterfly Flight Animations - Extended Bottom Boundaries */
+.butterfly {
+  will-change: transform;
+  backface-visibility: hidden;
+  transform-style: preserve-3d;
+}
+
 @keyframes butterfly-flight-1 {
   0% { transform: translate(-250px, -50px) rotate(0deg) scale(0.8); opacity: 0.7; }
   25% { transform: translate(200px, -80px) rotate(15deg) scale(1.1); opacity: 1; }
