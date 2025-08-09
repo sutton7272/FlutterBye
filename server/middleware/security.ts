@@ -28,19 +28,20 @@ export const authRateLimit = rateLimit({
   legacyHeaders: false,
 });
 
-// Security headers middleware
+// Security headers middleware - Updated to fix CSP blocking issues
 export const securityHeaders = helmet({
   contentSecurityPolicy: {
     directives: {
       defaultSrc: ["'self'"],
-      styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
-      fontSrc: ["'self'", "https://fonts.gstatic.com"],
-      imgSrc: ["'self'", "data:", "https:"],
-      scriptSrc: ["'self'", "'unsafe-eval'"], // Required for Vite in development
-      connectSrc: ["'self'", "wss:", "https:"],
+      styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com", "https://cdn.jsdelivr.net"],
+      fontSrc: ["'self'", "https://fonts.gstatic.com", "https://cdn.jsdelivr.net", "data:"],
+      imgSrc: ["'self'", "data:", "https:", "blob:"],
+      scriptSrc: ["'self'", "'unsafe-eval'", "'unsafe-inline'", "https://vercel.live", "https://cdn.jsdelivr.net", "blob:"], // Fixed script blocking
+      connectSrc: ["'self'", "wss:", "ws:", "https:", "wss://*.replit.dev", "ws://*.replit.dev"], // Fixed WebSocket connections
       objectSrc: ["'none'"],
       mediaSrc: ["'self'"],
-      frameSrc: ["'none'"],
+      frameSrc: ["'self'", "https://vercel.live"],
+      workerSrc: ["'self'", "blob:"], // Added for web workers
     },
   },
   crossOriginEmbedderPolicy: false, // Required for some blockchain libraries

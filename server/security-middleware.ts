@@ -39,17 +39,18 @@ export class SecurityMiddleware {
   // Comprehensive security headers
   static securityHeaders() {
     return (req: Request, res: Response, next: NextFunction) => {
-      // Content Security Policy
+      // Content Security Policy - Updated to fix script blocking issues
       res.setHeader('Content-Security-Policy', [
         "default-src 'self'",
-        "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://vercel.live",
-        "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
-        "font-src 'self' https://fonts.gstatic.com",
+        "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://vercel.live https://cdn.jsdelivr.net blob:",
+        "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net",
+        "font-src 'self' https://fonts.gstatic.com https://cdn.jsdelivr.net data:",
         "img-src 'self' data: https: blob:",
-        "connect-src 'self' wss: ws: https:",
+        "connect-src 'self' wss: ws: https: wss://*.replit.dev ws://*.replit.dev",
         "frame-src 'self' https://vercel.live",
         "object-src 'none'",
-        "base-uri 'self'"
+        "base-uri 'self'",
+        "worker-src 'self' blob:"
       ].join('; '));
 
       // Security headers
