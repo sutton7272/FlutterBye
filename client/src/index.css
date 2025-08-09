@@ -51,6 +51,32 @@
   transform-style: preserve-3d;
 }
 
+/* Electric Butterfly Color Classes */
+.butterfly-electric-blue {
+  color: hsl(200, 100%, 50%) !important;
+  filter: drop-shadow(0 0 12px hsl(200, 100%, 50%)) !important;
+}
+
+.butterfly-bright-blue {
+  color: hsl(210, 100%, 60%) !important;
+  filter: drop-shadow(0 0 10px hsl(210, 100%, 60%)) !important;
+}
+
+.butterfly-electric-green {
+  color: hsl(140, 100%, 40%) !important;
+  filter: drop-shadow(0 0 14px hsl(140, 100%, 40%)) !important;
+}
+
+.butterfly-neon-green {
+  color: hsl(155, 100%, 35%) !important;
+  filter: drop-shadow(0 0 11px hsl(155, 100%, 35%)) !important;
+}
+
+.butterfly-circuit-teal {
+  color: hsl(180, 100%, 45%) !important;
+  filter: drop-shadow(0 0 9px hsl(180, 100%, 45%)) !important;
+}
+
 @keyframes butterfly-flight-1 {
   0% { transform: translate(-250px, -50px) rotate(0deg) scale(0.8); opacity: 0.7; }
   25% { transform: translate(200px, -80px) rotate(15deg) scale(1.1); opacity: 1; }
