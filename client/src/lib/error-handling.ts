@@ -43,6 +43,17 @@ export function setupGlobalErrorHandling() {
         event.preventDefault();
         return;
       }
+
+      // WebSocket errors that should not trigger error boundary
+      if (reason.message && (
+        reason.message.includes('WebSocket') ||
+        reason.message.includes('Failed to construct') ||
+        reason.message.includes('SyntaxError')
+      )) {
+        console.log('📍 WebSocket error caught and handled');
+        event.preventDefault();
+        return;
+      }
     }
     
     // Prevent all unhandled rejections from triggering error boundary in development

@@ -40,7 +40,22 @@ export function WebSocketProvider({ children }: WebSocketProviderProps) {
     console.log('🚀 Connecting to WebSocket:', wsUrl);
     setConnectionStatus('connecting');
     
-    const ws = new WebSocket(wsUrl);
+    let ws: WebSocket;
+    try {
+      ws = new WebSocket(wsUrl);
+    } catch (constructorError) {
+      console.error('❌ WebSocket constructor failed:', constructorError);
+      // Try fallback URL without SSL
+      try {
+        const fallbackUrl = `ws://${window.location.host}/ws`;
+        console.log('🔄 Trying fallback WebSocket URL:', fallbackUrl);
+        ws = new WebSocket(fallbackUrl);
+      } catch (fallbackError) {
+        console.error('❌ Fallback WebSocket also failed:', fallbackError);
+        setConnectionStatus('error');
+        return;
+      }
+    }
     
     ws.onopen = () => {
       if (!isMountedRef.current) {
