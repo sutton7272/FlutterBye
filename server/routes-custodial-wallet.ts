@@ -685,4 +685,49 @@ export function registerCustodialWalletRoutes(app: Express, storage: IStorage) {
       });
     }
   });
+
+  // Secure backup endpoint for disaster recovery
+  app.post("/api/admin/custodial-wallet/secure-backup/:walletId", async (req, res) => {
+    try {
+      const { walletId } = req.params;
+      
+      // Get wallet from database
+      const wallet = await storage.getCustodialWallet(walletId);
+      if (!wallet) {
+        return res.status(404).json({
+          success: false,
+          error: 'Wallet not found'
+        });
+      }
+
+      // Log the backup request for security audit
+      await secureWalletService.logSecurityEvent({
+        eventType: 'backup_requested',
+        walletId: wallet.id,
+        severity: 'medium',
+        description: `Secure backup requested for ${wallet.currency} wallet`,
+        ipAddress: req.ip,
+        userAgent: req.get('User-Agent'),
+        additionalData: {
+          walletAddress: wallet.walletAddress,
+          currency: wallet.currency
+        }
+      });
+
+      res.json({
+        success: true,
+        encryptedBackup: wallet.privateKeyEncrypted,
+        walletAddress: wallet.walletAddress,
+        currency: wallet.currency,
+        message: 'Secure backup data prepared for download'
+      });
+
+    } catch (error) {
+      console.error("Secure backup error:", error);
+      res.status(500).json({ 
+        success: false, 
+        error: (error as Error).message || "Failed to create secure backup" 
+      });
+    }
+  });
 }

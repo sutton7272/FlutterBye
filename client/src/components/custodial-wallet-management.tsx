@@ -188,6 +188,53 @@ export function CustodialWalletManagement() {
     return `${num.toFixed(4)} ${currency}`;
   };
 
+  // Secure backup for disaster recovery
+  const handleSecureBackup = async (wallet: CustodialWallet) => {
+    try {
+      const response = await apiRequest(`/api/admin/custodial-wallet/secure-backup/${wallet.id}`, {
+        method: 'POST'
+      });
+
+      if (response.success) {
+        // Create downloadable backup file
+        const backupData = {
+          walletId: wallet.id,
+          currency: wallet.currency,
+          walletAddress: wallet.walletAddress,
+          encryptedPrivateKey: response.encryptedBackup,
+          backupDate: new Date().toISOString(),
+          recoveryInstructions: "This file contains encrypted private key data for disaster recovery. Store securely and use only with proper decryption keys.",
+          securityLevel: "AES-256",
+          requiresDecryptionKey: true
+        };
+
+        const blob = new Blob([JSON.stringify(backupData, null, 2)], { 
+          type: 'application/json' 
+        });
+        
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `wallet-backup-${wallet.currency}-${wallet.walletAddress.slice(0, 8)}-${Date.now()}.json`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+
+        toast({
+          title: "✅ Secure Backup Created",
+          description: `Encrypted backup file downloaded for ${wallet.currency} wallet. Store securely for disaster recovery.`,
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "❌ Backup Failed",
+        description: "Failed to create secure backup. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -202,8 +249,8 @@ export function CustodialWalletManagement() {
           <Alert className="border-electric-blue/30 bg-electric-blue/10 backdrop-blur-sm">
             <Shield className="w-4 h-4" />
             <AlertDescription className="text-electric-blue text-sm">
-              <strong>Bank-Grade Security:</strong> Private keys are encrypted using AES-256 and never displayed. 
-              Only encrypted backups available for disaster recovery.
+              <strong>Disaster Recovery:</strong> Private keys encrypted using AES-256. 
+              Click "Backup" to download encrypted recovery files for fund restoration.
             </AlertDescription>
           </Alert>
         </div>
@@ -440,10 +487,21 @@ export function CustodialWalletManagement() {
                           </div>
                         </div>
                         <div>
-                          <Label className="text-xs text-gray-300">Security Status</Label>
-                          <div className="flex items-center space-x-2">
-                            <Lock className="w-3 h-3 text-electric-blue" />
-                            <span className="text-xs text-electric-blue">Encrypted</span>
+                          <Label className="text-xs text-gray-300">Security & Recovery</Label>
+                          <div className="flex items-center space-x-3">
+                            <div className="flex items-center space-x-1">
+                              <Lock className="w-3 h-3 text-electric-blue" />
+                              <span className="text-xs text-electric-blue">Encrypted</span>
+                            </div>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => handleSecureBackup(wallet)}
+                              className="h-6 px-2 text-xs border-green-600/30 text-green-400 hover:bg-green-600/10"
+                            >
+                              <Download className="w-3 h-3 mr-1" />
+                              Backup
+                            </Button>
                           </div>
                         </div>
                       </div>
