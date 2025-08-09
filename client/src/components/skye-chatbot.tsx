@@ -73,14 +73,19 @@ export function SkyeChatbot() {
         });
       } else {
         console.error('Chat API Error:', response.status, response.statusText);
-        // Show error message
+        
+        // Add error message to chat
         const errorMsg: Message = {
           id: `error_${Date.now()}`,
-          message: "Sorry, I'm having trouble responding right now. Please try again.",
+          message: "I'm having trouble connecting right now. Please try again in a moment! 🔄",
           messageType: "assistant",
           createdAt: new Date().toISOString()
         };
-        setMessages(prev => [...prev, errorMsg]);
+        
+        setMessages(prev => {
+          const withoutTemp = prev.filter(msg => msg.id !== tempUserMsg.id);
+          return [...withoutTemp, tempUserMsg, errorMsg];
+        });
       }
     } catch (error) {
       // Show error message
