@@ -17,6 +17,7 @@ import { LoadingState } from "@/components/loading-state";
 import { ViralGrowthAccelerator } from "@/components/viral-growth-accelerator";
 import { MobileOnboardingWizard } from "@/components/mobile-onboarding-wizard";
 import { usePerformance } from "@/hooks/use-performance";
+import { FlutterAIDemoCards } from "@/components/flutterai-demo-cards";
 import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 
@@ -107,6 +108,23 @@ export default function Home() {
     });
 
     const [selectedContent, setSelectedContent] = useState<any>(null);
+    
+    // Type guard for aiStats
+    const typedAiStats = aiStats as { queueSize?: number } | undefined;
+    
+    // Type guard for latestContent
+    const typedLatestContent = latestContent as Array<{
+      id?: number;
+      type?: string;
+      title?: string;
+      topic?: string;
+      content?: string;
+      preview?: string;
+      timestamp?: string;
+      wordCount?: number;
+      seoScore?: number;
+      readabilityScore?: number;
+    }> | undefined;
 
     if (isLoading) {
       return (
@@ -137,11 +155,11 @@ export default function Home() {
             </p>
             
             {/* AI Stats */}
-            {aiStats && (
+            {typedAiStats && (
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-2xl mx-auto mb-8">
                 <Card className="bg-electric-blue/20 border-electric-blue/30 backdrop-blur-sm">
                   <CardContent className="p-4 text-center">
-                    <div className="text-2xl font-bold text-electric-blue">{aiStats.queueSize || 0}</div>
+                    <div className="text-2xl font-bold text-electric-blue">{typedAiStats.queueSize || 0}</div>
                     <div className="text-xs text-gray-400">Queue Size</div>
                   </CardContent>
                 </Card>
@@ -202,9 +220,9 @@ export default function Home() {
             <div className="lg:col-span-2">
               <h3 className="text-xl font-bold mb-6 text-electric-green">Latest AI-Generated Content</h3>
               
-              {latestContent && latestContent.length > 0 ? (
+              {typedLatestContent && typedLatestContent.length > 0 ? (
                 <div className="space-y-4 max-h-96 overflow-y-auto">
-                  {latestContent.slice(0, 3).map((content: any, index: number) => (
+                  {typedLatestContent.slice(0, 3).map((content, index: number) => (
                     <Card key={index} className="bg-gradient-to-r from-gray-900/80 to-electric-blue/10 border-electric-blue/20 backdrop-blur-sm">
                       <CardContent className="p-6">
                         <div className="flex items-start justify-between mb-3">
@@ -757,6 +775,13 @@ export default function Home() {
           </div>
         </div>
       </div>
+
+        {/* FlutterAI Demo Cards */}
+        <div className="border-t border-electric-blue/30 bg-gradient-to-r from-gray-900/80 via-electric-blue/10 to-purple-900/80 py-16 mt-16">
+          <div className="container mx-auto px-4">
+            <FlutterAIDemoCards />
+          </div>
+        </div>
 
         {/* AI-Generated Content Showcase */}
         <AIContentShowcase />
