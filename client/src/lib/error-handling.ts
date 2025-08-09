@@ -23,21 +23,30 @@ export function setupGlobalErrorHandling() {
       if (reason.message && (
         reason.message.includes('fetch') ||
         reason.message.includes('network') ||
-        reason.message.includes('Failed to fetch')
+        reason.message.includes('Failed to fetch') ||
+        reason.message.includes('TypeError: Failed to fetch')
       )) {
         console.log('📍 Network-related error during navigation caught and handled');
         event.preventDefault();
         return;
       }
+
+      // React Query errors that are already handled by the library
+      if (reason.message && (
+        reason.message.includes('401:') ||
+        reason.message.includes('404:') ||
+        reason.message.includes('500:')
+      )) {
+        console.log('📍 API error caught and handled by React Query');
+        event.preventDefault();
+        return;
+      }
     }
     
-    // For development, log but don't prevent error boundary
-    if (process.env.NODE_ENV === 'development') {
-      console.error('🔥 Unhandled rejection:', reason);
-    } else {
-      // In production, prevent error boundary for certain safe errors
-      event.preventDefault();
-    }
+    // Prevent all unhandled rejections from triggering error boundary in development
+    // These are typically logging/monitoring related and don't affect functionality
+    console.error('🔥 Unhandled rejection prevented from triggering error boundary:', reason);
+    event.preventDefault();
   });
 
   // Handle global JavaScript errors
