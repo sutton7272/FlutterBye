@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { flutterinaService } from './flutterina-ai-service';
-// Note: Using simple auth check - admin routes should be properly secured in production
 import { storage } from './storage';
+import { authenticateWallet, requireAdmin } from './admin-middleware';
 
 const router = Router();
 
@@ -10,31 +10,12 @@ const router = Router();
  * Provides comprehensive control over AI system costs and usage
  */
 
-// Admin middleware to check if user has admin permissions
-const isAdmin = async (req: any, res: any, next: any) => {
-  try {
-    if (!req.isAuthenticated()) {
-      return res.status(401).json({ error: 'Authentication required' });
-    }
-
-    const userId = req.user.claims.sub;
-    const user = await storage.getUser(userId);
-    
-    if (!user?.isAdmin) {
-      return res.status(403).json({ error: 'Admin access required' });
-    }
-    
-    next();
-  } catch (error) {
-    console.error('Admin check error:', error);
-    res.status(500).json({ error: 'Authorization check failed' });
-  }
-};
+// All routes use middleware from admin-middleware.ts
 
 /**
  * Toggle Flutterina system on/off (Emergency shutoff)
  */
-router.post('/system/toggle', isAuthenticated, isAdmin, async (req: any, res) => {
+router.post('/api/flutterina/admin/system/toggle', authenticateWallet, requireAdmin, async (req: any, res) => {
   try {
     const { enabled } = req.body;
     const adminUserId = req.user.claims.sub;
@@ -56,7 +37,7 @@ router.post('/system/toggle', isAuthenticated, isAdmin, async (req: any, res) =>
 /**
  * Get current system status and usage statistics
  */
-router.get('/system/status', isAuthenticated, isAdmin, async (req: any, res) => {
+router.get('/api/flutterina/admin/stats', authenticateWallet, requireAdmin, async (req: any, res) => {
   try {
     const systemEnabled = await flutterinaService.checkSystemEnabled();
     const globalUsageStats = await flutterinaService.getUsageStats();
@@ -76,7 +57,7 @@ router.get('/system/status', isAuthenticated, isAdmin, async (req: any, res) => 
 /**
  * Get user-specific usage statistics
  */
-router.get('/user/:userId/usage', isAuthenticated, isAdmin, async (req, res) => {
+router.get('/api/flutterina/admin/user/:userId/usage', authenticateWallet, requireAdmin, async (req, res) => {
   try {
     const { userId } = req.params;
     const userUsageStats = await flutterinaService.getUsageStats(userId);
@@ -95,7 +76,7 @@ router.get('/user/:userId/usage', isAuthenticated, isAdmin, async (req, res) => 
 /**
  * User opt-out functionality (users can disable Flutterina for themselves)
  */
-router.post('/user/opt-out', isAuthenticated, async (req: any, res) => {
+router.post('/api/flutterina/user/opt-out', authenticateWallet, async (req: any, res) => {
   try {
     const userId = req.user.claims.sub;
     const { optOut } = req.body;
@@ -128,7 +109,7 @@ router.post('/user/opt-out', isAuthenticated, async (req: any, res) => {
 /**
  * Get user's current Flutterina preferences and settings
  */
-router.get('/user/preferences', isAuthenticated, async (req: any, res) => {
+router.get('/api/flutterina/user/preferences', authenticateWallet, async (req: any, res) => {
   try {
     const userId = req.user.claims.sub;
     const context = await storage.getFlutterinaUserContext(userId) || {};
@@ -148,7 +129,7 @@ router.get('/user/preferences', isAuthenticated, async (req: any, res) => {
 /**
  * Cost monitoring and alerts
  */
-router.get('/cost/monitor', isAuthenticated, isAdmin, async (req, res) => {
+router.get('/api/flutterina/admin/cost/monitor', authenticateWallet, requireAdmin, async (req, res) => {
   try {
     const stats = await flutterinaService.getUsageStats();
     const systemEnabled = await flutterinaService.checkSystemEnabled();

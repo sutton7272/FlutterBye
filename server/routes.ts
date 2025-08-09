@@ -67,6 +67,7 @@ import { flutterAIRoutes } from "./flutterai-routes";
 import { registerFlutterAIWalletRoutes } from "./flutterai-wallet-routes";
 import { registerEnterpriseWalletRoutes } from "./enterprise-wallet-routes";
 import { registerFlutterinaRoutes } from "./flutterina-routes";
+import flutterinaAdminRoutes from "./flutterina-admin-routes";
 import { 
   analyzeWallet,
   getWalletIntelligence,
@@ -10712,6 +10713,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // Register Blog Routes
   registerBlogRoutes(app);
+  
+  // Register Flutterina Admin Routes
+  app.use(flutterinaAdminRoutes);
   
   // Phase 1: Monitoring & Stability System
   registerMonitoringRoutes(app);
