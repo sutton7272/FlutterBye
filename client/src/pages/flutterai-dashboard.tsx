@@ -1138,7 +1138,7 @@ export default function FlutterAIDashboard() {
 
         {/* Enhanced FlutterAI Dashboard - 5 Essential Tabs */}
         <Tabs defaultValue="overview" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-6 bg-slate-800/50 mb-6">
+          <TabsList className="grid w-full grid-cols-7 bg-slate-800/50 mb-6">
             <TabsTrigger value="overview" className="data-[state=active]:bg-purple-600">
               <Brain className="h-4 w-4 mr-2" />
               Intelligence Overview
@@ -1158,6 +1158,10 @@ export default function FlutterAIDashboard() {
             <TabsTrigger value="flutterina" className="data-[state=active]:bg-pink-600">
               <Settings className="h-4 w-4 mr-2" />
               Skye AI Settings
+            </TabsTrigger>
+            <TabsTrigger value="scoring" className="data-[state=active]:bg-indigo-600">
+              <Target className="h-4 w-4 mr-2" />
+              Scoring Methodology
             </TabsTrigger>
             <TabsTrigger value="settings" className="data-[state=active]:bg-orange-600">
               <Settings className="h-4 w-4 mr-2" />
@@ -1972,7 +1976,335 @@ export default function FlutterAIDashboard() {
             </Card>
           </TabsContent>
 
-          {/* 5. FLUTTERINA AI MANAGEMENT TAB */}
+          {/* 5. SCORING METHODOLOGY TAB - Complete Scoring Framework */}
+          <TabsContent value="scoring" className="space-y-6">
+            
+            {/* Overall Scoring Framework */}
+            <Card className="bg-slate-800/50 border-indigo-500/20">
+              <CardHeader>
+                <CardTitle className="text-white flex items-center gap-2">
+                  <Target className="h-5 w-5 text-indigo-400" />
+                  Wallet Intelligence Scoring Framework
+                </CardTitle>
+                <CardDescription className="text-indigo-200">
+                  Complete methodology for the 0-1000 point social credit scoring system
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+                  <div className="text-center p-4 bg-slate-700/50 rounded-lg border border-red-500/20">
+                    <div className="text-2xl font-bold text-red-400 mb-2">0-200</div>
+                    <div className="text-sm text-red-300">Low Risk</div>
+                    <div className="text-xs text-slate-400 mt-1">Minimal activity, new accounts</div>
+                  </div>
+                  <div className="text-center p-4 bg-slate-700/50 rounded-lg border border-yellow-500/20">
+                    <div className="text-2xl font-bold text-yellow-400 mb-2">201-500</div>
+                    <div className="text-sm text-yellow-300">Medium</div>
+                    <div className="text-xs text-slate-400 mt-1">Regular users, moderate activity</div>
+                  </div>
+                  <div className="text-center p-4 bg-slate-700/50 rounded-lg border border-blue-500/20">
+                    <div className="text-2xl font-bold text-blue-400 mb-2">501-750</div>
+                    <div className="text-sm text-blue-300">High Value</div>
+                    <div className="text-xs text-slate-400 mt-1">Active traders, good patterns</div>
+                  </div>
+                  <div className="text-center p-4 bg-slate-700/50 rounded-lg border border-green-500/20">
+                    <div className="text-2xl font-bold text-green-400 mb-2">751-1000</div>
+                    <div className="text-sm text-green-300">Elite</div>
+                    <div className="text-xs text-slate-400 mt-1">Whales, influencers, innovators</div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Core Scoring Categories */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              
+              {/* Trading Behavior (25%) */}
+              <Card className="bg-slate-800/50 border-indigo-500/20">
+                <CardHeader>
+                  <CardTitle className="text-white flex items-center gap-2">
+                    <TrendingUp className="h-5 w-5 text-green-400" />
+                    Trading Behavior (25%)
+                  </CardTitle>
+                  <CardDescription className="text-indigo-200">
+                    Transaction patterns, volume analysis, and trading frequency
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="space-y-3">
+                    <div className="flex justify-between items-center p-3 bg-slate-700/50 rounded-lg">
+                      <span className="text-white">Volume per Transaction</span>
+                      <Badge className="bg-green-600">0-100 pts</Badge>
+                    </div>
+                    <div className="flex justify-between items-center p-3 bg-slate-700/50 rounded-lg">
+                      <span className="text-white">Trading Frequency</span>
+                      <Badge className="bg-green-600">0-75 pts</Badge>
+                    </div>
+                    <div className="flex justify-between items-center p-3 bg-slate-700/50 rounded-lg">
+                      <span className="text-white">Timing Patterns</span>
+                      <Badge className="bg-green-600">0-50 pts</Badge>
+                    </div>
+                    <div className="flex justify-between items-center p-3 bg-slate-700/50 rounded-lg">
+                      <span className="text-white">Market Timing</span>
+                      <Badge className="bg-green-600">0-25 pts</Badge>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Portfolio Quality (20%) */}
+              <Card className="bg-slate-800/50 border-indigo-500/20">
+                <CardHeader>
+                  <CardTitle className="text-white flex items-center gap-2">
+                    <Star className="h-5 w-5 text-yellow-400" />
+                    Portfolio Quality (20%)
+                  </CardTitle>
+                  <CardDescription className="text-indigo-200">
+                    Asset diversity, blue-chip holdings, and DeFi participation
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="space-y-3">
+                    <div className="flex justify-between items-center p-3 bg-slate-700/50 rounded-lg">
+                      <span className="text-white">Asset Diversity</span>
+                      <Badge className="bg-yellow-600">0-80 pts</Badge>
+                    </div>
+                    <div className="flex justify-between items-center p-3 bg-slate-700/50 rounded-lg">
+                      <span className="text-white">Blue-chip Holdings</span>
+                      <Badge className="bg-yellow-600">0-60 pts</Badge>
+                    </div>
+                    <div className="flex justify-between items-center p-3 bg-slate-700/50 rounded-lg">
+                      <span className="text-white">DeFi Participation</span>
+                      <Badge className="bg-yellow-600">0-40 pts</Badge>
+                    </div>
+                    <div className="flex justify-between items-center p-3 bg-slate-700/50 rounded-lg">
+                      <span className="text-white">Portfolio Balance</span>
+                      <Badge className="bg-yellow-600">0-20 pts</Badge>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Network Activity (15%) */}
+              <Card className="bg-slate-800/50 border-indigo-500/20">
+                <CardHeader>
+                  <CardTitle className="text-white flex items-center gap-2">
+                    <Users className="h-5 w-5 text-blue-400" />
+                    Network Activity (15%)
+                  </CardTitle>
+                  <CardDescription className="text-indigo-200">
+                    Social connections, influence metrics, and community engagement
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="space-y-3">
+                    <div className="flex justify-between items-center p-3 bg-slate-700/50 rounded-lg">
+                      <span className="text-white">Social Connections</span>
+                      <Badge className="bg-blue-600">0-60 pts</Badge>
+                    </div>
+                    <div className="flex justify-between items-center p-3 bg-slate-700/50 rounded-lg">
+                      <span className="text-white">Influence Score</span>
+                      <Badge className="bg-blue-600">0-45 pts</Badge>
+                    </div>
+                    <div className="flex justify-between items-center p-3 bg-slate-700/50 rounded-lg">
+                      <span className="text-white">Community Engagement</span>
+                      <Badge className="bg-blue-600">0-30 pts</Badge>
+                    </div>
+                    <div className="flex justify-between items-center p-3 bg-slate-700/50 rounded-lg">
+                      <span className="text-white">Viral Potential</span>
+                      <Badge className="bg-blue-600">0-15 pts</Badge>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Risk Assessment (15%) */}
+              <Card className="bg-slate-800/50 border-indigo-500/20">
+                <CardHeader>
+                  <CardTitle className="text-white flex items-center gap-2">
+                    <Shield className="h-5 w-5 text-red-400" />
+                    Risk Assessment (15%)
+                  </CardTitle>
+                  <CardDescription className="text-indigo-200">
+                    Suspicious activity detection and compliance flags
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="space-y-3">
+                    <div className="flex justify-between items-center p-3 bg-slate-700/50 rounded-lg">
+                      <span className="text-white">Clean Transaction History</span>
+                      <Badge className="bg-green-600">+60 pts</Badge>
+                    </div>
+                    <div className="flex justify-between items-center p-3 bg-slate-700/50 rounded-lg">
+                      <span className="text-white">No Compliance Flags</span>
+                      <Badge className="bg-green-600">+45 pts</Badge>
+                    </div>
+                    <div className="flex justify-between items-center p-3 bg-slate-700/50 rounded-lg">
+                      <span className="text-white">Suspicious Activity</span>
+                      <Badge className="bg-red-600">-150 pts</Badge>
+                    </div>
+                    <div className="flex justify-between items-center p-3 bg-slate-700/50 rounded-lg">
+                      <span className="text-white">Mixer/Tornado Usage</span>
+                      <Badge className="bg-red-600">-45 pts</Badge>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Wealth Indicators (10%) */}
+              <Card className="bg-slate-800/50 border-indigo-500/20">
+                <CardHeader>
+                  <CardTitle className="text-white flex items-center gap-2">
+                    <DollarSign className="h-5 w-5 text-green-400" />
+                    Wealth Indicators (10%)
+                  </CardTitle>
+                  <CardDescription className="text-indigo-200">
+                    Total holdings, transaction sizes, and liquidity depth
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="space-y-3">
+                    <div className="flex justify-between items-center p-3 bg-slate-700/50 rounded-lg">
+                      <span className="text-white">Total Portfolio Value</span>
+                      <Badge className="bg-green-600">0-40 pts</Badge>
+                    </div>
+                    <div className="flex justify-between items-center p-3 bg-slate-700/50 rounded-lg">
+                      <span className="text-white">Avg Transaction Size</span>
+                      <Badge className="bg-green-600">0-30 pts</Badge>
+                    </div>
+                    <div className="flex justify-between items-center p-3 bg-slate-700/50 rounded-lg">
+                      <span className="text-white">Liquidity Provision</span>
+                      <Badge className="bg-green-600">0-20 pts</Badge>
+                    </div>
+                    <div className="flex justify-between items-center p-3 bg-slate-700/50 rounded-lg">
+                      <span className="text-white">Staking Activities</span>
+                      <Badge className="bg-green-600">0-10 pts</Badge>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Innovation Adoption (10%) */}
+              <Card className="bg-slate-800/50 border-indigo-500/20">
+                <CardHeader>
+                  <CardTitle className="text-white flex items-center gap-2">
+                    <Zap className="h-5 w-5 text-purple-400" />
+                    Innovation Adoption (10%)
+                  </CardTitle>
+                  <CardDescription className="text-indigo-200">
+                    Early adopter behavior and new protocol usage
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="space-y-3">
+                    <div className="flex justify-between items-center p-3 bg-slate-700/50 rounded-lg">
+                      <span className="text-white">Early Adopter Score</span>
+                      <Badge className="bg-purple-600">0-40 pts</Badge>
+                    </div>
+                    <div className="flex justify-between items-center p-3 bg-slate-700/50 rounded-lg">
+                      <span className="text-white">New Protocol Usage</span>
+                      <Badge className="bg-purple-600">0-30 pts</Badge>
+                    </div>
+                    <div className="flex justify-between items-center p-3 bg-slate-700/50 rounded-lg">
+                      <span className="text-white">NFT Activity</span>
+                      <Badge className="bg-purple-600">0-20 pts</Badge>
+                    </div>
+                    <div className="flex justify-between items-center p-3 bg-slate-700/50 rounded-lg">
+                      <span className="text-white">Innovation Index</span>
+                      <Badge className="bg-purple-600">0-10 pts</Badge>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+            </div>
+
+            {/* AI Enhancement & Score Validation */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              
+              {/* AI Enhancement Factors */}
+              <Card className="bg-slate-800/50 border-indigo-500/20">
+                <CardHeader>
+                  <CardTitle className="text-white flex items-center gap-2">
+                    <Brain className="h-5 w-5 text-indigo-400" />
+                    AI Enhancement Factors
+                  </CardTitle>
+                  <CardDescription className="text-indigo-200">
+                    Machine learning pattern recognition and behavioral analysis
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="space-y-3">
+                    <div className="flex justify-between items-center p-3 bg-slate-700/50 rounded-lg">
+                      <span className="text-white">Pattern Recognition Bonus</span>
+                      <Badge className="bg-indigo-600">0-50 pts</Badge>
+                    </div>
+                    <div className="flex justify-between items-center p-3 bg-slate-700/50 rounded-lg">
+                      <span className="text-white">Behavioral Anomaly Detection</span>
+                      <Badge className="bg-orange-600">±30 pts</Badge>
+                    </div>
+                    <div className="flex justify-between items-center p-3 bg-slate-700/50 rounded-lg">
+                      <span className="text-white">Cross-chain Analysis</span>
+                      <Badge className="bg-indigo-600">0-25 pts</Badge>
+                    </div>
+                    <div className="flex justify-between items-center p-3 bg-slate-700/50 rounded-lg">
+                      <span className="text-white">Predictive Adjustments</span>
+                      <Badge className="bg-indigo-600">±20 pts</Badge>
+                    </div>
+                  </div>
+                  <Alert className="bg-slate-700/50 border-indigo-500/20">
+                    <Brain className="h-4 w-4 text-indigo-400" />
+                    <AlertDescription className="text-indigo-200">
+                      AI enhancements are applied after base scoring calculation and can significantly boost high-performing wallets.
+                    </AlertDescription>
+                  </Alert>
+                </CardContent>
+              </Card>
+
+              {/* Score Validation & Quality */}
+              <Card className="bg-slate-800/50 border-indigo-500/20">
+                <CardHeader>
+                  <CardTitle className="text-white flex items-center gap-2">
+                    <CheckCircle className="h-5 w-5 text-green-400" />
+                    Score Validation & Quality
+                  </CardTitle>
+                  <CardDescription className="text-indigo-200">
+                    Confidence intervals and data quality metrics
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="space-y-3">
+                    <div className="flex justify-between items-center p-3 bg-slate-700/50 rounded-lg">
+                      <span className="text-white">High Confidence (90%+)</span>
+                      <Badge className="bg-green-600">Complete Data</Badge>
+                    </div>
+                    <div className="flex justify-between items-center p-3 bg-slate-700/50 rounded-lg">
+                      <span className="text-white">Medium Confidence (70-89%)</span>
+                      <Badge className="bg-yellow-600">Partial Data</Badge>
+                    </div>
+                    <div className="flex justify-between items-center p-3 bg-slate-700/50 rounded-lg">
+                      <span className="text-white">Low Confidence (<70%)</span>
+                      <Badge className="bg-red-600">Limited Data</Badge>
+                    </div>
+                    <div className="flex justify-between items-center p-3 bg-slate-700/50 rounded-lg">
+                      <span className="text-white">Manual Override Available</span>
+                      <Badge className="bg-purple-600">Admin Control</Badge>
+                    </div>
+                  </div>
+                  <Alert className="bg-slate-700/50 border-green-500/20">
+                    <Lock className="h-4 w-4 text-green-400" />
+                    <AlertDescription className="text-green-200">
+                      All scores include confidence intervals. Lower confidence scores are flagged for manual review.
+                    </AlertDescription>
+                  </Alert>
+                </CardContent>
+              </Card>
+
+            </div>
+
+          </TabsContent>
+
+          {/* 6. FLUTTERINA AI MANAGEMENT TAB */}
           <TabsContent value="flutterina" className="space-y-6">
             <FlutterinaAdminPanel />
           </TabsContent>
