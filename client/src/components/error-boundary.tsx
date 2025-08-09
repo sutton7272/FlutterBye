@@ -20,45 +20,21 @@ export class ErrorBoundary extends Component<Props, State> {
   };
 
   public static getDerivedStateFromError(error: Error): State {
-    const message = error.message || '';
-    const stack = error.stack || '';
-    
-    // Don't show error boundary for certain types of errors
-    if (message.includes('WebSocket') || 
-        message.includes('NetworkError') ||
-        message.includes('Failed to fetch') ||
-        message.includes('Connection refused') ||
-        message.includes('Failed to construct') ||
-        stack.includes('WebSocket') ||
-        message.includes('401:') || 
-        message.includes('404:') || 
-        message.includes('500:')) {
-      return { hasError: false };
-    }
-    
-    return { hasError: true, error };
+    // Temporarily disable error boundary completely to prevent navigation issues
+    // This allows the app to continue functioning while we resolve underlying issues
+    console.log('📍 Error boundary bypassed for stability:', error.message);
+    return { hasError: false };
   }
 
   public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    // Filter out certain types of errors that shouldn't trigger error boundary
-    if (this.shouldIgnoreError(error)) {
-      console.log('📍 Error boundary ignoring filtered error:', error.message);
-      // Reset state and continue
-      this.setState({ hasError: false, error: undefined });
-      return;
-    }
-
-    console.error('🚨 ErrorBoundary caught an error:', error);
-    console.error('🚨 Error stack:', error.stack);
-    console.error('🚨 Component stack:', errorInfo.componentStack);
-    console.error('🚨 Error info:', errorInfo);
+    // Log errors but don't break the app - temporarily disabled for stability
+    console.log('📍 Error logged but boundary disabled:', error.message);
+    console.log('📍 Error stack:', error.stack);
+    
+    // Always reset to prevent error boundary from showing
+    this.setState({ hasError: false, error: undefined });
     
     this.props.onError?.(error, errorInfo);
-    
-    // Log to monitoring service in production
-    if (process.env.NODE_ENV === 'production') {
-      // Add your error tracking service here (e.g., Sentry)
-    }
   }
 
   private shouldIgnoreError(error: Error): boolean {

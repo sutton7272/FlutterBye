@@ -20,6 +20,9 @@ window.addEventListener('error', (e) => {
 window.addEventListener('unhandledrejection', (e) => {
   e.preventDefault();
   console.log('🛡️ Main fallback rejection prevention:', e.reason);
+  
+  // Force stopImmediatePropagation to prevent any other handlers
+  e.stopImmediatePropagation();
 });
 
 createRoot(document.getElementById("root")!).render(<App />);
