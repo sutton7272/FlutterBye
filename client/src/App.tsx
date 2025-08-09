@@ -159,7 +159,9 @@ function Router() {
         <Route path="/campaign-builder" component={() => (
           <>
             <Navbar />
-            <CampaignBuilder />
+            <SuspenseWrapper>
+              <CampaignBuilder />
+            </SuspenseWrapper>
           </>
         )} />
         <Route path="/trade" component={() => (
@@ -189,19 +191,25 @@ function Router() {
         <Route path="/flutter-art" component={() => (
           <>
             <Navbar />
-            <FlutterArt />
+            <SuspenseWrapper>
+              <FlutterArt />
+            </SuspenseWrapper>
           </>
         )} />
         <Route path="/chat" component={() => (
           <>
             <Navbar />
-            <Chat />
+            <SuspenseWrapper>
+              <Chat />
+            </SuspenseWrapper>
           </>
         )} />
         <Route path="/intelligence" component={() => (
           <>
             <Navbar />
-            <Intelligence />
+            <SuspenseWrapper>
+              <Intelligence />
+            </SuspenseWrapper>
           </>
         )} />
         
@@ -209,13 +217,17 @@ function Router() {
         <Route path="/home" component={() => (
           <>
             <Navbar />
-            <Dashboard />
+            <SuspenseWrapper>
+              <Dashboard />
+            </SuspenseWrapper>
           </>
         )} />
         <Route path="/marketplace" component={() => (
           <>
             <Navbar />
-            <Trade />
+            <SuspenseWrapper>
+              <Trade />
+            </SuspenseWrapper>
           </>
         )} />
         <Route path="/portfolio" component={() => (
@@ -227,13 +239,17 @@ function Router() {
         <Route path="/mint" component={() => (
           <>
             <Navbar />
-            <Mint />
+            <SuspenseWrapper>
+              <Mint />
+            </SuspenseWrapper>
           </>
         )} />
         <Route path="/mint/basic" component={() => (
           <>
             <Navbar />
-            <MintBasic />
+            <SuspenseWrapper>
+              <MintBasic />
+            </SuspenseWrapper>
           </>
         )} />
         <Route path="/mint/ai-enhanced" component={() => (
