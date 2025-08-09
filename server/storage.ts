@@ -328,6 +328,13 @@ export class MemStorage implements IStorage {
   private analysisQueue: Map<string, AnalysisQueue> = new Map();
   private escrowFeeConfigs: Map<string, EscrowFeeConfig> = new Map();
   
+  // Custodial Wallet Storage
+  private custodialWallets: Map<string, CustodialWallet> = new Map();
+  private userWalletBalances: Map<string, UserWalletBalance> = new Map();
+  private valueAttachments: Map<string, ValueAttachment> = new Map();
+  private custodialWalletTransactions: Map<string, CustodialWalletTransaction> = new Map();
+  private walletSecurityLogs: Map<string, WalletSecurityLog> = new Map();
+  
   // FlutterArt NFT Storage
   private flutterArtCollections: Map<string, any> = new Map();
   private flutterArtNFTs: Map<string, any> = new Map();
@@ -335,6 +342,7 @@ export class MemStorage implements IStorage {
   constructor() {
     this.initializeTestData();
     this.initializeDefaultEscrowFees();
+    this.initializeTestCustodialWallets();
   }
 
   private initializeTestData() {
@@ -403,6 +411,107 @@ export class MemStorage implements IStorage {
     };
 
     this.systemSettings.set("default_token_image", defaultTokenImageSetting);
+  }
+
+  private initializeTestCustodialWallets() {
+    // Create test custodial wallets for development
+    const testWallets = [
+      {
+        id: "test-wallet-1",
+        currency: "SOL",
+        walletAddress: "8jK9L4mN2oP5qR7sT6uV3wX8yZ1aB2cD4eF5gH7iJ9kL",
+        privateKeyEncrypted: "encrypted_test_key_1",
+        isHotWallet: true,
+        balance: "125.50",
+        reservedBalance: "25.00",
+        status: "active",
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+      {
+        id: "test-wallet-2", 
+        currency: "USDC",
+        walletAddress: "9mO3P6qT8uW2yA5bE7gJ1kN4rS9vX2cF6hI8lM3oR7tU",
+        privateKeyEncrypted: "encrypted_test_key_2",
+        isHotWallet: true,
+        balance: "2,450.75",
+        reservedBalance: "150.25",
+        status: "active",
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+      {
+        id: "test-wallet-3",
+        currency: "FLBY",
+        walletAddress: "4rY7Z2cE8hL5oS6tW9aB3dG1jM4nP7qU2vX5yA8bD6fI",
+        privateKeyEncrypted: "encrypted_test_key_3",
+        isHotWallet: false,
+        balance: "15,750.00",
+        reservedBalance: "500.00",
+        status: "active",
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+      {
+        id: "test-wallet-4",
+        currency: "SOL",
+        walletAddress: "6jK3L8mQ2oR5sT9uV7wX1yZ4aB6cD8eF2gH5iJ7kL9nP",
+        privateKeyEncrypted: "encrypted_test_key_4",
+        isHotWallet: false,
+        balance: "75.25",
+        reservedBalance: "10.00",
+        status: "maintenance",
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      }
+    ];
+
+    testWallets.forEach(wallet => {
+      this.custodialWallets.set(wallet.id, wallet as CustodialWallet);
+    });
+
+    // Create test security logs
+    const testSecurityLogs = [
+      {
+        id: "sec-log-1",
+        userId: "test-user-1",
+        action: "wallet_creation",
+        description: "New custodial wallet created for SOL",
+        severity: "info",
+        ipAddress: "192.168.1.100",
+        userAgent: "Flutterbye Admin Dashboard",
+        additionalData: '{"walletId":"test-wallet-1","currency":"SOL"}',
+        createdAt: new Date(Date.now() - 1000 * 60 * 30), // 30 minutes ago
+      },
+      {
+        id: "sec-log-2",
+        userId: "test-user-2",
+        action: "balance_update",
+        description: "Wallet balance updated for USDC custodial wallet",
+        severity: "warning",
+        ipAddress: "10.0.0.50",
+        userAgent: "Flutterbye API Client",
+        additionalData: '{"walletId":"test-wallet-2","oldBalance":"2400.00","newBalance":"2450.75"}',
+        createdAt: new Date(Date.now() - 1000 * 60 * 15), // 15 minutes ago
+      },
+      {
+        id: "sec-log-3",
+        userId: "admin",
+        action: "wallet_maintenance",
+        description: "Wallet set to maintenance mode for security audit",
+        severity: "high",
+        ipAddress: "172.16.0.10",
+        userAgent: "Flutterbye Security Tools",
+        additionalData: '{"walletId":"test-wallet-4","reason":"routine_security_audit"}',
+        createdAt: new Date(Date.now() - 1000 * 60 * 5), // 5 minutes ago
+      }
+    ];
+
+    testSecurityLogs.forEach(log => {
+      this.walletSecurityLogs.set(log.id, log as WalletSecurityLog);
+    });
+
+    console.log(`Custodial wallet storage initialized with ${testWallets.length} test wallets and ${testSecurityLogs.length} security logs`);
   }
 
   private initializeDefaultEscrowFees() {
@@ -2084,6 +2193,306 @@ export class MemStorage implements IStorage {
 
   async getAllEscrowFeeConfigs(): Promise<EscrowFeeConfig[]> {
     return Array.from(this.escrowFeeConfigs.values());
+  }
+
+  // Secure Custodial Wallet Operations
+  async createCustodialWallet(wallet: InsertCustodialWallet): Promise<CustodialWallet> {
+    const id = randomUUID();
+    const custodialWallet: CustodialWallet = {
+      id,
+      ...wallet,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+    this.custodialWallets.set(id, custodialWallet);
+    return custodialWallet;
+  }
+
+  async getCustodialWallet(id: string): Promise<CustodialWallet | undefined> {
+    return this.custodialWallets.get(id);
+  }
+
+  async getCustodialWalletByAddress(walletAddress: string): Promise<CustodialWallet | undefined> {
+    return Array.from(this.custodialWallets.values()).find(w => w.walletAddress === walletAddress);
+  }
+
+  async getAllCustodialWallets(): Promise<CustodialWallet[]> {
+    return Array.from(this.custodialWallets.values());
+  }
+
+  async getCustodialWalletsByCurrency(currency: string): Promise<CustodialWallet[]> {
+    return Array.from(this.custodialWallets.values()).filter(w => w.currency === currency);
+  }
+
+  async updateCustodialWalletBalance(id: string, balance: string, reservedBalance: string): Promise<CustodialWallet> {
+    const wallet = this.custodialWallets.get(id);
+    if (!wallet) {
+      throw new Error(`Custodial wallet not found: ${id}`);
+    }
+    const updatedWallet = {
+      ...wallet,
+      balance,
+      reservedBalance,
+      updatedAt: new Date(),
+    };
+    this.custodialWallets.set(id, updatedWallet);
+    return updatedWallet;
+  }
+
+  async updateCustodialWalletStatus(id: string, status: string): Promise<CustodialWallet> {
+    const wallet = this.custodialWallets.get(id);
+    if (!wallet) {
+      throw new Error(`Custodial wallet not found: ${id}`);
+    }
+    const updatedWallet = {
+      ...wallet,
+      status,
+      updatedAt: new Date(),
+    };
+    this.custodialWallets.set(id, updatedWallet);
+    return updatedWallet;
+  }
+
+  // User Wallet Balance Operations
+  async getUserWalletBalance(userId: string, currency: string): Promise<UserWalletBalance | undefined> {
+    const key = `${userId}-${currency}`;
+    return this.userWalletBalances.get(key);
+  }
+
+  async getAllUserWalletBalances(userId: string): Promise<UserWalletBalance[]> {
+    return Array.from(this.userWalletBalances.values()).filter(b => b.userId === userId);
+  }
+
+  async createUserWalletBalance(balance: InsertUserWalletBalance): Promise<UserWalletBalance> {
+    const id = randomUUID();
+    const userBalance: UserWalletBalance = {
+      id,
+      ...balance,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+    const key = `${balance.userId}-${balance.currency}`;
+    this.userWalletBalances.set(key, userBalance);
+    return userBalance;
+  }
+
+  async updateUserWalletBalance(userId: string, currency: string, updates: Partial<UserWalletBalance>): Promise<UserWalletBalance> {
+    const key = `${userId}-${currency}`;
+    const balance = this.userWalletBalances.get(key);
+    if (!balance) {
+      throw new Error(`User wallet balance not found: ${userId}-${currency}`);
+    }
+    const updatedBalance = {
+      ...balance,
+      ...updates,
+      updatedAt: new Date(),
+    };
+    this.userWalletBalances.set(key, updatedBalance);
+    return updatedBalance;
+  }
+
+  async transferUserBalance(fromUserId: string, toUserId: string, currency: string, amount: string): Promise<void> {
+    const fromKey = `${fromUserId}-${currency}`;
+    const toKey = `${toUserId}-${currency}`;
+    
+    const fromBalance = this.userWalletBalances.get(fromKey);
+    const toBalance = this.userWalletBalances.get(toKey);
+    
+    if (!fromBalance || !toBalance) {
+      throw new Error("User balance not found for transfer");
+    }
+
+    const transferAmount = parseFloat(amount);
+    const fromAmount = parseFloat(fromBalance.availableBalance);
+    
+    if (fromAmount < transferAmount) {
+      throw new Error("Insufficient balance for transfer");
+    }
+
+    const updatedFromBalance = {
+      ...fromBalance,
+      availableBalance: (fromAmount - transferAmount).toString(),
+      updatedAt: new Date(),
+    };
+
+    const updatedToBalance = {
+      ...toBalance,
+      availableBalance: (parseFloat(toBalance.availableBalance) + transferAmount).toString(),
+      updatedAt: new Date(),
+    };
+
+    this.userWalletBalances.set(fromKey, updatedFromBalance);
+    this.userWalletBalances.set(toKey, updatedToBalance);
+  }
+
+  // Value Attachment Operations
+  async createValueAttachment(attachment: InsertValueAttachment): Promise<ValueAttachment> {
+    const id = randomUUID();
+    const valueAttachment: ValueAttachment = {
+      id,
+      ...attachment,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+    this.valueAttachments.set(id, valueAttachment);
+    return valueAttachment;
+  }
+
+  async getValueAttachment(id: string): Promise<ValueAttachment | undefined> {
+    return this.valueAttachments.get(id);
+  }
+
+  async getValueAttachmentByCode(redemptionCode: string): Promise<ValueAttachment | undefined> {
+    return Array.from(this.valueAttachments.values()).find(va => va.redemptionCode === redemptionCode);
+  }
+
+  async getUserValueAttachments(userId: string): Promise<ValueAttachment[]> {
+    return Array.from(this.valueAttachments.values()).filter(va => va.createdBy === userId);
+  }
+
+  async getProductValueAttachments(productId: string, productType: string): Promise<ValueAttachment[]> {
+    return Array.from(this.valueAttachments.values()).filter(
+      va => va.productId === productId && va.productType === productType
+    );
+  }
+
+  async updateValueAttachmentStatus(id: string, status: string): Promise<ValueAttachment> {
+    const attachment = this.valueAttachments.get(id);
+    if (!attachment) {
+      throw new Error(`Value attachment not found: ${id}`);
+    }
+    const updatedAttachment = {
+      ...attachment,
+      status,
+      updatedAt: new Date(),
+    };
+    this.valueAttachments.set(id, updatedAttachment);
+    return updatedAttachment;
+  }
+
+  async redeemValueAttachment(id: string, redeemedBy: string): Promise<ValueAttachment> {
+    const attachment = this.valueAttachments.get(id);
+    if (!attachment) {
+      throw new Error(`Value attachment not found: ${id}`);
+    }
+    const updatedAttachment = {
+      ...attachment,
+      status: "redeemed",
+      redeemedBy,
+      redeemedAt: new Date(),
+      updatedAt: new Date(),
+    };
+    this.valueAttachments.set(id, updatedAttachment);
+    return updatedAttachment;
+  }
+
+  async expireValueAttachments(): Promise<number> {
+    const now = new Date();
+    let expiredCount = 0;
+    
+    for (const [id, attachment] of this.valueAttachments) {
+      if (attachment.expiresAt && attachment.expiresAt < now && attachment.status === "active") {
+        const expiredAttachment = {
+          ...attachment,
+          status: "expired",
+          updatedAt: now,
+        };
+        this.valueAttachments.set(id, expiredAttachment);
+        expiredCount++;
+      }
+    }
+    
+    return expiredCount;
+  }
+
+  // Custodial Wallet Transaction Operations
+  async createCustodialWalletTransaction(transaction: InsertCustodialWalletTransaction): Promise<CustodialWalletTransaction> {
+    const id = randomUUID();
+    const custodialTransaction: CustodialWalletTransaction = {
+      id,
+      ...transaction,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+    this.custodialWalletTransactions.set(id, custodialTransaction);
+    return custodialTransaction;
+  }
+
+  async getCustodialWalletTransaction(id: string): Promise<CustodialWalletTransaction | undefined> {
+    return this.custodialWalletTransactions.get(id);
+  }
+
+  async getUserCustodialTransactions(userId: string, limit: number = 50): Promise<CustodialWalletTransaction[]> {
+    const transactions = Array.from(this.custodialWalletTransactions.values())
+      .filter(t => t.userId === userId)
+      .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
+      .slice(0, limit);
+    return transactions;
+  }
+
+  async getAllCustodialTransactions(limit: number = 100, offset: number = 0): Promise<CustodialWalletTransaction[]> {
+    const transactions = Array.from(this.custodialWalletTransactions.values())
+      .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
+      .slice(offset, offset + limit);
+    return transactions;
+  }
+
+  async updateCustodialTransactionStatus(id: string, status: string, transactionHash?: string): Promise<CustodialWalletTransaction> {
+    const transaction = this.custodialWalletTransactions.get(id);
+    if (!transaction) {
+      throw new Error(`Custodial wallet transaction not found: ${id}`);
+    }
+    const updatedTransaction = {
+      ...transaction,
+      status,
+      transactionHash: transactionHash || transaction.transactionHash,
+      updatedAt: new Date(),
+    };
+    this.custodialWalletTransactions.set(id, updatedTransaction);
+    return updatedTransaction;
+  }
+
+  // Wallet Security Log Operations
+  async createSecurityLog(log: InsertWalletSecurityLog): Promise<WalletSecurityLog> {
+    const id = randomUUID();
+    const securityLog: WalletSecurityLog = {
+      id,
+      ...log,
+      createdAt: new Date(),
+    };
+    this.walletSecurityLogs.set(id, securityLog);
+    return securityLog;
+  }
+
+  async getSecurityLogs(userId?: string, severity?: string, limit: number = 100): Promise<WalletSecurityLog[]> {
+    let logs = Array.from(this.walletSecurityLogs.values());
+    
+    if (userId) {
+      logs = logs.filter(log => log.userId === userId);
+    }
+    
+    if (severity) {
+      logs = logs.filter(log => log.severity === severity);
+    }
+    
+    return logs
+      .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
+      .slice(0, limit);
+  }
+
+  async resolveSecurityLog(id: string, resolvedBy: string, actionTaken: string): Promise<WalletSecurityLog> {
+    const log = this.walletSecurityLogs.get(id);
+    if (!log) {
+      throw new Error(`Security log not found: ${id}`);
+    }
+    const resolvedLog = {
+      ...log,
+      resolvedBy,
+      actionTaken,
+      resolvedAt: new Date(),
+    };
+    this.walletSecurityLogs.set(id, resolvedLog);
+    return resolvedLog;
   }
 }
 
