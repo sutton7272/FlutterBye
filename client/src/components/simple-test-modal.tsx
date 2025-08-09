@@ -1,7 +1,10 @@
 import { useState } from "react";
 
 export function SimpleTestModal() {
+  console.log("SimpleTestModal component loading...");
   const [isOpen, setIsOpen] = useState(false);
+  
+  console.log("SimpleTestModal state - isOpen:", isOpen);
   
   return (
     <>

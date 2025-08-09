@@ -217,8 +217,11 @@ function DemoCard({
 }
 
 export function FlutterAIDemoCards() {
+  console.log("FlutterAIDemoCards component loading...");
   const [activeDemos, setActiveDemos] = useState<string[]>([]);
   const [isDemoOpen, setIsDemoOpen] = useState(false);
+  
+  console.log("FlutterAIDemoCards state - activeDemos:", activeDemos, "isDemoOpen:", isDemoOpen);
 
   const handleStartDemo = (demoName: string) => {
     console.log("Starting demo:", demoName); // Debug log
