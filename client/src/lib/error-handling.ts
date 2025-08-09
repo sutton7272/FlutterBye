@@ -65,9 +65,9 @@ export function setupGlobalErrorHandling() {
       }
     }
     
-    // Prevent all unhandled rejections from triggering error boundary in development
-    // These are typically logging/monitoring related and don't affect functionality
-    console.error('🔥 Unhandled rejection prevented from triggering error boundary:', reason);
+    // Aggressively prevent ALL unhandled rejections from triggering error boundary
+    // This is a temporary fix while we resolve the underlying WebSocket issues
+    console.log('🔥 ALL unhandled rejections prevented from triggering error boundary:', reason);
     event.preventDefault();
   });
 

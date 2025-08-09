@@ -45,16 +45,18 @@ export function WebSocketProvider({ children }: WebSocketProviderProps) {
       ws = new WebSocket(wsUrl);
     } catch (constructorError) {
       console.error('❌ WebSocket constructor failed:', constructorError);
-      // Try fallback URL without SSL
-      try {
-        const fallbackUrl = `ws://${window.location.host}/ws`;
-        console.log('🔄 Trying fallback WebSocket URL:', fallbackUrl);
-        ws = new WebSocket(fallbackUrl);
-      } catch (fallbackError) {
-        console.error('❌ Fallback WebSocket also failed:', fallbackError);
-        setConnectionStatus('error');
-        return;
+      setConnectionStatus('error');
+      
+      // Schedule reconnect after delay
+      if (reconnectAttempts < 5) {
+        reconnectTimeoutRef.current = setTimeout(() => {
+          if (isMountedRef.current) {
+            setReconnectAttempts(prev => prev + 1);
+            connectWebSocket();
+          }
+        }, Math.min(1000 * Math.pow(2, reconnectAttempts), 30000));
       }
+      return;
     }
     
     ws.onopen = () => {
