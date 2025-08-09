@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Checkbox } from "@/components/ui/checkbox";
 import { 
   Wallet, 
   DollarSign, 
@@ -83,9 +84,27 @@ export function CustodialWalletManagement() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   
-  const [selectedCurrency, setSelectedCurrency] = useState<string>("SOL");
+  const [selectedCurrencies, setSelectedCurrencies] = useState<string[]>(["SOL"]);
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [securityFilter, setSecurityFilter] = useState<string>("all");
+  
+  const availableCurrencies = ["SOL", "USDC", "FLBY"];
+  
+  const handleCurrencyToggle = (currency: string) => {
+    setSelectedCurrencies(prev => 
+      prev.includes(currency) 
+        ? prev.filter(c => c !== currency)
+        : [...prev, currency]
+    );
+  };
+  
+  const handleSelectAll = () => {
+    setSelectedCurrencies(
+      selectedCurrencies.length === availableCurrencies.length 
+        ? [] 
+        : [...availableCurrencies]
+    );
+  };
 
   // Fetch custodial wallets
   const { data: walletsData, isLoading: walletsLoading } = useQuery({
@@ -113,35 +132,37 @@ export function CustodialWalletManagement() {
 
   // Create wallet mutation
   const createWalletMutation = useMutation({
-    mutationFn: async (data: { currency: string; isHotWallet: boolean }) =>
-      apiRequest("POST", "/api/admin/custodial-wallet/create", data),
-    onSuccess: () => {
+    mutationFn: async (data: { currencies: string[]; isHotWallet: boolean }) =>
+      apiRequest("POST", "/api/admin/custodial-wallet/create-multiple", data),
+    onSuccess: (data) => {
+      const count = (data as any)?.created || selectedCurrencies.length;
       toast({
         title: "Success",
-        description: "Custodial wallet created successfully",
+        description: `${count} custodial wallet(s) created successfully`,
       });
       queryClient.invalidateQueries({ queryKey: ["/api/admin/custodial-wallet/wallets"] });
       setIsCreateDialogOpen(false);
+      setSelectedCurrencies(["SOL"]);
     },
     onError: (error: Error) => {
       toast({
         title: "Error",
-        description: error.message || "Failed to create custodial wallet",
+        description: error.message || "Failed to create custodial wallet(s)",
         variant: "destructive",
       });
     },
   });
 
-  const wallets: CustodialWallet[] = walletsData?.wallets || [];
-  const statistics: WalletStatistics = statisticsData?.statistics || {
+  const wallets: CustodialWallet[] = (walletsData as any)?.wallets || [];
+  const statistics: WalletStatistics = (statisticsData as any)?.statistics || {
     totalWallets: 0,
     totalBalance: { SOL: 0, USDC: 0, FLBY: 0 },
     activeTransactions: 0,
     suspiciousActivities: 0,
     complianceAlerts: 0
   };
-  const securityLogs: SecurityLog[] = securityLogsData?.logs || [];
-  const healthChecks = healthData?.wallets || [];
+  const securityLogs: SecurityLog[] = (securityLogsData as any)?.logs || [];
+  const healthChecks = (healthData as any)?.wallets || [];
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -182,38 +203,75 @@ export function CustodialWalletManagement() {
               Create Wallet
             </Button>
           </DialogTrigger>
-          <DialogContent className="bg-dark-navy/90 backdrop-blur-sm border-electric-blue/30 shadow-xl">
+          <DialogContent className="bg-dark-navy/90 backdrop-blur-sm border-electric-blue/30 shadow-xl max-w-md">
             <DialogHeader className="bg-dark-navy/60 -mx-6 -mt-6 px-6 pt-6 pb-4 rounded-t-lg border-b border-electric-blue/20">
-              <DialogTitle className="text-white">Create New Custodial Wallet</DialogTitle>
+              <DialogTitle className="text-white">Create New Custodial Wallets</DialogTitle>
             </DialogHeader>
-            <div className="space-y-4 pt-4">
-              <div className="space-y-2">
-                <Label htmlFor="currency" className="text-gray-200 font-medium">Currency</Label>
-                <Select value={selectedCurrency} onValueChange={setSelectedCurrency}>
-                  <SelectTrigger className="bg-dark-navy/60 border-electric-blue/30 text-white backdrop-blur-sm">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent className="bg-dark-navy/90 border-electric-blue/30">
-                    <SelectItem value="SOL">SOL</SelectItem>
-                    <SelectItem value="USDC">USDC</SelectItem>
-                    <SelectItem value="FLBY">FLBY</SelectItem>
-                  </SelectContent>
-                </Select>
+            <div className="space-y-6 pt-4">
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <Label className="text-gray-200 font-medium">Select Currencies</Label>
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={handleSelectAll}
+                    className="text-xs border-electric-blue/30 text-electric-blue hover:bg-electric-blue/10"
+                  >
+                    {selectedCurrencies.length === availableCurrencies.length ? "Deselect All" : "Select All"}
+                  </Button>
+                </div>
+                
+                <div className="space-y-3 bg-dark-navy/40 p-4 rounded-lg border border-electric-blue/20">
+                  {availableCurrencies.map((currency) => (
+                    <div key={currency} className="flex items-center space-x-3">
+                      <Checkbox
+                        id={currency}
+                        checked={selectedCurrencies.includes(currency)}
+                        onCheckedChange={() => handleCurrencyToggle(currency)}
+                        className="border-electric-blue/30 data-[state=checked]:bg-electric-blue data-[state=checked]:border-electric-blue"
+                      />
+                      <Label
+                        htmlFor={currency}
+                        className="text-white font-medium cursor-pointer flex-1"
+                      >
+                        {currency}
+                      </Label>
+                      <Badge variant="outline" className="text-xs text-gray-400 border-gray-600">
+                        {currency === "SOL" ? "Solana" : currency === "USDC" ? "Stablecoin" : "Platform Token"}
+                      </Badge>
+                    </div>
+                  ))}
+                </div>
+                
+                {selectedCurrencies.length > 0 && (
+                  <div className="bg-electric-blue/10 border border-electric-blue/30 rounded-lg p-3">
+                    <div className="text-sm text-electric-blue font-medium mb-1">
+                      Creating {selectedCurrencies.length} wallet{selectedCurrencies.length > 1 ? 's' : ''}
+                    </div>
+                    <div className="text-xs text-gray-300">
+                      Selected: {selectedCurrencies.join(", ")}
+                    </div>
+                  </div>
+                )}
               </div>
+              
               <div className="flex justify-end space-x-2">
                 <Button 
                   variant="outline" 
-                  onClick={() => setIsCreateDialogOpen(false)}
+                  onClick={() => {
+                    setIsCreateDialogOpen(false);
+                    setSelectedCurrencies(["SOL"]);
+                  }}
                   className="border-gray-600 text-gray-300"
                 >
                   Cancel
                 </Button>
                 <Button 
                   onClick={() => createWalletMutation.mutate({ 
-                    currency: selectedCurrency, 
+                    currencies: selectedCurrencies, 
                     isHotWallet: true 
                   })}
-                  disabled={createWalletMutation.isPending}
+                  disabled={createWalletMutation.isPending || selectedCurrencies.length === 0}
                   className="bg-electric-blue hover:bg-electric-blue/80"
                 >
                   {createWalletMutation.isPending ? (
@@ -222,7 +280,7 @@ export function CustodialWalletManagement() {
                       Creating...
                     </>
                   ) : (
-                    "Create Wallet"
+                    `Create ${selectedCurrencies.length} Wallet${selectedCurrencies.length > 1 ? 's' : ''}`
                   )}
                 </Button>
               </div>
@@ -408,7 +466,7 @@ export function CustodialWalletManagement() {
                 </div>
               ) : (
                 <div className="space-y-4">
-                  {healthData?.overallHealth ? (
+                  {(healthData as any)?.overallHealth ? (
                     <Alert className="border-green-400/40 bg-green-500/10 backdrop-blur-sm">
                       <CheckCircle className="w-4 h-4" />
                       <AlertDescription className="text-green-400">

@@ -562,6 +562,74 @@ export function registerCustodialWalletRoutes(app: Express, storage: IStorage) {
     }
   });
 
+  // Admin: Create Multiple Custodial Wallets
+  app.post("/api/admin/custodial-wallet/create-multiple", async (req, res) => {
+    try {
+      const schema = z.object({
+        currencies: z.array(z.enum(["SOL", "USDC", "FLBY"])).min(1),
+        isHotWallet: z.boolean().default(true)
+      });
+
+      const { currencies, isHotWallet } = schema.parse(req.body);
+
+      const createdWallets = [];
+      const errors = [];
+
+      // Create wallets for each currency
+      for (const currency of currencies) {
+        try {
+          // Check if wallet already exists for this currency
+          const existingWallets = await storage.getCustodialWalletsByCurrency(currency);
+          if (existingWallets.length > 0) {
+            errors.push({
+              currency,
+              error: `Custodial wallet for ${currency} already exists`
+            });
+            continue;
+          }
+
+          // Create secure wallet
+          const walletData = await secureWalletService.createSecureWallet(currency, isHotWallet);
+          const wallet = await storage.createCustodialWallet(walletData);
+          
+          createdWallets.push({
+            id: wallet.id,
+            currency: wallet.currency,
+            walletAddress: wallet.walletAddress,
+            status: wallet.status,
+            isHotWallet: wallet.isHotWallet
+          });
+        } catch (error) {
+          console.error(`Error creating ${currency} wallet:`, error);
+          errors.push({
+            currency,
+            error: error.message || `Failed to create ${currency} wallet`
+          });
+        }
+      }
+
+      const response = {
+        success: createdWallets.length > 0,
+        message: `Created ${createdWallets.length} out of ${currencies.length} wallets`,
+        created: createdWallets.length,
+        wallets: createdWallets
+      };
+
+      if (errors.length > 0) {
+        response.errors = errors;
+      }
+
+      res.status(createdWallets.length > 0 ? 200 : 400).json(response);
+
+    } catch (error) {
+      console.error("Error creating multiple wallets:", error);
+      res.status(500).json({ 
+        success: false, 
+        error: "Failed to create custodial wallets" 
+      });
+    }
+  });
+
   // Admin: Get Security Logs
   app.get("/api/admin/custodial-wallet/security-logs", async (req, res) => {
     try {
