@@ -51,6 +51,7 @@ const VoiceMessageRecorder = lazy(() => import("@/components/voice-message-recor
 const ViralGrowthAccelerator = lazy(() => import("@/components/viral-growth-accelerator").then(m => ({ default: m.ViralGrowthAccelerator })));
 const MobileOnboardingWizard = lazy(() => import("@/components/mobile-onboarding-wizard").then(m => ({ default: m.MobileOnboardingWizard })));
 const WalletConnectionWizard = lazy(() => import("@/components/wallet-connection-wizard").then(m => ({ default: m.WalletConnectionWizard })));
+const MultiWalletConnector = lazy(() => import("@/components/multi-wallet-connector"));
 const QuickAccessFAB = lazy(() => import("@/components/quick-access-fab").then(m => ({ default: m.QuickAccessFAB })));
 const PersonalizedDashboard = lazy(() => import("@/components/PersonalizedDashboard").then(m => ({ default: m.PersonalizedDashboard })));
 const PerformanceDashboard = lazy(() => import("@/components/performance-dashboard"));
@@ -94,6 +95,8 @@ export default function Dashboard() {
   const [activeTab, setActiveTab] = useState("overview");
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [showWalletWizard, setShowWalletWizard] = useState(false);
+  const [showMultiWallet, setShowMultiWallet] = useState(false);
+  const [connectedWallet, setConnectedWallet] = useState<string | null>(localStorage.getItem("flutter_connected_wallet"));
   const performanceMetrics = usePerformance();
   const [isMobile, setIsMobile] = useState(false);
   
@@ -130,9 +133,16 @@ export default function Dashboard() {
     setShowOnboarding(false);
   };
 
-  const handleWalletConnect = (walletId: string) => {
-    console.log("Connecting to wallet:", walletId);
+  const handleWalletConnect = (walletId: string, walletName?: string) => {
+    console.log("Connecting to wallet:", walletId, walletName);
+    setConnectedWallet(walletId);
     setShowWalletWizard(false);
+    setShowMultiWallet(false);
+    
+    toast({
+      title: "Wallet Connected!",
+      description: `Successfully connected to ${walletName || walletId}`,
+    });
   };
 
   // Fetch dashboard data
