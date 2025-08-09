@@ -24,6 +24,7 @@ Priority focus: Initial release strategy focusing on coin minting as the core en
 - Slower graceful flight animations (35-50s duration) covering full screen
 - Perfect wireframe aesthetic with connection nodes and circuit-style patterns
 - Global implementation across all pages via FlyingButterflies component
+- **Navbar Logo Integration**: Custom SVG butterfly logo replaces "F" in navbar with matching electric colors and glow effects
 
 **DISASTER RECOVERY SYSTEM - COMPLETE:** Implemented comprehensive custodial wallet backup system for fund recovery:
 - Secure backup buttons on each wallet with AES-256 encrypted private key export
