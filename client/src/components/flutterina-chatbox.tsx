@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { MessageCircle, X, Send, Sparkles, Heart, Zap } from "lucide-react";
+import { X, Send, Sparkles, Heart, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
@@ -29,6 +29,100 @@ interface FlutterinaConversation {
   lastInteractionAt: string;
 }
 
+// Animated Electric Butterfly Component
+function ElectricButterfly({ className = "", isOpen = false }: { className?: string; isOpen?: boolean }) {
+  return (
+    <div className={cn("relative", className)}>
+      <svg
+        width="24"
+        height="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+        className="electric-butterfly"
+      >
+        {/* Butterfly Body */}
+        <path
+          d="M12 3 L12 21"
+          stroke="url(#electricGradient)"
+          strokeWidth="1.5"
+          strokeLinecap="round"
+          className="butterfly-body"
+        />
+        
+        {/* Top Wings */}
+        <path
+          d="M12 6 C8 4, 4 6, 6 10 C7 11, 9 10, 12 8"
+          fill="url(#wingGradient)"
+          className="wing wing-top-left"
+          style={{
+            transformOrigin: '12px 8px',
+            animation: isOpen ? 'flutter 0.6s ease-in-out infinite alternate' : 'flutter 2s ease-in-out infinite alternate'
+          }}
+        />
+        <path
+          d="M12 6 C16 4, 20 6, 18 10 C17 11, 15 10, 12 8"
+          fill="url(#wingGradient)"
+          className="wing wing-top-right"
+          style={{
+            transformOrigin: '12px 8px',
+            animation: isOpen ? 'flutter 0.6s ease-in-out infinite alternate-reverse' : 'flutter 2s ease-in-out infinite alternate-reverse'
+          }}
+        />
+        
+        {/* Bottom Wings */}
+        <path
+          d="M12 14 C9 16, 5 15, 7 18 C8 19, 10 18, 12 16"
+          fill="url(#wingGradient2)"
+          className="wing wing-bottom-left"
+          style={{
+            transformOrigin: '12px 16px',
+            animation: isOpen ? 'flutter 0.8s ease-in-out infinite alternate' : 'flutter 2.5s ease-in-out infinite alternate'
+          }}
+        />
+        <path
+          d="M12 14 C15 16, 19 15, 17 18 C16 19, 14 18, 12 16"
+          fill="url(#wingGradient2)"
+          className="wing wing-bottom-right"
+          style={{
+            transformOrigin: '12px 16px',
+            animation: isOpen ? 'flutter 0.8s ease-in-out infinite alternate-reverse' : 'flutter 2.5s ease-in-out infinite alternate-reverse'
+          }}
+        />
+        
+        {/* Electric Effects */}
+        <circle cx="12" cy="12" r="12" fill="none" stroke="url(#pulseGradient)" strokeWidth="0.5" opacity="0.6" className="electric-pulse" />
+        
+        {/* Gradients */}
+        <defs>
+          <linearGradient id="electricGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="#00ffff" />
+            <stop offset="50%" stopColor="#0080ff" />
+            <stop offset="100%" stopColor="#0040ff" />
+          </linearGradient>
+          <linearGradient id="wingGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="#00ffff" stopOpacity="0.8" />
+            <stop offset="50%" stopColor="#0080ff" stopOpacity="0.6" />
+            <stop offset="100%" stopColor="#0040ff" stopOpacity="0.4" />
+          </linearGradient>
+          <linearGradient id="wingGradient2" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="#00ff80" stopOpacity="0.7" />
+            <stop offset="50%" stopColor="#0080ff" stopOpacity="0.5" />
+            <stop offset="100%" stopColor="#0040ff" stopOpacity="0.3" />
+          </linearGradient>
+          <radialGradient id="pulseGradient">
+            <stop offset="0%" stopColor="#00ffff" stopOpacity="0" />
+            <stop offset="70%" stopColor="#0080ff" stopOpacity="0.3" />
+            <stop offset="100%" stopColor="#0040ff" stopOpacity="0.6" />
+          </radialGradient>
+        </defs>
+      </svg>
+      
+
+    </div>
+  );
+}
+
 export function FlutterinaFloatingChatbox() {
   const [isOpen, setIsOpen] = useState(false);
   const [message, setMessage] = useState("");
@@ -49,12 +143,12 @@ export function FlutterinaFloatingChatbox() {
   );
 
   // Fetch conversation history
-  const { data: conversation } = useQuery({
+  const { data: conversation } = useQuery<FlutterinaConversation>({
     queryKey: ["/api/flutterina/conversation", sessionId.current, location],
     enabled: isOpen,
   });
 
-  const { data: messages = [] } = useQuery({
+  const { data: messages = [] } = useQuery<FlutterinaMessage[]>({
     queryKey: ["/api/flutterina/messages", conversation?.id],
     enabled: !!conversation?.id && isOpen,
   });
@@ -146,7 +240,7 @@ export function FlutterinaFloatingChatbox() {
             <X className="h-6 w-6 text-white" />
           ) : (
             <div className="relative">
-              <MessageCircle className="h-6 w-6 text-white" />
+              <ElectricButterfly className="text-white" isOpen={isOpen} />
               <div className="absolute -top-1 -right-1 h-4 w-4 bg-gradient-to-r from-pink-400 to-red-400 rounded-full flex items-center justify-center">
                 <Heart className="h-2 w-2 text-white" />
               </div>
