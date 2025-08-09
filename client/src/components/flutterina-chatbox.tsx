@@ -69,7 +69,8 @@ export function FlutterinaFloatingChatbox() {
     }) => {
       return await apiRequest("/api/flutterina/messages", "POST", messageData);
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
+      console.log('Message sent successfully:', data);
       setMessage("");
       setIsTyping(false);
       // Invalidate and refetch messages
@@ -83,7 +84,8 @@ export function FlutterinaFloatingChatbox() {
     onMutate: () => {
       setIsTyping(true);
     },
-    onError: () => {
+    onError: (error) => {
+      console.error('Failed to send message:', error);
       setIsTyping(false);
     },
   });
@@ -95,10 +97,11 @@ export function FlutterinaFloatingChatbox() {
     }
   }, [messages, isTyping]);
 
-  const handleSendMessage = () => {
-    if (!message.trim()) return;
+  const handleSendMessage = async () => {
+    if (!message.trim() || sendMessageMutation.isPending) return;
     
-    setIsTyping(true);
+    console.log('Sending message:', message.trim());
+    
     sendMessageMutation.mutate({
       message: message.trim(),
       pageContext: location,
@@ -107,6 +110,7 @@ export function FlutterinaFloatingChatbox() {
   };
 
   const handleKeyPress = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    console.log('Key pressed:', e.key, 'Shift:', e.shiftKey);
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       handleSendMessage();
