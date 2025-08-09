@@ -3,6 +3,7 @@ import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { EarlyAccessGate } from "@/components/early-access-gate";
+import { FlutterinaFloatingChatbox } from "@/components/flutterina-chatbox";
 import { useState, useEffect, lazy, Suspense } from "react";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { LoadingSpinner } from "@/components/loading-spinner";
@@ -801,6 +802,7 @@ function App() {
               <PWAInstallPrompt />
               <PWANotificationPrompt />
               <CommandPalette />
+              <FlutterinaFloatingChatbox />
               <Router />
             </TooltipProvider>
           </WebSocketProvider>

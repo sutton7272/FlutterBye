@@ -719,6 +719,112 @@ export const blogTitleVariations = pgTable("blog_title_variations", {
   generatedAt: timestamp("generated_at").defaultNow(),
 });
 
+// Flutterina AI Conversation System
+export const flutterinaConversations = pgTable("flutterina_conversations", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").references(() => users.id),
+  sessionId: varchar("session_id").notNull(), // Browser session identifier
+  walletAddress: text("wallet_address"), // For guest users
+  
+  // Context tracking
+  currentPage: text("current_page").notNull(),
+  pageContext: json("page_context").$type<Record<string, any>>(), // Page-specific data
+  userIntent: text("user_intent"), // help, product_recommendation, guidance, chat
+  
+  // Conversation metadata
+  isActive: boolean("is_active").default(true),
+  totalMessages: integer("total_messages").default(0),
+  lastInteractionAt: timestamp("last_interaction_at").defaultNow(),
+  
+  // Personalization data
+  userPreferences: json("user_preferences").$type<{
+    preferredTopics: string[],
+    communicationStyle: string,
+    helpLevel: string, // beginner, intermediate, advanced
+    interests: string[]
+  }>(),
+  
+  // Relationship building
+  relationshipLevel: text("relationship_level").default("new"), // new, familiar, friend, trusted
+  personalityInsights: json("personality_insights").$type<Record<string, any>>(),
+  
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const flutterinaMessages = pgTable("flutterina_messages", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  conversationId: varchar("conversation_id").references(() => flutterinaConversations.id).notNull(),
+  
+  // Message content
+  message: text("message").notNull(),
+  messageType: text("message_type").notNull(), // user, assistant, system
+  
+  // Context awareness
+  pageContext: text("page_context").notNull(), // Page where message was sent
+  actionContext: json("action_context").$type<Record<string, any>>(), // What user was doing
+  
+  // AI processing
+  aiModel: text("ai_model").default("gpt-4o"),
+  tokenUsage: json("token_usage").$type<{
+    promptTokens: number,
+    completionTokens: number,
+    totalTokens: number
+  }>(),
+  
+  // Response features
+  containsRecommendations: boolean("contains_recommendations").default(false),
+  recommendationData: json("recommendation_data").$type<{
+    products: string[],
+    actions: string[],
+    links: Array<{url: string, title: string}>
+  }>(),
+  
+  // Analytics
+  responseTime: integer("response_time"), // milliseconds
+  userSatisfaction: integer("user_satisfaction"), // 1-5 rating if provided
+  
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const flutterinaPersonalityProfiles = pgTable("flutterina_personality_profiles", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").references(() => users.id),
+  walletAddress: text("wallet_address"), // For guest users
+  
+  // Personality analysis
+  communicationStyle: text("communication_style").default("friendly"), // friendly, professional, casual, technical
+  preferredResponseLength: text("preferred_response_length").default("medium"), // short, medium, long
+  helpLevel: text("help_level").default("beginner"), // beginner, intermediate, advanced
+  
+  // Interest tracking
+  topicInterests: json("topic_interests").$type<{
+    [key: string]: number // topic -> interest score (0-1)
+  }>(),
+  
+  // Behavioral patterns
+  activeTimePatterns: json("active_time_patterns").$type<string[]>(), // hours when user is most active
+  sessionDuration: integer("avg_session_duration"), // average minutes per session
+  questionTypes: json("question_types").$type<string[]>(), // common question categories
+  
+  // Memory and preferences
+  rememberedPreferences: json("remembered_preferences").$type<Record<string, any>>(),
+  pastRecommendations: json("past_recommendations").$type<Array<{
+    id: string,
+    accepted: boolean,
+    feedback: string,
+    timestamp: string
+  }>>(),
+  
+  // Engagement metrics
+  engagementScore: decimal("engagement_score", { precision: 3, scale: 2 }).default("0.5"), // 0-1
+  loyaltyScore: decimal("loyalty_score", { precision: 3, scale: 2 }).default("0.5"), // 0-1
+  
+  lastAnalyzed: timestamp("last_analyzed").defaultNow(),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
 // Insert schemas
 export const insertUserSchema = createInsertSchema(users).omit({
   id: true,
@@ -920,6 +1026,26 @@ export const insertSmsDeliverySchema = createInsertSchema(smsDeliveries).omit({
   viewedAt: true,
 });
 
+// Flutterina AI System Schemas
+export const insertFlutterinaConversationSchema = createInsertSchema(flutterinaConversations).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+  lastInteractionAt: true,
+});
+
+export const insertFlutterinaMessageSchema = createInsertSchema(flutterinaMessages).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertFlutterinaPersonalityProfileSchema = createInsertSchema(flutterinaPersonalityProfiles).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+  lastAnalyzed: true,
+});
+
 // Types
 export type User = typeof users.$inferSelect;
 export type InsertUser = z.infer<typeof insertUserSchema>;
@@ -1097,6 +1223,16 @@ export type Badge = typeof badges.$inferSelect;
 
 export const insertUserBadgeSchema = createInsertSchema(userBadges).omit({ id: true, earnedAt: true });
 export type InsertUserBadge = z.infer<typeof insertUserBadgeSchema>;
+
+// Flutterina AI System Types  
+export type FlutterinaConversation = typeof flutterinaConversations.$inferSelect;
+export type InsertFlutterinaConversation = z.infer<typeof insertFlutterinaConversationSchema>;
+
+export type FlutterinaMessage = typeof flutterinaMessages.$inferSelect;
+export type InsertFlutterinaMessage = z.infer<typeof insertFlutterinaMessageSchema>;
+
+export type FlutterinaPersonalityProfile = typeof flutterinaPersonalityProfiles.$inferSelect;
+export type InsertFlutterinaPersonalityProfile = z.infer<typeof insertFlutterinaPersonalityProfileSchema>;
 export type UserBadge = typeof userBadges.$inferSelect;
 
 export const insertRewardTransactionSchema = createInsertSchema(rewardTransactions).omit({ id: true, createdAt: true });

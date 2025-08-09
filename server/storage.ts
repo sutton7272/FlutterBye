@@ -61,6 +61,12 @@ import {
   type InsertCustodialWalletTransaction,
   type WalletSecurityLog,
   type InsertWalletSecurityLog,
+  type FlutterinaConversation,
+  type InsertFlutterinaConversation,
+  type FlutterinaMessage,
+  type InsertFlutterinaMessage,
+  type FlutterinaPersonalityProfile,
+  type InsertFlutterinaPersonalityProfile,
   pricingTiers,
   walletIntelligence,
   walletBatches,
@@ -295,6 +301,25 @@ export interface IStorage {
   createSecurityLog(log: InsertWalletSecurityLog): Promise<WalletSecurityLog>;
   getSecurityLogs(userId?: string, severity?: string, limit?: number): Promise<WalletSecurityLog[]>;
   resolveSecurityLog(id: string, resolvedBy: string, actionTaken: string): Promise<WalletSecurityLog>;
+  
+  // Flutterina AI Conversation Operations
+  createFlutterinaConversation(conversation: InsertFlutterinaConversation): Promise<FlutterinaConversation>;
+  getFlutterinaConversation(id: string): Promise<FlutterinaConversation | undefined>;
+  getFlutterinaConversationBySession(sessionId: string): Promise<FlutterinaConversation | undefined>;
+  updateFlutterinaConversation(id: string, updates: Partial<FlutterinaConversation>): Promise<FlutterinaConversation>;
+  
+  // Flutterina AI Message Operations  
+  createFlutterinaMessage(message: InsertFlutterinaMessage): Promise<FlutterinaMessage>;
+  getFlutterinaMessage(id: string): Promise<FlutterinaMessage | undefined>;
+  getFlutterinaMessages(conversationId: string, limit?: number): Promise<FlutterinaMessage[]>;
+  
+  // Flutterina Analytics
+  getFlutterinaAnalytics(): Promise<{
+    totalConversations: number;
+    totalMessages: number;
+    activeConversations: number;
+    avgMessagesPerConversation: number;
+  }>;
 }
 
 // In-memory storage implementation
@@ -331,6 +356,11 @@ export class MemStorage implements IStorage {
   // FlutterArt NFT Storage
   private flutterArtCollections: Map<string, any> = new Map();
   private flutterArtNFTs: Map<string, any> = new Map();
+  
+  // Flutterina AI Storage
+  private flutterinaConversations: Map<string, FlutterinaConversation> = new Map();
+  private flutterinaMessages: Map<string, FlutterinaMessage> = new Map();
+  private flutterinaPersonalityProfiles: Map<string, FlutterinaPersonalityProfile> = new Map();
 
   constructor() {
     this.initializeTestData();
@@ -2084,6 +2114,119 @@ export class MemStorage implements IStorage {
 
   async getAllEscrowFeeConfigs(): Promise<EscrowFeeConfig[]> {
     return Array.from(this.escrowFeeConfigs.values());
+  }
+
+  // Flutterina AI Conversation Operations
+  async createFlutterinaConversation(conversation: InsertFlutterinaConversation): Promise<FlutterinaConversation> {
+    const id = randomUUID();
+    const newConversation: FlutterinaConversation = {
+      id,
+      sessionId: conversation.sessionId,
+      userId: conversation.userId || null,
+      walletAddress: conversation.walletAddress || null,
+      currentPage: conversation.currentPage,
+      pageContext: conversation.pageContext || {},
+      userIntent: conversation.userIntent || "help",
+      relationshipLevel: "new",
+      totalMessages: 0,
+      lastInteractionAt: new Date(),
+      conversationTags: conversation.conversationTags || [],
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
+    
+    this.flutterinaConversations.set(id, newConversation);
+    return newConversation;
+  }
+
+  async getFlutterinaConversation(id: string): Promise<FlutterinaConversation | undefined> {
+    return this.flutterinaConversations.get(id);
+  }
+
+  async getFlutterinaConversationBySession(sessionId: string): Promise<FlutterinaConversation | undefined> {
+    return Array.from(this.flutterinaConversations.values())
+      .find(conversation => conversation.sessionId === sessionId);
+  }
+
+  async updateFlutterinaConversation(id: string, updates: Partial<FlutterinaConversation>): Promise<FlutterinaConversation> {
+    const existing = this.flutterinaConversations.get(id);
+    if (!existing) {
+      throw new Error(`Conversation not found: ${id}`);
+    }
+
+    const updated: FlutterinaConversation = {
+      ...existing,
+      ...updates,
+      updatedAt: new Date()
+    };
+
+    this.flutterinaConversations.set(id, updated);
+    return updated;
+  }
+
+  // Flutterina AI Message Operations
+  async createFlutterinaMessage(message: InsertFlutterinaMessage): Promise<FlutterinaMessage> {
+    const id = randomUUID();
+    const newMessage: FlutterinaMessage = {
+      id,
+      conversationId: message.conversationId,
+      message: message.message,
+      messageType: message.messageType,
+      pageContext: message.pageContext,
+      actionContext: message.actionContext || {},
+      containsRecommendations: message.containsRecommendations || false,
+      recommendationData: message.recommendationData,
+      tokenUsage: message.tokenUsage,
+      responseTime: message.responseTime,
+      sentiment: message.sentiment || null,
+      intent: message.intent || null,
+      createdAt: new Date()
+    };
+
+    this.flutterinaMessages.set(id, newMessage);
+    return newMessage;
+  }
+
+  async getFlutterinaMessage(id: string): Promise<FlutterinaMessage | undefined> {
+    return this.flutterinaMessages.get(id);
+  }
+
+  async getFlutterinaMessages(conversationId: string, limit?: number): Promise<FlutterinaMessage[]> {
+    const messages = Array.from(this.flutterinaMessages.values())
+      .filter(message => message.conversationId === conversationId)
+      .sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
+
+    if (limit) {
+      return messages.slice(-limit);
+    }
+    return messages;
+  }
+
+  // Flutterina Analytics
+  async getFlutterinaAnalytics(): Promise<{
+    totalConversations: number;
+    totalMessages: number;
+    activeConversations: number;
+    avgMessagesPerConversation: number;
+  }> {
+    const totalConversations = this.flutterinaConversations.size;
+    const totalMessages = this.flutterinaMessages.size;
+    
+    // Active conversations: have messages in the last 24 hours
+    const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
+    const activeConversations = Array.from(this.flutterinaConversations.values())
+      .filter(conv => conv.lastInteractionAt > oneDayAgo).length;
+
+    const avgMessagesPerConversation = totalConversations > 0 
+      ? Math.round((totalMessages / totalConversations) * 100) / 100 
+      : 0;
+
+    return {
+      totalConversations,
+      totalMessages,
+      activeConversations,
+      avgMessagesPerConversation
+    };
   }
 }
 

@@ -66,6 +66,7 @@ import { registerNextGenAIRoutes } from "./next-gen-ai-routes";
 import { flutterAIRoutes } from "./flutterai-routes";
 import { registerFlutterAIWalletRoutes } from "./flutterai-wallet-routes";
 import { registerEnterpriseWalletRoutes } from "./enterprise-wallet-routes";
+import { registerFlutterinaRoutes } from "./flutterina-routes";
 import { 
   analyzeWallet,
   getWalletIntelligence,
@@ -6298,6 +6299,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   registerSolanaRoutes(app);
   registerEscrowRoutes(app);
   registerCustodialWalletRoutes(app, storage);
+  registerFlutterinaRoutes(app);
   
   // Register escrow profits routes
   const escrowProfitsRoutes = (await import('./routes-escrow-profits')).default;
