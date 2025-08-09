@@ -42,20 +42,19 @@ export function WebSocketProvider({ children }: WebSocketProviderProps) {
     
     let ws: WebSocket;
     try {
+      // Only attempt WebSocket connection if we have a valid URL and environment
+      if (!wsUrl || typeof WebSocket === 'undefined') {
+        console.log('📍 WebSocket not available or invalid URL, running without real-time features');
+        setConnectionStatus('disconnected');
+        return;
+      }
+      
       ws = new WebSocket(wsUrl);
     } catch (constructorError) {
-      console.error('❌ WebSocket constructor failed:', constructorError);
-      setConnectionStatus('error');
+      console.log('📍 WebSocket constructor failed, continuing without real-time features:', constructorError.message);
+      setConnectionStatus('disconnected');
       
-      // Schedule reconnect after delay
-      if (reconnectAttempts < 5) {
-        reconnectTimeoutRef.current = setTimeout(() => {
-          if (isMountedRef.current) {
-            setReconnectAttempts(prev => prev + 1);
-            connectWebSocket();
-          }
-        }, Math.min(1000 * Math.pow(2, reconnectAttempts), 30000));
-      }
+      // Don't attempt reconnection on constructor failures
       return;
     }
     

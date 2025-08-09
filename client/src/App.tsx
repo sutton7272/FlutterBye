@@ -842,18 +842,22 @@ function Router() {
 }
 
 function App() {
-  // Register service worker for PWA functionality
+  // Register service worker for PWA functionality (graceful failure)
   useEffect(() => {
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/service-worker.js')
-          .then((registration) => {
-            console.log('SW registered: ', registration);
-          })
-          .catch((registrationError) => {
-            console.log('SW registration failed: ', registrationError);
-          });
-      });
+    try {
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/service-worker.js')
+            .then((registration) => {
+              console.log('SW registered: ', registration);
+            })
+            .catch((registrationError) => {
+              console.log('SW registration failed: ', registrationError);
+            });
+        });
+      }
+    } catch (error) {
+      console.log('Service worker setup failed gracefully:', error);
     }
   }, []);
 
@@ -869,8 +873,12 @@ function App() {
               <PWAInstallPrompt />
               <PWANotificationPrompt />
               <CommandPalette />
-              <SkyeChatbot />
+              
+              {/* Main App Content - Direct Router without Error Boundary */}
               <Router />
+              
+              {/* Floating AI Chat */}
+              <SkyeChatbot />
             </TooltipProvider>
           </WebSocketProvider>
         </WalletProvider>
