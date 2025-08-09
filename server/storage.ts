@@ -228,9 +228,11 @@ export interface IStorage {
   createWalletAlert(alert: any): Promise<any>;
   getWalletAlerts(resolved?: boolean): Promise<any[]>;
 
-  // Wallet Intelligence Operations
+  // PHASE 1: Enhanced Wallet Intelligence Operations - Revolutionary 1-1000 Scoring System
   collectWalletAddress(walletAddress: string, source: string, collectedBy?: string): Promise<WalletIntelligence>;
-  getWalletIntelligence(walletAddress: string): Promise<WalletIntelligence | undefined>;
+  getWalletIntelligence(walletAddress: string, blockchain?: string): Promise<WalletIntelligence | undefined>;
+  upsertWalletIntelligence(data: InsertWalletIntelligence): Promise<WalletIntelligence>;
+  getWalletIntelligenceList(limit: number, offset: number, filters?: any): Promise<WalletIntelligence[]>;
   updateWalletScore(walletAddress: string, scoreData: Partial<WalletIntelligence>): Promise<WalletIntelligence>;
   getAllWalletIntelligence(limit?: number, offset?: number): Promise<WalletIntelligence[]>;
   searchWalletIntelligence(query: string): Promise<WalletIntelligence[]>;
@@ -1710,8 +1712,68 @@ export class MemStorage implements IStorage {
     return walletIntel;
   }
 
-  async getWalletIntelligence(walletAddress: string): Promise<WalletIntelligence | undefined> {
+  async getWalletIntelligence(walletAddress: string, blockchain?: string): Promise<WalletIntelligence | undefined> {
+    // For Phase 1, we'll use walletAddress as primary key, blockchain filtering can be added later
     return this.walletIntelligence.get(walletAddress);
+  }
+
+  // PHASE 1: Enhanced upsert method for revolutionary 1-1000 scoring system
+  async upsertWalletIntelligence(data: InsertWalletIntelligence): Promise<WalletIntelligence> {
+    const existing = this.walletIntelligence.get(data.walletAddress);
+    
+    if (existing) {
+      // Update existing record with new data
+      const updated: WalletIntelligence = {
+        ...existing,
+        ...data,
+        id: existing.id, // Keep existing ID
+        updatedAt: new Date(),
+        lastScoreUpdate: new Date()
+      };
+      this.walletIntelligence.set(data.walletAddress, updated);
+      return updated;
+    } else {
+      // Create new record
+      const newRecord: WalletIntelligence = {
+        id: randomUUID(),
+        ...data,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        lastScoreUpdate: new Date()
+      };
+      this.walletIntelligence.set(data.walletAddress, newRecord);
+      return newRecord;
+    }
+  }
+
+  // PHASE 1: Enhanced list method with filtering for revolutionary dashboard
+  async getWalletIntelligenceList(limit: number, offset: number, filters?: any): Promise<WalletIntelligence[]> {
+    let wallets = Array.from(this.walletIntelligence.values());
+    
+    // Apply filters if provided
+    if (filters) {
+      if (filters.blockchain) {
+        wallets = wallets.filter(w => w.blockchain === filters.blockchain);
+      }
+      if (filters.scoreRange) {
+        const { min, max } = filters.scoreRange;
+        wallets = wallets.filter(w => {
+          const score = w.overallScore || 500;
+          return score >= min && score <= max;
+        });
+      }
+      if (filters.riskLevel) {
+        wallets = wallets.filter(w => w.riskLevel === filters.riskLevel);
+      }
+    }
+    
+    // Sort by overall score (highest first) for Phase 1 dashboard
+    wallets.sort((a, b) => (b.overallScore || 500) - (a.overallScore || 500));
+    
+    // Apply pagination
+    const start = offset || 0;
+    const end = start + limit;
+    return wallets.slice(start, end);
   }
 
   async updateWalletScore(walletAddress: string, scoreData: Partial<WalletIntelligence>): Promise<WalletIntelligence> {

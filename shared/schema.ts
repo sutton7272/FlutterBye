@@ -1122,15 +1122,7 @@ export type InsertRedeemableCode = z.infer<typeof insertRedeemableCodeSchema>;
 
 export type CodeRedemption = typeof codeRedemptions.$inferSelect;
 
-// Flutterina AI Chat System Types
-export type FlutterinaConversation = typeof flutterinaConversations.$inferSelect;
-export type InsertFlutterinaConversation = typeof flutterinaConversations.$inferInsert;
-
-export type FlutterinaMessage = typeof flutterinaMessages.$inferSelect;
-export type InsertFlutterinaMessage = typeof flutterinaMessages.$inferInsert;
-
-export type FlutterinaPersonalityProfile = typeof flutterinaPersonalityProfiles.$inferSelect;
-export type InsertFlutterinaPersonalityProfile = typeof flutterinaPersonalityProfiles.$inferInsert;
+// Flutterina AI Chat System Types - Using insert schemas for consistency
 // Voice messages table for production voice functionality
 export const voiceMessages = pgTable("voice_messages", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
@@ -1234,7 +1226,7 @@ export type Badge = typeof badges.$inferSelect;
 export const insertUserBadgeSchema = createInsertSchema(userBadges).omit({ id: true, earnedAt: true });
 export type InsertUserBadge = z.infer<typeof insertUserBadgeSchema>;
 
-// Flutterina AI System Types  
+// Flutterina AI System Types - Consolidated  
 export type FlutterinaConversation = typeof flutterinaConversations.$inferSelect;
 export type InsertFlutterinaConversation = z.infer<typeof insertFlutterinaConversationSchema>;
 
@@ -1463,19 +1455,49 @@ export const insertWalletAlertSchema = createInsertSchema(walletAlerts).omit({
   createdAt: true,
 });
 
-// Wallet Intelligence Schema - Revolutionary Social Credit Score System
+// PHASE 1: Enhanced Wallet Intelligence Schema - Revolutionary 1-1000 Scoring System
 export const walletIntelligence = pgTable("wallet_intelligence", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   walletAddress: varchar("wallet_address").notNull(),
-  blockchain: varchar("blockchain", { length: 20 }).notNull().default("solana"), // solana, ethereum, bitcoin
+  blockchain: varchar("blockchain", { length: 20 }).notNull().default("solana"), // solana, ethereum, bitcoin, polygon, bsc, arbitrum, avalanche, base
   network: varchar("network", { length: 20 }).default("mainnet"), // mainnet, testnet, devnet
-  socialCreditScore: integer("social_credit_score").default(0),
-  riskLevel: varchar("risk_level", { length: 20 }).default("unknown"), // low, medium, high, critical, unknown
-  tradingBehaviorScore: integer("trading_behavior_score").default(0),
-  portfolioQualityScore: integer("portfolio_quality_score").default(0),
-  liquidityScore: integer("liquidity_score").default(0),
-  activityScore: integer("activity_score").default(0),
-  defiEngagementScore: integer("defi_engagement_score").default(0),
+  
+  // REVOLUTIONARY 1-1000 SCORING SYSTEM - PHASE 1
+  overallScore: integer("overall_score").default(500), // Main 1-1000 score
+  scoreGrade: varchar("score_grade", { length: 10 }).default("C"), // A+, A, B, C, D, F
+  scorePercentile: decimal("score_percentile", { precision: 5, scale: 2 }).default("50.00"), // 0-100 percentile
+  lastScoreUpdate: timestamp("last_score_update").defaultNow(),
+  
+  // CROSS-CHAIN INTELLIGENCE SCORING (Each 1-1000 scale)
+  socialCreditScore: integer("social_credit_score").default(500),
+  riskLevel: varchar("risk_level", { length: 20 }).default("medium"), // low, medium, high, critical, unknown
+  tradingBehaviorScore: integer("trading_behavior_score").default(500), // 1-1000 scale
+  portfolioQualityScore: integer("portfolio_quality_score").default(500), // 1-1000 scale
+  liquidityScore: integer("liquidity_score").default(500), // 1-1000 scale
+  activityScore: integer("activity_score").default(500), // 1-1000 scale
+  defiEngagementScore: integer("defi_engagement_score").default(500), // 1-1000 scale
+  
+  // PHASE 1: ENHANCED MULTI-CHAIN SCORING COMPONENTS (1-1000 scale each)
+  crossChainScore: integer("cross_chain_score").default(500), // Multi-blockchain activity
+  arbitrageDetectionScore: integer("arbitrage_detection_score").default(500), // MEV and sophisticated trading
+  wealthIndicatorScore: integer("wealth_indicator_score").default(500), // Portfolio size and holdings
+  influenceNetworkScore: integer("influence_network_score").default(500), // Social connections and influence
+  complianceScore: integer("compliance_score").default(500), // Regulatory compliance rating
+  
+  // MULTI-CHAIN DATA POINTS  
+  primaryChain: varchar("primary_chain", { length: 20 }).default("solana"), // Most active blockchain
+  chainDistribution: json("chain_distribution").$type<Record<string, number>>().default({}), // % activity per chain
+  crossChainBehavior: json("cross_chain_behavior").$type<{
+    migrationPatterns: string[];
+    arbitrageActivity: boolean;
+    multiChainStrategies: string[];
+    bridgeUsage: Record<string, number>;
+  }>().default({
+    migrationPatterns: [],
+    arbitrageActivity: false,
+    multiChainStrategies: [],
+    bridgeUsage: {}
+  }),
   
   // Marketing Intelligence Data
   marketingSegment: varchar("marketing_segment", { length: 50 }).default("unknown"), // whale, retail, degen, institutional

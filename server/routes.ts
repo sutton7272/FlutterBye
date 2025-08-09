@@ -98,6 +98,7 @@ import { databaseOptimizer } from "./database-optimizer";
 import { aiCostOptimizer } from "./ai-cost-optimizer";
 import { blogScheduler } from "./blog-content-scheduler";
 import { registerMonitoringRoutes } from "./monitoring-routes";
+import { phase1IntelligenceRoutes } from "./phase1-intelligence-routes";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Trust proxy for rate limiting
@@ -4637,6 +4638,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // Register FlutterAI routes
   app.use("/api/flutterai", flutterAIRoutes);
+  
+  // PHASE 1: Revolutionary 1-1000 Scoring Intelligence Routes
+  app.use("/api/phase1", phase1IntelligenceRoutes);
+  console.log("🚀 PHASE 1: Revolutionary 1-1000 scoring intelligence routes activated!");
   registerFlutterAIWalletRoutes(app);
   
   // Enterprise FlutterAI Routes
