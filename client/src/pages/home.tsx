@@ -18,6 +18,7 @@ import { ViralGrowthAccelerator } from "@/components/viral-growth-accelerator";
 import { MobileOnboardingWizard } from "@/components/mobile-onboarding-wizard";
 import { usePerformance } from "@/hooks/use-performance";
 import { FlutterAIDemoCards } from "@/components/flutterai-demo-cards";
+import { SimpleTestModal } from "@/components/simple-test-modal";
 import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 
@@ -238,7 +239,7 @@ export default function Home() {
                         
                         <p className="text-gray-300 text-sm line-clamp-3 leading-relaxed">
                           {content.content?.slice(0, 200) || content.preview || 'Advanced AI-powered content generation system creating SEO-optimized blog posts with comprehensive metadata analysis...'}
-                          {(content.content?.length > 200 || content.preview?.length > 200) && '...'}
+                          {((content.content && content.content.length > 200) || (content.preview && content.preview.length > 200)) && '...'}
                         </p>
                         
                         <div className="flex items-center gap-4 mt-4 text-xs text-gray-400">
@@ -802,6 +803,10 @@ export default function Home() {
             onComplete={() => setShowOnboarding(false)}
           />
         )}
+        
+        {/* Test Modal Component */}
+        <SimpleTestModal />
+        
       </div>
     </ErrorBoundary>
   );

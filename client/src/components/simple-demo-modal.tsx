@@ -9,7 +9,14 @@ interface SimpleDemoModalProps {
 export function SimpleDemoModal({ isOpen, onClose }: SimpleDemoModalProps) {
   const [currentSlide, setCurrentSlide] = useState(0);
   
-  if (!isOpen) return null;
+  console.log("SimpleDemoModal render - isOpen:", isOpen);
+  
+  if (!isOpen) {
+    console.log("Modal not open, returning null");
+    return null;
+  }
+  
+  console.log("Modal should show now!");
   
   const slides = [
     {
