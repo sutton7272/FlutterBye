@@ -10780,6 +10780,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Register Flutterina Admin Routes
   app.use(flutterinaAdminRoutes);
   
+  // Register Skye Knowledge Management Routes
+  app.use('/api/skye', skyeKnowledgeRoutes);
+  
   // Phase 1: Monitoring & Stability System
   registerMonitoringRoutes(app);
   console.log("🔍 Phase 1: Monitoring & Stability System activated!");

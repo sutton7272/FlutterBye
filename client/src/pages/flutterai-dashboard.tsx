@@ -18,6 +18,7 @@ import EnterpriseDashboard from '@/components/enterprise-dashboard';
 import RealTimeIntelligenceDashboard from '@/components/real-time-intelligence-dashboard';
 import { SolviturBrandBadge } from '@/components/solvitur-brand-badge';
 import { FlutterinaAdminPanel } from '@/components/flutterina-admin-panel';
+import { SkyeKnowledgeAdmin } from "@/components/skye-knowledge-admin";
 import { 
   Brain, 
   Wallet, 
@@ -1137,7 +1138,7 @@ export default function FlutterAIDashboard() {
 
         {/* Enhanced FlutterAI Dashboard - 5 Essential Tabs */}
         <Tabs defaultValue="overview" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-5 bg-slate-800/50 mb-6">
+          <TabsList className="grid w-full grid-cols-6 bg-slate-800/50 mb-6">
             <TabsTrigger value="overview" className="data-[state=active]:bg-purple-600">
               <Brain className="h-4 w-4 mr-2" />
               Intelligence Overview
@@ -1149,6 +1150,10 @@ export default function FlutterAIDashboard() {
             <TabsTrigger value="analytics" className="data-[state=active]:bg-green-600">
               <BarChart3 className="h-4 w-4 mr-2" />
               Analytics & Insights
+            </TabsTrigger>
+            <TabsTrigger value="skye" className="data-[state=active]:bg-purple-600">
+              <Brain className="h-4 w-4 mr-2" />
+              Skye AI Knowledge
             </TabsTrigger>
             <TabsTrigger value="flutterina" className="data-[state=active]:bg-pink-600">
               <MessageSquare className="h-4 w-4 mr-2" />
@@ -1789,7 +1794,12 @@ export default function FlutterAIDashboard() {
             </Card>
           </TabsContent>
 
-          {/* 4. SETTINGS TAB - Configuration and Technical Settings */}
+          {/* 4. SKYE AI KNOWLEDGE MANAGEMENT TAB */}
+          <TabsContent value="skye" className="space-y-6">
+            <SkyeKnowledgeAdmin />
+          </TabsContent>
+
+          {/* 5. SETTINGS TAB - Configuration and Technical Settings */}
           <TabsContent value="settings" className="space-y-6">
             
             {/* Core Configuration */}

@@ -1,11 +1,10 @@
 import { Router } from "express";
 import { z } from "zod";
-import { isAuthenticated } from "./replitAuth";
 
 const router = Router();
 
 // Knowledge Base Routes
-router.get("/knowledge", isAuthenticated, async (req, res) => {
+router.get("/knowledge", async (req, res) => {
   try {
     // For now, return mock data - implement storage later
     const knowledge = [
@@ -54,7 +53,7 @@ const createKnowledgeSchema = z.object({
   isActive: z.boolean()
 });
 
-router.post("/knowledge", isAuthenticated, async (req, res) => {
+router.post("/knowledge", async (req, res) => {
   try {
     const validatedData = createKnowledgeSchema.parse(req.body);
     
@@ -74,7 +73,7 @@ router.post("/knowledge", isAuthenticated, async (req, res) => {
   }
 });
 
-router.put("/knowledge/:id", isAuthenticated, async (req, res) => {
+router.put("/knowledge/:id", async (req, res) => {
   try {
     const { id } = req.params;
     const updates = req.body;
@@ -87,7 +86,7 @@ router.put("/knowledge/:id", isAuthenticated, async (req, res) => {
   }
 });
 
-router.delete("/knowledge/:id", isAuthenticated, async (req, res) => {
+router.delete("/knowledge/:id", async (req, res) => {
   try {
     const { id } = req.params;
     
@@ -100,7 +99,7 @@ router.delete("/knowledge/:id", isAuthenticated, async (req, res) => {
 });
 
 // Get truths only
-router.get("/truths", isAuthenticated, async (req, res) => {
+router.get("/truths", async (req, res) => {
   try {
     // Mock truths data
     const truths = [
@@ -124,7 +123,7 @@ router.get("/truths", isAuthenticated, async (req, res) => {
 });
 
 // Personality Settings Routes
-router.get("/personality", isAuthenticated, async (req, res) => {
+router.get("/personality", async (req, res) => {
   try {
     const settings = [
       {
@@ -152,7 +151,7 @@ router.get("/personality", isAuthenticated, async (req, res) => {
   }
 });
 
-router.put("/personality/:key", isAuthenticated, async (req, res) => {
+router.put("/personality/:key", async (req, res) => {
   try {
     const { key } = req.params;
     const { value, description } = req.body;
@@ -166,7 +165,7 @@ router.put("/personality/:key", isAuthenticated, async (req, res) => {
 });
 
 // Analytics Routes
-router.get("/analytics", isAuthenticated, async (req, res) => {
+router.get("/analytics", async (req, res) => {
   try {
     const analytics = {
       totalEntries: 2,
@@ -211,7 +210,7 @@ router.get("/analytics", isAuthenticated, async (req, res) => {
 });
 
 // Test Knowledge Route
-router.post("/test", isAuthenticated, async (req, res) => {
+router.post("/test", async (req, res) => {
   try {
     const { prompt } = req.body;
     
