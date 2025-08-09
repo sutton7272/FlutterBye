@@ -41,7 +41,7 @@ export default function Marketplace() {
 
   // Fetch FLBY tokens
   const { data: tokens = [], isLoading: isLoadingTokens } = useQuery<Token[]>({
-    queryKey: ["/api/tokens", { search: searchQuery }],
+    queryKey: ["/api/tokens", searchQuery],
     enabled: true,
   });
 
