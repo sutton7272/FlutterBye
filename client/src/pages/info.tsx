@@ -96,6 +96,7 @@ export default function InfoPage() {
             <TabsTrigger value="flby" className="flex items-center gap-2">
               <Zap className="w-4 h-4" />
               FLBY Token
+              <Badge className="bg-red-600 text-white text-xs ml-1">Coming Soon</Badge>
             </TabsTrigger>
             <TabsTrigger value="features" className="flex items-center gap-2">
               <Star className="w-4 h-4" />
@@ -104,6 +105,7 @@ export default function InfoPage() {
             <TabsTrigger value="programs" className="flex items-center gap-2">
               <Gift className="w-4 h-4" />
               Programs
+              <Badge className="bg-red-600 text-white text-xs ml-1">Coming Soon</Badge>
             </TabsTrigger>
             <TabsTrigger value="explore" className="flex items-center gap-2">
               <Sparkles className="w-4 h-4" />
