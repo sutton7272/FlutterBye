@@ -3,7 +3,7 @@ import { MessageCircle, X, Send, Sparkles, Heart, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useLocation } from "wouter";
 
@@ -35,6 +35,7 @@ export function FlutterinaFloatingChatbox() {
   const [isTyping, setIsTyping] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const [location] = useLocation();
+  const queryClient = useQueryClient();
   
   // Generate session ID
   const sessionId = useRef(
@@ -49,12 +50,12 @@ export function FlutterinaFloatingChatbox() {
   );
 
   // Fetch conversation history
-  const { data: conversation } = useQuery({
+  const { data: conversation } = useQuery<FlutterinaConversation>({
     queryKey: ["/api/flutterina/conversation", sessionId.current, location],
     enabled: isOpen,
   });
 
-  const { data: messages = [] } = useQuery({
+  const { data: messages = [] } = useQuery<FlutterinaMessage[]>({
     queryKey: ["/api/flutterina/messages", conversation?.id],
     enabled: !!conversation?.id && isOpen,
   });
@@ -71,6 +72,16 @@ export function FlutterinaFloatingChatbox() {
     onSuccess: () => {
       setMessage("");
       setIsTyping(false);
+      // Invalidate and refetch messages
+      queryClient.invalidateQueries({ 
+        queryKey: ["/api/flutterina/messages", conversation?.id] 
+      });
+      queryClient.invalidateQueries({ 
+        queryKey: ["/api/flutterina/conversation", sessionId.current, location] 
+      });
+    },
+    onMutate: () => {
+      setIsTyping(true);
     },
     onError: () => {
       setIsTyping(false);
