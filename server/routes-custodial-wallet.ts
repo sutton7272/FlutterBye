@@ -603,12 +603,12 @@ export function registerCustodialWalletRoutes(app: Express, storage: IStorage) {
           console.error(`Error creating ${currency} wallet:`, error);
           errors.push({
             currency,
-            error: error.message || `Failed to create ${currency} wallet`
+            error: (error as Error).message || `Failed to create ${currency} wallet`
           });
         }
       }
 
-      const response = {
+      const response: any = {
         success: createdWallets.length > 0,
         message: `Created ${createdWallets.length} out of ${currencies.length} wallets`,
         created: createdWallets.length,
