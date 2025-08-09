@@ -115,6 +115,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.set('trust proxy', 1);
 
   // Security and performance middleware
+  // Re-enable security headers with CSP disabled
   app.use(securityHeaders);
   app.use(cors(corsConfig));
   app.use(responseCompression);
@@ -268,7 +269,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.use(monitoring.performanceMiddleware());
   
   // Apply production-grade security middleware  
-  app.use(productionAuth.securityHeaders);
+  // Temporarily disable production security headers to fix CSP issues
+  // app.use(productionAuth.securityHeaders);
   
   // Production monitoring is handled by performanceMiddleware above
   
