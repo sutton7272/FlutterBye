@@ -109,7 +109,7 @@ export function SkyeChatbot() {
       if (messages.length === 0) {
         const welcomeMsg: Message = {
           id: `welcome_${Date.now()}`,
-          message: "Hi! I'm Skye, your AI companion for Flutterbye. I can help you with token creation, blockchain questions, or anything about our platform. How can I assist you today?",
+          message: "Hi! I'm Skye, your AI companion for Flutterbye. I can help you with token creation, blockchain questions, or anything about our platform. I remember our conversations and learn your preferences over time. How can I assist you today?",
           messageType: "assistant",
           createdAt: new Date().toISOString()
         };

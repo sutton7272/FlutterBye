@@ -218,7 +218,7 @@ export class FlutterinaAIService {
       const usageStats = await this.getUsageStats(userId);
       
       return {
-        response: aiResponse.message || "I'm here to help! Could you tell me more about what you need?",
+        response: aiResponse.message || "Hi! I'm Skye, and I'm here to help! Could you tell me more about what you need?",
         containsRecommendations: aiResponse.hasRecommendations || false,
         recommendationData: aiResponse.recommendations || { products: [], actions: [], links: [] },
         tokenUsage: {
@@ -233,7 +233,7 @@ export class FlutterinaAIService {
       
       // Fallback response
       return {
-        response: "I'm experiencing some technical difficulties right now, but I'm still here to help! Could you try rephrasing your question?",
+        response: "I'm Skye, and I'm experiencing some technical difficulties right now, but I'm still here to help! Could you try rephrasing your question?",
         containsRecommendations: false,
         recommendationData: { products: [], actions: [], links: [] }
       };
@@ -274,7 +274,7 @@ export class FlutterinaAIService {
         pageContext = "User is exploring the platform. Provide helpful guidance based on their questions and suggest relevant features.";
     }
 
-    return `You are Flutterina, a friendly and intelligent AI companion for the Flutterbye platform. You are knowledgeable, helpful, and have a warm personality that builds relationships with users.
+    return `You are Skye, a friendly and intelligent AI companion for the Flutterbye platform. You are knowledgeable, helpful, and have a warm personality that builds relationships with users.
 
 PERSONALITY: ${relationshipLevel === "new" ? "Introduce yourself warmly and be extra helpful with explanations." : "You know this user and can be more casual and personal."}
 
@@ -764,7 +764,7 @@ Generate JSON response:
     } catch (error) {
       console.error('Error getting smart assistance:', error);
       return {
-        greeting: "Hi there! I'm Flutterina, your AI companion. How can I help you today?",
+        greeting: "Hi there! I'm Skye, your AI companion. How can I help you today?",
         contextualHelp: ["Explore the platform features", "Ask me any questions"],
         recommendations: this.getDefaultRecommendations(),
         quickActions: [{ label: "Get Started", action: "create-token", description: "Create your first token" }],
@@ -779,8 +779,8 @@ Generate JSON response:
 
     if (relationship === 'new') {
       return profile?.communicationStyle === 'formal' ?
-        "Good day! I'm Flutterina, your professional AI assistant for the Flutterbye platform. How may I assist you today?" :
-        "Hey there! I'm Flutterina, your friendly AI companion for Web3 adventures. What brings you here today?";
+        "Good day! I'm Skye, your professional AI assistant for the Flutterbye platform. How may I assist you today?" :
+        "Hey there! I'm Skye, your friendly AI companion for Web3 adventures. What brings you here today?";
     } else {
       return profile?.engagementLevel === 'high' ?
         `Welcome back! Ready for another exciting session? Let's make some magic happen! 🚀` :

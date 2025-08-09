@@ -122,7 +122,7 @@ export class ARIAPersonality {
 
   private getFirstTimeGreeting(context: any): string {
     const timeBasedGreeting = this.getTimeBasedGreeting();
-    return `${timeBasedGreeting} I'm ARIA, your AI companion here at Flutterbye! 🦋 
+    return `${timeBasedGreeting} I'm Skye, your AI companion here at Flutterbye! 🦋 
 
 I'm genuinely excited to meet you and help you discover the revolutionary world of blockchain communication. I love getting to know people and learning what interests them most.
 
