@@ -266,6 +266,287 @@ export class BitcoinAdapter implements BlockchainAdapter {
   }
 }
 
+// Sui Blockchain Adapter - Next-gen Move-based blockchain
+export class SuiAdapter implements BlockchainAdapter {
+  chain = 'sui';
+  
+  async getWalletTransactions(address: string, limit = 100): Promise<BlockchainTransaction[]> {
+    return [
+      {
+        hash: 'sui_0xd4f6e2a8b1c3e5f7a9b1c3d5e7f9a1b3c5d7e9f1a3b5c7d9e1f3a5b7c9d1e3f5',
+        blockNumber: 24500000,
+        timestamp: new Date(),
+        from: address,
+        to: '0xa2b4c6d8e0f2a4b6c8d0e2f4a6b8c0d2e4f6a8b0c2d4e6f8a0b2c4d6e8f0a2b4',
+        value: '1000',
+        type: 'transfer',
+        chain: 'sui',
+        tokenTransfers: [{
+          token: 'SUI',
+          from: address,
+          to: '0xa2b4c6d8e0f2a4b6c8d0e2f4a6b8c0d2e4f6a8b0c2d4e6f8a0b2c4d6e8f0a2b4',
+          amount: '1000',
+          symbol: 'SUI',
+          decimals: 9
+        }]
+      }
+    ];
+  }
+
+  async getTokenBalances(address: string): Promise<TokenBalance[]> {
+    return [
+      {
+        token: 'SUI',
+        symbol: 'SUI',
+        amount: '15000',
+        usdValue: 18500,
+        decimals: 9,
+        chain: 'sui'
+      },
+      {
+        token: 'MOVE_TOKEN',
+        symbol: 'MOVE',
+        amount: '50000',
+        usdValue: 2500,
+        decimals: 6,
+        contractAddress: '0x2::coin::Coin<0x123::move_token::MOVE_TOKEN>',
+        chain: 'sui'
+      }
+    ];
+  }
+
+  async getStakingPositions(address: string): Promise<StakingPosition[]> {
+    return [
+      {
+        validator: 'Sui Foundation Validator',
+        stakedAmount: '5000',
+        rewards: '125.5',
+        apy: 5.2,
+        unbondingPeriod: 1,
+        chain: 'sui'
+      }
+    ];
+  }
+
+  async getDeFiPositions(address: string): Promise<DeFiPosition[]> {
+    return [
+      {
+        protocol: 'Cetus DEX',
+        type: 'liquidity',
+        tokens: [
+          {
+            token: 'SUI',
+            symbol: 'SUI',
+            amount: '2500',
+            usdValue: 3125,
+            decimals: 9,
+            chain: 'sui'
+          },
+          {
+            token: 'USDC',
+            symbol: 'USDC',
+            amount: '3125',
+            usdValue: 3125,
+            decimals: 6,
+            chain: 'sui'
+          }
+        ],
+        totalUsdValue: 6250,
+        apy: 12.8,
+        risk: 'medium',
+        chain: 'sui'
+      }
+    ];
+  }
+
+  async getWalletIntelligence(address: string): Promise<WalletIntelligence> {
+    return {
+      address,
+      chain: 'sui',
+      totalBalance: 24125,
+      riskScore: 75,
+      wealthCategory: 'retail',
+      activityPattern: 'active',
+      behavioral_tags: ['defi_user', 'early_adopter', 'move_developer', 'liquidity_provider'],
+      last_activity: new Date(),
+      transaction_count: 847,
+      defi_experience: 'intermediate'
+    };
+  }
+
+  subscribeToWalletUpdates(address: string, callback: (update: any) => void): void {
+    console.log(`Subscribing to Sui updates for ${address}`);
+  }
+
+  isValidAddress(address: string): boolean {
+    return /^0x[a-fA-F0-9]{64}$/.test(address);
+  }
+}
+
+// XRP Ledger Adapter - Enterprise payment blockchain
+export class XRPAdapter implements BlockchainAdapter {
+  chain = 'xrp';
+  
+  async getWalletTransactions(address: string, limit = 100): Promise<BlockchainTransaction[]> {
+    return [
+      {
+        hash: 'xrp_E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855',
+        blockNumber: 82000000,
+        timestamp: new Date(),
+        from: address,
+        to: 'rN7n7otQDd6FczFgLdSqtcsAUxDkw6fzRH',
+        value: '1000',
+        type: 'transfer',
+        chain: 'xrp'
+      }
+    ];
+  }
+
+  async getTokenBalances(address: string): Promise<TokenBalance[]> {
+    return [
+      {
+        token: 'XRP',
+        symbol: 'XRP',
+        amount: '50000',
+        usdValue: 32500,
+        decimals: 6,
+        chain: 'xrp'
+      },
+      {
+        token: 'USD',
+        symbol: 'USD',
+        amount: '10000',
+        usdValue: 10000,
+        decimals: 2,
+        contractAddress: 'rUSDTokenIssuer123456789ABCDEFGH',
+        chain: 'xrp'
+      }
+    ];
+  }
+
+  async getStakingPositions(address: string): Promise<StakingPosition[]> {
+    return []; // XRP doesn't have traditional staking
+  }
+
+  async getDeFiPositions(address: string): Promise<DeFiPosition[]> {
+    return [
+      {
+        protocol: 'XRPL AMM',
+        type: 'liquidity',
+        tokens: [
+          {
+            token: 'XRP',
+            symbol: 'XRP',
+            amount: '25000',
+            usdValue: 16250,
+            decimals: 6,
+            chain: 'xrp'
+          },
+          {
+            token: 'USD',
+            symbol: 'USD',
+            amount: '16250',
+            usdValue: 16250,
+            decimals: 2,
+            chain: 'xrp'
+          }
+        ],
+        totalUsdValue: 32500,
+        apy: 8.5,
+        risk: 'low',
+        chain: 'xrp'
+      }
+    ];
+  }
+
+  async getWalletIntelligence(address: string): Promise<WalletIntelligence> {
+    return {
+      address,
+      chain: 'xrp',
+      totalBalance: 42500,
+      riskScore: 90,
+      wealthCategory: 'whale',
+      activityPattern: 'active',
+      behavioral_tags: ['institutional', 'payment_focused', 'high_volume', 'enterprise_user'],
+      last_activity: new Date(),
+      transaction_count: 15247,
+      defi_experience: 'expert'
+    };
+  }
+
+  subscribeToWalletUpdates(address: string, callback: (update: any) => void): void {
+    console.log(`Subscribing to XRP updates for ${address}`);
+  }
+
+  isValidAddress(address: string): boolean {
+    return /^r[1-9A-HJ-NP-Za-km-z]{25,34}$/.test(address);
+  }
+}
+
+// Kaspa Blockchain Adapter - High-throughput UTXO blockchain
+export class KaspaAdapter implements BlockchainAdapter {
+  chain = 'kaspa';
+  
+  async getWalletTransactions(address: string, limit = 100): Promise<BlockchainTransaction[]> {
+    return [
+      {
+        hash: 'kaspa_1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f1a2b',
+        blockNumber: 42000000,
+        timestamp: new Date(),
+        from: address,
+        to: 'kaspa:qr83cu3p93vz8dlgkm9d2r8ew3t7ks9eq8v5qhg98nv5v3x8a4gz7p8h6hmlg',
+        value: '10000',
+        type: 'transfer',
+        chain: 'kaspa'
+      }
+    ];
+  }
+
+  async getTokenBalances(address: string): Promise<TokenBalance[]> {
+    return [
+      {
+        token: 'KAS',
+        symbol: 'KAS',
+        amount: '500000',
+        usdValue: 85000,
+        decimals: 8,
+        chain: 'kaspa'
+      }
+    ];
+  }
+
+  async getStakingPositions(address: string): Promise<StakingPosition[]> {
+    return []; // Kaspa uses PoW, no staking
+  }
+
+  async getDeFiPositions(address: string): Promise<DeFiPosition[]> {
+    return []; // Limited DeFi ecosystem on Kaspa currently
+  }
+
+  async getWalletIntelligence(address: string): Promise<WalletIntelligence> {
+    return {
+      address,
+      chain: 'kaspa',
+      totalBalance: 85000,
+      riskScore: 70,
+      wealthCategory: 'whale',
+      activityPattern: 'active',
+      behavioral_tags: ['miner', 'early_adopter', 'high_throughput_user', 'dag_enthusiast'],
+      last_activity: new Date(),
+      transaction_count: 5247,
+      defi_experience: 'beginner'
+    };
+  }
+
+  subscribeToWalletUpdates(address: string, callback: (update: any) => void): void {
+    console.log(`Subscribing to Kaspa updates for ${address}`);
+  }
+
+  isValidAddress(address: string): boolean {
+    return /^kaspa:[a-z0-9]{61,63}$/.test(address);
+  }
+}
+
 // Cross-Chain Intelligence Engine
 export class CrossChainIntelligenceEngine {
   private adapters: Map<string, BlockchainAdapter> = new Map();
@@ -273,6 +554,12 @@ export class CrossChainIntelligenceEngine {
   constructor() {
     this.adapters.set('ethereum', new EthereumAdapter());
     this.adapters.set('bitcoin', new BitcoinAdapter());
+    this.adapters.set('sui', new SuiAdapter());
+    this.adapters.set('xrp', new XRPAdapter());
+    this.adapters.set('kaspa', new KaspaAdapter());
+    this.adapters.set('sui', new SuiAdapter());
+    this.adapters.set('xrp', new XRPAdapter());
+    this.adapters.set('kaspa', new KaspaAdapter());
     // Add more chains as needed
   }
 
@@ -307,6 +594,19 @@ export class CrossChainIntelligenceEngine {
 
   getSupportedChains(): string[] {
     return Array.from(this.adapters.keys());
+  }
+
+  getChainCapabilities(): Record<string, string[]> {
+    return {
+      solana: ['tokens', 'nfts', 'defi', 'staking', 'real_time'],
+      ethereum: ['tokens', 'nfts', 'defi', 'staking', 'real_time'],
+      bitcoin: ['transactions', 'whale_tracking', 'long_term_analysis'],
+      sui: ['move_contracts', 'defi', 'staking', 'high_throughput'],
+      xrp: ['payments', 'enterprise', 'amm', 'institutional'],
+      kaspa: ['high_throughput', 'dag_analysis', 'mining_patterns'],
+      polygon: ['ethereum_compatible', 'low_cost', 'defi'],
+      avalanche: ['subnets', 'defi', 'enterprise']
+    };
   }
 }
 

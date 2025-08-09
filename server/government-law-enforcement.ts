@@ -85,7 +85,7 @@ export class GovernmentIntelligenceService {
           'Round number transfers',
           'Shared counterparties'
         ],
-        chains: ['ethereum', 'bitcoin', 'solana'],
+        chains: ['ethereum', 'bitcoin', 'solana', 'sui', 'xrp', 'kaspa'],
         lastActivity: new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000)
       };
 
@@ -232,7 +232,7 @@ export class GovernmentIntelligenceService {
       evidence: [],
       riskScore: maxRisk,
       estimatedValue,
-      chains: ['ethereum', 'bitcoin', 'solana']
+      chains: ['ethereum', 'bitcoin', 'solana', 'sui', 'xrp', 'kaspa']
     };
 
     return investigationCase;
@@ -278,7 +278,7 @@ export class GovernmentIntelligenceService {
       evidence: [],
       riskScore: 85,
       estimatedValue: 2500000,
-      chains: ['ethereum', 'bitcoin']
+      chains: ['ethereum', 'bitcoin', 'sui', 'xrp', 'kaspa']
     };
 
     return {
