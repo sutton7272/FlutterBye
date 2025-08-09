@@ -233,7 +233,9 @@ function Router() {
         <Route path="/portfolio" component={() => (
           <>
             <Navbar />
-            <Trade />
+            <SuspenseWrapper>
+              <Trade />
+            </SuspenseWrapper>
           </>
         )} />
         <Route path="/mint" component={() => (
@@ -255,55 +257,73 @@ function Router() {
         <Route path="/mint/ai-enhanced" component={() => (
           <>
             <Navbar />
-            <MintAIEnhanced />
+            <SuspenseWrapper>
+              <MintAIEnhanced />
+            </SuspenseWrapper>
           </>
         )} />
         <Route path="/mint/voice" component={() => (
           <>
             <Navbar />
-            <MintVoice />
+            <SuspenseWrapper>
+              <MintVoice />
+            </SuspenseWrapper>
           </>
         )} />
         <Route path="/mint/multimedia" component={() => (
           <>
             <Navbar />
-            <MintMultimedia />
+            <SuspenseWrapper>
+              <MintMultimedia />
+            </SuspenseWrapper>
           </>
         )} />
         <Route path="/redeem" component={() => (
           <>
             <Navbar />
-            <Redeem />
+            <SuspenseWrapper>
+              <Redeem />
+            </SuspenseWrapper>
           </>
         )} />
         <Route path="/activity" component={() => (
           <>
             <Navbar />
-            <Activity />
+            <SuspenseWrapper>
+              <Activity />
+            </SuspenseWrapper>
           </>
         )} />
         <Route path="/trending" component={() => (
           <>
             <Navbar />
-            <Explore />
+            <SuspenseWrapper>
+              <Explore />
+            </SuspenseWrapper>
           </>
         )} />
         <Route path="/how-it-works" component={() => (
           <>
             <Navbar />
-            <HowItWorks />
+            <SuspenseWrapper>
+              <HowItWorks />
+            </SuspenseWrapper>
           </>
         )} />
         <Route path="/free-codes" component={() => (
           <>
             <Navbar />
-            <FreeCodes />
+            <SuspenseWrapper>
+              <FreeCodes />
+            </SuspenseWrapper>
           </>
         )} />
         <Route path="/search" component={() => (
           <>
             <Navbar />
-            <SearchPage />
+            <SuspenseWrapper>
+              <SearchPage />
+            </SuspenseWrapper>
           </>
         )} />
         {/* Admin Gateway - Password Protected Entry Point */}
@@ -312,35 +332,45 @@ function Router() {
         {/* Protected Admin Routes */}
         <Route path="/admin/dashboard" component={() => (
           <AdminRouteGuard>
-            <AdminDashboard />
+            <SuspenseWrapper>
+              <AdminDashboard />
+            </SuspenseWrapper>
           </AdminRouteGuard>
         )} />
         
         <Route path="/admin/flutterai" component={() => (
           <AdminRouteGuard>
             <Navbar />
-            <FlutterAIDashboard />
+            <SuspenseWrapper>
+              <FlutterAIDashboard />
+            </SuspenseWrapper>
           </AdminRouteGuard>
         )} />
         
         <Route path="/admin/phase1" component={() => (
           <AdminRouteGuard>
             <Navbar />
-            <Phase1Dashboard />
+            <SuspenseWrapper>
+              <Phase1Dashboard />
+            </SuspenseWrapper>
           </AdminRouteGuard>
         )} />
         
         <Route path="/admin/phase2" component={() => (
           <AdminRouteGuard>
             <Navbar />
-            <Phase2Dashboard />
+            <SuspenseWrapper>
+              <Phase2Dashboard />
+            </SuspenseWrapper>
           </AdminRouteGuard>
         )} />
         
         <Route path="/admin/phase3" component={() => (
           <AdminRouteGuard>
             <Navbar />
-            <Phase3Dashboard />
+            <SuspenseWrapper>
+              <Phase3Dashboard />
+            </SuspenseWrapper>
           </AdminRouteGuard>
         )} />
         

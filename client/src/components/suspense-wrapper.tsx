@@ -1,4 +1,4 @@
-import { Suspense, ReactNode } from 'react';
+import { Suspense, ReactNode, startTransition } from 'react';
 import { LoadingSpinner } from './loading-spinner';
 
 interface SuspenseWrapperProps {
