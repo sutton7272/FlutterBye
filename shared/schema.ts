@@ -719,8 +719,8 @@ export const blogTitleVariations = pgTable("blog_title_variations", {
   generatedAt: timestamp("generated_at").defaultNow(),
 });
 
-// Flutterina AI Conversation System
-export const flutterinaConversations = pgTable("flutterina_conversations", {
+// Skye AI Conversation System
+export const skyeConversations = pgTable("skye_conversations", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   userId: varchar("user_id").references(() => users.id),
   sessionId: varchar("session_id").notNull(), // Browser session identifier
@@ -752,9 +752,9 @@ export const flutterinaConversations = pgTable("flutterina_conversations", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
-export const flutterinaMessages = pgTable("flutterina_messages", {
+export const skyeMessages = pgTable("skye_messages", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  conversationId: varchar("conversation_id").references(() => flutterinaConversations.id).notNull(),
+  conversationId: varchar("conversation_id").references(() => skyeConversations.id).notNull(),
   
   // Message content
   message: text("message").notNull(),
@@ -787,7 +787,7 @@ export const flutterinaMessages = pgTable("flutterina_messages", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
-export const flutterinaPersonalityProfiles = pgTable("flutterina_personality_profiles", {
+export const skyePersonalityProfiles = pgTable("skye_personality_profiles", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   userId: varchar("user_id").references(() => users.id),
   walletAddress: text("wallet_address"), // For guest users
@@ -1026,20 +1026,20 @@ export const insertSmsDeliverySchema = createInsertSchema(smsDeliveries).omit({
   viewedAt: true,
 });
 
-// Flutterina AI System Schemas
-export const insertFlutterinaConversationSchema = createInsertSchema(flutterinaConversations).omit({
+// Skye AI System Schemas
+export const insertSkyeConversationSchema = createInsertSchema(skyeConversations).omit({
   id: true,
   createdAt: true,
   updatedAt: true,
   lastInteractionAt: true,
 });
 
-export const insertFlutterinaMessageSchema = createInsertSchema(flutterinaMessages).omit({
+export const insertSkyeMessageSchema = createInsertSchema(skyeMessages).omit({
   id: true,
   createdAt: true,
 });
 
-export const insertFlutterinaPersonalityProfileSchema = createInsertSchema(flutterinaPersonalityProfiles).omit({
+export const insertSkyePersonalityProfileSchema = createInsertSchema(skyePersonalityProfiles).omit({
   id: true,
   createdAt: true,
   updatedAt: true,

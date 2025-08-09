@@ -64,7 +64,7 @@ interface SmartAssistance {
   learningOpportunities: string[];
 }
 
-export default function FlutterinaEnhancedChatbox() {
+export default function SkyeEnhancedChatbox() {
   const [isOpen, setIsOpen] = useState(false);
   const [isMinimized, setIsMinimized] = useState(false);
   const [messages, setMessages] = useState<FlutterinaMessage[]>([]);
@@ -258,7 +258,7 @@ export default function FlutterinaEnhancedChatbox() {
     }
   };
 
-  const handleKeyPress = (e: React.KeyboardEvent) => {
+  const handleKeyPress = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       sendMessage();

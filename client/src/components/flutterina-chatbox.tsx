@@ -95,7 +95,7 @@ export function FlutterinaFloatingChatbox() {
     });
   };
 
-  const handleKeyPress = (e: React.KeyboardEvent) => {
+  const handleKeyPress = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       handleSendMessage();
@@ -108,10 +108,10 @@ export function FlutterinaFloatingChatbox() {
     
     if (relationship === "new") {
       return hour < 12 
-        ? "Good morning! I'm Flutterina, your AI companion. How can I help you today?" 
+        ? "Good morning! I'm Skye, your AI companion. How can I help you today?" 
         : hour < 18 
-        ? "Good afternoon! I'm Flutterina, here to assist with anything you need."
-        : "Good evening! I'm Flutterina, ready to help you navigate the platform.";
+        ? "Good afternoon! I'm Skye, here to assist with anything you need."
+        : "Good evening! I'm Skye, ready to help you navigate the platform.";
     } else {
       return hour < 12 
         ? "Good morning! Nice to see you again. What can I help with today?" 
@@ -171,7 +171,7 @@ export function FlutterinaFloatingChatbox() {
                   </div>
                 </div>
                 <div>
-                  <h3 className="font-semibold">Flutterina</h3>
+                  <h3 className="font-semibold">Skye</h3>
                   <p className="text-xs text-white/80">
                     Your AI companion
                   </p>
@@ -292,7 +292,7 @@ export function FlutterinaFloatingChatbox() {
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
                 onKeyDown={handleKeyPress}
-                placeholder="Ask me anything about Flutterbye..."
+                placeholder="Ask Skye anything about Flutterbye..."
                 className="flex-1 min-h-[40px] max-h-[100px] text-sm resize-none"
                 disabled={sendMessageMutation.isPending}
               />
