@@ -870,6 +870,50 @@
                 linear-gradient(45deg, hsl(210, 100%, 45%), hsl(140, 100%, 40%)) border-box;
   }
 
+  /* Electric LED Coming Soon Badge */
+  .glow-red {
+    background: linear-gradient(45deg, #ff0040, #ff1555, #ff0040) !important;
+    text-shadow: 
+      0 0 5px #ff0040,
+      0 0 10px #ff0040,
+      0 0 15px #ff0040,
+      0 0 20px #ff0040 !important;
+    box-shadow: 
+      0 0 10px #ff0040,
+      0 0 20px #ff0040,
+      0 0 30px #ff0040,
+      inset 0 0 10px rgba(255, 0, 64, 0.3) !important;
+    border: 1px solid #ff0040 !important;
+    animation: ledPulse 1.5s ease-in-out infinite !important;
+  }
+
+  @keyframes ledPulse {
+    0%, 100% {
+      box-shadow: 
+        0 0 10px #ff0040,
+        0 0 20px #ff0040,
+        0 0 30px #ff0040,
+        inset 0 0 10px rgba(255, 0, 64, 0.3);
+      text-shadow: 
+        0 0 5px #ff0040,
+        0 0 10px #ff0040,
+        0 0 15px #ff0040,
+        0 0 20px #ff0040;
+    }
+    50% {
+      box-shadow: 
+        0 0 15px #ff0040,
+        0 0 30px #ff0040,
+        0 0 45px #ff0040,
+        inset 0 0 15px rgba(255, 0, 64, 0.5);
+      text-shadow: 
+        0 0 8px #ff0040,
+        0 0 15px #ff0040,
+        0 0 25px #ff0040,
+        0 0 35px #ff0040;
+    }
+  }
+
 @layer utilities {
   /* Revolutionary SMS Nexus Animation Keyframes */
   @keyframes quantumPulse {
