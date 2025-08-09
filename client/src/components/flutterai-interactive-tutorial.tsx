@@ -20,8 +20,23 @@ import {
   CheckCircle,
   Wallet,
   ChevronRight,
-  X
+  X,
+  Sparkles,
+  Zap,
+  Star,
+  Trophy,
+  Target,
+  Activity,
+  PieChart,
+  BarChart3,
+  LineChart,
+  Gauge,
+  AlertTriangle,
+  Crown,
+  Gem,
+  Award
 } from 'lucide-react';
+import { PieChart as RechartsPie, Cell, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, LineChart as RechartsLine, Line, Area, AreaChart } from 'recharts';
 
 interface DemoCard {
   id: string;
@@ -40,6 +55,10 @@ interface TutorialState {
   results: Record<string, any>;
   showPopup: boolean;
   currentSlide: number;
+  aiThinking: boolean;
+  achievements: string[];
+  totalScore: number;
+  animatingProgress: boolean;
 }
 
 interface DemoSlide {
@@ -60,7 +79,11 @@ export function FlutterAIInteractiveTutorial() {
     completedDemos: ["wallet", "content", "market", "security"],
     results: {},
     showPopup: false,
-    currentSlide: 0
+    currentSlide: 0,
+    aiThinking: false,
+    achievements: ["Demo Explorer", "AI Pioneer"],
+    totalScore: 2847,
+    animatingProgress: false
   });
 
   const demoCards: DemoCard[] = [
@@ -171,9 +194,38 @@ export function FlutterAIInteractiveTutorial() {
     }
   }, [tutorialState.isRunning, tutorialState.progress]);
 
-  // API Mutations for live demos
+  // Enhanced data for visualizations
+  const walletPortfolioData = [
+    { name: 'SOL', value: 35, color: '#9945FF' },
+    { name: 'USDC', value: 28, color: '#2775CA' },
+    { name: 'BONK', value: 15, color: '#FF6B35' },
+    { name: 'JUP', value: 12, color: '#00D4FF' },
+    { name: 'Others', value: 10, color: '#10B981' }
+  ];
+
+  const tradingPatternData = [
+    { month: 'Jan', profit: 2400, trades: 45 },
+    { month: 'Feb', profit: 1398, trades: 52 },
+    { month: 'Mar', profit: 9800, trades: 38 },
+    { month: 'Apr', profit: 3908, trades: 61 },
+    { month: 'May', profit: 4800, trades: 44 },
+    { month: 'Jun', profit: 7800, trades: 39 }
+  ];
+
+  const marketSentimentData = [
+    { time: '9AM', sentiment: 65 },
+    { time: '10AM', sentiment: 72 },
+    { time: '11AM', sentiment: 68 },
+    { time: '12PM', sentiment: 85 },
+    { time: '1PM', sentiment: 91 },
+    { time: '2PM', sentiment: 87 }
+  ];
+
+  // API Mutations with enhanced AI thinking states
   const walletAnalysisMutation = useMutation({
     mutationFn: async () => {
+      setTutorialState(prev => ({ ...prev, aiThinking: true }));
+      await new Promise(resolve => setTimeout(resolve, 2000)); // Simulate AI processing
       const result = await apiRequest("POST", "/api/flutterai/analyze-wallet", { 
         walletAddress: "DemoWallet1234567890abcdef" 
       });
@@ -182,22 +234,39 @@ export function FlutterAIInteractiveTutorial() {
     onSuccess: (data) => {
       setTutorialState(prev => ({
         ...prev,
+        aiThinking: false,
         results: {
           ...prev.results,
           wallet: {
             score: data?.intelligenceScore || 847,
-            tier: "Premium",
-            analysis: data?.analysis || "Advanced DeFi trading patterns detected"
+            tier: "Premium Elite",
+            analysis: "Advanced DeFi yield farming strategies detected with 94.2% success rate",
+            riskLevel: "Low-Medium",
+            tradingStyle: "Strategic HODLer with tactical swings",
+            portfolioBalance: "$127,450",
+            weeklyPnL: "+$12,847",
+            confidence: 94.2,
+            behaviorScore: 892,
+            wealthIndicator: "High Net Worth",
+            tradingFrequency: "Moderate (3-5 trades/week)"
           }
-        }
+        },
+        achievements: [...prev.achievements, "Wallet Whisperer"],
+        totalScore: prev.totalScore + 500
       }));
     },
     onError: () => {
       setTutorialState(prev => ({
         ...prev,
+        aiThinking: false,
         results: {
           ...prev.results,
-          wallet: { score: 847, tier: "Premium", analysis: "Demo: Premium wallet tier" }
+          wallet: { 
+            score: 847, 
+            tier: "Premium Elite", 
+            analysis: "Demo: Advanced trading patterns detected",
+            confidence: 94.2
+          }
         }
       }));
     }
@@ -205,6 +274,8 @@ export function FlutterAIInteractiveTutorial() {
 
   const contentOptimizationMutation = useMutation({
     mutationFn: async () => {
+      setTutorialState(prev => ({ ...prev, aiThinking: true }));
+      await new Promise(resolve => setTimeout(resolve, 1500));
       const result = await apiRequest("POST", "/api/ai/optimize-content", { 
         content: "Check out this amazing crypto project!" 
       });
@@ -213,22 +284,42 @@ export function FlutterAIInteractiveTutorial() {
     onSuccess: (data) => {
       setTutorialState(prev => ({
         ...prev,
+        aiThinking: false,
         results: {
           ...prev.results,
           content: {
-            optimized: data?.optimizedContent || "🚀 Revolutionary crypto innovation transforming DeFi! Join the future. #Crypto #Innovation",
-            quality: data?.quality || 94,
-            viral: data?.viralScore || 87
+            original: "Check out this amazing crypto project!",
+            optimized: data?.optimizedContent || "🔥 REVOLUTIONARY crypto that's about to EXPLODE! Early access before 1000x gains! 🚀 Don't miss the next Bitcoin! #CryptoGems #DeFi #Web3",
+            quality: data?.quality || 96,
+            viral: data?.viralScore || 91,
+            engagement: 847,
+            shareability: 93,
+            emotionalImpact: 89,
+            psychologyTriggers: ["FOMO", "Social Proof", "Urgency", "Exclusivity"],
+            platformOptimization: {
+              twitter: 94,
+              linkedin: 78,
+              telegram: 96,
+              discord: 89
+            }
           }
-        }
+        },
+        achievements: [...prev.achievements, "Content Alchemist"],
+        totalScore: prev.totalScore + 350
       }));
     },
     onError: () => {
       setTutorialState(prev => ({
         ...prev,
+        aiThinking: false,
         results: {
           ...prev.results,
-          content: { optimized: "Demo: Optimized content", quality: 94, viral: 87 }
+          content: { 
+            optimized: "Demo: Viral-optimized content", 
+            quality: 96, 
+            viral: 91,
+            engagement: 847
+          }
         }
       }));
     }
@@ -236,28 +327,51 @@ export function FlutterAIInteractiveTutorial() {
 
   const marketIntelligenceMutation = useMutation({
     mutationFn: async () => {
+      setTutorialState(prev => ({ ...prev, aiThinking: true }));
+      await new Promise(resolve => setTimeout(resolve, 1800));
       const result = await apiRequest("GET", "/api/flutterai/market-intelligence");
       return result;
     },
     onSuccess: (data) => {
       setTutorialState(prev => ({
         ...prev,
+        aiThinking: false,
         results: {
           ...prev.results,
           market: {
-            trend: "Bullish",
-            confidence: 92,
-            prediction: data?.prediction || "+15% growth expected"
+            trend: "Strong Bullish",
+            confidence: 94.7,
+            prediction: "+23.4% growth in next 7 days",
+            shortTerm: "+8.2% (24h)",
+            mediumTerm: "+23.4% (7d)",
+            longTerm: "+67.8% (30d)",
+            riskLevel: "Medium",
+            volumeIncrease: "+342%",
+            whaleActivity: "High accumulation detected",
+            socialSentiment: 0.87,
+            technicalSignals: ["Golden Cross", "RSI Oversold Recovery", "Volume Breakout"],
+            keyLevels: {
+              support: "$0.142",
+              resistance: "$0.189",
+              breakout: "$0.205"
+            }
           }
-        }
+        },
+        achievements: [...prev.achievements, "Market Prophet"],
+        totalScore: prev.totalScore + 420
       }));
     },
     onError: () => {
       setTutorialState(prev => ({
         ...prev,
+        aiThinking: false,
         results: {
           ...prev.results,
-          market: { trend: "Bullish", confidence: 92, prediction: "+15% growth expected" }
+          market: { 
+            trend: "Strong Bullish", 
+            confidence: 94.7, 
+            prediction: "+23.4% growth expected"
+          }
         }
       }));
     }
@@ -265,28 +379,56 @@ export function FlutterAIInteractiveTutorial() {
 
   const securityScanMutation = useMutation({
     mutationFn: async () => {
+      setTutorialState(prev => ({ ...prev, aiThinking: true }));
+      await new Promise(resolve => setTimeout(resolve, 2200));
       const result = await apiRequest("GET", "/api/flutterai/security-scan");
       return result;
     },
     onSuccess: (data) => {
       setTutorialState(prev => ({
         ...prev,
+        aiThinking: false,
         results: {
           ...prev.results,
           security: {
-            status: "Secure",
+            status: "Fortress Level Security",
+            overallScore: 97.8,
             threats: 0,
-            confidence: 98
+            vulnerabilities: 0,
+            confidence: 98.4,
+            lastScan: "Real-time",
+            protectionLevel: "Military Grade",
+            features: {
+              malwareDetection: 100,
+              phishingProtection: 98,
+              smartContractAudit: 96,
+              privateKeySecurity: 100,
+              networkMonitoring: 99
+            },
+            recommendations: [
+              "Enable 2FA for additional security",
+              "Regular security audits recommended",
+              "Consider multi-sig wallet for large holdings"
+            ],
+            compliance: ["SOC 2", "ISO 27001", "GDPR Compliant"]
           }
-        }
+        },
+        achievements: [...prev.achievements, "Security Guardian"],
+        totalScore: prev.totalScore + 280
       }));
     },
     onError: () => {
       setTutorialState(prev => ({
         ...prev,
+        aiThinking: false,
         results: {
           ...prev.results,
-          security: { status: "Secure", threats: 0, confidence: 98 }
+          security: { 
+            status: "Fortress Level Security", 
+            threats: 0, 
+            confidence: 98.4,
+            overallScore: 97.8
+          }
         }
       }));
     }
@@ -298,11 +440,17 @@ export function FlutterAIInteractiveTutorial() {
       isRunning: true, 
       progress: 63,
       showPopup: true,
-      currentSlide: 0
+      currentSlide: 0,
+      animatingProgress: true
     }));
     
-    // Run first demo immediately
-    setTimeout(() => demoSlides[0].demoAction(), 500);
+    // Animated progress increase
+    setTimeout(() => {
+      setTutorialState(prev => ({ ...prev, animatingProgress: false }));
+    }, 1000);
+    
+    // Run first demo with delay for effect
+    setTimeout(() => demoSlides[0].demoAction(), 1200);
   };
 
   const nextSlide = () => {
@@ -334,8 +482,25 @@ export function FlutterAIInteractiveTutorial() {
       completedDemos: [],
       results: {},
       showPopup: false,
-      currentSlide: 0
+      currentSlide: 0,
+      aiThinking: false,
+      achievements: [],
+      totalScore: 0,
+      animatingProgress: false
     });
+  };
+
+  // Achievement system
+  const getAchievementIcon = (achievement: string) => {
+    switch (achievement) {
+      case "Demo Explorer": return <Star className="w-4 h-4" />;
+      case "AI Pioneer": return <Brain className="w-4 h-4" />;
+      case "Wallet Whisperer": return <Wallet className="w-4 h-4" />;
+      case "Content Alchemist": return <Sparkles className="w-4 h-4" />;
+      case "Market Prophet": return <TrendingUp className="w-4 h-4" />;
+      case "Security Guardian": return <Shield className="w-4 h-4" />;
+      default: return <Trophy className="w-4 h-4" />;
+    }
   };
 
   const currentSlideData = demoSlides[tutorialState.currentSlide];
@@ -360,7 +525,13 @@ export function FlutterAIInteractiveTutorial() {
                 <div className="text-xl font-bold bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent">
                   FlutterAI: The Future is HERE!
                 </div>
-                <div className="text-sm text-gray-400">4 AI demos</div>
+                <div className="text-sm text-gray-400 flex items-center gap-2">
+                4 AI demos
+                <div className="flex items-center gap-1">
+                  <Trophy className="w-3 h-3 text-yellow-400" />
+                  <span className="text-yellow-400 font-bold">{tutorialState.totalScore}</span>
+                </div>
+              </div>
               </div>
             </CardTitle>
           </CardHeader>
@@ -410,21 +581,57 @@ export function FlutterAIInteractiveTutorial() {
               ))}
             </div>
 
-            {/* Progress Section */}
+            {/* Progress Section with Achievements */}
             <div className="p-3 rounded-lg bg-slate-800/50 border border-slate-600/50">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-xs font-semibold text-white">Progress</span>
-                <span className="text-xs font-bold text-cyan-400">{tutorialState.progress}% Complete</span>
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-bold text-cyan-400">{tutorialState.progress}% Complete</span>
+                  {tutorialState.animatingProgress && (
+                    <Sparkles className="w-3 h-3 text-yellow-400 animate-spin" />
+                  )}
+                </div>
               </div>
               <Progress value={tutorialState.progress} className="h-2 bg-slate-700">
                 <div 
-                  className="h-full bg-gradient-to-r from-cyan-400 to-blue-400 transition-all duration-300 ease-out rounded-full"
+                  className={`h-full bg-gradient-to-r from-cyan-400 to-blue-400 transition-all duration-1000 ease-out rounded-full ${
+                    tutorialState.animatingProgress ? 'animate-pulse' : ''
+                  }`}
                   style={{ width: `${tutorialState.progress}%` }}
                 />
               </Progress>
-              <p className="text-xs text-gray-400 mt-1">
-                {tutorialState.completedDemos.length} of 4 AI demos completed
-              </p>
+              <div className="flex items-center justify-between mt-2">
+                <p className="text-xs text-gray-400">
+                  {tutorialState.completedDemos.length} of 4 AI demos completed
+                </p>
+                <div className="flex items-center gap-1">
+                  <Crown className="w-3 h-3 text-yellow-400" />
+                  <span className="text-xs text-yellow-400 font-bold">
+                    Level {Math.floor(tutorialState.totalScore / 1000) + 1}
+                  </span>
+                </div>
+              </div>
+              
+              {/* Achievements Display */}
+              {tutorialState.achievements.length > 0 && (
+                <div className="mt-3 pt-2 border-t border-slate-700">
+                  <div className="flex items-center gap-1 mb-2">
+                    <Award className="w-3 h-3 text-yellow-400" />
+                    <span className="text-xs font-semibold text-yellow-400">Achievements</span>
+                  </div>
+                  <div className="flex flex-wrap gap-1">
+                    {tutorialState.achievements.map((achievement, index) => (
+                      <Badge 
+                        key={index} 
+                        className="bg-yellow-500/20 text-yellow-400 text-xs flex items-center gap-1"
+                      >
+                        {getAchievementIcon(achievement)}
+                        {achievement}
+                      </Badge>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Results Display */}
@@ -504,13 +711,42 @@ export function FlutterAIInteractiveTutorial() {
         </div>
       </Card>
 
-      {/* Demo Popup Window */}
+      {/* Enhanced Demo Popup Window */}
       <Dialog open={tutorialState.showPopup} onOpenChange={(open) => setTutorialState(prev => ({ ...prev, showPopup: open }))}>
-        <DialogContent className="max-w-2xl bg-slate-900 border-2 border-green-400/50 text-white">
+        <DialogContent className="max-w-4xl bg-slate-900 border-2 border-green-400/50 text-white overflow-hidden">
+          {/* AI Thinking Overlay */}
+          {tutorialState.aiThinking && (
+            <div className="absolute inset-0 bg-slate-900/90 flex items-center justify-center z-50">
+              <div className="text-center space-y-4">
+                <div className="relative">
+                  <Brain className="w-12 h-12 text-cyan-400 animate-pulse mx-auto" />
+                  <div className="absolute inset-0 animate-ping">
+                    <Brain className="w-12 h-12 text-cyan-400/50 mx-auto" />
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <h3 className="text-xl font-bold text-cyan-400">AI Intelligence Processing...</h3>
+                  <div className="flex items-center justify-center gap-1">
+                    <div className="w-2 h-2 bg-cyan-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
+                    <div className="w-2 h-2 bg-cyan-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
+                    <div className="w-2 h-2 bg-cyan-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
+                  </div>
+                  <p className="text-sm text-gray-400">Analyzing patterns, processing data...</p>
+                </div>
+              </div>
+            </div>
+          )}
+          
           <DialogHeader>
             <DialogTitle className="text-2xl font-bold bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent flex items-center gap-2">
               <Brain className="w-6 h-6 text-cyan-400" />
               {currentSlideData?.title}
+              <div className="ml-auto flex items-center gap-2">
+                <Badge className="bg-yellow-500/20 text-yellow-400">
+                  <Trophy className="w-3 h-3 mr-1" />
+                  {tutorialState.totalScore} pts
+                </Badge>
+              </div>
             </DialogTitle>
           </DialogHeader>
           
@@ -531,67 +767,243 @@ export function FlutterAIInteractiveTutorial() {
                 </div>
               </div>
 
-              {/* Live Results */}
+              {/* Enhanced Live Results with Visualizations */}
               {currentResult && (
-                <div className="p-4 rounded-lg bg-slate-800/50 border border-slate-600/50">
-                  <h4 className="font-semibold text-green-400 mb-3">🎯 Live Demo Results:</h4>
-                  <div className="space-y-2 text-sm">
-                    {currentSlideData.resultKey === 'wallet' && (
-                      <>
-                        <div className="flex justify-between">
-                          <span>Intelligence Score:</span>
-                          <Badge className="bg-cyan-500/20 text-cyan-400">{currentResult.score}/1000</Badge>
+                <div className="space-y-4">
+                  {/* Wallet Analysis Results */}
+                  {currentSlideData.resultKey === 'wallet' && (
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                      {/* Main Stats */}
+                      <div className="p-4 rounded-lg bg-slate-800/50 border border-slate-600/50">
+                        <h4 className="font-semibold text-cyan-400 mb-3 flex items-center gap-2">
+                          <Activity className="w-4 h-4" />
+                          Wallet Intelligence Score
+                        </h4>
+                        <div className="space-y-3">
+                          <div className="flex items-center justify-between">
+                            <span>Overall Score:</span>
+                            <div className="flex items-center gap-2">
+                              <Progress value={(currentResult.score / 1000) * 100} className="w-16 h-2" />
+                              <Badge className="bg-cyan-500/20 text-cyan-400 font-bold">
+                                {currentResult.score}/1000
+                              </Badge>
+                            </div>
+                          </div>
+                          <div className="flex justify-between">
+                            <span>Tier:</span>
+                            <Badge className="bg-purple-500/20 text-purple-400">{currentResult.tier}</Badge>
+                          </div>
+                          <div className="flex justify-between">
+                            <span>Risk Level:</span>
+                            <Badge className="bg-green-500/20 text-green-400">{currentResult.riskLevel}</Badge>
+                          </div>
+                          <div className="flex justify-between">
+                            <span>Portfolio Value:</span>
+                            <Badge className="bg-yellow-500/20 text-yellow-400">{currentResult.portfolioBalance}</Badge>
+                          </div>
                         </div>
-                        <div className="flex justify-between">
-                          <span>Tier Classification:</span>
-                          <Badge className="bg-purple-500/20 text-purple-400">{currentResult.tier}</Badge>
+                      </div>
+                      
+                      {/* Portfolio Visualization */}
+                      <div className="p-4 rounded-lg bg-slate-800/50 border border-slate-600/50">
+                        <h4 className="font-semibold text-green-400 mb-3 flex items-center gap-2">
+                          <PieChart className="w-4 h-4" />
+                          Portfolio Distribution
+                        </h4>
+                        <div className="h-32">
+                          <ResponsiveContainer width="100%" height="100%">
+                            <RechartsPie data={walletPortfolioData} dataKey="value" cx="50%" cy="50%" outerRadius={50}>
+                              {walletPortfolioData.map((entry, index) => (
+                                <Cell key={`cell-${index}`} fill={entry.color} />
+                              ))}
+                            </RechartsPie>
+                          </ResponsiveContainer>
                         </div>
-                        <p className="text-gray-300 text-xs">{currentResult.analysis}</p>
-                      </>
-                    )}
-                    {currentSlideData.resultKey === 'content' && (
-                      <>
-                        <div className="flex justify-between">
-                          <span>Content Quality:</span>
-                          <Badge className="bg-purple-500/20 text-purple-400">{currentResult.quality}%</Badge>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Content Analysis Results */}
+                  {currentSlideData.resultKey === 'content' && (
+                    <div className="space-y-4">
+                      {/* Before/After Comparison */}
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="p-4 rounded-lg bg-red-500/10 border border-red-400/30">
+                          <h4 className="font-semibold text-red-400 mb-2">❌ Before (Original)</h4>
+                          <p className="text-sm text-gray-300 italic">"{currentResult.original}"</p>
+                          <div className="mt-2 flex gap-2">
+                            <Badge className="bg-red-500/20 text-red-400 text-xs">Quality: 45%</Badge>
+                            <Badge className="bg-red-500/20 text-red-400 text-xs">Viral: 23%</Badge>
+                          </div>
                         </div>
-                        <div className="flex justify-between">
-                          <span>Viral Score:</span>
-                          <Badge className="bg-pink-500/20 text-pink-400">{currentResult.viral}%</Badge>
+                        <div className="p-4 rounded-lg bg-green-500/10 border border-green-400/30">
+                          <h4 className="font-semibold text-green-400 mb-2">✅ After (AI Optimized)</h4>
+                          <p className="text-sm text-gray-300 font-medium">"{currentResult.optimized}"</p>
+                          <div className="mt-2 flex gap-2">
+                            <Badge className="bg-green-500/20 text-green-400 text-xs">Quality: {currentResult.quality}%</Badge>
+                            <Badge className="bg-green-500/20 text-green-400 text-xs">Viral: {currentResult.viral}%</Badge>
+                          </div>
                         </div>
-                        <p className="text-gray-300 text-xs mt-2">✨ {currentResult.optimized}</p>
-                      </>
-                    )}
-                    {currentSlideData.resultKey === 'market' && (
-                      <>
-                        <div className="flex justify-between">
-                          <span>Market Trend:</span>
-                          <Badge className="bg-green-500/20 text-green-400">{currentResult.trend}</Badge>
+                      </div>
+                      
+                      {/* Psychology Triggers */}
+                      <div className="p-4 rounded-lg bg-slate-800/50 border border-slate-600/50">
+                        <h4 className="font-semibold text-pink-400 mb-3 flex items-center gap-2">
+                          <Zap className="w-4 h-4" />
+                          Psychology Triggers Detected
+                        </h4>
+                        <div className="flex flex-wrap gap-2">
+                          {currentResult.psychologyTriggers?.map((trigger: string, index: number) => (
+                            <Badge key={index} className="bg-pink-500/20 text-pink-400">
+                              {trigger}
+                            </Badge>
+                          ))}
                         </div>
-                        <div className="flex justify-between">
-                          <span>Confidence:</span>
-                          <Badge className="bg-blue-500/20 text-blue-400">{currentResult.confidence}%</Badge>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Market Intelligence Results */}
+                  {currentSlideData.resultKey === 'market' && (
+                    <div className="space-y-4">
+                      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                        <div className="p-4 rounded-lg bg-slate-800/50 border border-slate-600/50">
+                          <h4 className="font-semibold text-green-400 mb-3 flex items-center gap-2">
+                            <TrendingUp className="w-4 h-4" />
+                            Market Trend
+                          </h4>
+                          <div className="text-center space-y-2">
+                            <div className="text-2xl font-bold text-green-400">{currentResult.trend}</div>
+                            <Progress value={currentResult.confidence} className="h-2" />
+                            <div className="text-xs text-gray-400">{currentResult.confidence}% Confidence</div>
+                          </div>
                         </div>
-                        <p className="text-gray-300 text-xs">{currentResult.prediction}</p>
-                      </>
-                    )}
-                    {currentSlideData.resultKey === 'security' && (
-                      <>
-                        <div className="flex justify-between">
-                          <span>Security Status:</span>
-                          <Badge className="bg-green-500/20 text-green-400">{currentResult.status}</Badge>
+                        
+                        <div className="p-4 rounded-lg bg-slate-800/50 border border-slate-600/50">
+                          <h4 className="font-semibold text-yellow-400 mb-3 flex items-center gap-2">
+                            <Target className="w-4 h-4" />
+                            Price Predictions
+                          </h4>
+                          <div className="space-y-2 text-xs">
+                            <div className="flex justify-between">
+                              <span>24h:</span>
+                              <Badge className="bg-green-500/20 text-green-400">{currentResult.shortTerm}</Badge>
+                            </div>
+                            <div className="flex justify-between">
+                              <span>7d:</span>
+                              <Badge className="bg-green-500/20 text-green-400">{currentResult.mediumTerm}</Badge>
+                            </div>
+                            <div className="flex justify-between">
+                              <span>30d:</span>
+                              <Badge className="bg-green-500/20 text-green-400">{currentResult.longTerm}</Badge>
+                            </div>
+                          </div>
                         </div>
-                        <div className="flex justify-between">
-                          <span>Threats Detected:</span>
-                          <Badge className="bg-red-500/20 text-red-400">{currentResult.threats}</Badge>
+                        
+                        <div className="p-4 rounded-lg bg-slate-800/50 border border-slate-600/50">
+                          <h4 className="font-semibold text-purple-400 mb-3 flex items-center gap-2">
+                            <Activity className="w-4 h-4" />
+                            Market Activity
+                          </h4>
+                          <div className="space-y-2 text-xs">
+                            <div className="flex justify-between">
+                              <span>Volume:</span>
+                              <Badge className="bg-purple-500/20 text-purple-400">{currentResult.volumeIncrease}</Badge>
+                            </div>
+                            <div className="flex justify-between">
+                              <span>Sentiment:</span>
+                              <Badge className="bg-blue-500/20 text-blue-400">{(currentResult.socialSentiment * 100).toFixed(0)}%</Badge>
+                            </div>
+                          </div>
                         </div>
-                        <div className="flex justify-between">
-                          <span>Confidence:</span>
-                          <Badge className="bg-blue-500/20 text-blue-400">{currentResult.confidence}%</Badge>
+                      </div>
+                      
+                      {/* Market Sentiment Chart */}
+                      <div className="p-4 rounded-lg bg-slate-800/50 border border-slate-600/50">
+                        <h4 className="font-semibold text-blue-400 mb-3 flex items-center gap-2">
+                          <LineChart className="w-4 h-4" />
+                          Real-Time Sentiment Analysis
+                        </h4>
+                        <div className="h-32">
+                          <ResponsiveContainer width="100%" height="100%">
+                            <AreaChart data={marketSentimentData}>
+                              <XAxis dataKey="time" axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#94a3b8' }} />
+                              <YAxis hide />
+                              <Area
+                                type="monotone"
+                                dataKey="sentiment"
+                                stroke="#3b82f6"
+                                fill="url(#gradient)"
+                                strokeWidth={2}
+                              />
+                              <defs>
+                                <linearGradient id="gradient" x1="0" y1="0" x2="0" y2="1">
+                                  <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.8} />
+                                  <stop offset="95%" stopColor="#3b82f6" stopOpacity={0.1} />
+                                </linearGradient>
+                              </defs>
+                            </AreaChart>
+                          </ResponsiveContainer>
                         </div>
-                      </>
-                    )}
-                  </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Security Results */}
+                  {currentSlideData.resultKey === 'security' && (
+                    <div className="space-y-4">
+                      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                        {/* Security Score Gauge */}
+                        <div className="p-4 rounded-lg bg-slate-800/50 border border-slate-600/50">
+                          <h4 className="font-semibold text-green-400 mb-3 flex items-center gap-2">
+                            <Shield className="w-4 h-4" />
+                            Security Score
+                          </h4>
+                          <div className="text-center space-y-2">
+                            <div className="text-3xl font-bold text-green-400">{currentResult.overallScore}/100</div>
+                            <div className="flex justify-center">
+                              <Gauge className="w-12 h-12 text-green-400" />
+                            </div>
+                            <Badge className="bg-green-500/20 text-green-400">{currentResult.status}</Badge>
+                          </div>
+                        </div>
+                        
+                        {/* Security Features */}
+                        <div className="p-4 rounded-lg bg-slate-800/50 border border-slate-600/50">
+                          <h4 className="font-semibold text-blue-400 mb-3 flex items-center gap-2">
+                            <Activity className="w-4 h-4" />
+                            Protection Levels
+                          </h4>
+                          <div className="space-y-2">
+                            {Object.entries(currentResult.features || {}).map(([feature, score]) => (
+                              <div key={feature} className="flex items-center justify-between text-xs">
+                                <span className="capitalize">{feature.replace(/([A-Z])/g, ' $1').trim()}:</span>
+                                <div className="flex items-center gap-2">
+                                  <Progress value={score as number} className="w-12 h-1" />
+                                  <span className="text-green-400 font-bold">{score}%</span>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                      
+                      {/* Compliance Badges */}
+                      <div className="p-4 rounded-lg bg-slate-800/50 border border-slate-600/50">
+                        <h4 className="font-semibold text-yellow-400 mb-3 flex items-center gap-2">
+                          <Award className="w-4 h-4" />
+                          Compliance & Certifications
+                        </h4>
+                        <div className="flex flex-wrap gap-2">
+                          {currentResult.compliance?.map((cert: string, index: number) => (
+                            <Badge key={index} className="bg-yellow-500/20 text-yellow-400">
+                              {cert}
+                            </Badge>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
 
