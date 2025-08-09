@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, lazy, Suspense } from "react";
 import { DashboardStatsSkeleton } from "@/components/loading-states";
 import { usePerformance } from "@/hooks/use-performance";
 import { Button } from "@/components/ui/button";
@@ -41,20 +41,23 @@ import { type Token } from "@shared/schema";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { InteractiveStatsDashboard } from "@/components/interactive-stats-dashboard";
-import { QuickActionPanel } from "@/components/quick-action-panel";
-import { EngagementBooster } from "@/components/engagement-booster";
-import { NFTPortfolioQuickView } from "@/components/dashboard/NFTPortfolioQuickView";
-import { ViralSharingAssistant } from "@/components/viral-sharing-assistant";
-import { VoiceMessageRecorder } from "@/components/voice-message-recorder";
-import { ViralGrowthAccelerator } from "@/components/viral-growth-accelerator";
-import { MobileOnboardingWizard } from "@/components/mobile-onboarding-wizard";
-import { WalletConnectionWizard } from "@/components/wallet-connection-wizard";
-import { QuickAccessFAB } from "@/components/quick-access-fab";
-import { PersonalizedDashboard } from "@/components/PersonalizedDashboard";
-import PerformanceDashboard from "@/components/performance-dashboard";
-import ViralDashboard from "@/pages/viral-dashboard";
-import { ContextualChatButton } from "@/components/contextual-chat-button";
+// Lazy loaded heavy components for better performance
+const InteractiveStatsDashboard = lazy(() => import("@/components/interactive-stats-dashboard").then(m => ({ default: m.InteractiveStatsDashboard })));
+const QuickActionPanel = lazy(() => import("@/components/quick-action-panel").then(m => ({ default: m.QuickActionPanel })));
+const EngagementBooster = lazy(() => import("@/components/engagement-booster").then(m => ({ default: m.EngagementBooster })));
+const NFTPortfolioQuickView = lazy(() => import("@/components/dashboard/NFTPortfolioQuickView").then(m => ({ default: m.NFTPortfolioQuickView })));
+const ViralSharingAssistant = lazy(() => import("@/components/viral-sharing-assistant").then(m => ({ default: m.ViralSharingAssistant })));
+const VoiceMessageRecorder = lazy(() => import("@/components/voice-message-recorder").then(m => ({ default: m.VoiceMessageRecorder })));
+const ViralGrowthAccelerator = lazy(() => import("@/components/viral-growth-accelerator").then(m => ({ default: m.ViralGrowthAccelerator })));
+const MobileOnboardingWizard = lazy(() => import("@/components/mobile-onboarding-wizard").then(m => ({ default: m.MobileOnboardingWizard })));
+const WalletConnectionWizard = lazy(() => import("@/components/wallet-connection-wizard").then(m => ({ default: m.WalletConnectionWizard })));
+const QuickAccessFAB = lazy(() => import("@/components/quick-access-fab").then(m => ({ default: m.QuickAccessFAB })));
+const PersonalizedDashboard = lazy(() => import("@/components/PersonalizedDashboard").then(m => ({ default: m.PersonalizedDashboard })));
+const PerformanceDashboard = lazy(() => import("@/components/performance-dashboard"));
+const ViralDashboard = lazy(() => import("@/pages/viral-dashboard"));
+const ContextualChatButton = lazy(() => import("@/components/contextual-chat-button").then(m => ({ default: m.ContextualChatButton })));
+
+
 
 interface NFTListing {
   id: string;
@@ -153,11 +156,14 @@ export default function Dashboard() {
   // Buy NFT mutation
   const buyNFTMutation = useMutation({
     mutationFn: async (nftId: string) => {
-      const response = await apiRequest(`/api/marketplace/buy/${nftId}`, {
+      const response = await fetch(`/api/marketplace/buy/${nftId}`, {
         method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
         body: JSON.stringify({ buyerId: 'demo-buyer' })
       });
-      return response;
+      return await response.json();
     },
     onSuccess: (data: any) => {
       toast({
@@ -181,11 +187,14 @@ export default function Dashboard() {
   // Burn NFT mutation
   const burnNFTMutation = useMutation({
     mutationFn: async (nftId: string) => {
-      const response = await apiRequest(`/api/marketplace/burn/${nftId}`, {
+      const response = await fetch(`/api/marketplace/burn/${nftId}`, {
         method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
         body: JSON.stringify({ burnerId: 'demo-burner' })
       });
-      return response;
+      return await response.json();
     },
     onSuccess: (data: any) => {
       toast({
@@ -241,7 +250,7 @@ export default function Dashboard() {
     return true;
   });
 
-  const nftListings = nftData?.nfts || [];
+  const nftListings = (nftData as any)?.nfts || [];
 
   const getRarityColor = (rarity?: string) => {
     switch (rarity?.toLowerCase()) {

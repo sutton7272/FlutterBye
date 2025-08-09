@@ -72,6 +72,7 @@ export function SkyeChatbot() {
           ];
         });
       } else {
+        console.error('Chat API Error:', response.status, response.statusText);
         // Show error message
         const errorMsg: Message = {
           id: `error_${Date.now()}`,
