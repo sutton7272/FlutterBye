@@ -56,7 +56,7 @@ export default function ModernHomePage() {
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-              <Link href="/mint">
+              <Link href="/create">
                 <Button size="lg" className="modern-gradient text-white font-semibold px-8 h-12 shadow-lg hover:shadow-xl transition-all">
                   <Coins className="mr-2 h-5 w-5" />
                   Create Your First Token
