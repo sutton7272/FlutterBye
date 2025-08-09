@@ -35,6 +35,94 @@ router.post('/api/flutterina/admin/system/toggle', authenticateWallet, requireAd
 });
 
 /**
+ * Get Flutterina settings
+ */
+router.get('/api/flutterina/admin/settings', authenticateWallet, requireAdmin, async (req: any, res) => {
+  try {
+    const settings = await flutterinaService.getSettings();
+    res.json(settings);
+  } catch (error) {
+    console.error('Settings get error:', error);
+    res.status(500).json({ error: 'Failed to get settings' });
+  }
+});
+
+/**
+ * Update Flutterina settings
+ */
+router.put('/api/flutterina/admin/settings', authenticateWallet, requireAdmin, async (req: any, res) => {
+  try {
+    const newSettings = req.body;
+    const adminUserId = req.user?.claims?.sub;
+    
+    const updatedSettings = await flutterinaService.updateSettings(newSettings, adminUserId);
+    
+    res.json({
+      success: true,
+      settings: updatedSettings,
+      message: 'Settings updated successfully',
+      adminUserId
+    });
+  } catch (error) {
+    console.error('Settings update error:', error);
+    res.status(500).json({ error: 'Failed to update settings' });
+  }
+});
+
+/**
+ * Get conversations list for admin monitoring
+ */
+router.get('/api/flutterina/admin/conversations', authenticateWallet, requireAdmin, async (req: any, res) => {
+  try {
+    const conversations = await flutterinaService.getAdminConversations();
+    res.json(conversations);
+  } catch (error) {
+    console.error('Conversations get error:', error);
+    res.status(500).json({ error: 'Failed to get conversations' });
+  }
+});
+
+/**
+ * Emergency stop all Flutterina operations
+ */
+router.post('/api/flutterina/admin/emergency-stop', authenticateWallet, requireAdmin, async (req: any, res) => {
+  try {
+    const adminUserId = req.user?.claims?.sub;
+    await flutterinaService.emergencyStop(adminUserId);
+    
+    res.json({
+      success: true,
+      message: 'Emergency stop activated - Flutterina disabled for all users',
+      adminUserId,
+      timestamp: new Date().toISOString()
+    });
+  } catch (error) {
+    console.error('Emergency stop error:', error);
+    res.status(500).json({ error: 'Failed to activate emergency stop' });
+  }
+});
+
+/**
+ * Reset usage statistics
+ */
+router.post('/api/flutterina/admin/reset-usage', authenticateWallet, requireAdmin, async (req: any, res) => {
+  try {
+    const adminUserId = req.user?.claims?.sub;
+    await flutterinaService.resetUsageStats(adminUserId);
+    
+    res.json({
+      success: true,
+      message: 'Usage statistics reset successfully',
+      adminUserId,
+      timestamp: new Date().toISOString()
+    });
+  } catch (error) {
+    console.error('Reset usage error:', error);
+    res.status(500).json({ error: 'Failed to reset usage statistics' });
+  }
+});
+
+/**
  * Get current system status and usage statistics
  */
 router.get('/api/flutterina/admin/stats', authenticateWallet, requireAdmin, async (req: any, res) => {

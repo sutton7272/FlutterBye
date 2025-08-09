@@ -964,6 +964,78 @@ Generate JSON response:
     console.log('✅ All Flutterina usage limits have been reset');
     return true;
   }
+
+  // Admin methods needed by routes
+  async getSettings() {
+    return {
+      systemEnabled: this.isSystemEnabled,
+      maxTokensPerUser: this.maxTokensPerUser,
+      maxTokensGlobal: this.maxTokensGlobal,
+      currentUsage: {
+        globalDaily: this.globalTokenUsage.daily,
+        activeUsers: this.tokenUsageTracking.size,
+        lastReset: this.globalTokenUsage.lastReset
+      },
+      adminSettings: {
+        aiModel: "gpt-4o",
+        responseTimeout: 30000,
+        maxConversationHistory: 50,
+        debugMode: false
+      }
+    };
+  }
+
+  async updateSettings(newSettings: any, adminUserId?: string) {
+    if (newSettings.maxTokensPerUser !== undefined) {
+      this.maxTokensPerUser = newSettings.maxTokensPerUser;
+    }
+    if (newSettings.maxTokensGlobal !== undefined) {
+      this.maxTokensGlobal = newSettings.maxTokensGlobal;
+    }
+    if (newSettings.systemEnabled !== undefined) {
+      this.isSystemEnabled = newSettings.systemEnabled;
+    }
+    
+    console.log(`Settings updated by admin: ${adminUserId}`, newSettings);
+    return await this.getSettings();
+  }
+
+  async getAdminConversations() {
+    try {
+      const conversations = await this.getActiveConversations();
+      return {
+        success: true,
+        conversations,
+        totalCount: conversations.length,
+        timestamp: new Date().toISOString()
+      };
+    } catch (error) {
+      console.error('Error getting admin conversations:', error);
+      return {
+        success: false,
+        error: 'Failed to get conversations',
+        conversations: [],
+        totalCount: 0
+      };
+    }
+  }
+
+  async resetUsageStats(adminUserId?: string) {
+    await this.resetAllUsage();
+    console.log(`Usage stats reset by admin: ${adminUserId}`);
+    return true;
+  }
+
+  async emergencyStop(adminUserId?: string) {
+    this.isSystemEnabled = false;
+    console.log(`🚨 EMERGENCY STOP activated by admin: ${adminUserId}`);
+    
+    // Clear all usage tracking to prevent any further processing
+    this.tokenUsageTracking.clear();
+    this.globalTokenUsage = { daily: 0, lastReset: new Date() };
+    
+    return true;
+  }
 }
 
 export const flutterinaService = new FlutterinaAIService();
