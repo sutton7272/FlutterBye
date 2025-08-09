@@ -10,7 +10,7 @@ import { InteractiveStatsDashboard } from "@/components/interactive-stats-dashbo
 import { EngagementBooster } from "@/components/engagement-booster";
 import { NFTPortfolioQuickView } from "@/components/dashboard/NFTPortfolioQuickView";
 import { ViralSharingAssistant } from "@/components/viral-sharing-assistant";
-import { TutorialLaunchButton } from "@/components/interactive-tutorial";
+// import { TutorialLaunchButton } from "@/components/interactive-tutorial"; // Disabled to prevent interference with demo modal
 import { VoiceMessageRecorder } from "@/components/voice-message-recorder";
 import { ErrorBoundary } from "@/components/error-boundary";
 import { LoadingState } from "@/components/loading-state";
@@ -467,10 +467,10 @@ export default function Home() {
 
           {/* Tutorial Access for All Users */}
           <div className="flex justify-center mb-16">
-            <TutorialLaunchButton 
-              className="text-lg px-8 py-4 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-bold rounded-xl border-2 border-purple-400/30 shadow-lg shadow-purple-500/25" 
-              variant="default"
-            />
+            {/* Tutorial button temporarily disabled to prevent demo interference */}
+            <div className="text-center text-gray-500 text-sm">
+              Interactive Tutorial temporarily disabled
+            </div>
           </div>
         </div>
 

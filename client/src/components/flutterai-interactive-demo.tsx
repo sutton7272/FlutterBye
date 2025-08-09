@@ -180,46 +180,152 @@ export function FlutterAIInteractiveDemo({ isOpen, onClose }: FlutterAIInteracti
 
   return (
     <div 
-      className="fixed inset-0 flex items-center justify-center p-4" 
+      className="fixed inset-0 bg-black/95 backdrop-blur-sm flex items-center justify-center p-4" 
       style={{ 
         zIndex: 999999, 
         position: 'fixed', 
         top: 0, 
         left: 0, 
         right: 0, 
-        bottom: 0,
-        backgroundColor: 'rgba(255, 0, 0, 0.9)'
+        bottom: 0
       }}
-      onClick={(e) => e.stopPropagation()}
+      onClick={(e) => {
+        if (e.target === e.currentTarget) {
+          onClose();
+        }
+      }}
     >
-      {/* TEST: Simple red box to see if modal appears */}
-      <div style={{
-        width: '90%',
-        height: '90%',
-        backgroundColor: 'red',
-        border: '5px solid white',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        flexDirection: 'column',
-        gap: '20px'
-      }}>
-        <h1 style={{color: 'white', fontSize: '2rem'}}>TEST MODAL IS WORKING!</h1>
-        <p style={{color: 'white'}}>Current slide: {currentSlide + 1}</p>
-        <button 
-          onClick={onClose}
-          style={{
-            padding: '10px 20px',
-            fontSize: '1rem',
-            backgroundColor: 'white',
-            color: 'black',
-            border: 'none',
-            borderRadius: '5px',
-            cursor: 'pointer'
-          }}
-        >
-          CLOSE TEST MODAL
-        </button>
+      <div className={`w-full max-w-4xl max-h-[90vh] overflow-auto bg-gradient-to-br ${currentSlideData.color} border-2 border-electric-blue rounded-lg shadow-2xl`}>
+        {/* Header */}
+        <div className="p-6 border-b border-white/10">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2">
+                {currentSlideData.icon}
+                <h2 className="text-white text-xl font-bold">
+                  FlutterAI Demo: {currentSlideData.title}
+                </h2>
+              </div>
+              <Badge className="bg-electric-blue/20 text-electric-blue border-electric-blue/30">
+                {currentSlide + 1} of {demoSlides.length}
+              </Badge>
+            </div>
+            <Button 
+              onClick={onClose} 
+              variant="ghost" 
+              size="sm"
+              className="text-gray-400 hover:text-white"
+            >
+              <X className="h-5 w-5" />
+            </Button>
+          </div>
+
+          {/* Progress */}
+          <div className="space-y-2 mt-4">
+            <div className="flex justify-between text-sm">
+              <span className="text-gray-400">Demo Progress</span>
+              <span className="text-electric-blue font-bold">
+                {Math.round((currentSlide / (demoSlides.length - 1)) * 100)}% Complete
+              </span>
+            </div>
+            <Progress value={(currentSlide / (demoSlides.length - 1)) * 100} className="h-2" />
+            <div className="text-xs text-gray-400">
+              Slide {currentSlide + 1}: {currentSlideData.title}
+            </div>
+          </div>
+        </div>
+
+        {/* Content */}
+        <div className="p-8 space-y-6">
+          {/* Slide Content */}
+          <div className="text-center space-y-4">
+            <h3 className="text-2xl font-bold text-white">
+              {currentSlideData.title}
+            </h3>
+            <p className="text-gray-300 text-lg">
+              {currentSlideData.description}
+            </p>
+          </div>
+
+          {/* Features */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {currentSlideData.features.map((feature, index) => (
+              <div key={index} className="bg-black/30 border border-white/10 rounded-lg p-4">
+                <div className="text-electric-blue text-sm font-medium flex items-center gap-2">
+                  <div className="w-2 h-2 rounded-full bg-electric-blue animate-pulse"></div>
+                  {feature}
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Preview */}
+          <div className="bg-black/40 border border-white/10 rounded-lg p-6">
+            <h3 className="text-white font-semibold mb-3 flex items-center gap-2">
+              <div className="w-2 h-2 rounded-full bg-electric-green animate-pulse"></div>
+              Live Demo Preview
+            </h3>
+            <pre className="text-gray-300 text-sm font-mono whitespace-pre-wrap leading-relaxed">
+              {currentSlideData.preview}
+            </pre>
+          </div>
+
+          {/* Controls */}
+          <div className="flex items-center justify-between">
+            <Button
+              onClick={prevSlide}
+              disabled={currentSlide === 0}
+              variant="outline"
+              className="border-white/20 text-white hover:bg-white/10"
+            >
+              <ChevronLeft className="h-4 w-4 mr-2" />
+              Previous
+            </Button>
+            
+            <div className="flex gap-2">
+              <Button
+                onClick={() => setAutoPlay(!autoPlay)}
+                variant="outline"
+                className="border-white/20 text-white hover:bg-white/10"
+              >
+                {autoPlay ? <Pause /> : <Play />}
+                <span className="ml-2">{autoPlay ? 'Pause' : 'Play'}</span>
+              </Button>
+              
+              <Button
+                onClick={() => setCurrentSlide(0)}
+                variant="outline"
+                className="border-white/20 text-white hover:bg-white/10"
+              >
+                <RotateCcw className="h-4 w-4" />
+              </Button>
+            </div>
+
+            <Button
+              onClick={nextSlide}
+              disabled={currentSlide === demoSlides.length - 1}
+              variant="outline"
+              className="border-white/20 text-white hover:bg-white/10"
+            >
+              Next
+              <ChevronRight className="h-4 w-4 ml-2" />
+            </Button>
+          </div>
+
+          {/* Slide Indicators */}
+          <div className="flex justify-center space-x-2">
+            {demoSlides.map((_, index) => (
+              <button
+                key={index}
+                onClick={() => setCurrentSlide(index)}
+                className={`w-3 h-3 rounded-full transition-all duration-300 ${
+                  index === currentSlide 
+                    ? 'bg-electric-blue scale-110' 
+                    : 'bg-white/20 hover:bg-white/40'
+                }`}
+              />
+            ))}
+          </div>
       <div className={`w-full max-w-4xl max-h-[90vh] overflow-auto bg-gradient-to-br ${currentSlideData.color} border-2 border-electric-blue rounded-lg shadow-2xl`}>
         {/* Header */}
         <div className="p-6 border-b border-white/10">
