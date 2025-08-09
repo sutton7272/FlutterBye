@@ -7,6 +7,7 @@ import { EarlyAccessGate } from "@/components/early-access-gate";
 
 import { MinimalChatTest } from "@/components/minimal-chat-test";
 import { SkyeChatFinal } from "@/components/skye-chat-final";
+import { WorkingChat } from "@/components/working-chat";
 import { useState, useEffect, lazy, Suspense } from "react";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { LoadingSpinner } from "@/components/loading-spinner";
@@ -862,6 +863,7 @@ function App() {
               <PWANotificationPrompt />
               <CommandPalette />
               <SkyeChatFinal />
+              <WorkingChat />
               <Router />
             </TooltipProvider>
           </WebSocketProvider>
