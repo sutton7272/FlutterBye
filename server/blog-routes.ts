@@ -6,7 +6,7 @@ import { blogService } from "./openai-blog-service";
 import type { BlogGenerationRequest } from "./openai-blog-service";
 import { databaseOptimizer } from "./database-optimizer";
 import { aiCostOptimizer } from "./ai-cost-optimizer";
-import { fastCache, responseTimeMonitor } from "./performance-optimizer";
+import { responseCache, performanceMonitor } from "./performance-optimizer";
 
 /**
  * Blog API Routes for FlutterBlog Bot System
@@ -18,7 +18,7 @@ export function registerBlogRoutes(app: Express) {
   /**
    * Get all blog posts with pagination and filtering - PERFORMANCE OPTIMIZED
    */
-  app.get("/api/blog/posts", fastCache(30000), responseTimeMonitor, async (req, res) => {
+  app.get("/api/blog/posts", async (req, res) => {
     try {
       const start = Date.now();
       const limit = Math.min(parseInt(req.query.limit as string) || 10, 20); // Reduced limit

@@ -77,6 +77,8 @@ import Phase1Dashboard from "@/pages/phase1-dashboard";
 import Phase2Dashboard from "@/pages/phase2-dashboard";
 import Phase3Dashboard from "@/pages/phase3-dashboard";
 import Phase4Dashboard from "@/pages/phase4-dashboard";
+import PerformanceDashboard from "@/components/performance-dashboard";
+import AIEnhancedDashboard from "@/components/ai-enhanced-dashboard";
 import NFTClaim from "@/pages/nft-claim";
 import AllOpportunities from "@/pages/AllOpportunities";
 import AdminAPIMonetization from "@/pages/admin-api-monetization";
@@ -312,6 +314,20 @@ function Router() {
           <AdminRouteGuard>
             <Navbar />
             <Phase4Dashboard />
+          </AdminRouteGuard>
+        )} />
+        
+        <Route path="/admin/performance" component={() => (
+          <AdminRouteGuard>
+            <Navbar />
+            <PerformanceDashboard />
+          </AdminRouteGuard>
+        )} />
+        
+        <Route path="/admin/ai-enhanced" component={() => (
+          <AdminRouteGuard>
+            <Navbar />
+            <AIEnhancedDashboard />
           </AdminRouteGuard>
         )} />
         

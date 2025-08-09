@@ -1,131 +1,235 @@
+// Performance Optimization Hook for Frontend
 import { useState, useEffect, useCallback } from 'react';
+import { useQuery } from '@tanstack/react-query';
 
-// Client-side performance monitoring and optimization
+interface PerformanceMetrics {
+  pageLoadTime: number;
+  apiResponseTime: number;
+  renderTime: number;
+  networkLatency: number;
+}
+
+interface PerformanceConfig {
+  enableLazyLoading: boolean;
+  enableCaching: boolean;
+  enableCompression: boolean;
+  preloadCriticalResources: boolean;
+}
+
 export function usePerformanceOptimization() {
-  const [metrics, setMetrics] = useState({
-    memoryUsage: 0,
-    connectionStatus: 'connected',
-    responseTime: 0,
-    errorRate: 0,
+  const [metrics, setMetrics] = useState<PerformanceMetrics>({
+    pageLoadTime: 0,
+    apiResponseTime: 0,
+    renderTime: 0,
+    networkLatency: 0
   });
 
-  const [optimizations, setOptimizations] = useState({
-    prefetchEnabled: true,
-    cacheEnabled: true,
-    compressionEnabled: true,
+  const [config, setConfig] = useState<PerformanceConfig>({
+    enableLazyLoading: true,
+    enableCaching: true,
+    enableCompression: true,
+    preloadCriticalResources: true
   });
 
-  // Monitor memory usage
+  // Measure page load time
   useEffect(() => {
-    const checkMemory = () => {
-      if ('memory' in performance) {
-        const memInfo = (performance as any).memory;
-        setMetrics(prev => ({
-          ...prev,
-          memoryUsage: Math.round(memInfo.usedJSHeapSize / 1024 / 1024),
-        }));
-      }
+    const startTime = performance.now();
+    
+    const handleLoad = () => {
+      const loadTime = performance.now() - startTime;
+      setMetrics(prev => ({ ...prev, pageLoadTime: loadTime }));
     };
 
-    const interval = setInterval(checkMemory, 30000); // Check every 30 seconds
-    return () => clearInterval(interval);
+    if (document.readyState === 'complete') {
+      handleLoad();
+    } else {
+      window.addEventListener('load', handleLoad);
+      return () => window.removeEventListener('load', handleLoad);
+    }
   }, []);
 
-  // Monitor connection status
-  useEffect(() => {
-    const updateConnectionStatus = () => {
-      setMetrics(prev => ({
-        ...prev,
-        connectionStatus: navigator.onLine ? 'connected' : 'offline',
-      }));
-    };
-
-    window.addEventListener('online', updateConnectionStatus);
-    window.addEventListener('offline', updateConnectionStatus);
-
+  // Measure render performance
+  const measureRender = useCallback((componentName: string) => {
+    const startTime = performance.now();
+    
     return () => {
-      window.removeEventListener('online', updateConnectionStatus);
-      window.removeEventListener('offline', updateConnectionStatus);
+      const renderTime = performance.now() - startTime;
+      setMetrics(prev => ({ ...prev, renderTime }));
+      console.log(`🎭 ${componentName} render time: ${renderTime.toFixed(2)}ms`);
     };
   }, []);
 
   // Measure API response time
-  const measureResponseTime = useCallback(async (apiCall: () => Promise<any>) => {
-    const start = performance.now();
+  const measureApiCall = useCallback(async <T>(
+    apiCall: () => Promise<T>,
+    endpointName: string
+  ): Promise<T> => {
+    const startTime = performance.now();
+    
     try {
       const result = await apiCall();
-      const responseTime = performance.now() - start;
+      const responseTime = performance.now() - startTime;
+      setMetrics(prev => ({ ...prev, apiResponseTime: responseTime }));
       
-      setMetrics(prev => ({
-        ...prev,
-        responseTime: Math.round(responseTime),
-      }));
+      if (responseTime > 1000) {
+        console.warn(`🐌 Slow API call: ${endpointName} took ${responseTime.toFixed(2)}ms`);
+      } else {
+        console.log(`⚡ Fast API call: ${endpointName} took ${responseTime.toFixed(2)}ms`);
+      }
       
       return result;
     } catch (error) {
-      setMetrics(prev => ({
-        ...prev,
-        errorRate: prev.errorRate + 1,
-      }));
+      const errorTime = performance.now() - startTime;
+      console.error(`❌ API call failed: ${endpointName} after ${errorTime.toFixed(2)}ms`, error);
       throw error;
     }
   }, []);
 
-  // Optimize images with lazy loading
-  const optimizeImage = useCallback((src: string, options?: { lazy?: boolean; quality?: number }) => {
-    if (options?.lazy) {
-      // Use Intersection Observer for lazy loading
-      return `${src}?optimize=true&quality=${options.quality || 75}`;
-    }
-    return src;
-  }, []);
-
-  // Prefetch critical resources
-  const prefetchResource = useCallback((url: string, type: 'script' | 'style' | 'fetch' = 'fetch') => {
-    if (!optimizations.prefetchEnabled) return;
+  // Preload critical resources
+  const preloadResource = useCallback((url: string, type: 'script' | 'style' | 'image' = 'script') => {
+    if (!config.preloadCriticalResources) return;
 
     const link = document.createElement('link');
-    link.rel = 'prefetch';
+    link.rel = type === 'image' ? 'preload' : 'preload';
+    link.as = type === 'image' ? 'image' : type === 'style' ? 'style' : 'script';
     link.href = url;
-    if (type !== 'fetch') {
-      link.as = type;
-    }
     document.head.appendChild(link);
-  }, [optimizations.prefetchEnabled]);
+  }, [config.preloadCriticalResources]);
 
-  // Clean up resources to prevent memory leaks
-  const cleanupResources = useCallback(() => {
-    // Clear any cached data that's no longer needed
-    if ('caches' in window) {
-      caches.keys().then(cacheNames => {
-        cacheNames.forEach(cacheName => {
-          if (cacheName.includes('old-') || cacheName.includes('expired-')) {
-            caches.delete(cacheName);
-          }
-        });
-      });
+  // Lazy load component
+  const createLazyComponent = useCallback((importFn: () => Promise<any>) => {
+    if (!config.enableLazyLoading) {
+      return importFn;
     }
 
-    // Clear performance entries
-    if (performance.clearResourceTimings) {
-      performance.clearResourceTimings();
+    return () => {
+      const startTime = performance.now();
+      return importFn().then(module => {
+        const loadTime = performance.now() - startTime;
+        console.log(`📦 Lazy component loaded in ${loadTime.toFixed(2)}ms`);
+        return module;
+      });
+    };
+  }, [config.enableLazyLoading]);
+
+  // Optimize images
+  const optimizeImage = useCallback((src: string, options?: {
+    width?: number;
+    height?: number;
+    quality?: number;
+    format?: 'webp' | 'avif' | 'original';
+  }) => {
+    if (!src) return src;
+
+    // Return optimized image URL based on options
+    const params = new URLSearchParams();
+    if (options?.width) params.set('w', options.width.toString());
+    if (options?.height) params.set('h', options.height.toString());
+    if (options?.quality) params.set('q', options.quality.toString());
+    if (options?.format && options.format !== 'original') params.set('f', options.format);
+
+    return params.toString() ? `${src}?${params.toString()}` : src;
+  }, []);
+
+  // Debounce function for search/input optimization
+  const debounce = useCallback(<T extends (...args: any[]) => any>(
+    func: T,
+    delay: number
+  ): ((...args: Parameters<T>) => void) => {
+    let timeoutId: NodeJS.Timeout;
+    
+    return (...args: Parameters<T>) => {
+      clearTimeout(timeoutId);
+      timeoutId = setTimeout(() => func(...args), delay);
+    };
+  }, []);
+
+  // Cache management
+  const clearCache = useCallback(async () => {
+    try {
+      await fetch('/api/performance/clear-cache', { method: 'POST' });
+      console.log('✅ Cache cleared successfully');
+    } catch (error) {
+      console.error('❌ Failed to clear cache:', error);
     }
   }, []);
 
-  // Auto-cleanup on high memory usage
-  useEffect(() => {
-    if (metrics.memoryUsage > 100) { // 100MB threshold
-      cleanupResources();
+  // Get performance stats from server
+  const { data: performanceStats } = useQuery({
+    queryKey: ['/api/performance/comprehensive-stats'],
+    queryFn: async () => {
+      const response = await fetch('/api/performance/comprehensive-stats');
+      if (!response.ok) throw new Error('Failed to fetch performance stats');
+      return response.json();
+    },
+    refetchInterval: 30000, // Refresh every 30 seconds
+  });
+
+  // Performance score calculation
+  const calculatePerformanceScore = useCallback(() => {
+    const { pageLoadTime, apiResponseTime, renderTime } = metrics;
+    
+    let score = 100;
+    
+    // Deduct points for slow performance
+    if (pageLoadTime > 3000) score -= 30;
+    else if (pageLoadTime > 2000) score -= 20;
+    else if (pageLoadTime > 1000) score -= 10;
+    
+    if (apiResponseTime > 2000) score -= 25;
+    else if (apiResponseTime > 1000) score -= 15;
+    else if (apiResponseTime > 500) score -= 5;
+    
+    if (renderTime > 100) score -= 15;
+    else if (renderTime > 50) score -= 10;
+    else if (renderTime > 16) score -= 5; // 60fps threshold
+    
+    return Math.max(0, score);
+  }, [metrics]);
+
+  // Performance recommendations
+  const getPerformanceRecommendations = useCallback(() => {
+    const recommendations = [];
+    const { pageLoadTime, apiResponseTime, renderTime } = metrics;
+    
+    if (pageLoadTime > 2000) {
+      recommendations.push("Enable code splitting and lazy loading");
+      recommendations.push("Optimize images and assets");
+      recommendations.push("Enable compression");
     }
-  }, [metrics.memoryUsage, cleanupResources]);
+    
+    if (apiResponseTime > 1000) {
+      recommendations.push("Implement API response caching");
+      recommendations.push("Optimize database queries");
+      recommendations.push("Consider using a CDN");
+    }
+    
+    if (renderTime > 50) {
+      recommendations.push("Optimize React components with memo()");
+      recommendations.push("Reduce component re-renders");
+      recommendations.push("Use virtualization for large lists");
+    }
+    
+    if (recommendations.length === 0) {
+      recommendations.push("Performance is excellent! 🎉");
+    }
+    
+    return recommendations;
+  }, [metrics]);
 
   return {
     metrics,
-    optimizations,
-    setOptimizations,
-    measureResponseTime,
+    config,
+    setConfig,
+    measureRender,
+    measureApiCall,
+    preloadResource,
+    createLazyComponent,
     optimizeImage,
-    prefetchResource,
-    cleanupResources,
+    debounce,
+    clearCache,
+    performanceStats,
+    calculatePerformanceScore,
+    getPerformanceRecommendations
   };
 }

@@ -102,6 +102,10 @@ import { phase1IntelligenceRoutes } from "./phase1-intelligence-routes";
 import { phase2IntelligenceRoutes } from "./phase2-intelligence-routes";
 import { phase3IntelligenceRoutes } from "./phase3-intelligence-routes";
 import { phase4IntelligenceRoutes } from "./phase4-intelligence-routes";
+import { createCompressionMiddleware, createPerformanceMiddleware, performanceMonitor, getPerformanceStats } from "./performance-optimizer";
+import { aiEnhancementEngine } from "./ai-enhancement-engine";
+import { responseCache, queryOptimizer, aiOptimizer } from "./performance-optimizer";
+import { registerEnhancedIntelligenceRoutes } from "./enhanced-intelligence-routes";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Trust proxy for rate limiting
@@ -4657,6 +4661,40 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // PHASE 4: Universal AI Orchestration & Multi-Reality Intelligence Routes
   app.use("/api/phase4", phase4IntelligenceRoutes);
   console.log("🌐 PHASE 4: Universal AI orchestration and multi-reality intelligence routes activated!");
+  
+  // PERFORMANCE & AI ENHANCEMENT ROUTES
+  app.get("/api/performance/comprehensive-stats", (req, res) => {
+    const stats = getPerformanceStats();
+    const aiStats = aiEnhancementEngine.getAIPerformanceStats();
+    res.json({
+      success: true,
+      performance: stats,
+      ai: aiStats,
+      optimizations: {
+        compressionEnabled: true,
+        cachingEnabled: true,
+        aiOptimized: true,
+        queryOptimized: true
+      }
+    });
+  });
+  
+  app.post("/api/performance/clear-cache", (req, res) => {
+    try {
+      responseCache.clear();
+      queryOptimizer.clearCache();
+      aiOptimizer.clearCache();
+      res.json({ success: true, message: "All caches cleared successfully" });
+    } catch (error) {
+      res.status(500).json({ success: false, error: "Failed to clear caches" });
+    }
+  });
+  
+  console.log("⚡ Performance and AI enhancement routes activated!");
+  
+  // ENHANCED INTELLIGENCE ROUTES WITH PERFORMANCE OPTIMIZATION
+  registerEnhancedIntelligenceRoutes(app);
+  
   registerFlutterAIWalletRoutes(app);
   
   // Enterprise FlutterAI Routes

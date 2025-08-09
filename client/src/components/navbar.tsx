@@ -3,7 +3,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { WalletConnect } from "@/components/wallet-connect";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { Menu, Home, Coins, Trophy, Users, MessageSquare, Settings, Sparkles, Zap, Heart, Building2, MapPin, Gift, Award, Star, Ticket, HelpCircle, LayoutDashboard, Brain, CreditCard, Stars, DollarSign, Code2, Rocket, Target, Shield } from "lucide-react";
+import { Menu, Home, Coins, Trophy, Users, MessageSquare, Settings, Sparkles, Zap, Heart, Building2, MapPin, Gift, Award, Star, Ticket, HelpCircle, LayoutDashboard, Brain, CreditCard, Stars, DollarSign, Code2, Rocket, Target, Shield, Activity } from "lucide-react";
 
 import { useFeatureToggles } from "@/hooks/useFeatureToggles";
 import { MobileNavigation } from "@/components/mobile-navigation";
@@ -23,6 +23,7 @@ export default function Navbar() {
     { href: "/info", label: "Info", icon: HelpCircle, description: "Platform info, tutorials & analytics", featureId: "info", priority: true },
     { href: "/enterprise-campaigns", label: "Marketing", icon: Target, description: "Enterprise marketing campaigns", featureId: "enterprise" },
     { href: "/intelligence", label: "AI Hub", icon: Brain, description: "AI intelligence and analytics", featureId: "intelligence" },
+    { href: "/admin/performance", label: "Performance", icon: Activity, description: "Performance optimization dashboard", featureId: "performance" },
     { href: "/admin", label: "Admin", icon: Settings, description: "Platform management", featureId: "admin_panel" },
   ];
 
