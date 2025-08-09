@@ -65,16 +65,16 @@ export default function AdminDashboard() {
     },
     {
       id: "flutterai",
-      title: "FlutterAI Intelligence",
-      description: "AI-powered wallet analytics, scoring, and marketing intelligence platform",
+      title: "FlutterAI Intelligence & Skye AI",
+      description: "Complete AI intelligence platform with Skye AI Knowledge Management and wallet analytics",
       icon: Brain,
       route: "/admin/flutterai",
       color: "electric-blue",
       features: [
-        "Wallet Intelligence Gathering",
-        "AI Behavioral Analysis", 
-        "Marketing Segmentation",
-        "Predictive Analytics"
+        "Skye AI Knowledge Management",
+        "AI Personality Configuration", 
+        "Wallet Intelligence Scoring",
+        "Advanced Marketing Analytics"
       ]
     },
     {
