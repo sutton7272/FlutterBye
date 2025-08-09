@@ -101,6 +101,7 @@ import { registerMonitoringRoutes } from "./monitoring-routes";
 import { phase1IntelligenceRoutes } from "./phase1-intelligence-routes";
 import { phase2IntelligenceRoutes } from "./phase2-intelligence-routes";
 import { phase3IntelligenceRoutes } from "./phase3-intelligence-routes";
+import { phase4IntelligenceRoutes } from "./phase4-intelligence-routes";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Trust proxy for rate limiting
@@ -4652,6 +4653,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // PHASE 3: Quantum AI Intelligence & Predictive Analytics Routes
   app.use("/api/phase3", phase3IntelligenceRoutes);
   console.log("🌌 PHASE 3: Quantum consciousness and predictive analytics routes activated!");
+  
+  // PHASE 4: Universal AI Orchestration & Multi-Reality Intelligence Routes
+  app.use("/api/phase4", phase4IntelligenceRoutes);
+  console.log("🌐 PHASE 4: Universal AI orchestration and multi-reality intelligence routes activated!");
   registerFlutterAIWalletRoutes(app);
   
   // Enterprise FlutterAI Routes
