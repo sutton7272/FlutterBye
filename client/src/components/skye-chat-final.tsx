@@ -74,7 +74,7 @@ export function SkyeChatFinal() {
     }
   }, [messages, isTyping]);
 
-  const handleSendMessage = () => {
+  const handleSendMessage = async () => {
     const trimmedMessage = message.trim();
     if (!trimmedMessage || sendMessageMutation.isPending) {
       console.log('Final chat - Cannot send: empty message or already pending');
@@ -83,17 +83,22 @@ export function SkyeChatFinal() {
     
     console.log('Final chat - Sending message:', trimmedMessage);
     
-    sendMessageMutation.mutate({
-      message: trimmedMessage,
-      pageContext: location,
-      sessionId: sessionId.current,
-    });
+    try {
+      await sendMessageMutation.mutateAsync({
+        message: trimmedMessage,
+        pageContext: location,
+        sessionId: sessionId.current,
+      });
+    } catch (error) {
+      console.error('Final chat - Send error:', error);
+    }
   };
 
   const handleKeyPress = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     console.log('Final chat - Key pressed:', e.key, 'Shift:', e.shiftKey);
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
+      e.stopPropagation();
       handleSendMessage();
     }
   };
@@ -208,7 +213,10 @@ export function SkyeChatFinal() {
                 disabled={sendMessageMutation.isPending}
               />
               <Button
-                onClick={() => {
+                type="button"
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
                   console.log('Final chat - Send button clicked!', message);
                   handleSendMessage();
                 }}
