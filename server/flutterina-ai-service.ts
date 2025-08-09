@@ -906,15 +906,22 @@ Generate JSON response:
   async updateSystemSettings(newSettings: any) {
     if (newSettings.enabled !== undefined) {
       this.isSystemEnabled = newSettings.enabled;
+      console.log(`🔄 Flutterina system ${newSettings.enabled ? 'ENABLED' : 'DISABLED'} by admin`);
     }
     if (newSettings.maxTokensPerUser !== undefined) {
       this.maxTokensPerUser = newSettings.maxTokensPerUser;
+      console.log(`👤 Per-user token limit updated to: ${newSettings.maxTokensPerUser}`);
     }
     if (newSettings.maxTokensGlobal !== undefined) {
       this.maxTokensGlobal = newSettings.maxTokensGlobal;
+      console.log(`🌍 Global token limit updated to: ${newSettings.maxTokensGlobal}`);
     }
     
-    console.log('Flutterina settings updated:', newSettings);
+    // Log cost estimates when limits change
+    const estimatedDailyCost = this.maxTokensGlobal * 0.00003;
+    const estimatedMonthlyCost = estimatedDailyCost * 30;
+    console.log(`💰 New cost estimates - Daily: $${estimatedDailyCost.toFixed(2)}, Monthly: $${estimatedMonthlyCost.toFixed(2)}`);
+    
     return this.getSystemSettings();
   }
 

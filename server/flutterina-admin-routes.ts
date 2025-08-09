@@ -311,4 +311,118 @@ router.post('/reset-usage', async (req: any, res) => {
   }
 });
 
+/**
+ * Get intelligent usage alerts and scaling recommendations
+ */
+router.get('/alerts', async (req: any, res) => {
+  try {
+    const stats = await flutterinaService.getComprehensiveStats();
+    const settings = await flutterinaService.getSystemSettings();
+    
+    const alerts = [];
+    const recommendations = [];
+    
+    // Generate intelligent usage alerts
+    const globalUsagePercent = (stats.totalTokensUsed / settings.maxTokensGlobal) * 100;
+    const dailyCost = stats.totalTokensUsed * 0.00003;
+    const projectedMonthlyCost = dailyCost * 30;
+    
+    if (globalUsagePercent > 95) {
+      alerts.push({
+        level: 'critical',
+        title: 'Critical Usage Warning',
+        message: 'Daily token usage exceeds 95% of global limit',
+        action: 'Consider emergency stop or immediate limit increase',
+        cost: dailyCost.toFixed(3),
+        priority: 'immediate'
+      });
+    } else if (globalUsagePercent > 80) {
+      alerts.push({
+        level: 'warning',
+        title: 'High Usage Alert',
+        message: 'Daily token usage exceeds 80% of global limit',
+        action: 'Monitor closely and prepare to increase limits',
+        cost: dailyCost.toFixed(3),
+        priority: 'high'
+      });
+    }
+    
+    // Cost-based alerts
+    if (projectedMonthlyCost > 200) {
+      alerts.push({
+        level: 'warning',
+        title: 'High Cost Projection',
+        message: `Projected monthly cost: $${projectedMonthlyCost.toFixed(2)}`,
+        action: 'Review usage patterns and consider optimization',
+        priority: 'medium'
+      });
+    }
+    
+    // Generate scaling recommendations
+    if (stats.activeUsers > 50 && settings.maxTokensPerUser < 5000) {
+      recommendations.push({
+        type: 'scaling',
+        title: 'Increase Per-User Limits',
+        description: `High user count (${stats.activeUsers}) with restrictive per-user limits`,
+        impact: 'Improved user experience and engagement',
+        actions: [
+          'Increase per-user daily limits to 5,000-10,000',
+          'Monitor for improved user satisfaction',
+          'Consider premium tiers for power users'
+        ],
+        estimatedCostIncrease: '$50-150/month'
+      });
+    }
+    
+    if (projectedMonthlyCost > 100) {
+      recommendations.push({
+        type: 'cost_optimization',
+        title: 'Implement Usage Optimization',
+        description: 'High usage patterns detected - optimization opportunities available',
+        impact: 'Reduce costs while maintaining quality',
+        actions: [
+          'Implement response caching for common queries',
+          'Add usage-based pricing tiers',
+          'Enable automatic scaling controls',
+          'Consider conversation length limits'
+        ],
+        estimatedSavings: '20-40% cost reduction'
+      });
+    }
+    
+    if (stats.activeUsers < 20 && settings.maxTokensGlobal > 50000) {
+      recommendations.push({
+        type: 'resource_optimization',
+        title: 'Optimize Resource Allocation',
+        description: 'Global limits may be overprovisioned for current user base',
+        impact: 'Better cost control and resource management',
+        actions: [
+          'Reduce global daily limits to 20,000-30,000',
+          'Implement auto-scaling based on user count',
+          'Set up usage alerts at lower thresholds'
+        ],
+        estimatedSavings: '$30-80/month'
+      });
+    }
+    
+    res.json({
+      success: true,
+      alerts,
+      recommendations,
+      metrics: {
+        globalUsagePercent: globalUsagePercent.toFixed(1),
+        dailyCost: dailyCost.toFixed(3),
+        projectedMonthlyCost: projectedMonthlyCost.toFixed(2),
+        activeUsers: stats.activeUsers,
+        avgTokensPerUser: stats.tokensPerUser,
+        systemHealth: globalUsagePercent < 80 ? 'healthy' : globalUsagePercent < 95 ? 'warning' : 'critical'
+      },
+      timestamp: new Date().toISOString()
+    });
+  } catch (error) {
+    console.error('Alerts error:', error);
+    res.status(500).json({ error: 'Failed to get usage alerts' });
+  }
+});
+
 export default router;

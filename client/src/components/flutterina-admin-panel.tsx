@@ -339,19 +339,22 @@ export function FlutterinaAdminPanel() {
         <TabsContent value="settings" className="space-y-6">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             
-            {/* Core Settings */}
+            {/* Usage Limits Management */}
             <Card className="bg-slate-800/50 border-purple-500/20">
               <CardHeader>
                 <CardTitle className="text-white flex items-center gap-2">
-                  <Settings className="h-5 w-5 text-purple-400" />
-                  Core Settings
+                  <Target className="h-5 w-5 text-purple-400" />
+                  Usage Limits Management
                 </CardTitle>
+                <CardDescription className="text-purple-200">
+                  Control AI token consumption and prevent cost overruns
+                </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 {settings && (
                   <>
                     <div className="flex items-center justify-between">
-                      <Label htmlFor="enabled" className="text-purple-200">Enable Flutterina</Label>
+                      <Label htmlFor="enabled" className="text-purple-200">Enable Flutterina System</Label>
                       <Switch
                         id="enabled"
                         checked={settings.enabled}
@@ -359,79 +362,281 @@ export function FlutterinaAdminPanel() {
                       />
                     </div>
                     
+                    <Alert className="bg-blue-900/20 border-blue-500/30">
+                      <DollarSign className="h-4 w-4 text-blue-400" />
+                      <AlertDescription className="text-blue-200">
+                        Current usage: {stats?.totalTokensUsed || 0} tokens today
+                        <br />
+                        Estimated cost: ${((stats?.totalTokensUsed || 0) * 0.00003).toFixed(2)}
+                      </AlertDescription>
+                    </Alert>
+                    
                     <div className="space-y-2">
-                      <Label htmlFor="maxTokensPerUser" className="text-purple-200">Max Tokens Per User (Daily)</Label>
-                      <Input
-                        id="maxTokensPerUser"
-                        type="number"
-                        value={settings.maxTokensPerUser}
-                        onChange={(e) => handleSettingChange('maxTokensPerUser', parseInt(e.target.value))}
-                        className="bg-slate-700 border-purple-500/30 text-white"
-                      />
+                      <Label htmlFor="maxTokensPerUser" className="text-purple-200 flex items-center gap-2">
+                        <Users className="h-4 w-4" />
+                        Daily Token Limit Per User
+                      </Label>
+                      <div className="flex gap-2">
+                        <Input
+                          id="maxTokensPerUser"
+                          type="number"
+                          min="100"
+                          max="50000"
+                          step="100"
+                          value={settings.maxTokensPerUser}
+                          onChange={(e) => handleSettingChange('maxTokensPerUser', parseInt(e.target.value))}
+                          className="bg-slate-700 border-purple-500/30 text-white"
+                        />
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => handleSettingChange('maxTokensPerUser', 5000)}
+                          className="whitespace-nowrap border-purple-500/30 text-purple-300"
+                        >
+                          Set to 5K
+                        </Button>
+                      </div>
+                      <div className="text-xs text-purple-300">
+                        Recommended: 5,000-10,000 for regular users, 20,000+ for enterprise
+                      </div>
                     </div>
                     
                     <div className="space-y-2">
-                      <Label htmlFor="maxTokensGlobal" className="text-purple-200">Max Tokens Global (Daily)</Label>
-                      <Input
-                        id="maxTokensGlobal"
-                        type="number"
-                        value={settings.maxTokensGlobal}
-                        onChange={(e) => handleSettingChange('maxTokensGlobal', parseInt(e.target.value))}
-                        className="bg-slate-700 border-purple-500/30 text-white"
-                      />
+                      <Label htmlFor="maxTokensGlobal" className="text-purple-200 flex items-center gap-2">
+                        <Globe className="h-4 w-4" />
+                        Daily Global Token Limit
+                      </Label>
+                      <div className="flex gap-2">
+                        <Input
+                          id="maxTokensGlobal"
+                          type="number"
+                          min="1000"
+                          max="1000000"
+                          step="1000"
+                          value={settings.maxTokensGlobal}
+                          onChange={(e) => handleSettingChange('maxTokensGlobal', parseInt(e.target.value))}
+                          className="bg-slate-700 border-purple-500/30 text-white"
+                        />
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => handleSettingChange('maxTokensGlobal', 100000)}
+                          className="whitespace-nowrap border-purple-500/30 text-purple-300"
+                        >
+                          Set to 100K
+                        </Button>
+                      </div>
+                      <div className="text-xs text-purple-300">
+                        Safety limit to prevent excessive costs. Current usage: {((stats?.totalTokensUsed || 0) / (settings.maxTokensGlobal || 1) * 100).toFixed(1)}%
+                      </div>
                     </div>
                     
                     <div className="space-y-2">
-                      <Label htmlFor="responseTimeout" className="text-purple-200">Response Timeout (seconds)</Label>
-                      <Input
-                        id="responseTimeout"
-                        type="number"
-                        value={settings.responseTimeout}
-                        onChange={(e) => handleSettingChange('responseTimeout', parseInt(e.target.value))}
-                        className="bg-slate-700 border-purple-500/30 text-white"
-                      />
+                      <Label htmlFor="responseTimeout" className="text-purple-200 flex items-center gap-2">
+                        <Clock className="h-4 w-4" />
+                        Response Timeout (seconds)
+                      </Label>
+                      <Select 
+                        value={settings.responseTimeout?.toString()} 
+                        onValueChange={(value) => handleSettingChange('responseTimeout', parseInt(value))}
+                      >
+                        <SelectTrigger className="bg-slate-700 border-purple-500/30 text-white">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="15">15 seconds (Fast)</SelectItem>
+                          <SelectItem value="30">30 seconds (Standard)</SelectItem>
+                          <SelectItem value="60">60 seconds (Extended)</SelectItem>
+                          <SelectItem value="120">120 seconds (Maximum)</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    {/* Quick Actions */}
+                    <div className="pt-4 border-t border-purple-500/20">
+                      <div className="text-sm font-medium text-purple-200 mb-3">Quick Actions</div>
+                      <div className="grid grid-cols-2 gap-2">
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => {
+                            handleSettingChange('maxTokensPerUser', 1000);
+                            handleSettingChange('maxTokensGlobal', 10000);
+                          }}
+                          className="border-yellow-500/30 text-yellow-300 hover:bg-yellow-600/20"
+                        >
+                          Conservative
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => {
+                            handleSettingChange('maxTokensPerUser', 10000);
+                            handleSettingChange('maxTokensGlobal', 100000);
+                          }}
+                          className="border-green-500/30 text-green-300 hover:bg-green-600/20"
+                        >
+                          Standard
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => {
+                            handleSettingChange('maxTokensPerUser', 25000);
+                            handleSettingChange('maxTokensGlobal', 500000);
+                          }}
+                          className="border-blue-500/30 text-blue-300 hover:bg-blue-600/20"
+                        >
+                          Enterprise
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => resetUsageMutation.mutate()}
+                          disabled={resetUsageMutation.isPending}
+                          className="border-purple-500/30 text-purple-300 hover:bg-purple-600/20"
+                        >
+                          {resetUsageMutation.isPending ? (
+                            <RefreshCw className="h-3 w-3 animate-spin" />
+                          ) : (
+                            'Reset Usage'
+                          )}
+                        </Button>
+                      </div>
                     </div>
                   </>
                 )}
               </CardContent>
             </Card>
 
-            {/* AI Features */}
+            {/* Real-Time Usage Monitor */}
             <Card className="bg-slate-800/50 border-purple-500/20">
               <CardHeader>
                 <CardTitle className="text-white flex items-center gap-2">
-                  <Brain className="h-5 w-5 text-purple-400" />
-                  AI Features
+                  <BarChart3 className="h-5 w-5 text-purple-400" />
+                  Real-Time Usage Monitor
                 </CardTitle>
+                <CardDescription className="text-purple-200">
+                  Live tracking of token consumption and cost estimates
+                </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
-                {settings && (
+                {settings && stats && (
                   <>
-                    <div className="flex items-center justify-between">
-                      <Label htmlFor="personalityLearning" className="text-purple-200">Personality Learning</Label>
-                      <Switch
-                        id="personalityLearning"
-                        checked={settings.personalityLearningEnabled}
-                        onCheckedChange={(checked) => handleSettingChange('personalityLearningEnabled', checked)}
-                      />
+                    {/* Current Usage Progress Bars */}
+                    <div className="space-y-3">
+                      <div>
+                        <div className="flex justify-between items-center mb-2">
+                          <span className="text-sm text-purple-200">Per-User Limit Progress</span>
+                          <Badge variant="secondary" className="bg-purple-600">
+                            {stats.tokensPerUser} / {settings.maxTokensPerUser}
+                          </Badge>
+                        </div>
+                        <Progress 
+                          value={(stats.tokensPerUser / settings.maxTokensPerUser) * 100} 
+                          className="h-2"
+                        />
+                        <div className="text-xs text-purple-300 mt-1">
+                          Average usage per active user
+                        </div>
+                      </div>
+
+                      <div>
+                        <div className="flex justify-between items-center mb-2">
+                          <span className="text-sm text-purple-200">Global Daily Limit</span>
+                          <Badge variant={stats.totalTokensUsed > settings.maxTokensGlobal * 0.8 ? "destructive" : "secondary"} className="bg-blue-600">
+                            {stats.totalTokensUsed} / {settings.maxTokensGlobal}
+                          </Badge>
+                        </div>
+                        <Progress 
+                          value={(stats.totalTokensUsed / settings.maxTokensGlobal) * 100} 
+                          className="h-2"
+                        />
+                        <div className="text-xs text-purple-300 mt-1">
+                          {((stats.totalTokensUsed / settings.maxTokensGlobal) * 100).toFixed(1)}% of daily global limit used
+                        </div>
+                      </div>
                     </div>
-                    
-                    <div className="flex items-center justify-between">
-                      <Label htmlFor="recommendations" className="text-purple-200">Product Recommendations</Label>
-                      <Switch
-                        id="recommendations"
-                        checked={settings.recommendationsEnabled}
-                        onCheckedChange={(checked) => handleSettingChange('recommendationsEnabled', checked)}
-                      />
+
+                    {/* Cost Analysis */}
+                    <div className="bg-slate-700/50 p-4 rounded-lg border border-purple-500/20">
+                      <div className="text-sm font-medium text-purple-200 mb-3">Cost Analysis</div>
+                      <div className="grid grid-cols-2 gap-3 text-xs">
+                        <div>
+                          <div className="text-purple-300">Today's Cost</div>
+                          <div className="text-white font-bold">
+                            ${((stats.totalTokensUsed || 0) * 0.00003).toFixed(3)}
+                          </div>
+                        </div>
+                        <div>
+                          <div className="text-purple-300">Monthly Est.</div>
+                          <div className="text-white font-bold">
+                            ${(((stats.totalTokensUsed || 0) * 0.00003) * 30).toFixed(2)}
+                          </div>
+                        </div>
+                        <div>
+                          <div className="text-purple-300">Active Users</div>
+                          <div className="text-white font-bold">{stats.activeUsers}</div>
+                        </div>
+                        <div>
+                          <div className="text-purple-300">Avg/User</div>
+                          <div className="text-white font-bold">
+                            ${stats.activeUsers > 0 ? (((stats.totalTokensUsed || 0) * 0.00003) / stats.activeUsers).toFixed(4) : '0.0000'}
+                          </div>
+                        </div>
+                      </div>
                     </div>
-                    
-                    <div className="flex items-center justify-between">
-                      <Label htmlFor="emergencyStop" className="text-purple-200">Emergency Stop Protection</Label>
-                      <Switch
-                        id="emergencyStop"
-                        checked={settings.emergencyStopEnabled}
-                        onCheckedChange={(checked) => handleSettingChange('emergencyStopEnabled', checked)}
-                      />
+
+                    {/* Usage Warnings */}
+                    {stats.totalTokensUsed > settings.maxTokensGlobal * 0.8 && (
+                      <Alert className="bg-yellow-900/20 border-yellow-500/30">
+                        <AlertTriangle className="h-4 w-4 text-yellow-400" />
+                        <AlertDescription className="text-yellow-200">
+                          Warning: Daily token usage is above 80% of global limit
+                        </AlertDescription>
+                      </Alert>
+                    )}
+
+                    {stats.totalTokensUsed > settings.maxTokensGlobal * 0.95 && (
+                      <Alert className="bg-red-900/20 border-red-500/30">
+                        <AlertTriangle className="h-4 w-4 text-red-400" />
+                        <AlertDescription className="text-red-200">
+                          Critical: Daily token usage is above 95% of global limit
+                        </AlertDescription>
+                      </Alert>
+                    )}
+
+                    {/* AI Features Controls */}
+                    <div className="pt-4 border-t border-purple-500/20">
+                      <div className="text-sm font-medium text-purple-200 mb-3">AI Features</div>
+                      <div className="space-y-3">
+                        <div className="flex items-center justify-between">
+                          <Label htmlFor="personalityLearning" className="text-purple-200 text-sm">Personality Learning</Label>
+                          <Switch
+                            id="personalityLearning"
+                            checked={settings.personalityLearningEnabled}
+                            onCheckedChange={(checked) => handleSettingChange('personalityLearningEnabled', checked)}
+                          />
+                        </div>
+                        
+                        <div className="flex items-center justify-between">
+                          <Label htmlFor="recommendations" className="text-purple-200 text-sm">Product Recommendations</Label>
+                          <Switch
+                            id="recommendations"
+                            checked={settings.recommendationsEnabled}
+                            onCheckedChange={(checked) => handleSettingChange('recommendationsEnabled', checked)}
+                          />
+                        </div>
+                        
+                        <div className="flex items-center justify-between">
+                          <Label htmlFor="emergencyStop" className="text-purple-200 text-sm">Emergency Protection</Label>
+                          <Switch
+                            id="emergencyStop"
+                            checked={settings.emergencyStopEnabled}
+                            onCheckedChange={(checked) => handleSettingChange('emergencyStopEnabled', checked)}
+                          />
+                        </div>
+                      </div>
                     </div>
                   </>
                 )}
