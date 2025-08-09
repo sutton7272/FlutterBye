@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Input } from "@/components/ui/input";
-import { BookOpen, Map, Zap, Users, Coins, Trophy, Star, CheckCircle, Clock, AlertCircle, Target, Rocket, FileText, TrendingUp, Shield, Globe, Heart, MessageSquare, DollarSign, Building2, Gift, Sparkles, Ticket, UserPlus, Search, Filter, Eye, Share2, BarChart3, LineChart, PieChart, Activity, Brain, Lock } from "lucide-react";
+import { BookOpen, Map, Zap, Users, Coins, Trophy, Star, CheckCircle, Clock, AlertCircle, Target, Rocket, FileText, TrendingUp, Shield, Globe, Heart, MessageSquare, DollarSign, Building2, Gift, Sparkles, Ticket, UserPlus, Search, Filter, Eye, Share2, BarChart3, LineChart, PieChart, Activity, Brain, Lock, Settings } from "lucide-react";
 
 interface Token {
   id: string;
@@ -777,6 +777,49 @@ export default function InfoPage() {
                   status: "Live",
                   color: "green"
                 },
+                // Additional Live Features
+                {
+                  title: "Viral Analytics Dashboard",
+                  description: "Real-time viral token tracking and metrics",
+                  icon: BarChart3,
+                  status: "Live",
+                  color: "green"
+                },
+                {
+                  title: "Admin Content Management",
+                  description: "Dynamic content editing and marketing analytics",
+                  icon: Settings,
+                  status: "Live",
+                  color: "green"
+                },
+                {
+                  title: "Enterprise Dashboard",
+                  description: "Comprehensive business intelligence platform",
+                  icon: Building2,
+                  status: "Live",
+                  color: "green"
+                },
+                {
+                  title: "Advanced Analytics Suite",
+                  description: "Real-time platform metrics and business intelligence",
+                  icon: PieChart,
+                  status: "Live",
+                  color: "green"
+                },
+                {
+                  title: "Automation Workflows",
+                  description: "AI-powered automation and task orchestration",
+                  icon: Zap,
+                  status: "Live",
+                  color: "green"
+                },
+                {
+                  title: "Platform Diagnostics",
+                  description: "Comprehensive health monitoring and diagnostics",
+                  icon: Activity,
+                  status: "Live",
+                  color: "green"
+                },
                 // Future Features
                 {
                   title: "Cross-Chain Integration",
@@ -786,11 +829,11 @@ export default function InfoPage() {
                   color: "blue"
                 },
                 {
-                  title: "Enterprise APIs",
-                  description: "Business integration tools",
-                  icon: Building2,
+                  title: "Metaverse Integration",
+                  description: "Virtual world communication protocol",
+                  icon: Star,
                   status: "Planned",
-                  color: "purple"
+                  color: "blue"
                 }
               ].map((feature, index) => (
                 <Card key={index} className="glassmorphism">
