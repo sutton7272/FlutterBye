@@ -53,8 +53,15 @@ export default function Navbar() {
         {/* Logo */}
         <div className="mr-8 flex items-center">
           <Link href="/" className="flex items-center space-x-3">
-            <div className="w-9 h-9 modern-gradient rounded-xl flex items-center justify-center">
-              <span className="text-sm font-bold text-white">F</span>
+            <div className="w-9 h-9 rounded-xl flex items-center justify-center p-1">
+              <img 
+                src="/attached_assets/image_1754701087171.png" 
+                alt="Flutterbye Butterfly Logo" 
+                className="w-full h-full object-contain"
+                style={{
+                  filter: 'drop-shadow(0 0 8px #00bfff) drop-shadow(0 0 16px #00ffcc)',
+                }}
+              />
             </div>
             <span className="hidden font-bold text-xl sm:inline-block text-white">
               Flutterbye
