@@ -49,8 +49,10 @@ interface TimeLeft {
   seconds: number;
 }
 
+// Set launch date to September 1, 2025 (outside component to prevent re-renders)
+const LAUNCH_DATE = new Date('2025-09-01T00:00:00Z');
+
 export default function LaunchCountdown() {
-  console.log("LaunchCountdown component loading...");
   const [timeLeft, setTimeLeft] = useState<TimeLeft>({ days: 0, hours: 0, minutes: 0, seconds: 0 });
   const [email, setEmail] = useState("");
   const [walletAddress, setWalletAddress] = useState("");
@@ -63,8 +65,7 @@ export default function LaunchCountdown() {
   const [, setLocation] = useLocation();
   const [signupCount, setSignupCount] = useState(12847);
 
-  // Set launch date to September 1, 2025
-  const launchDate = new Date('2025-09-01T00:00:00Z'); // Public launch date
+  // Set launch date to September 1, 2025 (moved outside component to prevent re-renders)
 
   // AI Content Showcase Component
   function AIContentShowcase() {
@@ -168,7 +169,7 @@ export default function LaunchCountdown() {
   useEffect(() => {
     const updateCountdown = () => {
       const now = new Date().getTime();
-      const distance = launchDate.getTime() - now;
+      const distance = LAUNCH_DATE.getTime() - now;
 
       if (distance > 0) {
         const days = Math.floor(distance / (1000 * 60 * 60 * 24));
@@ -190,7 +191,7 @@ export default function LaunchCountdown() {
     const timer = setInterval(updateCountdown, 1000);
 
     return () => clearInterval(timer);
-  }, []); // Remove launchDate dependency to prevent re-renders
+  }, []); // Empty dependency array is now safe
 
   // Dynamic signup counter effect
   useEffect(() => {
@@ -404,7 +405,7 @@ export default function LaunchCountdown() {
             <div className="mt-4 text-center">
               <p className="text-sm text-muted-foreground">
                 Public Launch: <span className="text-cyan-400 font-semibold">
-                  {launchDate.toLocaleDateString('en-US', { 
+                  {LAUNCH_DATE.toLocaleDateString('en-US', { 
                     weekday: 'long', 
                     year: 'numeric', 
                     month: 'long', 
@@ -424,7 +425,7 @@ export default function LaunchCountdown() {
               className="h-full bg-gradient-to-r from-cyan-500 via-blue-500 to-purple-500 transition-all duration-1000 ease-out"
               style={{
                 width: `${Math.max(0, Math.min(100, 
-                  100 - ((launchDate.getTime() - new Date().getTime()) / (30 * 24 * 60 * 60 * 1000)) * 100
+                  100 - ((LAUNCH_DATE.getTime() - new Date().getTime()) / (30 * 24 * 60 * 60 * 1000)) * 100
                 ))}%`
               }}
             />
