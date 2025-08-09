@@ -100,6 +100,7 @@ import { blogScheduler } from "./blog-content-scheduler";
 import { registerMonitoringRoutes } from "./monitoring-routes";
 import { phase1IntelligenceRoutes } from "./phase1-intelligence-routes";
 import { phase2IntelligenceRoutes } from "./phase2-intelligence-routes";
+import { phase3IntelligenceRoutes } from "./phase3-intelligence-routes";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Trust proxy for rate limiting
@@ -4647,6 +4648,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // PHASE 2: Advanced Cross-Chain AI Intelligence Routes
   app.use("/api/phase2", phase2IntelligenceRoutes);
   console.log("🚀 PHASE 2: Advanced cross-chain AI intelligence routes activated!");
+  
+  // PHASE 3: Quantum AI Intelligence & Predictive Analytics Routes
+  app.use("/api/phase3", phase3IntelligenceRoutes);
+  console.log("🌌 PHASE 3: Quantum consciousness and predictive analytics routes activated!");
   registerFlutterAIWalletRoutes(app);
   
   // Enterprise FlutterAI Routes
