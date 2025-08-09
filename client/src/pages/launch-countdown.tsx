@@ -322,8 +322,7 @@ export default function LaunchCountdown() {
   // Main Launch Countdown & Waitlist (for authorized users)
   return (
     <div className="min-h-screen text-white relative overflow-hidden">
-      {/* FlutterAI Animated Tutorial - matches the uploaded design */}
-      <FlutterAIAnimatedTutorial />
+
       
       {/* Show navbar if access is granted */}
       {hasAccess && (
