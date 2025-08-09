@@ -74,6 +74,7 @@ import EnterpriseDashboard from "@/pages/enterprise-dashboard";
 import ViralDashboard from "@/pages/viral-dashboard";
 import MessageNFTCreator from "@/pages/message-nft-creator";
 import Phase1Dashboard from "@/pages/phase1-dashboard";
+import Phase2Dashboard from "@/pages/phase2-dashboard";
 import NFTClaim from "@/pages/nft-claim";
 import AllOpportunities from "@/pages/AllOpportunities";
 import AdminAPIMonetization from "@/pages/admin-api-monetization";
@@ -288,6 +289,13 @@ function Router() {
           <AdminRouteGuard>
             <Navbar />
             <Phase1Dashboard />
+          </AdminRouteGuard>
+        )} />
+        
+        <Route path="/admin/phase2" component={() => (
+          <AdminRouteGuard>
+            <Navbar />
+            <Phase2Dashboard />
           </AdminRouteGuard>
         )} />
         
