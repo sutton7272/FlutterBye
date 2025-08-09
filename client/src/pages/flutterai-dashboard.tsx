@@ -2283,7 +2283,7 @@ export default function FlutterAIDashboard() {
                       <Badge className="bg-yellow-600">Partial Data</Badge>
                     </div>
                     <div className="flex justify-between items-center p-3 bg-slate-700/50 rounded-lg">
-                      <span className="text-white">Low Confidence (<70%)</span>
+                      <span className="text-white">Low Confidence (&lt;70%)</span>
                       <Badge className="bg-red-600">Limited Data</Badge>
                     </div>
                     <div className="flex justify-between items-center p-3 bg-slate-700/50 rounded-lg">
