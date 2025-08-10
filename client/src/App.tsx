@@ -112,7 +112,7 @@ import Final5PercentDashboard from "@/pages/final-5-percent-dashboard";
 import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";
 import { PersonalizedDashboard } from "@/components/PersonalizedDashboard";
-import { ErrorBoundary } from "@/components/error-boundary";
+// import { ErrorBoundary } from "@/components/error-boundary";
 import { PWAInstallPrompt, PWANotificationPrompt } from "@/components/pwa-features";
 import { CommandPalette } from "@/components/command-palette";
 import { WebSocketProvider } from "@/components/websocket-provider-disabled";
@@ -125,17 +125,21 @@ import AdminGateway from "@/pages/admin-gateway";
 import AdminDashboard from "@/pages/admin-dashboard";
 import AdminEscrow from "@/pages/admin-escrow";
 import { AdminRouteGuard } from "@/components/admin-route-guard";
+import SimpleLaunch from "@/pages/simple-launch";
+
 function Router() {
   return (
     <div className="dark min-h-screen flex flex-col bg-transparent">
       <div className="flex-1 bg-transparent">
         <Switch>
-        <Route path="/" component={LaunchCountdown} />
-        <Route path="/launch" component={LaunchCountdown} />
+        <Route path="/" component={SimpleLaunch} />
+        <Route path="/launch" component={SimpleLaunch} />
         <Route path="/home" component={() => (
           <>
             <Navbar />
-            <Home />
+            <SuspenseWrapper>
+              <Home />
+            </SuspenseWrapper>
           </>
         )} />
         
