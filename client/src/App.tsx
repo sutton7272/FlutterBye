@@ -901,8 +901,11 @@ function Router() {
 }
 
 function App() {
-  // Register service worker for PWA functionality (graceful failure)
+  // Ensure proper initialization before rendering
+  const [isInitialized, setIsInitialized] = useState(false);
+
   useEffect(() => {
+    // Register service worker for PWA functionality (graceful failure)
     try {
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
@@ -918,7 +921,22 @@ function App() {
     } catch (error) {
       console.log('Service worker setup failed gracefully:', error);
     }
+
+    // Small delay to ensure DOM is fully ready
+    const timer = setTimeout(() => {
+      setIsInitialized(true);
+    }, 50);
+
+    return () => clearTimeout(timer);
   }, []);
+
+  if (!isInitialized) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-900">
+        <LoadingSpinner />
+      </div>
+    );
+  }
 
   return (
     <ThemeProvider defaultTheme="dark">

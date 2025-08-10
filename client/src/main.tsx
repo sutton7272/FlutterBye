@@ -18,16 +18,24 @@ window.addEventListener('error', (e) => {
 });
 
 window.addEventListener('unhandledrejection', (e) => {
-  // Completely prevent ALL unhandled rejections to stop error boundary
-  e.preventDefault();
-  e.stopPropagation();
-  e.stopImmediatePropagation();
+  // Only suppress WebSocket and known non-critical rejections
+  if (e.reason?.message?.includes('WebSocket') || 
+      e.reason?.message?.includes('Failed to construct') ||
+      e.reason?.name === 'AbortError') {
+    e.preventDefault();
+    console.log('🛡️ Suppressed non-critical rejection:', e.reason?.message);
+    return false;
+  }
   
-  // Suppress all logging for now to prevent console spam
-  // console.log('🛡️ All promise rejections suppressed for stability');
-  
-  // Return false to completely stop event propagation
-  return false;
+  // Allow other rejections through for proper error handling
+  console.log('🔍 Unhandled rejection:', e.reason);
 });
 
-createRoot(document.getElementById("root")!).render(<App />);
+// Ensure DOM is ready before rendering
+const container = document.getElementById("root");
+if (container) {
+  const root = createRoot(container);
+  root.render(<App />);
+} else {
+  console.error("Root container not found");
+}
