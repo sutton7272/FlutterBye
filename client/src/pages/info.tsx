@@ -1,6 +1,5 @@
-import { useState, memo, useMemo } from 'react';
-import { useOptimizedQuery, useLowPriorityQuery } from '@/hooks/useOptimizedQuery';
-import { StatsSkeleton, GridSkeleton } from '@/components/optimized-loading';
+import { useState, useMemo } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
@@ -34,12 +33,27 @@ export default function InfoPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [valueFilter, setValueFilter] = useState('all');
 
-  // Optimized data fetching with performance enhancements
-  const { data: publicTokens = [], isLoading: tokensLoading, error: tokensError } = useLowPriorityQuery<Token[]>('/api/tokens/public');
+  // Data fetching with error handling
+  const { data: publicTokens = [], isLoading: tokensLoading, error: tokensError } = useQuery<Token[]>({
+    queryKey: ['/api/tokens/public'],
+    retry: 1,
+    refetchOnWindowFocus: false,
+    staleTime: 30000,
+  });
 
-  const { data: tokensWithValue = [], isLoading: valueTokensLoading, error: valueTokensError } = useLowPriorityQuery<Token[]>('/api/tokens/with-value');
+  const { data: tokensWithValue = [], isLoading: valueTokensLoading, error: valueTokensError } = useQuery<Token[]>({
+    queryKey: ['/api/tokens/with-value'],
+    retry: 1,
+    refetchOnWindowFocus: false,
+    staleTime: 30000,
+  });
 
-  const { data: stats, isLoading: statsLoading, error: statsError } = useOptimizedQuery<DashboardStats>('/api/dashboard/stats');
+  const { data: stats, isLoading: statsLoading, error: statsError } = useQuery<DashboardStats>({
+    queryKey: ['/api/dashboard/stats'],
+    retry: 1,
+    refetchOnWindowFocus: false,
+    staleTime: 30000,
+  });
 
   // Memoized filter functions for performance
   const filteredPublicTokens = useMemo(() => {
@@ -1032,7 +1046,18 @@ export default function InfoPage() {
 
                 {/* Stats Overview */}
                 {statsLoading ? (
-                  <StatsSkeleton />
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                    {Array.from({ length: 4 }, (_, i) => (
+                      <Card key={i} className="bg-slate-700/30 border border-electric-blue/20">
+                        <CardContent className="p-4 text-center">
+                          <div className="animate-pulse">
+                            <div className="h-6 bg-slate-600 rounded mb-2"></div>
+                            <div className="h-4 bg-slate-600 rounded w-2/3 mx-auto"></div>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
                 ) : (
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
                     <Card className="bg-slate-700/30 border border-electric-blue/20">
@@ -1085,7 +1110,14 @@ export default function InfoPage() {
                   </CardHeader>
                   <CardContent>
                     {tokensLoading ? (
-                      <GridSkeleton count={6} />
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        {Array.from({ length: 6 }, (_, i) => (
+                          <div key={i} className="bg-slate-700/30 rounded-lg p-4 animate-pulse">
+                            <div className="h-4 bg-slate-600 rounded mb-2"></div>
+                            <div className="h-3 bg-slate-600 rounded w-3/4"></div>
+                          </div>
+                        ))}
+                      </div>
                     ) : tokensError ? (
                       <div className="text-center py-8">
                         <div className="text-slate-400 mb-2">Unable to load public tokens</div>
@@ -1143,7 +1175,12 @@ export default function InfoPage() {
                   <CardContent>
                     {valueTokensLoading ? (
                       <div className="space-y-4">
-                        <GridSkeleton count={4} />
+                        {Array.from({ length: 4 }, (_, i) => (
+                          <div key={i} className="bg-slate-700/30 rounded-lg p-4 animate-pulse">
+                            <div className="h-4 bg-slate-600 rounded mb-2"></div>
+                            <div className="h-3 bg-slate-600 rounded w-1/2"></div>
+                          </div>
+                        ))}
                       </div>
                     ) : valueTokensError ? (
                       <div className="text-center py-8">

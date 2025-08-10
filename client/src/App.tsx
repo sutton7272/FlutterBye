@@ -129,12 +129,21 @@ function Router() {
     <div className="dark min-h-screen flex flex-col bg-transparent">
       <div className="flex-1 bg-transparent">
         <Switch>
-        <Route path="/" component={LaunchCountdown} />
+        <Route path="/" component={() => (
+          <>
+            <Navbar />
+            <Suspense fallback={<LoadingSpinner />}>
+              <InfoPage />
+            </Suspense>
+          </>
+        )} />
         <Route path="/launch" component={LaunchCountdown} />
         <Route path="/home" component={() => (
           <>
             <Navbar />
-            <Home />
+            <Suspense fallback={<LoadingSpinner />}>
+              <Home />
+            </Suspense>
           </>
         )} />
         
