@@ -2,6 +2,22 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Floating dust animations */
+@keyframes float-0 {
+  0%, 100% { transform: translateY(0px) rotate(0deg); opacity: 0.6; }
+  50% { transform: translateY(-4px) rotate(180deg); opacity: 1; }
+}
+
+@keyframes float-1 {
+  0%, 100% { transform: translateY(0px) rotate(0deg); opacity: 0.4; }
+  50% { transform: translateY(-6px) rotate(-180deg); opacity: 0.8; }
+}
+
+@keyframes float-2 {
+  0%, 100% { transform: translateY(0px) rotate(0deg); opacity: 0.5; }
+  50% { transform: translateY(-3px) rotate(90deg); opacity: 0.9; }
+}
+
 :root {
   /* Electric Blue & Green Theme with Pulse Effects */
   --background: hsl(220, 15%, 3%);

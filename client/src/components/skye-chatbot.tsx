@@ -144,16 +144,60 @@ export function SkyeChatbot() {
           )}
         </button>
         {!isOpen && (
-          <span 
-            className="ml-3 font-bold text-pink-400 animate-pulse pointer-events-none"
-            style={{
-              fontSize: '16px',
-              textShadow: '0 0 10px rgba(236, 72, 153, 0.8), 0 0 20px rgba(236, 72, 153, 0.6), 0 0 30px rgba(236, 72, 153, 0.4)',
-              fontFamily: 'fantasy, cursive',
-            }}
-          >
-            Skye
-          </span>
+          <div className="ml-3 relative pointer-events-none">
+            {/* Animated dust particles */}
+            <div className="absolute inset-0 -m-4">
+              {[...Array(8)].map((_, i) => (
+                <div
+                  key={i}
+                  className="absolute w-1 h-1 bg-pink-400 rounded-full animate-ping"
+                  style={{
+                    left: `${20 + Math.sin(i * 45 * Math.PI / 180) * 25}px`,
+                    top: `${10 + Math.cos(i * 45 * Math.PI / 180) * 15}px`,
+                    animationDelay: `${i * 0.2}s`,
+                    animationDuration: '1.5s',
+                    opacity: 0.7,
+                  }}
+                />
+              ))}
+            </div>
+            
+            {/* Main text with pixelated effect */}
+            <span 
+              className="font-bold text-pink-400 animate-pulse relative z-10"
+              style={{
+                fontSize: '16px',
+                fontFamily: 'monospace, "Courier New"',
+                textShadow: `
+                  0 0 2px rgba(236, 72, 153, 1),
+                  0 0 5px rgba(236, 72, 153, 0.8),
+                  0 0 10px rgba(236, 72, 153, 0.6),
+                  0 0 15px rgba(236, 72, 153, 0.4),
+                  1px 1px 0 rgba(236, 72, 153, 0.3),
+                  -1px -1px 0 rgba(236, 72, 153, 0.3)
+                `,
+                filter: 'contrast(1.2) brightness(1.1)',
+                letterSpacing: '1px',
+              }}
+            >
+              Skye
+            </span>
+            
+            {/* Floating dust particles */}
+            {[...Array(6)].map((_, i) => (
+              <div
+                key={`float-${i}`}
+                className="absolute w-0.5 h-0.5 bg-pink-300 rounded-full"
+                style={{
+                  left: `${15 + i * 8}px`,
+                  top: `${8 + (i % 2) * 6}px`,
+                  animation: `float-${i % 3} 2s ease-in-out infinite`,
+                  animationDelay: `${i * 0.3}s`,
+                  opacity: 0.6,
+                }}
+              />
+            ))}
+          </div>
         )}
       </div>
 
