@@ -33,24 +33,18 @@ export default function InfoPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [valueFilter, setValueFilter] = useState('all');
 
-  // Data fetching for explore functionality - optimized with error handling
-  const { data: publicTokens = [], isLoading: tokensLoading, error: tokensError } = useQuery({
-    queryKey: ['/api/tokens/public'],
-    retry: 1,
-    staleTime: 30000, // Cache for 30 seconds
-  });
-
-  const { data: tokensWithValue = [], isLoading: valueTokensLoading, error: valueTokensError } = useQuery({
-    queryKey: ['/api/tokens/with-value'],
-    retry: 1,
-    staleTime: 30000,
-  });
-
-  const { data: stats, isLoading: statsLoading, error: statsError } = useQuery<DashboardStats>({
-    queryKey: ['/api/dashboard/stats'],
-    retry: 1,
-    staleTime: 60000, // Cache for 1 minute
-  });
+  // Data fetching disabled for performance - info page focuses on static content
+  const publicTokens: Token[] = [];
+  const tokensWithValue: Token[] = [];
+  const stats: DashboardStats = {
+    totalTokens: 0,
+    totalValueEscrowed: "0",
+    totalRedemptions: 0,
+    activeUsers: 0
+  };
+  const tokensLoading = false;
+  const valueTokensLoading = false;
+  const statsLoading = false;
 
   // Filter functions for explore functionality - performance optimized
   const filteredPublicTokens = Array.isArray(publicTokens) ? (publicTokens as Token[]).filter((token: Token) => {

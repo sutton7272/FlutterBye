@@ -1,5 +1,5 @@
 import { Suspense, ReactNode } from 'react';
-import { SimpleFallback } from './simple-fallback';
+import { FastLoadingFallback } from './fast-loading-fallback';
 
 interface SuspenseWrapperProps {
   children: ReactNode;
@@ -7,7 +7,7 @@ interface SuspenseWrapperProps {
 
 export function SuspenseWrapper({ children }: SuspenseWrapperProps) {
   return (
-    <Suspense fallback={<SimpleFallback />}>
+    <Suspense fallback={<FastLoadingFallback />}>
       {children}
     </Suspense>
   );
