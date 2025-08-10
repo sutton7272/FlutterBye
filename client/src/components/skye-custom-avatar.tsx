@@ -1,33 +1,23 @@
+import skyeAvatarImage from "@assets/image_1754786488692.png";
+
 interface SkyeCustomAvatarProps {
   className?: string;
   size?: number;
-  imageUrl?: string;
 }
 
-export function SkyeCustomAvatar({ className = "", size = 40, imageUrl }: SkyeCustomAvatarProps) {
-  // If no custom image is provided, show a simple placeholder
-  if (!imageUrl) {
-    return (
-      <div 
-        className={`rounded-full bg-gradient-to-r from-blue-500 to-green-500 flex items-center justify-center text-white font-bold ${className}`}
-        style={{ width: size, height: size, fontSize: size * 0.4 }}
-      >
-        S
-      </div>
-    );
-  }
-
+export function SkyeCustomAvatar({ className = "", size = 40 }: SkyeCustomAvatarProps) {
   return (
     <div 
-      className={`rounded-full overflow-hidden border-2 border-blue-400/50 ${className}`}
+      className={`rounded-full overflow-hidden ${className}`}
       style={{ width: size, height: size }}
     >
       <img 
-        src={imageUrl} 
+        src={skyeAvatarImage} 
         alt="Skye Avatar" 
         className="w-full h-full object-cover"
         style={{
-          filter: 'drop-shadow(0 0 8px rgba(34, 197, 94, 0.4))',
+          filter: 'drop-shadow(0 0 8px rgba(236, 72, 153, 0.6)) brightness(1.1)',
+          background: 'rgba(0, 0, 0, 0.9)',
         }}
       />
     </div>

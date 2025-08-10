@@ -135,12 +135,12 @@ export function SkyeChatbot() {
       <div className="fixed bottom-4 left-4 z-50">
         <button
           onClick={handleToggle}
-          className="h-16 w-16 rounded-full bg-gradient-to-r from-blue-900/20 to-green-900/20 backdrop-blur-sm border border-blue-500/30 hover:border-green-500/50 shadow-lg text-white flex items-center justify-center transition-all duration-300 hover:scale-110"
+          className="h-16 w-16 rounded-full bg-black/80 backdrop-blur-sm border border-pink-500/50 hover:border-pink-400/80 shadow-lg text-white flex items-center justify-center transition-all duration-300 hover:scale-110"
         >
           {isOpen ? (
             <X className="h-6 w-6 text-blue-400" />
           ) : (
-            <SkyeCustomAvatar size={48} className="animate-bounce" />
+            <SkyeCustomAvatar size={48} className="animate-pulse hover:animate-bounce" />
           )}
         </button>
       </div>
