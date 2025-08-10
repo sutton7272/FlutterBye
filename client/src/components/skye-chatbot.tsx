@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { MessageCircle, X, Send, Sparkles } from "lucide-react";
-import { SkyeFairyAvatar } from "./skye-fairy-avatar";
+import { SkyeCustomAvatar } from "./skye-custom-avatar";
 
 interface Message {
   id: string;
@@ -140,7 +140,7 @@ export function SkyeChatbot() {
           {isOpen ? (
             <X className="h-6 w-6 text-blue-400" />
           ) : (
-            <SkyeFairyAvatar size={48} className="animate-bounce" />
+            <SkyeCustomAvatar size={48} className="animate-bounce" />
           )}
         </button>
       </div>
@@ -152,7 +152,7 @@ export function SkyeChatbot() {
           <div className="bg-gradient-to-r from-blue-600 to-green-600 p-3 text-white rounded-t-lg">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-2">
-                <SkyeFairyAvatar size={32} />
+                <SkyeCustomAvatar size={32} />
                 <div>
                   <h3 className="font-semibold">Skye</h3>
                   <p className="text-xs opacity-90">Your AI Fairy Companion</p>
@@ -178,7 +178,7 @@ export function SkyeChatbot() {
                 }`}>
                   {msg.messageType === "assistant" && (
                     <div className="flex items-center space-x-2 mb-2">
-                      <SkyeFairyAvatar size={16} />
+                      <SkyeCustomAvatar size={16} />
                       <span className="font-medium text-blue-600 dark:text-blue-400">Skye</span>
                     </div>
                   )}
