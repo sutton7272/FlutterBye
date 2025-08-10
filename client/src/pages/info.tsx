@@ -1,5 +1,6 @@
-import { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useState, memo, useMemo } from 'react';
+import { useOptimizedQuery, useLowPriorityQuery } from '@/hooks/useOptimizedQuery';
+import { StatsSkeleton, GridSkeleton } from '@/components/optimized-loading';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
@@ -33,40 +34,29 @@ export default function InfoPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [valueFilter, setValueFilter] = useState('all');
 
-  // Data fetching for explore functionality with error handling
-  const { data: publicTokens = [], isLoading: tokensLoading, error: tokensError } = useQuery({
-    queryKey: ['/api/tokens/public'],
-    retry: 1,
-    refetchOnWindowFocus: false,
-    staleTime: 30000, // Cache for 30 seconds
-  });
+  // Optimized data fetching with performance enhancements
+  const { data: publicTokens = [], isLoading: tokensLoading, error: tokensError } = useLowPriorityQuery<Token[]>('/api/tokens/public');
 
-  const { data: tokensWithValue = [], isLoading: valueTokensLoading, error: valueTokensError } = useQuery({
-    queryKey: ['/api/tokens/with-value'],
-    retry: 1,
-    refetchOnWindowFocus: false,
-    staleTime: 30000, // Cache for 30 seconds
-  });
+  const { data: tokensWithValue = [], isLoading: valueTokensLoading, error: valueTokensError } = useLowPriorityQuery<Token[]>('/api/tokens/with-value');
 
-  const { data: stats, isLoading: statsLoading, error: statsError } = useQuery<DashboardStats>({
-    queryKey: ['/api/dashboard/stats'],
-    retry: 1,
-    refetchOnWindowFocus: false,
-    staleTime: 30000, // Cache for 30 seconds
-  });
+  const { data: stats, isLoading: statsLoading, error: statsError } = useOptimizedQuery<DashboardStats>('/api/dashboard/stats');
 
-  // Filter functions for explore functionality
-  const filteredPublicTokens = (publicTokens as Token[]).filter((token: Token) => {
-    const searchMatch = token.message.toLowerCase().includes(searchQuery.toLowerCase());
-    const valueMatch = valueFilter === 'all' || 
-      (valueFilter === 'with-value' && token.hasAttachedValue) ||
-      (valueFilter === 'no-value' && !token.hasAttachedValue);
-    return searchMatch && valueMatch;
-  });
+  // Memoized filter functions for performance
+  const filteredPublicTokens = useMemo(() => {
+    return (publicTokens as Token[]).filter((token: Token) => {
+      const searchMatch = token.message.toLowerCase().includes(searchQuery.toLowerCase());
+      const valueMatch = valueFilter === 'all' || 
+        (valueFilter === 'with-value' && token.hasAttachedValue) ||
+        (valueFilter === 'no-value' && !token.hasAttachedValue);
+      return searchMatch && valueMatch;
+    });
+  }, [publicTokens, searchQuery, valueFilter]);
 
-  const filteredValueTokens = (tokensWithValue as Token[]).filter((token: Token) => 
-    token.message.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredValueTokens = useMemo(() => {
+    return (tokensWithValue as Token[]).filter((token: Token) => 
+      token.message.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  }, [tokensWithValue, searchQuery]);
 
   const getStatusBadge = (token: Token) => {
     if (token.hasAttachedValue) {
@@ -1041,68 +1031,36 @@ export default function InfoPage() {
                 </div>
 
                 {/* Stats Overview */}
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-                  <Card className="bg-slate-700/30 border border-electric-blue/20">
-                    <CardContent className="p-4 text-center">
-                      {statsLoading ? (
-                        <div className="animate-pulse">
-                          <div className="h-6 bg-slate-600 rounded mb-2"></div>
-                          <div className="h-4 bg-slate-600 rounded w-2/3 mx-auto"></div>
-                        </div>
-                      ) : (
-                        <>
-                          <div className="text-2xl font-bold text-electric-blue">{stats?.totalTokens || 0}</div>
-                          <div className="text-sm text-gray-400">Total Tokens</div>
-                        </>
-                      )}
-                    </CardContent>
-                  </Card>
-                  <Card className="bg-slate-700/30 border border-electric-green/20">
-                    <CardContent className="p-4 text-center">
-                      {statsLoading ? (
-                        <div className="animate-pulse">
-                          <div className="h-6 bg-slate-600 rounded mb-2"></div>
-                          <div className="h-4 bg-slate-600 rounded w-2/3 mx-auto"></div>
-                        </div>
-                      ) : (
-                        <>
-                          <div className="text-2xl font-bold text-electric-green">{stats?.totalValueEscrowed || '$0'}</div>
-                          <div className="text-sm text-gray-400">Value Escrowed</div>
-                        </>
-                      )}
-                    </CardContent>
-                  </Card>
-                  <Card className="bg-slate-700/30 border border-purple-400/20">
-                    <CardContent className="p-4 text-center">
-                      {statsLoading ? (
-                        <div className="animate-pulse">
-                          <div className="h-6 bg-slate-600 rounded mb-2"></div>
-                          <div className="h-4 bg-slate-600 rounded w-2/3 mx-auto"></div>
-                        </div>
-                      ) : (
-                        <>
-                          <div className="text-2xl font-bold text-purple-400">{stats?.totalRedemptions || 0}</div>
-                          <div className="text-sm text-gray-400">Redemptions</div>
-                        </>
-                      )}
-                    </CardContent>
-                  </Card>
-                  <Card className="bg-slate-700/30 border border-yellow-400/20">
-                    <CardContent className="p-4 text-center">
-                      {statsLoading ? (
-                        <div className="animate-pulse">
-                          <div className="h-6 bg-slate-600 rounded mb-2"></div>
-                          <div className="h-4 bg-slate-600 rounded w-2/3 mx-auto"></div>
-                        </div>
-                      ) : (
-                        <>
-                          <div className="text-2xl font-bold text-yellow-400">{stats?.activeUsers || 0}</div>
-                          <div className="text-sm text-gray-400">Active Users</div>
-                        </>
-                      )}
-                    </CardContent>
-                  </Card>
-                </div>
+                {statsLoading ? (
+                  <StatsSkeleton />
+                ) : (
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                    <Card className="bg-slate-700/30 border border-electric-blue/20">
+                      <CardContent className="p-4 text-center">
+                        <div className="text-2xl font-bold text-electric-blue">{stats?.totalTokens || 0}</div>
+                        <div className="text-sm text-gray-400">Total Tokens</div>
+                      </CardContent>
+                    </Card>
+                    <Card className="bg-slate-700/30 border border-electric-green/20">
+                      <CardContent className="p-4 text-center">
+                        <div className="text-2xl font-bold text-electric-green">{stats?.totalValueEscrowed || '$0'}</div>
+                        <div className="text-sm text-gray-400">Value Escrowed</div>
+                      </CardContent>
+                    </Card>
+                    <Card className="bg-slate-700/30 border border-purple-400/20">
+                      <CardContent className="p-4 text-center">
+                        <div className="text-2xl font-bold text-purple-400">{stats?.totalRedemptions || 0}</div>
+                        <div className="text-sm text-gray-400">Redemptions</div>
+                      </CardContent>
+                    </Card>
+                    <Card className="bg-slate-700/30 border border-yellow-400/20">
+                      <CardContent className="p-4 text-center">
+                        <div className="text-2xl font-bold text-yellow-400">{stats?.activeUsers || 0}</div>
+                        <div className="text-sm text-gray-400">Active Users</div>
+                      </CardContent>
+                    </Card>
+                  </div>
+                )}
               </CardContent>
             </Card>
 
@@ -1127,14 +1085,7 @@ export default function InfoPage() {
                   </CardHeader>
                   <CardContent>
                     {tokensLoading ? (
-                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                        {[...Array(6)].map((_, i) => (
-                          <div key={i} className="bg-slate-700/30 rounded-lg p-4 animate-pulse">
-                            <div className="h-4 bg-slate-600 rounded mb-2"></div>
-                            <div className="h-3 bg-slate-600 rounded w-3/4"></div>
-                          </div>
-                        ))}
-                      </div>
+                      <GridSkeleton count={6} />
                     ) : tokensError ? (
                       <div className="text-center py-8">
                         <div className="text-slate-400 mb-2">Unable to load public tokens</div>
@@ -1192,12 +1143,7 @@ export default function InfoPage() {
                   <CardContent>
                     {valueTokensLoading ? (
                       <div className="space-y-4">
-                        {[...Array(4)].map((_, i) => (
-                          <div key={i} className="bg-slate-700/30 rounded-lg p-4 animate-pulse">
-                            <div className="h-4 bg-slate-600 rounded mb-2"></div>
-                            <div className="h-3 bg-slate-600 rounded w-1/2"></div>
-                          </div>
-                        ))}
+                        <GridSkeleton count={4} />
                       </div>
                     ) : valueTokensError ? (
                       <div className="text-center py-8">
