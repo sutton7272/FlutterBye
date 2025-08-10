@@ -13,6 +13,7 @@ import { SkyeChatbot } from "@/components/skye-chatbot";
 import { useState, useEffect, lazy, Suspense } from "react";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { LoadingSpinner } from "@/components/loading-spinner";
+import { SuspenseWrapper } from "@/components/suspense-wrapper";
 import NotFound from "@/pages/not-found";
 
 // Lazy loaded pages for better performance
@@ -129,21 +130,12 @@ function Router() {
     <div className="dark min-h-screen flex flex-col bg-transparent">
       <div className="flex-1 bg-transparent">
         <Switch>
-        <Route path="/" component={() => (
-          <>
-            <Navbar />
-            <Suspense fallback={<LoadingSpinner />}>
-              <InfoPage />
-            </Suspense>
-          </>
-        )} />
+        <Route path="/" component={LaunchCountdown} />
         <Route path="/launch" component={LaunchCountdown} />
         <Route path="/home" component={() => (
           <>
             <Navbar />
-            <Suspense fallback={<LoadingSpinner />}>
-              <Home />
-            </Suspense>
+            <Home />
           </>
         )} />
         
@@ -167,9 +159,9 @@ function Router() {
         <Route path="/campaign-builder" component={() => (
           <>
             <Navbar />
-            <Suspense>
+            <SuspenseWrapper>
               <CampaignBuilder />
-            </Suspense>
+            </SuspenseWrapper>
           </>
         )} />
         <Route path="/trade" component={() => (
@@ -183,41 +175,41 @@ function Router() {
         <Route path="/flutterai" component={() => (
           <>
             <Navbar />
-            <Suspense>
+            <SuspenseWrapper>
               <FlutterAIDashboard />
-            </Suspense>
+            </SuspenseWrapper>
           </>
         )} />
         <Route path="/flutter-wave" component={() => (
           <>
             <Navbar />
-            <Suspense>
+            <SuspenseWrapper>
               <FlutterWave />
-            </Suspense>
+            </SuspenseWrapper>
           </>
         )} />
         <Route path="/flutter-art" component={() => (
           <>
             <Navbar />
-            <Suspense>
+            <SuspenseWrapper>
               <FlutterArt />
-            </Suspense>
+            </SuspenseWrapper>
           </>
         )} />
         <Route path="/chat" component={() => (
           <>
             <Navbar />
-            <Suspense>
+            <SuspenseWrapper>
               <Chat />
-            </Suspense>
+            </SuspenseWrapper>
           </>
         )} />
         <Route path="/intelligence" component={() => (
           <>
             <Navbar />
-            <Suspense>
+            <SuspenseWrapper>
               <Intelligence />
-            </Suspense>
+            </SuspenseWrapper>
           </>
         )} />
         
@@ -225,113 +217,113 @@ function Router() {
         <Route path="/home" component={() => (
           <>
             <Navbar />
-            <Suspense>
+            <SuspenseWrapper>
               <Dashboard />
-            </Suspense>
+            </SuspenseWrapper>
           </>
         )} />
         <Route path="/marketplace" component={() => (
           <>
             <Navbar />
-            <Suspense>
+            <SuspenseWrapper>
               <Trade />
-            </Suspense>
+            </SuspenseWrapper>
           </>
         )} />
         <Route path="/portfolio" component={() => (
           <>
             <Navbar />
-            <Suspense>
+            <SuspenseWrapper>
               <Trade />
-            </Suspense>
+            </SuspenseWrapper>
           </>
         )} />
         <Route path="/mint" component={() => (
           <>
             <Navbar />
-            <Suspense>
+            <SuspenseWrapper>
               <Mint />
-            </Suspense>
+            </SuspenseWrapper>
           </>
         )} />
         <Route path="/mint/basic" component={() => (
           <>
             <Navbar />
-            <Suspense>
+            <SuspenseWrapper>
               <MintBasic />
-            </Suspense>
+            </SuspenseWrapper>
           </>
         )} />
         <Route path="/mint/ai-enhanced" component={() => (
           <>
             <Navbar />
-            <Suspense>
+            <SuspenseWrapper>
               <MintAIEnhanced />
-            </Suspense>
+            </SuspenseWrapper>
           </>
         )} />
         <Route path="/mint/voice" component={() => (
           <>
             <Navbar />
-            <Suspense>
+            <SuspenseWrapper>
               <MintVoice />
-            </Suspense>
+            </SuspenseWrapper>
           </>
         )} />
         <Route path="/mint/multimedia" component={() => (
           <>
             <Navbar />
-            <Suspense>
+            <SuspenseWrapper>
               <MintMultimedia />
-            </Suspense>
+            </SuspenseWrapper>
           </>
         )} />
         <Route path="/redeem" component={() => (
           <>
             <Navbar />
-            <Suspense>
+            <SuspenseWrapper>
               <Redeem />
-            </Suspense>
+            </SuspenseWrapper>
           </>
         )} />
         <Route path="/activity" component={() => (
           <>
             <Navbar />
-            <Suspense>
+            <SuspenseWrapper>
               <Activity />
-            </Suspense>
+            </SuspenseWrapper>
           </>
         )} />
         <Route path="/trending" component={() => (
           <>
             <Navbar />
-            <Suspense>
+            <SuspenseWrapper>
               <Explore />
-            </Suspense>
+            </SuspenseWrapper>
           </>
         )} />
         <Route path="/how-it-works" component={() => (
           <>
             <Navbar />
-            <Suspense>
+            <SuspenseWrapper>
               <HowItWorks />
-            </Suspense>
+            </SuspenseWrapper>
           </>
         )} />
         <Route path="/free-codes" component={() => (
           <>
             <Navbar />
-            <Suspense>
+            <SuspenseWrapper>
               <FreeCodes />
-            </Suspense>
+            </SuspenseWrapper>
           </>
         )} />
         <Route path="/search" component={() => (
           <>
             <Navbar />
-            <Suspense>
+            <SuspenseWrapper>
               <SearchPage />
-            </Suspense>
+            </SuspenseWrapper>
           </>
         )} />
         {/* Admin Gateway - Password Protected Entry Point */}
@@ -340,45 +332,45 @@ function Router() {
         {/* Protected Admin Routes */}
         <Route path="/admin/dashboard" component={() => (
           <AdminRouteGuard>
-            <Suspense>
+            <SuspenseWrapper>
               <AdminDashboard />
-            </Suspense>
+            </SuspenseWrapper>
           </AdminRouteGuard>
         )} />
         
         <Route path="/admin/flutterai" component={() => (
           <AdminRouteGuard>
             <Navbar />
-            <Suspense>
+            <SuspenseWrapper>
               <FlutterAIDashboard />
-            </Suspense>
+            </SuspenseWrapper>
           </AdminRouteGuard>
         )} />
         
         <Route path="/admin/phase1" component={() => (
           <AdminRouteGuard>
             <Navbar />
-            <Suspense>
+            <SuspenseWrapper>
               <Phase1Dashboard />
-            </Suspense>
+            </SuspenseWrapper>
           </AdminRouteGuard>
         )} />
         
         <Route path="/admin/phase2" component={() => (
           <AdminRouteGuard>
             <Navbar />
-            <Suspense>
+            <SuspenseWrapper>
               <Phase2Dashboard />
-            </Suspense>
+            </SuspenseWrapper>
           </AdminRouteGuard>
         )} />
         
         <Route path="/admin/phase3" component={() => (
           <AdminRouteGuard>
             <Navbar />
-            <Suspense>
+            <SuspenseWrapper>
               <Phase3Dashboard />
-            </Suspense>
+            </SuspenseWrapper>
           </AdminRouteGuard>
         )} />
         
