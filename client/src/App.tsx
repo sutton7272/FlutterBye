@@ -109,7 +109,7 @@ import CelestialDashboard from "@/pages/CelestialDashboard";
 import EnterpriseSalesDashboard from "@/pages/enterprise-sales-dashboard";
 import APIMonetizationDashboard from "@/pages/api-monetization-dashboard";
 import Final5PercentDashboard from "@/pages/final-5-percent-dashboard";
-import OptimizedOptimizedNavbar from "@/components/optimized-navbar";
+import Navbar from "@/components/optimized-navbar";
 import Footer from "@/components/footer";
 import { PersonalizedDashboard } from "@/components/PersonalizedDashboard";
 // import { ErrorBoundary } from "@/components/error-boundary";
@@ -136,7 +136,7 @@ function Router() {
         <Route path="/launch" component={SimpleLaunch} />
         <Route path="/home" component={() => (
           <>
-            <OptimizedOptimizedNavbar />
+            <Navbar />
             <SuspenseWrapper>
               <Home />
             </SuspenseWrapper>
@@ -146,7 +146,7 @@ function Router() {
         {/* Simplified Routes with navbar - unified navigation structure */}
         <Route path="/dashboard" component={() => (
           <>
-            <OptimizedOptimizedNavbar />
+            <Navbar />
             <SuspenseWrapper>
               <Dashboard />
             </SuspenseWrapper>
@@ -154,7 +154,7 @@ function Router() {
         )} />
         <Route path="/create" component={() => (
           <>
-            <OptimizedOptimizedNavbar />
+            <Navbar />
             <SuspenseWrapper>
               <Create />
             </SuspenseWrapper>
@@ -162,7 +162,7 @@ function Router() {
         )} />
         <Route path="/campaign-builder" component={() => (
           <>
-            <OptimizedNavbar />
+            <Navbar />
             <SuspenseWrapper>
               <CampaignBuilder />
             </SuspenseWrapper>
@@ -170,7 +170,7 @@ function Router() {
         )} />
         <Route path="/trade" component={() => (
           <>
-            <OptimizedNavbar />
+            <Navbar />
             <SuspenseWrapper>
               <Trade />
             </SuspenseWrapper>
@@ -178,7 +178,7 @@ function Router() {
         )} />
         <Route path="/flutterai" component={() => (
           <>
-            <OptimizedNavbar />
+            <Navbar />
             <SuspenseWrapper>
               <FlutterAIDashboard />
             </SuspenseWrapper>
@@ -186,7 +186,7 @@ function Router() {
         )} />
         <Route path="/flutter-wave" component={() => (
           <>
-            <OptimizedNavbar />
+            <Navbar />
             <SuspenseWrapper>
               <FlutterWave />
             </SuspenseWrapper>
@@ -194,7 +194,7 @@ function Router() {
         )} />
         <Route path="/flutter-art" component={() => (
           <>
-            <OptimizedNavbar />
+            <Navbar />
             <SuspenseWrapper>
               <FlutterArt />
             </SuspenseWrapper>
@@ -202,7 +202,7 @@ function Router() {
         )} />
         <Route path="/chat" component={() => (
           <>
-            <OptimizedNavbar />
+            <Navbar />
             <SuspenseWrapper>
               <Chat />
             </SuspenseWrapper>
@@ -210,7 +210,7 @@ function Router() {
         )} />
         <Route path="/intelligence" component={() => (
           <>
-            <OptimizedNavbar />
+            <Navbar />
             <SuspenseWrapper>
               <Intelligence />
             </SuspenseWrapper>
@@ -220,7 +220,7 @@ function Router() {
         {/* Legacy routes for backward compatibility */}
         <Route path="/home" component={() => (
           <>
-            <OptimizedNavbar />
+            <Navbar />
             <SuspenseWrapper>
               <Dashboard />
             </SuspenseWrapper>
@@ -228,7 +228,7 @@ function Router() {
         )} />
         <Route path="/marketplace" component={() => (
           <>
-            <OptimizedNavbar />
+            <Navbar />
             <SuspenseWrapper>
               <Trade />
             </SuspenseWrapper>
@@ -236,7 +236,7 @@ function Router() {
         )} />
         <Route path="/portfolio" component={() => (
           <>
-            <OptimizedNavbar />
+            <Navbar />
             <SuspenseWrapper>
               <Trade />
             </SuspenseWrapper>
@@ -244,7 +244,7 @@ function Router() {
         )} />
         <Route path="/mint" component={() => (
           <>
-            <OptimizedNavbar />
+            <Navbar />
             <SuspenseWrapper>
               <Mint />
             </SuspenseWrapper>
@@ -252,7 +252,7 @@ function Router() {
         )} />
         <Route path="/mint/basic" component={() => (
           <>
-            <OptimizedNavbar />
+            <Navbar />
             <SuspenseWrapper>
               <MintBasic />
             </SuspenseWrapper>
@@ -260,7 +260,7 @@ function Router() {
         )} />
         <Route path="/mint/ai-enhanced" component={() => (
           <>
-            <OptimizedNavbar />
+            <Navbar />
             <SuspenseWrapper>
               <MintAIEnhanced />
             </SuspenseWrapper>
@@ -268,7 +268,7 @@ function Router() {
         )} />
         <Route path="/mint/voice" component={() => (
           <>
-            <OptimizedNavbar />
+            <Navbar />
             <SuspenseWrapper>
               <MintVoice />
             </SuspenseWrapper>
@@ -276,7 +276,7 @@ function Router() {
         )} />
         <Route path="/mint/multimedia" component={() => (
           <>
-            <OptimizedNavbar />
+            <Navbar />
             <SuspenseWrapper>
               <MintMultimedia />
             </SuspenseWrapper>
@@ -284,7 +284,7 @@ function Router() {
         )} />
         <Route path="/redeem" component={() => (
           <>
-            <OptimizedNavbar />
+            <Navbar />
             <SuspenseWrapper>
               <Redeem />
             </SuspenseWrapper>
@@ -292,7 +292,7 @@ function Router() {
         )} />
         <Route path="/activity" component={() => (
           <>
-            <OptimizedNavbar />
+            <Navbar />
             <SuspenseWrapper>
               <Activity />
             </SuspenseWrapper>
@@ -300,7 +300,7 @@ function Router() {
         )} />
         <Route path="/trending" component={() => (
           <>
-            <OptimizedNavbar />
+            <Navbar />
             <SuspenseWrapper>
               <Explore />
             </SuspenseWrapper>
@@ -308,7 +308,7 @@ function Router() {
         )} />
         <Route path="/how-it-works" component={() => (
           <>
-            <OptimizedNavbar />
+            <Navbar />
             <SuspenseWrapper>
               <HowItWorks />
             </SuspenseWrapper>
@@ -316,7 +316,7 @@ function Router() {
         )} />
         <Route path="/free-codes" component={() => (
           <>
-            <OptimizedNavbar />
+            <Navbar />
             <SuspenseWrapper>
               <FreeCodes />
             </SuspenseWrapper>
@@ -324,7 +324,7 @@ function Router() {
         )} />
         <Route path="/search" component={() => (
           <>
-            <OptimizedNavbar />
+            <Navbar />
             <SuspenseWrapper>
               <SearchPage />
             </SuspenseWrapper>
@@ -344,7 +344,7 @@ function Router() {
         
         <Route path="/admin/flutterai" component={() => (
           <AdminRouteGuard>
-            <OptimizedNavbar />
+            <Navbar />
             <SuspenseWrapper>
               <FlutterAIDashboard />
             </SuspenseWrapper>
@@ -353,7 +353,7 @@ function Router() {
         
         <Route path="/admin/phase1" component={() => (
           <AdminRouteGuard>
-            <OptimizedNavbar />
+            <Navbar />
             <SuspenseWrapper>
               <Phase1Dashboard />
             </SuspenseWrapper>
@@ -362,7 +362,7 @@ function Router() {
         
         <Route path="/admin/phase2" component={() => (
           <AdminRouteGuard>
-            <OptimizedNavbar />
+            <Navbar />
             <SuspenseWrapper>
               <Phase2Dashboard />
             </SuspenseWrapper>
@@ -371,7 +371,7 @@ function Router() {
         
         <Route path="/admin/phase3" component={() => (
           <AdminRouteGuard>
-            <OptimizedNavbar />
+            <Navbar />
             <SuspenseWrapper>
               <Phase3Dashboard />
             </SuspenseWrapper>
@@ -380,35 +380,35 @@ function Router() {
         
         <Route path="/admin/phase4" component={() => (
           <AdminRouteGuard>
-            <OptimizedNavbar />
+            <Navbar />
             <Phase4Dashboard />
           </AdminRouteGuard>
         )} />
         
         <Route path="/admin/performance" component={() => (
           <AdminRouteGuard>
-            <OptimizedNavbar />
+            <Navbar />
             <PerformanceDashboard />
           </AdminRouteGuard>
         )} />
         
         <Route path="/admin/ai-enhanced" component={() => (
           <AdminRouteGuard>
-            <OptimizedNavbar />
+            <Navbar />
             <AIEnhancedDashboard />
           </AdminRouteGuard>
         )} />
         
         <Route path="/admin/cost-effective-ai" component={() => (
           <AdminRouteGuard>
-            <OptimizedNavbar />
+            <Navbar />
             <CostEffectiveAIPanel />
           </AdminRouteGuard>
         )} />
         
         <Route path="/admin/unified" component={() => (
           <AdminRouteGuard>
-            <OptimizedNavbar />
+            <Navbar />
             <UnifiedAdminDashboard />
           </AdminRouteGuard>
         )} />
@@ -422,61 +422,61 @@ function Router() {
         {/* Legacy Admin Route */}
         <Route path="/admin-legacy" component={() => (
           <>
-            <OptimizedNavbar />
+            <Navbar />
             <Admin />
           </>
         )} />
         <Route path="/sms" component={() => (
           <>
-            <OptimizedNavbar />
+            <Navbar />
             <SmsIntegrationPage />
           </>
         )} />
         <Route path="/sms-demo" component={() => (
           <>
-            <OptimizedNavbar />
+            <Navbar />
             <SMSDemoPage />
           </>
         )} />
         <Route path="/sms-nexus" component={() => (
           <>
-            <OptimizedNavbar />
+            <Navbar />
             <SMSNexusPage />
           </>
         )} />
         <Route path="/wallets" component={() => (
           <>
-            <OptimizedNavbar />
+            <Navbar />
             <WalletManagementPage />
           </>
         )} />
         <Route path="/rewards" component={() => (
           <>
-            <OptimizedNavbar />
+            <Navbar />
             <RewardsPage />
           </>
         )} />
         <Route path="/journey" component={() => (
           <>
-            <OptimizedNavbar />
+            <Navbar />
             <JourneyPage />
           </>
         )} />
         <Route path="/heatmap" component={() => (
           <>
-            <OptimizedNavbar />
+            <Navbar />
             <TransactionHeatmapPage />
           </>
         )} />
         <Route path="/badges" component={() => (
           <>
-            <OptimizedNavbar />
+            <Navbar />
             <BadgesPage />
           </>
         )} />
         <Route path="/chat" component={() => (
           <>
-            <OptimizedNavbar />
+            <Navbar />
             <Chat />
           </>
         )} />
@@ -492,91 +492,91 @@ function Router() {
         )} />
         <Route path="/limited-edition" component={() => (
           <>
-            <OptimizedNavbar />
+            <Navbar />
             <LimitedEdition />
           </>
         )} />
         <Route path="/search" component={() => (
           <>
-            <OptimizedNavbar />
+            <Navbar />
             <AdvancedSearch />
           </>
         )} />
         <Route path="/token-map" component={() => (
           <>
-            <OptimizedNavbar />
+            <Navbar />
             <TokenHolderMapPage />
           </>
         )} />
         <Route path="/admin-system" component={() => (
           <>
-            <OptimizedNavbar />
+            <Navbar />
             <AdminSystem />
           </>
         )} />
         <Route path="/confetti-demo" component={() => (
           <>
-            <OptimizedNavbar />
+            <Navbar />
             <ConfettiDemo />
           </>
         )} />
         <Route path="/electric-demo" component={() => (
           <>
-            <OptimizedNavbar />
+            <Navbar />
             <ElectricDemo />
           </>
         )} />
         <Route path="/greeting-cards" component={() => (
           <>
-            <OptimizedNavbar />
+            <Navbar />
             <GreetingCards />
           </>
         )} />
         <Route path="/enterprise" component={() => (
           <>
-            <OptimizedNavbar />
+            <Navbar />
             <EnterpriseCampaigns />
           </>
         )} />
         <Route path="/enterprise-intelligence" component={() => (
           <>
-            <OptimizedNavbar />
+            <Navbar />
             <EnterpriseDashboard />
           </>
         )} />
         <Route path="/advanced-analytics" component={() => (
           <>
-            <OptimizedNavbar />
+            <Navbar />
             <AdvancedAnalytics />
           </>
         )} />
         <Route path="/enterprise-sales" component={() => (
           <>
-            <OptimizedNavbar />
+            <Navbar />
             <EnterpriseSalesDashboard />
           </>
         )} />
         <Route path="/api-monetization" component={() => (
           <>
-            <OptimizedNavbar />
+            <Navbar />
             <APIMonetizationDashboard />
           </>
         )} />
         <Route path="/flby/staking" component={() => (
           <>
-            <OptimizedNavbar />
+            <Navbar />
             <FlbyStaking />
           </>
         )} />
         <Route path="/flby/governance" component={() => (
           <>
-            <OptimizedNavbar />
+            <Navbar />
             <FlbyGovernance />
           </>
         )} />
         <Route path="/flby/airdrop" component={() => (
           <>
-            <OptimizedNavbar />
+            <Navbar />
             <FlbyAirdrop />
           </>
         )} />
@@ -607,32 +607,32 @@ function Router() {
         }} />
         <Route path="/referrals" component={() => (
           <>
-            <OptimizedNavbar />
+            <Navbar />
             <ReferralRewards />
           </>
         )} />
         <Route path="/subscribe" component={() => (
           <>
-            <OptimizedNavbar />
+            <Navbar />
             <Subscribe />
           </>
         )} />
         <Route path="/payments" component={() => (
           <>
-            <OptimizedNavbar />
+            <Navbar />
             <Payments />
           </>
         )} />
         <Route path="/ai-payments" component={() => (
           <>
-            <OptimizedNavbar />
+            <Navbar />
             <AIPayments />
           </>
         )} />
         <Route path="/payment-success" component={PaymentSuccess} />
         <Route path="/info" component={() => (
           <>
-            <OptimizedOptimizedNavbar />
+            <Navbar />
             <SuspenseWrapper>
               <InfoPage />
             </SuspenseWrapper>
@@ -640,37 +640,37 @@ function Router() {
         )} />
         <Route path="/personalization" component={() => (
           <>
-            <OptimizedNavbar />
+            <Navbar />
             <PersonalizedDashboard />
           </>
         )} />
         <Route path="/collaborative-creation" component={() => (
           <>
-            <OptimizedNavbar />
+            <Navbar />
             <CollaborativeCreation />
           </>
         )} />
         <Route path="/viral-dashboard" component={() => (
           <>
-            <OptimizedNavbar />
+            <Navbar />
             <ViralDashboard />
           </>
         )} />
         <Route path="/final-5-percent-dashboard" component={() => (
           <>
-            <OptimizedNavbar />
+            <Navbar />
             <Final5PercentDashboard />
           </>
         )} />
         <Route path="/message-nfts" component={() => (
           <>
-            <OptimizedNavbar />
+            <Navbar />
             <MessageNFTCreator />
           </>
         )} />
         <Route path="/nft-marketplace" component={() => (
           <>
-            <OptimizedNavbar />
+            <Navbar />
             <NFTMarketplace />
           </>
         )} />
@@ -685,43 +685,43 @@ function Router() {
         }} />
         <Route path="/ai-overview" component={() => (
           <>
-            <OptimizedNavbar />
+            <Navbar />
             <AIComprehensiveOverview />
           </>
         )} />
         <Route path="/ai-test" component={() => (
           <>
-            <OptimizedNavbar />
+            <Navbar />
             <AIFeaturesTest />
           </>
         )} />
         <Route path="/ai-features-test" component={() => (
           <>
-            <OptimizedNavbar />
+            <Navbar />
             <AIFeaturesTest />
           </>
         )} />
         <Route path="/flutterai" component={() => (
           <>
-            <OptimizedNavbar />
+            <Navbar />
             <FlutterAIDashboard />
           </>
         )} />
         <Route path="/flutterai-dashboard" component={() => (
           <>
-            <OptimizedNavbar />
+            <Navbar />
             <FlutterAIDashboard />
           </>
         )} />
         <Route path="/flutterblog-bot" component={() => (
           <>
-            <OptimizedNavbar />
+            <Navbar />
             <FlutterBlogBot />
           </>
         )} />
         <Route path="/all-opportunities" component={() => (
           <>
-            <OptimizedNavbar />
+            <Navbar />
             <AllOpportunities />
           </>
         )} />
@@ -737,7 +737,7 @@ function Router() {
         )} />
         <Route path="/monitoring" component={() => (
           <>
-            <OptimizedNavbar />
+            <Navbar />
             <MonitoringDashboard />
           </>
         )} />
@@ -756,7 +756,7 @@ function Router() {
           const RevolutionaryAIShowcase = lazy(() => import('./pages/revolutionary-ai-showcase'));
           return (
             <>
-              <OptimizedNavbar />
+              <Navbar />
               <Suspense fallback={
                 <div className="flex items-center justify-center min-h-screen">
                   <div className="text-center">
@@ -774,7 +774,7 @@ function Router() {
           const AIMarketingDashboard = lazy(() => import('./pages/ai-marketing-dashboard'));
           return (
             <>
-              <OptimizedNavbar />
+              <Navbar />
               <Suspense fallback={
                 <div className="flex items-center justify-center min-h-screen">
                   <div className="text-center">
@@ -792,7 +792,7 @@ function Router() {
         <Route path="/claim/:collectionId/:tokenNumber" component={NFTClaim} />
         <Route path="/dynamic-pricing" component={() => (
           <>
-            <OptimizedNavbar />
+            <Navbar />
             <DynamicPricingDashboard />
           </>
         )} />
@@ -808,7 +808,7 @@ function Router() {
         )} />
         <Route path="/production-deployment" component={() => (
           <>
-            <OptimizedNavbar />
+            <Navbar />
             <ProductionDeployment />
           </>
         )} />
@@ -816,7 +816,7 @@ function Router() {
           const DualEnvironment = lazy(() => import('./pages/dual-environment'));
           return (
             <>
-              <OptimizedNavbar />
+              <Navbar />
               <Suspense fallback={
                 <div className="flex items-center justify-center min-h-screen">
                   <div className="text-center">
@@ -834,7 +834,7 @@ function Router() {
           const ProductionReadiness = lazy(() => import('./pages/production-readiness'));
           return (
             <>
-              <OptimizedNavbar />
+              <Navbar />
               <Suspense fallback={
                 <div className="flex items-center justify-center min-h-screen">
                   <div className="text-center">
@@ -852,7 +852,7 @@ function Router() {
           const CoinMintingLaunch = lazy(() => import('./pages/coin-minting-launch'));
           return (
             <>
-              <OptimizedNavbar />
+              <Navbar />
               <Suspense fallback={
                 <div className="flex items-center justify-center min-h-screen">
                   <div className="text-center">
@@ -870,7 +870,7 @@ function Router() {
           const Final5PercentDashboard = lazy(() => import('./pages/final-5-percent-dashboard'));
           return (
             <>
-              <OptimizedNavbar />
+              <Navbar />
               <Suspense fallback={
                 <div className="flex items-center justify-center min-h-screen">
                   <div className="text-center">
@@ -886,13 +886,13 @@ function Router() {
         }} />
         <Route path="/admin-ai-marketing" component={() => (
           <>
-            <OptimizedNavbar />
+            <Navbar />
             <AIMarketingBot />
           </>
         )} />
         <Route path="/admin-custodial-wallet" component={() => (
           <>
-            <OptimizedNavbar />
+            <Navbar />
             <AdminCustodialWallet />
           </>
         )} />
