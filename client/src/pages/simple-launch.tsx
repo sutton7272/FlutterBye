@@ -1,4 +1,18 @@
+import { useEffect } from "react";
+import { useLocation } from "wouter";
+
 export default function SimpleLaunch() {
+  const [, navigate] = useLocation();
+
+  useEffect(() => {
+    // Auto-navigate to home after 2 seconds
+    const timer = setTimeout(() => {
+      navigate("/home");
+    }, 2000);
+
+    return () => clearTimeout(timer);
+  }, [navigate]);
+
   return (
     <div className="min-h-screen bg-gray-900 text-white flex items-center justify-center">
       <div className="text-center">
@@ -8,6 +22,7 @@ export default function SimpleLaunch() {
           <div className="w-16 h-16 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto"></div>
         </div>
         <p className="mt-4 text-gray-400">Loading Platform...</p>
+        <p className="mt-2 text-sm text-gray-500">Initializing quantum consciousness systems...</p>
       </div>
     </div>
   );
