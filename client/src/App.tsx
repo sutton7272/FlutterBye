@@ -12,7 +12,7 @@ import { DebugChat } from "@/components/debug-chat";
 import { SkyeChatbot } from "@/components/skye-chatbot";
 import { useState, useEffect, lazy, Suspense } from "react";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { FastLoadingFallback } from "@/components/fast-loading-fallback";
+import { LoadingSpinner } from "@/components/loading-spinner";
 import { SuspenseWrapper } from "@/components/suspense-wrapper";
 import NotFound from "@/pages/not-found";
 
@@ -109,10 +109,10 @@ import CelestialDashboard from "@/pages/CelestialDashboard";
 import EnterpriseSalesDashboard from "@/pages/enterprise-sales-dashboard";
 import APIMonetizationDashboard from "@/pages/api-monetization-dashboard";
 import Final5PercentDashboard from "@/pages/final-5-percent-dashboard";
-import Navbar from "@/components/optimized-navbar";
+import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";
 import { PersonalizedDashboard } from "@/components/PersonalizedDashboard";
-// import { ErrorBoundary } from "@/components/error-boundary";
+import { ErrorBoundary } from "@/components/error-boundary";
 import { PWAInstallPrompt, PWANotificationPrompt } from "@/components/pwa-features";
 import { CommandPalette } from "@/components/command-palette";
 import { WebSocketProvider } from "@/components/websocket-provider-disabled";
@@ -125,21 +125,17 @@ import AdminGateway from "@/pages/admin-gateway";
 import AdminDashboard from "@/pages/admin-dashboard";
 import AdminEscrow from "@/pages/admin-escrow";
 import { AdminRouteGuard } from "@/components/admin-route-guard";
-import SimpleLaunch from "@/pages/simple-launch";
-
 function Router() {
   return (
     <div className="dark min-h-screen flex flex-col bg-transparent">
       <div className="flex-1 bg-transparent">
         <Switch>
-        <Route path="/" component={SimpleLaunch} />
-        <Route path="/launch" component={SimpleLaunch} />
+        <Route path="/" component={LaunchCountdown} />
+        <Route path="/launch" component={LaunchCountdown} />
         <Route path="/home" component={() => (
           <>
             <Navbar />
-            <SuspenseWrapper>
-              <Home />
-            </SuspenseWrapper>
+            <Home />
           </>
         )} />
         
@@ -147,17 +143,17 @@ function Router() {
         <Route path="/dashboard" component={() => (
           <>
             <Navbar />
-            <SuspenseWrapper>
+            <Suspense fallback={<LoadingSpinner />}>
               <Dashboard />
-            </SuspenseWrapper>
+            </Suspense>
           </>
         )} />
         <Route path="/create" component={() => (
           <>
             <Navbar />
-            <SuspenseWrapper>
+            <Suspense fallback={<LoadingSpinner />}>
               <Create />
-            </SuspenseWrapper>
+            </Suspense>
           </>
         )} />
         <Route path="/campaign-builder" component={() => (
@@ -171,9 +167,9 @@ function Router() {
         <Route path="/trade" component={() => (
           <>
             <Navbar />
-            <SuspenseWrapper>
+            <Suspense fallback={<LoadingSpinner />}>
               <Trade />
-            </SuspenseWrapper>
+            </Suspense>
           </>
         )} />
         <Route path="/flutterai" component={() => (
@@ -633,9 +629,7 @@ function Router() {
         <Route path="/info" component={() => (
           <>
             <Navbar />
-            <SuspenseWrapper>
-              <InfoPage />
-            </SuspenseWrapper>
+            <InfoPage />
           </>
         )} />
         <Route path="/personalization" component={() => (

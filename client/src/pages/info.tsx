@@ -33,32 +33,31 @@ export default function InfoPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [valueFilter, setValueFilter] = useState('all');
 
-  // Data fetching disabled for performance - info page focuses on static content
-  const publicTokens: Token[] = [];
-  const tokensWithValue: Token[] = [];
-  const stats: DashboardStats = {
-    totalTokens: 0,
-    totalValueEscrowed: "0",
-    totalRedemptions: 0,
-    activeUsers: 0
-  };
-  const tokensLoading = false;
-  const valueTokensLoading = false;
-  const statsLoading = false;
+  // Data fetching for explore functionality
+  const { data: publicTokens = [], isLoading: tokensLoading } = useQuery({
+    queryKey: ['/api/tokens/public'],
+  });
 
-  // Filter functions for explore functionality - performance optimized
-  const filteredPublicTokens = Array.isArray(publicTokens) ? (publicTokens as Token[]).filter((token: Token) => {
-    if (!token || !token.message) return false;
+  const { data: tokensWithValue = [], isLoading: valueTokensLoading } = useQuery({
+    queryKey: ['/api/tokens/with-value'],
+  });
+
+  const { data: stats, isLoading: statsLoading } = useQuery<DashboardStats>({
+    queryKey: ['/api/dashboard/stats'],
+  });
+
+  // Filter functions for explore functionality
+  const filteredPublicTokens = (publicTokens as Token[]).filter((token: Token) => {
     const searchMatch = token.message.toLowerCase().includes(searchQuery.toLowerCase());
     const valueMatch = valueFilter === 'all' || 
       (valueFilter === 'with-value' && token.hasAttachedValue) ||
       (valueFilter === 'no-value' && !token.hasAttachedValue);
     return searchMatch && valueMatch;
-  }) : [];
+  });
 
-  const filteredValueTokens = Array.isArray(tokensWithValue) ? (tokensWithValue as Token[]).filter((token: Token) => 
-    token && token.message && token.message.toLowerCase().includes(searchQuery.toLowerCase())
-  ) : [];
+  const filteredValueTokens = (tokensWithValue as Token[]).filter((token: Token) => 
+    token.message.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   const getStatusBadge = (token: Token) => {
     if (token.hasAttachedValue) {
