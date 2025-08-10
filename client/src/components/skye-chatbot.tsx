@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { MessageCircle, X, Send, Sparkles } from "lucide-react";
+import { SkyeFairyAvatar } from "./skye-fairy-avatar";
 
 interface Message {
   id: string;
@@ -134,9 +135,13 @@ export function SkyeChatbot() {
       <div className="fixed bottom-4 left-4 z-50">
         <button
           onClick={handleToggle}
-          className="h-12 w-12 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 shadow-lg text-white flex items-center justify-center transition-all duration-200"
+          className="h-16 w-16 rounded-full bg-gradient-to-r from-blue-900/20 to-green-900/20 backdrop-blur-sm border border-blue-500/30 hover:border-green-500/50 shadow-lg text-white flex items-center justify-center transition-all duration-300 hover:scale-110"
         >
-          {isOpen ? <X className="h-6 w-6" /> : <Sparkles className="h-6 w-6" />}
+          {isOpen ? (
+            <X className="h-6 w-6 text-blue-400" />
+          ) : (
+            <SkyeFairyAvatar size={48} className="animate-bounce" />
+          )}
         </button>
       </div>
 
@@ -144,13 +149,13 @@ export function SkyeChatbot() {
       {isOpen && (
         <div className="fixed bottom-20 left-4 w-80 h-96 bg-white dark:bg-gray-900 rounded-lg shadow-xl border border-gray-200 dark:border-gray-700 z-50 flex flex-col">
           {/* Header */}
-          <div className="bg-gradient-to-r from-purple-500 to-pink-500 p-3 text-white rounded-t-lg">
+          <div className="bg-gradient-to-r from-blue-600 to-green-600 p-3 text-white rounded-t-lg">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-2">
-                <Sparkles className="h-5 w-5" />
+                <SkyeFairyAvatar size={32} />
                 <div>
                   <h3 className="font-semibold">Skye</h3>
-                  <p className="text-xs opacity-90">Your AI companion</p>
+                  <p className="text-xs opacity-90">Your AI Fairy Companion</p>
                 </div>
               </div>
               <button
@@ -173,8 +178,8 @@ export function SkyeChatbot() {
                 }`}>
                   {msg.messageType === "assistant" && (
                     <div className="flex items-center space-x-2 mb-2">
-                      <Sparkles className="h-4 w-4 text-purple-500" />
-                      <span className="font-medium text-purple-600 dark:text-purple-400">Skye</span>
+                      <SkyeFairyAvatar size={16} />
+                      <span className="font-medium text-blue-600 dark:text-blue-400">Skye</span>
                     </div>
                   )}
                   <p className="text-sm">{msg.message}</p>
