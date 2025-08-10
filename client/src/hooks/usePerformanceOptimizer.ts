@@ -22,7 +22,7 @@ export function usePerformanceOptimizer() {
   const cleanupUnusedQueries = useCallback(() => {
     queryClient.removeQueries({
       predicate: (query) => {
-        const isStale = Date.now() - query.dataUpdatedAt > 10 * 60 * 1000; // 10 minutes
+        const isStale = Date.now() - (query.state.dataUpdatedAt || 0) > 10 * 60 * 1000; // 10 minutes
         const isInactive = query.observers.length === 0;
         return isStale && isInactive;
       },
