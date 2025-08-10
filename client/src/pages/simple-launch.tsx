@@ -5,9 +5,9 @@ export default function SimpleLaunch() {
   const [, navigate] = useLocation();
 
   useEffect(() => {
-    // Auto-navigate to home after 2 seconds
+    // Auto-navigate to info page after 2 seconds
     const timer = setTimeout(() => {
-      navigate("/home");
+      navigate("/info");
     }, 2000);
 
     return () => clearTimeout(timer);
