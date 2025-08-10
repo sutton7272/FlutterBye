@@ -152,9 +152,8 @@ export function SkyeChatbot() {
           <div className="bg-gradient-to-r from-blue-600 to-green-600 p-3 text-white rounded-t-lg">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-2">
-                <SkyeCustomAvatar size={32} />
+                <SkyeCustomAvatar size={32} showName={true} />
                 <div>
-                  <h3 className="font-semibold">Skye</h3>
                   <p className="text-xs opacity-90">Your AI Fairy Companion</p>
                 </div>
               </div>
@@ -178,7 +177,7 @@ export function SkyeChatbot() {
                 }`}>
                   {msg.messageType === "assistant" && (
                     <div className="flex items-center space-x-2 mb-2">
-                      <SkyeCustomAvatar size={16} />
+                      <SkyeCustomAvatar size={16} showName={false} />
                       <span className="font-medium text-blue-600 dark:text-blue-400">Skye</span>
                     </div>
                   )}
