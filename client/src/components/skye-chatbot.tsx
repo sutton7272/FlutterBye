@@ -132,7 +132,7 @@ export function SkyeChatbot() {
   return (
     <>
       {/* Chat Button */}
-      <div className="fixed bottom-4 left-4 z-50">
+      <div className="fixed bottom-4 left-4 z-50 flex items-center">
         <button
           onClick={handleToggle}
           className="h-16 w-16 rounded-full bg-black/80 backdrop-blur-sm border border-pink-500/50 hover:border-pink-400/80 shadow-lg text-white flex items-center justify-center transition-all duration-300 hover:scale-110"
@@ -143,6 +143,18 @@ export function SkyeChatbot() {
             <SkyeCustomAvatar size={48} className="animate-pulse hover:animate-bounce" />
           )}
         </button>
+        {!isOpen && (
+          <span 
+            className="ml-3 font-bold text-pink-400 animate-pulse pointer-events-none"
+            style={{
+              fontSize: '16px',
+              textShadow: '0 0 10px rgba(236, 72, 153, 0.8), 0 0 20px rgba(236, 72, 153, 0.6), 0 0 30px rgba(236, 72, 153, 0.4)',
+              fontFamily: 'fantasy, cursive',
+            }}
+          >
+            Skye
+          </span>
+        )}
       </div>
 
       {/* Chat Window */}
