@@ -1,4 +1,4 @@
-import { Suspense, ReactNode, startTransition, useState, useEffect } from 'react';
+import { Suspense, ReactNode } from 'react';
 import { LoadingSpinner } from './loading-spinner';
 
 interface SuspenseWrapperProps {
@@ -11,7 +11,7 @@ export function SuspenseWrapper({ children, fallback }: SuspenseWrapperProps) {
     <Suspense 
       fallback={
         fallback || (
-          <div className="min-h-screen flex items-center justify-center bg-transparent">
+          <div className="min-h-screen flex items-center justify-center">
             <LoadingSpinner />
           </div>
         )

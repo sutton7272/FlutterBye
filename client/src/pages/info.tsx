@@ -33,26 +33,17 @@ export default function InfoPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [valueFilter, setValueFilter] = useState('all');
 
-  // Data fetching for explore functionality - optimized with error handling
-  const { data: publicTokens = [], isLoading: tokensLoading, error: tokensError } = useQuery({
+  // Data fetching for explore functionality
+  const { data: publicTokens = [], isLoading: tokensLoading } = useQuery({
     queryKey: ['/api/tokens/public'],
-    retry: 2,
-    staleTime: 30000, // 30 seconds
-    refetchOnWindowFocus: false,
   });
 
-  const { data: tokensWithValue = [], isLoading: valueTokensLoading, error: valueTokensError } = useQuery({
+  const { data: tokensWithValue = [], isLoading: valueTokensLoading } = useQuery({
     queryKey: ['/api/tokens/with-value'],
-    retry: 2,
-    staleTime: 30000,
-    refetchOnWindowFocus: false,
   });
 
-  const { data: stats, isLoading: statsLoading, error: statsError } = useQuery<DashboardStats>({
+  const { data: stats, isLoading: statsLoading } = useQuery<DashboardStats>({
     queryKey: ['/api/dashboard/stats'],
-    retry: 2,
-    staleTime: 30000,
-    refetchOnWindowFocus: false,
   });
 
   // Filter functions for explore functionality

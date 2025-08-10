@@ -629,9 +629,9 @@ function Router() {
         <Route path="/info" component={() => (
           <>
             <Navbar />
-            <SuspenseWrapper>
+            <Suspense fallback={<LoadingSpinner />}>
               <InfoPage />
-            </SuspenseWrapper>
+            </Suspense>
           </>
         )} />
         <Route path="/personalization" component={() => (
