@@ -629,7 +629,9 @@ function Router() {
         <Route path="/info" component={() => (
           <>
             <Navbar />
-            <InfoPage />
+            <SuspenseWrapper>
+              <InfoPage />
+            </SuspenseWrapper>
           </>
         )} />
         <Route path="/personalization" component={() => (
