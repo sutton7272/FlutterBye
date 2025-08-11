@@ -1,34 +1,30 @@
 import "./polyfills";
 import { createRoot } from "react-dom/client";
-import App from "./App";
+import SimpleApp from "./simple-app";
 import "./index.css";
-import { setupGlobalErrorHandling } from "./lib/error-handling";
 
-// Setup comprehensive global error handling to prevent unnecessary error boundary triggers
-setupGlobalErrorHandling();
+console.log('🚀 Starting FlutterBye app...');
 
-// Additional aggressive fallback error prevention to stop error boundary
-window.addEventListener('error', (e) => {
-  if (e.message?.includes('WebSocket') || 
-      e.message?.includes('Failed to construct') ||
-      e.message?.includes('SyntaxError')) {
-    e.preventDefault();
-    console.log('🛡️ Main fallback error prevention:', e.message);
-  }
-});
-
-window.addEventListener('unhandledrejection', (e) => {
-  // Only suppress WebSocket and known non-critical rejections
-  if (e.reason?.message?.includes('WebSocket') || 
-      e.reason?.message?.includes('Failed to construct') ||
-      e.reason?.name === 'AbortError') {
-    e.preventDefault();
-    console.log('🛡️ Suppressed non-critical rejection:', e.reason?.message);
-    return false;
+try {
+  const container = document.getElementById("root");
+  if (!container) {
+    throw new Error("Root container not found");
   }
   
-  // Allow other rejections through for proper error handling
-  console.log('🔍 Unhandled rejection:', e.reason);
-});
-
-createRoot(document.getElementById("root")!).render(<App />);
+  console.log('✅ Root container found, creating React root...');
+  const root = createRoot(container);
+  
+  console.log('✅ React root created, rendering app...');
+  root.render(<SimpleApp />);
+  
+  console.log('✅ App rendered successfully!');
+} catch (error) {
+  console.error('❌ Failed to start app:', error);
+  document.body.innerHTML = `
+    <div style="color: white; background: #1a1a1a; padding: 20px; font-family: Arial;">
+      <h1>FlutterBye Loading Error</h1>
+      <p>Error: ${error.message}</p>
+      <p>Check console for details</p>
+    </div>
+  `;
+}
