@@ -1,6 +1,6 @@
 import "./polyfills";
 import { createRoot } from "react-dom/client";
-import SimpleApp from "./simple-app";
+import App from "./App";
 import "./index.css";
 
 console.log('🚀 Starting FlutterBye app...');
@@ -15,7 +15,7 @@ try {
   const root = createRoot(container);
   
   console.log('✅ React root created, rendering app...');
-  root.render(<SimpleApp />);
+  root.render(<App />);
   
   console.log('✅ App rendered successfully!');
 } catch (error) {
@@ -23,7 +23,7 @@ try {
   document.body.innerHTML = `
     <div style="color: white; background: #1a1a1a; padding: 20px; font-family: Arial;">
       <h1>FlutterBye Loading Error</h1>
-      <p>Error: ${error.message}</p>
+      <p>Error: ${(error as Error).message}</p>
       <p>Check console for details</p>
     </div>
   `;
