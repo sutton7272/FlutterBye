@@ -443,43 +443,29 @@ export default function LaunchCountdown() {
           <CardContent>
             <div className="grid md:grid-cols-2 gap-8">
               <div className="space-y-6">
-                <div className="bg-gradient-to-br from-electric-blue/10 to-cyan-500/10 rounded-xl p-4 electric-frame">
-                  <div className="flex items-center gap-3 mb-3">
-                    <Shield className="w-6 h-6 text-electric-blue" />
-                    <h4 className="font-bold">Wallet Intelligence Scoring</h4>
+                <div className="flex items-start gap-4">
+                  <Badge className="bg-electric-blue/20 text-electric-blue border-electric-blue/30 shrink-0">1</Badge>
+                  <div>
+                    <h4 className="font-bold mb-2">Wallet Intelligence Scoring</h4>
+                    <p className="text-sm text-muted-foreground">Revolutionary credit score system for crypto wallets (1-1000 scale)</p>
                   </div>
-                  <p className="text-sm text-muted-foreground mb-3">Revolutionary credit score system for crypto wallets (1-1000 scale)</p>
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs text-muted-foreground">Sample Wallet Score</span>
-                    <Badge className="bg-electric-green/20 text-electric-green">847/1000</Badge>
-                  </div>
-                  <Progress value={84.7} className="h-2 mt-2" />
                 </div>
-                
-                <div className="bg-gradient-to-br from-purple-500/10 to-pink-500/10 rounded-xl p-4 electric-frame">
-                  <div className="flex items-center gap-3 mb-3">
-                    <Activity className="w-6 h-6 text-purple-400" />
-                    <h4 className="font-bold">Behavioral Analytics</h4>
+                <div className="flex items-start gap-4">
+                  <Badge className="bg-purple-400/20 text-purple-400 border-purple-400/30 shrink-0">2</Badge>
+                  <div>
+                    <h4 className="font-bold mb-2">Behavioral Analytics</h4>
+                    <p className="text-sm text-muted-foreground">AI-powered pattern recognition across 11+ blockchains including Sui, XRP, Kaspa</p>
                   </div>
-                  <p className="text-sm text-muted-foreground">AI-powered pattern recognition across 11+ blockchains including Sui, XRP, Kaspa</p>
-                  <div className="grid grid-cols-3 gap-2 mt-3">
-                    <div className="text-center">
-                      <div className="text-lg font-bold text-electric-blue">94%</div>
-                      <div className="text-xs text-muted-foreground">Success Rate</div>
-                    </div>
-                    <div className="text-center">
-                      <div className="text-lg font-bold text-electric-green">2.4M</div>
-                      <div className="text-xs text-muted-foreground">Transactions</div>
-                    </div>
-                    <div className="text-center">
-                      <div className="text-lg font-bold text-purple-400">15</div>
-                      <div className="text-xs text-muted-foreground">Networks</div>
-                    </div>
+                </div>
+                <div className="flex items-start gap-4">
+                  <Badge className="bg-electric-green/20 text-electric-green border-electric-green/30 shrink-0">3</Badge>
+                  <div>
+                    <h4 className="font-bold mb-2">Predictive Intelligence</h4>
+                    <p className="text-sm text-muted-foreground">Advanced AI insights for portfolio optimization and risk assessment</p>
                   </div>
                 </div>
               </div>
-              
-              <div className="bg-gradient-to-br from-electric-green/10 to-blue-500/10 rounded-xl p-6 electric-frame">
+              <div className="bg-gradient-to-br from-electric-blue/10 to-purple-500/10 rounded-xl p-6 electric-frame">
                 <FlutterAIInteractiveDemo />
               </div>
             </div>
