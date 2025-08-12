@@ -88,28 +88,64 @@ export default function AdminSystem() {
   // Navigation toggle mutation
   const navToggleMutation = useMutation({
     mutationFn: async ({ itemId, enabled }: { itemId: string; enabled: boolean }) => {
-      return await apiRequest(`/api/admin/navigation-control/${itemId}`, 'PATCH', { enabled });
+      console.log(`🔄 Frontend: Toggling navigation ${itemId} to ${enabled}`);
+      try {
+        const response = await apiRequest(`/api/admin/navigation-control/${itemId}`, 'PATCH', { enabled });
+        console.log('✅ Frontend: Navigation toggle success:', response);
+        return response;
+      } catch (error) {
+        console.error('❌ Frontend: Navigation toggle error:', error);
+        throw error;
+      }
     },
-    onSuccess: () => {
+    onSuccess: (data, variables) => {
+      console.log('🎉 Frontend: Navigation mutation success:', data, variables);
       queryClient.invalidateQueries({ queryKey: ['/api/admin/navigation-control'] });
-      toast({ title: "Navigation updated", description: "Changes applied successfully" });
+      toast({ 
+        title: "Success", 
+        description: `${variables.itemId} ${variables.enabled ? 'enabled' : 'disabled'}`,
+        className: "border-green-500 bg-green-500/10" 
+      });
     },
-    onError: () => {
-      toast({ title: "Error", description: "Failed to update navigation", variant: "destructive" });
+    onError: (error, variables) => {
+      console.error('💥 Frontend: Navigation mutation error:', error, variables);
+      toast({ 
+        title: "Error", 
+        description: `Failed to update ${variables.itemId}`, 
+        variant: "destructive" 
+      });
     }
   });
 
   // AI feature toggle mutation
   const aiToggleMutation = useMutation({
     mutationFn: async ({ featureId, enabled }: { featureId: string; enabled: boolean }) => {
-      return await apiRequest(`/api/admin/ai-features/${featureId}`, 'PATCH', { enabled });
+      console.log(`🤖 Frontend: Toggling AI feature ${featureId} to ${enabled}`);
+      try {
+        const response = await apiRequest(`/api/admin/ai-features/${featureId}`, 'PATCH', { enabled });
+        console.log('✅ Frontend: AI toggle success:', response);
+        return response;
+      } catch (error) {
+        console.error('❌ Frontend: AI toggle error:', error);
+        throw error;
+      }
     },
-    onSuccess: () => {
+    onSuccess: (data, variables) => {
+      console.log('🎉 Frontend: AI mutation success:', data, variables);
       queryClient.invalidateQueries({ queryKey: ['/api/admin/ai-features'] });
-      toast({ title: "AI feature updated", description: "Changes applied successfully" });
+      toast({ 
+        title: "Success", 
+        description: `${variables.featureId} ${variables.enabled ? 'enabled' : 'disabled'}`,
+        className: "border-blue-500 bg-blue-500/10" 
+      });
     },
-    onError: () => {
-      toast({ title: "Error", description: "Failed to update AI feature", variant: "destructive" });
+    onError: (error, variables) => {
+      console.error('💥 Frontend: AI mutation error:', error, variables);
+      toast({ 
+        title: "Error", 
+        description: `Failed to update ${variables.featureId}`, 
+        variant: "destructive" 
+      });
     }
   });
 
@@ -319,10 +355,33 @@ export default function AdminSystem() {
                   </CardTitle>
                   <CardDescription>Quickly disable high-cost features to reduce expenses</CardDescription>
                 </div>
-                <Badge variant="outline" className="text-red-400 border-red-400">
-                  <DollarSign className="h-4 w-4 mr-2" />
-                  High Cost Features
-                </Badge>
+                <div className="flex items-center gap-2">
+                  <Badge variant="outline" className="text-red-400 border-red-400">
+                    <DollarSign className="h-4 w-4 mr-2" />
+                    High Cost Features
+                  </Badge>
+                  <Button 
+                    size="sm" 
+                    onClick={async () => {
+                      console.log('🧪 TEST: Manual API call');
+                      try {
+                        const response = await fetch('/api/admin/navigation-control/flutter-art', {
+                          method: 'PATCH',
+                          headers: { 'Content-Type': 'application/json' },
+                          body: JSON.stringify({ enabled: false })
+                        });
+                        const data = await response.json();
+                        console.log('🧪 TEST: Manual API response:', data);
+                        queryClient.invalidateQueries({ queryKey: ['/api/admin/navigation-control'] });
+                      } catch (error) {
+                        console.error('🧪 TEST: Manual API error:', error);
+                      }
+                    }}
+                    className="bg-purple-600 hover:bg-purple-700"
+                  >
+                    TEST API
+                  </Button>
+                </div>
               </div>
             </CardHeader>
             <CardContent>
