@@ -30,7 +30,7 @@ export default function Navbar() {
 
   // Filter navigation items based on feature toggles
   const primaryNavItems = featuresLoading 
-    ? allNavItems // Show all items while loading including admin
+    ? [] // Show no items while loading to prevent flash
     : allNavItems.filter(item => {
         // Admin panel is always visible (critical for platform management)
         if (item.featureId === "admin_panel") {
@@ -134,7 +134,14 @@ export default function Navbar() {
 
         {/* Primary Navigation - Desktop */}
         <nav className="hidden md:flex items-center space-x-2">
-          {primaryNavItems.map((item) => (
+          {featuresLoading && (
+            <div className="flex items-center space-x-2">
+              <div className="h-8 w-24 bg-muted/50 rounded animate-pulse" />
+              <div className="h-8 w-20 bg-muted/50 rounded animate-pulse" />
+              <div className="h-8 w-28 bg-muted/50 rounded animate-pulse" />
+            </div>
+          )}
+          {!featuresLoading && primaryNavItems.map((item) => (
             <Link key={item.href} href={item.href}>
               <Button
                 variant={isActive(item.href) ? "default" : "ghost"}
