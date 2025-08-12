@@ -460,51 +460,7 @@ export default function LaunchCountdown() {
           </CardContent>
         </Card>
 
-        {/* SECTION 3: SINGLE COLUMN - FlutterART & FlutterWave Preview */}
-        <Card className="electric-frame max-w-4xl mx-auto mb-16">
-          <CardHeader className="text-center pb-6">
-            <CardTitle className="text-4xl text-gradient flex items-center justify-center gap-3">
-              <Star className="w-10 h-10" />
-              Coming Soon Features
-            </CardTitle>
-            <CardDescription className="text-lg text-muted-foreground max-w-3xl mx-auto">
-              Revolutionary FlutterART NFT creation and FlutterWave SMS-to-blockchain integration in development
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="grid md:grid-cols-2 gap-8">
-              <div className="space-y-6">
-                <div className="text-center p-6 bg-gradient-to-br from-pink-500/10 to-purple-500/10 rounded-xl electric-frame">
-                  <Palette className="w-16 h-16 mx-auto mb-4 text-pink-400" />
-                  <h3 className="text-2xl font-bold text-gradient mb-3">FlutterART</h3>
-                  <p className="text-sm text-muted-foreground mb-4">AI-powered NFT creation platform with automatic rarity scoring and marketplace integration</p>
-                  <Badge className="bg-pink-500/20 text-pink-400 border-pink-400/30">Beta Testing</Badge>
-                </div>
-              </div>
-              <div className="space-y-6">
-                <div className="text-center p-6 bg-gradient-to-br from-cyan-500/10 to-blue-500/10 rounded-xl electric-frame">
-                  <MessageSquare className="w-16 h-16 mx-auto mb-4 text-cyan-400" />
-                  <h3 className="text-2xl font-bold text-gradient mb-3">FlutterWave</h3>
-                  <p className="text-sm text-muted-foreground mb-4">Send blockchain tokens via SMS! Revolutionary bridge between traditional messaging and Web3</p>
-                  <Badge className="bg-cyan-500/20 text-cyan-400 border-cyan-400/30">Development Phase</Badge>
-                </div>
-              </div>
-            </div>
-            <div className="mt-8 text-center">
-              <p className="text-sm text-muted-foreground mb-4">
-                Both features are available for preview in the Complete Platform Tutorial above
-              </p>
-              <Button 
-                variant="outline" 
-                className="border-electric-blue/30 text-electric-blue hover:bg-electric-blue/10"
-                onClick={() => document.querySelector('.electric-frame')?.scrollIntoView({ behavior: 'smooth' })}
-              >
-                Experience Preview in Tutorial
-                <ArrowRight className="w-4 h-4 ml-2" />
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
+
 
         {/* SECTION 4: THREE COLUMNS - VIP Waitlist, Early Adopters, Early Access */}
         <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto mb-16">
