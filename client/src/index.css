@@ -1124,3 +1124,23 @@
   0%, 100% { opacity: 1; }
   50% { opacity: 0.8; }
 }
+
+/* Ensure tooltips appear above all content with maximum z-index */
+[data-radix-popper-content-wrapper] {
+  z-index: 9999 !important;
+}
+
+[data-tooltip-content] {
+  z-index: 9999 !important;
+}
+
+/* Additional tooltip visibility fixes */
+.tooltip-content-override {
+  z-index: 9999 !important;
+  position: relative !important;
+}
+
+/* Force tooltips to be on top of everything */
+div[data-radix-popper-content-wrapper] > div {
+  z-index: 9999 !important;
+}
