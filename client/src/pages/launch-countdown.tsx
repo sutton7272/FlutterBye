@@ -386,15 +386,15 @@ export default function LaunchCountdown() {
           </CardContent>
         </Card>
 
-        {/* SECTION 2: SINGLE COLUMN - Platform Tutorial */}
+        {/* SECTION 2: SINGLE COLUMN - Platform Tutorial with FlutterAI */}
         <Card className="electric-frame max-w-4xl mx-auto mb-12">
           <CardHeader className="text-center pb-6">
             <CardTitle className="text-4xl text-gradient flex items-center justify-center gap-3">
               <Play className="w-10 h-10" />
-              Platform Tutorial
+              Complete Platform Tutorial
             </CardTitle>
             <CardDescription className="text-lg text-muted-foreground max-w-3xl mx-auto">
-              Master the art of blockchain communication with our interactive tutorial system
+              Master token creation, FlutterAI intelligence, and experience FlutterART & FlutterWave previews in one unified walkthrough
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -403,22 +403,29 @@ export default function LaunchCountdown() {
                 <div className="flex items-start gap-4">
                   <Badge className="bg-electric-blue/20 text-electric-blue border-electric-blue/30 shrink-0">1</Badge>
                   <div>
-                    <h4 className="font-bold mb-2">Create Your Message</h4>
-                    <p className="text-sm text-muted-foreground">Craft your 27-character message and choose your token parameters</p>
+                    <h4 className="font-bold mb-2">Token Creation Mastery</h4>
+                    <p className="text-sm text-muted-foreground">60-second SPL token creation with FlutterAI wallet intelligence scoring</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-4">
                   <Badge className="bg-electric-green/20 text-electric-green border-electric-green/30 shrink-0">2</Badge>
                   <div>
-                    <h4 className="font-bold mb-2">Attach Value (Optional)</h4>
-                    <p className="text-sm text-muted-foreground">Add SOL, USDC, or FLBY value with automatic escrow protection</p>
+                    <h4 className="font-bold mb-2">AI-Powered Features</h4>
+                    <p className="text-sm text-muted-foreground">Experience FlutterAI intelligence, volume pricing, and FLBY economics</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-4">
                   <Badge className="bg-purple-400/20 text-purple-400 border-purple-400/30 shrink-0">3</Badge>
                   <div>
-                    <h4 className="font-bold mb-2">Deploy & Distribute</h4>
-                    <p className="text-sm text-muted-foreground">Launch on Solana blockchain and activate viral distribution algorithms</p>
+                    <h4 className="font-bold mb-2">Coming Soon Preview</h4>
+                    <p className="text-sm text-muted-foreground">FlutterART NFT creation and FlutterWave SMS integration demonstrations</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-4">
+                  <Badge className="bg-orange-400/20 text-orange-400 border-orange-400/30 shrink-0">4</Badge>
+                  <div>
+                    <h4 className="font-bold mb-2">Marketing & Trading</h4>
+                    <p className="text-sm text-muted-foreground">Viral growth engine, marketplace dynamics, and launch strategies</p>
                   </div>
                 </div>
               </div>
@@ -429,45 +436,48 @@ export default function LaunchCountdown() {
           </CardContent>
         </Card>
 
-        {/* SECTION 3: SINGLE COLUMN - AI Intelligence Demo */}
+        {/* SECTION 3: SINGLE COLUMN - FlutterART & FlutterWave Preview */}
         <Card className="electric-frame max-w-4xl mx-auto mb-16">
           <CardHeader className="text-center pb-6">
             <CardTitle className="text-4xl text-gradient flex items-center justify-center gap-3">
-              <Brain className="w-10 h-10" />
-              AI Intelligence Demo
+              <Star className="w-10 h-10" />
+              Coming Soon Features
             </CardTitle>
             <CardDescription className="text-lg text-muted-foreground max-w-3xl mx-auto">
-              Experience our revolutionary FlutterAI system with wallet scoring, behavioral analysis, and predictive analytics
+              Revolutionary FlutterART NFT creation and FlutterWave SMS-to-blockchain integration in development
             </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="grid md:grid-cols-2 gap-8">
               <div className="space-y-6">
-                <div className="flex items-start gap-4">
-                  <Badge className="bg-electric-blue/20 text-electric-blue border-electric-blue/30 shrink-0">1</Badge>
-                  <div>
-                    <h4 className="font-bold mb-2">Wallet Intelligence Scoring</h4>
-                    <p className="text-sm text-muted-foreground">Revolutionary credit score system for crypto wallets (1-1000 scale)</p>
-                  </div>
-                </div>
-                <div className="flex items-start gap-4">
-                  <Badge className="bg-purple-400/20 text-purple-400 border-purple-400/30 shrink-0">2</Badge>
-                  <div>
-                    <h4 className="font-bold mb-2">Behavioral Analytics</h4>
-                    <p className="text-sm text-muted-foreground">AI-powered pattern recognition across 11+ blockchains including Sui, XRP, Kaspa</p>
-                  </div>
-                </div>
-                <div className="flex items-start gap-4">
-                  <Badge className="bg-electric-green/20 text-electric-green border-electric-green/30 shrink-0">3</Badge>
-                  <div>
-                    <h4 className="font-bold mb-2">Predictive Intelligence</h4>
-                    <p className="text-sm text-muted-foreground">Advanced AI insights for portfolio optimization and risk assessment</p>
-                  </div>
+                <div className="text-center p-6 bg-gradient-to-br from-pink-500/10 to-purple-500/10 rounded-xl electric-frame">
+                  <Palette className="w-16 h-16 mx-auto mb-4 text-pink-400" />
+                  <h3 className="text-2xl font-bold text-gradient mb-3">FlutterART</h3>
+                  <p className="text-sm text-muted-foreground mb-4">AI-powered NFT creation platform with automatic rarity scoring and marketplace integration</p>
+                  <Badge className="bg-pink-500/20 text-pink-400 border-pink-400/30">Beta Testing</Badge>
                 </div>
               </div>
-              <div className="bg-gradient-to-br from-electric-blue/10 to-purple-500/10 rounded-xl p-6 electric-frame">
-                <FlutterAIInteractiveDemo />
+              <div className="space-y-6">
+                <div className="text-center p-6 bg-gradient-to-br from-cyan-500/10 to-blue-500/10 rounded-xl electric-frame">
+                  <MessageSquare className="w-16 h-16 mx-auto mb-4 text-cyan-400" />
+                  <h3 className="text-2xl font-bold text-gradient mb-3">FlutterWave</h3>
+                  <p className="text-sm text-muted-foreground mb-4">Send blockchain tokens via SMS! Revolutionary bridge between traditional messaging and Web3</p>
+                  <Badge className="bg-cyan-500/20 text-cyan-400 border-cyan-400/30">Development Phase</Badge>
+                </div>
               </div>
+            </div>
+            <div className="mt-8 text-center">
+              <p className="text-sm text-muted-foreground mb-4">
+                Both features are available for preview in the Complete Platform Tutorial above
+              </p>
+              <Button 
+                variant="outline" 
+                className="border-electric-blue/30 text-electric-blue hover:bg-electric-blue/10"
+                onClick={() => document.querySelector('.electric-frame')?.scrollIntoView({ behavior: 'smooth' })}
+              >
+                Experience Preview in Tutorial
+                <ArrowRight className="w-4 h-4 ml-2" />
+              </Button>
             </div>
           </CardContent>
         </Card>

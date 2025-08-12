@@ -52,6 +52,22 @@ const TUTORIAL_STEPS: TutorialStep[] = [
   },
   {
     id: 3,
+    title: "🧠 FlutterAI Wallet Intelligence",
+    description: "REVOLUTIONARY AI that analyzes any wallet with 1-1000 intelligence points! Instant behavioral analysis, risk assessment, portfolio quality scoring, and predictive insights across 11+ blockchains for perfect token targeting!",
+    icon: <Brain className="w-6 h-6 text-electric-blue" />,
+    category: 'token',
+    demo: async () => ({ 
+      walletScore: 847,
+      riskLevel: 'Low',
+      portfolioHealth: 'Excellent',
+      marketingPotential: 'Very High',
+      targetingAccuracy: '94%'
+    }),
+    interactionType: 'analyze',
+    expectedResult: "INTELLIGENT targeting: 847/1000 wallet score with perfect behavioral analysis for laser-focused token distribution and marketing!"
+  },
+  {
+    id: 4,
     title: "💎 Volume Pricing Intelligence",
     description: "SMART pricing that gets smarter with scale! Our AI-powered system automatically applies volume discounts, tracks market rates, and optimizes pricing to maximize your savings while creating tokens at enterprise scale!",
     icon: <Calculator className="w-6 h-6 text-blue-400" />,
@@ -67,7 +83,7 @@ const TUTORIAL_STEPS: TutorialStep[] = [
     expectedResult: "MAXIMUM savings unlocked: Volume pricing tiers automatically applied, saving hundreds of dollars on bulk token creation with transparent, fair pricing!"
   },
   {
-    id: 4,
+    id: 5,
     title: "👑 FLBY Token Economics",
     description: "EXCLUSIVE benefits that make you feel like crypto royalty! FLBY token holders get massive fee discounts, staking rewards up to 18% APY, governance voting power, and revenue sharing. It's like having VIP access to the future!",
     icon: <Crown className="w-6 h-6 text-purple-400" />,
@@ -83,23 +99,55 @@ const TUTORIAL_STEPS: TutorialStep[] = [
     expectedResult: "ROYAL treatment activated: Fee discounts, high-yield staking, profit sharing, and platform governance control - being a FLBY holder pays!"
   },
   {
-    id: 5,
-    title: "🌟 Advanced Staking System",
-    description: "WEALTH-BUILDING machine that turns your FLBY tokens into a passive income powerhouse! Multiple staking tiers with increasing rewards, revenue sharing, and compound growth. Watch your crypto portfolio grow while you sleep!",
-    icon: <Award className="w-6 h-6 text-orange-400" />,
-    category: 'economy',
+    id: 6,
+    title: "🎨 FlutterART NFT Creation",
+    description: "COMING SOON: Revolutionary NFT creation platform! AI-powered artwork generation, custom collections, metadata automation, and marketplace integration. Turn your tokens into stunning digital art pieces that collectors crave!",
+    icon: <Star className="w-6 h-6 text-pink-400" />,
+    category: 'token',
     demo: async () => ({ 
-      stakingTier: 'Platinum (365 days)',
-      currentAPY: '18%',
-      revenueShare: '12%',
-      projectedEarnings: '$4,320/year',
-      compoundGrowth: '+156%'
+      artworkGenerated: 'AI Abstract #847',
+      rarity: 'Legendary',
+      estimatedValue: '2.5 SOL',
+      collectionSize: '10,000 pieces',
+      status: 'Beta Testing'
     }),
-    interactionType: 'analyze',
-    expectedResult: "PASSIVE income engine: Long-term staking with compounding rewards, revenue sharing, and exponential growth potential for serious investors!"
+    interactionType: 'click',
+    expectedResult: "ARTISTIC revolution: AI-generated NFT artwork with automatic rarity scoring and marketplace-ready metadata - coming soon to Flutterbye!"
   },
   {
-    id: 6,
+    id: 7,
+    title: "📱 FlutterWave SMS Integration",
+    description: "COMING SOON: Send blockchain tokens via SMS! Revolutionary bridge between traditional messaging and Web3. Your friends can receive and redeem crypto without wallets - pure magical user experience!",
+    icon: <MessageSquare className="w-6 h-6 text-cyan-400" />,
+    category: 'value',
+    demo: async () => ({ 
+      smsTokensSent: '47 messages',
+      redemptionRate: '89%',
+      avgClaimTime: '3.2 minutes',
+      viralSpread: '+234% growth',
+      status: 'Development Phase'
+    }),
+    interactionType: 'type',
+    expectedResult: "SMS revolution: Blockchain tokens sent via text message with incredible redemption rates - bringing crypto to the masses via FlutterWave!"
+  },
+  {
+    id: 8,
+    title: "🎯 Viral Marketing Engine",
+    description: "EXPONENTIAL expansion system powered by FlutterAI intelligence! Smart targeting, viral mechanics, social sharing incentives, and network effects that create unstoppable growth momentum for your tokens!",
+    icon: <TrendingUp className="w-6 h-6 text-orange-400" />,
+    category: 'trading',
+    demo: async () => ({ 
+      viralMultiplier: '3.4x',
+      targetingAccuracy: '94%',
+      networkGrowth: '+847% month',
+      socialShares: 15420,
+      communitySize: '89K+ members'
+    }),
+    interactionType: 'watch',
+    expectedResult: "VIRAL explosion: AI-powered targeting, network effects, and social mechanics create exponential user growth and token value appreciation!"
+  },
+  {
+    id: 9,
     title: "📈 Token Marketplace Magic",
     description: "TRADING paradise where your message tokens become valuable digital assets! Real-time price discovery, liquidity pools, trending algorithms, and a vibrant community of traders competing for the most valuable messages!",
     icon: <BarChart3 className="w-6 h-6 text-emerald-400" />,
@@ -115,23 +163,7 @@ const TUTORIAL_STEPS: TutorialStep[] = [
     expectedResult: "TRADING revolution: Your message tokens gain real market value, creating a new economy where creativity meets cryptocurrency profits!"
   },
   {
-    id: 7,
-    title: "🎯 Viral Growth Engine",
-    description: "EXPONENTIAL expansion system that turns every token holder into your marketing army! Built-in referral rewards, viral mechanics, social sharing incentives, and network effects that create unstoppable growth momentum!",
-    icon: <TrendingUp className="w-6 h-6 text-pink-400" />,
-    category: 'trading',
-    demo: async () => ({ 
-      referralRewards: '50-250 FLBY',
-      viralMultiplier: '3.4x',
-      networkGrowth: '+847% month',
-      socialShares: 15420,
-      communitySize: '89K+ members'
-    }),
-    interactionType: 'watch',
-    expectedResult: "VIRAL explosion: Network effects, referral incentives, and social mechanics create exponential user growth and token value appreciation!"
-  },
-  {
-    id: 8,
+    id: 10,
     title: "🚀 Launch Countdown Power",
     description: "EXCITEMENT generator that builds massive anticipation! Countdown timers, early access rewards, exclusive airdrops, and limited-time offers that create FOMO and drive explosive launch-day adoption!",
     icon: <Zap className="w-6 h-6 text-electric-blue" />,
@@ -240,12 +272,14 @@ function InteractiveTutorialContent() {
     const achievements = {
       1: "Token Creator",
       2: "Value Attacher", 
-      3: "Pricing Guru",
-      4: "FLBY Master",
-      5: "Staking Pro",
-      6: "Trading Expert",
-      7: "Growth Hacker",
-      8: "Launch Specialist"
+      3: "AI Intelligence Expert",
+      4: "Pricing Guru",
+      5: "FLBY Master",
+      6: "Art Pioneer",
+      7: "SMS Innovator",
+      8: "Growth Hacker",
+      9: "Trading Expert",
+      10: "Launch Specialist"
     };
     return achievements[step.id] || "Platform Explorer";
   };
@@ -304,57 +338,151 @@ function InteractiveTutorialContent() {
   const renderStepResult = (result: any, category: string, stepId: number) => {
     switch (category) {
       case 'token':
-        return (
-          <>
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-gray-300 text-sm">🪙 Token Created:</span>
-              <Badge className="bg-yellow-500/20 text-yellow-400 font-bold">{result.tokenAddress?.substring(0, 12)}...</Badge>
-            </div>
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-gray-300 text-sm">💬 Message:</span>
-              <span className="text-white text-sm font-medium">"{result.message}"</span>
-            </div>
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-gray-300 text-sm">🔢 Total Supply:</span>
-              <Badge className="bg-blue-500/20 text-blue-400">{result.supply?.toLocaleString()} tokens</Badge>
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="text-gray-300 text-sm">💰 Cost:</span>
-              <Badge className="bg-green-500/20 text-green-400 font-bold">{result.mintCost}</Badge>
-            </div>
-            <div className="mt-3 p-2 bg-green-500/10 rounded border-l-2 border-green-400">
-              <div className="text-green-400 text-xs font-medium">🎉 SUCCESS! Your professional SPL token is live on Solana blockchain!</div>
-            </div>
-          </>
-        );
+        if (stepId === 1) {
+          return (
+            <>
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-gray-300 text-sm">🪙 Token Created:</span>
+                <Badge className="bg-yellow-500/20 text-yellow-400 font-bold">{result.tokenAddress?.substring(0, 12)}...</Badge>
+              </div>
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-gray-300 text-sm">💬 Message:</span>
+                <span className="text-white text-sm font-medium">"{result.message}"</span>
+              </div>
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-gray-300 text-sm">🔢 Total Supply:</span>
+                <Badge className="bg-blue-500/20 text-blue-400">{result.supply?.toLocaleString()} tokens</Badge>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-gray-300 text-sm">💰 Cost:</span>
+                <Badge className="bg-green-500/20 text-green-400 font-bold">{result.mintCost}</Badge>
+              </div>
+              <div className="mt-3 p-2 bg-green-500/10 rounded border-l-2 border-green-400">
+                <div className="text-green-400 text-xs font-medium">🎉 SUCCESS! Your professional SPL token is live on Solana blockchain!</div>
+              </div>
+            </>
+          );
+        } else if (stepId === 3) {
+          // FlutterAI Wallet Intelligence
+          return (
+            <>
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-gray-300 text-sm">🧠 Intelligence Score:</span>
+                <Badge className="bg-electric-blue/20 text-electric-blue font-bold">{result.walletScore}/1000</Badge>
+              </div>
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-gray-300 text-sm">⚠️ Risk Level:</span>
+                <Badge className="bg-green-500/20 text-green-400">{result.riskLevel}</Badge>
+              </div>
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-gray-300 text-sm">💼 Portfolio Health:</span>
+                <Badge className="bg-purple-500/20 text-purple-400">{result.portfolioHealth}</Badge>
+              </div>
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-gray-300 text-sm">🎯 Marketing Potential:</span>
+                <Badge className="bg-pink-500/20 text-pink-400">{result.marketingPotential}</Badge>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-gray-300 text-sm">🎪 Targeting Accuracy:</span>
+                <Badge className="bg-yellow-500/20 text-yellow-400 font-bold">{result.targetingAccuracy}</Badge>
+              </div>
+              <div className="mt-3 p-2 bg-electric-blue/10 rounded border-l-2 border-electric-blue">
+                <div className="text-electric-blue text-xs font-medium">🚀 FLUTTERAI: Advanced wallet intelligence analysis complete!</div>
+              </div>
+            </>
+          );
+        } else if (stepId === 6) {
+          // FlutterART NFT Creation
+          return (
+            <>
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-gray-300 text-sm">🎨 Artwork Generated:</span>
+                <Badge className="bg-pink-500/20 text-pink-400 font-bold">{result.artworkGenerated}</Badge>
+              </div>
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-gray-300 text-sm">✨ Rarity Level:</span>
+                <Badge className="bg-yellow-500/20 text-yellow-400">{result.rarity}</Badge>
+              </div>
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-gray-300 text-sm">💰 Estimated Value:</span>
+                <Badge className="bg-green-500/20 text-green-400">{result.estimatedValue}</Badge>
+              </div>
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-gray-300 text-sm">🔢 Collection Size:</span>
+                <Badge className="bg-blue-500/20 text-blue-400">{result.collectionSize}</Badge>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-gray-300 text-sm">⚗️ Status:</span>
+                <Badge className="bg-orange-500/20 text-orange-400">{result.status}</Badge>
+              </div>
+              <div className="mt-3 p-2 bg-pink-500/10 rounded border-l-2 border-pink-400">
+                <div className="text-pink-400 text-xs font-medium">🎨 FLUTTERART: AI-powered NFT creation coming soon!</div>
+              </div>
+            </>
+          );
+        }
+        return null;
 
       case 'value':
-        return (
-          <>
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-gray-300 text-sm">💰 Value Pool:</span>
-              <Badge className="bg-green-500/20 text-green-400 font-bold">{result.valueAttached}</Badge>
-            </div>
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-gray-300 text-sm">🎯 Per Token:</span>
-              <Badge className="bg-yellow-500/20 text-yellow-400">{result.valuePerToken}</Badge>
-            </div>
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-gray-300 text-sm">⏰ Expires in:</span>
-              <Badge className="bg-orange-500/20 text-orange-400">{result.expirationDate}</Badge>
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="text-gray-300 text-sm">🔥 Redemption Rate:</span>
-              <Badge className="bg-purple-500/20 text-purple-400">{result.redemptionRate}</Badge>
-            </div>
-            <div className="mt-3 p-2 bg-green-500/10 rounded border-l-2 border-green-400">
-              <div className="text-green-400 text-xs font-medium">💎 TREASURE ACTIVATED! Real crypto value locked and ready for redemption!</div>
-            </div>
-          </>
-        );
+        if (stepId === 2) {
+          return (
+            <>
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-gray-300 text-sm">💰 Value Pool:</span>
+                <Badge className="bg-green-500/20 text-green-400 font-bold">{result.valueAttached}</Badge>
+              </div>
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-gray-300 text-sm">🎯 Per Token:</span>
+                <Badge className="bg-yellow-500/20 text-yellow-400">{result.valuePerToken}</Badge>
+              </div>
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-gray-300 text-sm">⏰ Expires in:</span>
+                <Badge className="bg-orange-500/20 text-orange-400">{result.expirationDate}</Badge>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-gray-300 text-sm">🔥 Redemption Rate:</span>
+                <Badge className="bg-purple-500/20 text-purple-400">{result.redemptionRate}</Badge>
+              </div>
+              <div className="mt-3 p-2 bg-green-500/10 rounded border-l-2 border-green-400">
+                <div className="text-green-400 text-xs font-medium">💎 TREASURE ACTIVATED! Real crypto value locked and ready for redemption!</div>
+              </div>
+            </>
+          );
+        } else if (stepId === 7) {
+          // FlutterWave SMS Integration
+          return (
+            <>
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-gray-300 text-sm">📱 SMS Tokens Sent:</span>
+                <Badge className="bg-cyan-500/20 text-cyan-400 font-bold">{result.smsTokensSent}</Badge>
+              </div>
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-gray-300 text-sm">🎯 Redemption Rate:</span>
+                <Badge className="bg-green-500/20 text-green-400">{result.redemptionRate}</Badge>
+              </div>
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-gray-300 text-sm">⚡ Avg Claim Time:</span>
+                <Badge className="bg-yellow-500/20 text-yellow-400">{result.avgClaimTime}</Badge>
+              </div>
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-gray-300 text-sm">🚀 Viral Spread:</span>
+                <Badge className="bg-pink-500/20 text-pink-400">{result.viralSpread}</Badge>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-gray-300 text-sm">⚗️ Status:</span>
+                <Badge className="bg-orange-500/20 text-orange-400">{result.status}</Badge>
+              </div>
+              <div className="mt-3 p-2 bg-cyan-500/10 rounded border-l-2 border-cyan-400">
+                <div className="text-cyan-400 text-xs font-medium">📱 FLUTTERWAVE: SMS-to-blockchain revolution coming soon!</div>
+              </div>
+            </>
+          );
+        }
+        return null;
 
       case 'economy':
-        if (stepId === 3) {
+        if (stepId === 4) {
+          // Volume Pricing Intelligence (now step 4)
           return (
             <>
               <div className="flex items-center justify-between mb-2">
@@ -378,7 +506,8 @@ function InteractiveTutorialContent() {
               </div>
             </>
           );
-        } else if (stepId === 4) {
+        } else if (stepId === 5) {
+          // FLBY Token Economics (now step 5)
           return (
             <>
               <div className="flex items-center justify-between mb-2">
@@ -402,31 +531,8 @@ function InteractiveTutorialContent() {
               </div>
             </>
           );
-        } else {
-          return (
-            <>
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-gray-300 text-sm">🏆 Staking Tier:</span>
-                <Badge className="bg-orange-500/20 text-orange-400 font-bold">{result.stakingTier}</Badge>
-              </div>
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-gray-300 text-sm">📊 Current APY:</span>
-                <Badge className="bg-green-500/20 text-green-400 font-bold">{result.currentAPY}</Badge>
-              </div>
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-gray-300 text-sm">💰 Projected Earnings:</span>
-                <Badge className="bg-blue-500/20 text-blue-400 font-bold">{result.projectedEarnings}</Badge>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-gray-300 text-sm">🚀 Growth Potential:</span>
-                <Badge className="bg-purple-500/20 text-purple-400 font-bold">{result.compoundGrowth}</Badge>
-              </div>
-              <div className="mt-3 p-2 bg-green-500/10 rounded border-l-2 border-green-400">
-                <div className="text-green-400 text-xs font-medium">💸 WEALTH ENGINE: Passive income machine activated for maximum returns!</div>
-              </div>
-            </>
-          );
         }
+        return null;
 
       case 'trading':
         if (stepId === 6) {
