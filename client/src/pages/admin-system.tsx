@@ -459,26 +459,18 @@ export default function AdminSystem() {
       </div>
 
       <Tabs defaultValue="emergency" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-5">
+        <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="emergency" className="flex items-center gap-2 text-red-400">
             <AlertTriangle className="h-4 w-4" />
-            Emergency
+            Emergency Controls
           </TabsTrigger>
           <TabsTrigger value="navigation" className="flex items-center gap-2">
             <Navigation className="h-4 w-4" />
-            Navigation
+            Navigation & Features
           </TabsTrigger>
           <TabsTrigger value="ai-features" className="flex items-center gap-2">
             <Brain className="h-4 w-4" />
-            AI Features
-          </TabsTrigger>
-          <TabsTrigger value="cost-management" className="flex items-center gap-2">
-            <DollarSign className="h-4 w-4" />
-            Costs
-          </TabsTrigger>
-          <TabsTrigger value="system-health" className="flex items-center gap-2">
-            <Activity className="h-4 w-4" />
-            Health
+            AI Management
           </TabsTrigger>
         </TabsList>
 
