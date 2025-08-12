@@ -139,7 +139,7 @@ export default function Mint({ tokenType }: MintProps = {}) {
   } | null>(null);
 
   const mintToken = useMutation({
-    mutationFn: async (data: InsertToken) => {
+    mutationFn: async (data: any) => {
       // Show progress overlay
       setShowMintingProgress(true);
       setMintingError("");
@@ -161,7 +161,7 @@ export default function Mint({ tokenType }: MintProps = {}) {
         
         // Step 4: Token creation
         setMintingStep("token");
-        const response = await apiRequest("POST", "/api/tokens", data);
+        const response = await apiRequest("/api/solana/create-token", "POST", data);
         await new Promise(resolve => setTimeout(resolve, 4000));
         
         // Step 5: Value attachment (if applicable)
@@ -174,7 +174,7 @@ export default function Mint({ tokenType }: MintProps = {}) {
         setMintingStep("finalization");
         await new Promise(resolve => setTimeout(resolve, 2000));
         
-        return response.json();
+        return response;
       } catch (error) {
         setMintingError(error instanceof Error ? error.message : "Unknown error occurred");
         throw error;
@@ -292,27 +292,14 @@ export default function Mint({ tokenType }: MintProps = {}) {
       // Basic wallet validation would go here
     }
 
-    const tokenData: InsertToken = {
+    // Format data for Solana API
+    const tokenData = {
       message,
-      symbol: "FlBY-MSG", // Always FlBY-MSG
-      creatorId: "user-1", // Mock user ID
-      totalSupply: parseInt(mintAmount) || 0,
-      availableSupply: parseInt(mintAmount) || 0,
-
-      // Phase 2: Value attachment
-      hasAttachedValue: attachValue,
-      attachedValue: attachValue ? attachedValue : "0",
-      currency: currency,
-      isPublic: isPublic,
-      expiresAt: attachValue && expirationDate ? new Date(expirationDate) : undefined,
-      metadata: {
-        ...(memo && { memo: [memo] }),
-        ...(redemptionCode && validatedCode && { redemptionCode: [redemptionCode] }),
-        ...(messageMedia.length > 0 && { messageMedia: [JSON.stringify(messageMedia)] })
-      },
-      valuePerToken: attachValue && attachedValue && mintAmount ? 
-        (parseFloat(attachedValue) / parseInt(mintAmount)).toString() : "0",
-      imageFile: tokenImage || undefined,
+      value: attachValue ? parseFloat(attachedValue) || 0 : 0,
+      recipients: targetType === "manual" && manualWallets ? 
+        manualWallets.split('\n').filter(w => w.trim()) : [],
+      walletAddress: "user-placeholder-wallet", // This would come from wallet connection
+      image: tokenImage || undefined
     };
 
     mintToken.mutate(tokenData);
