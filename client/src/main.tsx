@@ -9,6 +9,11 @@ if (typeof window !== 'undefined') {
   
   // Log that we're in DevNet mode
   console.log('🌐 DevNet mode detected - WebSocket disabled for stability');
+  
+  // Ensure proper environment detection for DevNet
+  if (!window.location.hostname.includes('localhost')) {
+    console.log('🔧 DevNet deployment detected');
+  }
 }
 
 import "./polyfills";
@@ -18,26 +23,37 @@ import "./index.css";
 
 console.log('🚀 Starting FlutterBye app...');
 
-try {
-  const container = document.getElementById("root");
-  if (!container) {
-    throw new Error("Root container not found");
+// Wait for DOM to be ready
+function initializeApp() {
+  try {
+    const container = document.getElementById("root");
+    if (!container) {
+      throw new Error("Root container not found");
+    }
+    
+    console.log('✅ Root container found, creating React root...');
+    const root = createRoot(container);
+    
+    console.log('✅ React root created, rendering app...');
+    root.render(<App />);
+    
+    console.log('✅ App rendered successfully!');
+  } catch (error) {
+    console.error('❌ Failed to start app:', error);
+    document.body.innerHTML = `
+      <div style="color: white; background: #1a1a1a; padding: 20px; font-family: Arial;">
+        <h1>FlutterBye Loading Error</h1>
+        <p>Error: ${(error as Error).message}</p>
+        <p>Check console for details</p>
+        <button onclick="location.reload()" style="padding: 10px 20px; margin-top: 10px; background: #0066cc; color: white; border: none; border-radius: 5px; cursor: pointer;">Reload</button>
+      </div>
+    `;
   }
-  
-  console.log('✅ Root container found, creating React root...');
-  const root = createRoot(container);
-  
-  console.log('✅ React root created, rendering app...');
-  root.render(<App />);
-  
-  console.log('✅ App rendered successfully!');
-} catch (error) {
-  console.error('❌ Failed to start app:', error);
-  document.body.innerHTML = `
-    <div style="color: white; background: #1a1a1a; padding: 20px; font-family: Arial;">
-      <h1>FlutterBye Loading Error</h1>
-      <p>Error: ${(error as Error).message}</p>
-      <p>Check console for details</p>
-    </div>
-  `;
+}
+
+// Initialize when DOM is ready
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initializeApp);
+} else {
+  initializeApp();
 }
