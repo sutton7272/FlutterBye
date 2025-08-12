@@ -1,4 +1,5 @@
 import express, { type Request, Response, NextFunction } from "express";
+import path from "path";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 const app = express();
@@ -102,6 +103,21 @@ app.use((req, res, next) => {
   // Add fallback route for DevNet deployment
   app.get('/fallback', (req, res) => {
     res.sendFile(path.resolve(import.meta.dirname, '..', 'public', 'index.html'));
+  });
+
+  // Add catch-all route for DevNet to prevent 404s
+  app.get('*', (req, res, next) => {
+    // Skip API routes
+    if (req.path.startsWith('/api')) {
+      return next();
+    }
+    
+    // For DevNet deployment, serve the fallback HTML for all non-API routes
+    if (process.env.REPLIT_DOMAINS) {
+      res.sendFile(path.resolve(import.meta.dirname, '..', 'public', 'index.html'));
+    } else {
+      next();
+    }
   });
 
   // For DevNet deployment, always use Vite for proper development serving

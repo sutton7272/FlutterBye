@@ -1,3 +1,13 @@
+// Completely disable WebSocket to prevent connection errors
+if (typeof window !== 'undefined') {
+  // Override WebSocket to prevent any connection attempts
+  window.WebSocket = class {
+    constructor() {
+      console.log('WebSocket blocked for stability');
+    }
+  } as any;
+}
+
 import "./polyfills";
 import { createRoot } from "react-dom/client";
 import App from "./App";

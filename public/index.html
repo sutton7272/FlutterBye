@@ -52,13 +52,24 @@
         </div>
         
         <script>
-            // Redirect to main app if JavaScript is enabled
+            // Try to load the React app
             setTimeout(() => {
-                if (window.location.pathname === '/') {
-                    console.log('Redirecting to React app...');
-                    window.location.href = '/home';
-                }
-            }, 2000);
+                console.log('DevNet fallback page loaded. Attempting to load React app...');
+                
+                // Check if we can access the API
+                fetch('/api/admin/features')
+                    .then(response => {
+                        if (response.ok) {
+                            console.log('API is working, React app should load');
+                            window.location.reload();
+                        } else {
+                            console.log('API not responding, staying on fallback');
+                        }
+                    })
+                    .catch(error => {
+                        console.log('API error, staying on fallback:', error);
+                    });
+            }, 3000);
         </script>
     </div>
 </body>
