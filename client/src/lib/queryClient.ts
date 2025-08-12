@@ -12,6 +12,10 @@ export async function apiRequest(
   url: string,
   data?: unknown | undefined,
 ): Promise<Response> {
+  // Use absolute URL for DevNet deployment
+  const baseUrl = window.location.origin;
+  const fullUrl = url.startsWith('http') ? url : `${baseUrl}${url}`;
+  
   const headers: Record<string, string> = {
     "Authorization": "Bearer development",
   };
@@ -20,7 +24,7 @@ export async function apiRequest(
     headers["Content-Type"] = "application/json";
   }
 
-  const res = await fetch(url, {
+  const res = await fetch(fullUrl, {
     method,
     headers,
     body: data ? JSON.stringify(data) : undefined,
@@ -37,7 +41,12 @@ export const getQueryFn: <T>(options: {
 }) => QueryFunction<T> =
   ({ on401: unauthorizedBehavior }) =>
   async ({ queryKey }) => {
-    const res = await fetch(queryKey.join("/") as string, {
+    // Use absolute URL for DevNet deployment
+    const baseUrl = window.location.origin;
+    const endpoint = queryKey.join("/") as string;
+    const fullUrl = endpoint.startsWith('http') ? endpoint : `${baseUrl}${endpoint}`;
+    
+    const res = await fetch(fullUrl, {
       credentials: "include",
       headers: {
         "Authorization": "Bearer development",

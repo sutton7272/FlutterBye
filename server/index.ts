@@ -25,6 +25,31 @@ app.use((req, res, next) => {
   next();
 });
 
+// CORS configuration for DevNet deployment
+app.use((req, res, next) => {
+  const allowedOrigins = [
+    'https://2fcdd792-8ec1-4b56-bf3f-adca95719b09-00-myci2lu9eu0e.worf.replit.dev',
+    'http://localhost:5000',
+    'http://localhost:3000'
+  ];
+  
+  const origin = req.headers.origin;
+  if (allowedOrigins.includes(origin || '')) {
+    res.setHeader('Access-Control-Allow-Origin', origin || '*');
+  }
+  
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  res.setHeader('Access-Control-Allow-Credentials', 'true');
+  
+  if (req.method === 'OPTIONS') {
+    res.sendStatus(200);
+    return;
+  }
+  
+  next();
+});
+
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: false, limit: '50mb' }));
 
@@ -74,10 +99,11 @@ app.use((req, res, next) => {
     console.error('Server error:', err);
   });
 
-  // importantly only setup vite in development and after
-  // setting up all the other routes so the catch-all route
-  // doesn't interfere with the other routes
-  if (app.get("env") === "development") {
+  // Setup vite for development AND DevNet environments
+  // DevNet deployment should still use vite for dynamic serving
+  const isProduction = process.env.NODE_ENV === 'production' && !process.env.REPLIT_DOMAINS;
+  
+  if (!isProduction) {
     await setupVite(app, server);
   } else {
     serveStatic(app);
