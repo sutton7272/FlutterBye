@@ -103,12 +103,7 @@ export default function Create() {
     <div className="min-h-screen bg-transparent">
       <div className="container mx-auto px-4 py-6 space-y-8">
         
-        {/* Simplified Header */}
-        <div className="text-center mb-6">
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-electric-blue to-electric-green bg-clip-text text-transparent">
-            Create Message Tokens
-          </h1>
-        </div>
+
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
           <TabsList className="grid w-full grid-cols-4 bg-slate-800/50 border border-electric-blue/20">
