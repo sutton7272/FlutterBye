@@ -11000,10 +11000,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   let navItemsState = {
     'dashboard': { enabled: true },
     'create': { enabled: true },
-    'intelligence': { enabled: true },
+    'intelligence': { enabled: false }, // Disabled per user request
     'chat': { enabled: true },
-    'flutter-art': { enabled: true },
-    'flutter-wave': { enabled: true },
+    'flutter-art': { enabled: false }, // Disabled per user request
+    'flutter-wave': { enabled: false }, // Disabled per user request
     'enterprise': { enabled: false },
     'admin': { enabled: true }
   };
