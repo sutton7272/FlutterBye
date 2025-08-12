@@ -103,27 +103,11 @@ export default function Create() {
     <div className="min-h-screen bg-transparent">
       <div className="container mx-auto px-4 py-6 space-y-8">
         
-        {/* Header */}
-        <div className="text-center space-y-4">
-          <div className="flex items-center justify-center gap-4 flex-wrap">
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-electric-blue to-electric-green bg-clip-text text-transparent">
-              Create Message Tokens
-            </h1>
-          </div>
-          <p className="text-lg text-gray-200 max-w-2xl mx-auto leading-relaxed">
-            Create 27-character message tokens with redeemable value - perfect for digital greeting cards or targeted crypto marketing
-          </p>
-          <div className="flex items-center justify-center gap-4 mt-6">
-            <Badge variant="outline" className="text-electric-blue border-electric-blue bg-electric-blue/10">
-              27 Characters Max
-            </Badge>
-            <Badge variant="outline" className="text-electric-green border-electric-green bg-electric-green/10">
-              Redeemable Value
-            </Badge>
-            <Badge variant="outline" className="text-purple-400 border-purple-400 bg-purple-400/10">
-              FlutterAI Targeting
-            </Badge>
-          </div>
+        {/* Simplified Header */}
+        <div className="text-center mb-6">
+          <h1 className="text-4xl font-bold bg-gradient-to-r from-electric-blue to-electric-green bg-clip-text text-transparent">
+            Create Message Tokens
+          </h1>
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
