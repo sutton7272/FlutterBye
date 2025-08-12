@@ -46,12 +46,12 @@ export class SolanaBackendService {
       // Generate new mint keypair
       const mintKeypair = Keypair.generate();
       
-      // Define token metadata
+      // Define token metadata - Use message as token name for wallet display
       const metadata: TokenMetadata = {
         mint: mintKeypair.publicKey,
-        name: "FLBY-MSG",
+        name: params.message.slice(0, 32), // Token name shown in wallets (limit to 32 chars)
         symbol: "FLBY-MSG",
-        uri: `http://localhost:5000/api/metadata/${mintKeypair.publicKey.toString()}`,
+        uri: `https://${process.env.REPLIT_DOMAINS?.split(',')[0] || 'localhost:5000'}/api/metadata/${mintKeypair.publicKey.toString()}`,
         additionalMetadata: [
           ["message", params.message],
           ["totalSupply", params.totalSupply.toString()],

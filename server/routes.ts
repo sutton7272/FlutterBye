@@ -5814,7 +5814,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         name: token.message,
         symbol: "FLBY-MSG",
         description: `Flutterbye Message Token: "${token.message}"`,
-        image: token.imageUrl || "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDIwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjMzMzIiByeD0iMTAiLz4KPHR5cGUgdGV4dC1hbmNob3I9Im1pZGRsZSIgeD0iMTAwIiB5PSIxMDAiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxOCIgZmlsbD0iI0ZGRiI+RkxCWS1NU0c8L3R5cGU+Cjwvc3ZnPg==",
+        image: token.imageUrl || `https://${req.get('host')}/butterfly-logo.png`,
         external_url: `https://flutterbye.app/token/${mintAddress}`,
         attributes: [
           {
