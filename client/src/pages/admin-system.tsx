@@ -195,17 +195,24 @@ export default function AdminSystem() {
       .reduce((total, f) => total + f.monthly_cost, 0);
   };
 
-  // Helper component for contextual help tooltips
+  // Helper component for contextual help tooltips with improved visibility
   const HelpTooltip = ({ content, children }: { content: React.ReactNode; children: React.ReactNode }) => (
-    <Tooltip>
+    <Tooltip delayDuration={200}>
       <TooltipTrigger asChild>
-        <div className="flex items-center gap-2 cursor-help">
+        <div className="flex items-center gap-2 cursor-help group">
           {children}
-          <HelpCircle className="h-4 w-4 text-gray-400 hover:text-blue-400 transition-colors" />
+          <HelpCircle className="h-4 w-4 text-blue-400 hover:text-blue-300 transition-colors opacity-80 group-hover:opacity-100 animate-pulse group-hover:animate-none" />
         </div>
       </TooltipTrigger>
-      <TooltipContent side="top" className="max-w-xs p-4 bg-gray-900 border border-gray-700">
-        <div className="text-sm text-white">{content}</div>
+      <TooltipContent 
+        side="top" 
+        className="max-w-sm p-4 bg-slate-900 border-2 border-blue-500/50 shadow-2xl z-50 rounded-lg"
+        sideOffset={8}
+      >
+        <div className="text-sm text-white leading-relaxed">
+          {content}
+        </div>
+        <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 translate-y-2 w-0 h-0 border-l-4 border-r-4 border-t-8 border-transparent border-t-slate-900"></div>
       </TooltipContent>
     </Tooltip>
   );

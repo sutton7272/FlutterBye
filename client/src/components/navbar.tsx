@@ -6,6 +6,7 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Menu, Home, Coins, Trophy, Users, MessageSquare, Settings, Sparkles, Zap, Heart, Building2, MapPin, Gift, Award, Star, Ticket, HelpCircle, LayoutDashboard, Brain, CreditCard, Stars, DollarSign, Code2, Rocket, Target, Shield, Activity } from "lucide-react";
 
 import { useFeatureToggles } from "@/hooks/useFeatureToggles";
+import { useQuery } from "@tanstack/react-query";
 import { MobileNavigation } from "@/components/mobile-navigation";
 
 export default function Navbar() {
@@ -13,12 +14,24 @@ export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const { isFeatureEnabled, isLoading: featuresLoading } = useFeatureToggles();
 
+  // Get navigation control state
+  const { data: navItems = [], isLoading: navLoading } = useQuery({
+    queryKey: ['/api/admin/navigation-control'],
+    staleTime: 1000 * 60 * 5, // 5 minutes
+  });
+
+  // Helper to check if a navigation item is enabled
+  const isNavEnabled = (navId: string): boolean => {
+    const navItem = (navItems as any[]).find((item: any) => item.id === navId);
+    return navItem?.enabled ?? true;
+  };
+
   // Primary navigation - core platform sections focused on launch products
   const allNavItems = [
     { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard, description: "Portfolio & activity", featureId: "dashboard", priority: true },
     { href: "/create", label: "FlutterbyeMSG", icon: MessageSquare, description: "27-character message tokens with value", featureId: "mint", priority: true },
-    { href: "/flutter-art", label: "FlutterArt", icon: Sparkles, description: "NFT message tokens & visual messages", featureId: "flutter_art", priority: true },
-    { href: "/flutter-wave", label: "FlutterWave", icon: Zap, description: "SMS-to-blockchain emotional tokens", featureId: "flutter_wave", priority: true },
+    { href: "/flutter-art", label: "FlutterArt", icon: Sparkles, description: "NFT message tokens & visual messages", featureId: "flutter-art", priority: true },
+    { href: "/flutter-wave", label: "FlutterWave", icon: Zap, description: "SMS-to-blockchain emotional tokens", featureId: "flutter-wave", priority: true },
     { href: "/redeem", label: "Redeem", icon: Gift, description: "Discover & redeem message tokens", featureId: "marketplace", priority: true },
     { href: "/info", label: "Info", icon: HelpCircle, description: "Platform info, tutorials & analytics", featureId: "info", priority: true },
     { href: "/enterprise-campaigns", label: "Marketing", icon: Target, description: "Enterprise marketing campaigns", featureId: "enterprise" },
@@ -28,18 +41,43 @@ export default function Navbar() {
     { href: "/admin", label: "Admin", icon: Settings, description: "Platform management", featureId: "admin_panel" },
   ];
 
-  // Filter navigation items based on feature toggles
-  const primaryNavItems = featuresLoading 
+  // Filter navigation items based on navigation control and feature toggles
+  const primaryNavItems = (featuresLoading || navLoading) 
     ? [] // Show no items while loading to prevent flash
     : allNavItems.filter(item => {
         // Admin panel is always visible (critical for platform management)
         if (item.featureId === "admin_panel") {
           return true;
         }
-        // Show core features by default
-        if (["home", "mint", "marketplace", "flutter_wave", "flutter_art", "chat", "dashboard", "info"].includes(item.featureId)) {
+        
+        // Map href to navigation control ID
+        const navId = item.href.replace('/', '').replace('-', '-'); // /flutter-art -> flutter-art
+        
+        // Special cases for navigation control
+        if (item.href === "/flutter-art") {
+          return isNavEnabled("flutter-art");
+        }
+        if (item.href === "/flutter-wave") {
+          return isNavEnabled("flutter-wave");
+        }
+        if (item.href === "/create") {
+          return isNavEnabled("create");
+        }
+        if (item.href === "/dashboard") {
+          return isNavEnabled("dashboard");
+        }
+        if (item.href === "/intelligence") {
+          return isNavEnabled("intelligence");
+        }
+        if (item.href === "/enterprise-campaigns") {
+          return isNavEnabled("enterprise");
+        }
+        
+        // Show core features by default if not controlled by navigation
+        if (["home", "mint", "marketplace", "chat", "redeem", "info"].includes(item.featureId)) {
           return true;
         }
+        
         // If no featureId is specified, show the item by default
         if (!item.featureId) return true;
         // Otherwise, check if the feature is enabled
