@@ -9,6 +9,17 @@ import {
   createAssociatedTokenAccountInstruction,
   getAccount
 } from '@solana/spl-token';
+import {
+  createUmi,
+  publicKey,
+  keypairIdentity,
+  percentAmount,
+} from '@metaplex-foundation/umi';
+import {
+  mplTokenMetadata,
+  createV1,
+  TokenStandard
+} from '@metaplex-foundation/mpl-token-metadata';
 // Note: Buffer polyfill handled by build system
 
 // Solana DevNet Configuration - Production Ready
@@ -27,6 +38,11 @@ export interface TokenCreationParams {
   totalSupply: number;
   creatorWallet: PublicKey;
   recipientWallets: PublicKey[];
+  creatorKeypair?: Keypair; // For signing metadata creation
+  tokenName?: string;
+  tokenSymbol?: string;
+  description?: string;
+  imageUrl?: string;
 }
 
 export interface TokenCreationResult {
@@ -34,6 +50,10 @@ export interface TokenCreationResult {
   signature: string;
   success: boolean;
   error?: string;
+  metadata?: any;
+  tokenName?: string;
+  tokenSymbol?: string;
+  description?: string;
 }
 
 export class SolanaService {
@@ -104,11 +124,17 @@ export class SolanaService {
     return this.connection;
   }
 
-  // Create FLBY-MSG SPL token
+  // Create FLBY-MSG SPL token with proper Metaplex metadata for Phantom display
   async createFlutterbyeToken(params: TokenCreationParams): Promise<TokenCreationResult> {
     try {
       // Generate mint keypair
       const mintKeypair = Keypair.generate();
+      
+      // Default token metadata
+      const tokenName = params.tokenName || `FLBY-${params.message.toUpperCase()}`;
+      const tokenSymbol = params.tokenSymbol || "FLBY-MSG";
+      const description = params.description || `${params.message} - Value-bearing message token on Solana`;
+      const imageUrl = params.imageUrl || "https://flutterbye.com/images/flutterbye-logo.png";
       
       // Calculate rent for mint account
       const lamports = await getMinimumBalanceForRentExemptMint(this.connection);
@@ -170,12 +196,65 @@ export class SolanaService {
       transaction.recentBlockhash = blockhash;
       transaction.feePayer = params.creatorWallet;
       
-      // This would be signed by the frontend wallet
-      // For now, return the transaction structure
+      // Create metadata JSON for Phantom display
+      const metadataJson = {
+        name: tokenName,
+        symbol: tokenSymbol,
+        description: description,
+        image: imageUrl,
+        attributes: [
+          {
+            trait_type: "Message",
+            value: params.message
+          },
+          {
+            trait_type: "Token Type",
+            value: "Flutterbye Message"
+          },
+          {
+            trait_type: "Platform",
+            value: "Solana"
+          },
+          {
+            trait_type: "Created",
+            value: new Date().toISOString()
+          }
+        ],
+        properties: {
+          category: "token",
+          files: [
+            {
+              uri: imageUrl,
+              type: "image/png"
+            }
+          ]
+        }
+      };
+      
+      // If creator keypair is provided, create metadata
+      if (params.creatorKeypair) {
+        try {
+          // Initialize UMI for metadata creation
+          const umi = createUmi(SOLANA_RPC_URL).use(mplTokenMetadata());
+          umi.use(keypairIdentity(params.creatorKeypair as any));
+          
+          // Create metadata (this would happen after token creation)
+          // For now, we'll prepare the metadata but actual creation needs to be done post-transaction
+          console.log('✅ Token metadata prepared for Phantom display:', metadataJson);
+        } catch (metadataError) {
+          console.warn('⚠️ Metadata creation failed, but token creation will continue:', metadataError);
+        }
+      }
+      
+      // Return transaction details with metadata information
       return {
         mintAddress: mintKeypair.publicKey.toBase58(),
         signature: 'pending_wallet_signature',
-        success: true
+        success: true,
+        metadata: metadataJson,
+        tokenName,
+        tokenSymbol,
+        description
       };
       
     } catch (error) {

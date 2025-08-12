@@ -1,6 +1,7 @@
 import type { Express, Request, Response } from "express";
 import { storage } from "./storage";
 import { DefaultTokenImageService } from "./default-token-image";
+import { AutoMetadataService } from "./auto-metadata-service";
 
 // Enhanced Solana integration routes for token creation and management
 export function registerSolanaRoutes(app: Express) {
@@ -52,6 +53,22 @@ export function registerSolanaRoutes(app: Express) {
       // Store token in database
       const tokenId = await storage.createToken(tokenDataWithImage);
       
+      // If this were a real mint operation with wallet signature,
+      // we would automatically create metadata here for Phantom display:
+      // 
+      // try {
+      //   await AutoMetadataService.createMetadataForNewToken({
+      //     secretKey: userWalletSecretKey, // Would come from wallet signature
+      //     mint: realMintAddress,
+      //     name: tokenName,
+      //     symbol: tokenSymbol,
+      //     description: `${message} - Value-bearing message token on Solana`
+      //   });
+      //   console.log('✅ Automatic metadata created for Phantom display');
+      // } catch (metadataError) {
+      //   console.warn('⚠️ Metadata creation failed, but token creation succeeded:', metadataError);
+      // }
+      
       res.json({
         success: true,
         tokenId,
@@ -60,7 +77,9 @@ export function registerSolanaRoutes(app: Express) {
         tokenName,
         tokenSymbol,
         supply: initialSupply,
-        blockchain: "solana-devnet"
+        blockchain: "solana-devnet",
+        phantomReady: false, // Will be true when real tokens include metadata
+        note: "When wallet connection is active, tokens will automatically include metadata for Phantom display"
       });
       
     } catch (error: any) {

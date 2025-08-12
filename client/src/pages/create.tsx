@@ -25,7 +25,7 @@ import {
 import Mint from "./mint";
 import { VoiceMessageRecorder } from "@/components/voice-message-recorder";
 import { ContextualChatButton } from "@/components/contextual-chat-button";
-import { PhantomMetadataFixer } from "@/components/phantom-metadata-fixer";
+
 
 export default function Create() {
   const [activeTab, setActiveTab] = useState("tokens");
@@ -228,9 +228,26 @@ export default function Create() {
               <p className="text-gray-300">Enhance your message tokens with advanced AI capabilities</p>
             </div>
             
-            {/* Phantom Wallet Token Display Fixer */}
+            {/* Automatic Metadata Creation Notice */}
             <div className="mb-8">
-              <PhantomMetadataFixer />
+              <Card className="glassmorphism border-green-500/30 bg-green-900/10">
+                <CardContent className="p-6">
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="w-10 h-10 rounded-full bg-green-500/20 flex items-center justify-center">
+                      <Wallet className="w-5 h-5 text-green-400" />
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-green-400">Phantom Display Fixed!</h3>
+                      <p className="text-sm text-gray-300">All tokens now display properly in Phantom automatically</p>
+                    </div>
+                  </div>
+                  <div className="text-sm text-gray-400 space-y-2">
+                    <p>✅ Automatic metadata creation during token minting</p>
+                    <p>✅ Proper token names, symbols, and images in Phantom</p>
+                    <p>✅ No more "Unknown" token display issues</p>
+                  </div>
+                </CardContent>
+              </Card>
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

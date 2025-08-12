@@ -54,6 +54,7 @@ import { messageNFTService } from "./message-nft-service";
 import { livingAIService } from "./living-ai-service";
 import { immersiveAIService } from "./immersive-ai-service";
 import * as phantomMetadataFixer from "./phantom-metadata-fixer";
+import { AutoMetadataService } from "./auto-metadata-service";
 import FlutterbeyeWebSocketServer from "./websocket-server";
 import { aiAdminService } from "./ai-admin-service";
 import apiMonetizationRoutes from "./api-monetization-routes";
@@ -4604,6 +4605,82 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.error('Generate metadata JSON error:', error);
       res.status(500).json({ 
         error: "Failed to generate metadata JSON" 
+      });
+    }
+  });
+
+  // Auto-create metadata for newly minted tokens
+  app.post("/api/tokens/auto-metadata", async (req, res) => {
+    try {
+      const { secretKey, mint, name, symbol, description } = req.body;
+
+      if (!secretKey || !mint || !name || !symbol) {
+        return res.status(400).json({ 
+          error: "Missing required fields: secretKey, mint, name, symbol" 
+        });
+      }
+
+      console.log(`🔧 Auto-creating metadata for new token: ${mint}`);
+      
+      const result = await AutoMetadataService.createMetadataForNewToken({
+        rpcUrl: "https://api.devnet.solana.com",
+        secretKey,
+        mint,
+        name,
+        symbol,
+        description: description || `${name} - Value-bearing message token on Solana`
+      });
+
+      if (result.success) {
+        res.json({
+          success: true,
+          ...result,
+          message: `Successfully ${result.action} metadata for token ${mint}`,
+          phantomReady: true
+        });
+      } else {
+        res.status(500).json({
+          error: "Failed to create metadata",
+          details: result.error
+        });
+      }
+
+    } catch (error) {
+      console.error('Auto metadata creation error:', error);
+      res.status(500).json({ 
+        error: "Failed to create metadata automatically",
+        details: error.message 
+      });
+    }
+  });
+
+  // Host metadata JSON for tokens (used by Metaplex URI)
+  app.get("/api/metadata/:mint.json", async (req, res) => {
+    try {
+      const { mint } = req.params;
+      
+      // Try to get token data from storage
+      const tokens = await storage.getAllTokens();
+      const tokenData = tokens.find(token => token.mintAddress === mint);
+      
+      if (tokenData) {
+        const metadataJson = await AutoMetadataService.getMetadataJson(mint, tokenData);
+        res.json(metadataJson);
+      } else {
+        // Generate default metadata for unknown tokens
+        const defaultMetadata = AutoMetadataService.generateFlutterbyeMetadataJson(
+          `FLBY-TOKEN`,
+          "FLBY-MSG",
+          "Flutterbye message token on Solana",
+          "Unknown"
+        );
+        res.json(defaultMetadata);
+      }
+
+    } catch (error) {
+      console.error('Metadata JSON hosting error:', error);
+      res.status(500).json({ 
+        error: "Failed to host metadata JSON" 
       });
     }
   });
