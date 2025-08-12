@@ -90,7 +90,7 @@ export default function AdminSystem() {
     mutationFn: async ({ itemId, enabled }: { itemId: string; enabled: boolean }) => {
       console.log(`🔄 Frontend: Toggling navigation ${itemId} to ${enabled}`);
       try {
-        const response = await apiRequest(`/api/admin/navigation-control/${itemId}`, 'PATCH', { enabled });
+        const response = await apiRequest('PATCH', `/api/admin/navigation-control/${itemId}`, { enabled });
         console.log('✅ Frontend: Navigation toggle success:', response);
         return response;
       } catch (error) {
@@ -122,7 +122,7 @@ export default function AdminSystem() {
     mutationFn: async ({ featureId, enabled }: { featureId: string; enabled: boolean }) => {
       console.log(`🤖 Frontend: Toggling AI feature ${featureId} to ${enabled}`);
       try {
-        const response = await apiRequest(`/api/admin/ai-features/${featureId}`, 'PATCH', { enabled });
+        const response = await apiRequest('PATCH', `/api/admin/ai-features/${featureId}`, { enabled });
         console.log('✅ Frontend: AI toggle success:', response);
         return response;
       } catch (error) {
@@ -152,7 +152,7 @@ export default function AdminSystem() {
   // Emergency AI shutdown mutation
   const emergencyShutdownMutation = useMutation({
     mutationFn: async () => {
-      return await apiRequest('/api/admin/emergency-ai-shutdown', 'POST');
+      return await apiRequest('POST', '/api/admin/emergency-ai-shutdown');
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/admin/ai-features'] });
@@ -163,7 +163,7 @@ export default function AdminSystem() {
   // Bulk operations
   const bulkToggleMutation = useMutation({
     mutationFn: async ({ items, enabled, type }: { items: string[]; enabled: boolean; type: 'nav' | 'ai' }) => {
-      return await apiRequest('/api/admin/bulk-toggle', 'POST', { items, enabled, type });
+      return await apiRequest('POST', '/api/admin/bulk-toggle', { items, enabled, type });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/admin/navigation-control'] });
