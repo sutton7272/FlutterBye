@@ -193,21 +193,15 @@ export default function Mint({ tokenType }: MintProps = {}) {
         type: 'FLBY-MSG Token Created',
         wasFreeMint: isFreeMode,
         redemptionCode: validatedCode?.code,
-        transactionUrl: data.blockchainUrl
+        transactionUrl: data.metadata?.solscanUrl || data.blockchainUrl
       });
       setShowSuccessOverlay(true);
       
-      // Show detailed success toast
+      // Show detailed success toast  
       toast({
         title: "🎉 Token Created Successfully!",
-        description: (
-          <div className="space-y-2">
-            <div>Message: "{message}"</div>
-            <div>Mint Address: {data.mintAddress}</div>
-            <div>Transaction: {data.transactionSignature?.slice(0, 16)}...</div>
-          </div>
-        ),
-        duration: 8000,
+        description: `Message: "${message}" | Mint: ${data.mintAddress?.slice(0, 8)}...${data.mintAddress?.slice(-4)}`,
+        duration: 6000,
       });
       
       // Auto-trigger share modal after 3 seconds
@@ -1558,6 +1552,7 @@ export default function Mint({ tokenType }: MintProps = {}) {
         transactionType={successData?.type || 'Transaction'}
         amount={successData?.amount}
         message={successData?.message}
+        blockchainUrl={successData?.transactionUrl}
       />
 
       {/* Share Success Modal */}
