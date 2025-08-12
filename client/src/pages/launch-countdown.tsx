@@ -354,8 +354,18 @@ export default function LaunchCountdown() {
       <div className={`container mx-auto px-4 relative z-10 ${hasAccess ? 'pt-24 pb-8' : 'py-8'}`}>
         
         {/* Main Flutterbye Title */}
-        <div className="text-center mb-16">
-          <div className="flex items-center justify-center gap-4 mb-6">
+        <div className="text-center mb-16 relative">
+          {/* Flying Butterflies */}
+          <div className="absolute inset-0 pointer-events-none overflow-hidden">
+            <div className="butterfly butterfly-1">🦋</div>
+            <div className="butterfly butterfly-2">🦋</div>
+            <div className="butterfly butterfly-3">🦋</div>
+            <div className="butterfly butterfly-4">🦋</div>
+            <div className="butterfly butterfly-5">🦋</div>
+            <div className="butterfly butterfly-6">🦋</div>
+          </div>
+          
+          <div className="flex items-center justify-center gap-4 mb-6 relative z-10">
             <img src={flutterbeyeLogoPath} alt="Flutterbye" className="w-16 h-16" />
             <h1 className="text-6xl font-bold text-gradient">
               Flutterbye
