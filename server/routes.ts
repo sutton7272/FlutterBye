@@ -53,6 +53,7 @@ import { openaiService } from "./openai-service";
 import { messageNFTService } from "./message-nft-service";
 import { livingAIService } from "./living-ai-service";
 import { immersiveAIService } from "./immersive-ai-service";
+import * as phantomMetadataFixer from "./phantom-metadata-fixer";
 import FlutterbeyeWebSocketServer from "./websocket-server";
 import { aiAdminService } from "./ai-admin-service";
 import apiMonetizationRoutes from "./api-monetization-routes";
@@ -4520,6 +4521,90 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error('Collection analytics error:', error);
       res.status(404).json({ error: error.message || 'Failed to get analytics' });
+    }
+  });
+
+  // Phantom Wallet Token Display Fix Routes
+  app.post("/api/phantom/fix-token-metadata", async (req, res) => {
+    try {
+      const { 
+        rpcUrl = "https://api.devnet.solana.com",
+        secretKey, 
+        mint, 
+        name, 
+        symbol, 
+        uri 
+      } = req.body;
+
+      if (!secretKey || !mint || !name || !symbol || !uri) {
+        return res.status(400).json({ 
+          error: "Missing required fields: secretKey, mint, name, symbol, uri" 
+        });
+      }
+
+      console.log(`🔧 Fixing Phantom display for token: ${mint}`);
+      
+      const result = await phantomMetadataFixer.fixTokenMetadata({
+        rpcUrl,
+        secretKey,
+        mint,
+        name,
+        symbol,
+        uri
+      });
+
+      res.json({
+        success: true,
+        ...result,
+        message: `Successfully ${result.action} metadata for token ${mint}`,
+        nextSteps: [
+          "Open your token in Solana Explorer/Solscan to verify name/symbol/image",
+          "In Phantom: Go to Manage > Add custom token (paste mint address)",
+          "Refresh Phantom cache if needed"
+        ]
+      });
+
+    } catch (error) {
+      console.error('Phantom metadata fix error:', error);
+      res.status(500).json({ 
+        error: "Failed to fix token metadata",
+        details: error.message 
+      });
+    }
+  });
+
+  // Generate default metadata JSON for Flutterbye tokens
+  app.post("/api/phantom/generate-metadata-json", async (req, res) => {
+    try {
+      const { name, symbol, description } = req.body;
+
+      if (!name || !symbol) {
+        return res.status(400).json({ 
+          error: "Name and symbol are required" 
+        });
+      }
+
+      const metadataJson = phantomMetadataFixer.generateDefaultMetadataJson(
+        name, 
+        symbol, 
+        description
+      );
+
+      res.json({
+        success: true,
+        metadataJson,
+        instructions: [
+          "Host this JSON at a public URL (IPFS, Arweave, or HTTPS)",
+          "Use that URL as the 'uri' parameter when fixing metadata",
+          "Make sure the image URL in the JSON is also publicly accessible"
+        ]
+      });
+
+    } catch (error) {
+      console.error('Generate metadata JSON error:', error);
+      res.status(500).json({ 
+        error: "Failed to generate metadata JSON" 
+      });
     }
   });
   // Verify phone number with code

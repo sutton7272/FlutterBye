@@ -19,11 +19,13 @@ import {
   Palette,
   Music,
   Video,
-  Users
+  Users,
+  Wallet
 } from "lucide-react";
 import Mint from "./mint";
 import { VoiceMessageRecorder } from "@/components/voice-message-recorder";
 import { ContextualChatButton } from "@/components/contextual-chat-button";
+import { PhantomMetadataFixer } from "@/components/phantom-metadata-fixer";
 
 export default function Create() {
   const [activeTab, setActiveTab] = useState("tokens");
@@ -224,6 +226,11 @@ export default function Create() {
             <div className="text-center mb-6">
               <h2 className="text-2xl font-bold text-white mb-2">AI-Powered Tools</h2>
               <p className="text-gray-300">Enhance your message tokens with advanced AI capabilities</p>
+            </div>
+            
+            {/* Phantom Wallet Token Display Fixer */}
+            <div className="mb-8">
+              <PhantomMetadataFixer />
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
