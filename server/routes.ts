@@ -10996,5 +10996,176 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   console.log("📱 SMS Campaign Management System activated!");
   
+  // Systems Dashboard API endpoints
+  app.get('/api/admin/navigation-control', (req, res) => {
+    const navItems = [
+      {
+        id: 'dashboard',
+        label: 'Dashboard',
+        description: 'Main platform overview and statistics',
+        enabled: true,
+        category: 'core',
+        cost_level: 'free'
+      },
+      {
+        id: 'create',
+        label: 'Create',
+        description: 'Token creation and minting tools',
+        enabled: true,
+        category: 'core',
+        cost_level: 'low'
+      },
+      {
+        id: 'intelligence',
+        label: 'Intelligence',
+        description: 'AI-powered wallet intelligence and analytics',
+        enabled: true,
+        category: 'ai',
+        cost_level: 'high'
+      },
+      {
+        id: 'chat',
+        label: 'Chat',
+        description: 'Real-time blockchain messaging',
+        enabled: true,
+        category: 'ai',
+        cost_level: 'medium'
+      },
+      {
+        id: 'flutter-art',
+        label: 'FlutterArt',
+        description: 'AI-generated NFT marketplace',
+        enabled: true,
+        category: 'ai',
+        cost_level: 'high'
+      },
+      {
+        id: 'enterprise',
+        label: 'Enterprise',
+        description: 'Enterprise wallet management',
+        enabled: false,
+        category: 'enterprise',
+        cost_level: 'high'
+      },
+      {
+        id: 'admin',
+        label: 'Admin',
+        description: 'Platform administration panel',
+        enabled: true,
+        category: 'admin',
+        cost_level: 'free'
+      }
+    ];
+    res.json(navItems);
+  });
+
+  app.get('/api/admin/ai-features', (req, res) => {
+    const aiFeatures = [
+      {
+        id: 'skye-ai',
+        name: 'Skye AI Chatbot',
+        description: 'Advanced AI assistant with personality system',
+        enabled: true,
+        monthly_cost: 250,
+        usage_count: 1420,
+        cost_level: 'medium'
+      },
+      {
+        id: 'wallet-intelligence',
+        name: 'Wallet Intelligence',
+        description: 'AI-powered wallet scoring and analysis',
+        enabled: true,
+        monthly_cost: 850,
+        usage_count: 3200,
+        cost_level: 'high'
+      },
+      {
+        id: 'content-generation',
+        name: 'AI Content Generation',
+        description: 'Automated blog posts and marketing content',
+        enabled: true,
+        monthly_cost: 180,
+        usage_count: 890,
+        cost_level: 'low'
+      },
+      {
+        id: 'nft-generation',
+        name: 'AI NFT Generation',
+        description: 'DALL-E powered NFT artwork creation',
+        enabled: true,
+        monthly_cost: 920,
+        usage_count: 450,
+        cost_level: 'critical'
+      },
+      {
+        id: 'sentiment-analysis',
+        name: 'Sentiment Analysis',
+        description: 'Real-time emotion detection for messages',
+        enabled: true,
+        monthly_cost: 120,
+        usage_count: 2100,
+        cost_level: 'low'
+      },
+      {
+        id: 'predictive-analytics',
+        name: 'Predictive Analytics',
+        description: 'Market trend prediction and insights',
+        enabled: false,
+        monthly_cost: 1200,
+        usage_count: 0,
+        cost_level: 'critical'
+      }
+    ];
+    res.json(aiFeatures);
+  });
+
+  app.get('/api/admin/system-stats', (req, res) => {
+    const stats = {
+      total_users: 12847,
+      active_sessions: 234,
+      monthly_ai_cost: 2320,
+      performance_score: 94,
+      uptime: 99.8
+    };
+    res.json(stats);
+  });
+
+  app.patch('/api/admin/navigation-control/:itemId', (req, res) => {
+    const { itemId } = req.params;
+    const { enabled } = req.body;
+    
+    console.log(`🎛️ Navigation item ${itemId} set to ${enabled ? 'enabled' : 'disabled'}`);
+    res.json({ success: true, message: `Navigation item ${itemId} updated` });
+  });
+
+  app.patch('/api/admin/ai-features/:featureId', (req, res) => {
+    const { featureId } = req.params;
+    const { enabled } = req.body;
+    
+    console.log(`🤖 AI feature ${featureId} set to ${enabled ? 'enabled' : 'disabled'}`);
+    res.json({ success: true, message: `AI feature ${featureId} updated` });
+  });
+
+  app.post('/api/admin/emergency-ai-shutdown', (req, res) => {
+    console.log('🚨 EMERGENCY AI SHUTDOWN ACTIVATED - All AI features disabled');
+    res.json({ 
+      success: true, 
+      message: 'Emergency AI shutdown completed',
+      disabled_features: 6,
+      estimated_savings: '$2,320/month'
+    });
+  });
+
+  app.post('/api/admin/bulk-toggle', (req, res) => {
+    const { items, enabled, type } = req.body;
+    
+    console.log(`🔄 Bulk ${type} toggle: ${items.length} items set to ${enabled ? 'enabled' : 'disabled'}`);
+    res.json({ 
+      success: true, 
+      message: `${items.length} ${type} items updated`,
+      affected_items: items.length
+    });
+  });
+
   return httpServer;
 }

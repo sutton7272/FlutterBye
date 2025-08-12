@@ -504,10 +504,12 @@ function Router() {
             <TokenHolderMapPage />
           </>
         )} />
-        <Route path="/admin-system" component={() => (
+        <Route path="/admin/system" component={() => (
           <>
             <Navbar />
-            <AdminSystem />
+            <SuspenseWrapper>
+              <AdminSystem />
+            </SuspenseWrapper>
           </>
         )} />
         <Route path="/confetti-demo" component={() => (
