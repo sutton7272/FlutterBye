@@ -2,11 +2,7 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
+
 import { 
   Brain, 
   Sparkles, 
@@ -39,7 +35,6 @@ interface DemoResult {
 }
 
 export function FlutterAIInteractiveDemo() {
-  const [isOpen, setIsOpen] = useState(false);
   const [activeDemo, setActiveDemo] = useState<string>("");
   const [walletAddress, setWalletAddress] = useState("DemoWallet1234567890abcdef");
   const [content, setContent] = useState("");
@@ -191,227 +186,75 @@ export function FlutterAIInteractiveDemo() {
   ];
 
   return (
-    <>
-      {/* Replace the red test button */}
-      <div style={{
-        position: 'fixed',
-        top: '20px',
-        right: '20px',
-        zIndex: 999999
-      }}>
-        <Dialog open={isOpen} onOpenChange={setIsOpen}>
-          <DialogTrigger asChild>
-            <Button 
-              className="bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white font-bold px-6 py-3 rounded-lg shadow-lg border-2 border-cyan-400/50"
-              onClick={() => {
-                console.log("AI Demo Modal opened");
-                setIsOpen(true);
-              }}
+    <div className="space-y-4">
+      {/* Interactive Demo Steps */}
+      <div className="text-center mb-6">
+        <Button 
+          onClick={() => setActiveDemo(activeDemo ? "" : "start")}
+          className="bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white font-bold px-6 py-3 rounded-lg"
+        >
+          <Play className="w-5 h-5 mr-2" />
+          Start Interactive Demo
+        </Button>
+      </div>
+
+      {/* Demo Steps */}
+      {activeDemo && (
+        <div className="space-y-4">
+          {demoOptions.map((demo, index) => (
+            <Card 
+              key={demo.id}
+              className={`cursor-pointer transition-all duration-200 hover:scale-105 bg-slate-800 border-slate-600 ${
+                activeDemo === demo.id ? 'ring-2 ring-cyan-400' : ''
+              }`}
+              onClick={() => !demo.loading && demo.action()}
             >
-              <Brain className="w-5 h-5 mr-2" />
-              Try FlutterAI Demo
-            </Button>
-          </DialogTrigger>
-          
-          <DialogContent className="max-w-4xl bg-slate-900 border border-slate-700 text-white">
-            <DialogHeader>
-              <DialogTitle className="text-2xl font-bold bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent">
-                FlutterAI Interactive Demo
-              </DialogTitle>
-            </DialogHeader>
-            
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
-              {/* Left Panel: Demo Options */}
-              <div className="space-y-4">
-                <h3 className="text-lg font-semibold mb-4">Choose a Demo:</h3>
-                
-                {demoOptions.map((demo) => (
-                  <Card 
-                    key={demo.id}
-                    className={`cursor-pointer transition-all duration-200 hover:scale-105 bg-slate-800 border-slate-600 ${
-                      activeDemo === demo.id ? 'ring-2 ring-cyan-400' : ''
-                    }`}
-                    onClick={() => !demo.loading && demo.action()}
-                  >
-                    <CardContent className="p-4">
-                      <div className="flex items-center space-x-3">
-                        <div className={`p-2 rounded-lg bg-gradient-to-r ${demo.color}`}>
-                          <demo.icon className="w-5 h-5 text-white" />
-                        </div>
-                        <div className="flex-1">
-                          <h4 className="font-semibold text-white">{demo.title}</h4>
-                          <p className="text-sm text-gray-400">{demo.description}</p>
-                        </div>
-                        {demo.loading ? (
-                          <Loader2 className="w-5 h-5 animate-spin text-cyan-400" />
-                        ) : (
-                          <ArrowRight className="w-5 h-5 text-gray-400" />
-                        )}
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-                
-                {/* Input Fields */}
-                <div className="space-y-3 mt-6">
-                  <div>
-                    <Label htmlFor="wallet" className="text-sm text-gray-300">
-                      Wallet Address (for analysis demo)
-                    </Label>
-                    <Input
-                      id="wallet"
-                      value={walletAddress}
-                      onChange={(e) => setWalletAddress(e.target.value)}
-                      placeholder="Enter wallet address"
-                      className="bg-slate-800 border-slate-600 text-white"
-                    />
+              <CardContent className="p-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-3">
+                    <Badge className="bg-electric-blue/20 text-electric-blue shrink-0">{index + 1}</Badge>
+                    <div>
+                      <h4 className="font-bold text-white">{demo.title}</h4>
+                      <p className="text-sm text-muted-foreground">{demo.description}</p>
+                    </div>
                   </div>
-                  
-                  <div>
-                    <Label htmlFor="content" className="text-sm text-gray-300">
-                      Content (for optimization demo)
-                    </Label>
-                    <Textarea
-                      id="content"
-                      value={content}
-                      onChange={(e) => setContent(e.target.value)}
-                      placeholder="Enter content to optimize"
-                      className="bg-slate-800 border-slate-600 text-white"
-                      rows={3}
-                    />
-                  </div>
+                  {demo.loading ? (
+                    <Loader2 className="w-5 h-5 animate-spin text-cyan-400" />
+                  ) : (
+                    <ArrowRight className="w-5 h-5 text-cyan-400" />
+                  )}
                 </div>
-              </div>
-              
-              {/* Right Panel: Results */}
-              <div className="space-y-4">
-                <h3 className="text-lg font-semibold mb-4">Demo Results:</h3>
                 
-                {!activeDemo ? (
-                  <Card className="bg-slate-800 border-slate-600">
-                    <CardContent className="p-8 text-center">
-                      <Bot className="w-12 h-12 mx-auto text-gray-400 mb-4" />
-                      <p className="text-gray-400">
-                        Select a demo to see FlutterAI in action
-                      </p>
-                    </CardContent>
-                  </Card>
-                ) : (
-                  <div className="space-y-4">
-                    {/* Wallet Analysis Results */}
-                    {activeDemo === "wallet" && demoResults.wallet && (
-                      <Card className="bg-slate-800 border-slate-600">
-                        <CardHeader>
-                          <CardTitle className="flex items-center gap-2 text-cyan-400">
-                            <Wallet className="w-5 h-5" />
-                            Wallet Intelligence Score
-                          </CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                          <div className="text-center mb-4">
-                            <div className="text-4xl font-bold text-cyan-400">
-                              {demoResults.wallet.score}/1000
-                            </div>
-                            <Badge className="mt-2 bg-cyan-500/20 text-cyan-400">
-                              Premium Tier
+                {/* Show results for completed demo */}
+                {demoResults[demo.id] && activeDemo === demo.id && (
+                  <div className="mt-4 p-4 bg-slate-900 rounded-lg border border-slate-600">
+                    <div className="space-y-2">
+                      {demoResults[demo.id].score && (
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm text-muted-foreground">Score:</span>
+                          <Badge className="bg-electric-green/20 text-electric-green">{demoResults[demo.id].score}/1000</Badge>
+                        </div>
+                      )}
+                      {demoResults[demo.id].analysis && (
+                        <p className="text-xs text-muted-foreground">{demoResults[demo.id].analysis}</p>
+                      )}
+                      {demoResults[demo.id].suggestions && (
+                        <div className="mt-2">
+                          {demoResults[demo.id].suggestions?.map((suggestion, i) => (
+                            <Badge key={i} variant="outline" className="mr-1 mb-1 text-xs">
+                              {suggestion}
                             </Badge>
-                          </div>
-                          <p className="text-gray-300 mb-3">{demoResults.wallet.analysis}</p>
-                          <div className="space-y-1">
-                            {demoResults.wallet.suggestions?.map((suggestion, index) => (
-                              <div key={index} className="flex items-center gap-2 text-sm">
-                                <CheckCircle className="w-4 h-4 text-green-400" />
-                                <span className="text-gray-300">{suggestion}</span>
-                              </div>
-                            ))}
-                          </div>
-                        </CardContent>
-                      </Card>
-                    )}
-                    
-                    {/* Content Optimization Results */}
-                    {activeDemo === "content" && demoResults.content && (
-                      <Card className="bg-slate-800 border-slate-600">
-                        <CardHeader>
-                          <CardTitle className="flex items-center gap-2 text-purple-400">
-                            <MessageSquare className="w-5 h-5" />
-                            Optimized Content
-                          </CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                          <div className="mb-4">
-                            <div className="bg-slate-700 p-3 rounded-lg mb-3">
-                              <p className="text-white">{demoResults.content.content}</p>
-                            </div>
-                            <div className="flex items-center gap-2 mb-2">
-                              <Star className="w-4 h-4 text-yellow-400" />
-                              <span className="text-sm text-gray-300">
-                                Quality Score: {demoResults.content.quality}%
-                              </span>
-                            </div>
-                            <div className="flex items-center gap-2 mb-3">
-                              <Sparkles className="w-4 h-4 text-pink-400" />
-                              <span className="text-sm text-gray-300">
-                                Emotion: {demoResults.content.emotion}
-                              </span>
-                            </div>
-                            <div className="flex flex-wrap gap-1">
-                              {demoResults.content.hashtags?.map((tag, index) => (
-                                <Badge key={index} className="bg-purple-500/20 text-purple-400">
-                                  {tag}
-                                </Badge>
-                              ))}
-                            </div>
-                          </div>
-                        </CardContent>
-                      </Card>
-                    )}
-                    
-                    {/* Market Intelligence Results */}
-                    {activeDemo === "market" && demoResults.market && (
-                      <Card className="bg-slate-800 border-slate-600">
-                        <CardHeader>
-                          <CardTitle className="flex items-center gap-2 text-green-400">
-                            <TrendingUp className="w-5 h-5" />
-                            Market Intelligence
-                          </CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                          <p className="text-gray-300 mb-3">{demoResults.market.analysis}</p>
-                          <div className="space-y-2">
-                            <h4 className="font-semibold text-white">Key Trends:</h4>
-                            {demoResults.market.suggestions?.map((trend, index) => (
-                              <div key={index} className="flex items-center gap-2 text-sm">
-                                <TrendingUp className="w-4 h-4 text-green-400" />
-                                <span className="text-gray-300">{trend}</span>
-                              </div>
-                            ))}
-                          </div>
-                        </CardContent>
-                      </Card>
-                    )}
+                          ))}
+                        </div>
+                      )}
+                    </div>
                   </div>
                 )}
-              </div>
-            </div>
-            
-            <div className="mt-6 pt-4 border-t border-slate-700">
-              <div className="text-center">
-                <p className="text-sm text-gray-400 mb-2">
-                  This is a live demo of FlutterAI's capabilities
-                </p>
-                <Button 
-                  variant="outline" 
-                  onClick={() => setIsOpen(false)}
-                  className="border-slate-600 text-gray-300 hover:bg-slate-800"
-                >
-                  Close Demo
-                </Button>
-              </div>
-            </div>
-          </DialogContent>
-        </Dialog>
-      </div>
-    </>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      )}
+    </div>
   );
 }

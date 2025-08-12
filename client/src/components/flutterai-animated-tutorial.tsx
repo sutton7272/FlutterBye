@@ -238,61 +238,20 @@ export function FlutterAIAnimatedTutorial() {
   };
 
   return (
-    <>
-      <div style={{
-        position: 'fixed',
-        top: '20px',
-        right: '20px',
-        zIndex: 999999
-      }}>
-        <Dialog open={isOpen} onOpenChange={setIsOpen}>
-          <DialogTrigger asChild>
-            <Button 
-              className="bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white font-bold px-6 py-3 rounded-lg shadow-lg border-2 border-cyan-400/50 animate-pulse"
-              onClick={() => setIsOpen(true)}
-            >
-              <Brain className="w-5 h-5 mr-2" />
-              Try FlutterAI Demo
-            </Button>
-          </DialogTrigger>
-          
-          <DialogContent className="max-w-2xl bg-slate-900/95 border-2 border-green-400/50 text-white backdrop-blur-sm">
-            {/* Animated Background */}
-            <div className="absolute inset-0 bg-gradient-to-br from-blue-900/20 via-purple-900/20 to-cyan-900/20 rounded-lg"></div>
-            <div className="absolute inset-0 opacity-30" style={{
-              backgroundImage: "url(\"data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23ffffff' fill-opacity='0.02'%3E%3Cpath d='M20 20c0-11.046-8.954-20-20-20v20h20z'/%3E%3C/g%3E%3C/svg%3E\")"
-            }}></div>
-            
-            <div className="relative z-10 p-6">
-              {/* Header */}
-              <div className="flex items-center justify-between mb-6">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 rounded-full bg-gradient-to-r from-cyan-400 to-blue-400">
-                    <Brain className="w-6 h-6 text-white" />
-                  </div>
-                  <div>
-                    <h2 className="text-2xl font-bold bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent">
-                      FlutterAI: The Future is HERE!
-                    </h2>
-                    <p className="text-sm text-gray-400">8 AI demos</p>
-                  </div>
-                </div>
-              </div>
+    <div className="space-y-4">
+      {/* Demo Grid */}
+      <div className="p-4 rounded-lg bg-gradient-to-r from-pink-500/20 to-purple-500/20 border border-pink-400/30 mb-6">
+        <div className="flex items-center gap-2 mb-2">
+          <div className="w-3 h-3 bg-pink-400 rounded-full animate-pulse"></div>
+          <h3 className="text-lg font-bold text-pink-400">Experience REVOLUTIONARY AI Intelligence</h3>
+        </div>
+        <p className="text-sm text-muted-foreground">
+          GPT-4o powered intelligence that transforms blockchain forever with wallet analysis, content optimization, and predictive analytics
+        </p>
+      </div>
 
-              {/* Revolutionary AI Intelligence Banner */}
-              <div className="mb-6 p-4 rounded-lg bg-gradient-to-r from-pink-500/20 to-purple-500/20 border border-pink-400/30">
-                <div className="flex items-center gap-2 mb-2">
-                  <div className="w-3 h-3 bg-pink-400 rounded-full animate-pulse"></div>
-                  <h3 className="text-lg font-bold text-pink-400">Experience REVOLUTIONARY AI Intelligence</h3>
-                </div>
-                <p className="text-sm text-gray-300">
-                  GPT-4o powered intelligence that transforms blockchain forever with wallet analysis, content optimization, and predictive analytics
-                </p>
-              </div>
-
-              {/* Demo Cards Grid */}
-              <div className="grid grid-cols-2 gap-3 mb-6">
-                {demoCards.map((demo, index) => (
+      <div className="grid grid-cols-2 gap-3 mb-6">
+        {demoCards.map((demo, index) => (
                   <Card 
                     key={demo.id}
                     className={`bg-slate-800/80 border-slate-600/50 transition-all duration-300 hover:scale-105 cursor-pointer ${
@@ -320,11 +279,11 @@ export function FlutterAIAnimatedTutorial() {
                       </div>
                     </CardContent>
                   </Card>
-                ))}
-              </div>
+        ))}
+      </div>
 
-              {/* AI Capabilities Section */}
-              <div className="mb-6 p-4 rounded-lg bg-slate-800/50 border border-slate-600/50">
+      {/* AI Capabilities Section */}
+      <div className="mb-6 p-4 rounded-lg bg-slate-800/50 border border-slate-600/50">
                 <h3 className="text-sm font-semibold text-white mb-3">AI Capabilities You'll Experience:</h3>
                 <ul className="space-y-2 text-xs text-gray-300">
                   <li className="flex items-center gap-2">
@@ -418,50 +377,27 @@ export function FlutterAIAnimatedTutorial() {
                   <Play className="w-4 h-4 mr-2" />
                   Start AI Intelligence Demo
                 </Button>
-              </div>
-
-              {/* Control Buttons */}
-              <div className="flex items-center justify-between mt-4 pt-4 border-t border-slate-700">
-                <Button 
-                  variant="ghost" 
-                  size="sm"
-                  onClick={() => setTutorialState(prev => ({ ...prev, isRunning: !prev.isRunning }))}
-                  className="text-yellow-400 hover:bg-yellow-400/10"
-                >
-                  {tutorialState.isRunning ? <Pause className="w-4 h-4 mr-1" /> : <Play className="w-4 h-4 mr-1" />}
-                  {tutorialState.isRunning ? 'Pause' : 'Resume'}
-                </Button>
-                
-                <Button 
-                  variant="ghost" 
-                  size="sm"
-                  onClick={resetDemo}
-                  className="text-gray-400 hover:bg-gray-400/10"
-                >
-                  <RotateCcw className="w-4 h-4 mr-1" />
-                  Reset
-                </Button>
-              </div>
-
-              {/* Status Footer */}
-              <div className="flex items-center justify-center gap-6 mt-4 pt-4 border-t border-slate-700">
-                <div className="flex items-center gap-2">
-                  <div className="w-2 h-2 bg-pink-400 rounded-full animate-pulse"></div>
-                  <span className="text-xs text-gray-400">8 AI systems</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-2 h-2 bg-orange-400 rounded-full animate-pulse"></div>
-                  <span className="text-xs text-gray-400">Live demos</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-                  <span className="text-xs text-gray-400">Future ready</span>
-                </div>
-              </div>
-            </div>
-          </DialogContent>
-        </Dialog>
       </div>
-    </>
+
+      {/* Control Buttons */}
+      <div className="flex items-center justify-center gap-4 mt-6">
+        <Button 
+          onClick={startDemo}
+          className="bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white font-bold px-6 py-2 rounded-lg"
+        >
+          <Play className="w-4 h-4 mr-2" />
+          Start AI Demo
+        </Button>
+        
+        <Button 
+          variant="outline" 
+          onClick={resetDemo}
+          className="border-slate-600 text-slate-300 hover:bg-slate-800"
+        >
+          <RotateCcw className="w-4 h-4 mr-2" />
+          Reset
+        </Button>
+      </div>
+    </div>
   );
 }
