@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useLocation } from "wouter";
 import { 
   Home, 
-  Dashboard, 
+  BarChart3, 
   Coins, 
   Bot, 
   Settings, 
@@ -18,7 +18,7 @@ export function DevNetNavigation() {
 
   const pages = [
     { path: "/home", label: "Home", icon: Home, description: "Main dashboard" },
-    { path: "/dashboard", label: "Dashboard", icon: Dashboard, description: "Analytics & stats" },
+    { path: "/dashboard", label: "Dashboard", icon: BarChart3, description: "Analytics & stats" },
     { path: "/create", label: "Create Token", icon: Coins, description: "Mint new tokens" },
     { path: "/mint", label: "Mint", icon: Zap, description: "Token minting" },
     { path: "/portfolio", label: "Portfolio", icon: Wallet, description: "Your wallet" },
