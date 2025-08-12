@@ -8,7 +8,8 @@ import {
   getAssociatedTokenAddress,
   createAssociatedTokenAccountInstruction
 } from '@solana/spl-token';
-import { Metaplex, keypairIdentity } from '@metaplex-foundation/js';
+// SPL tokens work without metadata, they just show as "Unknown Token" in wallets
+// Advanced metadata requires complex setup with Token Metadata Program
 import bs58 from 'bs58';
 
 export class SolanaService {
@@ -196,6 +197,10 @@ export class SolanaService {
       
       // Confirm transaction
       await this.connection.confirmTransaction(signature, 'confirmed');
+
+      // Note: SPL tokens without metadata will show as "Unknown Token" in wallets
+      // To display properly, tokens need metadata created via Token Metadata Program
+      console.log('ℹ️  Token created as basic SPL token (will show as "Unknown Token" in wallets)');
 
       console.log('✅ SPL Token created successfully:', mintKeypair.publicKey.toString());
       console.log('📄 Token metadata available at:', `https://${process.env.REPLIT_DOMAINS?.split(',')[0] || 'localhost:5000'}/api/metadata/${mintKeypair.publicKey.toString()}`);
