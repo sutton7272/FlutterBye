@@ -17,7 +17,8 @@ export default function Navbar() {
   // Get navigation control state
   const { data: navItems = [], isLoading: navLoading } = useQuery({
     queryKey: ['/api/admin/navigation-control'],
-    staleTime: 1000 * 60 * 5, // 5 minutes
+    staleTime: 0, // No cache - always fresh data
+    refetchInterval: 1000 * 30, // Refetch every 30 seconds
   });
 
   // Helper to check if a navigation item is enabled
