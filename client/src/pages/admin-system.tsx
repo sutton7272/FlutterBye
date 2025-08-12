@@ -29,7 +29,10 @@ import {
   RefreshCw,
   Target,
   Users,
-  Clock
+  Clock,
+  Calculator,
+  MessageSquare,
+  Palette
 } from "lucide-react";
 
 interface NavItem {
@@ -280,11 +283,15 @@ export default function AdminSystem() {
         </Card>
       </div>
 
-      <Tabs defaultValue="navigation" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-4">
+      <Tabs defaultValue="emergency" className="space-y-6">
+        <TabsList className="grid w-full grid-cols-5">
+          <TabsTrigger value="emergency" className="flex items-center gap-2 text-red-400">
+            <AlertTriangle className="h-4 w-4" />
+            Emergency
+          </TabsTrigger>
           <TabsTrigger value="navigation" className="flex items-center gap-2">
             <Navigation className="h-4 w-4" />
-            Navigation Control
+            Navigation
           </TabsTrigger>
           <TabsTrigger value="ai-features" className="flex items-center gap-2">
             <Brain className="h-4 w-4" />
@@ -292,13 +299,157 @@ export default function AdminSystem() {
           </TabsTrigger>
           <TabsTrigger value="cost-management" className="flex items-center gap-2">
             <DollarSign className="h-4 w-4" />
-            Cost Management
+            Costs
           </TabsTrigger>
           <TabsTrigger value="system-health" className="flex items-center gap-2">
             <Activity className="h-4 w-4" />
-            System Health
+            Health
           </TabsTrigger>
         </TabsList>
+
+        {/* Emergency Controls Tab */}
+        <TabsContent value="emergency" className="space-y-6">
+          <Card className="premium-card border-red-500/50">
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle className="text-white flex items-center gap-2">
+                    <AlertTriangle className="h-5 w-5 text-red-400" />
+                    Emergency Cost Control
+                  </CardTitle>
+                  <CardDescription>Quickly disable high-cost features to reduce expenses</CardDescription>
+                </div>
+                <Badge variant="outline" className="text-red-400 border-red-400">
+                  <DollarSign className="h-4 w-4 mr-2" />
+                  High Cost Features
+                </Badge>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* FlutterArt Emergency Control */}
+                <div className="p-4 border-2 border-red-400 rounded-lg bg-red-500/10">
+                  <div className="flex items-center justify-between mb-3">
+                    <h3 className="font-bold text-white flex items-center gap-2">
+                      <Palette className="h-5 w-5" />
+                      FlutterArt System
+                    </h3>
+                    <Badge className="bg-red-600 text-white">CRITICAL COST</Badge>
+                  </div>
+                  <p className="text-sm text-text-secondary mb-4">
+                    AI-powered NFT generation marketplace ($1,200/month)
+                  </p>
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-white">Navigation Access</span>
+                      <Button
+                        size="sm"
+                        variant={navItems.find(item => item.id === 'flutter-art')?.enabled ? "destructive" : "default"}
+                        onClick={() => {
+                          const isEnabled = navItems.find(item => item.id === 'flutter-art')?.enabled;
+                          navToggleMutation.mutate({ itemId: 'flutter-art', enabled: !isEnabled });
+                        }}
+                        disabled={navToggleMutation.isPending}
+                        className="h-8 px-3 text-xs"
+                      >
+                        {navItems.find(item => item.id === 'flutter-art')?.enabled ? 'DISABLE' : 'ENABLE'}
+                      </Button>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-white">AI Engine</span>
+                      <Button
+                        size="sm"
+                        variant={aiFeatures.find(f => f.id === 'flutter-art-ai')?.enabled ? "destructive" : "default"}
+                        onClick={() => {
+                          const isEnabled = aiFeatures.find(f => f.id === 'flutter-art-ai')?.enabled;
+                          aiToggleMutation.mutate({ featureId: 'flutter-art-ai', enabled: !isEnabled });
+                        }}
+                        disabled={aiToggleMutation.isPending}
+                        className="h-8 px-3 text-xs"
+                      >
+                        {aiFeatures.find(f => f.id === 'flutter-art-ai')?.enabled ? 'DISABLE' : 'ENABLE'}
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+
+                {/* FlutterWave Emergency Control */}
+                <div className="p-4 border-2 border-orange-400 rounded-lg bg-orange-500/10">
+                  <div className="flex items-center justify-between mb-3">
+                    <h3 className="font-bold text-white flex items-center gap-2">
+                      <MessageSquare className="h-5 w-5" />
+                      FlutterWave System
+                    </h3>
+                    <Badge className="bg-orange-600 text-white">HIGH COST</Badge>
+                  </div>
+                  <p className="text-sm text-text-secondary mb-4">
+                    SMS-to-blockchain emotional intelligence ($380/month)
+                  </p>
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-white">Navigation Access</span>
+                      <Button
+                        size="sm"
+                        variant={navItems.find(item => item.id === 'flutter-wave')?.enabled ? "destructive" : "default"}
+                        onClick={() => {
+                          const isEnabled = navItems.find(item => item.id === 'flutter-wave')?.enabled;
+                          navToggleMutation.mutate({ itemId: 'flutter-wave', enabled: !isEnabled });
+                        }}
+                        disabled={navToggleMutation.isPending}
+                        className="h-8 px-3 text-xs"
+                      >
+                        {navItems.find(item => item.id === 'flutter-wave')?.enabled ? 'DISABLE' : 'ENABLE'}
+                      </Button>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-white">AI Processing</span>
+                      <Button
+                        size="sm"
+                        variant={aiFeatures.find(f => f.id === 'flutter-wave-ai')?.enabled ? "destructive" : "default"}
+                        onClick={() => {
+                          const isEnabled = aiFeatures.find(f => f.id === 'flutter-wave-ai')?.enabled;
+                          aiToggleMutation.mutate({ featureId: 'flutter-wave-ai', enabled: !isEnabled });
+                        }}
+                        disabled={aiToggleMutation.isPending}
+                        className="h-8 px-3 text-xs"
+                      >
+                        {aiFeatures.find(f => f.id === 'flutter-wave-ai')?.enabled ? 'DISABLE' : 'ENABLE'}
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="mt-6 p-4 border border-yellow-400 rounded-lg bg-yellow-500/10">
+                <h3 className="font-bold text-white mb-2 flex items-center gap-2">
+                  <Calculator className="h-4 w-4" />
+                  Cost Impact Analysis
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                  <div>
+                    <span className="text-text-secondary">FlutterArt Status:</span>
+                    <div className={`font-semibold ${navItems.find(item => item.id === 'flutter-art')?.enabled ? 'text-red-400' : 'text-green-400'}`}>
+                      {navItems.find(item => item.id === 'flutter-art')?.enabled ? 'ACTIVE ($1,200/mo)' : 'DISABLED (Saving $1,200/mo)'}
+                    </div>
+                  </div>
+                  <div>
+                    <span className="text-text-secondary">FlutterWave Status:</span>
+                    <div className={`font-semibold ${navItems.find(item => item.id === 'flutter-wave')?.enabled ? 'text-orange-400' : 'text-green-400'}`}>
+                      {navItems.find(item => item.id === 'flutter-wave')?.enabled ? 'ACTIVE ($380/mo)' : 'DISABLED (Saving $380/mo)'}
+                    </div>
+                  </div>
+                  <div>
+                    <span className="text-text-secondary">Total Potential Savings:</span>
+                    <div className="font-semibold text-green-400">
+                      ${(!navItems.find(item => item.id === 'flutter-art')?.enabled ? 1200 : 0) + 
+                        (!navItems.find(item => item.id === 'flutter-wave')?.enabled ? 380 : 0)}/month
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
 
         {/* Navigation Control Tab */}
         <TabsContent value="navigation" className="space-y-6">

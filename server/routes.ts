@@ -10996,6 +10996,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   console.log("📱 SMS Campaign Management System activated!");
   
+  // In-memory state for demo purposes - in production this would be in database
+  let navItemsState = {
+    'dashboard': { enabled: true },
+    'create': { enabled: true },
+    'intelligence': { enabled: true },
+    'chat': { enabled: true },
+    'flutter-art': { enabled: true },
+    'flutter-wave': { enabled: true },
+    'enterprise': { enabled: false },
+    'admin': { enabled: true }
+  };
+
   // Systems Dashboard API endpoints
   app.get('/api/admin/navigation-control', (req, res) => {
     const navItems = [
@@ -11003,7 +11015,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         id: 'dashboard',
         label: 'Dashboard',
         description: 'Main platform overview and statistics',
-        enabled: true,
+        enabled: navItemsState['dashboard'].enabled,
         category: 'core',
         cost_level: 'free'
       },
@@ -11011,7 +11023,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         id: 'create',
         label: 'Create',
         description: 'Token creation and minting tools',
-        enabled: true,
+        enabled: navItemsState['create'].enabled,
         category: 'core',
         cost_level: 'low'
       },
@@ -11019,7 +11031,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         id: 'intelligence',
         label: 'Intelligence',
         description: 'AI-powered wallet intelligence and analytics',
-        enabled: true,
+        enabled: navItemsState['intelligence'].enabled,
         category: 'ai',
         cost_level: 'high'
       },
@@ -11027,7 +11039,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         id: 'chat',
         label: 'Chat',
         description: 'Real-time blockchain messaging',
-        enabled: true,
+        enabled: navItemsState['chat'].enabled,
         category: 'ai',
         cost_level: 'medium'
       },
@@ -11035,7 +11047,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
         id: 'flutter-art',
         label: 'FlutterArt',
         description: 'AI-generated NFT marketplace',
-        enabled: true,
+        enabled: navItemsState['flutter-art'].enabled,
+        category: 'ai',
+        cost_level: 'high'
+      },
+      {
+        id: 'flutter-wave',
+        label: 'FlutterWave',
+        description: 'SMS-to-blockchain emotional intelligence system',
+        enabled: navItemsState['flutter-wave'].enabled,
         category: 'ai',
         cost_level: 'high'
       },
@@ -11043,7 +11063,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         id: 'enterprise',
         label: 'Enterprise',
         description: 'Enterprise wallet management',
-        enabled: false,
+        enabled: navItemsState['enterprise'].enabled,
         category: 'enterprise',
         cost_level: 'high'
       },
@@ -11051,7 +11071,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         id: 'admin',
         label: 'Admin',
         description: 'Platform administration panel',
-        enabled: true,
+        enabled: navItemsState['admin'].enabled,
         category: 'admin',
         cost_level: 'free'
       }
@@ -11059,13 +11079,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
     res.json(navItems);
   });
 
+  // In-memory state for AI features
+  let aiFeatureState = {
+    'skye-ai': { enabled: true },
+    'wallet-intelligence': { enabled: true },
+    'content-generation': { enabled: true },
+    'nft-generation': { enabled: true },
+    'sentiment-analysis': { enabled: true },
+    'predictive-analytics': { enabled: false },
+    'flutter-art-ai': { enabled: true },
+    'flutter-wave-ai': { enabled: true }
+  };
+
   app.get('/api/admin/ai-features', (req, res) => {
     const aiFeatures = [
       {
         id: 'skye-ai',
         name: 'Skye AI Chatbot',
         description: 'Advanced AI assistant with personality system',
-        enabled: true,
+        enabled: aiFeatureState['skye-ai'].enabled,
         monthly_cost: 250,
         usage_count: 1420,
         cost_level: 'medium'
@@ -11074,7 +11106,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         id: 'wallet-intelligence',
         name: 'Wallet Intelligence',
         description: 'AI-powered wallet scoring and analysis',
-        enabled: true,
+        enabled: aiFeatureState['wallet-intelligence'].enabled,
         monthly_cost: 850,
         usage_count: 3200,
         cost_level: 'high'
@@ -11083,7 +11115,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         id: 'content-generation',
         name: 'AI Content Generation',
         description: 'Automated blog posts and marketing content',
-        enabled: true,
+        enabled: aiFeatureState['content-generation'].enabled,
         monthly_cost: 180,
         usage_count: 890,
         cost_level: 'low'
@@ -11092,16 +11124,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
         id: 'nft-generation',
         name: 'AI NFT Generation',
         description: 'DALL-E powered NFT artwork creation',
-        enabled: true,
+        enabled: aiFeatureState['nft-generation'].enabled,
         monthly_cost: 920,
         usage_count: 450,
         cost_level: 'critical'
       },
       {
+        id: 'flutter-art-ai',
+        name: 'FlutterArt AI Engine',
+        description: 'AI-powered NFT generation for FlutterArt marketplace',
+        enabled: aiFeatureState['flutter-art-ai'].enabled,
+        monthly_cost: 1200,
+        usage_count: 850,
+        cost_level: 'critical'
+      },
+      {
+        id: 'flutter-wave-ai',
+        name: 'FlutterWave AI Processing',
+        description: 'Emotional intelligence and SMS processing AI',
+        enabled: aiFeatureState['flutter-wave-ai'].enabled,
+        monthly_cost: 380,
+        usage_count: 2400,
+        cost_level: 'high'
+      },
+      {
         id: 'sentiment-analysis',
         name: 'Sentiment Analysis',
         description: 'Real-time emotion detection for messages',
-        enabled: true,
+        enabled: aiFeatureState['sentiment-analysis'].enabled,
         monthly_cost: 120,
         usage_count: 2100,
         cost_level: 'low'
@@ -11110,7 +11160,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         id: 'predictive-analytics',
         name: 'Predictive Analytics',
         description: 'Market trend prediction and insights',
-        enabled: false,
+        enabled: aiFeatureState['predictive-analytics'].enabled,
         monthly_cost: 1200,
         usage_count: 0,
         cost_level: 'critical'
@@ -11134,16 +11184,50 @@ export async function registerRoutes(app: Express): Promise<Server> {
     const { itemId } = req.params;
     const { enabled } = req.body;
     
-    console.log(`🎛️ Navigation item ${itemId} set to ${enabled ? 'enabled' : 'disabled'}`);
-    res.json({ success: true, message: `Navigation item ${itemId} updated` });
+    if (navItemsState[itemId]) {
+      navItemsState[itemId].enabled = enabled;
+      console.log(`🎛️ Navigation item ${itemId} set to ${enabled ? 'enabled' : 'disabled'}`);
+      
+      // Special handling for FlutterArt and FlutterWave
+      if (itemId === 'flutter-art') {
+        console.log(`🎨 FlutterArt NFT marketplace ${enabled ? 'ENABLED' : 'DISABLED'}`);
+      } else if (itemId === 'flutter-wave') {
+        console.log(`📱 FlutterWave SMS-to-blockchain ${enabled ? 'ENABLED' : 'DISABLED'}`);
+      }
+      
+      res.json({ 
+        success: true, 
+        message: `Navigation item ${itemId} updated`,
+        current_state: navItemsState[itemId].enabled
+      });
+    } else {
+      res.status(404).json({ error: `Navigation item ${itemId} not found` });
+    }
   });
 
   app.patch('/api/admin/ai-features/:featureId', (req, res) => {
     const { featureId } = req.params;
     const { enabled } = req.body;
     
-    console.log(`🤖 AI feature ${featureId} set to ${enabled ? 'enabled' : 'disabled'}`);
-    res.json({ success: true, message: `AI feature ${featureId} updated` });
+    if (aiFeatureState[featureId]) {
+      aiFeatureState[featureId].enabled = enabled;
+      console.log(`🤖 AI feature ${featureId} set to ${enabled ? 'enabled' : 'disabled'}`);
+      
+      // Special handling for FlutterArt and FlutterWave AI
+      if (featureId === 'flutter-art-ai') {
+        console.log(`🎨 FlutterArt AI Engine ${enabled ? 'ENABLED' : 'DISABLED'} - NFT generation ${enabled ? 'active' : 'inactive'}`);
+      } else if (featureId === 'flutter-wave-ai') {
+        console.log(`📱 FlutterWave AI Processing ${enabled ? 'ENABLED' : 'DISABLED'} - SMS intelligence ${enabled ? 'active' : 'inactive'}`);
+      }
+      
+      res.json({ 
+        success: true, 
+        message: `AI feature ${featureId} updated`,
+        current_state: aiFeatureState[featureId].enabled
+      });
+    } else {
+      res.status(404).json({ error: `AI feature ${featureId} not found` });
+    }
   });
 
   app.post('/api/admin/emergency-ai-shutdown', (req, res) => {
