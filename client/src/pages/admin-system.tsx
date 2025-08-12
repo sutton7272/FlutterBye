@@ -158,12 +158,51 @@ export default function AdminSystem() {
         <div>
           <h1 className="text-3xl font-bold text-white">Systems Dashboard</h1>
           <p className="text-text-secondary mt-2">Control platform visibility, AI features, and operational costs</p>
+          <div className="mt-4 flex items-center gap-4">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => window.location.href = '/admin'}
+              className="flex items-center gap-2"
+            >
+              <Settings className="h-4 w-4" />
+              Admin Panel
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => window.location.href = '/'}
+              className="flex items-center gap-2"
+            >
+              <Navigation className="h-4 w-4" />
+              Dashboard
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => window.location.href = '/intelligence'}
+              className="flex items-center gap-2"
+            >
+              <Brain className="h-4 w-4" />
+              Intelligence
+            </Button>
+          </div>
         </div>
         <div className="flex items-center gap-4">
           <Badge variant="outline" className="text-green-400 border-green-400">
             <Activity className="h-4 w-4 mr-2" />
             System Online
           </Badge>
+          <Badge variant="outline" className="text-blue-400 border-blue-400">
+            <Target className="h-4 w-4 mr-2" />
+            API Connected
+          </Badge>
+          {(navToggleMutation.isPending || aiToggleMutation.isPending) && (
+            <Badge variant="outline" className="text-yellow-400 border-yellow-400">
+              <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+              Processing...
+            </Badge>
+          )}
           <AlertDialog>
             <AlertDialogTrigger asChild>
               <Button variant="destructive" size="sm">
@@ -313,11 +352,13 @@ export default function AdminSystem() {
                             .map((item: NavItem) => (
                               <div
                                 key={item.id}
-                                className={`p-4 rounded-lg border transition-all ${
+                                className={`p-4 rounded-lg border-2 transition-all ${
                                   item.enabled 
-                                    ? 'border-green-500/50 bg-green-500/10' 
-                                    : 'border-red-500/50 bg-red-500/10'
-                                } ${bulkMode ? 'cursor-pointer hover:bg-muted/50' : ''}`}
+                                    ? 'border-green-400 bg-green-500/20' 
+                                    : 'border-red-400 bg-red-500/20'
+                                } ${bulkMode ? 'cursor-pointer hover:bg-muted/50' : ''} ${
+                                  selectedItems.includes(item.id) ? 'ring-2 ring-blue-400' : ''
+                                }`}
                                 onClick={() => {
                                   if (bulkMode) {
                                     setSelectedItems(prev => 
@@ -335,25 +376,47 @@ export default function AdminSystem() {
                                         type="checkbox"
                                         checked={selectedItems.includes(item.id)}
                                         onChange={() => {}}
-                                        className="rounded"
+                                        className="w-4 h-4 rounded border-gray-300"
                                       />
                                     )}
                                     <span className="font-medium text-white">{item.label}</span>
                                   </div>
                                   <div className="flex items-center gap-2">
-                                    <Badge className={getCostBadgeColor(item.cost_level)}>
-                                      {item.cost_level}
+                                    <Badge className={`${getCostBadgeColor(item.cost_level)} text-white font-semibold`}>
+                                      {item.cost_level.toUpperCase()}
                                     </Badge>
-                                    <Switch
-                                      checked={item.enabled}
-                                      onCheckedChange={(enabled) => 
-                                        navToggleMutation.mutate({ itemId: item.id, enabled })
-                                      }
-                                      disabled={navToggleMutation.isPending}
-                                    />
+                                    <div className="flex items-center gap-1">
+                                      <Switch
+                                        checked={item.enabled}
+                                        onCheckedChange={(enabled) => {
+                                          console.log(`Toggling ${item.id} to ${enabled}`);
+                                          navToggleMutation.mutate({ itemId: item.id, enabled });
+                                        }}
+                                        disabled={navToggleMutation.isPending}
+                                        className="data-[state=checked]:bg-green-500 data-[state=unchecked]:bg-red-500"
+                                      />
+                                      <span className="text-xs text-text-secondary">
+                                        {item.enabled ? 'ON' : 'OFF'}
+                                      </span>
+                                    </div>
                                   </div>
                                 </div>
                                 <p className="text-sm text-text-secondary">{item.description}</p>
+                                <div className="mt-2 flex items-center justify-between">
+                                  <span className="text-xs text-text-secondary">Category: {item.category}</span>
+                                  <Button
+                                    size="sm"
+                                    variant={item.enabled ? "destructive" : "default"}
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      navToggleMutation.mutate({ itemId: item.id, enabled: !item.enabled });
+                                    }}
+                                    disabled={navToggleMutation.isPending}
+                                    className="h-6 px-2 text-xs"
+                                  >
+                                    {item.enabled ? 'Disable' : 'Enable'}
+                                  </Button>
+                                </div>
                               </div>
                             ))}
                         </div>
@@ -394,29 +457,36 @@ export default function AdminSystem() {
                     {aiFeatures.map((feature: AIFeature) => (
                       <div
                         key={feature.id}
-                        className={`p-4 rounded-lg border transition-all ${
+                        className={`p-4 rounded-lg border-2 transition-all ${
                           feature.enabled 
-                            ? 'border-blue-500/50 bg-blue-500/10' 
-                            : 'border-gray-500/50 bg-gray-500/10'
+                            ? 'border-blue-400 bg-blue-500/20' 
+                            : 'border-gray-400 bg-gray-500/20'
                         }`}
                       >
                         <div className="flex items-center justify-between mb-2">
                           <span className="font-medium text-white">{feature.name}</span>
                           <div className="flex items-center gap-2">
-                            <Badge className={getCostBadgeColor(feature.cost_level)}>
+                            <Badge className={`${getCostBadgeColor(feature.cost_level)} text-white font-semibold`}>
                               ${feature.monthly_cost}/mo
                             </Badge>
-                            <Switch
-                              checked={feature.enabled}
-                              onCheckedChange={(enabled) => 
-                                aiToggleMutation.mutate({ featureId: feature.id, enabled })
-                              }
-                              disabled={aiToggleMutation.isPending}
-                            />
+                            <div className="flex items-center gap-1">
+                              <Switch
+                                checked={feature.enabled}
+                                onCheckedChange={(enabled) => {
+                                  console.log(`Toggling AI feature ${feature.id} to ${enabled}`);
+                                  aiToggleMutation.mutate({ featureId: feature.id, enabled });
+                                }}
+                                disabled={aiToggleMutation.isPending}
+                                className="data-[state=checked]:bg-blue-500 data-[state=unchecked]:bg-gray-500"
+                              />
+                              <span className="text-xs text-text-secondary">
+                                {feature.enabled ? 'ON' : 'OFF'}
+                              </span>
+                            </div>
                           </div>
                         </div>
                         <p className="text-sm text-text-secondary mb-2">{feature.description}</p>
-                        <div className="flex items-center justify-between text-xs">
+                        <div className="flex items-center justify-between text-xs mb-2">
                           <span className="text-text-secondary">
                             Usage: {feature.usage_count} times this month
                           </span>
@@ -431,6 +501,21 @@ export default function AdminSystem() {
                               Disabled
                             </span>
                           )}
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs text-text-secondary">Level: {feature.cost_level}</span>
+                          <Button
+                            size="sm"
+                            variant={feature.enabled ? "destructive" : "default"}
+                            onClick={() => {
+                              console.log(`Button toggle AI feature ${feature.id} to ${!feature.enabled}`);
+                              aiToggleMutation.mutate({ featureId: feature.id, enabled: !feature.enabled });
+                            }}
+                            disabled={aiToggleMutation.isPending}
+                            className="h-6 px-2 text-xs"
+                          >
+                            {aiToggleMutation.isPending ? 'Loading...' : (feature.enabled ? 'Disable' : 'Enable')}
+                          </Button>
                         </div>
                       </div>
                     ))}
