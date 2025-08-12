@@ -1127,20 +1127,42 @@
 
 /* Ensure tooltips appear above all content with maximum z-index */
 [data-radix-popper-content-wrapper] {
-  z-index: 9999 !important;
+  z-index: 99999 !important;
+  position: fixed !important;
 }
 
 [data-tooltip-content] {
-  z-index: 9999 !important;
+  z-index: 99999 !important;
+  position: fixed !important;
+}
+
+[data-radix-tooltip-content] {
+  z-index: 99999 !important;
+  position: fixed !important;
 }
 
 /* Additional tooltip visibility fixes */
 .tooltip-content-override {
-  z-index: 9999 !important;
-  position: relative !important;
+  z-index: 99999 !important;
+  position: fixed !important;
 }
 
 /* Force tooltips to be on top of everything */
 div[data-radix-popper-content-wrapper] > div {
-  z-index: 9999 !important;
+  z-index: 99999 !important;
+}
+
+/* Prevent card overflow from clipping tooltips */
+.card, [data-card] {
+  overflow: visible !important;
+}
+
+/* Ensure parent containers don't clip tooltips */
+.container, .mx-auto, .space-y-8 {
+  overflow: visible !important;
+}
+
+/* Radix tooltip portal override */
+[data-radix-portal] {
+  z-index: 99999 !important;
 }

@@ -209,9 +209,11 @@ export default function AdminSystem() {
       </TooltipTrigger>
       <TooltipContent 
         side="top" 
-        className="max-w-sm p-4 bg-slate-900 border-2 border-blue-500/50 shadow-2xl z-[9999] rounded-lg"
-        sideOffset={12}
-        style={{ zIndex: 9999 }}
+        className="max-w-sm p-4 bg-slate-900 border-2 border-blue-500/50 shadow-2xl z-[99999] rounded-lg"
+        sideOffset={16}
+        style={{ zIndex: 99999, position: 'fixed' }}
+        avoidCollisions={true}
+        sticky="always"
       >
         <div className="text-sm text-white leading-relaxed">
           {content}
