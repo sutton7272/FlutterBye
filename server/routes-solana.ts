@@ -15,13 +15,9 @@ export function registerSolanaRoutes(app: Express) {
         return res.status(400).json({ error: "Message must be 1-27 characters" });
       }
       
-      if (!walletAddress) {
-        return res.status(400).json({ error: "Wallet address required" });
-      }
-      
-      // Basic wallet address validation (44 characters, base58)
-      if (!walletAddress || walletAddress.length !== 44) {
-        return res.status(400).json({ error: "Invalid wallet address" });
+      // Flexible wallet address validation for DevNet testing
+      if (!walletAddress || walletAddress.length < 3) {
+        return res.status(400).json({ error: "Wallet address required (minimum 3 characters)" });
       }
       
       // Create token name and symbol from message
