@@ -6,6 +6,9 @@ if (typeof window !== 'undefined') {
       console.log('WebSocket blocked for stability');
     }
   } as any;
+  
+  // Log that we're in DevNet mode
+  console.log('🌐 DevNet mode detected - WebSocket disabled for stability');
 }
 
 import "./polyfills";

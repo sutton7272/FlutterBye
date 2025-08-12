@@ -100,25 +100,7 @@ app.use((req, res, next) => {
     console.error('Server error:', err);
   });
 
-  // Add fallback route for DevNet deployment
-  app.get('/fallback', (req, res) => {
-    res.sendFile(path.resolve(import.meta.dirname, '..', 'public', 'index.html'));
-  });
-
-  // Add catch-all route for DevNet to prevent 404s
-  app.get('*', (req, res, next) => {
-    // Skip API routes
-    if (req.path.startsWith('/api')) {
-      return next();
-    }
-    
-    // For DevNet deployment, serve the fallback HTML for all non-API routes
-    if (process.env.REPLIT_DOMAINS) {
-      res.sendFile(path.resolve(import.meta.dirname, '..', 'public', 'index.html'));
-    } else {
-      next();
-    }
-  });
+  // Remove problematic fallback routes
 
   // For DevNet deployment, always use Vite for proper development serving
   // Only use static serving for true production builds
