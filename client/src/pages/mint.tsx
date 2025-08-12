@@ -294,7 +294,7 @@ export default function Mint({ tokenType }: MintProps = {}) {
 
     const tokenData: InsertToken = {
       message,
-      symbol: "FlBY-MSG", // Always FlBY-MSG
+      symbol: "FLBY-MSG", // Always FLBY-MSG
       creatorId: "user-1", // Mock user ID
       totalSupply: parseInt(mintAmount) || 0,
       availableSupply: parseInt(mintAmount) || 0,

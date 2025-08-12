@@ -1353,8 +1353,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Message must be 27 characters or less" });
       }
       // Import Solana service (standard SPL tokens)
-      const { SolanaBackendService } = await import("./solana-service-wallet-fix");
-      const solanaService = new SolanaBackendService();
+      const { SolanaService } = await import("./solana-service");
+      const solanaService = new SolanaService();
       // Debug: Log received data to see what fields are available
       console.log('Token creation request data:', {
         ...tokenData,
