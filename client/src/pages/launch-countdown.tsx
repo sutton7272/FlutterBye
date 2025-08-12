@@ -353,6 +353,30 @@ export default function LaunchCountdown() {
 
       <div className={`container mx-auto px-4 relative z-10 ${hasAccess ? 'pt-24 pb-8' : 'py-8'}`}>
         
+        {/* Main Flutterbye Title */}
+        <div className="text-center mb-16">
+          <div className="flex items-center justify-center gap-4 mb-6">
+            <img src={flutterbeyeLogoPath} alt="Flutterbye" className="w-16 h-16" />
+            <h1 className="text-6xl font-bold text-gradient">
+              Flutterbye
+            </h1>
+          </div>
+          <p className="text-xl text-muted-foreground max-w-4xl mx-auto leading-relaxed">
+            Revolutionary blockchain communication platform transforming messages into valuable, tradeable digital assets
+          </p>
+          <div className="mt-8 flex items-center justify-center gap-6">
+            <Badge className="bg-electric-blue/20 text-electric-blue border-electric-blue/30 px-4 py-2 text-sm">
+              🚀 Quantum Pioneer Platform
+            </Badge>
+            <Badge className="bg-electric-green/20 text-electric-green border-electric-green/30 px-4 py-2 text-sm">
+              🎯 $250M+ ARR Target
+            </Badge>
+            <Badge className="bg-purple-400/20 text-purple-400 border-purple-400/30 px-4 py-2 text-sm">
+              🧠 FlutterAI Intelligence
+            </Badge>
+          </div>
+        </div>
+        
         {/* SECTION 1: SINGLE COLUMN - What is Flutterbye */}
         <Card className="electric-frame max-w-4xl mx-auto mb-12">
           <CardHeader className="text-center pb-6">
