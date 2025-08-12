@@ -41,6 +41,7 @@ import { FlutterAIInteractiveTutorial } from "@/components/flutterai-interactive
 import { FlutterAIInteractiveDemo } from "@/components/flutterai-interactive-demo";
 import { FlutterAIAnimatedTutorial } from "@/components/flutterai-animated-tutorial";
 import { InteractiveTutorial } from "@/components/interactive-tutorial";
+import { DevNetNavigation } from "@/components/devnet-navigation";
 
 interface TimeLeft {
   days: number;
@@ -1024,6 +1025,11 @@ export default function LaunchCountdown() {
         </div>
 
 
+
+        {/* DevNet Navigation for Easy Access */}
+        <div className="mb-12">
+          <DevNetNavigation />
+        </div>
 
         {/* AI-Generated Content Showcase */}
         <AIContentShowcase />
