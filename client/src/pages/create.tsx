@@ -127,71 +127,118 @@ export default function Create() {
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-2 bg-slate-800/50 border border-electric-blue/20">
-            <TabsTrigger value="tokens">Token Creation</TabsTrigger>
+          <TabsList className="grid w-full grid-cols-4 bg-slate-800/50 border border-electric-blue/20">
+            <TabsTrigger value="tokens">Message Creator</TabsTrigger>
+            <TabsTrigger value="greeting-cards">Greeting Cards</TabsTrigger>
+            <TabsTrigger value="marketing">Marketing</TabsTrigger>
             <TabsTrigger value="ai-tools">AI Tools</TabsTrigger>
           </TabsList>
 
           <TabsContent value="tokens" className="space-y-6">
-            {/* Enhanced Creation Options */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-              {creationOptions.map((option) => (
-                <Card key={option.id} className="group hover:shadow-lg transition-all duration-300 cursor-pointer bg-slate-800/40 border border-electric-blue/30 hover:border-electric-blue/60 electric-frame">
-                  <CardContent className="p-6">
-                    <div className="space-y-4">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-4">
-                          <div className={`p-3 rounded-lg bg-${option.color === 'electric-green' ? 'electric-green' : 'purple-400'}/10 group-hover:bg-${option.color === 'electric-green' ? 'electric-green' : 'purple-400'}/20 transition-colors border border-${option.color === 'electric-green' ? 'electric-green' : 'purple-400'}/20`}>
-                            <option.icon className={`h-5 w-5 ${option.color === 'electric-green' ? 'text-electric-green' : 'text-purple-400'}`} />
-                          </div>
-                          <div>
-                            <h3 className="font-semibold text-lg text-white group-hover:text-electric-blue transition-colors">
-                              {option.title}
-                            </h3>
-                            <p className="text-sm text-gray-300">{option.description}</p>
-                          </div>
-                        </div>
-                        {option.recommended && (
-                          <Badge className="bg-gradient-to-r from-electric-blue to-electric-green text-white text-xs px-2 py-1 animate-pulse">
-                            POPULAR
-                          </Badge>
-                        )}
-                      </div>
-                      
-                      {/* Features List */}
-                      <div className="flex flex-wrap gap-2">
-                        {option.features.map((feature, idx) => (
-                          <Badge key={idx} variant="outline" className="text-gray-300 border-gray-600 bg-slate-700/50 text-xs">
-                            {feature}
-                          </Badge>
-                        ))}
-                      </div>
-
-                      {/* Examples */}
-                      <div className="text-xs text-gray-400">
-                        <p className="font-medium">Examples:</p>
-                        <ul className="list-disc list-inside space-y-1 mt-1">
-                          {option.examples.slice(0, 2).map((example, idx) => (
-                            <li key={idx}>"{example}"</li>
-                          ))}
-                        </ul>
-                      </div>
-
-                      <Link href={getCreationRoute(option.id)}>
-                        <Button className="w-full group-hover:from-electric-blue group-hover:to-electric-green bg-gradient-to-r from-slate-700 to-slate-600 hover:from-electric-blue hover:to-electric-green transition-all duration-300">
-                          Create {option.title} <ArrowRight className="ml-2 h-4 w-4" />
-                        </Button>
-                      </Link>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-
             {/* Main Flutterbye Message Creation Center */}
             <div className="bg-transparent">
               <Mint />
             </div>
+          </TabsContent>
+
+          <TabsContent value="greeting-cards" className="space-y-6">
+            <div className="text-center mb-6">
+              <h2 className="text-2xl font-bold text-white mb-2">Digital Greeting Cards</h2>
+              <p className="text-gray-300">Create personal 27-character messages with SOL value - perfect for gifts</p>
+            </div>
+            
+            <Card className="group hover:shadow-lg transition-all duration-300 bg-slate-800/40 border border-electric-green/30 hover:border-electric-green/60 electric-frame max-w-2xl mx-auto">
+              <CardContent className="p-6">
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-4">
+                      <div className="p-3 rounded-lg bg-electric-green/10 group-hover:bg-electric-green/20 transition-colors border border-electric-green/20">
+                        <Gift className="h-5 w-5 text-electric-green" />
+                      </div>
+                      <div>
+                        <h3 className="font-semibold text-lg text-white group-hover:text-electric-blue transition-colors">
+                          Digital Greeting Card
+                        </h3>
+                        <p className="text-sm text-gray-300">Personal 27-character messages with SOL value</p>
+                      </div>
+                    </div>
+                    <Badge className="bg-gradient-to-r from-electric-blue to-electric-green text-white text-xs px-2 py-1 animate-pulse">
+                      POPULAR
+                    </Badge>
+                  </div>
+                  
+                  <div className="flex flex-wrap gap-2">
+                    <Badge variant="outline" className="text-gray-300 border-gray-600 bg-slate-700/50 text-xs">27-character message</Badge>
+                    <Badge variant="outline" className="text-gray-300 border-gray-600 bg-slate-700/50 text-xs">Attach SOL value</Badge>
+                    <Badge variant="outline" className="text-gray-300 border-gray-600 bg-slate-700/50 text-xs">Perfect for gifts</Badge>
+                  </div>
+
+                  <div className="text-xs text-gray-400">
+                    <p className="font-medium">Examples:</p>
+                    <ul className="list-disc list-inside space-y-1 mt-1">
+                      <li>"Happy Birthday! $5 gift"</li>
+                      <li>"Coffee on me - enjoy!"</li>
+                    </ul>
+                  </div>
+
+                  <Link href="/mint/basic">
+                    <Button className="w-full group-hover:from-electric-blue group-hover:to-electric-green bg-gradient-to-r from-slate-700 to-slate-600 hover:from-electric-blue hover:to-electric-green transition-all duration-300">
+                      Create Greeting Card <ArrowRight className="ml-2 h-4 w-4" />
+                    </Button>
+                  </Link>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="marketing" className="space-y-6">
+            <div className="text-center mb-6">
+              <h2 className="text-2xl font-bold text-white mb-2">Targeted Marketing</h2>
+              <p className="text-gray-300">Precision crypto marketing with FlutterAI wallet targeting</p>
+            </div>
+            
+            <Card className="group hover:shadow-lg transition-all duration-300 bg-slate-800/40 border border-purple-400/30 hover:border-purple-400/60 electric-frame max-w-2xl mx-auto">
+              <CardContent className="p-6">
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-4">
+                      <div className="p-3 rounded-lg bg-purple-400/10 group-hover:bg-purple-400/20 transition-colors border border-purple-400/20">
+                        <Brain className="h-5 w-5 text-purple-400" />
+                      </div>
+                      <div>
+                        <h3 className="font-semibold text-lg text-white group-hover:text-electric-blue transition-colors">
+                          Targeted Marketing
+                        </h3>
+                        <p className="text-sm text-gray-300">Precision crypto marketing with FlutterAI</p>
+                      </div>
+                    </div>
+                    <Badge className="bg-gradient-to-r from-electric-blue to-electric-green text-white text-xs px-2 py-1 animate-pulse">
+                      POPULAR
+                    </Badge>
+                  </div>
+                  
+                  <div className="flex flex-wrap gap-2">
+                    <Badge variant="outline" className="text-gray-300 border-gray-600 bg-slate-700/50 text-xs">FlutterAI wallet targeting</Badge>
+                    <Badge variant="outline" className="text-gray-300 border-gray-600 bg-slate-700/50 text-xs">Campaign analytics</Badge>
+                    <Badge variant="outline" className="text-gray-300 border-gray-600 bg-slate-700/50 text-xs">Bulk distribution</Badge>
+                  </div>
+
+                  <div className="text-xs text-gray-400">
+                    <p className="font-medium">Examples:</p>
+                    <ul className="list-disc list-inside space-y-1 mt-1">
+                      <li>"Try our 5% yield pool!"</li>
+                      <li>"New NFT drop preview"</li>
+                    </ul>
+                  </div>
+
+                  <Link href="/campaign-builder">
+                    <Button className="w-full group-hover:from-electric-blue group-hover:to-electric-green bg-gradient-to-r from-slate-700 to-slate-600 hover:from-electric-blue hover:to-electric-green transition-all duration-300">
+                      Create Marketing Campaign <ArrowRight className="ml-2 h-4 w-4" />
+                    </Button>
+                  </Link>
+                </div>
+              </CardContent>
+            </Card>
           </TabsContent>
 
           <TabsContent value="ai-tools" className="space-y-6">
