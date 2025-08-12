@@ -6,6 +6,7 @@ import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Progress } from "@/components/ui/progress";
+import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from "@/components/ui/tooltip";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
@@ -32,7 +33,10 @@ import {
   Clock,
   Calculator,
   MessageSquare,
-  Palette
+  Palette,
+  HelpCircle,
+  Info,
+  DollarSign as CostIcon
 } from "lucide-react";
 
 interface NavItem {
@@ -191,7 +195,126 @@ export default function AdminSystem() {
       .reduce((total, f) => total + f.monthly_cost, 0);
   };
 
+  // Helper component for contextual help tooltips
+  const HelpTooltip = ({ content, children }: { content: React.ReactNode; children: React.ReactNode }) => (
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <div className="flex items-center gap-2 cursor-help">
+          {children}
+          <HelpCircle className="h-4 w-4 text-gray-400 hover:text-blue-400 transition-colors" />
+        </div>
+      </TooltipTrigger>
+      <TooltipContent side="top" className="max-w-xs p-4 bg-gray-900 border border-gray-700">
+        <div className="text-sm text-white">{content}</div>
+      </TooltipContent>
+    </Tooltip>
+  );
+
+  // Navigation item tooltip content
+  const getNavTooltipContent = (item: any) => {
+    const tooltips: Record<string, React.ReactNode> = {
+      'flutter-art': (
+        <div className="space-y-2">
+          <div className="font-semibold text-blue-400">FlutterArt NFT Marketplace</div>
+          <div>AI-powered NFT creation and trading platform. When enabled, users can access NFT generation tools, marketplace, and trading features.</div>
+          <div className="flex items-center gap-2 text-red-400">
+            <CostIcon className="h-3 w-3" />
+            <span className="text-xs">High Cost: $1,200/month</span>
+          </div>
+          <div className="text-xs text-gray-400">Impact: Disabling saves significant AI processing costs but removes NFT functionality</div>
+        </div>
+      ),
+      'flutter-wave': (
+        <div className="space-y-2">
+          <div className="font-semibold text-purple-400">FlutterWave SMS Intelligence</div>
+          <div>SMS-to-blockchain emotional intelligence system. Converts text messages into tokenized emotional assets with AI analysis.</div>
+          <div className="flex items-center gap-2 text-orange-400">
+            <CostIcon className="h-3 w-3" />
+            <span className="text-xs">High Cost: $380/month</span>
+          </div>
+          <div className="text-xs text-gray-400">Impact: Disabling reduces SMS processing costs but removes emotional token creation</div>
+        </div>
+      ),
+      'intelligence': (
+        <div className="space-y-2">
+          <div className="font-semibold text-green-400">FlutterAI Intelligence</div>
+          <div>Comprehensive wallet intelligence and scoring system. Provides 0-1000 point scoring for crypto wallets with behavioral analysis.</div>
+          <div className="flex items-center gap-2 text-yellow-400">
+            <CostIcon className="h-3 w-3" />
+            <span className="text-xs">Core Revenue Driver</span>
+          </div>
+          <div className="text-xs text-gray-400">Impact: Core platform feature - disabling affects primary revenue stream</div>
+        </div>
+      ),
+      'chat': (
+        <div className="space-y-2">
+          <div className="font-semibold text-cyan-400">Real-time Chat</div>
+          <div>Blockchain-powered messaging with token integration. Enables real-time communication with value attachment.</div>
+          <div className="flex items-center gap-2 text-blue-400">
+            <CostIcon className="h-3 w-3" />
+            <span className="text-xs">Medium Cost: WebSocket + AI</span>
+          </div>
+          <div className="text-xs text-gray-400">Impact: Essential for user engagement and platform stickiness</div>
+        </div>
+      )
+    };
+    return tooltips[item.id] || (
+      <div className="space-y-2">
+        <div className="font-semibold">{item.label}</div>
+        <div>{item.description}</div>
+        <div className="text-xs text-gray-400">Cost Level: {item.cost_level}</div>
+      </div>
+    );
+  };
+
+  // AI feature tooltip content
+  const getAITooltipContent = (feature: any) => {
+    const tooltips: Record<string, React.ReactNode> = {
+      'flutter-art-ai': (
+        <div className="space-y-2">
+          <div className="font-semibold text-blue-400">FlutterArt AI Engine</div>
+          <div>Advanced AI for NFT generation, style analysis, and marketplace optimization. Uses GPT-4o for creative content generation.</div>
+          <div className="flex items-center gap-2 text-red-400">
+            <CostIcon className="h-3 w-3" />
+            <span className="text-xs">High Cost: $800/month AI tokens</span>
+          </div>
+          <div className="text-xs text-gray-400">Impact: Core to NFT quality - disabling reduces generation capabilities</div>
+        </div>
+      ),
+      'flutter-wave-ai': (
+        <div className="space-y-2">
+          <div className="font-semibold text-purple-400">FlutterWave AI Processing</div>
+          <div>Emotional intelligence analysis for SMS messages. Sentiment analysis, mood detection, and personalized token creation.</div>
+          <div className="flex items-center gap-2 text-orange-400">
+            <CostIcon className="h-3 w-3" />
+            <span className="text-xs">High Cost: $280/month processing</span>
+          </div>
+          <div className="text-xs text-gray-400">Impact: Essential for emotional token accuracy and user engagement</div>
+        </div>
+      ),
+      'skye-ai': (
+        <div className="space-y-2">
+          <div className="font-semibold text-pink-400">Skye AI Chatbot</div>
+          <div>Advanced AI companion with personality system, wallet analysis integration, and personalized responses.</div>
+          <div className="flex items-center gap-2 text-yellow-400">
+            <CostIcon className="h-3 w-3" />
+            <span className="text-xs">Revenue Driver: User retention</span>
+          </div>
+          <div className="text-xs text-gray-400">Impact: Core to user experience - primary platform assistant</div>
+        </div>
+      )
+    };
+    return tooltips[feature.id] || (
+      <div className="space-y-2">
+        <div className="font-semibold">{feature.name}</div>
+        <div>{feature.description}</div>
+        <div className="text-xs text-gray-400">Monthly Cost: ${feature.monthly_cost}</div>
+      </div>
+    );
+  };
+
   return (
+    <TooltipProvider>
     <div className="container mx-auto p-6 space-y-8">
       <div className="flex items-center justify-between">
         <div>
@@ -349,10 +472,18 @@ export default function AdminSystem() {
             <CardHeader>
               <div className="flex items-center justify-between">
                 <div>
-                  <CardTitle className="text-white flex items-center gap-2">
-                    <AlertTriangle className="h-5 w-5 text-red-400" />
-                    Emergency Cost Control
-                  </CardTitle>
+                  <HelpTooltip content={
+                    <div className="space-y-2">
+                      <div className="font-semibold text-red-400">Emergency Cost Control</div>
+                      <div>Immediate control panel for high-cost platform features. Use when urgent cost reduction is needed.</div>
+                      <div className="text-xs text-gray-400">Total potential savings: $1,580/month by disabling FlutterArt + FlutterWave</div>
+                    </div>
+                  }>
+                    <CardTitle className="text-white flex items-center gap-2">
+                      <AlertTriangle className="h-5 w-5 text-red-400" />
+                      Emergency Cost Control
+                    </CardTitle>
+                  </HelpTooltip>
                   <CardDescription>Quickly disable high-cost features to reduce expenses</CardDescription>
                 </div>
                 <div className="flex items-center gap-2">
@@ -400,7 +531,9 @@ export default function AdminSystem() {
                   </p>
                   <div className="space-y-3">
                     <div className="flex items-center justify-between">
-                      <span className="text-sm text-white">Navigation Access</span>
+                      <HelpTooltip content={getNavTooltipContent({ id: 'flutter-art', label: 'FlutterArt', description: 'NFT Marketplace Access' })}>
+                        <span className="text-sm text-white">Navigation Access</span>
+                      </HelpTooltip>
                       <Button
                         size="sm"
                         variant={navItems.find(item => item.id === 'flutter-art')?.enabled ? "destructive" : "default"}
@@ -415,7 +548,9 @@ export default function AdminSystem() {
                       </Button>
                     </div>
                     <div className="flex items-center justify-between">
-                      <span className="text-sm text-white">AI Engine</span>
+                      <HelpTooltip content={getAITooltipContent({ id: 'flutter-art-ai', name: 'FlutterArt AI Engine', description: 'Advanced NFT Generation' })}>
+                        <span className="text-sm text-white">AI Engine</span>
+                      </HelpTooltip>
                       <Button
                         size="sm"
                         variant={aiFeatures.find(f => f.id === 'flutter-art-ai')?.enabled ? "destructive" : "default"}
@@ -446,7 +581,9 @@ export default function AdminSystem() {
                   </p>
                   <div className="space-y-3">
                     <div className="flex items-center justify-between">
-                      <span className="text-sm text-white">Navigation Access</span>
+                      <HelpTooltip content={getNavTooltipContent({ id: 'flutter-wave', label: 'FlutterWave', description: 'SMS Intelligence Access' })}>
+                        <span className="text-sm text-white">Navigation Access</span>
+                      </HelpTooltip>
                       <Button
                         size="sm"
                         variant={navItems.find(item => item.id === 'flutter-wave')?.enabled ? "destructive" : "default"}
@@ -461,7 +598,9 @@ export default function AdminSystem() {
                       </Button>
                     </div>
                     <div className="flex items-center justify-between">
-                      <span className="text-sm text-white">AI Processing</span>
+                      <HelpTooltip content={getAITooltipContent({ id: 'flutter-wave-ai', name: 'FlutterWave AI Processing', description: 'Emotional Intelligence System' })}>
+                        <span className="text-sm text-white">AI Processing</span>
+                      </HelpTooltip>
                       <Button
                         size="sm"
                         variant={aiFeatures.find(f => f.id === 'flutter-wave-ai')?.enabled ? "destructive" : "default"}
@@ -915,5 +1054,6 @@ export default function AdminSystem() {
         </TabsContent>
       </Tabs>
     </div>
+    </TooltipProvider>
   );
 }
