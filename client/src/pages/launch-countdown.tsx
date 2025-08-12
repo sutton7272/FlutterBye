@@ -33,7 +33,8 @@ import {
   Brain,
   Bot,
   ArrowRight,
-  MessageSquare
+  MessageSquare,
+  Activity
 } from "lucide-react";
 import flutterbeyeLogoPath from "@assets/image_1754068877999.png";
 import Navbar from "@/components/navbar";
