@@ -182,7 +182,7 @@ export function EmotionAnalyzer({
                     <div className={`text-lg font-bold capitalize ${getSentimentColor(analysis.sentiment)}`}>
                       {analysis.sentiment}
                       <span className="text-sm text-gray-400 ml-2">
-                        ({Math.round(analysis.emotionScore * 100)}% confidence)
+                        ({Math.round((analysis.emotionScore ?? 0) * 100)}% confidence)
                       </span>
                     </div>
                   </div>
@@ -207,12 +207,12 @@ export function EmotionAnalyzer({
                     </div>
                     <div className="flex items-center gap-2">
                       <span className="text-lg font-bold text-green-400">
-                        {analysis.suggestedValue.toFixed(3)} SOL
+                        {(analysis.suggestedValue ?? 0).toFixed(3)} SOL
                       </span>
                       <Button
                         size="sm"
                         variant="outline"
-                        onClick={() => onValueSuggestion?.(analysis.suggestedValue)}
+                        onClick={() => onValueSuggestion?.(analysis.suggestedValue ?? 0)}
                         className="text-xs"
                       >
                         Use
@@ -231,19 +231,19 @@ export function EmotionAnalyzer({
                     <div className="flex-1 bg-gray-700 rounded-full h-2">
                       <motion.div
                         initial={{ width: 0 }}
-                        animate={{ width: `${analysis.viralityScore * 100}%` }}
+                        animate={{ width: `${(analysis.viralityScore ?? 0) * 100}%` }}
                         transition={{ duration: 0.5, delay: 0.2 }}
                         className="bg-gradient-to-r from-yellow-400 to-orange-400 h-2 rounded-full"
                       />
                     </div>
                     <span className="text-sm font-bold text-yellow-400">
-                      {Math.round(analysis.viralityScore * 100)}%
+                      {Math.round((analysis.viralityScore ?? 0) * 100)}%
                     </span>
                   </div>
                 </div>
 
                 {/* Marketing Tags */}
-                {analysis.marketingTags.length > 0 && (
+                {(analysis.marketingTags?.length ?? 0) > 0 && (
                   <div className="space-y-2">
                     <div className="flex items-center gap-2">
                       <Target className="w-4 h-4 text-cyan-400" />
