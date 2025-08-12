@@ -155,15 +155,13 @@ export function TransactionSuccessOverlay({
   onClose,
   transactionType = 'Token',
   amount,
-  message,
-  blockchainUrl
+  message 
 }: {
   isVisible: boolean;
   onClose: () => void;
   transactionType?: string;
   amount?: string;
   message?: string;
-  blockchainUrl?: string;
 }) {
   return (
     <AnimatePresence>
@@ -245,24 +243,10 @@ export function TransactionSuccessOverlay({
 
               {/* Action Buttons */}
               <div className="flex gap-3 justify-center">
-                {blockchainUrl && (
-                  <motion.button
-                    initial={{ y: 20, opacity: 0 }}
-                    animate={{ y: 0, opacity: 1 }}
-                    transition={{ delay: 0.6 }}
-                    onClick={() => window.open(blockchainUrl, '_blank')}
-                    className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-semibold transition-colors flex items-center gap-2"
-                  >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                    </svg>
-                    View on Blockchain
-                  </motion.button>
-                )}
                 <motion.button
                   initial={{ y: 20, opacity: 0 }}
                   animate={{ y: 0, opacity: 1 }}
-                  transition={{ delay: 0.7 }}
+                  transition={{ delay: 0.6 }}
                   onClick={onClose}
                   className="bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded-lg font-semibold transition-colors"
                 >
@@ -271,7 +255,7 @@ export function TransactionSuccessOverlay({
                 <motion.button
                   initial={{ y: 20, opacity: 0 }}
                   animate={{ y: 0, opacity: 1 }}
-                  transition={{ delay: 0.8 }}
+                  transition={{ delay: 0.7 }}
                   onClick={() => {
                     // Trigger share modal
                     onClose();

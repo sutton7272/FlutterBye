@@ -8,40 +8,33 @@ import {
   getAssociatedTokenAddress,
   createAssociatedTokenAccountInstruction
 } from '@solana/spl-token';
-import { Metaplex, keypairIdentity } from '@metaplex-foundation/js';
+import { Metaplex, keypairIdentity, bundlrStorage } from '@metaplex-foundation/js';
 import bs58 from 'bs58';
 
-export class SolanaService {
+export class SolanaBackendService {
   private connection: Connection;
   private keypair: Keypair;
-  private metaplex: Metaplex;
 
   constructor() {
-    // Connect to Solana DevNet
-    this.connection = new Connection(
-      process.env.SOLANA_RPC_URL || 'https://api.devnet.solana.com',
-      'confirmed'
-    );
-
-    // Load admin keypair from environment
+    const rpcUrl = process.env.SOLANA_RPC_URL || 'https://devnet.helius-rpc.com/?api-key=070d7528-d275-45b4-bec6-2bfd09926d7d';
+    this.connection = new Connection(rpcUrl, 'confirmed');
+    
     if (!process.env.SOLANA_PRIVATE_KEY) {
       throw new Error('SOLANA_PRIVATE_KEY environment variable is required');
     }
-
+    
     try {
-      const privateKeyArray = bs58.decode(process.env.SOLANA_PRIVATE_KEY);
-      this.keypair = Keypair.fromSecretKey(privateKeyArray);
-      
-      // Initialize Metaplex SDK for metadata creation
-      this.metaplex = Metaplex.make(this.connection)
-        .use(keypairIdentity(this.keypair));
+      // Decode the base58 private key
+      const privateKeyBytes = bs58.decode(process.env.SOLANA_PRIVATE_KEY);
+      this.keypair = Keypair.fromSecretKey(privateKeyBytes);
+      console.log('Solana admin wallet loaded:', this.keypair.publicKey.toString());
     } catch (error) {
-      console.error('Error loading Solana keypair:', error);
+      console.error('Error loading Solana private key:', error);
       throw new Error('Invalid SOLANA_PRIVATE_KEY format. Must be base58 encoded.');
     }
   }
 
-  // Create FLBY-MSG token on DevNet with standard SPL token implementation
+  // Create FLBY-MSG token on DevNet with optimized distribution
   async createFlutterbyeToken(params: {
     message: string;
     totalSupply: number;
@@ -50,44 +43,95 @@ export class SolanaService {
     distributionWallets?: string[]; // Wallets to receive 1 token each
   }) {
     try {
-      console.log('Creating SPL token with params:', {
-        message: params.message,
-        totalSupply: params.totalSupply,
-        recipientWallets: params.recipientWallets,
-        creatorWallet: params.targetWallet
-      });
-
       // Generate new mint keypair
       const mintKeypair = Keypair.generate();
-      console.log('Creating SPL token:', mintKeypair.publicKey.toString());
       
-      // Get rent exemption for mint account
-      const lamports = await getMinimumBalanceForRentExemptMint(this.connection);
+      // Define token metadata
+      const metadata: TokenMetadata = {
+        mint: mintKeypair.publicKey,
+        name: "FLBY-MSG",
+        symbol: "FLBY-MSG",
+        uri: `http://localhost:5000/api/metadata/${mintKeypair.publicKey.toString()}`,
+        additionalMetadata: [
+          ["message", params.message],
+          ["totalSupply", params.totalSupply.toString()],
+          ["tokenType", "FLBY-MSG"],
+          ["description", `Flutterbye Message Token: "${params.message}"`]
+        ],
+      };
+
+      // Calculate space needed for mint with metadata extension
+      const metadataExtension = TYPE_SIZE + LENGTH_SIZE + pack(metadata).length;
+      const mintLen = getMintLen([ExtensionType.MetadataPointer]);
+      const lamports = await this.connection.getMinimumBalanceForRentExemption(
+        mintLen + metadataExtension
+      );
       
-      // Create transaction with standard SPL token instructions
+      // Create transaction
       const transaction = new Transaction();
       
-      // Create mint account
+      // Add create mint account instruction for Token-2022
       transaction.add(
         SystemProgram.createAccount({
           fromPubkey: this.keypair.publicKey,
           newAccountPubkey: mintKeypair.publicKey,
-          space: MINT_SIZE,
+          space: mintLen + metadataExtension,
           lamports,
-          programId: TOKEN_PROGRAM_ID,
+          programId: TOKEN_2022_PROGRAM_ID,
         })
       );
+
+      // Add initialize metadata pointer instruction
+      transaction.add(
+        createInitializeMetadataPointerInstruction(
+          mintKeypair.publicKey,
+          this.keypair.publicKey,
+          mintKeypair.publicKey, // Metadata account same as mint
+          TOKEN_2022_PROGRAM_ID
+        )
+      );
       
-      // Initialize mint (0 decimals for whole number tokens)
+      // Add initialize mint instruction (0 decimals for whole numbers only)
       transaction.add(
         createInitializeMintInstruction(
           mintKeypair.publicKey,
           0, // Decimals = 0 for whole number tokens
-          this.keypair.publicKey, // Mint authority
-          this.keypair.publicKey, // Freeze authority
-          TOKEN_PROGRAM_ID
+          this.keypair.publicKey,
+          this.keypair.publicKey,
+          TOKEN_2022_PROGRAM_ID
         )
       );
+
+      // Add initialize metadata instruction
+      transaction.add(
+        createInitializeInstruction({
+          programId: TOKEN_2022_PROGRAM_ID,
+          mint: mintKeypair.publicKey,
+          metadata: mintKeypair.publicKey,
+          name: metadata.name,
+          symbol: metadata.symbol,
+          uri: metadata.uri,
+          mintAuthority: this.keypair.publicKey,
+          updateAuthority: this.keypair.publicKey,
+        })
+      );
+
+      // Add additional metadata fields
+      for (const [key, value] of metadata.additionalMetadata || []) {
+        transaction.add(
+          createUpdateFieldInstruction({
+            programId: TOKEN_2022_PROGRAM_ID,
+            metadata: mintKeypair.publicKey,
+            updateAuthority: this.keypair.publicKey,
+            field: key,
+            value,
+          })
+        );
+      }
+
+      // Note: Metaplex metadata creation temporarily disabled due to deprecated API
+      // Tokens will work properly but may show as "Unknown Token" in wallets
+      // The JSON metadata endpoint at /api/metadata/{mintAddress} provides all token information
 
       // Optimized token distribution logic
       let minterWallet = this.keypair.publicKey.toString(); // Default to admin wallet
@@ -127,17 +171,17 @@ export class SolanaService {
           mintKeypair.publicKey,
           recipientPubkey,
           false,
-          TOKEN_PROGRAM_ID
+          TOKEN_2022_PROGRAM_ID
         );
 
-        // Create associated token account for standard SPL token
+        // Create associated token account for Token-2022
         transaction.add(
           createAssociatedTokenAccountInstruction(
             this.keypair.publicKey,
             associatedTokenAddress,
             recipientPubkey,
             mintKeypair.publicKey,
-            TOKEN_PROGRAM_ID
+            TOKEN_2022_PROGRAM_ID
           )
         );
 
@@ -149,7 +193,7 @@ export class SolanaService {
             this.keypair.publicKey,
             1, // Always 1 token per distribution wallet
             [],
-            TOKEN_PROGRAM_ID
+            TOKEN_2022_PROGRAM_ID
           )
         );
       }
@@ -161,17 +205,17 @@ export class SolanaService {
           mintKeypair.publicKey,
           minterPubkey,
           false,
-          TOKEN_PROGRAM_ID
+          TOKEN_2022_PROGRAM_ID
         );
 
-        // Create associated token account for minter (standard SPL token)
+        // Create associated token account for minter (Token-2022)
         transaction.add(
           createAssociatedTokenAccountInstruction(
             this.keypair.publicKey,
             minterTokenAddress,
             minterPubkey,
             mintKeypair.publicKey,
-            TOKEN_PROGRAM_ID
+            TOKEN_2022_PROGRAM_ID
           )
         );
 
@@ -183,7 +227,7 @@ export class SolanaService {
             this.keypair.publicKey,
             surplusTokens,
             [],
-            TOKEN_PROGRAM_ID
+            TOKEN_2022_PROGRAM_ID
           )
         );
       }
@@ -202,13 +246,6 @@ export class SolanaService {
       // Confirm transaction
       await this.connection.confirmTransaction(signature, 'confirmed');
 
-      // Skip metadata creation to avoid Metaplex SDK conflicts  
-      // Our tokens work perfectly without on-chain metadata
-      console.log('✅ SPL token created without on-chain metadata (shows as "Unknown Token" in wallets)');
-
-      console.log('✅ SPL Token created successfully:', mintKeypair.publicKey.toString());
-      console.log('📄 Token metadata available at:', `https://${process.env.REPLIT_DOMAINS?.split(',')[0] || 'localhost:5000'}/api/metadata/${mintKeypair.publicKey.toString()}`);
-
       return {
         mintAddress: mintKeypair.publicKey.toString(),
         signature,
@@ -226,6 +263,8 @@ export class SolanaService {
     }
   }
 
+
+
   // Create metadata endpoint to serve token information
   // This creates a JSON metadata file that can be hosted and referenced
   createTokenMetadataJson(params: {
@@ -235,12 +274,12 @@ export class SolanaService {
     imageUrl?: string;
   }) {
     return {
-      name: params.message.slice(0, 32), // Use message as token name for wallet display
+      name: "FLBY-MSG",
       symbol: "FLBY-MSG", 
       description: `Flutterbye Message Token: "${params.message}"`,
-      image: params.imageUrl || `https://${process.env.REPLIT_DOMAINS?.split(',')[0] || 'localhost:5000'}/butterfly-logo.png`,
+      image: params.imageUrl || "https://flutterbye.app/assets/token-icon.png",
       animation_url: "",
-      external_url: `https://${process.env.REPLIT_DOMAINS?.split(',')[0] || 'localhost:5000'}/token/${params.mintAddress}`,
+      external_url: "https://flutterbye.app",
       attributes: [
         {
           trait_type: "Message",
@@ -258,7 +297,7 @@ export class SolanaService {
       properties: {
         files: [
           {
-            uri: params.imageUrl || `https://${process.env.REPLIT_DOMAINS?.split(',')[0] || 'localhost:5000'}/butterfly-logo.png`,
+            uri: params.imageUrl || "https://flutterbye.app/assets/token-icon.png",
             type: "image/png"
           }
         ],
@@ -277,23 +316,31 @@ export class SolanaService {
   async getTokenHolders(mintAddress: string) {
     try {
       const mintPubkey = new PublicKey(mintAddress);
-      
-      // Get all token accounts for this mint
-      const tokenAccounts = await this.connection.getTokenAccountsByMint(mintPubkey);
-      
+      const tokenAccounts = await this.connection.getProgramAccounts(TOKEN_PROGRAM_ID, {
+        filters: [
+          {
+            dataSize: 165, // Token account data size
+          },
+          {
+            memcmp: {
+              offset: 0,
+              bytes: mintPubkey.toBase58(),
+            },
+          },
+        ],
+      });
+
       const holders = [];
-      
-      for (const accountInfo of tokenAccounts.value) {
-        // Skip empty accounts
-        if (accountInfo.account.data && accountInfo.account.data.toString('base64')) {
+      for (const account of tokenAccounts) {
+        const balance = await this.connection.getTokenAccountBalance(account.pubkey);
+        if (parseInt(balance.value.amount) > 0) {
           holders.push({
-            address: accountInfo.pubkey.toString(),
-            // Note: Would need to parse token account data to get actual balance
-            balance: 'Unknown' // Simplified for this implementation
+            address: account.pubkey.toString(),
+            balance: parseInt(balance.value.amount)
           });
         }
       }
-      
+
       return holders;
     } catch (error) {
       console.error('Error getting token holders:', error);
@@ -301,7 +348,7 @@ export class SolanaService {
     }
   }
 
-  // Validate wallet address format
+  // Validate wallet address
   validateWalletAddress(address: string): boolean {
     try {
       new PublicKey(address);
@@ -322,3 +369,5 @@ export class SolanaService {
     }
   }
 }
+
+export const solanaBackendService = new SolanaBackendService();

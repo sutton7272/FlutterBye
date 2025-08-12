@@ -1352,14 +1352,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (tokenData.message.length > 27) {
         return res.status(400).json({ message: "Message must be 27 characters or less" });
       }
-      
-      // Validate whole number tokens BEFORE any blockchain operations
-      if (!Number.isInteger(tokenData.totalSupply) || tokenData.totalSupply <= 0) {
-        return res.status(400).json({ message: "Total supply must be a whole number greater than 0" });
-      }
       // Import Solana service (standard SPL tokens)
-      const { SolanaService } = await import("./solana-service");
-      const solanaService = new SolanaService();
+      const { SolanaBackendService } = await import("./solana-service-wallet-fix");
+      const solanaService = new SolanaBackendService();
       // Debug: Log received data to see what fields are available
       console.log('Token creation request data:', {
         ...tokenData,
@@ -1378,6 +1373,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
           message: "Failed to mint token on Solana blockchain",
           error: solanaResult.error 
         });
+      }
+      // Validate whole number tokens  
+      if (!Number.isInteger(tokenData.totalSupply) || tokenData.totalSupply <= 0) {
+        return res.status(400).json({ message: "Total supply must be a whole number greater than 0" });
       }
       
       // Create token with blockchain data using actual schema fields
@@ -5815,7 +5814,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         name: token.message,
         symbol: "FLBY-MSG",
         description: `Flutterbye Message Token: "${token.message}"`,
-        image: token.imageUrl || `https://${req.get('host')}/butterfly-logo.png`,
+        image: token.imageUrl || "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDIwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjMzMzIiByeD0iMTAiLz4KPHR5cGUgdGV4dC1hbmNob3I9Im1pZGRsZSIgeD0iMTAwIiB5PSIxMDAiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxOCIgZmlsbD0iI0ZGRiI+RkxCWS1NU0c8L3R5cGU+Cjwvc3ZnPg==",
         external_url: `https://flutterbye.app/token/${mintAddress}`,
         attributes: [
           {

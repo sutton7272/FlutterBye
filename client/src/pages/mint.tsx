@@ -161,7 +161,7 @@ export default function Mint({ tokenType }: MintProps = {}) {
         
         // Step 4: Token creation
         setMintingStep("token");
-        const response = await apiRequest("/api/tokens", "POST", data);
+        const response = await apiRequest("POST", "/api/tokens", data);
         await new Promise(resolve => setTimeout(resolve, 4000));
         
         // Step 5: Value attachment (if applicable)
@@ -174,40 +174,26 @@ export default function Mint({ tokenType }: MintProps = {}) {
         setMintingStep("finalization");
         await new Promise(resolve => setTimeout(resolve, 2000));
         
-        return response;
+        return response.json();
       } catch (error) {
         setMintingError(error instanceof Error ? error.message : "Unknown error occurred");
         throw error;
       }
     },
-    onSuccess: (data: any) => {
+    onSuccess: (data) => {
       setShowMintingProgress(false);
       setMintingStep("");
       
-      console.log('Token creation success data:', data);
-      
-      // Show confetti celebration with detailed token info
+      // Show confetti celebration
       setSuccessData({
         message: message,
-        amount: `${mintAmount} tokens • Mint: ${data.mintAddress?.slice(0, 8)}...${data.mintAddress?.slice(-4)}`,
-        type: 'FLBY-MSG Token Created',
+        amount: `${mintAmount} tokens${attachValue ? ` • ${attachedValue} ${currency} value` : ''}`,
+        type: 'Token Mint',
         wasFreeMint: isFreeMode,
         redemptionCode: validatedCode?.code,
-        transactionUrl: data.metadata?.solscanUrl || data.blockchainUrl
+        transactionUrl: data.blockchainUrl
       });
       setShowSuccessOverlay(true);
-      
-      // Show detailed success toast  
-      toast({
-        title: "🎉 Token Created Successfully!",
-        description: `Message: "${message}" | Mint: ${data.mintAddress?.slice(0, 8)}...${data.mintAddress?.slice(-4)}`,
-        duration: 6000,
-      });
-      
-      // Auto-trigger share modal after 3 seconds
-      setTimeout(() => {
-        setShowShareModal(true);
-      }, 3000);
       
       // Reset form
       setMessage("");
@@ -308,7 +294,7 @@ export default function Mint({ tokenType }: MintProps = {}) {
 
     const tokenData: InsertToken = {
       message,
-      symbol: "FLBY-MSG", // Always FLBY-MSG
+      symbol: "FlBY-MSG", // Always FlBY-MSG
       creatorId: "user-1", // Mock user ID
       totalSupply: parseInt(mintAmount) || 0,
       availableSupply: parseInt(mintAmount) || 0,
@@ -1552,7 +1538,6 @@ export default function Mint({ tokenType }: MintProps = {}) {
         transactionType={successData?.type || 'Transaction'}
         amount={successData?.amount}
         message={successData?.message}
-        blockchainUrl={successData?.transactionUrl}
       />
 
       {/* Share Success Modal */}
