@@ -1,0 +1,371 @@
+here’s a drop-in Replit script that fixes Phantom showing your token as “Unknown” by creating (or updating) the Metaplex Token Metadata for your existing mint.
+
+It will:
+
+connect to your RPC,
+
+load your wallet,
+
+check if the metadata account exists,
+
+create it (with Fungible standard) if missing, or update it if it exists,
+
+point it to your off-chain JSON uri (which must include an image field).
+This is the metadata Phantom reads for name, symbol, image. 
+Phantom Developer Documentation
+Metaplex Developer Hub
+
+1) Replit setup (one time)
+Create a new Node.js repl and add these files.
+
+package.json
+json
+Copy
+Edit
+{
+  "name": "flby-metadata-fixer",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "@metaplex-foundation/mpl-token-metadata": "^3.0.0",
+    "@metaplex-foundation/umi": "^1.0.0",
+    "bs58": "^5.0.0",
+    "dotenv": "^16.4.5"
+  }
+}
+Tip: Replit will auto-install dependencies after you hit Run the first time.
+
+.env (fill these in)
+ini
+Copy
+Edit
+RPC_URL=https://api.mainnet-beta.solana.com
+# Or your provider endpoint
+
+SECRET_KEY=<YOUR_WALLET_SECRET_KEY_IN_BASE58>
+# Example: the long base58 string from your keypair (NOT the public key)
+
+MINT=<YOUR_TOKEN_MINT_ADDRESS>
+NAME=Flutterbye Message
+SYMBOL=FLBY-MSG
+URI=https://your-domain.com/flby.json
+# URI must return JSON with at least: name, symbol, description, image
+Important: The URI must point to a valid JSON that contains an image URL (PNG/JPG/SVG). That’s what Phantom uses for the logo. 
+Solana Stack Exchange
+
+If you don’t have hosting yet, you can put it on IPFS/Arweave and paste that URL here. (Metaplex’s standard expects a public JSON with image.) 
+Metaplex Developer Hub
+
+Example JSON (host this at your URI):
+
+json
+Copy
+Edit
+{
+  "name": "Flutterbye Message",
+  "symbol": "FLBY-MSG",
+  "description": "Value-bearing message token on Solana.",
+  "image": "https://your-domain.com/flby.png",
+  "extensions": { "website": "https://flutterbye.io" }
+}
+2) The script
+index.js
+js
+Copy
+Edit
+import 'dotenv/config';
+import bs58 from 'bs58';
+import {
+  createUmi,
+  publicKey,
+  keypairIdentity,
+} from '@metaplex-foundation/umi';
+import {
+  mplTokenMetadata,
+  findMetadataPda,
+  fetchMetadata,
+  createV1,
+  updateV1,
+  TokenStandard
+} from '@metaplex-foundation/mpl-token-metadata';
+
+async function main() {
+  // 1) Load env
+  const RPC_URL = process.env.RPC_URL;
+  const SECRET_KEY = process.env.SECRET_KEY;
+  const MINT = process.env.MINT;
+  const NAME = process.env.NAME;
+  const SYMBOL = process.env.SYMBOL;
+  const URI = process.env.URI;
+
+  if (!RPC_URL || !SECRET_KEY || !MINT || !NAME || !SYMBOL || !URI) {
+    throw new Error("Missing one or more required env vars: RPC_URL, SECRET_KEY, MINT, NAME, SYMBOL, URI");
+  }
+
+  // 2) Init Umi & identity
+  const umi = createUmi(RPC_URL).use(mplTokenMetadata());
+  const secretBytes = bs58.decode(SECRET_KEY);
+  const keypair = umi.eddsa.createKeypairFromSecretKey(secretBytes);
+  umi.use(keypairIdentity(keypair));
+
+  const mint = publicKey(MINT);
+  const metadataPda = findMetadataPda(umi, { mint });
+
+  console.log('RPC:', RPC_URL);
+  console.log('Mint:', MINT);
+  console.log('Metadata PDA:', metadataPda.toString());
+  console.log('Preparing to ensure on-chain metadata exists…');
+
+  // 3) Check if metadata exists
+  let exists = false;
+  try {
+    const md = await fetchMetadata(umi, metadataPda);
+    exists = !!md;
+    console.log('Metadata currently exists on-chain. Will update it.');
+  } catch (e) {
+    console.log('No metadata found. Will create it.');
+  }
+
+  // 4) Create or Update
+  if (!exists) {
+    // Create fresh metadata for a Fungible token
+    const tx = await createV1(umi, {
+      mint,
+      authority: umi.identity,            // update authority
+      name: NAME,
+      symbol: SYMBOL,
+      uri: URI,                           // points to your JSON with image
+      sellerFeeBasisPoints: 0,            // fungible tokens typically 0
+      tokenStandard: TokenStandard.Fungible,
+      isMutable: true
+    }).sendAndConfirm(umi);
+
+    console.log('✅ Created metadata.');
+    console.log('Signature:', bs58.encode(tx.signature));
+  } else {
+    // Update fields (name, symbol, uri)
+    const tx = await updateV1(umi, {
+      mint,
+      authority: umi.identity,            // must be current update authority
+      data: {
+        // Only include fields you want to change; we set all three for clarity
+        name: NAME,
+        symbol: SYMBOL,
+        uri: URI,
+        sellerFeeBasisPoints: 0
+      },
+      primarySaleHappened: null,          // leave unchanged
+      isMutable: true                     // keep mutable so you can adjust later
+    }).sendAndConfirm(umi);
+
+    console.log('✅ Updated metadata.');
+    console.log('Signature:', bs58.encode(tx.signature));
+  }
+
+  console.log('\nNext steps:');
+  console.log('- Open your mint in Solana Explorer/Solscan to see name/symbol/uri.');
+  console.log('- In Phantom: Manage > Add custom token (paste mint), then refresh cache.');
+}
+
+main().catch((err) => {
+  console.error('❌ Error:', err);
+  process.exit(1);
+});
+3) Run it
+Put your values in .env.
+
+Click Run (or open the shell and run npm start).
+
+After confirmation, open your token on an explorer to verify name/symbol/uri. Then in Phantom, Add custom token with the mint and refresh/clear cache if needed. 
+Metaplex Developer Hub
+Phantom Developer Documentation
+
+Notes & gotchas
+The wallet you load via SECRET_KEY must be the update authority for the token’s metadata (or the mint authority if you’re creating metadata for the first time). 
+Metaplex Developer Hub
+
+The URI must be publicly reachable and return valid JSON with an image field; otherwise Phantom can’t show your logo. 
+Solana Stack Exchange
+
+Use TokenStandard.Fungible for simple SPL tokens; that’s what Phantom expects for fungible token display. 
+Metaplex Developer Hub
+Phantom Developer Documentation
+
+If you want, send me your mint address (devnet or mainnet) and the URI you plan to use, and I’ll sanity-check both and tell you if the image/JSON will render cleanly in Phantom.
+
+
+
+
+
+
+
+
+You said:
+can you give it all to me at once
+
+
+ChatGPT said:
+Here’s the full Replit-ready package all in one place so you can just copy it over, fill in your details, and run it to fix your Phantom display issue.
+
+1️⃣ Create a new Node.js repl
+On Replit, choose "Node.js" as your template.
+
+2️⃣ Add these three files exactly
+package.json
+json
+Copy
+Edit
+{
+  "name": "flby-metadata-fixer",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "@metaplex-foundation/mpl-token-metadata": "^3.0.0",
+    "@metaplex-foundation/umi": "^1.0.0",
+    "bs58": "^5.0.0",
+    "dotenv": "^16.4.5"
+  }
+}
+.env (replace with your actual details)
+ini
+Copy
+Edit
+RPC_URL=https://api.mainnet-beta.solana.com
+# Or your preferred Solana RPC endpoint
+
+SECRET_KEY=<YOUR_WALLET_SECRET_KEY_IN_BASE58>
+# This must be the keypair with authority to update metadata
+
+MINT=<YOUR_TOKEN_MINT_ADDRESS>
+NAME=Flutterbye Message
+SYMBOL=FLBY-MSG
+URI=https://your-domain.com/flby.json
+# URI must return JSON with name, symbol, description, and image fields
+Example JSON you must host at the URI (IPFS, Arweave, or HTTPS):
+
+json
+Copy
+Edit
+{
+  "name": "Flutterbye Message",
+  "symbol": "FLBY-MSG",
+  "description": "Value-bearing message token on Solana.",
+  "image": "https://your-domain.com/flby.png",
+  "extensions": {
+    "website": "https://flutterbye.io"
+  }
+}
+Image tip: PNG/JPG/SVG, square (512×512 or 1024×1024), and under ~200KB for faster load.
+
+index.js
+js
+Copy
+Edit
+import 'dotenv/config';
+import bs58 from 'bs58';
+import {
+  createUmi,
+  publicKey,
+  keypairIdentity,
+} from '@metaplex-foundation/umi';
+import {
+  mplTokenMetadata,
+  findMetadataPda,
+  fetchMetadata,
+  createV1,
+  updateV1,
+  TokenStandard
+} from '@metaplex-foundation/mpl-token-metadata';
+
+async function main() {
+  const RPC_URL = process.env.RPC_URL;
+  const SECRET_KEY = process.env.SECRET_KEY;
+  const MINT = process.env.MINT;
+  const NAME = process.env.NAME;
+  const SYMBOL = process.env.SYMBOL;
+  const URI = process.env.URI;
+
+  if (!RPC_URL || !SECRET_KEY || !MINT || !NAME || !SYMBOL || !URI) {
+    throw new Error("Missing one or more required env vars: RPC_URL, SECRET_KEY, MINT, NAME, SYMBOL, URI");
+  }
+
+  const umi = createUmi(RPC_URL).use(mplTokenMetadata());
+  const secretBytes = bs58.decode(SECRET_KEY);
+  const keypair = umi.eddsa.createKeypairFromSecretKey(secretBytes);
+  umi.use(keypairIdentity(keypair));
+
+  const mint = publicKey(MINT);
+  const metadataPda = findMetadataPda(umi, { mint });
+
+  console.log('RPC:', RPC_URL);
+  console.log('Mint:', MINT);
+  console.log('Metadata PDA:', metadataPda.toString());
+
+  let exists = false;
+  try {
+    const md = await fetchMetadata(umi, metadataPda);
+    exists = !!md;
+    console.log('Metadata exists, updating...');
+  } catch (e) {
+    console.log('No metadata found, creating new...');
+  }
+
+  if (!exists) {
+    const tx = await createV1(umi, {
+      mint,
+      authority: umi.identity,
+      name: NAME,
+      symbol: SYMBOL,
+      uri: URI,
+      sellerFeeBasisPoints: 0,
+      tokenStandard: TokenStandard.Fungible,
+      isMutable: true
+    }).sendAndConfirm(umi);
+
+    console.log('✅ Created metadata.');
+    console.log('Signature:', bs58.encode(tx.signature));
+  } else {
+    const tx = await updateV1(umi, {
+      mint,
+      authority: umi.identity,
+      data: {
+        name: NAME,
+        symbol: SYMBOL,
+        uri: URI,
+        sellerFeeBasisPoints: 0
+      },
+      primarySaleHappened: null,
+      isMutable: true
+    }).sendAndConfirm(umi);
+
+    console.log('✅ Updated metadata.');
+    console.log('Signature:', bs58.encode(tx.signature));
+  }
+
+  console.log('\nNext steps:');
+  console.log('- View token in Solana Explorer/Solscan to verify name/symbol/image.');
+  console.log('- In Phantom: Manage > Add custom token (paste mint) and refresh cache.');
+}
+
+main().catch((err) => {
+  console.error('❌ Error:', err);
+  process.exit(1);
+});
+3️⃣ How to run
+Paste the three files into your Replit project.
+
+Fill in your .env with your wallet, mint, and hosted JSON URL.
+
+Click Run in Replit or in the shell run:
+
+bash
+Copy
+Edit
+npm install
+npm start
