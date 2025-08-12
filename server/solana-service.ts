@@ -197,25 +197,8 @@ export class SolanaService {
       // Confirm transaction
       await this.connection.confirmTransaction(signature, 'confirmed');
 
-      // Create Metaplex metadata for wallet compatibility using the correct method
-      try {
-        const metaplex = Metaplex.make(this.connection)
-          .use(keypairIdentity(this.keypair));
-
-        // Create metadata using Metaplex for proper wallet display
-        const { nft } = await metaplex.nfts().create({
-          uri: `https://${process.env.REPLIT_DOMAINS?.split(',')[0] || 'localhost:5000'}/api/metadata/${mintKeypair.publicKey.toString()}`,
-          name: params.message.slice(0, 32), // Token name (truncated to 32 chars)
-          symbol: "FLBY-MSG",
-          sellerFeeBasisPoints: 0,
-          useExistingMint: mintKeypair.publicKey,
-        });
-
-        console.log('✅ Metaplex metadata created for:', mintKeypair.publicKey.toString());
-      } catch (metadataError) {
-        console.warn('⚠️ Metaplex metadata creation failed (token still created):', metadataError);
-        // Continue even if metadata fails - token is still functional
-      }
+      console.log('✅ SPL Token created successfully:', mintKeypair.publicKey.toString());
+      console.log('📄 Token metadata available at:', `https://${process.env.REPLIT_DOMAINS?.split(',')[0] || 'localhost:5000'}/api/metadata/${mintKeypair.publicKey.toString()}`);
 
       return {
         mintAddress: mintKeypair.publicKey.toString(),
