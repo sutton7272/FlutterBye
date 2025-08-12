@@ -161,7 +161,7 @@ export default function Mint({ tokenType }: MintProps = {}) {
         
         // Step 4: Token creation
         setMintingStep("token");
-        const response = await apiRequest("POST", "/api/tokens", data);
+        const response = await apiRequest("/api/tokens", "POST", data);
         await new Promise(resolve => setTimeout(resolve, 4000));
         
         // Step 5: Value attachment (if applicable)
@@ -174,13 +174,13 @@ export default function Mint({ tokenType }: MintProps = {}) {
         setMintingStep("finalization");
         await new Promise(resolve => setTimeout(resolve, 2000));
         
-        return response.json();
+        return response;
       } catch (error) {
         setMintingError(error instanceof Error ? error.message : "Unknown error occurred");
         throw error;
       }
     },
-    onSuccess: (data) => {
+    onSuccess: (data: any) => {
       setShowMintingProgress(false);
       setMintingStep("");
       
@@ -194,6 +194,13 @@ export default function Mint({ tokenType }: MintProps = {}) {
         transactionUrl: data.blockchainUrl
       });
       setShowSuccessOverlay(true);
+      
+      // Show success toast with token details
+      toast({
+        title: "Token Created Successfully! 🎉",
+        description: `"${message}" minted with address: ${data.mintAddress?.slice(0, 8)}...`,
+        duration: 5000,
+      });
       
       // Reset form
       setMessage("");
