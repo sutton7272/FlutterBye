@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 
 import { 
   Brain, 
@@ -35,6 +36,7 @@ interface DemoResult {
 }
 
 export function FlutterAIInteractiveDemo() {
+  const [isOpen, setIsOpen] = useState(false);
   const [activeDemo, setActiveDemo] = useState<string>("");
   const [walletAddress, setWalletAddress] = useState("DemoWallet1234567890abcdef");
   const [content, setContent] = useState("");
@@ -186,75 +188,125 @@ export function FlutterAIInteractiveDemo() {
   ];
 
   return (
-    <div className="space-y-4">
-      {/* Interactive Demo Steps */}
-      <div className="text-center mb-6">
-        <Button 
-          onClick={() => setActiveDemo(activeDemo ? "" : "start")}
-          className="bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white font-bold px-6 py-3 rounded-lg"
-        >
-          <Play className="w-5 h-5 mr-2" />
-          Start Interactive Demo
-        </Button>
-      </div>
-
-      {/* Demo Steps */}
-      {activeDemo && (
-        <div className="space-y-4">
-          {demoOptions.map((demo, index) => (
-            <Card 
-              key={demo.id}
-              className={`cursor-pointer transition-all duration-200 hover:scale-105 bg-slate-800 border-slate-600 ${
-                activeDemo === demo.id ? 'ring-2 ring-cyan-400' : ''
-              }`}
-              onClick={() => !demo.loading && demo.action()}
-            >
-              <CardContent className="p-4">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-3">
-                    <Badge className="bg-electric-blue/20 text-electric-blue shrink-0">{index + 1}</Badge>
-                    <div>
-                      <h4 className="font-bold text-white">{demo.title}</h4>
-                      <p className="text-sm text-muted-foreground">{demo.description}</p>
+    <div className="text-center">
+      <Dialog open={isOpen} onOpenChange={setIsOpen}>
+        <DialogTrigger asChild>
+          <Button 
+            className="bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white font-bold px-6 py-3 rounded-lg w-full"
+          >
+            <Play className="w-5 h-5 mr-2" />
+            Try FlutterAI Demo
+          </Button>
+        </DialogTrigger>
+        
+        <DialogContent className="max-w-4xl bg-slate-900 border border-slate-700 text-white">
+          <DialogHeader>
+            <DialogTitle className="text-2xl font-bold bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent">
+              FlutterAI Interactive Demo
+            </DialogTitle>
+          </DialogHeader>
+          
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
+            {/* Left Panel: Demo Options */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold mb-4">Choose a Demo:</h3>
+              
+              {demoOptions.map((demo, index) => (
+                <Card 
+                  key={demo.id}
+                  className={`cursor-pointer transition-all duration-200 hover:scale-105 bg-slate-800 border-slate-600 ${
+                    activeDemo === demo.id ? 'ring-2 ring-cyan-400' : ''
+                  }`}
+                  onClick={() => !demo.loading && demo.action()}
+                >
+                  <CardContent className="p-4">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-3">
+                        <Badge className="bg-electric-blue/20 text-electric-blue shrink-0">{index + 1}</Badge>
+                        <div>
+                          <h4 className="font-bold text-white">{demo.title}</h4>
+                          <p className="text-sm text-muted-foreground">{demo.description}</p>
+                        </div>
+                      </div>
+                      {demo.loading ? (
+                        <Loader2 className="w-5 h-5 animate-spin text-cyan-400" />
+                      ) : (
+                        <ArrowRight className="w-5 h-5 text-cyan-400" />
+                      )}
                     </div>
-                  </div>
-                  {demo.loading ? (
-                    <Loader2 className="w-5 h-5 animate-spin text-cyan-400" />
-                  ) : (
-                    <ArrowRight className="w-5 h-5 text-cyan-400" />
-                  )}
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+            
+            {/* Right Panel: Demo Results */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold mb-4">Demo Results:</h3>
+              
+              {!activeDemo ? (
+                <Card className="bg-slate-800 border-slate-600">
+                  <CardContent className="p-8 text-center">
+                    <Brain className="w-12 h-12 mx-auto text-gray-400 mb-4" />
+                    <p className="text-gray-400">
+                      Select a demo to see FlutterAI in action
+                    </p>
+                  </CardContent>
+                </Card>
+              ) : (
+                <div className="space-y-4">
+                  {/* Show results for completed demo */}
+                  {Object.keys(demoResults).map((demoId) => (
+                    <Card key={demoId} className="bg-slate-800 border-slate-600">
+                      <CardHeader>
+                        <CardTitle className="text-lg text-cyan-400">
+                          {demoOptions.find(d => d.id === demoId)?.title} Results
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="space-y-2">
+                          {demoResults[demoId].score && (
+                            <div className="flex items-center justify-between">
+                              <span className="text-sm text-muted-foreground">Score:</span>
+                              <Badge className="bg-electric-green/20 text-electric-green">{demoResults[demoId].score}/1000</Badge>
+                            </div>
+                          )}
+                          {demoResults[demoId].analysis && (
+                            <p className="text-sm text-muted-foreground">{demoResults[demoId].analysis}</p>
+                          )}
+                          {demoResults[demoId].suggestions && (
+                            <div className="mt-2">
+                              {demoResults[demoId].suggestions?.map((suggestion, i) => (
+                                <Badge key={i} variant="outline" className="mr-1 mb-1 text-xs">
+                                  {suggestion}
+                                </Badge>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
                 </div>
-                
-                {/* Show results for completed demo */}
-                {demoResults[demo.id] && activeDemo === demo.id && (
-                  <div className="mt-4 p-4 bg-slate-900 rounded-lg border border-slate-600">
-                    <div className="space-y-2">
-                      {demoResults[demo.id].score && (
-                        <div className="flex items-center justify-between">
-                          <span className="text-sm text-muted-foreground">Score:</span>
-                          <Badge className="bg-electric-green/20 text-electric-green">{demoResults[demo.id].score}/1000</Badge>
-                        </div>
-                      )}
-                      {demoResults[demo.id].analysis && (
-                        <p className="text-xs text-muted-foreground">{demoResults[demo.id].analysis}</p>
-                      )}
-                      {demoResults[demo.id].suggestions && (
-                        <div className="mt-2">
-                          {demoResults[demo.id].suggestions?.map((suggestion, i) => (
-                            <Badge key={i} variant="outline" className="mr-1 mb-1 text-xs">
-                              {suggestion}
-                            </Badge>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      )}
+              )}
+            </div>
+          </div>
+          
+          <div className="mt-6 pt-4 border-t border-slate-700">
+            <div className="text-center">
+              <p className="text-sm text-gray-400 mb-2">
+                This is a live demo of FlutterAI's capabilities
+              </p>
+              <Button 
+                variant="outline" 
+                onClick={() => setIsOpen(false)}
+                className="border-slate-600 text-gray-300 hover:bg-slate-800"
+              >
+                Close Demo
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
