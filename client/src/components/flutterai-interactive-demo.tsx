@@ -74,55 +74,13 @@ export function FlutterAIInteractiveDemo() {
             </DialogTitle>
           </DialogHeader>
           
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
-            {/* Left Panel: Demo Features */}
-            <div className="space-y-4">
-              <h3 className="text-lg font-semibold mb-4">AI Intelligence Features:</h3>
-              
-              <Card className="bg-slate-800 border-slate-600">
-                <CardContent className="p-4">
-                  <div className="flex items-start gap-4">
-                    <Badge className="bg-electric-blue/20 text-electric-blue shrink-0">1</Badge>
-                    <div>
-                      <h4 className="font-bold text-white mb-2">Wallet Intelligence Scoring</h4>
-                      <p className="text-sm text-muted-foreground">Revolutionary credit score system for crypto wallets (1-1000 scale)</p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card className="bg-slate-800 border-slate-600">
-                <CardContent className="p-4">
-                  <div className="flex items-start gap-4">
-                    <Badge className="bg-purple-400/20 text-purple-400 shrink-0">2</Badge>
-                    <div>
-                      <h4 className="font-bold text-white mb-2">Behavioral Analytics</h4>
-                      <p className="text-sm text-muted-foreground">AI-powered pattern recognition across 11+ blockchains including Sui, XRP, Kaspa</p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card className="bg-slate-800 border-slate-600">
-                <CardContent className="p-4">
-                  <div className="flex items-start gap-4">
-                    <Badge className="bg-electric-green/20 text-electric-green shrink-0">3</Badge>
-                    <div>
-                      <h4 className="font-bold text-white mb-2">Predictive Intelligence</h4>
-                      <p className="text-sm text-muted-foreground">Advanced AI insights for portfolio optimization and risk assessment</p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-            
-            {/* Right Panel: Demo Results */}
-            <div className="space-y-4">
-              <h3 className="text-lg font-semibold mb-4">Live Demo Results:</h3>
-              
-              {isLoading ? (
-                <Card className="bg-electric-blue/10 border-electric-blue/30 min-h-[300px]">
-                  <CardContent className="p-6">
+          <div className="space-y-6 py-6">
+            <Card className="electric-frame border-2 border-electric-blue/30 min-h-[400px]">
+              <CardContent className="p-6">
+                <div className="space-y-4">
+                  <h3 className="text-xl font-bold text-white mb-4">🧠 AI Intelligence Analysis</h3>
+                  
+                  {isLoading ? (
                     <div className="space-y-4">
                       <div className="flex items-center gap-3">
                         <Loader2 className="w-5 h-5 text-electric-blue animate-spin" />
@@ -132,11 +90,7 @@ export function FlutterAIInteractiveDemo() {
                         Analyzing wallet intelligence, behavioral patterns, and predictive insights...
                       </div>
                     </div>
-                  </CardContent>
-                </Card>
-              ) : isCompleted ? (
-                <Card className="bg-green-400/10 border-green-400/30 min-h-[300px]">
-                  <CardContent className="p-6">
+                  ) : isCompleted ? (
                     <div className="space-y-3">
                       <h4 className="font-bold text-green-400 mb-3 flex items-center gap-2">
                         <CheckCircle className="w-5 h-5" />
@@ -172,17 +126,15 @@ export function FlutterAIInteractiveDemo() {
                         <div className="text-electric-blue text-xs font-medium">🚀 REVOLUTIONARY: Advanced AI intelligence system operational!</div>
                       </div>
                     </div>
-                  </CardContent>
-                </Card>
-              ) : (
-                <Card className="bg-slate-800/50 border border-slate-600 border-dashed min-h-[300px] flex items-center justify-center">
-                  <p className="text-gray-400 text-center">
-                    <Brain className="w-8 h-8 mx-auto mb-2 text-cyan-400" />
-                    Demo will auto-start...
-                  </p>
-                </Card>
-              )}
-            </div>
+                  ) : (
+                    <div className="text-center py-8">
+                      <Brain className="w-8 h-8 mx-auto mb-2 text-cyan-400" />
+                      <p className="text-gray-400">Demo will auto-start...</p>
+                    </div>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
           </div>
           
           <div className="mt-6 pt-4 border-t border-slate-700">
