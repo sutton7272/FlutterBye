@@ -197,22 +197,24 @@ export default function AdminSystem() {
 
   // Helper component for contextual help tooltips with improved visibility
   const HelpTooltip = ({ content, children }: { content: React.ReactNode; children: React.ReactNode }) => (
-    <Tooltip delayDuration={200}>
+    <Tooltip delayDuration={100}>
       <TooltipTrigger asChild>
-        <div className="flex items-center gap-2 cursor-help group">
+        <div className="flex items-center gap-2 cursor-help group hover:bg-blue-500/10 rounded px-2 py-1 transition-all">
           {children}
-          <HelpCircle className="h-4 w-4 text-blue-400 hover:text-blue-300 transition-colors opacity-80 group-hover:opacity-100 animate-pulse group-hover:animate-none" />
+          <div className="relative">
+            <HelpCircle className="h-5 w-5 text-blue-400 hover:text-blue-300 transition-all opacity-90 group-hover:opacity-100 animate-pulse group-hover:animate-none group-hover:scale-110" />
+            <div className="absolute -top-1 -right-1 w-2 h-2 bg-blue-400 rounded-full animate-ping"></div>
+          </div>
         </div>
       </TooltipTrigger>
       <TooltipContent 
         side="top" 
-        className="max-w-sm p-4 bg-slate-900 border-2 border-blue-500/50 shadow-2xl z-50 rounded-lg"
-        sideOffset={8}
+        className="max-w-sm p-4 bg-slate-900 border-2 border-blue-500/50 shadow-2xl z-[100] rounded-lg"
+        sideOffset={12}
       >
         <div className="text-sm text-white leading-relaxed">
           {content}
         </div>
-        <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 translate-y-2 w-0 h-0 border-l-4 border-r-4 border-t-8 border-transparent border-t-slate-900"></div>
       </TooltipContent>
     </Tooltip>
   );
@@ -327,6 +329,10 @@ export default function AdminSystem() {
         <div>
           <h1 className="text-3xl font-bold text-white">Systems Dashboard</h1>
           <p className="text-text-secondary mt-2">Control platform visibility, AI features, and operational costs</p>
+          <div className="mt-2 flex items-center gap-2 text-sm">
+            <HelpCircle className="h-4 w-4 text-blue-400 animate-pulse" />
+            <span className="text-blue-400">Hover over blue help icons (?) for detailed explanations</span>
+          </div>
           <div className="mt-4 flex items-center gap-4">
             <Button
               variant="outline"
@@ -494,10 +500,18 @@ export default function AdminSystem() {
                   <CardDescription>Quickly disable high-cost features to reduce expenses</CardDescription>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Badge variant="outline" className="text-red-400 border-red-400">
-                    <DollarSign className="h-4 w-4 mr-2" />
-                    High Cost Features
-                  </Badge>
+                  <HelpTooltip content={
+                    <div className="space-y-2">
+                      <div className="font-semibold text-yellow-400">Cost Management Badge</div>
+                      <div>This section contains features with the highest operational costs. Quick toggles are provided for emergency cost reduction.</div>
+                      <div className="text-xs text-gray-400">Total potential monthly savings: $1,580 by disabling all high-cost features</div>
+                    </div>
+                  }>
+                    <Badge variant="outline" className="text-red-400 border-red-400">
+                      <DollarSign className="h-4 w-4 mr-2" />
+                      High Cost Features
+                    </Badge>
+                  </HelpTooltip>
                   <Button 
                     size="sm" 
                     onClick={async () => {
@@ -626,10 +640,18 @@ export default function AdminSystem() {
               </div>
               
               <div className="mt-6 p-4 border border-yellow-400 rounded-lg bg-yellow-500/10">
-                <h3 className="font-bold text-white mb-2 flex items-center gap-2">
-                  <Calculator className="h-4 w-4" />
-                  Cost Impact Analysis
-                </h3>
+                <HelpTooltip content={
+                  <div className="space-y-2">
+                    <div className="font-semibold text-yellow-400">Real-time Cost Impact</div>
+                    <div>Live calculation of monthly savings based on current toggle states. Helps visualize immediate financial impact.</div>
+                    <div className="text-xs text-gray-400">Updates automatically when features are enabled/disabled</div>
+                  </div>
+                }>
+                  <h3 className="font-bold text-white mb-2 flex items-center gap-2">
+                    <Calculator className="h-4 w-4" />
+                    Cost Impact Analysis
+                  </h3>
+                </HelpTooltip>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
                   <div>
                     <span className="text-text-secondary">FlutterArt Status:</span>
