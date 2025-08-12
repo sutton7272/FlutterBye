@@ -184,23 +184,36 @@ export default function Mint({ tokenType }: MintProps = {}) {
       setShowMintingProgress(false);
       setMintingStep("");
       
-      // Show confetti celebration
+      console.log('Token creation success data:', data);
+      
+      // Show confetti celebration with detailed token info
       setSuccessData({
         message: message,
-        amount: `${mintAmount} tokens${attachValue ? ` • ${attachedValue} ${currency} value` : ''}`,
-        type: 'Token Mint',
+        amount: `${mintAmount} tokens • Mint: ${data.mintAddress?.slice(0, 8)}...${data.mintAddress?.slice(-4)}`,
+        type: 'FLBY-MSG Token Created',
         wasFreeMint: isFreeMode,
         redemptionCode: validatedCode?.code,
         transactionUrl: data.blockchainUrl
       });
       setShowSuccessOverlay(true);
       
-      // Show success toast with token details
+      // Show detailed success toast
       toast({
-        title: "Token Created Successfully! 🎉",
-        description: `"${message}" minted with address: ${data.mintAddress?.slice(0, 8)}...`,
-        duration: 5000,
+        title: "🎉 Token Created Successfully!",
+        description: (
+          <div className="space-y-2">
+            <div>Message: "{message}"</div>
+            <div>Mint Address: {data.mintAddress}</div>
+            <div>Transaction: {data.transactionSignature?.slice(0, 16)}...</div>
+          </div>
+        ),
+        duration: 8000,
       });
+      
+      // Auto-trigger share modal after 3 seconds
+      setTimeout(() => {
+        setShowShareModal(true);
+      }, 3000);
       
       // Reset form
       setMessage("");
