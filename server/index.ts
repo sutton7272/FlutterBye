@@ -99,14 +99,19 @@ app.use((req, res, next) => {
     console.error('Server error:', err);
   });
 
-  // Setup vite for development AND DevNet environments
-  // DevNet deployment should still use vite for dynamic serving
-  const isProduction = process.env.NODE_ENV === 'production' && !process.env.REPLIT_DOMAINS;
+  // Add fallback route for DevNet deployment
+  app.get('/fallback', (req, res) => {
+    res.sendFile(path.resolve(import.meta.dirname, '..', 'public', 'index.html'));
+  });
+
+  // For DevNet deployment, always use Vite for proper development serving
+  // Only use static serving for true production builds
+  const useStaticServing = process.env.NODE_ENV === 'production' && process.env.BUILD_STATIC === 'true';
   
-  if (!isProduction) {
-    await setupVite(app, server);
-  } else {
+  if (useStaticServing) {
     serveStatic(app);
+  } else {
+    await setupVite(app, server);
   }
 
   // ALWAYS serve the app on the port specified in the environment variable PORT
