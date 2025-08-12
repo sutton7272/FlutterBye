@@ -127,10 +127,9 @@ export default function Create() {
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-3 bg-slate-800/50 border border-electric-blue/20">
+          <TabsList className="grid w-full grid-cols-2 bg-slate-800/50 border border-electric-blue/20">
             <TabsTrigger value="tokens">Token Creation</TabsTrigger>
             <TabsTrigger value="ai-tools">AI Tools</TabsTrigger>
-            <TabsTrigger value="advanced">Advanced</TabsTrigger>
           </TabsList>
 
           <TabsContent value="tokens" className="space-y-6">
@@ -229,78 +228,7 @@ export default function Create() {
             </div>
           </TabsContent>
 
-          <TabsContent value="advanced" className="space-y-6">
-            <div className="text-center mb-6">
-              <h2 className="text-2xl font-bold text-white mb-2">Advanced Creation Tools</h2>
-              <p className="text-gray-300">Unlock powerful features for sophisticated token creation</p>
-            </div>
-            
-            {/* Advanced Creation Tools */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              <Link href="/collaborative-creation">
-                <Card className="group hover:shadow-xl transition-all duration-300 cursor-pointer h-full bg-slate-800/40 border border-electric-green/30 hover:border-electric-green/60 electric-frame">
-                  <CardHeader className="text-center space-y-4">
-                    <div className="mx-auto p-3 rounded-lg bg-electric-green/10 group-hover:bg-electric-green/20 transition-colors border border-electric-green/20 w-fit">
-                      <Users className="h-8 w-8 text-electric-green" />
-                    </div>
-                    <div>
-                      <CardTitle className="text-white group-hover:text-electric-green transition-colors">Collaborative Creation</CardTitle>
-                      <CardDescription className="text-gray-300">Create tokens with multiple contributors</CardDescription>
-                    </div>
-                  </CardHeader>
-                </Card>
-              </Link>
 
-              <Link href="/limited-edition">
-                <Card className="group hover:shadow-xl transition-all duration-300 cursor-pointer h-full bg-slate-800/40 border border-yellow-400/30 hover:border-yellow-400/60 electric-frame">
-                  <CardHeader className="text-center space-y-4">
-                    <div className="mx-auto p-3 rounded-lg bg-yellow-400/10 group-hover:bg-yellow-400/20 transition-colors border border-yellow-400/20 w-fit">
-                      <Star className="h-8 w-8 text-yellow-400" />
-                    </div>
-                    <div>
-                      <CardTitle className="text-white group-hover:text-yellow-400 transition-colors">Limited Edition Sets</CardTitle>
-                      <CardDescription className="text-gray-300">Create exclusive token collections</CardDescription>
-                    </div>
-                  </CardHeader>
-                </Card>
-              </Link>
-
-              <Link href="/message-nfts">
-                <Card className="group hover:shadow-xl transition-all duration-300 cursor-pointer h-full bg-slate-800/40 border border-pink-400/30 hover:border-pink-400/60 electric-frame">
-                  <CardHeader className="text-center space-y-4">
-                    <div className="mx-auto p-3 rounded-lg bg-pink-400/10 group-hover:bg-pink-400/20 transition-colors border border-pink-400/20 w-fit">
-                      <Palette className="h-8 w-8 text-pink-400" />
-                    </div>
-                    <div>
-                      <CardTitle className="text-white group-hover:text-pink-400 transition-colors">NFT Messages</CardTitle>
-                      <CardDescription className="text-gray-300">Create artistic message NFTs</CardDescription>
-                    </div>
-                  </CardHeader>
-                </Card>
-              </Link>
-            </div>
-
-            {/* Voice Recording - Enhanced */}
-            <Card className="bg-slate-800/40 border border-electric-green/30 electric-frame">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-3 text-white">
-                  <div className="p-2 rounded-lg bg-electric-green/10 border border-electric-green/20">
-                    <Mic className="h-5 w-5 text-electric-green" />
-                  </div>
-                  Voice Message Creator
-                </CardTitle>
-                <CardDescription className="text-gray-300">
-                  Record emotional voice messages and turn them into blockchain tokens
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <VoiceMessageRecorder onVoiceRecord={(audioData) => {
-                  console.log('Voice message recorded:', audioData);
-                  // Handle the voice message attachment
-                }} />
-              </CardContent>
-            </Card>
-          </TabsContent>
         </Tabs>
 
         {/* Contextual Chat Button */}
