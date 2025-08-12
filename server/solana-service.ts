@@ -8,7 +8,7 @@ import {
   getAssociatedTokenAddress,
   createAssociatedTokenAccountInstruction
 } from '@solana/spl-token';
-import { Metaplex, keypairIdentity, bundlrStorage } from '@metaplex-foundation/js';
+import { Metaplex, keypairIdentity } from '@metaplex-foundation/js';
 import bs58 from 'bs58';
 
 export class SolanaBackendService {
@@ -34,7 +34,7 @@ export class SolanaBackendService {
     }
   }
 
-  // Create FLBY-MSG token on DevNet with optimized distribution
+  // Create FLBY-MSG token on DevNet with Metaplex metadata for wallet compatibility
   async createFlutterbyeToken(params: {
     message: string;
     totalSupply: number;
@@ -43,86 +43,44 @@ export class SolanaBackendService {
     distributionWallets?: string[]; // Wallets to receive 1 token each
   }) {
     try {
+      console.log('Creating SPL token with params:', {
+        message: params.message,
+        totalSupply: params.totalSupply,
+        recipientWallets: params.recipientWallets,
+        creatorWallet: params.targetWallet
+      });
+
       // Generate new mint keypair
       const mintKeypair = Keypair.generate();
+      console.log('Creating SPL token:', mintKeypair.publicKey.toString());
       
-      // Define token metadata - Use message as token name for wallet display
-      const metadata: TokenMetadata = {
-        mint: mintKeypair.publicKey,
-        name: params.message.slice(0, 32), // Token name shown in wallets (limit to 32 chars)
-        symbol: "FLBY-MSG",
-        uri: `https://${process.env.REPLIT_DOMAINS?.split(',')[0] || 'localhost:5000'}/api/metadata/${mintKeypair.publicKey.toString()}`,
-        additionalMetadata: [
-          ["message", params.message],
-          ["totalSupply", params.totalSupply.toString()],
-          ["tokenType", "FLBY-MSG"],
-          ["description", `Flutterbye Message Token: "${params.message}"`]
-        ],
-      };
-
-      // Calculate space needed for mint with metadata extension
-      const metadataExtension = TYPE_SIZE + LENGTH_SIZE + pack(metadata).length;
-      const mintLen = getMintLen([ExtensionType.MetadataPointer]);
-      const lamports = await this.connection.getMinimumBalanceForRentExemption(
-        mintLen + metadataExtension
-      );
+      // Get rent exemption for mint account
+      const lamports = await getMinimumBalanceForRentExemptMint(this.connection);
       
-      // Create transaction
+      // Create transaction with standard SPL token instructions
       const transaction = new Transaction();
       
-      // Add create mint account instruction for Token-2022
+      // Create mint account
       transaction.add(
         SystemProgram.createAccount({
           fromPubkey: this.keypair.publicKey,
           newAccountPubkey: mintKeypair.publicKey,
-          space: mintLen + metadataExtension,
+          space: MINT_SIZE,
           lamports,
-          programId: TOKEN_2022_PROGRAM_ID,
+          programId: TOKEN_PROGRAM_ID,
         })
       );
-
-      // Add initialize metadata pointer instruction
-      transaction.add(
-        createInitializeMetadataPointerInstruction(
-          mintKeypair.publicKey,
-          this.keypair.publicKey,
-          mintKeypair.publicKey, // Metadata account same as mint
-          TOKEN_2022_PROGRAM_ID
-        )
-      );
       
-      // Add initialize mint instruction (0 decimals for whole numbers only)
+      // Initialize mint (0 decimals for whole number tokens)
       transaction.add(
         createInitializeMintInstruction(
           mintKeypair.publicKey,
           0, // Decimals = 0 for whole number tokens
-          this.keypair.publicKey,
-          this.keypair.publicKey,
-          TOKEN_2022_PROGRAM_ID
+          this.keypair.publicKey, // Mint authority
+          this.keypair.publicKey, // Freeze authority
+          TOKEN_PROGRAM_ID
         )
       );
-
-      // Add initialize metadata instruction
-      transaction.add(
-        createInitializeInstruction({
-          programId: TOKEN_2022_PROGRAM_ID,
-          mint: mintKeypair.publicKey,
-          metadata: mintKeypair.publicKey,
-          name: metadata.name,
-          symbol: metadata.symbol,
-          uri: metadata.uri,
-          mintAuthority: this.keypair.publicKey,
-          updateAuthority: this.keypair.publicKey,
-        })
-      );
-
-      // Add additional metadata fields
-      for (const [key, value] of metadata.additionalMetadata || []) {
-        transaction.add(
-          createUpdateFieldInstruction({
-            programId: TOKEN_2022_PROGRAM_ID,
-            metadata: mintKeypair.publicKey,
-            updateAuthority: this.keypair.publicKey,
             field: key,
             value,
           })
@@ -171,17 +129,17 @@ export class SolanaBackendService {
           mintKeypair.publicKey,
           recipientPubkey,
           false,
-          TOKEN_2022_PROGRAM_ID
+          TOKEN_PROGRAM_ID
         );
 
-        // Create associated token account for Token-2022
+        // Create associated token account for standard SPL token
         transaction.add(
           createAssociatedTokenAccountInstruction(
             this.keypair.publicKey,
             associatedTokenAddress,
             recipientPubkey,
             mintKeypair.publicKey,
-            TOKEN_2022_PROGRAM_ID
+            TOKEN_PROGRAM_ID
           )
         );
 
@@ -193,7 +151,7 @@ export class SolanaBackendService {
             this.keypair.publicKey,
             1, // Always 1 token per distribution wallet
             [],
-            TOKEN_2022_PROGRAM_ID
+            TOKEN_PROGRAM_ID
           )
         );
       }
@@ -205,17 +163,17 @@ export class SolanaBackendService {
           mintKeypair.publicKey,
           minterPubkey,
           false,
-          TOKEN_2022_PROGRAM_ID
+          TOKEN_PROGRAM_ID
         );
 
-        // Create associated token account for minter (Token-2022)
+        // Create associated token account for minter (standard SPL token)
         transaction.add(
           createAssociatedTokenAccountInstruction(
             this.keypair.publicKey,
             minterTokenAddress,
             minterPubkey,
             mintKeypair.publicKey,
-            TOKEN_2022_PROGRAM_ID
+            TOKEN_PROGRAM_ID
           )
         );
 
@@ -227,7 +185,7 @@ export class SolanaBackendService {
             this.keypair.publicKey,
             surplusTokens,
             [],
-            TOKEN_2022_PROGRAM_ID
+            TOKEN_PROGRAM_ID
           )
         );
       }
@@ -245,6 +203,27 @@ export class SolanaBackendService {
       
       // Confirm transaction
       await this.connection.confirmTransaction(signature, 'confirmed');
+
+      // Create Metaplex metadata for wallet compatibility
+      try {
+        const metaplex = Metaplex.make(this.connection)
+          .use(keypairIdentity(this.keypair));
+
+        // Create metadata using Metaplex for proper wallet display
+        await metaplex.nfts().create({
+          uri: `https://${process.env.REPLIT_DOMAINS?.split(',')[0] || 'localhost:5000'}/api/metadata/${mintKeypair.publicKey.toString()}`,
+          name: params.message.slice(0, 32), // Token name (truncated to 32 chars)
+          symbol: "FLBY-MSG",
+          sellerFeeBasisPoints: 0,
+          useExistingMint: mintKeypair.publicKey,
+          updateAuthority: this.keypair,
+        });
+
+        console.log('✅ Metaplex metadata created for:', mintKeypair.publicKey.toString());
+      } catch (metadataError) {
+        console.warn('⚠️ Metaplex metadata creation failed (token still created):', metadataError);
+        // Continue even if metadata fails - token is still functional
+      }
 
       return {
         mintAddress: mintKeypair.publicKey.toString(),
@@ -274,12 +253,12 @@ export class SolanaBackendService {
     imageUrl?: string;
   }) {
     return {
-      name: "FLBY-MSG",
+      name: params.message.slice(0, 32), // Use message as token name for wallet display
       symbol: "FLBY-MSG", 
       description: `Flutterbye Message Token: "${params.message}"`,
-      image: params.imageUrl || "https://flutterbye.app/assets/token-icon.png",
+      image: params.imageUrl || `https://${process.env.REPLIT_DOMAINS?.split(',')[0] || 'localhost:5000'}/butterfly-logo.png`,
       animation_url: "",
-      external_url: "https://flutterbye.app",
+      external_url: `https://${process.env.REPLIT_DOMAINS?.split(',')[0] || 'localhost:5000'}/token/${params.mintAddress}`,
       attributes: [
         {
           trait_type: "Message",
@@ -297,7 +276,7 @@ export class SolanaBackendService {
       properties: {
         files: [
           {
-            uri: params.imageUrl || "https://flutterbye.app/assets/token-icon.png",
+            uri: params.imageUrl || `https://${process.env.REPLIT_DOMAINS?.split(',')[0] || 'localhost:5000'}/butterfly-logo.png`,
             type: "image/png"
           }
         ],
