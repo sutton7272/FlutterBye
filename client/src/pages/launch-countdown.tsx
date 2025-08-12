@@ -360,9 +360,6 @@ export default function LaunchCountdown() {
             <div className="butterfly butterfly-1">🦋</div>
             <div className="butterfly butterfly-2">🦋</div>
             <div className="butterfly butterfly-3">🦋</div>
-            <div className="butterfly butterfly-4">🦋</div>
-            <div className="butterfly butterfly-5">🦋</div>
-            <div className="butterfly butterfly-6">🦋</div>
           </div>
           
           <div className="flex items-center justify-center gap-4 mb-6 relative z-10">
