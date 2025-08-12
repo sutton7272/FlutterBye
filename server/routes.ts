@@ -1352,6 +1352,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (tokenData.message.length > 27) {
         return res.status(400).json({ message: "Message must be 27 characters or less" });
       }
+      
+      // Validate whole number tokens BEFORE any blockchain operations
+      if (!Number.isInteger(tokenData.totalSupply) || tokenData.totalSupply <= 0) {
+        return res.status(400).json({ message: "Total supply must be a whole number greater than 0" });
+      }
       // Import Solana service (standard SPL tokens)
       const { SolanaService } = await import("./solana-service");
       const solanaService = new SolanaService();
@@ -1373,10 +1378,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
           message: "Failed to mint token on Solana blockchain",
           error: solanaResult.error 
         });
-      }
-      // Validate whole number tokens  
-      if (!Number.isInteger(tokenData.totalSupply) || tokenData.totalSupply <= 0) {
-        return res.status(400).json({ message: "Total supply must be a whole number greater than 0" });
       }
       
       // Create token with blockchain data using actual schema fields
