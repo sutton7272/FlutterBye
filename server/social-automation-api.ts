@@ -147,17 +147,17 @@ export function registerSocialAutomationAPI(app: Express) {
             return hours * 60 + minutes;
           };
 
-          // Get current time in EST (UTC-5)
+          // Get current time in EDT (UTC-4, since it's daylight saving time)
           const now = new Date();
           const utcHour = now.getUTCHours();
           const utcMinute = now.getUTCMinutes();
           
-          // Convert UTC to EST (UTC-5)
-          const estHour = (utcHour - 5 + 24) % 24;
-          const currentTime = estHour * 60 + utcMinute;
+          // Convert UTC to EDT (UTC-4) - Daylight Saving Time
+          const edtHour = (utcHour - 4 + 24) % 24;
+          const currentTime = edtHour * 60 + utcMinute;
           
           console.log(`⏰ Current UTC time: ${utcHour}:${utcMinute.toString().padStart(2, '0')}`);
-          console.log(`⏰ Current EST time: ${estHour}:${utcMinute.toString().padStart(2, '0')} (${currentTime} minutes from midnight)`);
+          console.log(`⏰ Current EDT time: ${edtHour}:${utcMinute.toString().padStart(2, '0')} (${currentTime} minutes from midnight)`);
 
           // Convert all slots to 24-hour format and sort
           const sortedSlots = enabledSlots
@@ -168,14 +168,19 @@ export function registerSocialAutomationAPI(app: Express) {
             })
             .sort((a, b) => a.timeInMinutes - b.timeInMinutes);
           
-          // Find next slot after current time
+          // Find next slot that is AFTER current time (not equal)
           let nextSlot = sortedSlots.find(slot => slot.timeInMinutes > currentTime);
           let isToday = true;
           
-          // If no slot today, take first slot tomorrow
+          console.log(`🔍 Current time: ${currentTime} minutes, looking for slots > ${currentTime}`);
+          
+          // If no slot today (all slots are in the past), take first slot tomorrow
           if (!nextSlot) {
             nextSlot = sortedSlots[0];
             isToday = false;
+            console.log(`📅 No more slots today, next slot tomorrow: ${nextSlot.config.time}`);
+          } else {
+            console.log(`📅 Found next slot today: ${nextSlot.config.time} at ${nextSlot.timeInMinutes} minutes`);
           }
           
           if (nextSlot) {
@@ -195,8 +200,8 @@ export function registerSocialAutomationAPI(app: Express) {
             nextPostTime = {
               countdown: `${hours}h ${mins}m`,
               scheduled: isToday ? 
-                `Today at ${nextSlot.config.time} EST` : 
-                `Tomorrow at ${nextSlot.config.time} EST`,
+                `Today at ${nextSlot.config.time} EDT` : 
+                `Tomorrow at ${nextSlot.config.time} EDT`,
               platform: "Twitter",
               contentType: "AI Generated"
             };
