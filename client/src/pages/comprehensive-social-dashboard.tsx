@@ -148,26 +148,31 @@ function ScheduleConfigDialog() {
   const saveSchedule = async () => {
     setSaving(true);
     try {
-      // Save to backend
       const response = await fetch('/api/social-automation/schedule', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ schedule: scheduleState })
       });
 
-      if (response.ok) {
+      const result = await response.json();
+
+      if (result.success) {
         toast({
-          title: "Schedule Saved",
-          description: "Your posting schedule has been saved successfully",
+          title: "Schedule Saved Successfully",
+          description: `${result.message} - Dashboard will update automatically.`,
         });
         setOpen(false);
+        
+        // Trigger dashboard refresh
+        window.dispatchEvent(new CustomEvent('scheduleUpdated'));
       } else {
-        throw new Error('Failed to save schedule');
+        throw new Error(result.error || 'Failed to save schedule');
       }
     } catch (error) {
+      console.error('Save error:', error);
       toast({
-        title: "Error",
-        description: "Failed to save posting schedule",
+        title: "Save Failed",
+        description: error.message || "Failed to save posting schedule",
         variant: "destructive"
       });
     } finally {
@@ -2551,9 +2556,21 @@ function DashboardOverview() {
     };
 
     fetchDashboardData();
+    
+    // Listen for schedule updates
+    const handleScheduleUpdate = () => {
+      fetchDashboardData();
+    };
+    
+    window.addEventListener('scheduleUpdated', handleScheduleUpdate);
+    
     // Refresh every 30 seconds
     const interval = setInterval(fetchDashboardData, 30000);
-    return () => clearInterval(interval);
+    
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener('scheduleUpdated', handleScheduleUpdate);
+    };
   }, []);
 
   return (
