@@ -160,23 +160,7 @@ export function registerSocialAutomationAPI(app: Express) {
     }
   });
 
-  app.get('/api/social-automation/bot/status', async (req, res) => {
-    try {
-      res.json({ 
-        success: true, 
-        botEnabled,
-        hasSchedule: savedSchedule !== null,
-        enabledSlots: savedSchedule ? 
-          Object.values(savedSchedule).filter((config: any) => config.enabled).length : 0
-      });
-    } catch (error) {
-      console.error('Error getting bot status:', error);
-      res.status(500).json({ 
-        success: false, 
-        error: 'Failed to get bot status' 
-      });
-    }
-  });
+
 
   app.get('/api/social-automation/schedule', async (req, res) => {
     try {
@@ -1315,7 +1299,7 @@ export function registerSocialAutomationAPI(app: Express) {
     }
   });
 
-  // Enhanced Bot Status with Diagnostics
+  // Enhanced Bot Status with Diagnostics (replaces the basic bot/status endpoint)
   app.get('/api/social-automation/bot-status', async (req, res) => {
     try {
       const enabledSlots = savedSchedule ? 
