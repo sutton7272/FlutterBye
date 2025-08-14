@@ -78,25 +78,33 @@ export class SocialPasswordAutomation {
       
       // Navigate to Twitter login
       await page.goto('https://twitter.com/login', { waitUntil: 'networkidle0' });
-      await page.waitForTimeout(2000);
+      await new Promise(resolve => setTimeout(resolve, 2000));
 
       // Enter username/email
       const usernameSelector = 'input[name="text"]';
       await page.waitForSelector(usernameSelector);
       await page.type(usernameSelector, credentials.username);
       
-      // Click Next
-      await page.click('[role="button"]:has-text("Next")');
-      await page.waitForTimeout(2000);
+      // Click Next button
+      await page.evaluate(() => {
+        const buttons = Array.from(document.querySelectorAll('[role="button"]'));
+        const nextButton = buttons.find(btn => btn.textContent?.includes('Next'));
+        if (nextButton) nextButton.click();
+      });
+      await new Promise(resolve => setTimeout(resolve, 2000));
 
       // Enter password
       const passwordSelector = 'input[name="password"]';
       await page.waitForSelector(passwordSelector);
       await page.type(passwordSelector, credentials.password);
       
-      // Click Log in
-      await page.click('[role="button"]:has-text("Log in")');
-      await page.waitForTimeout(5000);
+      // Click Log in button
+      await page.evaluate(() => {
+        const buttons = Array.from(document.querySelectorAll('[role="button"]'));
+        const loginButton = buttons.find(btn => btn.textContent?.includes('Log in'));
+        if (loginButton) loginButton.click();
+      });
+      await new Promise(resolve => setTimeout(resolve, 5000));
 
       // Check if login successful by looking for compose button
       try {
@@ -107,7 +115,7 @@ export class SocialPasswordAutomation {
 
       // Click compose tweet button
       await page.click('[data-testid="SideNav_NewTweet_Button"]');
-      await page.waitForTimeout(2000);
+      await new Promise(resolve => setTimeout(resolve, 2000));
 
       // Type the tweet content
       const tweetTextSelector = '[data-testid="tweetTextarea_0"]';
@@ -120,13 +128,13 @@ export class SocialPasswordAutomation {
         const imageInput = await page.$('input[data-testid="fileInput"]');
         if (imageInput) {
           await imageInput.uploadFile(postContent.imagePath);
-          await page.waitForTimeout(3000); // Wait for image to process
+          await new Promise(resolve => setTimeout(resolve, 3000)); // Wait for image to process
         }
       }
 
       // Tweet the post
       await page.click('[data-testid="tweetButtonInline"]');
-      await page.waitForTimeout(3000);
+      await new Promise(resolve => setTimeout(resolve, 3000));
 
       return { success: true, message: 'Tweet posted successfully!' };
       
