@@ -10,6 +10,12 @@ export class TwitterAPIService {
   private client: TwitterApi;
 
   constructor() {
+    console.log('🔍 Checking Twitter API credentials...');
+    console.log('API_KEY exists:', !!process.env.TWITTER_API_KEY);
+    console.log('API_SECRET exists:', !!process.env.TWITTER_API_SECRET);
+    console.log('ACCESS_TOKEN exists:', !!process.env.TWITTER_ACCESS_TOKEN);
+    console.log('ACCESS_TOKEN_SECRET exists:', !!process.env.TWITTER_ACCESS_TOKEN_SECRET);
+    
     if (!process.env.TWITTER_API_KEY || !process.env.TWITTER_API_SECRET || 
         !process.env.TWITTER_ACCESS_TOKEN || !process.env.TWITTER_ACCESS_TOKEN_SECRET) {
       throw new Error('Twitter API credentials not found');
