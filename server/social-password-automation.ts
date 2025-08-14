@@ -59,8 +59,17 @@ export class SocialPasswordAutomation {
   // Twitter automation with password login
   async postToTwitter(credentials: SocialCredentials, postContent: PostContent): Promise<{success: boolean, message: string}> {
     const browser = await puppeteer.launch({ 
-      headless: false, // Show browser for debugging
-      args: ['--no-sandbox', '--disable-setuid-sandbox']
+      headless: true, // Run headless for server environment
+      executablePath: process.env.PUPPETEER_EXECUTABLE_PATH || 'chromium',
+      args: [
+        '--no-sandbox', 
+        '--disable-setuid-sandbox',
+        '--disable-dev-shm-usage',
+        '--disable-accelerated-2d-canvas',
+        '--no-first-run',
+        '--no-zygote',
+        '--disable-gpu'
+      ]
     });
     
     try {
