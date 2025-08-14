@@ -730,6 +730,13 @@ function EngagementAccountsContent() {
   const { toast } = useToast();
   const [accounts, setAccounts] = useState<any[]>([]);
   const [showAddAccount, setShowAddAccount] = useState(false);
+  const [targetAccounts, setTargetAccounts] = useState<any[]>([]);
+  const [showAddTarget, setShowAddTarget] = useState(false);
+  const [newTargetAccount, setNewTargetAccount] = useState({
+    username: '',
+    platform: 'Twitter',
+    engagementType: 'all'
+  });
 
   const mockAccounts = [
     {
@@ -742,6 +749,36 @@ function EngagementAccountsContent() {
       followers: 15420,
       following: 892,
       posts: 1247
+    }
+  ];
+
+  const mockTargetAccounts = [
+    {
+      id: '1',
+      username: '@elonmusk',
+      platform: 'Twitter',
+      engagementType: 'all',
+      isActive: true,
+      addedDate: '2025-01-14T10:00:00Z',
+      interactions: 47
+    },
+    {
+      id: '2',
+      username: '@satyanadella',
+      platform: 'Twitter',
+      engagementType: 'likes',
+      isActive: true,
+      addedDate: '2025-01-13T15:30:00Z',
+      interactions: 23
+    },
+    {
+      id: '3',
+      username: '@sundarpichai',
+      platform: 'Twitter',
+      engagementType: 'comments',
+      isActive: false,
+      addedDate: '2025-01-12T09:15:00Z',
+      interactions: 15
     }
   ];
 
@@ -765,6 +802,7 @@ function EngagementAccountsContent() {
 
   useEffect(() => {
     setAccounts(mockAccounts);
+    setTargetAccounts(mockTargetAccounts);
   }, []);
 
   const handleAddAccount = () => {
@@ -774,13 +812,118 @@ function EngagementAccountsContent() {
     });
   };
 
+  const handleAddTargetAccount = async () => {
+    if (!newTargetAccount.username.trim()) {
+      toast({
+        title: "Error",
+        description: "Please enter a username",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    try {
+      const response = await fetch('/api/social-automation/target-accounts', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          username: newTargetAccount.username.startsWith('@') ? newTargetAccount.username : `@${newTargetAccount.username}`,
+          platform: newTargetAccount.platform,
+          engagementType: newTargetAccount.engagementType
+        })
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        if (result.success) {
+          setTargetAccounts(prev => [...prev, {
+            id: Date.now().toString(),
+            username: newTargetAccount.username.startsWith('@') ? newTargetAccount.username : `@${newTargetAccount.username}`,
+            platform: newTargetAccount.platform,
+            engagementType: newTargetAccount.engagementType,
+            isActive: true,
+            addedDate: new Date().toISOString(),
+            interactions: 0
+          }]);
+          setNewTargetAccount({ username: '', platform: 'Twitter', engagementType: 'all' });
+          setShowAddTarget(false);
+          toast({
+            title: "Target Account Added",
+            description: `${newTargetAccount.username} has been added to your engagement targets`,
+          });
+        }
+      } else {
+        throw new Error('Failed to add target account');
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to add target account. Please try again.",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handleToggleTargetAccount = async (accountId: string) => {
+    try {
+      const account = targetAccounts.find(acc => acc.id === accountId);
+      const response = await fetch(`/api/social-automation/target-accounts/${accountId}/toggle`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ isActive: !account.isActive })
+      });
+
+      if (response.ok) {
+        setTargetAccounts(prev => 
+          prev.map(acc => 
+            acc.id === accountId ? { ...acc, isActive: !acc.isActive } : acc
+          )
+        );
+        toast({
+          title: "Updated",
+          description: `Target account ${!account.isActive ? 'activated' : 'deactivated'}`,
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to update target account status",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handleRemoveTargetAccount = async (accountId: string) => {
+    try {
+      const response = await fetch(`/api/social-automation/target-accounts/${accountId}`, {
+        method: 'DELETE'
+      });
+
+      if (response.ok) {
+        setTargetAccounts(prev => prev.filter(acc => acc.id !== accountId));
+        toast({
+          title: "Removed",
+          description: "Target account has been removed",
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to remove target account",
+        variant: "destructive"
+      });
+    }
+  };
+
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h3 className="text-xl font-semibold text-white">Connected Accounts</h3>
-          <p className="text-slate-400">Manage your social media accounts for automation</p>
-        </div>
+    <div className="space-y-8">
+      {/* Connected Accounts Section */}
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <h3 className="text-xl font-semibold text-white">Connected Accounts</h3>
+            <p className="text-slate-400">Manage your social media accounts for automation</p>
+          </div>
         <Dialog open={showAddAccount} onOpenChange={setShowAddAccount}>
           <DialogTrigger asChild>
             <Button className="bg-blue-600 hover:bg-blue-700">
@@ -863,6 +1006,184 @@ function EngagementAccountsContent() {
             </Card>
           );
         })}
+      </div>
+      </div>
+
+      {/* Target Accounts for Bot Interaction Section */}
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <h3 className="text-xl font-semibold text-white">Target Accounts for Bot Interaction</h3>
+            <p className="text-slate-400">Add accounts for your bot to engage with automatically</p>
+          </div>
+          <Dialog open={showAddTarget} onOpenChange={setShowAddTarget}>
+            <DialogTrigger asChild>
+              <Button className="bg-green-600 hover:bg-green-700" data-testid="add-target-account-button">
+                <Target className="w-4 h-4 mr-2" />
+                Add Target Account
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="bg-slate-800 border-slate-700">
+              <DialogHeader>
+                <DialogTitle>Add Target Account for Engagement</DialogTitle>
+                <p className="text-slate-400 text-sm">
+                  The bot will automatically interact with posts from this account
+                </p>
+              </DialogHeader>
+              <div className="space-y-4">
+                <div>
+                  <Label htmlFor="target-username">Username</Label>
+                  <Input
+                    id="target-username"
+                    placeholder="@username (without @)"
+                    value={newTargetAccount.username}
+                    onChange={(e) => setNewTargetAccount(prev => ({ ...prev, username: e.target.value }))}
+                    className="bg-slate-700 border-slate-600"
+                    data-testid="target-username-input"
+                  />
+                </div>
+                
+                <div>
+                  <Label htmlFor="target-platform">Platform</Label>
+                  <Select 
+                    value={newTargetAccount.platform} 
+                    onValueChange={(value) => setNewTargetAccount(prev => ({ ...prev, platform: value }))}
+                  >
+                    <SelectTrigger className="bg-slate-700 border-slate-600" data-testid="target-platform-select">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent className="bg-slate-700 border-slate-600">
+                      <SelectItem value="Twitter">Twitter</SelectItem>
+                      <SelectItem value="Instagram">Instagram</SelectItem>
+                      <SelectItem value="LinkedIn">LinkedIn</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div>
+                  <Label htmlFor="engagement-type">Engagement Type</Label>
+                  <Select 
+                    value={newTargetAccount.engagementType} 
+                    onValueChange={(value) => setNewTargetAccount(prev => ({ ...prev, engagementType: value }))}
+                  >
+                    <SelectTrigger className="bg-slate-700 border-slate-600" data-testid="engagement-type-select">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent className="bg-slate-700 border-slate-600">
+                      <SelectItem value="all">All (Likes, Comments, Retweets)</SelectItem>
+                      <SelectItem value="likes">Likes Only</SelectItem>
+                      <SelectItem value="comments">Comments Only</SelectItem>
+                      <SelectItem value="retweets">Retweets Only</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="flex gap-3 pt-4">
+                  <Button 
+                    variant="outline" 
+                    onClick={() => setShowAddTarget(false)}
+                    className="flex-1"
+                  >
+                    Cancel
+                  </Button>
+                  <Button 
+                    onClick={handleAddTargetAccount}
+                    className="flex-1 bg-green-600 hover:bg-green-700"
+                    data-testid="add-target-confirm-button"
+                  >
+                    Add Target
+                  </Button>
+                </div>
+              </div>
+            </DialogContent>
+          </Dialog>
+        </div>
+
+        {/* Target Accounts List */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {targetAccounts.map((targetAccount) => {
+            const config = platformConfigs[targetAccount.platform as keyof typeof platformConfigs];
+            const IconComponent = config?.icon || Twitter;
+            
+            return (
+              <Card key={targetAccount.id} className="bg-slate-800/50 border-slate-700 backdrop-blur-sm">
+                <CardHeader className="pb-3">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <IconComponent className={`w-5 h-5 ${config?.color}`} />
+                      <div>
+                        <h4 className="font-semibold text-white">{targetAccount.username}</h4>
+                        <p className="text-xs text-slate-400">{targetAccount.platform}</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Switch
+                        checked={targetAccount.isActive}
+                        onCheckedChange={() => handleToggleTargetAccount(targetAccount.id)}
+                        data-testid={`target-toggle-${targetAccount.id}`}
+                      />
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => handleRemoveTargetAccount(targetAccount.id)}
+                        className="text-red-400 hover:bg-red-900/20"
+                        data-testid={`remove-target-${targetAccount.id}`}
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-slate-400">Engagement:</span>
+                    <Badge variant="outline" className={`text-xs ${targetAccount.isActive ? 'text-green-400 border-green-400' : 'text-slate-400 border-slate-600'}`}>
+                      {targetAccount.engagementType}
+                    </Badge>
+                  </div>
+                  
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-slate-400">Status:</span>
+                    <Badge variant={targetAccount.isActive ? "default" : "secondary"} className="text-xs">
+                      {targetAccount.isActive ? "Active" : "Inactive"}
+                    </Badge>
+                  </div>
+                  
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-slate-400">Interactions:</span>
+                    <span className="text-white font-medium">{targetAccount.interactions}</span>
+                  </div>
+                  
+                  <div className="text-xs text-slate-500">
+                    Added: {new Date(targetAccount.addedDate).toLocaleDateString()}
+                  </div>
+                </CardContent>
+              </Card>
+            );
+          })}
+          
+          {targetAccounts.length === 0 && (
+            <div className="col-span-full">
+              <Card className="bg-slate-800/30 border-slate-700 border-dashed">
+                <CardContent className="flex flex-col items-center justify-center py-12">
+                  <Target className="w-12 h-12 text-slate-600 mb-4" />
+                  <h3 className="text-lg font-medium text-slate-400 mb-2">No Target Accounts</h3>
+                  <p className="text-sm text-slate-500 text-center mb-4">
+                    Add accounts for your bot to engage with automatically
+                  </p>
+                  <Button 
+                    onClick={() => setShowAddTarget(true)}
+                    className="bg-green-600 hover:bg-green-700"
+                    data-testid="add-first-target-button"
+                  >
+                    <Target className="w-4 h-4 mr-2" />
+                    Add Your First Target
+                  </Button>
+                </CardContent>
+              </Card>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

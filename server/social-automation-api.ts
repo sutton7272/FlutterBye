@@ -36,6 +36,17 @@ interface APIKeys {
   openai: string;
 }
 
+interface TargetAccount {
+  id: string;
+  username: string;
+  platform: string;
+  engagementType: 'all' | 'likes' | 'comments' | 'retweets';
+  isActive: boolean;
+  addedDate: string;
+  interactions: number;
+  lastInteraction: string | null;
+}
+
 // In-memory storage (in production, use database)
 const socialAccounts: SocialAccount[] = [];
 const botConfigs: BotConfig[] = [];
@@ -599,6 +610,114 @@ export function registerSocialAutomationAPI(app: Express) {
       res.status(500).json({ 
         success: false, 
         error: 'Internal server error during test post' 
+      });
+    }
+  });
+
+  // Target Account Management for Bot Interactions
+  let targetAccounts: TargetAccount[] = [];
+
+  // Get all target accounts
+  app.get('/api/social-automation/target-accounts', (req, res) => {
+    res.json({ success: true, accounts: targetAccounts });
+  });
+
+  // Add new target account
+  app.post('/api/social-automation/target-accounts', (req, res) => {
+    try {
+      const { username, platform, engagementType } = req.body;
+      
+      if (!username || !platform || !engagementType) {
+        return res.status(400).json({ 
+          success: false, 
+          error: 'Username, platform, and engagement type are required' 
+        });
+      }
+
+      // Check if account already exists
+      const existingAccount = targetAccounts.find(acc => 
+        acc.username.toLowerCase() === username.toLowerCase() && 
+        acc.platform === platform
+      );
+
+      if (existingAccount) {
+        return res.status(409).json({ 
+          success: false, 
+          error: 'Target account already exists' 
+        });
+      }
+
+      const newTargetAccount: TargetAccount = {
+        id: Date.now().toString(),
+        username,
+        platform,
+        engagementType,
+        isActive: true,
+        addedDate: new Date().toISOString(),
+        interactions: 0,
+        lastInteraction: null
+      };
+
+      targetAccounts.push(newTargetAccount);
+
+      res.json({ 
+        success: true, 
+        message: 'Target account added successfully',
+        account: newTargetAccount 
+      });
+    } catch (error) {
+      res.status(500).json({ 
+        success: false, 
+        error: error instanceof Error ? error.message : 'Failed to add target account' 
+      });
+    }
+  });
+
+  // Toggle target account status
+  app.patch('/api/social-automation/target-accounts/:id/toggle', (req, res) => {
+    try {
+      const { id } = req.params;
+      const { isActive } = req.body;
+      
+      const account = targetAccounts.find(acc => acc.id === id);
+      if (!account) {
+        return res.status(404).json({ success: false, error: 'Target account not found' });
+      }
+
+      account.isActive = isActive;
+      res.json({ 
+        success: true, 
+        message: `Target account ${isActive ? 'activated' : 'deactivated'}`,
+        account 
+      });
+    } catch (error) {
+      res.status(500).json({ 
+        success: false, 
+        error: error instanceof Error ? error.message : 'Failed to toggle target account' 
+      });
+    }
+  });
+
+  // Delete target account
+  app.delete('/api/social-automation/target-accounts/:id', (req, res) => {
+    try {
+      const { id } = req.params;
+      
+      const accountIndex = targetAccounts.findIndex(acc => acc.id === id);
+      if (accountIndex === -1) {
+        return res.status(404).json({ success: false, error: 'Target account not found' });
+      }
+
+      const removedAccount = targetAccounts.splice(accountIndex, 1)[0];
+      res.json({ 
+        success: true, 
+        message: 'Target account removed successfully',
+        account: removedAccount 
+      });
+    } catch (error) {
+      res.status(500).json({ 
+        success: false, 
+        error: error instanceof Error ? error.message : 'Failed to remove target account' 
       });
     }
   });
