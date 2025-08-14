@@ -13,7 +13,7 @@ interface ScheduledPost {
 }
 
 export class TwitterContentScheduler {
-  private twitterService: TwitterAPIService;
+  private twitterService!: TwitterAPIService;
   private isInitialized = false;
   private isActive = false;
   private activeBotConfigId?: string;

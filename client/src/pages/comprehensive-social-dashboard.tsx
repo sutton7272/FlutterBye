@@ -2541,6 +2541,7 @@ function DashboardOverview() {
     totalPosts: 0,
     engagement: 0
   });
+  const [isTogglingBot, setIsTogglingBot] = useState(false);
 
   useEffect(() => {
     // Fetch dashboard data
@@ -2574,6 +2575,38 @@ function DashboardOverview() {
     };
   }, []);
 
+  const handleBotToggle = async () => {
+    setIsTogglingBot(true);
+    try {
+      const response = await fetch('/api/social-automation/bot/toggle', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ enabled: !dashboardData.isActive })
+      });
+      
+      const result = await response.json();
+      
+      if (result.success) {
+        setDashboardData(prev => ({ ...prev, isActive: !prev.isActive }));
+        toast({
+          title: result.message,
+          description: `Bot is now ${!dashboardData.isActive ? 'active' : 'inactive'}`,
+          variant: "default"
+        });
+      } else {
+        throw new Error(result.message || 'Failed to toggle bot');
+      }
+    } catch (error: any) {
+      toast({
+        title: "Toggle Failed",
+        description: error.message || "Failed to toggle bot status",
+        variant: "destructive"
+      });
+    } finally {
+      setIsTogglingBot(false);
+    }
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -2581,11 +2614,40 @@ function DashboardOverview() {
           <h3 className="text-2xl font-bold text-white mb-2">Bot Activity Dashboard</h3>
           <p className="text-slate-400">Monitor your social media automation in real-time</p>
         </div>
-        <div className="flex items-center gap-2">
-          <div className={`w-3 h-3 rounded-full ${dashboardData.isActive ? 'bg-green-500 animate-pulse' : 'bg-red-500'}`} />
-          <span className="text-sm text-slate-300">
-            {dashboardData.isActive ? 'Bot Active' : 'Bot Inactive'}
-          </span>
+        <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2">
+            <div className={`w-3 h-3 rounded-full ${dashboardData.isActive ? 'bg-green-500 animate-pulse' : 'bg-red-500'}`} />
+            <span className="text-sm text-slate-300">
+              {dashboardData.isActive ? 'Bot Active' : 'Bot Inactive'}
+            </span>
+          </div>
+          <Button 
+            onClick={handleBotToggle}
+            disabled={isTogglingBot}
+            className={`${dashboardData.isActive ? 'bg-red-600 hover:bg-red-700' : 'bg-green-600 hover:bg-green-700'} min-w-[120px]`}
+            data-testid="bot-toggle-button"
+          >
+            {isTogglingBot ? (
+              <>
+                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
+                {dashboardData.isActive ? 'Stopping...' : 'Starting...'}
+              </>
+            ) : (
+              <>
+                {dashboardData.isActive ? (
+                  <>
+                    <Pause className="w-4 h-4 mr-2" />
+                    Stop Bot
+                  </>
+                ) : (
+                  <>
+                    <Play className="w-4 h-4 mr-2" />
+                    Start Bot
+                  </>
+                )}
+              </>
+            )}
+          </Button>
         </div>
       </div>
 

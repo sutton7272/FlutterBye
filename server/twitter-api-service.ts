@@ -29,11 +29,16 @@ export class TwitterAPIService {
     });
   }
 
-  async postTweet(content: PostContent): Promise<{success: boolean, message: string, tweetId?: string}> {
+  async postTweet(content: string | PostContent): Promise<{success: boolean, message: string, tweetId?: string, error?: string}> {
     try {
       console.log('🐦 Posting tweet via Twitter API...');
       
-      const fullText = `${content.text} ${content.hashtags.join(' ')}`;
+      let fullText: string;
+      if (typeof content === 'string') {
+        fullText = content;
+      } else {
+        fullText = `${content.text} ${content.hashtags.join(' ')}`;
+      }
       
       // Post tweet using Twitter API v2
       const tweet = await this.client.v2.tweet(fullText);
@@ -53,22 +58,26 @@ export class TwitterAPIService {
       if (error.code === 429) {
         return {
           success: false,
-          message: 'Rate limit exceeded - please wait before posting again'
+          message: 'Rate limit exceeded - please wait before posting again',
+          error: 'Rate limit exceeded'
         };
       } else if (error.code === 403) {
         return {
           success: false,
-          message: 'Access forbidden - check API credentials and permissions'
+          message: 'Access forbidden - check API credentials and permissions',
+          error: 'Access forbidden'
         };
       } else if (error.message?.includes('duplicate')) {
         return {
           success: false,
-          message: 'Duplicate tweet - Twitter prevents posting identical content'
+          message: 'Duplicate tweet - Twitter prevents posting identical content',
+          error: 'Duplicate content'
         };
       } else {
         return {
           success: false,
-          message: `Twitter API error: ${error.message || 'Unknown error'}`
+          message: `Twitter API error: ${error.message || 'Unknown error'}`,
+          error: error.message || 'Unknown error'
         };
       }
     }

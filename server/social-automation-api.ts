@@ -52,6 +52,7 @@ const runningBots = new Map<string, { automation: any; interval: NodeJS.Timeout 
 
 // Simple in-memory storage for schedule (in production, use database)
 let savedSchedule: any = null;
+let botEnabled: boolean = false;
 
 export function registerSocialAutomationAPI(app: Express) {
   console.log('🤖 Social Automation API routes registered');
@@ -77,6 +78,8 @@ export function registerSocialAutomationAPI(app: Express) {
         console.log(`   - ${key}: ${config.time}`);
       });
 
+      // Note: Bot activation is now controlled separately via the bot toggle switch
+
       res.json({ 
         success: true, 
         message: `Schedule saved with ${enabledSlots.length} active time slots`,
@@ -87,6 +90,54 @@ export function registerSocialAutomationAPI(app: Express) {
       res.status(500).json({ 
         success: false, 
         error: 'Failed to save schedule' 
+      });
+    }
+  });
+
+  // Bot control endpoints
+  app.post('/api/social-automation/bot/toggle', async (req, res) => {
+    try {
+      const { enabled } = req.body;
+      
+      if (typeof enabled !== 'boolean') {
+        return res.status(400).json({ 
+          success: false, 
+          error: 'enabled must be a boolean value' 
+        });
+      }
+
+      botEnabled = enabled;
+      
+      console.log(`🤖 Bot ${enabled ? 'activated' : 'deactivated'} by user`);
+      
+      res.json({ 
+        success: true, 
+        message: `Bot ${enabled ? 'activated' : 'deactivated'} successfully`,
+        botEnabled 
+      });
+    } catch (error) {
+      console.error('Error toggling bot:', error);
+      res.status(500).json({ 
+        success: false, 
+        error: 'Failed to toggle bot' 
+      });
+    }
+  });
+
+  app.get('/api/social-automation/bot/status', async (req, res) => {
+    try {
+      res.json({ 
+        success: true, 
+        botEnabled,
+        hasSchedule: savedSchedule !== null,
+        enabledSlots: savedSchedule ? 
+          Object.values(savedSchedule).filter((config: any) => config.enabled).length : 0
+      });
+    } catch (error) {
+      console.error('Error getting bot status:', error);
+      res.status(500).json({ 
+        success: false, 
+        error: 'Failed to get bot status' 
       });
     }
   });
@@ -209,8 +260,8 @@ export function registerSocialAutomationAPI(app: Express) {
         }
       }
       
-      // Get actual bot status
-      const isActive = savedSchedule && Object.values(savedSchedule).some((config: any) => config.enabled);
+      // Get actual bot status - both enabled AND has schedule
+      const isActive = botEnabled && savedSchedule && Object.values(savedSchedule).some((config: any) => config.enabled);
       const enabledSlotsCount = savedSchedule ? 
         Object.values(savedSchedule).filter((config: any) => config.enabled).length : 0;
 
