@@ -3,6 +3,7 @@ import FlutterbySocialBot, { type SocialMediaPost } from "./social-media-bot";
 import { contentGenerator } from "./social-content-generator";
 import { passwordAutomation } from "./social-password-automation";
 import { engagementAutomation } from "./social-engagement-automation";
+import { aiPostingOptimizer } from "./ai-posting-optimizer";
 import cron from "node-cron";
 
 // Global bot instance
@@ -639,8 +640,135 @@ export function registerSocialRoutes(app: Express) {
     }
   });
 
+  // AI-POWERED OPTIMIZATION ROUTES (Smart timing, content optimization, response automation)
+  
+  // Analyze optimal posting times using AI
+  app.post('/api/social/ai/analyze-timing', async (req, res) => {
+    try {
+      const { platform, timezone = 'UTC', contentType = 'general' } = req.body;
+      
+      if (!platform) {
+        return res.status(400).json({
+          success: false,
+          error: "Platform is required"
+        });
+      }
+
+      const insights = await aiPostingOptimizer.analyzeOptimalPostingTimes(
+        platform, 
+        timezone, 
+        contentType
+      );
+
+      res.json({
+        success: true,
+        insights,
+        message: `AI analyzed optimal posting times for ${platform}`
+      });
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        error: error instanceof Error ? error.message : "Failed to analyze posting times"
+      });
+    }
+  });
+
+  // Optimize post content for maximum engagement and viral potential
+  app.post('/api/social/ai/optimize-content', async (req, res) => {
+    try {
+      const { content, platform, goals = ['engagement', 'viral_potential'] } = req.body;
+      
+      if (!content || !platform) {
+        return res.status(400).json({
+          success: false,
+          error: "Content and platform are required"
+        });
+      }
+
+      const optimization = await aiPostingOptimizer.optimizePostContent(
+        content,
+        platform,
+        goals
+      );
+
+      res.json({
+        success: true,
+        optimization,
+        message: `Content optimized for ${platform} with ${optimization.engagement_score}% engagement score`
+      });
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        error: error instanceof Error ? error.message : "Failed to optimize content"
+      });
+    }
+  });
+
+  // Generate optimized response variants for user engagement
+  app.post('/api/social/ai/optimize-responses', async (req, res) => {
+    try {
+      const { originalPost, userComment, responseStyle = 'helpful' } = req.body;
+      
+      if (!originalPost || !userComment) {
+        return res.status(400).json({
+          success: false,
+          error: "Original post and user comment are required"
+        });
+      }
+
+      const responseOptimization = await aiPostingOptimizer.optimizeEngagementResponses(
+        originalPost,
+        userComment,
+        responseStyle
+      );
+
+      res.json({
+        success: true,
+        responseOptimization,
+        message: `Generated ${responseOptimization.response_variants.length} optimized response variants`
+      });
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        error: error instanceof Error ? error.message : "Failed to optimize responses"
+      });
+    }
+  });
+
+  // Generate AI-optimized posting schedule
+  app.post('/api/social/ai/generate-schedule', async (req, res) => {
+    try {
+      const { platform, contentTypes = ['general'], weeklyGoal = 5 } = req.body;
+      
+      if (!platform) {
+        return res.status(400).json({
+          success: false,
+          error: "Platform is required"
+        });
+      }
+
+      const schedule = await aiPostingOptimizer.generatePostingSchedule(
+        platform,
+        contentTypes,
+        weeklyGoal
+      );
+
+      res.json({
+        success: true,
+        schedule,
+        message: `Generated AI-optimized posting schedule for ${platform} with ${weeklyGoal} posts per week`
+      });
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        error: error instanceof Error ? error.message : "Failed to generate schedule"
+      });
+    }
+  });
+
   console.log("🤖 Social media bot routes registered");
   console.log("📝 Content generator routes registered (no API keys required)");
   console.log("🔐 Password automation routes registered (login with username/password)");
   console.log("🎯 Engagement automation routes registered (multi-account amplification)");
+  console.log("🧠 AI optimization routes registered (smart timing, content optimization, response automation)");
 }

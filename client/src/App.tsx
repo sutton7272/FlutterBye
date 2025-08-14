@@ -76,6 +76,7 @@ const AdminCustodialWallet = lazy(() => import("@/pages/admin-custodial-wallet")
 const SocialAutomation = lazy(() => import("@/pages/social-automation"));
 const SocialAutomationNoKeys = lazy(() => import("@/pages/social-automation-no-keys"));
 const SocialPasswordAutomation = lazy(() => import("@/pages/social-password-automation"));
+const AISocialOptimization = lazy(() => import("@/pages/ai-social-optimization"));
 const UnifiedAdminDashboard = lazy(() => import("@/pages/admin-unified"));
 import TokenHolderMapPage from "@/pages/token-holder-map";
 import CollaborativeCreation from "@/pages/collaborative-creation";
@@ -417,6 +418,15 @@ function Router() {
             <Navbar />
             <SuspenseWrapper>
               <SocialPasswordAutomation />
+            </SuspenseWrapper>
+          </>
+        )} />
+        
+        <Route path="/ai-social-optimization" component={() => (
+          <>
+            <Navbar />
+            <SuspenseWrapper>
+              <AISocialOptimization />
             </SuspenseWrapper>
           </>
         )} />
