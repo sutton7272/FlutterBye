@@ -909,16 +909,20 @@ export function registerSocialRoutes(app: Express) {
             const { contentGenerator } = await import('./social-content-generator.js');
             let testContent;
             
+            // Calculate the correct hour interval for display
+            const postsPerDay = parseInt(bot.postingFrequency) || 4;
+            const hourInterval = Math.floor(24 / postsPerDay);
+            
             try {
               const activationContent = await contentGenerator.generateContent('platform_update', 'twitter');
               testContent = {
-                text: `🚀 ${bot.name} is now LIVE! Automated FlutterBye content every ${bot.postingFrequency || 4} hours. ${activationContent.content}`,
+                text: `🚀 ${bot.name} is now LIVE! Automated FlutterBye content every ${hourInterval} hours (${postsPerDay} posts/day). ${activationContent.content}`,
                 hashtags: activationContent.hashtags
               };
             } catch (error) {
               console.log('Using fallback activation content');
               testContent = {
-                text: `🚀 FlutterBye Bot "${bot.name}" is now LIVE! Automated posting every ${bot.postingFrequency || 4} hours. #FlutterBye #Automation`,
+                text: `🚀 FlutterBye Bot "${bot.name}" is now LIVE! Automated posting every ${hourInterval} hours (${postsPerDay} posts/day). #FlutterBye #Automation`,
                 hashtags: ['#FlutterByeBot', '#SocialAutomation', '#Web3']
               };
             }
@@ -1011,7 +1015,7 @@ export function registerSocialRoutes(app: Express) {
                 twitterAPI: twitterAPI
               });
               
-              console.log(`✅ Bot ${bot.name} automation started with ${intervalHours}h intervals`);
+              console.log(`✅ Bot ${bot.name} automation started with ${intervalHours}h intervals (${postsPerDay} posts/day)`);
             }
           } catch (apiError) {
             console.error('❌ Twitter API error when starting bot:', apiError);
