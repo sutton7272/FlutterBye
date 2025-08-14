@@ -50,7 +50,6 @@ import { registerTwitterAuthFixEndpoint } from "./twitter-auth-fix";
 import { registerTwitterDiagnosticEndpoint } from "./twitter-diagnostic";
 import { registerTwitterAPIRoutes } from "./twitter-api-routes";
 import { registerTwitterSchedulerRoutes } from "./twitter-scheduler-routes";
-import { registerSocialAnalyticsRoutes } from "./social-analytics-routes";
 import { productionAuth } from "./production-auth";
 import { realTimeMonitor } from "./real-time-monitor";
 import { transactionMonitor } from "./transaction-monitor";

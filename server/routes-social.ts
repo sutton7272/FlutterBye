@@ -1183,6 +1183,15 @@ export function registerSocialRoutes(app: Express) {
   });
 
   // API Keys management
+  app.get('/api/social/api-keys', async (req, res) => {
+    try {
+      // Return empty object for now since we're using memory storage
+      res.json({});
+    } catch (error) {
+      res.status(500).json({ error: 'Failed to fetch API keys' });
+    }
+  });
+
   app.post('/api/social/api-keys', async (req, res) => {
     try {
       // In production, save to secure storage
