@@ -39,6 +39,7 @@ import { chatService } from "./chat-service";
 import { registerSolanaRoutes } from "./routes-solana";
 import { registerEscrowRoutes } from "./routes-escrow";
 import { registerCustodialWalletRoutes } from "./routes-custodial-wallet";
+import { registerSocialRoutes } from "./routes-social";
 import { productionAuth } from "./production-auth";
 import { realTimeMonitor } from "./real-time-monitor";
 import { transactionMonitor } from "./transaction-monitor";
@@ -6625,6 +6626,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   registerSolanaRoutes(app);
   registerEscrowRoutes(app);
   registerCustodialWalletRoutes(app, storage);
+  
+  // Register social media automation routes
+  registerSocialRoutes(app);
   registerFlutterinaRoutes(app)
   
   // Enhanced Skye AI with Memory & Emotional Intelligence

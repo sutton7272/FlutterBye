@@ -73,6 +73,7 @@ const AdminFreeCodes = lazy(() => import("@/pages/admin-free-codes"));
 const AdminPricing = lazy(() => import("@/pages/admin-pricing"));
 const AdminDefaultImage = lazy(() => import("@/pages/admin-default-image"));
 const AdminCustodialWallet = lazy(() => import("@/pages/admin-custodial-wallet"));
+const SocialAutomation = lazy(() => import("@/pages/social-automation"));
 const UnifiedAdminDashboard = lazy(() => import("@/pages/admin-unified"));
 import TokenHolderMapPage from "@/pages/token-holder-map";
 import CollaborativeCreation from "@/pages/collaborative-creation";
@@ -407,6 +408,15 @@ function Router() {
             <Navbar />
             <UnifiedAdminDashboard />
           </AdminRouteGuard>
+        )} />
+        
+        <Route path="/social-automation" component={() => (
+          <>
+            <Navbar />
+            <SuspenseWrapper>
+              <SocialAutomation />
+            </SuspenseWrapper>
+          </>
         )} />
         
         <Route path="/admin/escrow" component={() => (
