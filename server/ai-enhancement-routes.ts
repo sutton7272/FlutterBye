@@ -1,9 +1,9 @@
 import { Router } from 'express';
-import { OpenAIService } from './openai-service';
+import { openaiService } from './openai-service';
 import { AIContentService } from './ai-content-service';
 import { ariaPersonality } from './aria-personality';
 
-const openAIService = new OpenAIService();
+// Using the singleton openaiService instance
 const aiContentService = new AIContentService();
 const router = Router();
 

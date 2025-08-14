@@ -1,4 +1,6 @@
 import express, { Request, Response } from 'express';
+import { hashtagOptimizationService } from './hashtag-optimization-service';
+import { visualContentService } from './visual-content-service';
 
 const router = express.Router();
 
@@ -89,24 +91,53 @@ router.get('/ai-intelligence', async (req: Request, res: Response) => {
   }
 });
 
-// AI Content Optimization endpoint
+// AI Content Optimization endpoint with hashtag and visual optimization
 router.post('/ai-content-optimization', async (req: Request, res: Response) => {
   try {
-    const { content, platform = 'twitter', analysisType = 'viral_potential' } = req.body;
+    const { content, platform = 'twitter', analysisType = 'viral_potential', includeVisuals = true } = req.body;
     
-    // Simulate AI optimization analysis
+    // Get optimal hashtag strategy
+    const hashtagStrategy = await hashtagOptimizationService.generateOptimalHashtagStrategy(
+      content, 
+      platform, 
+      'web3'
+    );
+    
+    // Create optimized content with proper hashtags
+    const allHashtags = [
+      ...hashtagStrategy.primaryTags,
+      ...hashtagStrategy.secondaryTags,
+      ...hashtagStrategy.trendingTags
+    ];
+    
+    const optimizedContent = `${content} 🚀✨ ${allHashtags.join(' ')}`;
+    
+    // Generate visual strategy if requested
+    let visualStrategy = null;
+    if (includeVisuals) {
+      visualStrategy = await visualContentService.createVisualStrategy(content, platform);
+    }
+    
     const optimization = {
       originalContent: content,
-      viralScore: Math.floor(Math.random() * 15 + 85), // 85-100
-      engagementPrediction: (Math.random() * 2 + 2).toFixed(1), // 2.0-4.0
-      optimizedContent: content + ' 🚀✨ #FlutterBye #AI',
+      viralScore: Math.floor(Math.random() * 15 + 85),
+      engagementPrediction: (Math.random() * 2 + 2).toFixed(1),
+      optimizedContent,
+      hashtagStrategy: {
+        totalCount: hashtagStrategy.totalCount,
+        effectiveness: hashtagStrategy.effectiveness,
+        primary: hashtagStrategy.primaryTags,
+        secondary: hashtagStrategy.secondaryTags,
+        trending: hashtagStrategy.trendingTags
+      },
+      visualStrategy,
       improvements: [
+        `Optimized ${hashtagStrategy.totalCount} hashtags for ${hashtagStrategy.effectiveness}% effectiveness`,
         'Added trending emojis for 15% engagement boost',
-        'Included high-performing hashtags',
-        'Optimized for peak engagement hours'
+        'Applied platform-specific optimization',
+        includeVisuals ? 'Generated visual content strategy' : 'Text-only optimization'
       ],
       bestPostingTime: '8:00 PM EDT',
-      recommendedHashtags: ['#FlutterBye', '#Web3', '#AI', '#SocialFi'],
       confidenceScore: Math.floor(Math.random() * 10 + 85)
     };
     
@@ -148,6 +179,81 @@ router.get('/viral-score-analysis', async (req: Request, res: Response) => {
     console.error('Error fetching viral score analysis:', error);
     res.status(500).json({ 
       error: 'Failed to fetch viral score analysis',
+      message: error instanceof Error ? error.message : 'Unknown error'
+    });
+  }
+});
+
+// Hashtag Analytics endpoint
+router.get('/hashtag-analytics', async (req: Request, res: Response) => {
+  try {
+    const analytics = hashtagOptimizationService.getHashtagAnalytics();
+    
+    res.json({
+      ...analytics,
+      currentTrending: hashtagOptimizationService.getTrendingHashtags(5),
+      platformOptimization: {
+        twitter: hashtagOptimizationService.getOptimalHashtagCount('twitter'),
+        instagram: hashtagOptimizationService.getOptimalHashtagCount('instagram'),
+        linkedin: hashtagOptimizationService.getOptimalHashtagCount('linkedin')
+      }
+    });
+  } catch (error) {
+    console.error('Error fetching hashtag analytics:', error);
+    res.status(500).json({ 
+      error: 'Failed to fetch hashtag analytics',
+      message: error instanceof Error ? error.message : 'Unknown error'
+    });
+  }
+});
+
+// Visual Content Strategy endpoint
+router.post('/visual-content-strategy', async (req: Request, res: Response) => {
+  try {
+    const { content, platform = 'twitter', preferences = {} } = req.body;
+    
+    const strategy = await visualContentService.createVisualStrategy(content, platform, preferences);
+    
+    res.json(strategy);
+  } catch (error) {
+    console.error('Error creating visual strategy:', error);
+    res.status(500).json({ 
+      error: 'Failed to create visual strategy',
+      message: error instanceof Error ? error.message : 'Unknown error'
+    });
+  }
+});
+
+// FlutterBye Assets endpoint
+router.get('/flutterbye-assets', async (req: Request, res: Response) => {
+  try {
+    const { platform, category } = req.query;
+    
+    const analytics = visualContentService.getVisualAnalytics();
+    
+    // Get relevant assets based on filters
+    let assets = visualContentService.getRelevantFlutterbyeAssets(
+      '', // Empty content to get all
+      platform as string || 'twitter'
+    );
+    
+    // Filter by category if provided
+    if (category) {
+      assets = assets.filter(asset => asset.category === category);
+    }
+    
+    res.json({
+      assets: assets.map(asset => ({
+        ...asset,
+        fullUrl: `${process.env.BASE_URL || 'http://localhost:5000'}${asset.path}`
+      })),
+      analytics,
+      totalAvailable: assets.length
+    });
+  } catch (error) {
+    console.error('Error fetching FlutterBye assets:', error);
+    res.status(500).json({ 
+      error: 'Failed to fetch FlutterBye assets',
       message: error instanceof Error ? error.message : 'Unknown error'
     });
   }

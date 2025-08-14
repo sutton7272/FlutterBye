@@ -1,9 +1,9 @@
 import { WebSocketServer, WebSocket } from 'ws';
 import { storage } from './storage';
-import { OpenAIService } from './openai-service';
+import { openaiService } from './openai-service';
 import { Server } from 'http';
 
-const openaiService = new OpenAIService();
+// Using the singleton openaiService instance
 
 export interface RealTimeWalletEvent {
   eventId: string;

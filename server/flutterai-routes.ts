@@ -4,12 +4,12 @@
 
 import { Router } from 'express';
 import { FlutterAIWalletScoringService } from './flutterai-wallet-scoring';
-import { OpenAIService } from './openai-service';
+import { openaiService } from './openai-service';
 import { AIContentService } from './ai-content-service';
 
 const router = Router();
 const walletScoringEngine = new FlutterAIWalletScoringService();
-const openAIService = new OpenAIService();
+// Using the singleton openaiService instance
 const aiContentService = new AIContentService();
 
 // === WALLET SCORING ENGINE ===

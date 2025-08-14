@@ -1,7 +1,7 @@
 import { storage } from './storage';
-import { OpenAIService } from './openai-service';
+import { openaiService } from './openai-service';
 
-const openaiService = new OpenAIService();
+// Using the singleton openaiService instance
 
 export interface WhiteLabelConfig {
   clientId: string;
