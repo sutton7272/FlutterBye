@@ -41,6 +41,7 @@ import { registerEscrowRoutes } from "./routes-escrow";
 import { registerCustodialWalletRoutes } from "./routes-custodial-wallet";
 import { registerSocialRoutes } from "./routes-social";
 import { registerSocialAutomationAPI } from "./social-automation-api";
+import { registerSocialAnalyticsRoutes } from "./social-analytics-routes";
 import socialOptimizationAPI from "./social-optimization-api";
 import { registerSocialTestEndpoints } from "./social-test-endpoint";
 import { registerInstantTestEndpoint } from "./social-instant-test";
@@ -49,6 +50,7 @@ import { registerTwitterAuthFixEndpoint } from "./twitter-auth-fix";
 import { registerTwitterDiagnosticEndpoint } from "./twitter-diagnostic";
 import { registerTwitterAPIRoutes } from "./twitter-api-routes";
 import { registerTwitterSchedulerRoutes } from "./twitter-scheduler-routes";
+import { registerSocialAnalyticsRoutes } from "./social-analytics-routes";
 import { productionAuth } from "./production-auth";
 import { realTimeMonitor } from "./real-time-monitor";
 import { transactionMonitor } from "./transaction-monitor";
@@ -6639,6 +6641,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Register social media automation routes
   registerSocialRoutes(app);
   registerSocialAutomationAPI(app);
+  registerSocialAnalyticsRoutes(app);
   app.use('/api/social-optimization', socialOptimizationAPI);
   registerSocialTestEndpoints(app);
   registerInstantTestEndpoint(app);

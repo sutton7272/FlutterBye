@@ -287,41 +287,49 @@ function AIContentGenerator() {
 
 // Component for Analytics Dashboard Content
 function SocialAnalyticsDashboardContent() {
-  const [posts, setPosts] = useState<any[]>([]);
+  const [analytics, setAnalytics] = useState<any>(null);
   const [timeRange, setTimeRange] = useState('7d');
-  
-  const mockPosts = [
-    {
-      id: '1',
-      content: '🚀 FlutterBye is revolutionizing Web3 communication! Join our tokenized messaging platform #FlutterBye #Web3',
-      platform: 'Twitter',
-      timestamp: '2025-01-14T10:00:00Z',
-      likes: 245,
-      comments: 32,
-      retweets: 89,
-      impressions: 15420,
-      engagementRate: 2.38,
-      reach: 12340,
-      clicks: 156,
-      hashtags: ['#FlutterBye', '#Web3', '#TokenizedMessaging']
-    },
-    {
-      id: '2',
-      content: 'Every message has value! Experience blockchain-powered communication ⚡ #SocialFi #Blockchain',
-      platform: 'Twitter',
-      timestamp: '2025-01-14T14:30:00Z',
-      likes: 189,
-      comments: 24,
-      retweets: 67,
-      impressions: 11230,
-      engagementRate: 2.49,
-      reach: 9870,
-      clicks: 134,
-      hashtags: ['#SocialFi', '#Blockchain', '#Innovation']
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchAnalytics();
+  }, [timeRange]);
+
+  const fetchAnalytics = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch(`/api/social-automation/analytics?timeRange=${timeRange}`);
+      const data = await response.json();
+      if (data.success) {
+        setAnalytics(data.analytics);
+      }
+    } catch (error) {
+      console.error('Failed to fetch analytics:', error);
+    } finally {
+      setLoading(false);
     }
+  };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="text-slate-400">Loading analytics...</div>
+      </div>
+    );
+  }
+
+  if (!analytics) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="text-slate-400">No analytics data available</div>
+      </div>
+    );
+  }
+
+  const recentPosts = analytics.recentPosts || [
   ];
 
-  const engagementByHour = [
+  const engagementByHour = analytics.engagementByHour || [
     { hour: '6AM', engagement: 1.8 },
     { hour: '9AM', engagement: 2.4 },
     { hour: '12PM', engagement: 3.1 },
@@ -331,12 +339,8 @@ function SocialAnalyticsDashboardContent() {
     { hour: '12AM', engagement: 1.5 }
   ];
 
-  useEffect(() => {
-    setPosts(mockPosts);
-  }, []);
-
   const calculateTotalMetrics = () => {
-    return posts.reduce((totals, post) => ({
+    return recentPosts.reduce((totals, post) => ({
       likes: totals.likes + post.likes,
       comments: totals.comments + post.comments,
       retweets: totals.retweets + post.retweets,
@@ -347,6 +351,22 @@ function SocialAnalyticsDashboardContent() {
   };
 
   const totalMetrics = calculateTotalMetrics();
+
+  const reachAnalytics = analytics.reachAnalytics || [
+    { platform: 'Twitter', reach: 45670, engagement: 3.2 }
+  ];
+
+  const topHashtags = analytics.topHashtags || [
+    { tag: '#FlutterBye', count: 234, avgEngagement: 3.2 }
+  ];
+
+  const optimization = analytics.optimization || {
+    bestPostingTime: '12:30 PM',
+    recommendedHashtags: ['#FlutterBye', '#Web3', '#SocialFi'],
+    contentSuggestions: [
+      'Focus on community engagement during lunch hours'
+    ]
+  };
 
   return (
     <div className="space-y-6">
@@ -430,7 +450,7 @@ function SocialAnalyticsDashboardContent() {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {posts.map((post) => (
+              {recentPosts.map((post) => (
                 <div key={post.id} className="p-4 bg-slate-700/50 rounded-lg">
                   <p className="text-sm text-slate-300 mb-2 line-clamp-2">{post.content}</p>
                   <div className="flex items-center justify-between text-xs text-slate-400">
@@ -861,11 +881,53 @@ function PostQueueContent() {
     }
   };
 
-  const handleCreatePost = () => {
-    toast({
-      title: "Post Creator",
-      description: "Opening post creation interface...",
-    });
+  const [newPostData, setNewPostData] = useState({
+    content: '',
+    scheduledTime: '',
+    platforms: ['Twitter'] as string[]
+  });
+
+  const handleCreatePost = async () => {
+    if (!newPostData.content.trim() || !newPostData.scheduledTime) {
+      toast({
+        title: "Invalid Input",
+        description: "Please fill in both content and schedule time",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    try {
+      const response = await fetch('/api/social-automation/scheduled-posts', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          content: newPostData.content,
+          scheduledTime: new Date(newPostData.scheduledTime).toISOString(),
+          platforms: newPostData.platforms,
+          source: 'manual'
+        })
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        toast({
+          title: "Post Scheduled!",
+          description: `Your post has been scheduled for ${new Date(newPostData.scheduledTime).toLocaleString()}`,
+        });
+        setShowCreatePost(false);
+        setNewPostData({ content: '', scheduledTime: '', platforms: ['Twitter'] });
+        await loadScheduledPosts(); // Refresh the list
+      } else {
+        throw new Error('Failed to schedule post');
+      }
+    } catch (error) {
+      toast({
+        title: "Scheduling Failed",
+        description: "Unable to schedule your post. Please try again.",
+        variant: "destructive"
+      });
+    }
   };
 
   const getStatusColor = (status: string) => {
@@ -902,6 +964,8 @@ function PostQueueContent() {
                   id="post-content"
                   placeholder="What's happening? #FlutterBye"
                   className="bg-slate-700 border-slate-600 min-h-[100px]"
+                  value={newPostData.content}
+                  onChange={(e) => setNewPostData(prev => ({ ...prev, content: e.target.value }))}
                 />
               </div>
               <div className="grid grid-cols-2 gap-4">
@@ -910,7 +974,24 @@ function PostQueueContent() {
                   <div className="space-y-2 mt-2">
                     {['Twitter', 'LinkedIn', 'Instagram'].map((platform) => (
                       <label key={platform} className="flex items-center space-x-2">
-                        <input type="checkbox" className="rounded" />
+                        <input 
+                          type="checkbox" 
+                          className="rounded"
+                          checked={newPostData.platforms.includes(platform)}
+                          onChange={(e) => {
+                            if (e.target.checked) {
+                              setNewPostData(prev => ({ 
+                                ...prev, 
+                                platforms: [...prev.platforms, platform] 
+                              }));
+                            } else {
+                              setNewPostData(prev => ({ 
+                                ...prev, 
+                                platforms: prev.platforms.filter(p => p !== platform) 
+                              }));
+                            }
+                          }}
+                        />
                         <span className="text-sm text-slate-300">{platform}</span>
                       </label>
                     ))}
@@ -922,10 +1003,19 @@ function PostQueueContent() {
                     id="schedule-time"
                     type="datetime-local"
                     className="bg-slate-700 border-slate-600"
+                    value={newPostData.scheduledTime}
+                    onChange={(e) => setNewPostData(prev => ({ ...prev, scheduledTime: e.target.value }))}
+                    min={new Date().toISOString().slice(0, 16)}
                   />
                 </div>
               </div>
-              <Button onClick={handleCreatePost} className="w-full">Schedule Post</Button>
+              <Button 
+                onClick={handleCreatePost} 
+                className="w-full"
+                disabled={!newPostData.content.trim() || !newPostData.scheduledTime}
+              >
+                Schedule Post
+              </Button>
             </div>
           </DialogContent>
         </Dialog>
@@ -1252,11 +1342,11 @@ function BotConfigurationContent() {
       const data = await response.json();
       
       if (response.ok && data.success) {
-        const successfulPosts = data.results.filter(r => r.status === 'success');
-        const failedPosts = data.results.filter(r => r.status === 'failed');
+        const successfulPosts = data.results.filter((r: any) => r.status === 'success');
+        const failedPosts = data.results.filter((r: any) => r.status === 'failed');
         
         if (successfulPosts.length > 0) {
-          const twitterPost = successfulPosts.find(p => p.platform === 'twitter');
+          const twitterPost = successfulPosts.find((p: any) => p.platform === 'twitter');
           if (twitterPost && twitterPost.url) {
             toast({
               title: "Posted to Twitter Successfully!",
@@ -1273,7 +1363,7 @@ function BotConfigurationContent() {
         }
         
         if (failedPosts.length > 0) {
-          failedPosts.forEach(post => {
+          failedPosts.forEach((post: any) => {
             toast({
               title: `${post.platform} Failed`,
               description: post.error || 'Unknown error occurred',
