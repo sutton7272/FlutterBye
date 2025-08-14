@@ -270,6 +270,20 @@ export class SocialEngagementAutomation {
     }
   }
 
+  // Generate optimal hashtags for engagement
+  private generateEngagementHashtags(originalHashtags: string[]): string[] {
+    const engagementHashtags = [
+      '#Excited', '#GameChanger', '#Revolutionary', '#Innovative', '#Future',
+      '#Amazing', '#Impressive', '#Bullish', '#Web3', '#Crypto', '#Tech'
+    ];
+    
+    // Mix original hashtags with engagement-specific ones
+    const selectedEngagement = engagementHashtags.sort(() => 0.5 - Math.random()).slice(0, 2);
+    const selectedOriginal = originalHashtags.slice(0, 3);
+    
+    return [...selectedOriginal, ...selectedEngagement];
+  }
+
   // Generate contextual comments based on engagement style
   private async generateContextualComment(
     style: string,
@@ -277,13 +291,17 @@ export class SocialEngagementAutomation {
     originalPoster: string
   ): Promise<string> {
     const stylePrompts = {
-      supportive: "Write a brief supportive comment (1-2 sentences) that encourages the post and shows enthusiasm about Flutterbye's innovation.",
-      curious: "Write a brief curious question (1-2 sentences) asking about a specific feature or how something works in Flutterbye.",
-      technical: "Write a brief technical comment (1-2 sentences) that shows understanding of the blockchain/Web3 aspects mentioned.",
-      casual: "Write a brief casual, friendly response (1-2 sentences) that sounds like a regular user who's interested in trying Flutterbye."
+      supportive: "Write a brief supportive comment (1-2 sentences) that encourages the post and shows enthusiasm about Flutterbye's innovation. Include 1-2 relevant hashtags at the end.",
+      curious: "Write a brief curious question (1-2 sentences) asking about a specific feature or how something works in Flutterbye. Include 1-2 relevant hashtags at the end.",
+      technical: "Write a brief technical comment (1-2 sentences) that shows understanding of the blockchain/Web3 aspects mentioned. Include 1-2 relevant hashtags at the end.",
+      casual: "Write a brief casual, friendly response (1-2 sentences) that sounds like a regular user who's interested in trying Flutterbye. Include 1-2 relevant hashtags at the end."
     };
 
     const prompt = stylePrompts[style as keyof typeof stylePrompts] || stylePrompts.supportive;
+
+    // Get engagement hashtags based on original post
+    const engagementHashtags = this.generateEngagementHashtags(originalContent.hashtags || []);
+    const hashtagContext = engagementHashtags.slice(0, 3).join(' ');
 
     try {
       const response = await openai.chat.completions.create({
@@ -291,27 +309,35 @@ export class SocialEngagementAutomation {
         messages: [
           {
             role: "system",
-            content: `You are commenting on a social media post about Flutterbye. Original post: "${originalContent.text}". ${prompt} Keep it under 100 characters and natural. Don't use hashtags in comments.`
+            content: `You are commenting on a social media post about Flutterbye. Original post: "${originalContent.text}". ${prompt} Keep it under 150 characters total including hashtags. Use these relevant hashtags: ${hashtagContext}`
           },
           {
             role: "user",
-            content: "Generate a natural comment response."
+            content: "Generate a natural comment response with optimal hashtags for maximum engagement."
           }
         ],
-        max_tokens: 50
+        max_tokens: 60
       });
 
-      return response.choices[0].message.content?.trim() || '';
+      const comment = response.choices[0].message.content?.trim() || '';
+      
+      // Ensure hashtags are included if AI didn't add them
+      if (comment && !comment.includes('#')) {
+        const topHashtags = engagementHashtags.slice(0, 2).join(' ');
+        return `${comment} ${topHashtags}`;
+      }
+      
+      return comment;
     } catch (error) {
-      // Fallback comments by style
+      // Enhanced fallback comments with hashtags by style
       const fallbacks = {
-        supportive: "This looks amazing! 🚀",
-        curious: "How does the token creation work exactly?",
-        technical: "The blockchain integration seems solid 👍",
-        casual: "Definitely want to try this out!"
+        supportive: "This looks amazing! 🚀 #GameChanger #Innovative",
+        curious: "How does the token creation work exactly? #Curious #Web3",
+        technical: "The blockchain integration seems solid 👍 #Tech #Bullish",
+        casual: "Definitely want to try this out! #Excited #Future"
       };
 
-      return fallbacks[style as keyof typeof fallbacks] || "Great post! 👏";
+      return fallbacks[style as keyof typeof fallbacks] || "Great post! 👏 #Amazing #Web3";
     }
   }
 

@@ -229,26 +229,97 @@ export class FlutterbySocialContentGenerator {
   }
 
   private async generateHashtags(platform: string, theme: string): Promise<string[]> {
-    const response = await openai.chat.completions.create({
-      model: "gpt-4o", // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
-      messages: [
-        {
-          role: "system",
-          content: `Generate relevant hashtags for ${platform} about Flutterbye's ${theme}. Return 5-8 hashtags as a JSON array.`
-        },
-        {
-          role: "user",
-          content: "Generate hashtags focusing on Web3, blockchain, AI, messaging, and innovation."
-        }
-      ],
-      response_format: { type: "json_object" }
-    });
+    // Core brand hashtags that should always be included
+    const coreHashtags = ['#Flutterbye', '#Web3', '#Blockchain'];
+    
+    // Platform-specific hashtags for maximum reach
+    const platformHashtags: Record<string, string[]> = {
+      twitter: ['#CryptoTwitter', '#BuildInPublic', '#Innovation', '#AIRevolution', '#Web3Community'],
+      linkedin: ['#BlockchainInnovation', '#Web3Technology', '#DigitalTransformation', '#FutureOfWork', '#TechLeadership'],
+      instagram: ['#Web3Life', '#CryptoInnovation', '#TechTrends', '#DigitalLife', '#Innovation'],
+      facebook: ['#Innovation', '#Technology', '#DigitalFuture', '#Blockchain', '#AI']
+    };
+
+    // Theme-specific hashtags for targeted engagement
+    const themeHashtags: Record<string, string[]> = {
+      'Token Creation': ['#TokenMinting', '#CreateTokens', '#NFT', '#DigitalAssets', '#Crypto'],
+      'AI Features': ['#AI', '#ArtificialIntelligence', '#MachineLearning', '#SmartContracts'],
+      'Platform Updates': ['#News', '#Update', '#Launch', '#Breaking', '#Announcement'],
+      'User Growth': ['#Growth', '#Analytics', '#Metrics', '#Success', '#Progress'],
+      'Tutorial': ['#Tutorial', '#HowTo', '#Learn', '#Guide', '#Education', '#Web3Education']
+    };
+
+    // Trending hashtags that boost visibility
+    const trendingHashtags = [
+      '#TokenizedWorld', '#DecentralizedSocial', '#FutureOfMessaging', '#CryptoLife',
+      '#Web3Tech', '#BlockchainSolutions', '#DigitalInnovation', '#SmartContracts',
+      '#DeFi', '#NFTCommunity', '#CryptoInnovation', '#Web3Revolution', '#GameChanger'
+    ];
 
     try {
+      const response = await openai.chat.completions.create({
+        model: "gpt-4o", // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
+        messages: [
+          {
+            role: "system",
+            content: `Generate 2-3 strategic, trending hashtags for ${platform} about Flutterbye's ${theme}. Focus on viral potential and maximum engagement. Return as JSON array with "hashtags" field.`
+          },
+          {
+            role: "user",
+            content: `Create hashtags that will trend and maximize visibility for a revolutionary Web3 messaging platform discussing ${theme}.`
+          }
+        ],
+        response_format: { type: "json_object" }
+      });
+
       const result = JSON.parse(response.choices[0].message.content || '{"hashtags":[]}');
-      return result.hashtags || [];
-    } catch {
-      return ['#Web3', '#Blockchain', '#AI', '#Innovation', '#Crypto', '#DeFi', '#SocialMedia'];
+      const aiHashtags = result.hashtags || [];
+      
+      // Combine hashtags strategically
+      const specificTags = themeHashtags[theme] || [];
+      const platformTags = platformHashtags[platform] || [];
+      const randomTrending = trendingHashtags.sort(() => 0.5 - Math.random()).slice(0, 2);
+      
+      // Platform-specific limits for optimal engagement
+      const platformLimits: Record<string, number> = {
+        twitter: 10,    // Twitter allows more hashtags
+        linkedin: 8,    // LinkedIn prefers fewer, more professional
+        instagram: 15,  // Instagram supports many hashtags
+        facebook: 6     // Facebook prefers minimal hashtags
+      };
+
+      // Build final hashtag list
+      const finalHashtags = [
+        ...coreHashtags,
+        ...platformTags.slice(0, 3),
+        ...specificTags.slice(0, 3),
+        ...aiHashtags.slice(0, 2),
+        ...randomTrending
+      ];
+      
+      // Remove duplicates and ensure proper formatting
+      const uniqueHashtags = [...new Set(finalHashtags)]
+        .map(tag => tag.startsWith('#') ? tag : `#${tag}`)
+        .slice(0, platformLimits[platform] || 8);
+      
+      console.log(`🏷️ Generated ${uniqueHashtags.length} optimal hashtags for ${platform} ${theme}:`, uniqueHashtags);
+      return uniqueHashtags;
+      
+    } catch (error) {
+      console.error('Failed to generate AI hashtags, using enhanced fallback:', error);
+      
+      // Enhanced fallback with theme-specific tags
+      const specificTags = themeHashtags[theme] || [];
+      const platformTags = platformHashtags[platform] || [];
+      const fallbackTags = [
+        ...coreHashtags,
+        ...platformTags.slice(0, 3),
+        ...specificTags.slice(0, 3),
+        '#CryptoTwitter',
+        '#Innovation'
+      ];
+      
+      return fallbackTags.slice(0, 10);
     }
   }
 

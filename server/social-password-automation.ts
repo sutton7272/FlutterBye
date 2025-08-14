@@ -331,26 +331,77 @@ export class SocialPasswordAutomation {
   }
 
   private async generateHashtags(contentType: string): Promise<string[]> {
-    const response = await openai.chat.completions.create({
-      model: "gpt-4o", // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
-      messages: [
-        {
-          role: "system",
-          content: `Generate 5-7 relevant hashtags for Flutterbye's ${contentType}. Return as a JSON array.`
-        },
-        {
-          role: "user",
-          content: "Generate hashtags focusing on Web3, blockchain, AI, messaging, and innovation."
-        }
-      ],
-      response_format: { type: "json_object" }
-    });
+    // Core Flutterbye hashtags that should always be included
+    const coreHashtags = ['#Flutterbye', '#Web3', '#Blockchain'];
+    
+    // Content-specific hashtag pools
+    const contentHashtags: Record<string, string[]> = {
+      'features': ['#TokenMessaging', '#AI', '#Innovation', '#DeFi', '#SmartContracts'],
+      'stats': ['#Growth', '#Analytics', '#UserAdoption', '#Metrics', '#Success'],
+      'tutorial': ['#Tutorial', '#HowTo', '#Learn', '#Guide', '#Education'],
+      'token-creation': ['#TokenMinting', '#CreateTokens', '#NFT', '#DigitalAssets', '#Crypto']
+    };
+
+    // Trending/Popular hashtags that boost visibility
+    const trendingHashtags = [
+      '#CryptoTwitter', '#BuildInPublic', '#Web3Community', '#BlockchainInnovation',
+      '#AIRevolution', '#FutureOfMessaging', '#DecentralizedSocial', '#TokenizedWorld',
+      '#DigitalTransformation', '#CryptoLife', '#Web3Tech', '#InnovationHub'
+    ];
 
     try {
+      const response = await openai.chat.completions.create({
+        model: "gpt-4o", // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
+        messages: [
+          {
+            role: "system",
+            content: `Generate 3-4 strategic hashtags for Flutterbye's ${contentType} content. Focus on viral, trending tags that maximize reach and engagement. Consider current crypto/Web3 trends. Return as a JSON array with "hashtags" field.`
+          },
+          {
+            role: "user",
+            content: `Create hashtags that will trend and get maximum visibility for a revolutionary Web3 messaging platform. Focus on ${contentType} content.`
+          }
+        ],
+        response_format: { type: "json_object" }
+      });
+
       const result = JSON.parse(response.choices[0].message.content || '{"hashtags":[]}');
-      return result.hashtags || [];
-    } catch {
-      return ['#Web3', '#Blockchain', '#AI', '#Innovation', '#Crypto', '#DeFi'];
+      const aiHashtags = result.hashtags || [];
+      
+      // Combine hashtags strategically
+      const specificTags = contentHashtags[contentType] || [];
+      const randomTrending = trendingHashtags.sort(() => 0.5 - Math.random()).slice(0, 2);
+      
+      // Build final hashtag list (8-12 total for maximum reach)
+      const finalHashtags = [
+        ...coreHashtags,
+        ...specificTags.slice(0, 3),
+        ...aiHashtags.slice(0, 3),
+        ...randomTrending
+      ];
+      
+      // Remove duplicates and ensure they start with #
+      const uniqueHashtags = [...new Set(finalHashtags)]
+        .map(tag => tag.startsWith('#') ? tag : `#${tag}`)
+        .slice(0, 12); // Limit to 12 hashtags
+      
+      console.log(`🏷️ Generated ${uniqueHashtags.length} optimal hashtags for ${contentType}:`, uniqueHashtags);
+      return uniqueHashtags;
+      
+    } catch (error) {
+      console.error('Failed to generate AI hashtags, using fallback:', error);
+      
+      // Enhanced fallback with content-specific tags
+      const specificTags = contentHashtags[contentType] || [];
+      const fallbackTags = [
+        ...coreHashtags,
+        ...specificTags.slice(0, 4),
+        '#CryptoTwitter',
+        '#Innovation',
+        '#BuildInPublic'
+      ];
+      
+      return fallbackTags.slice(0, 10);
     }
   }
 
