@@ -64,7 +64,7 @@ interface InteractionStat {
   targetAccount: string;
   engagementAccount: string;
   platform: string;
-  interactionType: 'like' | 'comment' | 'retweet' | 'follow';
+  interactionType: 'like' | 'comment' | 'retweet' | 'follow' | 'post';
   timestamp: string;
   success: boolean;
 }
