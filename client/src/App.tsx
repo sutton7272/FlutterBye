@@ -79,6 +79,12 @@ const SocialPasswordAutomation = lazy(() => import("@/pages/social-password-auto
 const AISocialOptimization = lazy(() => import("@/pages/ai-social-optimization"));
 const SocialAutomationDashboard = lazy(() => import("@/pages/social-automation-dashboard-streamlined"));
 const SocialContentScheduler = lazy(() => import("@/pages/social-content-scheduler"));
+const SocialAnalyticsDashboard = lazy(() => import("@/pages/social-analytics-dashboard"));
+const EngagementAccounts = lazy(() => import("@/pages/engagement-accounts"));
+const ContentLibrary = lazy(() => import("@/pages/content-library"));
+const PostQueueManager = lazy(() => import("@/pages/post-queue-manager"));
+const AIOptimizationCenter = lazy(() => import("@/pages/ai-optimization-center"));
+const ComprehensiveSocialDashboard = lazy(() => import("@/pages/comprehensive-social-dashboard"));
 const UnifiedAdminDashboard = lazy(() => import("@/pages/admin-unified"));
 import TokenHolderMapPage from "@/pages/token-holder-map";
 import CollaborativeCreation from "@/pages/collaborative-creation";
@@ -136,7 +142,14 @@ function Router() {
     <div className="dark min-h-screen flex flex-col bg-transparent">
       <div className="flex-1 bg-transparent">
         <Switch>
-        <Route path="/" component={LaunchCountdown} />
+        <Route path="/" component={() => (
+          <>
+            <Navbar />
+            <SuspenseWrapper>
+              <SocialAutomationDashboard />
+            </SuspenseWrapper>
+          </>
+        )} />
         <Route path="/launch" component={LaunchCountdown} />
         <Route path="/home" component={() => (
           <>
@@ -426,7 +439,32 @@ function Router() {
         
         <Route path="/social-automation-dashboard" component={() => (
           <SuspenseWrapper>
-            <SocialAutomationDashboard />
+            <ComprehensiveSocialDashboard />
+          </SuspenseWrapper>
+        )} />
+        <Route path="/social-analytics" component={() => (
+          <SuspenseWrapper>
+            <SocialAnalyticsDashboard />
+          </SuspenseWrapper>
+        )} />
+        <Route path="/engagement-accounts" component={() => (
+          <SuspenseWrapper>
+            <EngagementAccounts />
+          </SuspenseWrapper>
+        )} />
+        <Route path="/content-library" component={() => (
+          <SuspenseWrapper>
+            <ContentLibrary />
+          </SuspenseWrapper>
+        )} />
+        <Route path="/post-queue" component={() => (
+          <SuspenseWrapper>
+            <PostQueueManager />
+          </SuspenseWrapper>
+        )} />
+        <Route path="/ai-optimization" component={() => (
+          <SuspenseWrapper>
+            <AIOptimizationCenter />
           </SuspenseWrapper>
         )} />
         <Route path="/social-content-scheduler" component={() => (
