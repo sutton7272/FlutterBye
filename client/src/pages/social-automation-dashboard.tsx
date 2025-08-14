@@ -135,22 +135,37 @@ export default function SocialAutomationDashboard() {
   const testInstantPost = async () => {
     setTestPostLoading(true);
     try {
-      const response = await fetch('/api/social/test-post', { method: 'POST' });
+      // Use the real browser automation endpoint that works
+      const response = await fetch('/api/social-automation/test-post', { 
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          platform: 'twitter',
+          username: 'flutterbye_io',
+          password: 'Flutterbye72!',
+          testMessage: '🚀 FlutterBye Social Bot LIVE from Dashboard! Revolutionary Web3 platform with AI-powered token messaging! #FlutterBye #Web3 #AI #SocialAutomation'
+        })
+      });
       const result = await response.json();
-      if (response.ok) {
+      if (response.ok && result.success) {
         toast({ 
-          title: 'Test Post Results', 
-          description: `${result.successful} accounts posted successfully` 
+          title: 'Twitter Post Success! 🎉', 
+          description: `Real tweet posted: ${result.message}`,
+          className: 'bg-green-900 border-green-500 text-white'
         });
       } else {
         toast({ 
-          title: 'Test failed', 
-          description: result.error || 'Unknown error',
+          title: 'Twitter Post Failed', 
+          description: result.error || result.message || 'Browser automation error',
           variant: 'destructive' 
         });
       }
     } catch (error) {
-      toast({ title: 'Test failed', variant: 'destructive' });
+      toast({ 
+        title: 'Test failed', 
+        description: 'Network or browser automation error',
+        variant: 'destructive' 
+      });
     } finally {
       setTestPostLoading(false);
     }
