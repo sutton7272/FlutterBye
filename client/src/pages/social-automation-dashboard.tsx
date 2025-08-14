@@ -92,21 +92,25 @@ export default function SocialAutomationDashboard() {
     openai: ''
   });
 
-  // Fetch social accounts from API with better error handling
-  const { data: socialAccounts = [], isLoading: accountsLoading, error: accountsError } = useQuery({
+  // Fetch social accounts from API with type safety
+  const { data: socialAccountsData = [], isLoading: accountsLoading, error: accountsError } = useQuery({
     queryKey: ['/api/social-automation/accounts'],
     refetchInterval: 10000, // Refresh every 10 seconds
     retry: 3,
     retryDelay: 1000,
   });
 
-  // Fetch bot configurations from API with better error handling
-  const { data: botConfigs = [], isLoading: botsLoading, error: botsError } = useQuery({
+  // Fetch bot configurations from API with type safety  
+  const { data: botConfigsData = [], isLoading: botsLoading, error: botsError } = useQuery({
     queryKey: ['/api/social-automation/bots'],
     refetchInterval: 5000, // Refresh every 5 seconds
     retry: 3,
     retryDelay: 1000,
   });
+
+  // Safely cast data with fallbacks
+  const socialAccounts: SocialAccount[] = Array.isArray(socialAccountsData) ? socialAccountsData : [];
+  const botConfigs: BotConfig[] = Array.isArray(botConfigsData) ? botConfigsData : [];
 
   // Fetch dashboard stats
   const { data: stats } = useQuery({
@@ -217,7 +221,7 @@ export default function SocialAutomationDashboard() {
   };
 
   const toggleBotStatus = async (botId: string) => {
-    const bot = botConfigs.find(b => b.id === botId);
+    const bot = botConfigs.find((b: any) => b.id === botId);
     if (!bot) return;
 
     const newStatus = bot.status === 'running' ? 'stopped' : 'running';
@@ -249,7 +253,7 @@ export default function SocialAutomationDashboard() {
   };
 
   const toggleAccountStatus = async (accountId: string) => {
-    const account = socialAccounts.find(acc => acc.id === accountId);
+    const account = socialAccounts.find((acc: any) => acc.id === accountId);
     if (!account) return;
 
     const newStatus = account.status === 'active' ? 'inactive' : 'active';
@@ -334,7 +338,7 @@ export default function SocialAutomationDashboard() {
                   <Activity className="w-8 h-8 text-purple-400" />
                   <div>
                     <p className="text-sm text-slate-400">Active Bots</p>
-                    <p className="text-2xl font-bold text-white">{botConfigs.filter(b => b.status === 'running').length}</p>
+                    <p className="text-2xl font-bold text-white">{botConfigs?.filter((b: any) => b.status === 'running')?.length || 0}</p>
                   </div>
                 </div>
               </CardContent>
@@ -346,7 +350,7 @@ export default function SocialAutomationDashboard() {
                   <Users className="w-8 h-8 text-purple-400" />
                   <div>
                     <p className="text-sm text-slate-400">Connected Accounts</p>
-                    <p className="text-2xl font-bold text-white">{socialAccounts.filter(a => a.status === 'active').length}</p>
+                    <p className="text-2xl font-bold text-white">{socialAccounts?.filter((a: any) => a.status === 'active')?.length || 0}</p>
                   </div>
                 </div>
               </CardContent>
@@ -358,7 +362,7 @@ export default function SocialAutomationDashboard() {
                   <TrendingUp className="w-8 h-8 text-purple-400" />
                   <div>
                     <p className="text-sm text-slate-400">Posts Today</p>
-                    <p className="text-2xl font-bold text-white">{botConfigs.reduce((sum, bot) => sum + bot.postsToday, 0)}</p>
+                    <p className="text-2xl font-bold text-white">{botConfigs?.reduce((sum: any, bot: any) => sum + (bot.postsToday || 0), 0) || 0}</p>
                   </div>
                 </div>
               </CardContent>
@@ -370,7 +374,7 @@ export default function SocialAutomationDashboard() {
                   <Target className="w-8 h-8 text-purple-400" />
                   <div>
                     <p className="text-sm text-slate-400">Total Engagements</p>
-                    <p className="text-2xl font-bold text-white">{botConfigs.reduce((sum, bot) => sum + bot.engagements, 0)}</p>
+                    <p className="text-2xl font-bold text-white">{botConfigs?.reduce((sum: any, bot: any) => sum + (bot.engagements || 0), 0) || 0}</p>
                   </div>
                 </div>
               </CardContent>
@@ -400,7 +404,7 @@ export default function SocialAutomationDashboard() {
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-3">
-                    {botConfigs.slice(0, 3).map((bot) => (
+                    {Array.isArray(botConfigs) && botConfigs.slice(0, 3).map((bot: any) => (
                       <div key={bot.id} className="flex items-center justify-between p-3 bg-slate-700/50 rounded-lg">
                         <div>
                           <p className="font-medium text-white">{bot.name}</p>
@@ -608,7 +612,7 @@ export default function SocialAutomationDashboard() {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {socialAccounts.map((account) => (
+                    {Array.isArray(socialAccounts) && socialAccounts.map((account: any) => (
                       <TableRow key={account.id} className="border-slate-700">
                         <TableCell className="font-medium">{account.platform}</TableCell>
                         <TableCell>{account.username}</TableCell>
@@ -617,9 +621,9 @@ export default function SocialAutomationDashboard() {
                             {account.status}
                           </Badge>
                         </TableCell>
-                        <TableCell>{account.postsToday}</TableCell>
-                        <TableCell>{account.followers.toLocaleString()}</TableCell>
-                        <TableCell>{account.lastActivity}</TableCell>
+                        <TableCell>{account.postsToday || 0}</TableCell>
+                        <TableCell>{account.followers?.toLocaleString() || 0}</TableCell>
+                        <TableCell>{account.lastActivity || 'Never'}</TableCell>
                         <TableCell>
                           <div className="flex gap-2">
                             <Button 
@@ -774,7 +778,7 @@ export default function SocialAutomationDashboard() {
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {botConfigs.map((bot) => (
+              {Array.isArray(botConfigs) && botConfigs.map((bot: any) => (
                 <Card key={bot.id} className="bg-slate-800/50 border-purple-500/30">
                   <CardHeader>
                     <div className="flex justify-between items-start">
@@ -792,21 +796,21 @@ export default function SocialAutomationDashboard() {
                       <div className="grid grid-cols-2 gap-4">
                         <div>
                           <p className="text-sm text-slate-400">Posts Today</p>
-                          <p className="text-2xl font-bold text-white">{bot.postsToday}</p>
+                          <p className="text-2xl font-bold text-white">{bot.postsToday || 0}</p>
                         </div>
                         <div>
                           <p className="text-sm text-slate-400">Engagements</p>
-                          <p className="text-2xl font-bold text-white">{bot.engagements}</p>
+                          <p className="text-2xl font-bold text-white">{bot.engagements || 0}</p>
                         </div>
                       </div>
                       <div className="grid grid-cols-2 gap-4">
                         <div>
                           <p className="text-sm text-slate-400">Uptime</p>
-                          <p className="font-medium text-white">{bot.uptime}</p>
+                          <p className="font-medium text-white">{bot.uptime || 'N/A'}</p>
                         </div>
                         <div>
                           <p className="text-sm text-slate-400">Last Activity</p>
-                          <p className="font-medium text-white">{bot.lastActivity}</p>
+                          <p className="font-medium text-white">{bot.lastActivity || 'Never'}</p>
                         </div>
                       </div>
                       <div className="flex gap-2 pt-4">
