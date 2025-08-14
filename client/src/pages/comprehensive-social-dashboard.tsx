@@ -943,8 +943,8 @@ function PostQueueContent() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h3 className="text-xl font-semibold text-white">Post Queue</h3>
-          <p className="text-slate-400">Schedule and manage your social media posts</p>
+          <h3 className="text-xl font-semibold text-white">Post Queue Management</h3>
+          <p className="text-slate-400">Schedule, manage, and monitor your social media posts across platforms</p>
         </div>
         <Dialog open={showCreatePost} onOpenChange={setShowCreatePost}>
           <DialogTrigger asChild>
@@ -1002,11 +1002,14 @@ function PostQueueContent() {
                   <Input
                     id="schedule-time"
                     type="datetime-local"
-                    className="bg-slate-700 border-slate-600"
+                    className="bg-slate-700 border-slate-600 text-white"
                     value={newPostData.scheduledTime}
                     onChange={(e) => setNewPostData(prev => ({ ...prev, scheduledTime: e.target.value }))}
                     min={new Date().toISOString().slice(0, 16)}
                   />
+                  <p className="text-xs text-slate-400 mt-1">
+                    Select date and time for posting (your timezone)
+                  </p>
                 </div>
               </div>
               <Button 

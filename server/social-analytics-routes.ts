@@ -8,17 +8,17 @@ export function registerSocialAnalyticsRoutes(app: Express) {
       const { timeRange = '7d' } = req.query;
       
       // Get scheduled posts data
-      const scheduledPosts = await socialBotStorage.getScheduledPosts();
-      const publishedPosts = scheduledPosts.filter(post => post.status === 'published');
+      const scheduledPosts = await socialBotStorage.getAllScheduledPosts();
+      const publishedPosts = scheduledPosts.filter((post: any) => post.status === 'published');
       
       // Calculate real engagement metrics
       const totalPosts = publishedPosts.length;
       const averageEngagement = publishedPosts.length > 0 
-        ? publishedPosts.reduce((sum, post) => sum + (post.engagementScore || 0), 0) / publishedPosts.length
+        ? publishedPosts.reduce((sum: number, post: any) => sum + (post.engagementScore || 0), 0) / publishedPosts.length
         : 0;
       
       // Platform distribution from actual posts
-      const platformDistribution = publishedPosts.reduce((acc: any, post) => {
+      const platformDistribution = publishedPosts.reduce((acc: any, post: any) => {
         const platform = post.platform || 'Twitter';
         acc[platform] = (acc[platform] || 0) + 1;
         return acc;
@@ -26,7 +26,7 @@ export function registerSocialAnalyticsRoutes(app: Express) {
       
       // Engagement by time of day from scheduled posts
       const engagementByHour = Array.from({ length: 24 }, (_, hour) => {
-        const hourPosts = scheduledPosts.filter(post => {
+        const hourPosts = scheduledPosts.filter((post: any) => {
           const postHour = new Date(post.scheduledTime).getHours();
           return postHour === hour;
         });
@@ -34,16 +34,16 @@ export function registerSocialAnalyticsRoutes(app: Express) {
         return {
           hour: hour === 0 ? '12AM' : hour <= 12 ? `${hour}AM` : `${hour - 12}PM`,
           engagement: hourPosts.length > 0 
-            ? hourPosts.reduce((sum, post) => sum + (post.engagementScore || 0), 0) / hourPosts.length
+            ? hourPosts.reduce((sum: number, post: any) => sum + (post.engagementScore || 0), 0) / hourPosts.length
             : 0
         };
       }).filter(item => item.engagement > 0);
       
       // Recent posts with real data
       const recentPosts = publishedPosts
-        .sort((a, b) => new Date(b.scheduledTime).getTime() - new Date(a.scheduledTime).getTime())
+        .sort((a: any, b: any) => new Date(b.scheduledTime).getTime() - new Date(a.scheduledTime).getTime())
         .slice(0, 10)
-        .map(post => ({
+        .map((post: any) => ({
           id: post.id,
           content: post.content,
           platform: post.platform || 'Twitter',
@@ -59,8 +59,8 @@ export function registerSocialAnalyticsRoutes(app: Express) {
         }));
       
       // Hashtag performance from actual posts
-      const hashtagPerformance = {};
-      publishedPosts.forEach(post => {
+      const hashtagPerformance: Record<string, any> = {};
+      publishedPosts.forEach((post: any) => {
         const hashtags = post.content.match(/#\w+/g) || [];
         hashtags.forEach((tag: string) => {
           if (!hashtagPerformance[tag]) {
@@ -124,14 +124,14 @@ export function registerSocialAnalyticsRoutes(app: Express) {
   // Get posting performance insights
   app.get('/api/social-automation/insights', async (req, res) => {
     try {
-      const scheduledPosts = await socialBotStorage.getScheduledPosts();
-      const botConfigs = await socialBotStorage.getBotConfigs();
+      const scheduledPosts = await socialBotStorage.getAllScheduledPosts();
+      const botConfigs = await socialBotStorage.getAllBotConfigurations();
       
       const insights = {
-        activeBots: botConfigs.filter(bot => bot.isActive).length,
+        activeBots: botConfigs.filter((bot: any) => bot.isActive).length,
         totalBots: botConfigs.length,
-        pendingPosts: scheduledPosts.filter(post => post.status === 'scheduled').length,
-        publishedPosts: scheduledPosts.filter(post => post.status === 'published').length,
+        pendingPosts: scheduledPosts.filter((post: any) => post.status === 'scheduled').length,
+        publishedPosts: scheduledPosts.filter((post: any) => post.status === 'published').length,
         averagePostsPerDay: Math.round(scheduledPosts.length / 7 * 10) / 10,
         contentStrategy: {
           usingFlutterByeAssets: true,
