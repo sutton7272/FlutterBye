@@ -13,6 +13,24 @@ let automationInterval: NodeJS.Timeout | null = null;
 // Storage for social posts (in production, use database)
 const socialPosts: SocialMediaPost[] = [];
 
+// Bot configurations and running instances
+interface BotConfig {
+  id: string;
+  name: string;
+  platform: string;
+  status: 'running' | 'stopped' | 'error';
+  postingFrequency: string;
+  engagementRate: string;
+  postsToday?: number;
+  uptime?: string;
+  lastActivity?: string;
+  createdAt: string;
+}
+
+// In-memory storage for bot configs (in production, use database)
+const botConfigs: BotConfig[] = [];
+const runningBots = new Map<string, { interval: NodeJS.Timeout; twitterAPI?: any }>();
+
 export function registerSocialRoutes(app: Express) {
   // Initialize social media bot
   app.post('/api/social/initialize', async (req, res) => {
@@ -121,6 +139,35 @@ export function registerSocialRoutes(app: Express) {
       posts: socialPosts.slice(-50), // Return last 50 posts
       total: socialPosts.length 
     });
+  });
+
+  // Get all bots
+  app.get('/api/social/bots', async (req, res) => {
+    res.json(botConfigs);
+  });
+
+  // Create new bot
+  app.post('/api/social/bots', async (req, res) => {
+    try {
+      const newBot: BotConfig = {
+        id: `bot-${Date.now()}`,
+        ...req.body,
+        status: 'stopped',
+        postsToday: 0,
+        uptime: '0h 0m',
+        lastActivity: 'Never',
+        createdAt: new Date().toISOString()
+      };
+      botConfigs.push(newBot);
+      res.json(newBot);
+    } catch (error) {
+      res.status(500).json({ error: 'Failed to create bot' });
+    }
+  });
+
+  // Get all accounts
+  app.get('/api/social/accounts', async (req, res) => {
+    res.json([]);
   });
 
   // Generate content preview without posting
@@ -842,14 +889,101 @@ export function registerSocialRoutes(app: Express) {
     try {
       const bot = botConfigs.find(b => b.id === req.params.id);
       if (bot) {
+        const previousStatus = bot.status;
         bot.status = bot.status === 'running' ? 'stopped' : 'running';
         bot.lastActivity = new Date().toISOString();
+        
         if (bot.status === 'running') {
           bot.uptime = '0h 1m';
+          
+          // Start actual Twitter posting when bot is activated
+          console.log(`🚀 Bot ${bot.name} activated - starting Twitter posting automation`);
+          
+          // Import Twitter API service
+          const { TwitterAPIService } = await import('./twitter-api-service.js');
+          
+          try {
+            const twitterAPI = new TwitterAPIService();
+            
+            // Create an immediate test post to verify functionality
+            const testContent = {
+              text: `🚀 FlutterBye Bot "${bot.name}" is now LIVE! Automated posting every ${bot.postingFrequency || 4} hours. #FlutterBye #Automation`,
+              hashtags: ['#FlutterByeBot', '#SocialAutomation', '#Web3']
+            };
+            
+            const postResult = await twitterAPI.postTweet(testContent);
+            console.log('🐦 Initial bot activation post result:', postResult);
+            
+            if (postResult.success) {
+              // Schedule recurring posts using the bot's posting frequency
+              const intervalHours = parseInt(bot.postingFrequency) || 4;
+              const intervalMs = intervalHours * 60 * 60 * 1000; // Convert to milliseconds
+              
+              // Store the interval reference so we can stop it later
+              if (runningBots.has(bot.id)) {
+                clearInterval(runningBots.get(bot.id)?.interval);
+              }
+              
+              const postingInterval = setInterval(async () => {
+                try {
+                  console.log(`🔄 Automated posting for bot ${bot.name}`);
+                  
+                  // Generate dynamic content for each post
+                  const messages = [
+                    'Building the future of Web3 communication with FlutterBye! Join our tokenized messaging revolution 🦋',
+                    'Every message has value! Experience the FlutterBye platform where communication meets blockchain innovation ⚡',
+                    'Tokenized messaging is here! Create, send, and monetize your messages on the FlutterBye platform 💎',
+                    'Web3 communication revolution! FlutterBye transforms how we share value through messages 🚀',
+                    'Join the FlutterBye ecosystem! Where every conversation has potential for viral value distribution 🌟'
+                  ];
+                  
+                  const randomMessage = messages[Math.floor(Math.random() * messages.length)];
+                  const hashtags = ['#FlutterBye', '#Web3', '#Blockchain', '#TokenizedMessaging', '#SocialFi'];
+                  
+                  const content = {
+                    text: randomMessage,
+                    hashtags: hashtags.slice(0, 3) // Use first 3 hashtags
+                  };
+                  
+                  const result = await twitterAPI.postTweet(content);
+                  if (result.success) {
+                    console.log(`✅ Bot ${bot.name} posted successfully: ${result.tweetId}`);
+                    bot.postsToday = (bot.postsToday || 0) + 1;
+                    bot.lastActivity = new Date().toISOString();
+                  } else {
+                    console.error(`❌ Bot ${bot.name} posting failed:`, result.message);
+                  }
+                } catch (error) {
+                  console.error(`❌ Bot ${bot.name} posting error:`, error);
+                }
+              }, intervalMs);
+              
+              // Store the running bot info
+              runningBots.set(bot.id, { 
+                interval: postingInterval,
+                twitterAPI: twitterAPI
+              });
+              
+              console.log(`✅ Bot ${bot.name} automation started with ${intervalHours}h intervals`);
+            }
+          } catch (apiError) {
+            console.error('❌ Twitter API error when starting bot:', apiError);
+            bot.status = 'error';
+          }
+        } else {
+          // Stop the bot posting automation
+          console.log(`⏹️ Bot ${bot.name} stopped - halting Twitter posting`);
+          
+          if (runningBots.has(bot.id)) {
+            clearInterval(runningBots.get(bot.id)?.interval);
+            runningBots.delete(bot.id);
+            console.log(`✅ Bot ${bot.name} automation stopped`);
+          }
         }
       }
-      res.json({ success: true });
+      res.json({ success: true, bot });
     } catch (error) {
+      console.error('❌ Failed to toggle bot:', error);
       res.status(500).json({ error: 'Failed to toggle bot' });
     }
   });
