@@ -1,0 +1,782 @@
+import { useState, useEffect } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Switch } from "@/components/ui/switch";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { useToast } from "@/hooks/use-toast";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { apiRequest } from "@/lib/queryClient";
+import Navbar from "@/components/navbar";
+import { 
+  Radio, 
+  Plus, 
+  Settings, 
+  Play, 
+  Pause, 
+  RotateCcw,
+  Trash2,
+  Eye,
+  EyeOff,
+  Activity,
+  Users,
+  TrendingUp,
+  BarChart3,
+  Brain,
+  Clock,
+  Zap,
+  Target,
+  CheckCircle,
+  AlertCircle,
+  Edit,
+  Save,
+  X
+} from "lucide-react";
+
+interface SocialAccount {
+  id: string;
+  platform: string;
+  username: string;
+  status: 'active' | 'inactive' | 'error';
+  lastActivity: string;
+  postsToday: number;
+  followers: number;
+}
+
+interface BotConfig {
+  id: string;
+  name: string;
+  status: 'running' | 'stopped' | 'error';
+  postsToday: number;
+  engagements: number;
+  uptime: string;
+  lastActivity: string;
+}
+
+export default function SocialAutomationDashboard() {
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+  const [showApiKeys, setShowApiKeys] = useState(false);
+  const [activeTab, setActiveTab] = useState("overview");
+  const [showAddAccount, setShowAddAccount] = useState(false);
+  const [showAddBot, setShowAddBot] = useState(false);
+  const [editingAccount, setEditingAccount] = useState<string | null>(null);
+
+  // Form states
+  const [newAccount, setNewAccount] = useState({
+    platform: '',
+    username: '',
+    password: '',
+    email: '',
+    phone: ''
+  });
+
+  const [newBot, setNewBot] = useState({
+    name: '',
+    platform: '',
+    targetAccounts: '',
+    postingFrequency: '4',
+    engagementRate: '75'
+  });
+
+  const [apiKeys, setApiKeys] = useState({
+    twitter: '',
+    instagram: '',
+    facebook: '',
+    tiktok: '',
+    openai: ''
+  });
+
+  // Mock data for demonstration
+  const [socialAccounts, setSocialAccounts] = useState<SocialAccount[]>([
+    {
+      id: '1',
+      platform: 'Twitter',
+      username: '@flutterbye_main',
+      status: 'active',
+      lastActivity: '2 minutes ago',
+      postsToday: 12,
+      followers: 5400
+    },
+    {
+      id: '2',
+      platform: 'Instagram',
+      username: '@flutterbye.official',
+      status: 'active',
+      lastActivity: '5 minutes ago',
+      postsToday: 8,
+      followers: 3200
+    },
+    {
+      id: '3',
+      platform: 'TikTok',
+      username: '@flutterbyte.crypto',
+      status: 'inactive',
+      lastActivity: '1 hour ago',
+      postsToday: 3,
+      followers: 1800
+    }
+  ]);
+
+  const [botConfigs, setBotConfigs] = useState<BotConfig[]>([
+    {
+      id: '1',
+      name: 'Main Engagement Bot',
+      status: 'running',
+      postsToday: 15,
+      engagements: 248,
+      uptime: '23h 45m',
+      lastActivity: '30 seconds ago'
+    },
+    {
+      id: '2',
+      name: 'Viral Amplifier Bot',
+      status: 'running',
+      postsToday: 8,
+      engagements: 156,
+      uptime: '18h 22m',
+      lastActivity: '1 minute ago'
+    }
+  ]);
+
+  const addSocialAccount = () => {
+    if (!newAccount.platform || !newAccount.username || !newAccount.password) {
+      toast({
+        title: "Missing Information",
+        description: "Please fill in all required fields",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    const account: SocialAccount = {
+      id: Date.now().toString(),
+      platform: newAccount.platform,
+      username: newAccount.username,
+      status: 'active',
+      lastActivity: 'Just now',
+      postsToday: 0,
+      followers: 0
+    };
+
+    setSocialAccounts([...socialAccounts, account]);
+    setNewAccount({ platform: '', username: '', password: '', email: '', phone: '' });
+    setShowAddAccount(false);
+    
+    toast({
+      title: "Account Added",
+      description: `${newAccount.platform} account @${newAccount.username} has been added successfully`,
+    });
+  };
+
+  const addBot = () => {
+    if (!newBot.name || !newBot.platform) {
+      toast({
+        title: "Missing Information",
+        description: "Please provide bot name and platform",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    const bot: BotConfig = {
+      id: Date.now().toString(),
+      name: newBot.name,
+      status: 'stopped',
+      postsToday: 0,
+      engagements: 0,
+      uptime: '0m',
+      lastActivity: 'Never'
+    };
+
+    setBotConfigs([...botConfigs, bot]);
+    setNewBot({ name: '', platform: '', targetAccounts: '', postingFrequency: '4', engagementRate: '75' });
+    setShowAddBot(false);
+    
+    toast({
+      title: "Bot Created",
+      description: `${newBot.name} has been created successfully`,
+    });
+  };
+
+  const toggleBotStatus = (botId: string) => {
+    setBotConfigs(bots => bots.map(bot => 
+      bot.id === botId 
+        ? { ...bot, status: bot.status === 'running' ? 'stopped' : 'running' }
+        : bot
+    ));
+  };
+
+  const toggleAccountStatus = (accountId: string) => {
+    setSocialAccounts(accounts => accounts.map(account => 
+      account.id === accountId 
+        ? { ...account, status: account.status === 'active' ? 'inactive' : 'active' }
+        : account
+    ));
+  };
+
+  const saveApiKeys = () => {
+    // In a real implementation, this would save to backend securely
+    toast({
+      title: "API Keys Saved",
+      description: "All API keys have been saved securely",
+    });
+    setShowApiKeys(false);
+  };
+
+  return (
+    <>
+      <Navbar />
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 p-6">
+        {/* Header */}
+        <div className="mb-8">
+          <div className="flex items-center gap-4 mb-4">
+            <div className="p-3 bg-purple-500/20 rounded-full border-2 border-purple-500/50 relative">
+              <div className="absolute inset-0 bg-purple-500/10 rounded-full animate-ping" />
+              <Radio className="w-8 h-8 text-purple-400 relative z-10" />
+            </div>
+            <div>
+              <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+                Social Automation Management
+              </h1>
+              <p className="text-slate-300">Complete AI-powered social media bot control center</p>
+            </div>
+          </div>
+
+          {/* Quick Stats */}
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+            <Card className="bg-slate-800/50 border-purple-500/30">
+              <CardContent className="p-4">
+                <div className="flex items-center gap-3">
+                  <Activity className="w-8 h-8 text-purple-400" />
+                  <div>
+                    <p className="text-sm text-slate-400">Active Bots</p>
+                    <p className="text-2xl font-bold text-white">{botConfigs.filter(b => b.status === 'running').length}</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-slate-800/50 border-purple-500/30">
+              <CardContent className="p-4">
+                <div className="flex items-center gap-3">
+                  <Users className="w-8 h-8 text-purple-400" />
+                  <div>
+                    <p className="text-sm text-slate-400">Connected Accounts</p>
+                    <p className="text-2xl font-bold text-white">{socialAccounts.filter(a => a.status === 'active').length}</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-slate-800/50 border-purple-500/30">
+              <CardContent className="p-4">
+                <div className="flex items-center gap-3">
+                  <TrendingUp className="w-8 h-8 text-purple-400" />
+                  <div>
+                    <p className="text-sm text-slate-400">Posts Today</p>
+                    <p className="text-2xl font-bold text-white">{botConfigs.reduce((sum, bot) => sum + bot.postsToday, 0)}</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-slate-800/50 border-purple-500/30">
+              <CardContent className="p-4">
+                <div className="flex items-center gap-3">
+                  <Target className="w-8 h-8 text-purple-400" />
+                  <div>
+                    <p className="text-sm text-slate-400">Total Engagements</p>
+                    <p className="text-2xl font-bold text-white">{botConfigs.reduce((sum, bot) => sum + bot.engagements, 0)}</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+
+        {/* Main Content Tabs */}
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+          <TabsList className="grid w-full grid-cols-4 mb-6 bg-slate-800/50">
+            <TabsTrigger value="overview">Overview</TabsTrigger>
+            <TabsTrigger value="accounts">Social Accounts</TabsTrigger>
+            <TabsTrigger value="bots">Bot Management</TabsTrigger>
+            <TabsTrigger value="settings">Settings & API Keys</TabsTrigger>
+          </TabsList>
+
+          {/* Overview Tab */}
+          <TabsContent value="overview" className="space-y-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* Active Bots */}
+              <Card className="bg-slate-800/50 border-purple-500/30">
+                <CardHeader>
+                  <CardTitle className="text-purple-400 flex items-center gap-2">
+                    <Radio className="w-5 h-5" />
+                    Active Bot Status
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3">
+                    {botConfigs.slice(0, 3).map((bot) => (
+                      <div key={bot.id} className="flex items-center justify-between p-3 bg-slate-700/50 rounded-lg">
+                        <div>
+                          <p className="font-medium text-white">{bot.name}</p>
+                          <p className="text-sm text-slate-400">Uptime: {bot.uptime}</p>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Badge variant={bot.status === 'running' ? 'default' : 'secondary'}>
+                            {bot.status}
+                          </Badge>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => toggleBotStatus(bot.id)}
+                            className="border-purple-500/50"
+                          >
+                            {bot.status === 'running' ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
+                          </Button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Recent Activity */}
+              <Card className="bg-slate-800/50 border-purple-500/30">
+                <CardHeader>
+                  <CardTitle className="text-purple-400 flex items-center gap-2">
+                    <BarChart3 className="w-5 h-5" />
+                    Recent Activity
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-3 p-3 bg-slate-700/50 rounded-lg">
+                      <CheckCircle className="w-5 h-5 text-green-400" />
+                      <div>
+                        <p className="font-medium text-white">Post published</p>
+                        <p className="text-sm text-slate-400">@flutterbye_main • 2 mins ago</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3 p-3 bg-slate-700/50 rounded-lg">
+                      <CheckCircle className="w-5 h-5 text-green-400" />
+                      <div>
+                        <p className="font-medium text-white">Engagement boost activated</p>
+                        <p className="text-sm text-slate-400">Viral Amplifier Bot • 5 mins ago</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3 p-3 bg-slate-700/50 rounded-lg">
+                      <CheckCircle className="w-5 h-5 text-green-400" />
+                      <div>
+                        <p className="font-medium text-white">Content optimized</p>
+                        <p className="text-sm text-slate-400">AI Optimization • 8 mins ago</p>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </TabsContent>
+
+          {/* Social Accounts Tab */}
+          <TabsContent value="accounts" className="space-y-6">
+            <div className="flex justify-between items-center">
+              <h3 className="text-2xl font-bold text-white">Connected Social Media Accounts</h3>
+              <Dialog open={showAddAccount} onOpenChange={setShowAddAccount}>
+                <DialogTrigger asChild>
+                  <Button className="bg-purple-600 hover:bg-purple-700">
+                    <Plus className="w-4 h-4 mr-2" />
+                    Add Account
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="bg-slate-800 border-purple-500/30">
+                  <DialogHeader>
+                    <DialogTitle className="text-purple-400">Add New Social Media Account</DialogTitle>
+                  </DialogHeader>
+                  <div className="space-y-4">
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <Label htmlFor="platform">Platform</Label>
+                        <Select value={newAccount.platform} onValueChange={(value) => setNewAccount({...newAccount, platform: value})}>
+                          <SelectTrigger className="bg-slate-700 border-slate-600">
+                            <SelectValue placeholder="Select platform" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="Twitter">Twitter</SelectItem>
+                            <SelectItem value="Instagram">Instagram</SelectItem>
+                            <SelectItem value="TikTok">TikTok</SelectItem>
+                            <SelectItem value="Facebook">Facebook</SelectItem>
+                            <SelectItem value="LinkedIn">LinkedIn</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div>
+                        <Label htmlFor="username">Username</Label>
+                        <Input
+                          id="username"
+                          placeholder="@username"
+                          value={newAccount.username}
+                          onChange={(e) => setNewAccount({...newAccount, username: e.target.value})}
+                          className="bg-slate-700 border-slate-600"
+                        />
+                      </div>
+                    </div>
+                    <div>
+                      <Label htmlFor="password">Password</Label>
+                      <Input
+                        id="password"
+                        type="password"
+                        placeholder="Account password"
+                        value={newAccount.password}
+                        onChange={(e) => setNewAccount({...newAccount, password: e.target.value})}
+                        className="bg-slate-700 border-slate-600"
+                      />
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <Label htmlFor="email">Email (optional)</Label>
+                        <Input
+                          id="email"
+                          type="email"
+                          placeholder="account@email.com"
+                          value={newAccount.email}
+                          onChange={(e) => setNewAccount({...newAccount, email: e.target.value})}
+                          className="bg-slate-700 border-slate-600"
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="phone">Phone (optional)</Label>
+                        <Input
+                          id="phone"
+                          placeholder="+1234567890"
+                          value={newAccount.phone}
+                          onChange={(e) => setNewAccount({...newAccount, phone: e.target.value})}
+                          className="bg-slate-700 border-slate-600"
+                        />
+                      </div>
+                    </div>
+                    <div className="flex gap-2 pt-4">
+                      <Button onClick={addSocialAccount} className="bg-purple-600 hover:bg-purple-700 flex-1">
+                        <Plus className="w-4 h-4 mr-2" />
+                        Add Account
+                      </Button>
+                      <Button variant="outline" onClick={() => setShowAddAccount(false)} className="border-slate-600">
+                        Cancel
+                      </Button>
+                    </div>
+                  </div>
+                </DialogContent>
+              </Dialog>
+            </div>
+
+            <Card className="bg-slate-800/50 border-purple-500/30">
+              <CardContent className="p-6">
+                <Table>
+                  <TableHeader>
+                    <TableRow className="border-slate-700">
+                      <TableHead>Platform</TableHead>
+                      <TableHead>Username</TableHead>
+                      <TableHead>Status</TableHead>
+                      <TableHead>Posts Today</TableHead>
+                      <TableHead>Followers</TableHead>
+                      <TableHead>Last Activity</TableHead>
+                      <TableHead>Actions</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {socialAccounts.map((account) => (
+                      <TableRow key={account.id} className="border-slate-700">
+                        <TableCell className="font-medium">{account.platform}</TableCell>
+                        <TableCell>{account.username}</TableCell>
+                        <TableCell>
+                          <Badge variant={account.status === 'active' ? 'default' : 'secondary'}>
+                            {account.status}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>{account.postsToday}</TableCell>
+                        <TableCell>{account.followers.toLocaleString()}</TableCell>
+                        <TableCell>{account.lastActivity}</TableCell>
+                        <TableCell>
+                          <div className="flex gap-2">
+                            <Button 
+                              size="sm" 
+                              variant="outline"
+                              onClick={() => toggleAccountStatus(account.id)}
+                              className="border-purple-500/50"
+                            >
+                              {account.status === 'active' ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
+                            </Button>
+                            <Button 
+                              size="sm" 
+                              variant="outline"
+                              onClick={() => setEditingAccount(account.id)}
+                              className="border-slate-600"
+                            >
+                              <Edit className="w-4 h-4" />
+                            </Button>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Bot Management Tab */}
+          <TabsContent value="bots" className="space-y-6">
+            <div className="flex justify-between items-center">
+              <h3 className="text-2xl font-bold text-white">Bot Configuration & Management</h3>
+              <Dialog open={showAddBot} onOpenChange={setShowAddBot}>
+                <DialogTrigger asChild>
+                  <Button className="bg-purple-600 hover:bg-purple-700">
+                    <Plus className="w-4 h-4 mr-2" />
+                    Create New Bot
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="bg-slate-800 border-purple-500/30">
+                  <DialogHeader>
+                    <DialogTitle className="text-purple-400">Create New Automation Bot</DialogTitle>
+                  </DialogHeader>
+                  <div className="space-y-4">
+                    <div>
+                      <Label htmlFor="botName">Bot Name</Label>
+                      <Input
+                        id="botName"
+                        placeholder="e.g., Content Amplifier Bot"
+                        value={newBot.name}
+                        onChange={(e) => setNewBot({...newBot, name: e.target.value})}
+                        className="bg-slate-700 border-slate-600"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="botPlatform">Primary Platform</Label>
+                      <Select value={newBot.platform} onValueChange={(value) => setNewBot({...newBot, platform: value})}>
+                        <SelectTrigger className="bg-slate-700 border-slate-600">
+                          <SelectValue placeholder="Select platform" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="Twitter">Twitter</SelectItem>
+                          <SelectItem value="Instagram">Instagram</SelectItem>
+                          <SelectItem value="TikTok">TikTok</SelectItem>
+                          <SelectItem value="Multi-Platform">Multi-Platform</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div>
+                      <Label htmlFor="targetAccounts">Target Accounts (comma-separated)</Label>
+                      <Input
+                        id="targetAccounts"
+                        placeholder="@account1, @account2, @account3"
+                        value={newBot.targetAccounts}
+                        onChange={(e) => setNewBot({...newBot, targetAccounts: e.target.value})}
+                        className="bg-slate-700 border-slate-600"
+                      />
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <Label htmlFor="postingFreq">Posts per Day</Label>
+                        <Select value={newBot.postingFrequency} onValueChange={(value) => setNewBot({...newBot, postingFrequency: value})}>
+                          <SelectTrigger className="bg-slate-700 border-slate-600">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="2">2 posts/day</SelectItem>
+                            <SelectItem value="4">4 posts/day</SelectItem>
+                            <SelectItem value="8">8 posts/day</SelectItem>
+                            <SelectItem value="12">12 posts/day</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div>
+                        <Label htmlFor="engagementRate">Engagement Rate %</Label>
+                        <Select value={newBot.engagementRate} onValueChange={(value) => setNewBot({...newBot, engagementRate: value})}>
+                          <SelectTrigger className="bg-slate-700 border-slate-600">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="25">25% - Conservative</SelectItem>
+                            <SelectItem value="50">50% - Moderate</SelectItem>
+                            <SelectItem value="75">75% - Aggressive</SelectItem>
+                            <SelectItem value="90">90% - Maximum</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+                    <div className="flex gap-2 pt-4">
+                      <Button onClick={addBot} className="bg-purple-600 hover:bg-purple-700 flex-1">
+                        <Plus className="w-4 h-4 mr-2" />
+                        Create Bot
+                      </Button>
+                      <Button variant="outline" onClick={() => setShowAddBot(false)} className="border-slate-600">
+                        Cancel
+                      </Button>
+                    </div>
+                  </div>
+                </DialogContent>
+              </Dialog>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {botConfigs.map((bot) => (
+                <Card key={bot.id} className="bg-slate-800/50 border-purple-500/30">
+                  <CardHeader>
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <CardTitle className="text-purple-400">{bot.name}</CardTitle>
+                        <p className="text-sm text-slate-400">ID: {bot.id}</p>
+                      </div>
+                      <Badge variant={bot.status === 'running' ? 'default' : 'secondary'}>
+                        {bot.status}
+                      </Badge>
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-4">
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <p className="text-sm text-slate-400">Posts Today</p>
+                          <p className="text-2xl font-bold text-white">{bot.postsToday}</p>
+                        </div>
+                        <div>
+                          <p className="text-sm text-slate-400">Engagements</p>
+                          <p className="text-2xl font-bold text-white">{bot.engagements}</p>
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <p className="text-sm text-slate-400">Uptime</p>
+                          <p className="font-medium text-white">{bot.uptime}</p>
+                        </div>
+                        <div>
+                          <p className="text-sm text-slate-400">Last Activity</p>
+                          <p className="font-medium text-white">{bot.lastActivity}</p>
+                        </div>
+                      </div>
+                      <div className="flex gap-2 pt-4">
+                        <Button
+                          onClick={() => toggleBotStatus(bot.id)}
+                          className={bot.status === 'running' ? "bg-red-600 hover:bg-red-700 flex-1" : "bg-green-600 hover:bg-green-700 flex-1"}
+                        >
+                          {bot.status === 'running' ? (
+                            <>
+                              <Pause className="w-4 h-4 mr-2" />
+                              Stop Bot
+                            </>
+                          ) : (
+                            <>
+                              <Play className="w-4 h-4 mr-2" />
+                              Start Bot
+                            </>
+                          )}
+                        </Button>
+                        <Button variant="outline" className="border-slate-600">
+                          <Settings className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </TabsContent>
+
+          {/* Settings & API Keys Tab */}
+          <TabsContent value="settings" className="space-y-6">
+            <h3 className="text-2xl font-bold text-white">Settings & API Configuration</h3>
+            
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* API Keys Management */}
+              <Card className="bg-slate-800/50 border-purple-500/30">
+                <CardHeader>
+                  <CardTitle className="text-purple-400 flex items-center gap-2">
+                    <Settings className="w-5 h-5" />
+                    API Keys Configuration
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  {Object.entries(apiKeys).map(([platform, key]) => (
+                    <div key={platform} className="space-y-2">
+                      <Label htmlFor={platform} className="capitalize">{platform} API Key</Label>
+                      <div className="flex gap-2">
+                        <Input
+                          id={platform}
+                          type={showApiKeys ? "text" : "password"}
+                          placeholder={`Enter ${platform} API key`}
+                          value={key}
+                          onChange={(e) => setApiKeys({...apiKeys, [platform]: e.target.value})}
+                          className="bg-slate-700 border-slate-600"
+                        />
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setShowApiKeys(!showApiKeys)}
+                          className="border-slate-600"
+                        >
+                          {showApiKeys ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
+                  <Button onClick={saveApiKeys} className="w-full bg-purple-600 hover:bg-purple-700">
+                    <Save className="w-4 h-4 mr-2" />
+                    Save API Keys
+                  </Button>
+                </CardContent>
+              </Card>
+
+              {/* Global Settings */}
+              <Card className="bg-slate-800/50 border-purple-500/30">
+                <CardHeader>
+                  <CardTitle className="text-purple-400 flex items-center gap-2">
+                    <Brain className="w-5 h-5" />
+                    Global Bot Settings
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="autoStart">Auto-start bots on system startup</Label>
+                    <Switch id="autoStart" />
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="smartTiming">Use AI-powered smart timing</Label>
+                    <Switch id="smartTiming" defaultChecked />
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="viralDetection">Enable viral content detection</Label>
+                    <Switch id="viralDetection" defaultChecked />
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="safetyMode">Enable safety mode</Label>
+                    <Switch id="safetyMode" defaultChecked />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Daily posting limit per account</Label>
+                    <Select defaultValue="20">
+                      <SelectTrigger className="bg-slate-700 border-slate-600">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="10">10 posts/day</SelectItem>
+                        <SelectItem value="20">20 posts/day</SelectItem>
+                        <SelectItem value="50">50 posts/day</SelectItem>
+                        <SelectItem value="unlimited">Unlimited</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </TabsContent>
+        </Tabs>
+      </div>
+    </>
+  );
+}

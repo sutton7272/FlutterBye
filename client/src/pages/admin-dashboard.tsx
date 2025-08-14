@@ -97,7 +97,7 @@ export default function AdminDashboard() {
       title: "Social Automation Management",
       description: "AI-powered social media bots with multi-account engagement amplification",
       icon: Radio,
-      route: "/ai-social-optimization",
+      route: "/social-automation-dashboard",
       color: "electric-purple",
       features: [
         "Multi-Bot Control Center",
