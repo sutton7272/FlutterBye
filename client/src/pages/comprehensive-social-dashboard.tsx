@@ -52,7 +52,8 @@ import {
   Copy,
   Sparkles,
   RefreshCw,
-  Send
+  Send,
+  Info
 } from 'lucide-react';
 
 // Component for AI Content Generation
@@ -1572,37 +1573,139 @@ function BotConfigurationContent() {
                   Configure Posting Schedule
                 </Button>
               </DialogTrigger>
-              <DialogContent className="bg-slate-800 border-slate-700 max-w-4xl">
+              <DialogContent className="bg-slate-800 border-slate-700 max-w-6xl max-h-[85vh]">
                 <DialogHeader>
-                  <DialogTitle>Strategic Posting Schedule</DialogTitle>
+                  <DialogTitle className="flex items-center gap-2">
+                    <Clock className="w-5 h-5" />
+                    Complete Daily Posting Schedule - All Time Slots
+                  </DialogTitle>
+                  <p className="text-slate-400 text-sm">
+                    Configure all posting times throughout the day. Enable/disable specific time slots and customize exact posting times for optimal engagement.
+                  </p>
                 </DialogHeader>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-h-[60vh] overflow-y-auto">
-                  {timeSlots.map((slot) => (
-                    <Card key={slot.key} className="bg-slate-700/50 border-slate-600">
-                      <CardContent className="p-4">
-                        <div className="flex items-center justify-between mb-2">
-                          <div>
-                            <h4 className="font-semibold text-white">{slot.label}</h4>
-                            <p className="text-xs text-slate-400">{slot.description}</p>
-                          </div>
-                          <input
-                            type="checkbox"
-                            checked={botConfig.postingSchedule[slot.key as keyof typeof botConfig.postingSchedule].enabled}
-                            onChange={() => handleScheduleToggle(slot.key)}
-                            className="rounded"
-                          />
-                        </div>
-                        {botConfig.postingSchedule[slot.key as keyof typeof botConfig.postingSchedule].enabled && (
-                          <Input
-                            type="time"
-                            value={botConfig.postingSchedule[slot.key as keyof typeof botConfig.postingSchedule].time}
-                            onChange={(e) => handleTimeChange(slot.key, e.target.value)}
-                            className="bg-slate-600 border-slate-500 text-white"
-                          />
-                        )}
-                      </CardContent>
-                    </Card>
-                  ))}
+                
+                <div className="space-y-4 overflow-y-auto">
+                  {/* Schedule Summary */}
+                  <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-4">
+                    <div className="flex items-center gap-2 text-blue-400 mb-2">
+                      <Info className="w-4 h-4" />
+                      <span className="text-sm font-medium">Schedule Summary</span>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+                      <div>
+                        <p className="text-blue-300">
+                          Active Time Slots: {Object.values(botConfig.postingSchedule).filter(config => config.enabled).length} of {Object.keys(botConfig.postingSchedule).length}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-blue-300">
+                          Daily Posts: {Object.values(botConfig.postingSchedule).filter(config => config.enabled).length} automated posts
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* All Time Slots */}
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                    {timeSlots.map((slot) => {
+                      const config = botConfig.postingSchedule[slot.key as keyof typeof botConfig.postingSchedule];
+                      return (
+                        <Card key={slot.key} className={`border transition-all duration-200 ${config.enabled ? 'bg-green-500/10 border-green-500/30' : 'bg-slate-700/30 border-slate-600'}`}>
+                          <CardContent className="p-4">
+                            <div className="flex items-center justify-between mb-3">
+                              <div className="flex-1">
+                                <h4 className="font-semibold text-white flex items-center gap-2">
+                                  {slot.label}
+                                  <div className={`w-3 h-3 rounded-full ${config.enabled ? 'bg-green-500' : 'bg-slate-500'}`} />
+                                </h4>
+                                <p className="text-xs text-slate-400 mt-1">{slot.description}</p>
+                              </div>
+                              <Switch
+                                checked={config.enabled}
+                                onCheckedChange={() => handleScheduleToggle(slot.key)}
+                                data-testid={`schedule-toggle-${slot.key}`}
+                              />
+                            </div>
+                            
+                            <div className="space-y-2">
+                              <Label htmlFor={`time-${slot.key}`} className="text-sm text-slate-300">
+                                Posting Time
+                              </Label>
+                              <Input
+                                id={`time-${slot.key}`}
+                                type="time"
+                                value={config.time}
+                                onChange={(e) => handleTimeChange(slot.key, e.target.value)}
+                                className={`bg-slate-600 border-slate-500 text-white font-mono text-center ${config.enabled ? 'border-green-500/50' : ''}`}
+                                disabled={!config.enabled}
+                                data-testid={`schedule-time-${slot.key}`}
+                              />
+                            </div>
+
+                            {config.enabled && (
+                              <div className="mt-3 p-2 bg-green-500/10 border border-green-500/20 rounded text-xs">
+                                <p className="text-green-400">
+                                  ✓ Will post at {config.time} daily
+                                </p>
+                              </div>
+                            )}
+                          </CardContent>
+                        </Card>
+                      );
+                    })}
+                  </div>
+
+                  {/* Quick Actions */}
+                  <div className="border-t border-slate-600 pt-4">
+                    <div className="flex gap-3 flex-wrap">
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        onClick={() => {
+                          const allEnabled = Object.keys(botConfig.postingSchedule).reduce((config, slot) => {
+                            config[slot] = { ...botConfig.postingSchedule[slot as keyof typeof botConfig.postingSchedule], enabled: true };
+                            return config;
+                          }, {} as any);
+                          setBotConfig(prev => ({ ...prev, postingSchedule: allEnabled }));
+                        }}
+                        className="text-green-400 border-green-400 hover:bg-green-400/10"
+                      >
+                        Enable All Time Slots
+                      </Button>
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        onClick={() => {
+                          const allDisabled = Object.keys(botConfig.postingSchedule).reduce((config, slot) => {
+                            config[slot] = { ...botConfig.postingSchedule[slot as keyof typeof botConfig.postingSchedule], enabled: false };
+                            return config;
+                          }, {} as any);
+                          setBotConfig(prev => ({ ...prev, postingSchedule: allDisabled }));
+                        }}
+                        className="text-red-400 border-red-400 hover:bg-red-400/10"
+                      >
+                        Disable All Time Slots
+                      </Button>
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        onClick={() => {
+                          const optimalTimes = ['earlyMorning', 'lunch', 'lateAfternoon', 'dinner', 'evening'];
+                          const optimized = Object.keys(botConfig.postingSchedule).reduce((config, slot) => {
+                            config[slot] = { 
+                              ...botConfig.postingSchedule[slot as keyof typeof botConfig.postingSchedule], 
+                              enabled: optimalTimes.includes(slot)
+                            };
+                            return config;
+                          }, {} as any);
+                          setBotConfig(prev => ({ ...prev, postingSchedule: optimized }));
+                        }}
+                        className="text-blue-400 border-blue-400 hover:bg-blue-400/10"
+                      >
+                        Use AI Optimal Times
+                      </Button>
+                    </div>
+                  </div>
                 </div>
               </DialogContent>
             </Dialog>
