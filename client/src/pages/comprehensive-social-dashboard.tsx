@@ -77,6 +77,15 @@ function AIContentGenerator() {
     { id: 'lateNight', label: 'Late Night (11:00 PM)', time: '23:00' }
   ];
 
+  // FlutterBye Content Strategy Indicators
+  const flutterByeContentFeatures = [
+    { feature: 'Brand Asset Integration', status: 'active', description: 'Uses cosmic butterfly logo and brand visuals' },
+    { feature: 'Real Platform Data', status: 'active', description: 'References actual FlutterBye features and achievements' },
+    { feature: 'Technical Accuracy', status: 'active', description: 'Mentions SPL tokens, AI scoring, metadata creation' },
+    { feature: 'Achievement Showcase', status: 'active', description: '10x performance, Twitter API, Phantom fixes' },
+    { feature: 'Strategic Messaging', status: 'active', description: 'Time-optimized content for maximum engagement' }
+  ];
+
   const generateAndScheduleContent = async () => {
     setIsGenerating(true);
     try {

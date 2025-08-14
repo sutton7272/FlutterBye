@@ -1,4 +1,5 @@
 import OpenAI from 'openai';
+import { flutterByeContentStrategy } from './flutterbye-content-strategy';
 
 const openai = new OpenAI({ 
   apiKey: process.env.OPENAI_API_KEY 
@@ -22,55 +23,103 @@ export interface GeneratedContent {
 }
 
 export class AIContentGenerator {
+  private flutterByeBrandAssets = {
+    tagline: "Tokens That Talk",
+    motto: "The Web3 communication layer",
+    keyFeatures: [
+      "SPL token messages (FLBY-MSG)",
+      "Burn-to-redeem functionality", 
+      "Value attachment with expiration dates",
+      "Free token minting system",
+      "Limited Edition Token sets",
+      "Real-time blockchain chat",
+      "SMS-to-blockchain integration",
+      "AI-powered social credit scoring",
+      "Multi-chain wallet intelligence",
+      "Enterprise escrow wallet system"
+    ],
+    visualAssets: [
+      "/images/cosmic-butterfly.png",
+      "/images/flutterbye-logo.png", 
+      "/public-objects/flutterbye-banner.jpg",
+      "/public-objects/web3-communication.gif"
+    ],
+    brandColors: ["Electric blue", "Electric green", "Dark navy", "Cosmic purple"],
+    brandPersonality: ["Innovative", "Friendly", "Professional", "Cutting-edge", "Community-focused"]
+  };
+
   private templates: ContentTemplate[] = [
     {
-      id: 'web3_innovation',
-      name: 'Web3 Innovation Focus',
-      prompt: 'Create an engaging tweet about Web3 innovation and blockchain technology. Focus on FlutterBye as a tokenized messaging platform. Make it inspiring and forward-looking.',
+      id: 'flutterbye_vision',
+      name: 'FlutterBye Vision & Mission',
+      prompt: `Create an inspiring tweet about FlutterBye's mission to become the universal Web3 communication protocol. Reference: "${this.flutterByeBrandAssets.tagline}" and "${this.flutterByeBrandAssets.motto}". Highlight our revolutionary approach to tokenized messaging that transforms how people communicate value and emotion across blockchain.`,
       category: 'product',
       timeSlots: ['earlyMorning', 'lunch', 'evening']
     },
     {
-      id: 'community_building',
-      name: 'Community Engagement',
-      prompt: 'Write a community-focused tweet that encourages engagement and interaction. Highlight FlutterBye\'s social features and value-driven communication.',
-      category: 'community',
-      timeSlots: ['breakfast', 'lateAfternoon', 'dinner']
-    },
-    {
-      id: 'educational_content',
-      name: 'Educational Web3',
-      prompt: 'Create an educational tweet explaining blockchain concepts or tokenized messaging benefits. Make it accessible and informative.',
-      category: 'educational',
-      timeSlots: ['lateMorning', 'earlyAfternoon', 'earlyEvening']
-    },
-    {
-      id: 'product_showcase',
-      name: 'Product Features',
-      prompt: 'Showcase FlutterBye\'s unique features like SPL token messages, burn-to-redeem, or value attachment. Make it compelling and feature-focused.',
+      id: 'token_features',
+      name: 'FLBY-MSG Token Features',
+      prompt: `Showcase FlutterBye's unique SPL token messages (FLBY-MSG) and core features: ${this.flutterByeBrandAssets.keyFeatures.slice(0,4).join(', ')}. Make it technical yet accessible, emphasizing the innovation of attaching real value to messages. Reference our cosmic butterfly branding.`,
       category: 'product',
       timeSlots: ['breakfast', 'lunch', 'lateAfternoon']
     },
     {
-      id: 'trending_topics',
-      name: 'Trending & Viral',
-      prompt: 'Create content that taps into current crypto/Web3 trends while promoting FlutterBye. Make it shareable and viral-ready.',
+      id: 'ai_intelligence',
+      name: 'FlutterAI Intelligence Platform',
+      prompt: `Create engaging content about FlutterBye's revolutionary AI-powered wallet intelligence and social credit scoring system. Mention our 1-1000 scoring scale, cross-chain analysis, and how we're creating the "credit score for crypto wallets". Position as industry-disrupting technology.`,
+      category: 'product',
+      timeSlots: ['lateMorning', 'earlyAfternoon', 'earlyEvening']
+    },
+    {
+      id: 'community_ecosystem',
+      name: 'FlutterBye Ecosystem',
+      prompt: `Highlight FlutterBye's growing ecosystem: SMS integration, real-time chat, enterprise solutions, and viral communication tools. Reference our community-focused approach and how we're building the Web3 communication infrastructure. Use inspiring, community-building tone.`,
+      category: 'community',
+      timeSlots: ['breakfast', 'lateAfternoon', 'dinner']
+    },
+    {
+      id: 'enterprise_solutions',
+      name: 'Enterprise & B2B Features',
+      prompt: `Showcase FlutterBye's enterprise-grade solutions: bank-level multi-signature escrow system, API monetization, enterprise wallet infrastructure. Target businesses looking for secure Web3 communication and value transfer solutions. Professional yet innovative tone.`,
+      category: 'promotional',
+      timeSlots: ['lateMorning', 'lunch', 'earlyAfternoon']
+    },
+    {
+      id: 'technical_innovation',
+      name: 'Technical Deep Dive',
+      prompt: `Create educational content about FlutterBye's technical innovations: Solana blockchain integration, automatic metadata creation, burn-to-redeem mechanisms, or real-time blockchain communication. Make complex concepts accessible while highlighting our technical excellence.`,
+      category: 'educational',
+      timeSlots: ['lunch', 'earlyAfternoon', 'earlyEvening']
+    },
+    {
+      id: 'success_stories',
+      name: 'Platform Success & Milestones',
+      prompt: `Share FlutterBye's achievements and milestones: AI optimization implementation, Twitter API integration success, performance improvements, or user adoption stories. Create excitement around our growth and technological advancement.`,
       category: 'promotional',
       timeSlots: ['evening', 'lateNight']
+    },
+    {
+      id: 'web3_education',
+      name: 'Web3 & Blockchain Education',
+      prompt: `Create educational content that positions FlutterBye as a thought leader in Web3 communication. Explain tokenized messaging benefits, blockchain communication advantages, or the future of value-attached messages. Reference our platform as the leading solution.`,
+      category: 'educational',
+      timeSlots: ['lateMorning', 'lunch', 'earlyEvening']
     }
   ];
 
-  async generateContent(
+  async generateContentWithFlutterByeAssets(
     template: ContentTemplate, 
     timeSlot: string,
     customContext?: string
   ): Promise<GeneratedContent> {
     try {
       const timeContext = this.getTimeContextPrompt(timeSlot);
+      const brandContext = this.getFlutterByeBrandContext();
       const fullPrompt = `
 ${template.prompt}
 
-Context: ${timeContext}
+FlutterBye Brand Context: ${brandContext}
+Time Context: ${timeContext}
 ${customContext ? `Additional context: ${customContext}` : ''}
 
 Requirements:
@@ -131,6 +180,35 @@ Respond with JSON in this format:
     }
   }
 
+  // Legacy method for backward compatibility
+  async generateContent(
+    template: ContentTemplate, 
+    timeSlot: string,
+    customContext?: string
+  ): Promise<GeneratedContent> {
+    return this.generateContentWithFlutterByeAssets(template, timeSlot, customContext);
+  }
+
+  private getFlutterByeBrandContext(): string {
+    // Get comprehensive FlutterBye content strategy and assets
+    const contentStrategy = flutterByeContentStrategy.generateContentStrategy('general', 'innovation');
+    const factsheet = flutterByeContentStrategy.getFlutterByeFactsheet();
+    
+    return `
+    ${factsheet}
+    
+    CONTENT STRATEGY GUIDANCE:
+    ${contentStrategy.contentDirection}
+    
+    RECOMMENDED VISUAL: ${contentStrategy.visualRecommendation}
+    
+    AVAILABLE CONTENT ASSETS:
+    ${contentStrategy.suggestedAssets.map(asset => 
+      `- ${asset.type}: ${asset.content} (${asset.metadata.category})`
+    ).join('\n')}
+    `;
+  }
+
   async generateBulkContent(
     activeTimeSlots: string[],
     count: number = 5
@@ -142,7 +220,7 @@ Respond with JSON in this format:
       const template = this.selectOptimalTemplate(timeSlot);
       
       try {
-        const content = await this.generateContent(template, timeSlot);
+        const content = await this.generateContentWithFlutterByeAssets(template, timeSlot);
         results.push({ timeSlot, content });
         
         // Small delay to avoid rate limits
