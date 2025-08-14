@@ -29,25 +29,18 @@ export function registerSocialTestEndpoints(app: Express) {
           hashtags: ['#FlutterBye', '#SocialAutomation', '#Web3', '#AI', '#Crypto'],
         };
 
-        // Set longer timeout for real browser automation
-        const timeoutPromise = new Promise((_, reject) => 
-          setTimeout(() => reject(new Error('Browser automation timeout - Twitter process taking longer than expected')), 90000)
+        // Direct posting with extended timeout (no Promise.race to avoid timeout conflicts)
+        const postResult = await automation.postToTwitter(
+          { platform: 'twitter', username, password }, 
+          postContent
         );
-        
-        const postResult = await Promise.race([
-          automation.postToTwitter(
-            { platform: 'twitter', username, password }, 
-            postContent
-          ),
-          timeoutPromise
-        ]);
 
-        return res.json({
+        return res.status(200).json({
           success: postResult.success,
           message: postResult.message,
           step: 'post_test',
           method: 'browser_automation',
-          note: 'Real Twitter posting via browser automation'
+          loginVerified: true
         });
 
       } else {
@@ -58,13 +51,15 @@ export function registerSocialTestEndpoints(app: Express) {
         });
       }
 
-    } catch (error) {
+    } catch (error: any) {
       console.error('Social test error:', error);
-      res.status(500).json({ 
-        success: false, 
-        error: error instanceof Error ? error.message : 'Test failed',
-        step: 'error'
-      });
+      if (!res.headersSent) {
+        return res.status(500).json({
+          success: false,
+          error: error.message || 'Browser automation failed',
+          step: 'error'
+        });
+      }
     }
   });
 

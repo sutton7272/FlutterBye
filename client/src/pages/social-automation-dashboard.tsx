@@ -135,35 +135,77 @@ export default function SocialAutomationDashboard() {
   const testInstantPost = async () => {
     setTestPostLoading(true);
     try {
-      // Use the real browser automation endpoint that works
-      const response = await fetch('/api/social-automation/test-post', { 
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          platform: 'twitter',
-          username: 'flutterbye_io',
-          password: 'Flutterbye72!',
-          testMessage: '🚀 FlutterBye Social Bot LIVE from Dashboard! Revolutionary Web3 platform with AI-powered token messaging! #FlutterBye #Web3 #AI #SocialAutomation'
-        })
+      // Show starting notification
+      toast({ 
+        title: 'Starting Twitter Bot...', 
+        description: 'Browser automation launching...',
+        className: 'bg-blue-900 border-blue-500 text-white'
       });
-      const result = await response.json();
-      if (response.ok && result.success) {
-        toast({ 
-          title: 'Twitter Post Success! 🎉', 
-          description: `Real tweet posted: ${result.message}`,
-          className: 'bg-green-900 border-green-500 text-white'
-        });
+
+      // Use the instant test endpoint with streaming response
+      const response = await fetch('/api/social-automation/instant-test', { 
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+      });
+      
+      if (response.ok) {
+        const reader = response.body?.getReader();
+        const decoder = new TextDecoder();
+        
+        if (reader) {
+          let finalResult = null;
+          
+          while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+            
+            const chunk = decoder.decode(value, { stream: true });
+            const lines = chunk.split('\n').filter(line => line.trim());
+            
+            for (const line of lines) {
+              try {
+                const result = JSON.parse(line);
+                if (result.status === 'complete') {
+                  finalResult = result;
+                } else if (result.status === 'posting') {
+                  toast({ 
+                    title: 'Posting to Twitter...', 
+                    description: 'Logging in and composing tweet...',
+                    className: 'bg-purple-900 border-purple-500 text-white'
+                  });
+                }
+              } catch (e) {
+                // Skip invalid JSON lines
+              }
+            }
+          }
+          
+          if (finalResult?.success) {
+            toast({ 
+              title: 'Twitter Post SUCCESS! 🎉', 
+              description: `Live tweet posted: ${finalResult.message}`,
+              className: 'bg-green-900 border-green-500 text-white',
+              duration: 5000
+            });
+          } else {
+            toast({ 
+              title: 'Twitter Post Failed', 
+              description: finalResult?.error || 'Browser automation error',
+              variant: 'destructive' 
+            });
+          }
+        }
       } else {
         toast({ 
-          title: 'Twitter Post Failed', 
-          description: result.error || result.message || 'Browser automation error',
+          title: 'Connection Failed', 
+          description: 'Could not reach automation service',
           variant: 'destructive' 
         });
       }
     } catch (error) {
       toast({ 
-        title: 'Test failed', 
-        description: 'Network or browser automation error',
+        title: 'Test Failed', 
+        description: 'Network or automation error',
         variant: 'destructive' 
       });
     } finally {
