@@ -2062,6 +2062,8 @@ function ContentLibraryContent() {
     tags: '',
     category: 'General'
   });
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [filePreview, setFilePreview] = useState<string>('');
 
   const mockContent = [
     {
@@ -2123,11 +2125,53 @@ function ContentLibraryContent() {
     }
   };
 
+  const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      setSelectedFile(file);
+      
+      // Create preview for images
+      if (file.type.startsWith('image/')) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          setFilePreview(e.target?.result as string);
+        };
+        reader.readAsDataURL(file);
+      } else {
+        setFilePreview('');
+      }
+      
+      // Auto-fill name if empty
+      if (!newContent.name.trim()) {
+        setNewContent(prev => ({ ...prev, name: file.name.replace(/\.[^/.]+$/, '') }));
+      }
+    }
+  };
+
   const handleUploadContent = async () => {
-    if (!newContent.name.trim() || !newContent.content.trim()) {
+    // Validation based on content type
+    if (!newContent.name.trim()) {
       toast({
         title: "Error",
-        description: "Please fill in all required fields",
+        description: "Please enter a content name",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    if ((newContent.type === 'image' || newContent.type === 'video') && !selectedFile) {
+      toast({
+        title: "Error",
+        description: "Please select a file to upload",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    if ((newContent.type === 'text' || newContent.type === 'template') && !newContent.content.trim()) {
+      toast({
+        title: "Error",
+        description: "Please enter content text",
         variant: "destructive"
       });
       return;
@@ -2135,34 +2179,67 @@ function ContentLibraryContent() {
 
     setUploading(true);
     try {
-      const response = await fetch('/api/social-automation/content', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          ...newContent,
-          tags: newContent.tags.split(',').map(tag => tag.trim()).filter(tag => tag.length > 0)
-        })
-      });
+      let contentData = {
+        ...newContent,
+        tags: newContent.tags.split(',').map(tag => tag.trim()).filter(tag => tag.length > 0)
+      };
 
-      if (response.ok) {
-        const result = await response.json();
-        if (result.success) {
-          setContentItems(prev => [...prev, result.content]);
-          setNewContent({
-            name: '',
-            type: 'text',
-            content: '',
-            tags: '',
-            category: 'General'
+      // Handle file upload for images/videos
+      if (selectedFile && (newContent.type === 'image' || newContent.type === 'video')) {
+        // Convert file to base64
+        const reader = new FileReader();
+        reader.onload = async (e) => {
+          const base64Data = e.target?.result as string;
+          
+          const response = await fetch('/api/social-automation/content', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              ...contentData,
+              fileData: base64Data,
+              fileName: selectedFile.name,
+              fileType: selectedFile.type
+            })
           });
-          setShowUpload(false);
-          toast({
-            title: "Content Saved",
-            description: "Your content has been added to the library",
-          });
-        }
+
+          if (response.ok) {
+            const result = await response.json();
+            if (result.success) {
+              setContentItems(prev => [...prev, result.content]);
+              resetForm();
+              toast({
+                title: "Content Saved",
+                description: "Your content has been added to the library",
+              });
+            }
+          } else {
+            throw new Error('Failed to save content');
+          }
+          setUploading(false);
+        };
+        reader.readAsDataURL(selectedFile);
       } else {
-        throw new Error('Failed to save content');
+        // Handle text/template content
+        const response = await fetch('/api/social-automation/content', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(contentData)
+        });
+
+        if (response.ok) {
+          const result = await response.json();
+          if (result.success) {
+            setContentItems(prev => [...prev, result.content]);
+            resetForm();
+            toast({
+              title: "Content Saved",
+              description: "Your content has been added to the library",
+            });
+          }
+        } else {
+          throw new Error('Failed to save content');
+        }
+        setUploading(false);
       }
     } catch (error) {
       toast({
@@ -2170,9 +2247,21 @@ function ContentLibraryContent() {
         description: "Failed to save content. Please try again.",
         variant: "destructive"
       });
-    } finally {
       setUploading(false);
     }
+  };
+
+  const resetForm = () => {
+    setNewContent({
+      name: '',
+      type: 'text',
+      content: '',
+      tags: '',
+      category: 'General'
+    });
+    setSelectedFile(null);
+    setFilePreview('');
+    setShowUpload(false);
   };
 
   const getTypeIcon = (type: string) => {
@@ -2261,16 +2350,82 @@ function ContentLibraryContent() {
                   </Select>
                 </div>
                 
-                <div>
-                  <Label htmlFor="content-content" className="text-slate-300">Content</Label>
-                  <Textarea
-                    id="content-content"
-                    value={newContent.content}
-                    onChange={(e) => setNewContent(prev => ({ ...prev, content: e.target.value }))}
-                    placeholder="Enter your content text, template, or description"
-                    className="bg-slate-700 border-slate-600 text-white h-24"
-                  />
-                </div>
+                {/* File Upload for Images/Videos */}
+                {(newContent.type === 'image' || newContent.type === 'video') && (
+                  <div>
+                    <Label htmlFor="file-upload" className="text-slate-300">
+                      {newContent.type === 'image' ? 'Select Image' : 'Select Video'}
+                    </Label>
+                    <div className="space-y-3">
+                      <div className="flex items-center gap-3">
+                        <Input
+                          id="file-upload"
+                          type="file"
+                          accept={newContent.type === 'image' ? 'image/*' : 'video/*'}
+                          onChange={handleFileSelect}
+                          className="bg-slate-700 border-slate-600 text-white file:bg-blue-600 file:text-white file:border-0 file:rounded file:px-3 file:py-1"
+                        />
+                        {selectedFile && (
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={() => {
+                              setSelectedFile(null);
+                              setFilePreview('');
+                            }}
+                          >
+                            Remove
+                          </Button>
+                        )}
+                      </div>
+                      
+                      {selectedFile && (
+                        <div className="text-sm text-slate-400">
+                          Selected: {selectedFile.name} ({(selectedFile.size / 1024 / 1024).toFixed(2)} MB)
+                        </div>
+                      )}
+                      
+                      {filePreview && newContent.type === 'image' && (
+                        <div className="w-full max-w-xs">
+                          <img 
+                            src={filePreview} 
+                            alt="Preview" 
+                            className="w-full h-32 object-cover rounded border border-slate-600"
+                          />
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                {/* Text Content for Text/Templates */}
+                {(newContent.type === 'text' || newContent.type === 'template') && (
+                  <div>
+                    <Label htmlFor="content-content" className="text-slate-300">Content</Label>
+                    <Textarea
+                      id="content-content"
+                      value={newContent.content}
+                      onChange={(e) => setNewContent(prev => ({ ...prev, content: e.target.value }))}
+                      placeholder="Enter your content text, template, or description"
+                      className="bg-slate-700 border-slate-600 text-white h-24"
+                    />
+                  </div>
+                )}
+
+                {/* Optional Description for Images/Videos */}
+                {(newContent.type === 'image' || newContent.type === 'video') && (
+                  <div>
+                    <Label htmlFor="content-description" className="text-slate-300">Description (Optional)</Label>
+                    <Textarea
+                      id="content-description"
+                      value={newContent.content}
+                      onChange={(e) => setNewContent(prev => ({ ...prev, content: e.target.value }))}
+                      placeholder="Enter a description for this file"
+                      className="bg-slate-700 border-slate-600 text-white h-20"
+                    />
+                  </div>
+                )}
                 
                 <div>
                   <Label htmlFor="content-tags" className="text-slate-300">Tags (comma separated)</Label>
@@ -2286,7 +2441,7 @@ function ContentLibraryContent() {
                 <div className="flex gap-2">
                   <Button 
                     variant="outline" 
-                    onClick={() => setShowUpload(false)}
+                    onClick={resetForm}
                     className="flex-1"
                     disabled={uploading}
                   >
@@ -2336,9 +2491,22 @@ function ContentLibraryContent() {
               <CardContent>
                 {item.type === 'text' || item.type === 'template' ? (
                   <p className="text-sm text-slate-300 mb-3 line-clamp-3">{item.content}</p>
+                ) : item.type === 'image' && item.url ? (
+                  <div className="h-32 bg-slate-700 rounded-lg mb-3 overflow-hidden">
+                    <img 
+                      src={item.url} 
+                      alt={item.name}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
                 ) : (
                   <div className="h-32 bg-slate-700 rounded-lg mb-3 flex items-center justify-center">
                     <TypeIcon className="w-8 h-8 text-slate-500" />
+                    {item.fileName && (
+                      <div className="text-xs text-slate-400 mt-2 text-center px-2">
+                        {item.fileName}
+                      </div>
+                    )}
                   </div>
                 )}
                 

@@ -58,6 +58,10 @@ interface ContentItem {
   createdAt: string;
   usage: number;
   aiGenerated: boolean;
+  url?: string;
+  fileName?: string;
+  fileType?: string;
+  fileSize?: number;
 }
 
 interface InteractionStat {
@@ -813,12 +817,27 @@ export function registerSocialAutomationAPI(app: Express) {
 
   app.post('/api/social-automation/content', (req, res) => {
     try {
-      const { name, type, content, tags, category } = req.body;
+      const { name, type, content, tags, category, fileData, fileName, fileType } = req.body;
       
-      if (!name || !content) {
+      if (!name) {
         return res.status(400).json({ 
           success: false, 
-          error: 'Name and content are required' 
+          error: 'Name is required' 
+        });
+      }
+
+      // Validation based on content type
+      if ((type === 'image' || type === 'video') && !fileData) {
+        return res.status(400).json({ 
+          success: false, 
+          error: 'File data is required for image and video content' 
+        });
+      }
+
+      if ((type === 'text' || type === 'template') && !content) {
+        return res.status(400).json({ 
+          success: false, 
+          error: 'Content text is required for text and template content' 
         });
       }
 
@@ -826,13 +845,21 @@ export function registerSocialAutomationAPI(app: Express) {
         id: Date.now().toString(),
         name,
         type: type || 'text',
-        content,
+        content: content || '',
         tags: Array.isArray(tags) ? tags : [],
         category: category || 'General',
         createdAt: new Date().toISOString(),
         usage: 0,
         aiGenerated: false
       };
+
+      // For file uploads, store additional metadata
+      if (fileData && fileName) {
+        newContent.url = fileData; // Store base64 data as URL for now
+        newContent.fileName = fileName;
+        newContent.fileType = fileType;
+        newContent.fileSize = Math.round(fileData.length * 0.75); // Approximate size from base64
+      }
 
       contentItems.push(newContent);
       
