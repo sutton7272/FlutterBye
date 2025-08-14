@@ -10,7 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
-import { Eye, EyeOff, Play, Settings, Users, Lock, Bot, Zap, Clock, Image } from "lucide-react";
+import { Eye, EyeOff, Play, Settings, Users, Lock, Bot, Zap, Clock, Image, UserPlus, Heart } from "lucide-react";
 
 interface SocialCredentials {
   platform: string;
@@ -19,10 +19,17 @@ interface SocialCredentials {
   email?: string;
 }
 
+interface EngagementCredentials extends SocialCredentials {
+  role: 'poster' | 'engager';
+  engagementStyle: 'supportive' | 'curious' | 'technical' | 'casual';
+  delay?: number;
+}
+
 export default function SocialPasswordAutomation() {
   const { toast } = useToast();
   const [showPassword, setShowPassword] = useState<Record<string, boolean>>({});
   const [credentials, setCredentials] = useState<Record<string, SocialCredentials>>({});
+  const [engagerAccounts, setEngagerAccounts] = useState<EngagementCredentials[]>([]);
   const [selectedContentType, setSelectedContentType] = useState("features");
   const [previewContent, setPreviewContent] = useState<any>(null);
 
@@ -102,6 +109,54 @@ export default function SocialPasswordAutomation() {
     },
   });
 
+  // Post with engagement automation
+  const postWithEngagementMutation = useMutation({
+    mutationFn: async (params: any) => {
+      return await apiRequest({
+        url: '/api/social/post-with-engagement',
+        method: 'POST',
+        data: params
+      });
+    },
+    onSuccess: (data) => {
+      toast({
+        title: "Post with Engagement Complete!",
+        description: `Posted and ${data.engagementResults.length} accounts engaged automatically`,
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Engagement Automation Failed",
+        description: error.message || "Failed to post with engagement",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Full engagement cycle
+  const fullCycleMutation = useMutation({
+    mutationFn: async (params: any) => {
+      return await apiRequest({
+        url: '/api/social/full-engagement-cycle',
+        method: 'POST',
+        data: params
+      });
+    },
+    onSuccess: (data) => {
+      toast({
+        title: "Full Engagement Cycle Complete!",
+        description: data.summary,
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Full Cycle Failed",
+        description: error.message || "Failed to complete engagement cycle",
+        variant: "destructive",
+      });
+    },
+  });
+
   // Schedule automation
   const scheduleMutation = useMutation({
     mutationFn: async (params: any) => {
@@ -173,8 +228,9 @@ export default function SocialPasswordAutomation() {
         </div>
 
         <Tabs defaultValue="setup" className="w-full">
-          <TabsList className="grid w-full grid-cols-4">
-            <TabsTrigger value="setup">Setup Credentials</TabsTrigger>
+          <TabsList className="grid w-full grid-cols-5">
+            <TabsTrigger value="setup">Setup Accounts</TabsTrigger>
+            <TabsTrigger value="engagement">Multi-Account</TabsTrigger>
             <TabsTrigger value="preview">Content Preview</TabsTrigger>
             <TabsTrigger value="post">Post Now</TabsTrigger>
             <TabsTrigger value="schedule">Schedule</TabsTrigger>
@@ -246,6 +302,230 @@ export default function SocialPasswordAutomation() {
                     )}
                   </Card>
                 ))}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="engagement" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <UserPlus className="h-5 w-5" />
+                  Multi-Account Engagement Setup
+                </CardTitle>
+                <CardDescription>
+                  Add your private/secondary accounts to automatically like, comment, and amplify your main posts
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="bg-blue-900/20 p-4 rounded-lg border border-blue-500/30">
+                  <h4 className="font-medium text-blue-300 mb-2">How Multi-Account Engagement Works:</h4>
+                  <ul className="text-sm text-blue-200 space-y-1">
+                    <li>• Your main account posts the content</li>
+                    <li>• Your other accounts wait 2-7 minutes, then automatically:</li>
+                    <li className="ml-4">- Like the post</li>
+                    <li className="ml-4">- Retweet/share the post</li>
+                    <li className="ml-4">- Add supportive comments</li>
+                    <li>• After 20-30 minutes, your main account responds to any user replies</li>
+                    <li>• Creates authentic-looking engagement and social proof</li>
+                  </ul>
+                </div>
+
+                <div>
+                  <div className="flex items-center justify-between mb-4">
+                    <Label className="text-lg">Your Engagement Accounts</Label>
+                    <Button 
+                      onClick={() => {
+                        setEngagerAccounts([...engagerAccounts, {
+                          platform: 'twitter',
+                          username: '',
+                          password: '',
+                          role: 'engager',
+                          engagementStyle: 'supportive',
+                          delay: Math.random() * 3 + 2 // 2-5 minutes
+                        }]);
+                      }}
+                      size="sm"
+                      data-testid="button-add-engager"
+                    >
+                      <UserPlus className="h-4 w-4 mr-2" />
+                      Add Account
+                    </Button>
+                  </div>
+
+                  {engagerAccounts.map((account, index) => (
+                    <Card key={index} className="p-4 mb-4 bg-slate-800/50">
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                        <div>
+                          <Label>Username/Handle</Label>
+                          <Input
+                            placeholder="@your_private_account"
+                            value={account.username}
+                            onChange={(e) => {
+                              const updated = [...engagerAccounts];
+                              updated[index].username = e.target.value;
+                              setEngagerAccounts(updated);
+                            }}
+                          />
+                        </div>
+                        
+                        <div className="relative">
+                          <Label>Password</Label>
+                          <div className="relative">
+                            <Input
+                              type={showPassword[`engager-${index}`] ? 'text' : 'password'}
+                              placeholder="Password"
+                              value={account.password}
+                              onChange={(e) => {
+                                const updated = [...engagerAccounts];
+                                updated[index].password = e.target.value;
+                                setEngagerAccounts(updated);
+                              }}
+                            />
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="sm"
+                              className="absolute right-0 top-0 h-full px-3"
+                              onClick={() => setShowPassword(prev => ({
+                                ...prev,
+                                [`engager-${index}`]: !prev[`engager-${index}`]
+                              }))}
+                            >
+                              {showPassword[`engager-${index}`] ? (
+                                <EyeOff className="h-4 w-4" />
+                              ) : (
+                                <Eye className="h-4 w-4" />
+                              )}
+                            </Button>
+                          </div>
+                        </div>
+
+                        <div>
+                          <Label>Engagement Style</Label>
+                          <Select 
+                            value={account.engagementStyle} 
+                            onValueChange={(value) => {
+                              const updated = [...engagerAccounts];
+                              updated[index].engagementStyle = value as any;
+                              setEngagerAccounts(updated);
+                            }}
+                          >
+                            <SelectTrigger>
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="supportive">Supportive (enthusiastic)</SelectItem>
+                              <SelectItem value="curious">Curious (asks questions)</SelectItem>
+                              <SelectItem value="technical">Technical (blockchain focus)</SelectItem>
+                              <SelectItem value="casual">Casual (friendly user)</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+
+                        <div className="flex items-end">
+                          <Button
+                            variant="destructive"
+                            size="sm"
+                            onClick={() => {
+                              setEngagerAccounts(accounts => accounts.filter((_, i) => i !== index));
+                            }}
+                            data-testid={`button-remove-engager-${index}`}
+                          >
+                            Remove
+                          </Button>
+                        </div>
+                      </div>
+
+                      {account.username && account.password && (
+                        <div className="mt-3 flex items-center gap-2">
+                          <Badge variant="default">
+                            Account Ready ✓
+                          </Badge>
+                          <Badge variant="outline">
+                            {account.engagementStyle} style
+                          </Badge>
+                          <Badge variant="outline">
+                            {account.delay?.toFixed(1)}min delay
+                          </Badge>
+                        </div>
+                      )}
+                    </Card>
+                  ))}
+
+                  {engagerAccounts.length === 0 && (
+                    <div className="text-center p-8 text-slate-400">
+                      <UserPlus className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                      <p>Add your secondary accounts to boost engagement automatically</p>
+                      <p className="text-sm mt-2">Perfect for private Twitter accounts, old accounts, etc.</p>
+                    </div>
+                  )}
+                </div>
+
+                {engagerAccounts.length > 0 && (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <Button
+                      onClick={() => {
+                        const mainAccount = Object.values(credentials)[0];
+                        if (!mainAccount?.username || !mainAccount?.password) {
+                          toast({
+                            title: "Main Account Required",
+                            description: "Set up your main posting account first in Setup tab",
+                            variant: "destructive"
+                          });
+                          return;
+                        }
+
+                        const validEngagers = engagerAccounts.filter(acc => acc.username && acc.password);
+                        
+                        postWithEngagementMutation.mutate({
+                          posterCredentials: { ...mainAccount, role: 'poster', engagementStyle: 'professional' },
+                          engagerCredentials: validEngagers,
+                          contentType: selectedContentType
+                        });
+                      }}
+                      disabled={postWithEngagementMutation.isPending}
+                      className="w-full"
+                      data-testid="button-post-with-engagement"
+                    >
+                      <Heart className="h-4 w-4 mr-2" />
+                      {postWithEngagementMutation.isPending ? "Posting..." : "Post + Auto-Engage"}
+                    </Button>
+
+                    <Button
+                      onClick={() => {
+                        const mainAccount = Object.values(credentials)[0];
+                        if (!mainAccount?.username || !mainAccount?.password) {
+                          toast({
+                            title: "Main Account Required",
+                            description: "Set up your main posting account first",
+                            variant: "destructive"
+                          });
+                          return;
+                        }
+
+                        const validEngagers = engagerAccounts.filter(acc => acc.username && acc.password);
+                        
+                        fullCycleMutation.mutate({
+                          posterCredentials: { ...mainAccount, role: 'poster', engagementStyle: 'professional' },
+                          engagerCredentials: validEngagers,
+                          contentType: selectedContentType
+                        });
+                      }}
+                      disabled={fullCycleMutation.isPending}
+                      className="w-full"
+                      variant="outline"
+                      data-testid="button-full-cycle"
+                    >
+                      <Bot className="h-4 w-4 mr-2" />
+                      {fullCycleMutation.isPending ? "Running..." : "Full Auto Cycle"}
+                    </Button>
+                  </div>
+                )}
+
+                <div className="text-xs text-slate-400 bg-slate-800/30 p-3 rounded">
+                  <strong>Full Auto Cycle:</strong> Posts → Engagers like/comment → Waits 20-30min → Responds to user replies
+                </div>
               </CardContent>
             </Card>
           </TabsContent>

@@ -2,6 +2,7 @@ import type { Express } from "express";
 import FlutterbySocialBot, { type SocialMediaPost } from "./social-media-bot";
 import { contentGenerator } from "./social-content-generator";
 import { passwordAutomation } from "./social-password-automation";
+import { engagementAutomation } from "./social-engagement-automation";
 import cron from "node-cron";
 
 // Global bot instance
@@ -516,7 +517,130 @@ export function registerSocialRoutes(app: Express) {
     }
   });
 
+  // ENGAGEMENT AUTOMATION ROUTES (Multi-account engagement amplification)
+  
+  // Post with automatic engagement from other accounts
+  app.post('/api/social/post-with-engagement', async (req, res) => {
+    try {
+      const { 
+        posterCredentials,
+        engagerCredentials,
+        contentType = 'features'
+      } = req.body;
+
+      if (!posterCredentials?.username || !posterCredentials?.password) {
+        return res.status(400).json({
+          success: false,
+          error: 'Poster credentials required'
+        });
+      }
+
+      if (!engagerCredentials || !Array.isArray(engagerCredentials)) {
+        return res.status(400).json({
+          success: false,
+          error: 'Engager credentials array required'
+        });
+      }
+
+      // Generate content
+      const postContent = await passwordAutomation.generateContentWithScreenshot(contentType);
+      
+      // Execute full engagement cycle
+      const result = await engagementAutomation.postWithEngagement(
+        posterCredentials,
+        engagerCredentials,
+        postContent
+      );
+
+      res.json({ 
+        success: result.success, 
+        postUrl: result.postUrl,
+        engagementResults: result.engagementResults,
+        content: postContent
+      });
+    } catch (error) {
+      res.status(500).json({ 
+        success: false, 
+        error: error instanceof Error ? error.message : "Failed to post with engagement" 
+      });
+    }
+  });
+
+  // Full engagement automation cycle (post + engage + respond to replies)
+  app.post('/api/social/full-engagement-cycle', async (req, res) => {
+    try {
+      const { 
+        posterCredentials,
+        engagerCredentials,
+        contentType = 'features'
+      } = req.body;
+
+      if (!posterCredentials?.username || !posterCredentials?.password) {
+        return res.status(400).json({
+          success: false,
+          error: 'Poster credentials required'
+        });
+      }
+
+      // Generate content
+      const postContent = await passwordAutomation.generateContentWithScreenshot(contentType);
+      
+      // Execute full automation cycle
+      const result = await engagementAutomation.fullEngagementCycle(
+        posterCredentials,
+        engagerCredentials || [],
+        postContent
+      );
+
+      res.json({ 
+        success: result.success, 
+        summary: result.summary,
+        content: postContent
+      });
+    } catch (error) {
+      res.status(500).json({ 
+        success: false, 
+        error: error instanceof Error ? error.message : "Failed to complete engagement cycle" 
+      });
+    }
+  });
+
+  // Respond to replies on an existing post
+  app.post('/api/social/respond-to-replies', async (req, res) => {
+    try {
+      const { 
+        posterCredentials,
+        postUrl,
+        engagementStyle = 'professional'
+      } = req.body;
+
+      if (!posterCredentials?.username || !posterCredentials?.password || !postUrl) {
+        return res.status(400).json({
+          success: false,
+          error: 'Poster credentials and post URL required'
+        });
+      }
+
+      const result = await engagementAutomation.respondToReplies(
+        posterCredentials,
+        postUrl,
+        engagementStyle
+      );
+
+      res.json({ 
+        success: result.success, 
+        responses: result.responses
+      });
+    } catch (error) {
+      res.status(500).json({ 
+        success: false, 
+        error: error instanceof Error ? error.message : "Failed to respond to replies" 
+      });
+    }
+  });
+
   console.log("🤖 Social media bot routes registered");
   console.log("📝 Content generator routes registered (no API keys required)");
   console.log("🔐 Password automation routes registered (login with username/password)");
+  console.log("🎯 Engagement automation routes registered (multi-account amplification)");
 }
