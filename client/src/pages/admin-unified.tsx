@@ -73,6 +73,7 @@ import {
   Heart,
   Gauge,
   Lock,
+  ArrowRightLeft,
   Wallet,
   ArrowRightLeft,
   TestTube
@@ -1599,6 +1600,491 @@ function Final5PercentProductionReadinessContent() {
   );
 }
 
+// Social Automation Management Component
+function SocialAutomationManagementContent() {
+  const [activeBot, setActiveBot] = useState("main");
+  const [botConfigs, setBotConfigs] = useState({});
+  const [isLoading, setIsLoading] = useState(false);
+  const [socialMetrics, setSocialMetrics] = useState<any>(null);
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+
+  // Fetch social automation data
+  const { data: socialStatus, refetch: refetchStatus } = useQuery({
+    queryKey: ["/api/social/status"],
+    refetchInterval: 10000,
+  });
+
+  const { data: botAccounts } = useQuery({
+    queryKey: ["/api/social/bot-accounts"],
+    refetchInterval: 30000,
+  });
+
+  const { data: automationAnalytics } = useQuery({
+    queryKey: ["/api/social/analytics"],
+    refetchInterval: 60000,
+  });
+
+  // Bot control functions
+  const startBot = useMutation({
+    mutationFn: async (botId: string) => {
+      return await apiRequest(`/api/social/bot/${botId}/start`, "POST", {});
+    },
+    onSuccess: () => {
+      toast({ title: "Bot Started", description: "Social automation bot is now active" });
+      queryClient.invalidateQueries({ queryKey: ["/api/social/status"] });
+    },
+    onError: (error: any) => {
+      toast({ title: "Error", description: error.message, variant: "destructive" });
+    },
+  });
+
+  const stopBot = useMutation({
+    mutationFn: async (botId: string) => {
+      return await apiRequest(`/api/social/bot/${botId}/stop`, "POST", {});
+    },
+    onSuccess: () => {
+      toast({ title: "Bot Stopped", description: "Social automation bot has been stopped" });
+      queryClient.invalidateQueries({ queryKey: ["/api/social/status"] });
+    },
+  });
+
+  const restartBot = useMutation({
+    mutationFn: async (botId: string) => {
+      return await apiRequest(`/api/social/bot/${botId}/restart`, "POST", {});
+    },
+    onSuccess: () => {
+      toast({ title: "Bot Restarted", description: "Social automation bot has been restarted" });
+      queryClient.invalidateQueries({ queryKey: ["/api/social/status"] });
+    },
+  });
+
+  const updateBotConfig = useMutation({
+    mutationFn: async ({ botId, config }: { botId: string; config: any }) => {
+      return await apiRequest(`/api/social/bot/${botId}/config`, "POST", config);
+    },
+    onSuccess: () => {
+      toast({ title: "Configuration Updated", description: "Bot settings have been saved" });
+    },
+  });
+
+  return (
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex justify-between items-center">
+        <div>
+          <h2 className="text-2xl font-bold text-white flex items-center gap-2">
+            <Radio className="w-6 h-6 text-purple-400" />
+            Social Automation Management
+          </h2>
+          <p className="text-slate-400">Centralized control for all social media bots and automation</p>
+        </div>
+        <div className="flex gap-2">
+          <Button onClick={() => refetchStatus()} variant="outline" size="sm">
+            <RefreshCw className="w-4 h-4 mr-2" />
+            Refresh
+          </Button>
+        </div>
+      </div>
+
+      {/* Bot Status Overview */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <Card className="bg-slate-800/50 border-green-500/30">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-white text-sm">Bot Status</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-center justify-between">
+              <div>
+                <div className="text-2xl font-bold text-green-400">
+                  {socialStatus?.activeBotsCount || 0}
+                </div>
+                <p className="text-xs text-slate-400">Active Bots</p>
+              </div>
+              <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-slate-800/50 border-blue-500/30">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-white text-sm">Engagement Accounts</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-center justify-between">
+              <div>
+                <div className="text-2xl font-bold text-blue-400">
+                  {botAccounts?.length || 0}
+                </div>
+                <p className="text-xs text-slate-400">Connected Accounts</p>
+              </div>
+              <Users className="w-6 h-6 text-blue-400" />
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-slate-800/50 border-purple-500/30">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-white text-sm">Daily Actions</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-center justify-between">
+              <div>
+                <div className="text-2xl font-bold text-purple-400">
+                  {automationAnalytics?.dailyActions || 0}
+                </div>
+                <p className="text-xs text-slate-400">Today</p>
+              </div>
+              <Activity className="w-6 h-6 text-purple-400" />
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Main Bot Controls */}
+      <Tabs value={activeBot} onValueChange={setActiveBot} className="w-full">
+        <TabsList className="grid w-full grid-cols-4 bg-slate-900/90 border border-slate-600 p-1">
+          <TabsTrigger value="main" className="data-[state=active]:bg-purple-600/60">
+            <Radio className="w-4 h-4 mr-2" />
+            Main Bot
+          </TabsTrigger>
+          <TabsTrigger value="engagement" className="data-[state=active]:bg-blue-600/60">
+            <Users className="w-4 h-4 mr-2" />
+            Engagement
+          </TabsTrigger>
+          <TabsTrigger value="ai-optimization" className="data-[state=active]:bg-green-600/60">
+            <Brain className="w-4 h-4 mr-2" />
+            AI Tools
+          </TabsTrigger>
+          <TabsTrigger value="analytics" className="data-[state=active]:bg-cyan-600/60">
+            <BarChart3 className="w-4 h-4 mr-2" />
+            Analytics
+          </TabsTrigger>
+        </TabsList>
+
+        {/* Main Bot Management */}
+        <TabsContent value="main" className="space-y-4">
+          <Card className="bg-slate-800/50 border-slate-600/50">
+            <CardHeader>
+              <CardTitle className="text-white flex items-center justify-between">
+                <span>Main Social Automation Bot</span>
+                <Badge className={socialStatus?.mainBot?.active ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'}>
+                  {socialStatus?.mainBot?.active ? 'ACTIVE' : 'INACTIVE'}
+                </Badge>
+              </CardTitle>
+              <CardDescription className="text-slate-400">
+                Primary bot for content posting, monitoring, and basic interactions
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex gap-2">
+                <Button 
+                  onClick={() => startBot.mutate('main')} 
+                  disabled={socialStatus?.mainBot?.active || startBot.isPending}
+                  className="bg-green-600 hover:bg-green-700"
+                >
+                  <Sparkles className="w-4 h-4 mr-2" />
+                  Start Bot
+                </Button>
+                <Button 
+                  onClick={() => stopBot.mutate('main')} 
+                  disabled={!socialStatus?.mainBot?.active || stopBot.isPending}
+                  variant="destructive"
+                >
+                  <X className="w-4 h-4 mr-2" />
+                  Stop Bot
+                </Button>
+                <Button 
+                  onClick={() => restartBot.mutate('main')} 
+                  disabled={restartBot.isPending}
+                  variant="outline"
+                >
+                  <RotateCcw className="w-4 h-4 mr-2" />
+                  Restart
+                </Button>
+              </div>
+
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+                <div>
+                  <div className="text-lg font-semibold text-blue-400">
+                    {socialStatus?.mainBot?.postsToday || 0}
+                  </div>
+                  <div className="text-xs text-slate-400">Posts Today</div>
+                </div>
+                <div>
+                  <div className="text-lg font-semibold text-green-400">
+                    {socialStatus?.mainBot?.engagements || 0}
+                  </div>
+                  <div className="text-xs text-slate-400">Engagements</div>
+                </div>
+                <div>
+                  <div className="text-lg font-semibold text-purple-400">
+                    {socialStatus?.mainBot?.uptime || '0h'}
+                  </div>
+                  <div className="text-xs text-slate-400">Uptime</div>
+                </div>
+                <div>
+                  <div className="text-lg font-semibold text-cyan-400">
+                    {socialStatus?.mainBot?.errors || 0}
+                  </div>
+                  <div className="text-xs text-slate-400">Errors</div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* Engagement Bot Management */}
+        <TabsContent value="engagement" className="space-y-4">
+          <Card className="bg-slate-800/50 border-slate-600/50">
+            <CardHeader>
+              <CardTitle className="text-white">Engagement Amplification Network</CardTitle>
+              <CardDescription className="text-slate-400">
+                Manage multiple accounts for viral content amplification and engagement
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {botAccounts?.map((account: any, index: number) => (
+                  <Card key={index} className="bg-slate-700/30 border-slate-600/30">
+                    <CardContent className="p-4">
+                      <div className="flex items-center justify-between mb-3">
+                        <div className="flex items-center gap-2">
+                          <div className={`w-2 h-2 rounded-full ${account.active ? 'bg-green-500' : 'bg-red-500'}`}></div>
+                          <span className="text-white font-medium">{account.username}</span>
+                        </div>
+                        <Badge variant="outline" className="text-xs">
+                          {account.platform}
+                        </Badge>
+                      </div>
+                      <div className="space-y-2 text-sm">
+                        <div className="flex justify-between">
+                          <span className="text-slate-400">Daily Reposts:</span>
+                          <span className="text-white">{account.dailyReposts || 0}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-slate-400">Engagement Rate:</span>
+                          <span className="text-green-400">{account.engagementRate || '0%'}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-slate-400">Last Active:</span>
+                          <span className="text-slate-300">{account.lastActive || 'Never'}</span>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+
+              <div className="flex gap-2">
+                <Button className="bg-blue-600 hover:bg-blue-700">
+                  <Plus className="w-4 h-4 mr-2" />
+                  Add Account
+                </Button>
+                <Button variant="outline">
+                  <Settings className="w-4 h-4 mr-2" />
+                  Configure Engagement
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* AI Optimization Tools */}
+        <TabsContent value="ai-optimization" className="space-y-4">
+          <Card className="bg-slate-800/50 border-slate-600/50">
+            <CardHeader>
+              <CardTitle className="text-white">AI Social Optimization Tools</CardTitle>
+              <CardDescription className="text-slate-400">
+                Advanced AI features for content optimization and viral growth
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <Card className="bg-gradient-to-br from-green-900/20 to-blue-900/20 border-green-500/30">
+                  <CardContent className="p-4">
+                    <div className="flex items-center gap-3 mb-3">
+                      <Clock className="w-5 h-5 text-green-400" />
+                      <span className="text-white font-medium">Timing Analysis</span>
+                    </div>
+                    <p className="text-xs text-slate-400 mb-3">AI-powered optimal posting times</p>
+                    <Button size="sm" className="bg-green-600/80 hover:bg-green-600">
+                      <Link href="/ai-social-optimization">Launch Tool</Link>
+                    </Button>
+                  </CardContent>
+                </Card>
+
+                <Card className="bg-gradient-to-br from-purple-900/20 to-pink-900/20 border-purple-500/30">
+                  <CardContent className="p-4">
+                    <div className="flex items-center gap-3 mb-3">
+                      <Sparkles className="w-5 h-5 text-purple-400" />
+                      <span className="text-white font-medium">Content Optimizer</span>
+                    </div>
+                    <p className="text-xs text-slate-400 mb-3">AI content enhancement & viral scoring</p>
+                    <Button size="sm" className="bg-purple-600/80 hover:bg-purple-600">
+                      <Link href="/ai-social-optimization">Optimize Content</Link>
+                    </Button>
+                  </CardContent>
+                </Card>
+
+                <Card className="bg-gradient-to-br from-blue-900/20 to-cyan-900/20 border-blue-500/30">
+                  <CardContent className="p-4">
+                    <div className="flex items-center gap-3 mb-3">
+                      <Brain className="w-5 h-5 text-blue-400" />
+                      <span className="text-white font-medium">Smart Responses</span>
+                    </div>
+                    <p className="text-xs text-slate-400 mb-3">AI-generated engagement responses</p>
+                    <Button size="sm" className="bg-blue-600/80 hover:bg-blue-600">
+                      <Link href="/ai-social-optimization">Generate Responses</Link>
+                    </Button>
+                  </CardContent>
+                </Card>
+
+                <Card className="bg-gradient-to-br from-orange-900/20 to-red-900/20 border-orange-500/30">
+                  <CardContent className="p-4">
+                    <div className="flex items-center gap-3 mb-3">
+                      <BarChart3 className="w-5 h-5 text-orange-400" />
+                      <span className="text-white font-medium">Schedule Generator</span>
+                    </div>
+                    <p className="text-xs text-slate-400 mb-3">AI-powered posting schedules</p>
+                    <Button size="sm" className="bg-orange-600/80 hover:bg-orange-600">
+                      <Link href="/ai-social-optimization">Create Schedule</Link>
+                    </Button>
+                  </CardContent>
+                </Card>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* Analytics Dashboard */}
+        <TabsContent value="analytics" className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <Card className="bg-slate-800/50 border-slate-600/50">
+              <CardHeader className="pb-3">
+                <CardTitle className="text-white text-sm">Viral Metrics</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  <div className="flex justify-between">
+                    <span className="text-slate-400 text-sm">Total Reach:</span>
+                    <span className="text-white font-medium">{automationAnalytics?.totalReach?.toLocaleString() || '0'}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-slate-400 text-sm">Engagement Rate:</span>
+                    <span className="text-green-400 font-medium">{automationAnalytics?.avgEngagement || '0%'}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-slate-400 text-sm">Viral Posts:</span>
+                    <span className="text-purple-400 font-medium">{automationAnalytics?.viralPosts || '0'}</span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-slate-800/50 border-slate-600/50">
+              <CardHeader className="pb-3">
+                <CardTitle className="text-white text-sm">Performance Stats</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  <div className="flex justify-between">
+                    <span className="text-slate-400 text-sm">Success Rate:</span>
+                    <span className="text-green-400 font-medium">{automationAnalytics?.successRate || '0%'}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-slate-400 text-sm">Error Rate:</span>
+                    <span className="text-red-400 font-medium">{automationAnalytics?.errorRate || '0%'}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-slate-400 text-sm">Uptime:</span>
+                    <span className="text-blue-400 font-medium">{automationAnalytics?.uptime || '0%'}</span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-slate-800/50 border-slate-600/50">
+              <CardHeader className="pb-3">
+                <CardTitle className="text-white text-sm">ROI Metrics</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  <div className="flex justify-between">
+                    <span className="text-slate-400 text-sm">Cost Efficiency:</span>
+                    <span className="text-green-400 font-medium">{automationAnalytics?.costEfficiency || 'N/A'}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-slate-400 text-sm">Revenue Impact:</span>
+                    <span className="text-yellow-400 font-medium">${automationAnalytics?.revenueImpact || '0'}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-slate-400 text-sm">Growth Rate:</span>
+                    <span className="text-cyan-400 font-medium">{automationAnalytics?.growthRate || '0%'}</span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          <Card className="bg-slate-800/50 border-slate-600/50">
+            <CardHeader>
+              <CardTitle className="text-white">Recent Bot Activities</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-2">
+                {socialStatus?.recentActivities?.map((activity: any, index: number) => (
+                  <div key={index} className="flex items-center justify-between p-2 bg-slate-700/30 rounded">
+                    <div className="flex items-center gap-3">
+                      <div className={`w-2 h-2 rounded-full ${activity.type === 'post' ? 'bg-green-400' : activity.type === 'engagement' ? 'bg-blue-400' : 'bg-purple-400'}`}></div>
+                      <span className="text-white text-sm">{activity.description}</span>
+                    </div>
+                    <span className="text-slate-400 text-xs">{activity.timestamp}</span>
+                  </div>
+                )) || (
+                  <div className="text-center text-slate-400 py-8">
+                    No recent activities
+                  </div>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
+
+      {/* Quick Actions */}
+      <Card className="bg-gradient-to-r from-purple-900/20 to-blue-900/20 border-purple-500/30">
+        <CardHeader>
+          <CardTitle className="text-white flex items-center gap-2">
+            <Zap className="w-5 h-5 text-purple-400" />
+            Quick Actions
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+            <Button variant="outline" size="sm" className="justify-start">
+              <Settings className="w-4 h-4 mr-2" />
+              Bot Settings
+            </Button>
+            <Button variant="outline" size="sm" className="justify-start">
+              <Users className="w-4 h-4 mr-2" />
+              Manage Accounts
+            </Button>
+            <Button variant="outline" size="sm" className="justify-start">
+              <Download className="w-4 h-4 mr-2" />
+              Export Data
+            </Button>
+            <Button variant="outline" size="sm" className="justify-start">
+              <Bell className="w-4 h-4 mr-2" />
+              Notifications
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
+
 // Consolidated Admin Dashboard - All admin functions in one place
 export default function UnifiedAdminDashboard() {
   const [activeTab, setActiveTab] = useState("overview");
@@ -1617,7 +2103,7 @@ export default function UnifiedAdminDashboard() {
     'core-management': ['overview', 'settings', 'users', 'tokens', 'pricing', 'codes', 'access', 'testing'],
     'business-intelligence': ['competitive', 'wallets', 'behavior', 'api-monetization', 'features'],
     'analytics-monitoring': ['analytics', 'performance', 'security', 'system', 'realtime', 'revenue', 'viral', 'final-5-percent', 'production-deployment', 'production-readiness', 'environment-management'],
-    'ai-optimization': ['dynamic-pricing', 'self-optimization', 'staking']
+    'ai-optimization': ['dynamic-pricing', 'self-optimization', 'staking', 'social-automation']
   };
 
   // Define all tab configurations
@@ -1648,7 +2134,8 @@ export default function UnifiedAdminDashboard() {
     { value: "final-5-percent", icon: Rocket, label: "🚀 Final 5%", color: "green" },
     { value: "production-deployment", icon: Rocket, label: "🚀 Production", color: "blue" },
     { value: "production-readiness", icon: Shield, label: "🛡️ Readiness", color: "green" },
-    { value: "environment-management", icon: ArrowRightLeft, label: "🔄 Environment", color: "blue" }
+    { value: "environment-management", icon: ArrowRightLeft, label: "🔄 Environment", color: "blue" },
+    { value: "social-automation", icon: Radio, label: "🤖 Social Bot", color: "purple" }
   ];
 
   // Get filtered tabs based on selected category
@@ -3704,6 +4191,11 @@ export default function UnifiedAdminDashboard() {
           {/* Environment Management Tab */}
           <TabsContent value="environment-management" className="space-y-6">
             <EnvironmentManagementContent />
+          </TabsContent>
+
+          {/* Social Automation Management Tab */}
+          <TabsContent value="social-automation" className="space-y-6">
+            <SocialAutomationManagementContent />
           </TabsContent>
 
         </Tabs>

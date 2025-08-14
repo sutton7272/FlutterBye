@@ -98,10 +98,7 @@ export default function AISocialOptimization() {
   const analyzeTimings = async () => {
     setLoading({ ...loading, timing: true });
     try {
-      const response = await apiRequest('/api/social/ai/analyze-timing', {
-        method: 'POST',
-        body: JSON.stringify(timingForm)
-      });
+      const response = await apiRequest('/api/social/ai/analyze-timing', 'POST', timingForm);
 
       setTimingAnalysis(response.insights);
       toast({
@@ -132,10 +129,7 @@ export default function AISocialOptimization() {
 
     setLoading({ ...loading, content: true });
     try {
-      const response = await apiRequest('/api/social/ai/optimize-content', {
-        method: 'POST',
-        body: JSON.stringify(contentForm)
-      });
+      const response = await apiRequest('/api/social/ai/optimize-content', 'POST', contentForm);
 
       setContentOptimization(response.optimization);
       toast({
@@ -166,10 +160,7 @@ export default function AISocialOptimization() {
 
     setLoading({ ...loading, response: true });
     try {
-      const response = await apiRequest('/api/social/ai/optimize-responses', {
-        method: 'POST',
-        body: JSON.stringify(responseForm)
-      });
+      const response = await apiRequest('/api/social/ai/optimize-responses', 'POST', responseForm);
 
       setResponseOptimization(response.responseOptimization);
       toast({
@@ -191,10 +182,7 @@ export default function AISocialOptimization() {
   const generateSchedule = async () => {
     setLoading({ ...loading, schedule: true });
     try {
-      const response = await apiRequest('/api/social/ai/generate-schedule', {
-        method: 'POST',
-        body: JSON.stringify(scheduleForm)
-      });
+      const response = await apiRequest('/api/social/ai/generate-schedule', 'POST', scheduleForm);
 
       setPostingSchedule(response.schedule);
       toast({
