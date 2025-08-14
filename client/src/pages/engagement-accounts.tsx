@@ -111,10 +111,10 @@ export default function EngagementAccounts() {
 
   const fetchAccounts = async () => {
     try {
-      const response = await fetch('/api/social/accounts');
+      const response = await fetch('/api/social-automation/engagement-accounts');
       if (response.ok) {
         const data = await response.json();
-        setAccounts(Array.isArray(data) ? data : mockAccounts);
+        setAccounts(data.accounts || mockAccounts);
       } else {
         setAccounts(mockAccounts);
       }
@@ -125,13 +125,43 @@ export default function EngagementAccounts() {
   };
 
   const addAccount = async () => {
+    // Validate required fields
+    if (!newAccount.username || !newAccount.displayName || !newAccount.platform) {
+      toast({
+        title: "Missing Information",
+        description: "Please fill in all required fields",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    // Validate required API credentials for the platform
+    const config = platformConfigs[newAccount.platform as keyof typeof platformConfigs];
+    const requiredFields = config.fields.filter(field => !field.label.includes('Optional'));
+    const missingFields = requiredFields.filter(field => !newAccount.credentials[field.key]?.trim());
+    
+    if (missingFields.length > 0) {
+      toast({
+        title: "Missing API Credentials",
+        description: `Please provide: ${missingFields.map(f => f.label).join(', ')}`,
+        variant: "destructive"
+      });
+      return;
+    }
+
     try {
       const accountData = {
         ...newAccount,
-        apiCredentials: newAccount.credentials
+        apiCredentials: newAccount.credentials,
+        id: Date.now().toString(),
+        isConnected: false,
+        lastSync: new Date().toISOString(),
+        followers: 0,
+        following: 0,
+        posts: 0
       };
 
-      const response = await fetch('/api/social/accounts', {
+      const response = await fetch('/api/social-automation/engagement-accounts', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(accountData)
@@ -139,7 +169,7 @@ export default function EngagementAccounts() {
       
       if (response.ok) {
         const data = await response.json();
-        setAccounts(prev => [...prev, data]);
+        setAccounts(prev => [...prev, data.account || accountData]);
         setNewAccount({
           platform: 'Twitter',
           username: '',
@@ -149,13 +179,16 @@ export default function EngagementAccounts() {
         setShowAddAccount(false);
         toast({ 
           title: 'Account Added Successfully!',
-          description: `${data.displayName} has been connected`,
+          description: `${accountData.displayName} has been added with individual API keys`,
           className: 'bg-green-900 border-green-500 text-white'
         });
+      } else {
+        throw new Error('Failed to add account');
       }
     } catch (error) {
       toast({ 
         title: 'Failed to add account', 
+        description: 'Please check your API credentials and try again',
         variant: 'destructive' 
       });
     }
@@ -164,7 +197,7 @@ export default function EngagementAccounts() {
   const testConnection = async (accountId: string) => {
     setTestingAccount(accountId);
     try {
-      const response = await fetch(`/api/social/accounts/${accountId}/test`, {
+      const response = await fetch(`/api/social-automation/engagement-accounts/${accountId}/test`, {
         method: 'POST'
       });
       
@@ -205,7 +238,7 @@ export default function EngagementAccounts() {
 
   const deleteAccount = async (accountId: string) => {
     try {
-      const response = await fetch(`/api/social/accounts/${accountId}`, {
+      const response = await fetch(`/api/social-automation/engagement-accounts/${accountId}`, {
         method: 'DELETE'
       });
       if (response.ok) {

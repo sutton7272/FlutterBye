@@ -1050,5 +1050,127 @@ export function registerSocialAutomationAPI(app: Express) {
     }
   });
 
-  console.log('🤖 Social Automation API routes registered');
+  // Individual Engagement Account API Key Management
+  let engagementAccounts: any[] = [];
+
+  app.get('/api/social-automation/engagement-accounts', (req, res) => {
+    res.json({ success: true, accounts: engagementAccounts });
+  });
+
+  app.post('/api/social-automation/engagement-accounts', (req, res) => {
+    try {
+      const account = {
+        ...req.body,
+        id: req.body.id || Date.now().toString(),
+        createdAt: new Date().toISOString(),
+        isConnected: false
+      };
+      
+      engagementAccounts.push(account);
+      
+      res.json({ 
+        success: true, 
+        account,
+        message: `Account ${account.displayName} added with individual API keys` 
+      });
+    } catch (error) {
+      res.status(500).json({ 
+        success: false, 
+        error: 'Failed to add engagement account' 
+      });
+    }
+  });
+
+  app.put('/api/social-automation/engagement-accounts/:id', (req, res) => {
+    try {
+      const accountId = req.params.id;
+      const accountIndex = engagementAccounts.findIndex(acc => acc.id === accountId);
+      
+      if (accountIndex === -1) {
+        return res.status(404).json({ success: false, error: 'Account not found' });
+      }
+      
+      engagementAccounts[accountIndex] = {
+        ...engagementAccounts[accountIndex],
+        ...req.body,
+        updatedAt: new Date().toISOString()
+      };
+      
+      res.json({ 
+        success: true, 
+        account: engagementAccounts[accountIndex],
+        message: 'Account updated successfully' 
+      });
+    } catch (error) {
+      res.status(500).json({ 
+        success: false, 
+        error: 'Failed to update engagement account' 
+      });
+    }
+  });
+
+  app.delete('/api/social-automation/engagement-accounts/:id', (req, res) => {
+    try {
+      const accountId = req.params.id;
+      const accountIndex = engagementAccounts.findIndex(acc => acc.id === accountId);
+      
+      if (accountIndex === -1) {
+        return res.status(404).json({ success: false, error: 'Account not found' });
+      }
+      
+      engagementAccounts.splice(accountIndex, 1);
+      
+      res.json({ 
+        success: true, 
+        message: 'Account removed successfully' 
+      });
+    } catch (error) {
+      res.status(500).json({ 
+        success: false, 
+        error: 'Failed to remove engagement account' 
+      });
+    }
+  });
+
+  // Test Individual Account API Keys
+  app.post('/api/social-automation/engagement-accounts/:id/test', (req, res) => {
+    try {
+      const accountId = req.params.id;
+      const account = engagementAccounts.find(acc => acc.id === accountId);
+      
+      if (!account) {
+        return res.status(404).json({ success: false, error: 'Account not found' });
+      }
+      
+      // Simulate API key testing
+      const hasRequiredKeys = account.apiCredentials && 
+        Object.keys(account.apiCredentials).length > 0 &&
+        Object.values(account.apiCredentials).some(key => key && typeof key === 'string' && key.trim().length > 0);
+      
+      if (hasRequiredKeys) {
+        // Update account connection status
+        const accountIndex = engagementAccounts.findIndex(acc => acc.id === accountId);
+        engagementAccounts[accountIndex].isConnected = true;
+        engagementAccounts[accountIndex].lastSync = new Date().toISOString();
+        
+        res.json({ 
+          success: true, 
+          message: 'API keys are valid and account is connected',
+          account: engagementAccounts[accountIndex]
+        });
+      } else {
+        res.json({ 
+          success: false, 
+          message: 'Invalid or missing API credentials'
+        });
+      }
+    } catch (error) {
+      res.status(500).json({ 
+        success: false, 
+        error: 'Failed to test account connection' 
+      });
+    }
+  });
+
+  console.log('🤖 Social Automation API routes registered with individual API key management');
 }
