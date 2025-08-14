@@ -665,12 +665,12 @@ export default function SocialAutomationDashboard() {
                     <h4 className="text-lg font-semibold text-purple-300 mb-2">How to Add Response & Engagement Accounts</h4>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
-                        <p className="text-slate-300 mb-2"><strong>Step 1: Add Your Response Accounts</strong></p>
-                        <p className="text-sm text-slate-400">Go to "Social Accounts" tab → Click "Add Response Account" → Enter your bot account credentials</p>
+                        <p className="text-slate-300 mb-2"><strong>Step 1: Add Flutterbye Content Creator Account</strong></p>
+                        <p className="text-sm text-slate-400">Go to "Social Accounts" tab → Add Flutterbye credentials → This account will post original content</p>
                       </div>
                       <div>
-                        <p className="text-slate-300 mb-2"><strong>Step 2: Configure Target Accounts</strong></p>
-                        <p className="text-sm text-slate-400">Create a bot below → In "Target Accounts" field → Add influencer/competitor accounts to engage with</p>
+                        <p className="text-slate-300 mb-2"><strong>Step 2: Create Engagement Amplifier Bots</strong></p>
+                        <p className="text-sm text-slate-400">Your other 4 accounts will automatically like, comment, and share Flutterbye's posts for viral growth</p>
                       </div>
                     </div>
                   </div>
@@ -684,19 +684,19 @@ export default function SocialAutomationDashboard() {
                 <DialogTrigger asChild>
                   <Button className="bg-purple-600 hover:bg-purple-700">
                     <Plus className="w-4 h-4 mr-2" />
-                    Create New Bot
+                    Create Engagement Bot
                   </Button>
                 </DialogTrigger>
                 <DialogContent className="bg-slate-800 border-purple-500/30">
                   <DialogHeader>
-                    <DialogTitle className="text-purple-400">Create New Automation Bot</DialogTitle>
+                    <DialogTitle className="text-purple-400">Create Flutterbye Engagement Amplifier Bot</DialogTitle>
                   </DialogHeader>
                   <div className="space-y-4">
                     <div>
                       <Label htmlFor="botName">Bot Name</Label>
                       <Input
                         id="botName"
-                        placeholder="e.g., Response Bot, Engagement Amplifier"
+                        placeholder="e.g., Flutterbye Amplifier Bot, Viral Growth Bot"
                         value={newBot.name}
                         onChange={(e) => setNewBot({...newBot, name: e.target.value})}
                         className="bg-slate-700 border-slate-600"
@@ -716,35 +716,35 @@ export default function SocialAutomationDashboard() {
                         </SelectContent>
                       </Select>
                     </div>
-                    <div className="bg-slate-900/50 p-4 rounded-lg border border-purple-500/20">
-                      <Label htmlFor="targetAccounts" className="text-purple-300 font-semibold">Response & Engagement Target Accounts</Label>
+                    <div className="bg-slate-900/50 p-4 rounded-lg border border-green-500/20">
+                      <Label htmlFor="targetAccounts" className="text-green-300 font-semibold">Target Flutterbye Accounts</Label>
                       <Input
                         id="targetAccounts"
-                        placeholder="@influencer1, @competitor2, @viral_account3, @trendingtopic"
+                        placeholder="@flutterbye, @flutterbye_official (add your Flutterbye accounts here)"
                         value={newBot.targetAccounts}
                         onChange={(e) => setNewBot({...newBot, targetAccounts: e.target.value})}
                         className="bg-slate-700 border-slate-600 mt-2"
                       />
                       <p className="text-xs text-slate-400 mt-2">
-                        🎯 <strong>This is where you add accounts for responses and engagement:</strong><br/>
-                        • Add influencer accounts to respond to their posts<br/>
-                        • Add competitor accounts to monitor and engage<br/>
-                        • Add trending accounts for viral amplification<br/>
-                        • Bot will automatically comment, like, and share from these targets
+                        🎯 <strong>Enter your Flutterbye account usernames:</strong><br/>
+                        • Your engagement bots will automatically like Flutterbye's posts<br/>
+                        • Bots will comment on Flutterbye's content for viral amplification<br/>
+                        • Automatic sharing/retweeting of Flutterbye posts<br/>
+                        • Creates artificial engagement for algorithmic boost
                       </p>
                     </div>
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <Label htmlFor="postingFreq">Posts per Day</Label>
+                        <Label htmlFor="postingFreq">Engagements per Day</Label>
                         <Select value={newBot.postingFrequency} onValueChange={(value) => setNewBot({...newBot, postingFrequency: value})}>
                           <SelectTrigger className="bg-slate-700 border-slate-600">
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="2">2 posts/day</SelectItem>
-                            <SelectItem value="4">4 posts/day</SelectItem>
-                            <SelectItem value="8">8 posts/day</SelectItem>
-                            <SelectItem value="12">12 posts/day</SelectItem>
+                            <SelectItem value="2">2 engagements/day</SelectItem>
+                            <SelectItem value="4">4 engagements/day</SelectItem>
+                            <SelectItem value="8">8 engagements/day</SelectItem>
+                            <SelectItem value="12">12 engagements/day</SelectItem>
                           </SelectContent>
                         </Select>
                       </div>
@@ -766,7 +766,7 @@ export default function SocialAutomationDashboard() {
                     <div className="flex gap-2 pt-4">
                       <Button onClick={addBot} className="bg-purple-600 hover:bg-purple-700 flex-1">
                         <Plus className="w-4 h-4 mr-2" />
-                        Create Bot
+                        Create Engagement Bot
                       </Button>
                       <Button variant="outline" onClick={() => setShowAddBot(false)} className="border-slate-600">
                         Cancel
