@@ -92,16 +92,20 @@ export default function SocialAutomationDashboard() {
     openai: ''
   });
 
-  // Fetch social accounts from API
-  const { data: socialAccounts = [] } = useQuery({
+  // Fetch social accounts from API with better error handling
+  const { data: socialAccounts = [], isLoading: accountsLoading, error: accountsError } = useQuery({
     queryKey: ['/api/social-automation/accounts'],
     refetchInterval: 10000, // Refresh every 10 seconds
+    retry: 3,
+    retryDelay: 1000,
   });
 
-  // Fetch bot configurations from API
-  const { data: botConfigs = [] } = useQuery({
+  // Fetch bot configurations from API with better error handling
+  const { data: botConfigs = [], isLoading: botsLoading, error: botsError } = useQuery({
     queryKey: ['/api/social-automation/bots'],
     refetchInterval: 5000, // Refresh every 5 seconds
+    retry: 3,
+    retryDelay: 1000,
   });
 
   // Fetch dashboard stats
@@ -127,30 +131,47 @@ export default function SocialAutomationDashboard() {
     }
 
     try {
-      const response = await apiRequest("POST", "/api/social-automation/accounts", newAccount);
+      console.log('Adding social account:', { platform: newAccount.platform, username: newAccount.username });
+      
+      const response = await apiRequest("POST", "/api/social-automation/accounts", {
+        platform: newAccount.platform,
+        username: newAccount.username,
+        password: newAccount.password,
+        email: newAccount.email || '',
+        phone: newAccount.phone || ''
+      });
+
+      console.log('Add account response status:', response.status);
+      
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+
       const result = await response.json();
+      console.log('Add account result:', result);
 
       if (result.success) {
         // Refresh accounts from server
-        queryClient.invalidateQueries({ queryKey: ['/api/social-automation/accounts'] });
+        await queryClient.invalidateQueries({ queryKey: ['/api/social-automation/accounts'] });
         setNewAccount({ platform: '', username: '', password: '', email: '', phone: '' });
         setShowAddAccount(false);
         
         toast({
-          title: "Account Added",
-          description: `${newAccount.platform} account @${newAccount.username} has been added successfully`,
+          title: "Account Added Successfully",
+          description: `${newAccount.platform} account @${newAccount.username} has been added`,
         });
       } else {
         toast({
-          title: "Error",
-          description: result.error || "Failed to add account",
+          title: "Failed to Add Account",
+          description: result.error || "Unknown error occurred",
           variant: "destructive"
         });
       }
     } catch (error) {
+      console.error('Error adding account:', error);
       toast({
-        title: "Error",
-        description: "Failed to add account",
+        title: "Connection Error",
+        description: error instanceof Error ? error.message : "Failed to connect to server",
         variant: "destructive"
       });
     }
