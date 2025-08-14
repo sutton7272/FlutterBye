@@ -1,6 +1,7 @@
 import type { Express } from "express";
 import FlutterbySocialBot, { type SocialMediaPost } from "./social-media-bot";
 import { contentGenerator } from "./social-content-generator";
+import { passwordAutomation } from "./social-password-automation";
 import cron from "node-cron";
 
 // Global bot instance
@@ -367,6 +368,155 @@ export function registerSocialRoutes(app: Express) {
     }
   });
 
+  // PASSWORD AUTOMATION ROUTES (Login with username/password)
+  
+  // Test single platform posting with credentials
+  app.post('/api/social/post-with-password', async (req, res) => {
+    try {
+      const { 
+        platform, 
+        credentials, 
+        contentType = 'features' 
+      } = req.body;
+
+      if (!platform || !credentials?.username || !credentials?.password) {
+        return res.status(400).json({
+          success: false,
+          error: 'Platform and credentials (username/password) are required'
+        });
+      }
+
+      // Generate content with screenshot
+      const postContent = await passwordAutomation.generateContentWithScreenshot(contentType);
+      
+      let result;
+      switch (platform) {
+        case 'twitter':
+          result = await passwordAutomation.postToTwitter(credentials, postContent);
+          break;
+        case 'linkedin':
+          result = await passwordAutomation.postToLinkedIn(credentials, postContent);
+          break;
+        case 'facebook':
+          result = await passwordAutomation.postToFacebook(credentials, postContent);
+          break;
+        default:
+          return res.status(400).json({
+            success: false,
+            error: `Unsupported platform: ${platform}`
+          });
+      }
+
+      res.json({ 
+        success: result.success, 
+        message: result.message,
+        content: postContent
+      });
+    } catch (error) {
+      res.status(500).json({ 
+        success: false, 
+        error: error instanceof Error ? error.message : "Failed to post with password" 
+      });
+    }
+  });
+
+  // Post to multiple platforms with credentials
+  app.post('/api/social/post-multi-password', async (req, res) => {
+    try {
+      const { 
+        platforms, 
+        contentType = 'features' 
+      } = req.body;
+
+      if (!platforms || typeof platforms !== 'object') {
+        return res.status(400).json({
+          success: false,
+          error: 'Platforms object with credentials is required'
+        });
+      }
+
+      // Convert platforms object to Map
+      const credentialsMap = new Map();
+      Object.entries(platforms).forEach(([platform, credentials]) => {
+        credentialsMap.set(platform, credentials);
+      });
+
+      // Generate content once for all platforms
+      const postContent = await passwordAutomation.generateContentWithScreenshot(contentType);
+      
+      // Post to all platforms
+      const results = await passwordAutomation.postToMultiplePlatforms(credentialsMap, postContent);
+
+      res.json({ 
+        success: true, 
+        results,
+        content: postContent
+      });
+    } catch (error) {
+      res.status(500).json({ 
+        success: false, 
+        error: error instanceof Error ? error.message : "Failed to post to multiple platforms" 
+      });
+    }
+  });
+
+  // Schedule automated posting with passwords
+  app.post('/api/social/schedule-password', async (req, res) => {
+    try {
+      const { 
+        platforms, 
+        contentType = 'features',
+        intervalHours = 4
+      } = req.body;
+
+      if (!platforms || typeof platforms !== 'object') {
+        return res.status(400).json({
+          success: false,
+          error: 'Platforms object with credentials is required'
+        });
+      }
+
+      // Convert platforms object to Map
+      const credentialsMap = new Map();
+      Object.entries(platforms).forEach(([platform, credentials]) => {
+        credentialsMap.set(platform, credentials);
+      });
+
+      const result = await passwordAutomation.schedulePost(credentialsMap, contentType, intervalHours);
+
+      res.json({ 
+        success: result.success, 
+        message: result.message
+      });
+    } catch (error) {
+      res.status(500).json({ 
+        success: false, 
+        error: error instanceof Error ? error.message : "Failed to schedule password automation" 
+      });
+    }
+  });
+
+  // Generate content preview (no posting)
+  app.post('/api/social/preview-content', async (req, res) => {
+    try {
+      const { contentType = 'features' } = req.body;
+      
+      const postContent = await passwordAutomation.generateContentWithScreenshot(contentType);
+      
+      res.json({ 
+        success: true, 
+        content: postContent,
+        message: "Content generated with screenshot"
+      });
+    } catch (error) {
+      res.status(500).json({ 
+        success: false, 
+        error: error instanceof Error ? error.message : "Failed to preview content" 
+      });
+    }
+  });
+
   console.log("🤖 Social media bot routes registered");
   console.log("📝 Content generator routes registered (no API keys required)");
+  console.log("🔐 Password automation routes registered (login with username/password)");
 }
