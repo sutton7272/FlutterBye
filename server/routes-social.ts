@@ -1,5 +1,6 @@
 import type { Express } from "express";
 import FlutterbySocialBot, { type SocialMediaPost } from "./social-media-bot";
+import { contentGenerator } from "./social-content-generator";
 import cron from "node-cron";
 
 // Global bot instance
@@ -239,5 +240,133 @@ export function registerSocialRoutes(app: Express) {
     }
   });
 
+  // CONTENT GENERATOR ROUTES (No API keys required)
+  
+  // Generate content for manual posting
+  app.post('/api/social/generate-content', async (req, res) => {
+    try {
+      const { 
+        platform = 'twitter', 
+        contentType = 'feature-highlight', 
+        includeScreenshot = true 
+      } = req.body;
+
+      const content = await contentGenerator.generateContentForExport({
+        platform,
+        contentType,
+        includeScreenshot
+      });
+
+      res.json({ 
+        success: true, 
+        content,
+        message: "Content generated and saved to files for manual posting"
+      });
+    } catch (error) {
+      res.status(500).json({ 
+        success: false, 
+        error: error instanceof Error ? error.message : "Failed to generate content" 
+      });
+    }
+  });
+
+  // Generate social media kit for all platforms
+  app.post('/api/social/generate-kit', async (req, res) => {
+    try {
+      const { theme = 'platform-features' } = req.body;
+      
+      const kit = await contentGenerator.generateSocialMediaKit(theme);
+      
+      res.json({ 
+        success: true, 
+        kit,
+        message: "Social media kit generated for all platforms"
+      });
+    } catch (error) {
+      res.status(500).json({ 
+        success: false, 
+        error: error instanceof Error ? error.message : "Failed to generate social media kit" 
+      });
+    }
+  });
+
+  // Generate CSV for scheduling tools
+  app.post('/api/social/generate-csv', async (req, res) => {
+    try {
+      const content = await contentGenerator.getGeneratedContent();
+      const csvPath = await contentGenerator.generateSchedulingCSV(content);
+      
+      res.json({ 
+        success: true, 
+        csvPath,
+        message: "CSV file generated for third-party scheduling tools",
+        downloadUrl: `/api/social/download-csv?file=${encodeURIComponent(csvPath)}`
+      });
+    } catch (error) {
+      res.status(500).json({ 
+        success: false, 
+        error: error instanceof Error ? error.message : "Failed to generate CSV" 
+      });
+    }
+  });
+
+  // Generate webhook content for automation
+  app.post('/api/social/generate-webhook', async (req, res) => {
+    try {
+      const { contentType = 'feature-highlight' } = req.body;
+      
+      const webhookData = await contentGenerator.generateWebhookContent(contentType);
+      
+      res.json({ 
+        success: true, 
+        webhook: webhookData,
+        message: "Webhook content generated for Zapier/Make.com integration"
+      });
+    } catch (error) {
+      res.status(500).json({ 
+        success: false, 
+        error: error instanceof Error ? error.message : "Failed to generate webhook content" 
+      });
+    }
+  });
+
+  // Get all generated content
+  app.get('/api/social/generated-content', async (req, res) => {
+    try {
+      const content = await contentGenerator.getGeneratedContent();
+      
+      res.json({ 
+        success: true, 
+        content,
+        total: content.length
+      });
+    } catch (error) {
+      res.status(500).json({ 
+        success: false, 
+        error: error instanceof Error ? error.message : "Failed to retrieve content" 
+      });
+    }
+  });
+
+  // Cleanup old content
+  app.delete('/api/social/cleanup-content', async (req, res) => {
+    try {
+      const { daysOld = 30 } = req.body;
+      
+      await contentGenerator.cleanupOldContent(daysOld);
+      
+      res.json({ 
+        success: true, 
+        message: `Cleaned up content older than ${daysOld} days`
+      });
+    } catch (error) {
+      res.status(500).json({ 
+        success: false, 
+        error: error instanceof Error ? error.message : "Failed to cleanup content" 
+      });
+    }
+  });
+
   console.log("🤖 Social media bot routes registered");
+  console.log("📝 Content generator routes registered (no API keys required)");
 }
