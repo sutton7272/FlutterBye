@@ -41,6 +41,7 @@ import { registerEscrowRoutes } from "./routes-escrow";
 import { registerCustodialWalletRoutes } from "./routes-custodial-wallet";
 import { registerSocialRoutes } from "./routes-social";
 import { registerSocialAutomationAPI } from "./social-automation-api";
+import socialOptimizationAPI from "./social-optimization-api";
 import { registerSocialTestEndpoints } from "./social-test-endpoint";
 import { registerInstantTestEndpoint } from "./social-instant-test";
 import { registerSimpleTestEndpoint } from "./social-simple-test";
@@ -6638,6 +6639,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Register social media automation routes
   registerSocialRoutes(app);
   registerSocialAutomationAPI(app);
+  app.use('/api/social-optimization', socialOptimizationAPI);
   registerSocialTestEndpoints(app);
   registerInstantTestEndpoint(app);
   registerSimpleTestEndpoint(app);

@@ -387,8 +387,17 @@ router.post('/ai/implement-recommendation/:id', (req, res) => {
 // Instant post generation endpoint
 router.post('/generate-post', async (req, res) => {
   try {
-    const { topic = 'social media', tone = 'engaging', platform = 'twitter' } = req.body;
+    const { topic = 'social media trends', tone = 'engaging', platform = 'twitter' } = req.body;
     
+    // Check if OpenAI API key is available
+    if (!process.env.OPENAI_API_KEY) {
+      console.error('OpenAI API key not found');
+      return res.status(500).json({ 
+        error: 'AI service not configured',
+        message: 'OpenAI API key is missing' 
+      });
+    }
+
     const prompt = `Generate a ${tone} ${platform} post about ${topic}. 
     The post should be:
     - Under 280 characters for Twitter
@@ -403,6 +412,8 @@ router.post('/generate-post', async (req, res) => {
     
     Return only the post content, no additional text.`;
 
+    console.log('Generating post with OpenAI...', { topic, tone, platform });
+
     const completion = await openai.chat.completions.create({
       model: "gpt-4o", // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
       messages: [{ role: "user", content: prompt }],
@@ -410,7 +421,13 @@ router.post('/generate-post', async (req, res) => {
       temperature: 0.8
     });
 
-    const generatedContent = completion.choices[0].message.content?.trim() || '';
+    const generatedContent = completion.choices[0]?.message?.content?.trim() || '';
+    
+    if (!generatedContent) {
+      throw new Error('No content generated from OpenAI');
+    }
+
+    console.log('Post generated successfully:', generatedContent.substring(0, 50) + '...');
     
     res.json({ 
       content: generatedContent,
@@ -419,9 +436,23 @@ router.post('/generate-post', async (req, res) => {
     });
   } catch (error) {
     console.error('Post generation error:', error);
-    res.status(500).json({ 
-      error: 'Failed to generate post content',
-      message: error.message 
+    
+    // Provide fallback content if AI generation fails
+    const fallbackPosts = [
+      "🚀 Ready to revolutionize your social media game? Discover the power of AI-driven content that actually converts! #SocialMedia #AIContent #MarketingTips",
+      "💡 The future of social media is here! Transform your engagement with smart, data-driven content strategies. Who's ready to level up? #DigitalMarketing #SocialStrategy",
+      "⚡ Breaking: AI-powered social media tools are changing everything! Get ahead of the curve and maximize your reach today. #Innovation #SocialMediaMarketing",
+      "🎯 Stop posting and start converting! Learn how strategic content creation can 10x your social media ROI. The results speak for themselves! #ContentStrategy #ROI"
+    ];
+    
+    const randomPost = fallbackPosts[Math.floor(Math.random() * fallbackPosts.length)];
+    
+    res.json({ 
+      content: randomPost,
+      platform,
+      generatedAt: new Date().toISOString(),
+      fallback: true,
+      message: 'Using fallback content due to AI service error'
     });
   }
 });

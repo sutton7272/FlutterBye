@@ -849,7 +849,7 @@ function BotConfigurationContent() {
   const handleGenerateInstantPost = async () => {
     setIsGeneratingPost(true);
     try {
-      const response = await fetch('/api/social/generate-post', {
+      const response = await fetch('/api/social-optimization/generate-post', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -863,9 +863,24 @@ function BotConfigurationContent() {
         const data = await response.json();
         setInstantPostContent(data.content);
         setShowInstantPost(true);
+        
+        if (data.fallback) {
+          toast({
+            title: "Content Generated (Fallback)",
+            description: "Using high-quality template content while AI service recovers",
+          });
+        } else {
+          toast({
+            title: "Post Generated!",
+            description: "AI has created engaging content ready for posting",
+          });
+        }
+      } else {
+        const errorData = await response.json();
         toast({
-          title: "Post Generated!",
-          description: "AI has created engaging content ready for posting",
+          title: "Generation Failed",
+          description: errorData.message || "Unable to generate content. Please try again.",
+          variant: "destructive"
         });
       }
     } catch (error) {
@@ -884,7 +899,7 @@ function BotConfigurationContent() {
     
     setIsPostingNow(true);
     try {
-      const response = await fetch('/api/social/post-now', {
+      const response = await fetch('/api/social-optimization/post-now', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
