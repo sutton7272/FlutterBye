@@ -92,59 +92,31 @@ export default function SocialAutomationDashboard() {
     openai: ''
   });
 
-  // Mock data for demonstration
-  const [socialAccounts, setSocialAccounts] = useState<SocialAccount[]>([
-    {
-      id: '1',
-      platform: 'Twitter',
-      username: '@flutterbye_main',
-      status: 'active',
-      lastActivity: '2 minutes ago',
-      postsToday: 12,
-      followers: 5400
-    },
-    {
-      id: '2',
-      platform: 'Instagram',
-      username: '@flutterbye.official',
-      status: 'active',
-      lastActivity: '5 minutes ago',
-      postsToday: 8,
-      followers: 3200
-    },
-    {
-      id: '3',
-      platform: 'TikTok',
-      username: '@flutterbyte.crypto',
-      status: 'inactive',
-      lastActivity: '1 hour ago',
-      postsToday: 3,
-      followers: 1800
-    }
-  ]);
+  // Fetch social accounts from API
+  const { data: socialAccounts = [] } = useQuery({
+    queryKey: ['/api/social-automation/accounts'],
+    refetchInterval: 10000, // Refresh every 10 seconds
+  });
 
-  const [botConfigs, setBotConfigs] = useState<BotConfig[]>([
-    {
-      id: '1',
-      name: 'Main Engagement Bot',
-      status: 'running',
-      postsToday: 15,
-      engagements: 248,
-      uptime: '23h 45m',
-      lastActivity: '30 seconds ago'
-    },
-    {
-      id: '2',
-      name: 'Viral Amplifier Bot',
-      status: 'running',
-      postsToday: 8,
-      engagements: 156,
-      uptime: '18h 22m',
-      lastActivity: '1 minute ago'
-    }
-  ]);
+  // Fetch bot configurations from API
+  const { data: botConfigs = [] } = useQuery({
+    queryKey: ['/api/social-automation/bots'],
+    refetchInterval: 5000, // Refresh every 5 seconds
+  });
 
-  const addSocialAccount = () => {
+  // Fetch dashboard stats
+  const { data: stats } = useQuery({
+    queryKey: ['/api/social-automation/stats'],
+    refetchInterval: 10000,
+  });
+
+  // Fetch API keys status
+  const { data: apiKeyStatus } = useQuery({
+    queryKey: ['/api/social-automation/api-keys/status'],
+    refetchInterval: 30000,
+  });
+
+  const addSocialAccount = async () => {
     if (!newAccount.platform || !newAccount.username || !newAccount.password) {
       toast({
         title: "Missing Information",
@@ -154,27 +126,37 @@ export default function SocialAutomationDashboard() {
       return;
     }
 
-    const account: SocialAccount = {
-      id: Date.now().toString(),
-      platform: newAccount.platform,
-      username: newAccount.username,
-      status: 'active',
-      lastActivity: 'Just now',
-      postsToday: 0,
-      followers: 0
-    };
+    try {
+      const response = await apiRequest("POST", "/api/social-automation/accounts", newAccount);
+      const result = await response.json();
 
-    setSocialAccounts([...socialAccounts, account]);
-    setNewAccount({ platform: '', username: '', password: '', email: '', phone: '' });
-    setShowAddAccount(false);
-    
-    toast({
-      title: "Account Added",
-      description: `${newAccount.platform} account @${newAccount.username} has been added successfully`,
-    });
+      if (result.success) {
+        // Refresh accounts from server
+        queryClient.invalidateQueries({ queryKey: ['/api/social-automation/accounts'] });
+        setNewAccount({ platform: '', username: '', password: '', email: '', phone: '' });
+        setShowAddAccount(false);
+        
+        toast({
+          title: "Account Added",
+          description: `${newAccount.platform} account @${newAccount.username} has been added successfully`,
+        });
+      } else {
+        toast({
+          title: "Error",
+          description: result.error || "Failed to add account",
+          variant: "destructive"
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to add account",
+        variant: "destructive"
+      });
+    }
   };
 
-  const addBot = () => {
+  const addBot = async () => {
     if (!newBot.name || !newBot.platform) {
       toast({
         title: "Missing Information",
@@ -184,49 +166,124 @@ export default function SocialAutomationDashboard() {
       return;
     }
 
-    const bot: BotConfig = {
-      id: Date.now().toString(),
-      name: newBot.name,
-      status: 'stopped',
-      postsToday: 0,
-      engagements: 0,
-      uptime: '0m',
-      lastActivity: 'Never'
-    };
+    try {
+      const response = await apiRequest("POST", "/api/social-automation/bots", newBot);
+      const result = await response.json();
 
-    setBotConfigs([...botConfigs, bot]);
-    setNewBot({ name: '', platform: '', targetAccounts: '', postingFrequency: '4', engagementRate: '75' });
-    setShowAddBot(false);
+      if (result.success) {
+        queryClient.invalidateQueries({ queryKey: ['/api/social-automation/bots'] });
+        setNewBot({ name: '', platform: '', targetAccounts: '', postingFrequency: '4', engagementRate: '75' });
+        setShowAddBot(false);
+        
+        toast({
+          title: "Bot Created",
+          description: `${newBot.name} has been created successfully`,
+        });
+      } else {
+        toast({
+          title: "Error",
+          description: result.error || "Failed to create bot",
+          variant: "destructive"
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to create bot",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const toggleBotStatus = async (botId: string) => {
+    const bot = botConfigs.find(b => b.id === botId);
+    if (!bot) return;
+
+    const newStatus = bot.status === 'running' ? 'stopped' : 'running';
     
-    toast({
-      title: "Bot Created",
-      description: `${newBot.name} has been created successfully`,
-    });
+    try {
+      const response = await apiRequest("PATCH", `/api/social-automation/bots/${botId}/status`, { status: newStatus });
+      const result = await response.json();
+
+      if (result.success) {
+        queryClient.invalidateQueries({ queryKey: ['/api/social-automation/bots'] });
+        toast({
+          title: "Bot Status Updated",
+          description: result.message || `Bot ${newStatus === 'running' ? 'started' : 'stopped'} successfully`,
+        });
+      } else {
+        toast({
+          title: "Error",
+          description: result.error || "Failed to update bot status",
+          variant: "destructive"
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to update bot status",
+        variant: "destructive"
+      });
+    }
   };
 
-  const toggleBotStatus = (botId: string) => {
-    setBotConfigs(bots => bots.map(bot => 
-      bot.id === botId 
-        ? { ...bot, status: bot.status === 'running' ? 'stopped' : 'running' }
-        : bot
-    ));
+  const toggleAccountStatus = async (accountId: string) => {
+    const account = socialAccounts.find(acc => acc.id === accountId);
+    if (!account) return;
+
+    const newStatus = account.status === 'active' ? 'inactive' : 'active';
+    
+    try {
+      const response = await apiRequest("PATCH", `/api/social-automation/accounts/${accountId}/status`, { status: newStatus });
+      const result = await response.json();
+
+      if (result.success) {
+        queryClient.invalidateQueries({ queryKey: ['/api/social-automation/accounts'] });
+        toast({
+          title: "Account Status Updated",
+          description: `Account ${newStatus === 'active' ? 'activated' : 'deactivated'} successfully`,
+        });
+      } else {
+        toast({
+          title: "Error", 
+          description: result.error || "Failed to update account status",
+          variant: "destructive"
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to update account status", 
+        variant: "destructive"
+      });
+    }
   };
 
-  const toggleAccountStatus = (accountId: string) => {
-    setSocialAccounts(accounts => accounts.map(account => 
-      account.id === accountId 
-        ? { ...account, status: account.status === 'active' ? 'inactive' : 'active' }
-        : account
-    ));
-  };
+  const saveApiKeys = async () => {
+    try {
+      const response = await apiRequest("POST", "/api/social-automation/api-keys", apiKeys);
+      const result = await response.json();
 
-  const saveApiKeys = () => {
-    // In a real implementation, this would save to backend securely
-    toast({
-      title: "API Keys Saved",
-      description: "All API keys have been saved securely",
-    });
-    setShowApiKeys(false);
+      if (result.success) {
+        toast({
+          title: "API Keys Saved",
+          description: "All API keys have been saved securely",
+        });
+        setShowApiKeys(false);
+      } else {
+        toast({
+          title: "Error",
+          description: result.error || "Failed to save API keys",
+          variant: "destructive"
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to save API keys",
+        variant: "destructive"
+      });
+    }
   };
 
   return (
