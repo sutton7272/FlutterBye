@@ -307,6 +307,13 @@ function AIContentGenerator() {
   const [customContext, setCustomContext] = useState('');
   const [previewContent, setPreviewContent] = useState<any>(null);
   const [isLoadingPreview, setIsLoadingPreview] = useState(false);
+  
+  // Instant post states
+  const [isGeneratingPost, setIsGeneratingPost] = useState(false);
+  const [isPostingNow, setIsPostingNow] = useState(false);
+  const [showInstantPost, setShowInstantPost] = useState(false);
+  const [instantPostContent, setInstantPostContent] = useState('');
+  
   const { toast } = useToast();
 
   const timeSlots = [
@@ -428,6 +435,113 @@ function AIContentGenerator() {
     }
   };
 
+  // Instant post functions
+  const handleGenerateInstantPost = async () => {
+    setIsGeneratingPost(true);
+    try {
+      const response = await fetch('/api/social-automation/instant-post', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          customContext: customContext.trim() || undefined,
+          generateOnly: true
+        })
+      });
+
+      const result = await response.json();
+      
+      if (result.success) {
+        setInstantPostContent(result.content);
+        setShowInstantPost(true);
+        toast({
+          title: "AI Post Generated!",
+          description: "Review your content and post when ready.",
+          variant: "default"
+        });
+      } else {
+        throw new Error(result.message);
+      }
+    } catch (error: any) {
+      toast({
+        title: "Generation Failed",
+        description: error.message || "Failed to generate instant post",
+        variant: "destructive"
+      });
+    } finally {
+      setIsGeneratingPost(false);
+    }
+  };
+
+  const handleGenerateAndPostInstantly = async () => {
+    setIsGeneratingPost(true);
+    try {
+      const response = await fetch('/api/social-automation/instant-post', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          customContext: customContext.trim() || undefined,
+          postImmediately: true
+        })
+      });
+
+      const result = await response.json();
+      
+      if (result.success) {
+        toast({
+          title: "Post Published Successfully!",
+          description: `Posted to ${result.platforms?.length || 'available'} platforms instantly`,
+          variant: "default"
+        });
+        setCustomContext('');
+      } else {
+        throw new Error(result.message);
+      }
+    } catch (error: any) {
+      toast({
+        title: "Instant Post Failed",
+        description: error.message || "Failed to generate and post content",
+        variant: "destructive"
+      });
+    } finally {
+      setIsGeneratingPost(false);
+    }
+  };
+
+  const handlePostInstantContent = async () => {
+    setIsPostingNow(true);
+    try {
+      const response = await fetch('/api/social-automation/post-now', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          content: instantPostContent
+        })
+      });
+
+      const result = await response.json();
+      
+      if (result.success) {
+        setShowInstantPost(false);
+        setInstantPostContent('');
+        toast({
+          title: "Post Published!",
+          description: `Successfully posted to ${result.platforms?.length || 'available'} platforms`,
+          variant: "default"
+        });
+      } else {
+        throw new Error(result.message);
+      }
+    } catch (error: any) {
+      toast({
+        title: "Posting Failed",
+        description: error.message || "Failed to publish post",
+        variant: "destructive"
+      });
+    } finally {
+      setIsPostingNow(false);
+    }
+  };
+
   return (
     <div className="space-y-6">
       <Card>
@@ -497,6 +611,58 @@ function AIContentGenerator() {
             </Button>
           </div>
 
+          {/* Instant Post Section */}
+          <div className="border-t pt-4 mt-4">
+            <div className="flex items-center gap-2 mb-3">
+              <Zap className="h-4 w-4 text-yellow-400" />
+              <h4 className="text-sm font-medium text-white">Instant Post Generation</h4>
+              <Badge variant="outline" className="text-xs">Bypasses Schedule</Badge>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <Button 
+                onClick={handleGenerateAndPostInstantly}
+                disabled={isGeneratingPost || isPostingNow}
+                className="bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 flex items-center gap-2"
+                data-testid="button-generate-post-instantly"
+              >
+                {isGeneratingPost || isPostingNow ? (
+                  <>
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    {isGeneratingPost ? 'Generating...' : 'Posting...'}
+                  </>
+                ) : (
+                  <>
+                    <Zap className="w-4 h-4" />
+                    Generate & Post Now
+                  </>
+                )}
+              </Button>
+              
+              <Button 
+                onClick={handleGenerateInstantPost}
+                disabled={isGeneratingPost}
+                variant="outline"
+                className="border-purple-500 text-purple-400 hover:bg-purple-500/10 flex items-center gap-2"
+                data-testid="button-generate-post-review"
+              >
+                {isGeneratingPost ? (
+                  <>
+                    <div className="w-4 h-4 border-2 border-purple-400 border-t-transparent rounded-full animate-spin" />
+                    Generating...
+                  </>
+                ) : (
+                  <>
+                    <Sparkles className="w-4 h-4" />
+                    Generate & Review
+                  </>
+                )}
+              </Button>
+            </div>
+            <p className="text-xs text-slate-400 mt-2">
+              Instant posts bypass bot schedules and post immediately to all active accounts
+            </p>
+          </div>
+
           {previewContent && (
             <Card className="bg-muted/50">
               <CardHeader>
@@ -524,6 +690,62 @@ function AIContentGenerator() {
               </CardContent>
             </Card>
           )}
+
+          {/* Instant Post Review Dialog */}
+          <Dialog open={showInstantPost} onOpenChange={setShowInstantPost}>
+            <DialogContent className="bg-slate-800 border-slate-700 max-w-2xl">
+              <DialogHeader>
+                <DialogTitle className="flex items-center gap-2">
+                  <Sparkles className="w-5 h-5 text-purple-400" />
+                  Instant Post Generator
+                </DialogTitle>
+                <p className="text-slate-400">Review and post AI-generated content</p>
+              </DialogHeader>
+              <div className="space-y-4">
+                <div>
+                  <Label htmlFor="post-content" className="text-slate-300">Generated Content</Label>
+                  <textarea
+                    id="post-content"
+                    value={instantPostContent}
+                    onChange={(e) => setInstantPostContent(e.target.value)}
+                    className="w-full h-32 p-3 bg-slate-700 border border-slate-600 rounded-md text-white resize-none"
+                    placeholder="AI-generated content will appear here..."
+                  />
+                </div>
+                <div className="flex justify-between items-center pt-4 border-t border-slate-600">
+                  <div className="text-sm text-slate-400">
+                    Posts instantly to all active accounts
+                  </div>
+                  <div className="flex gap-2">
+                    <Button 
+                      variant="outline" 
+                      onClick={() => setShowInstantPost(false)}
+                      disabled={isPostingNow}
+                    >
+                      Cancel
+                    </Button>
+                    <Button 
+                      onClick={handlePostInstantContent}
+                      disabled={isPostingNow || !instantPostContent.trim()}
+                      className="bg-green-600 hover:bg-green-700"
+                    >
+                      {isPostingNow ? (
+                        <>
+                          <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
+                          Posting...
+                        </>
+                      ) : (
+                        <>
+                          <Send className="w-4 h-4 mr-2" />
+                          Post Now
+                        </>
+                      )}
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            </DialogContent>
+          </Dialog>
         </CardContent>
       </Card>
     </div>
