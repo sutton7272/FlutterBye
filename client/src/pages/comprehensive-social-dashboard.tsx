@@ -604,7 +604,21 @@ function PostQueueContent() {
 
   useEffect(() => {
     setQueuedPosts(mockQueuedPosts);
+    loadBotStatus();
   }, []);
+
+  const loadBotStatus = async () => {
+    try {
+      const response = await fetch('/api/social-automation/bot/status');
+      const result = await response.json();
+      
+      if (result.success) {
+        setBotConfig(result.status);
+      }
+    } catch (error) {
+      console.error('Failed to load bot status:', error);
+    }
+  };
 
   const handleCreatePost = () => {
     toast({
@@ -804,38 +818,88 @@ function BotConfigurationContent() {
     { key: 'lateNight', label: 'Late Night', description: '11:00 PM - Night Owls' }
   ];
 
-  const handleScheduleToggle = (slot: string) => {
-    setBotConfig(prev => ({
-      ...prev,
+  const handleScheduleToggle = async (slot: string) => {
+    const newConfig = {
+      ...botConfig,
       postingSchedule: {
-        ...prev.postingSchedule,
+        ...botConfig.postingSchedule,
         [slot]: {
-          ...prev.postingSchedule[slot as keyof typeof prev.postingSchedule],
-          enabled: !prev.postingSchedule[slot as keyof typeof prev.postingSchedule].enabled
+          ...botConfig.postingSchedule[slot as keyof typeof botConfig.postingSchedule],
+          enabled: !botConfig.postingSchedule[slot as keyof typeof botConfig.postingSchedule].enabled
         }
       }
-    }));
+    };
+    
+    try {
+      const response = await fetch('/api/social-automation/bot/config', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ config: newConfig })
+      });
+      
+      const result = await response.json();
+      if (result.success) {
+        setBotConfig(newConfig);
+      }
+    } catch (error) {
+      console.error('Failed to update schedule:', error);
+    }
   };
 
-  const handleTimeChange = (slot: string, time: string) => {
-    setBotConfig(prev => ({
-      ...prev,
+  const handleTimeChange = async (slot: string, time: string) => {
+    const newConfig = {
+      ...botConfig,
       postingSchedule: {
-        ...prev.postingSchedule,
+        ...botConfig.postingSchedule,
         [slot]: {
-          ...prev.postingSchedule[slot as keyof typeof prev.postingSchedule],
+          ...botConfig.postingSchedule[slot as keyof typeof botConfig.postingSchedule],
           time
         }
       }
-    }));
+    };
+    
+    try {
+      const response = await fetch('/api/social-automation/bot/config', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ config: newConfig })
+      });
+      
+      const result = await response.json();
+      if (result.success) {
+        setBotConfig(newConfig);
+      }
+    } catch (error) {
+      console.error('Failed to update schedule time:', error);
+    }
   };
 
-  const handleBotToggle = () => {
-    setBotConfig(prev => ({ ...prev, isActive: !prev.isActive }));
-    toast({
-      title: botConfig.isActive ? "Bot Stopped" : "Bot Started",
-      description: botConfig.isActive ? "Social automation has been paused" : "Social automation is now active",
-    });
+  const handleBotToggle = async () => {
+    try {
+      const endpoint = botConfig.isActive ? '/api/social-automation/bot/stop' : '/api/social-automation/bot/start';
+      const response = await fetch(endpoint, { method: 'POST' });
+      const result = await response.json();
+      
+      if (result.success) {
+        setBotConfig(prev => ({ ...prev, isActive: !prev.isActive }));
+        toast({
+          title: botConfig.isActive ? "Bot Stopped" : "Bot Started",
+          description: result.message,
+        });
+      } else {
+        toast({
+          title: "Error",
+          description: result.message || "Failed to toggle bot",
+          variant: "destructive"
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to communicate with bot service",
+        variant: "destructive"
+      });
+    }
   };
 
   const handleRunAIAnalysis = () => {

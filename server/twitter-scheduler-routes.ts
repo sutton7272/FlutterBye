@@ -67,6 +67,47 @@ export function registerTwitterSchedulerRoutes(app: Express) {
     }
   });
 
+  // Bot control endpoints
+  app.post('/api/social-automation/bot/start', (req, res) => {
+    try {
+      const result = twitterScheduler.startBot();
+      res.json(result);
+    } catch (error: any) {
+      res.status(500).json({ success: false, message: error.message });
+    }
+  });
+
+  app.post('/api/social-automation/bot/stop', (req, res) => {
+    try {
+      const result = twitterScheduler.stopBot();
+      res.json(result);
+    } catch (error: any) {
+      res.status(500).json({ success: false, message: error.message });
+    }
+  });
+
+  app.get('/api/social-automation/bot/status', (req, res) => {
+    try {
+      const status = twitterScheduler.getBotStatus();
+      res.json({ success: true, status });
+    } catch (error: any) {
+      res.status(500).json({ success: false, message: error.message });
+    }
+  });
+
+  app.put('/api/social-automation/bot/config', (req, res) => {
+    try {
+      const { config } = req.body;
+      if (!config) {
+        return res.status(400).json({ success: false, message: 'Config is required' });
+      }
+      const result = twitterScheduler.updateBotConfig(config);
+      res.json(result);
+    } catch (error: any) {
+      res.status(500).json({ success: false, message: error.message });
+    }
+  });
+
   // Quick schedule - daily post
   app.post('/api/social-automation/schedule-daily', (req, res) => {
     try {

@@ -14,6 +14,19 @@ export class TwitterContentScheduler {
   private twitterService: TwitterAPIService;
   private scheduledPosts: ScheduledPost[] = [];
   private isInitialized = false;
+  private isActive = false;
+  private postingSchedule: any = {
+    earlyMorning: { enabled: true, time: '06:00' },
+    breakfast: { enabled: true, time: '08:30' },
+    lateMorning: { enabled: false, time: '10:00' },
+    lunch: { enabled: true, time: '12:00' },
+    earlyAfternoon: { enabled: false, time: '14:00' },
+    lateAfternoon: { enabled: true, time: '16:00' },
+    dinner: { enabled: true, time: '18:30' },
+    earlyEvening: { enabled: false, time: '20:00' },
+    evening: { enabled: true, time: '21:30' },
+    lateNight: { enabled: false, time: '23:00' }
+  };
 
   constructor() {
     try {
@@ -38,6 +51,8 @@ export class TwitterContentScheduler {
   }
 
   private async checkAndPostScheduledContent() {
+    if (!this.isActive) return; // Only check if bot is active
+    
     const now = new Date();
     const pendingPosts = this.scheduledPosts.filter(post => 
       post.status === 'pending' && new Date(post.scheduledTime) <= now
@@ -161,6 +176,35 @@ export class TwitterContentScheduler {
     nextWeek.setHours(hour, 0, 0, 0);
     
     return this.schedulePost(content, hashtags, nextWeek.toISOString());
+  }
+
+  // Bot control methods
+  startBot() {
+    this.isActive = true;
+    console.log('🤖 Twitter bot activated');
+    return { success: true, message: 'Bot started successfully' };
+  }
+
+  stopBot() {
+    this.isActive = false;
+    console.log('🛑 Twitter bot deactivated');
+    return { success: true, message: 'Bot stopped successfully' };
+  }
+
+  getBotStatus() {
+    return {
+      isActive: this.isActive,
+      isInitialized: this.isInitialized,
+      postingSchedule: this.postingSchedule,
+      scheduledPostsCount: this.scheduledPosts.length
+    };
+  }
+
+  updateBotConfig(config: any) {
+    this.isActive = config.isActive;
+    this.postingSchedule = config.postingSchedule;
+    console.log('⚙️ Bot configuration updated:', config);
+    return { success: true, message: 'Configuration updated successfully' };
   }
 }
 
