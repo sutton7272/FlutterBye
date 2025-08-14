@@ -1243,21 +1243,22 @@ export function registerSocialAutomationAPI(app: Express) {
     }
   });
 
-  // Bot auto-start endpoint
-  app.post('/api/social-automation/bot/auto-start', async (req, res) => {
+  // Bot status endpoint
+  app.get('/api/social-automation/bot/status', async (req, res) => {
     try {
-      if (!savedSchedule) {
-        savedSchedule = {
-          earlyMorning: { enabled: true, time: '8:00 AM' },
-          lunch: { enabled: true, time: '12:30 PM' },
-          earlyEvening: { enabled: true, time: '6:00 PM' },
-          evening: { enabled: true, time: '9:00 PM' }
-        };
-      }
-      botEnabled = true;
-      res.json({ success: true, message: 'Bot auto-started', botEnabled: true, enabledSlots: 4 });
+      const enabledSlots = savedSchedule ? 
+        Object.values(savedSchedule).filter((config: any) => config.enabled).length : 0;
+      
+      res.json({ 
+        success: true, 
+        botEnabled,
+        hasSchedule: savedSchedule !== null,
+        enabledSlots,
+        totalInteractions: interactionStats.length,
+        isReadyToPost: botEnabled && savedSchedule && enabledSlots > 0
+      });
     } catch (error) {
-      res.status(500).json({ success: false, error: 'Failed to auto-start bot' });
+      res.status(500).json({ success: false, error: 'Failed to get bot status' });
     }
   });
 
