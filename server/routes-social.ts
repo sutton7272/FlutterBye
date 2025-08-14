@@ -914,7 +914,7 @@ export function registerSocialRoutes(app: Express) {
             const hourInterval = Math.floor(24 / postsPerDay);
             
             try {
-              const activationContent = await contentGenerator.generateContent('platform_update', 'twitter');
+              const activationContent = await contentGenerator.getGeneratedContent('platform_update', 'twitter');
               testContent = {
                 text: `🚀 ${bot.name} is now LIVE! Automated FlutterBye content every ${hourInterval} hours (${postsPerDay} posts/day). ${activationContent.content}`,
                 hashtags: activationContent.hashtags
@@ -968,7 +968,7 @@ export function registerSocialRoutes(app: Express) {
                     const contentTypes = ['feature_highlight', 'user_success', 'platform_update', 'community_growth', 'innovation_showcase'];
                     const randomType = contentTypes[Math.floor(Math.random() * contentTypes.length)];
                     
-                    const generatedContent = await contentGenerator.generateContent(randomType, 'twitter');
+                    const generatedContent = await contentGenerator.getGeneratedContent(randomType, 'twitter');
                     content = {
                       text: generatedContent.content,
                       hashtags: generatedContent.hashtags || ['#FlutterBye', '#Web3', '#TokenizedMessaging']

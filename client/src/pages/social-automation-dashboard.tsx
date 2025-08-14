@@ -12,11 +12,11 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Plus, Settings, Brain, Users, Bot, Zap, Play, Pause, Edit, Eye, EyeOff, Save, MessageSquare, TrendingUp, Calendar, Globe, Activity, Clock } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
-export default function SocialAutomationDashboard() {
+export default function SocialAutomationDashboardOLD() {
   const { toast } = useToast();
   const [socialAccounts, setSocialAccounts] = useState<any[]>([]);
   const [botConfigs, setBotConfigs] = useState<any[]>([]);
-  const [activeTab, setActiveTab] = useState('overview');
+  const [activeTab, setActiveTab] = useState('bots');
   const [showAddAccount, setShowAddAccount] = useState(false);
   const [showAddBot, setShowAddBot] = useState(false);
   const [editingAccount, setEditingAccount] = useState<string | null>(null);
@@ -478,27 +478,18 @@ export default function SocialAutomationDashboard() {
           </div>
 
           <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-8">
-            <TabsList className="grid w-full grid-cols-4 bg-slate-800 border-purple-500/30">
-              <TabsTrigger value="overview" className="text-white data-[state=active]:bg-purple-600">
-                <TrendingUp className="w-4 h-4 mr-2" />
-                Overview
-              </TabsTrigger>
-              <TabsTrigger value="accounts" className="text-white data-[state=active]:bg-purple-600">
-                <Users className="w-4 h-4 mr-2" />
-                Social Accounts
-              </TabsTrigger>
+            <TabsList className="grid w-full grid-cols-2 bg-slate-800 border-purple-500/30">
               <TabsTrigger value="bots" className="text-white data-[state=active]:bg-purple-600">
                 <Bot className="w-4 h-4 mr-2" />
-                Bot Management
+                Bot Management & Control
               </TabsTrigger>
               <TabsTrigger value="settings" className="text-white data-[state=active]:bg-purple-600">
                 <Settings className="w-4 h-4 mr-2" />
-                Settings
+                Twitter API Testing
               </TabsTrigger>
             </TabsList>
 
-            {/* Overview Tab */}
-            <TabsContent value="overview" className="space-y-6">
+            {/* Removed Overview and Accounts tabs - streamlined interface */}
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 <Card className="bg-gradient-to-r from-green-900/30 to-emerald-900/30 border-green-500/50">
                   <CardContent className="p-6">
