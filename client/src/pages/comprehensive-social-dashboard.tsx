@@ -908,13 +908,45 @@ function BotConfigurationContent() {
         })
       });
       
-      if (response.ok) {
+      const data = await response.json();
+      
+      if (response.ok && data.success) {
+        const successfulPosts = data.results.filter(r => r.status === 'success');
+        const failedPosts = data.results.filter(r => r.status === 'failed');
+        
+        if (successfulPosts.length > 0) {
+          const twitterPost = successfulPosts.find(p => p.platform === 'twitter');
+          if (twitterPost && twitterPost.url) {
+            toast({
+              title: "Posted to Twitter Successfully!",
+              description: `Your tweet is live! Click here to view: ${twitterPost.url}`,
+            });
+          } else {
+            toast({
+              title: "Posted Successfully!",
+              description: data.summary || "Your content has been published",
+            });
+          }
+          setShowInstantPost(false);
+          setInstantPostContent('');
+        }
+        
+        if (failedPosts.length > 0) {
+          failedPosts.forEach(post => {
+            toast({
+              title: `${post.platform} Failed`,
+              description: post.error || 'Unknown error occurred',
+              variant: "destructive",
+            });
+          });
+        }
+      } else {
+        const errorMessage = data.summary || data.error || "Unable to publish content";
         toast({
-          title: "Posted Successfully!",
-          description: "Your content has been published across selected platforms",
+          title: "Posting Failed",
+          description: errorMessage,
+          variant: "destructive"
         });
-        setShowInstantPost(false);
-        setInstantPostContent('');
       }
     } catch (error) {
       toast({

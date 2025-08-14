@@ -1,5 +1,6 @@
 import express from 'express';
 import OpenAI from 'openai';
+import { TwitterAPIService } from './twitter-api-service';
 
 const router = express.Router();
 
@@ -466,14 +467,69 @@ router.post('/post-now', async (req, res) => {
       return res.status(400).json({ error: 'Content is required' });
     }
 
-    // Simulate posting to platforms (in production, integrate with actual APIs)
-    const results = platforms.map(platform => ({
-      platform,
-      status: 'success',
-      postId: `${platform}_${Date.now()}`,
-      url: `https://${platform}.com/post/${Date.now()}`,
-      postedAt: new Date().toISOString()
-    }));
+    console.log('📤 Attempting to post to platforms:', platforms);
+    console.log('📝 Content:', content);
+    
+    const results = [];
+    
+    // Process each platform
+    for (const platform of platforms) {
+      if (platform === 'twitter') {
+        try {
+          // Initialize Twitter API service
+          const twitterService = new TwitterAPIService();
+          
+          // Extract hashtags from content
+          const hashtags = content.match(/#\w+/g) || [];
+          const textWithoutHashtags = content.replace(/#\w+/g, '').trim();
+          
+          // Post to Twitter
+          const twitterResult = await twitterService.postTweet({
+            text: textWithoutHashtags,
+            hashtags: hashtags
+          });
+          
+          if (twitterResult.success) {
+            results.push({
+              platform: 'twitter',
+              status: 'success',
+              postId: twitterResult.tweetId,
+              url: `https://twitter.com/i/web/status/${twitterResult.tweetId}`,
+              postedAt: new Date().toISOString(),
+              message: twitterResult.message
+            });
+          } else {
+            results.push({
+              platform: 'twitter',
+              status: 'failed',
+              error: twitterResult.message,
+              postedAt: new Date().toISOString()
+            });
+          }
+          
+        } catch (error: any) {
+          console.error('❌ Twitter posting failed:', error.message);
+          results.push({
+            platform: 'twitter',
+            status: 'failed',
+            error: error.message.includes('Twitter API credentials') 
+              ? 'Twitter API credentials not configured. Please add your Twitter API keys to environment variables.'
+              : `Twitter API error: ${error.message}`,
+            postedAt: new Date().toISOString()
+          });
+        }
+      } else {
+        // For other platforms, keep simulation for now
+        results.push({
+          platform,
+          status: 'simulated',
+          postId: `${platform}_${Date.now()}`,
+          url: `https://${platform}.com/post/${Date.now()}`,
+          postedAt: new Date().toISOString(),
+          message: `Simulated post to ${platform} (real API integration pending)`
+        });
+      }
+    }
 
     // Add to analytics for tracking
     const newPost = {
@@ -488,15 +544,24 @@ router.post('/post-now', async (req, res) => {
       reach: 0,
       clicks: 0,
       hashtags: content.match(/#\w+/g) || [],
-      isInstantPost: true
+      isInstantPost: true,
+      postResults: results
     };
     
     mockAnalytics.posts.unshift(newPost);
     
+    const hasSuccessfulPost = results.some(r => r.status === 'success');
+    const hasFailedPost = results.some(r => r.status === 'failed');
+    
     res.json({
-      success: true,
+      success: hasSuccessfulPost,
       results,
-      postData: newPost
+      postData: newPost,
+      summary: hasSuccessfulPost ? 
+        'Post published successfully!' : 
+        hasFailedPost ? 
+          'Post failed to publish. Check error details.' : 
+          'Post simulated successfully!'
     });
   } catch (error) {
     console.error('Post publishing error:', error);
