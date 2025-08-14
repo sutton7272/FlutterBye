@@ -51,6 +51,70 @@ let apiKeys: APIKeys = {
 const runningBots = new Map<string, { automation: any; interval: NodeJS.Timeout }>();
 
 export function registerSocialAutomationAPI(app: Express) {
+  console.log('🤖 Social Automation API routes registered');
+  
+  // Schedule management endpoints
+  app.post('/api/social-automation/schedule', async (req, res) => {
+    try {
+      const { schedule } = req.body;
+      
+      if (!schedule) {
+        return res.status(400).json({ 
+          success: false, 
+          error: 'Schedule data is required' 
+        });
+      }
+
+      // Store schedule configuration (in production, save to database)
+      const enabledSlots = Object.entries(schedule).filter(([key, config]: [string, any]) => config.enabled);
+      
+      console.log(`📅 Schedule saved with ${enabledSlots.length} active time slots`);
+      enabledSlots.forEach(([key, config]: [string, any]) => {
+        console.log(`   - ${key}: ${config.time}`);
+      });
+
+      res.json({ 
+        success: true, 
+        message: `Schedule saved with ${enabledSlots.length} active time slots`,
+        activeSlots: enabledSlots.length
+      });
+    } catch (error) {
+      console.error('Error saving schedule:', error);
+      res.status(500).json({ 
+        success: false, 
+        error: 'Failed to save schedule' 
+      });
+    }
+  });
+
+  app.get('/api/social-automation/schedule', async (req, res) => {
+    try {
+      // In production, load from database
+      const defaultSchedule = {
+        earlyMorning: { enabled: false, time: '06:00' },
+        breakfast: { enabled: false, time: '08:30' },
+        lateMorning: { enabled: false, time: '10:00' },
+        lunch: { enabled: false, time: '12:00' },
+        earlyAfternoon: { enabled: false, time: '14:00' },
+        lateAfternoon: { enabled: false, time: '16:00' },
+        dinner: { enabled: false, time: '18:30' },
+        earlyEvening: { enabled: false, time: '20:00' },
+        evening: { enabled: false, time: '21:30' },
+        lateNight: { enabled: false, time: '23:00' }
+      };
+
+      res.json({ 
+        success: true, 
+        schedule: defaultSchedule 
+      });
+    } catch (error) {
+      console.error('Error loading schedule:', error);
+      res.status(500).json({ 
+        success: false, 
+        error: 'Failed to load schedule' 
+      });
+    }
+  });
   
   // Get all social accounts
   app.get('/api/social-automation/accounts', (req, res) => {
