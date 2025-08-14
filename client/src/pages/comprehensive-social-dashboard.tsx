@@ -2524,6 +2524,301 @@ function BotConfigurationManagement() {
   );
 }
 
+// Dashboard Overview Component with Live Bot Activity
+function DashboardOverview() {
+  const { toast } = useToast();
+  const [dashboardData, setDashboardData] = useState({
+    recentPost: null,
+    nextPostTime: null,
+    botActivity: [],
+    isActive: false,
+    totalPosts: 0,
+    engagement: 0
+  });
+
+  useEffect(() => {
+    // Fetch dashboard data
+    const fetchDashboardData = async () => {
+      try {
+        const response = await fetch('/api/social-automation/dashboard-overview');
+        if (response.ok) {
+          const data = await response.json();
+          setDashboardData(data);
+        }
+      } catch (error) {
+        console.error('Failed to fetch dashboard data:', error);
+      }
+    };
+
+    fetchDashboardData();
+    // Refresh every 30 seconds
+    const interval = setInterval(fetchDashboardData, 30000);
+    return () => clearInterval(interval);
+  }, []);
+
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <h3 className="text-2xl font-bold text-white mb-2">Bot Activity Dashboard</h3>
+          <p className="text-slate-400">Monitor your social media automation in real-time</p>
+        </div>
+        <div className="flex items-center gap-2">
+          <div className={`w-3 h-3 rounded-full ${dashboardData.isActive ? 'bg-green-500 animate-pulse' : 'bg-red-500'}`} />
+          <span className="text-sm text-slate-300">
+            {dashboardData.isActive ? 'Bot Active' : 'Bot Inactive'}
+          </span>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {/* Recent Post Card */}
+        <Card className="bg-slate-800/50 border-slate-700">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-lg flex items-center gap-2">
+              <MessageSquare className="w-5 h-5 text-blue-400" />
+              Most Recent Post
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {dashboardData.recentPost ? (
+              <div className="space-y-3">
+                <div className="text-sm text-slate-300 line-clamp-3">
+                  {dashboardData.recentPost.content}
+                </div>
+                <div className="flex items-center justify-between text-xs text-slate-500">
+                  <span>{dashboardData.recentPost.platform}</span>
+                  <span>{dashboardData.recentPost.timeAgo}</span>
+                </div>
+                <div className="flex gap-4 text-xs text-slate-400">
+                  <div className="flex items-center gap-1">
+                    <Heart className="w-3 h-3" />
+                    {dashboardData.recentPost.likes || 0}
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <MessageCircle className="w-3 h-3" />
+                    {dashboardData.recentPost.comments || 0}
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <Repeat2 className="w-3 h-3" />
+                    {dashboardData.recentPost.shares || 0}
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div className="text-slate-500 text-center py-4">
+                No recent posts yet
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Next Post Timer */}
+        <Card className="bg-slate-800/50 border-slate-700">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-lg flex items-center gap-2">
+              <Clock className="w-5 h-5 text-green-400" />
+              Next Post Schedule
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {dashboardData.nextPostTime ? (
+              <div className="space-y-3">
+                <div className="text-2xl font-bold text-green-400">
+                  {dashboardData.nextPostTime.countdown}
+                </div>
+                <div className="text-sm text-slate-300">
+                  {dashboardData.nextPostTime.scheduled}
+                </div>
+                <div className="text-xs text-slate-500">
+                  {dashboardData.nextPostTime.platform} • {dashboardData.nextPostTime.contentType}
+                </div>
+              </div>
+            ) : (
+              <div className="text-slate-500 text-center py-4">
+                No scheduled posts
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Bot Performance */}
+        <Card className="bg-slate-800/50 border-slate-700">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-lg flex items-center gap-2">
+              <TrendingUp className="w-5 h-5 text-purple-400" />
+              Performance Today
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3">
+              <div className="flex justify-between items-center">
+                <span className="text-sm text-slate-400">Posts Created</span>
+                <span className="text-lg font-semibold text-white">{dashboardData.totalPosts}</span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-sm text-slate-400">Avg Engagement</span>
+                <span className="text-lg font-semibold text-purple-400">{dashboardData.engagement}%</span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-sm text-slate-400">Success Rate</span>
+                <span className="text-lg font-semibold text-green-400">98%</span>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Recent Activity Log */}
+      <Card className="bg-slate-800/50 border-slate-700">
+        <CardHeader>
+          <CardTitle className="text-lg flex items-center gap-2">
+            <Activity className="w-5 h-5 text-blue-400" />
+            Live Bot Activity
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-3 max-h-64 overflow-y-auto">
+            {dashboardData.botActivity.length > 0 ? (
+              dashboardData.botActivity.map((activity, index) => (
+                <div key={index} className="flex items-center gap-3 p-3 bg-slate-700/30 rounded-lg">
+                  <div className={`w-2 h-2 rounded-full ${activity.status === 'success' ? 'bg-green-500' : activity.status === 'error' ? 'bg-red-500' : 'bg-yellow-500'}`} />
+                  <div className="flex-1">
+                    <div className="text-sm text-white">{activity.action}</div>
+                    <div className="text-xs text-slate-400">{activity.timestamp}</div>
+                  </div>
+                  <Badge variant={activity.status === 'success' ? 'default' : activity.status === 'error' ? 'destructive' : 'secondary'}>
+                    {activity.status}
+                  </Badge>
+                </div>
+              ))
+            ) : (
+              <div className="text-center py-8 text-slate-500">
+                No recent activity. Bot may be idle or not configured.
+              </div>
+            )}
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
+
+// Unified Content & AI Component
+function UnifiedContentAndAI() {
+  const [activeContentTab, setActiveContentTab] = useState('generator');
+
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <h3 className="text-2xl font-bold text-white mb-2">Content & AI Management</h3>
+          <p className="text-slate-400">Create, manage, and optimize your social media content</p>
+        </div>
+      </div>
+
+      <Tabs value={activeContentTab} onValueChange={setActiveContentTab} className="space-y-6">
+        <TabsList className="grid w-full grid-cols-3 bg-slate-800/50">
+          <TabsTrigger value="generator" className="flex items-center gap-2">
+            <Brain className="w-4 h-4" />
+            AI Generator
+          </TabsTrigger>
+          <TabsTrigger value="library" className="flex items-center gap-2">
+            <FileText className="w-4 h-4" />
+            Content Library
+          </TabsTrigger>
+          <TabsTrigger value="templates" className="flex items-center gap-2">
+            <Target className="w-4 h-4" />
+            Templates
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="generator" className="space-y-6">
+          <AIContentGenerator />
+        </TabsContent>
+
+        <TabsContent value="library" className="space-y-6">
+          <ContentLibraryContent />
+        </TabsContent>
+
+        <TabsContent value="templates" className="space-y-6">
+          <ContentTemplatesSection />
+        </TabsContent>
+      </Tabs>
+    </div>
+  );
+}
+
+// Content Templates Section
+function ContentTemplatesSection() {
+  const templates = [
+    {
+      id: 1,
+      name: "FlutterBye Feature Highlight",
+      category: "Product",
+      description: "Showcase new platform features and capabilities",
+      content: "🚀 New on FlutterBye: [FEATURE] is here! [DESCRIPTION] #FlutterBye #Innovation",
+      uses: 15
+    },
+    {
+      id: 2,
+      name: "Community Engagement",
+      category: "Social",
+      description: "Drive community interaction and discussion",
+      content: "What's your favorite way to use blockchain for [TOPIC]? Share your thoughts! 💭 #Community",
+      uses: 23
+    },
+    {
+      id: 3,
+      name: "Market Update",
+      category: "News",
+      description: "Share market insights and trends",
+      content: "📈 Market insights: [TREND] showing [PERCENTAGE]% growth. What does this mean for [SECTOR]?",
+      uses: 8
+    }
+  ];
+
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <h4 className="text-lg font-semibold text-white">Content Templates</h4>
+          <p className="text-slate-400 text-sm">Pre-made templates for quick content creation</p>
+        </div>
+        <Button className="bg-blue-600 hover:bg-blue-700">
+          <Plus className="w-4 h-4 mr-2" />
+          Create Template
+        </Button>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {templates.map((template) => (
+          <Card key={template.id} className="bg-slate-800/50 border-slate-700 hover:border-blue-500/50 transition-all">
+            <CardHeader className="pb-3">
+              <div className="flex items-center justify-between">
+                <CardTitle className="text-sm font-medium text-white">{template.name}</CardTitle>
+                <Badge variant="secondary" className="text-xs">{template.category}</Badge>
+              </div>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <p className="text-xs text-slate-400">{template.description}</p>
+              <div className="bg-slate-700/30 p-3 rounded text-xs text-slate-300 line-clamp-3">
+                {template.content}
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-xs text-slate-500">Used {template.uses} times</span>
+                <Button size="sm" variant="outline" className="text-xs">
+                  Use Template
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export default function ComprehensiveSocialDashboard() {
   const { toast } = useToast();
   const [activeTab, setActiveTab] = useState('dashboard');
@@ -2550,14 +2845,14 @@ export default function ComprehensiveSocialDashboard() {
 
         {/* Main Dashboard */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-7 bg-slate-800/50 backdrop-blur-sm">
+          <TabsList className="grid w-full grid-cols-6 bg-slate-800/50 backdrop-blur-sm">
             <TabsTrigger value="dashboard" className="flex items-center gap-2">
               <Settings className="w-4 h-4" />
-              Bot Config
+              Dashboard
             </TabsTrigger>
-            <TabsTrigger value="ai-content" className="flex items-center gap-2">
+            <TabsTrigger value="content" className="flex items-center gap-2">
               <Brain className="w-4 h-4" />
-              AI Content
+              Content & AI
             </TabsTrigger>
             <TabsTrigger value="queue" className="flex items-center gap-2">
               <Calendar className="w-4 h-4" />
@@ -2571,10 +2866,6 @@ export default function ComprehensiveSocialDashboard() {
               <Users className="w-4 h-4" />
               Accounts
             </TabsTrigger>
-            <TabsTrigger value="content" className="flex items-center gap-2">
-              <FileText className="w-4 h-4" />
-              Content
-            </TabsTrigger>
             <TabsTrigger value="ai-optimization" className="flex items-center gap-2">
               <Sparkles className="w-4 h-4" />
               AI Optimization
@@ -2583,7 +2874,17 @@ export default function ComprehensiveSocialDashboard() {
 
           {/* Dashboard Overview */}
           <TabsContent value="dashboard" className="space-y-6">
-            <BotConfigurationManagement />
+            <DashboardOverview />
+          </TabsContent>
+
+          {/* Unified Content & AI Tab */}
+          <TabsContent value="content" className="space-y-6">
+            <UnifiedContentAndAI />
+          </TabsContent>
+
+          {/* Post Queue Manager */}
+          <TabsContent value="queue" className="space-y-6">
+            <PostQueueContent />
           </TabsContent>
 
           {/* Analytics Dashboard */}
@@ -2594,21 +2895,6 @@ export default function ComprehensiveSocialDashboard() {
           {/* Engagement Accounts */}
           <TabsContent value="accounts" className="space-y-6">
             <EngagementAccountsContent />
-          </TabsContent>
-
-          {/* Content Library */}
-          <TabsContent value="content" className="space-y-6">
-            <ContentLibraryContent />
-          </TabsContent>
-
-          {/* Post Queue Manager */}
-          <TabsContent value="queue" className="space-y-6">
-            <PostQueueContent />
-          </TabsContent>
-
-          {/* AI Content Generator */}
-          <TabsContent value="ai-content" className="space-y-6">
-            <AIContentGenerator />
           </TabsContent>
 
           {/* AI Optimization Center */}

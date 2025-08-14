@@ -115,6 +115,67 @@ export function registerSocialAutomationAPI(app: Express) {
       });
     }
   });
+
+  // Dashboard overview endpoint
+  app.get('/api/social-automation/dashboard-overview', async (req, res) => {
+    try {
+      // Mock data for dashboard overview (in production, fetch from database)
+      const dashboardData = {
+        recentPost: {
+          content: "🚀 FlutterBye just launched new AI-powered social automation! Experience the future of blockchain-based social media management. #FlutterBye #AI #Blockchain",
+          platform: "Twitter",
+          timeAgo: "2 hours ago",
+          likes: 47,
+          comments: 12,
+          shares: 8
+        },
+        nextPostTime: {
+          countdown: "1h 23m",
+          scheduled: "Tomorrow at 9:00 AM",
+          platform: "Twitter",
+          contentType: "AI Generated"
+        },
+        isActive: true,
+        totalPosts: 12,
+        engagement: 85,
+        botActivity: [
+          {
+            action: "AI content generated for Twitter",
+            timestamp: "2 minutes ago",
+            status: "success"
+          },
+          {
+            action: "Posted to Twitter successfully",
+            timestamp: "1 hour ago",
+            status: "success"
+          },
+          {
+            action: "Engagement analysis completed",
+            timestamp: "1 hour ago",
+            status: "success"
+          },
+          {
+            action: "Content optimized for peak hours",
+            timestamp: "2 hours ago",
+            status: "success"
+          },
+          {
+            action: "Scheduled 5 new posts",
+            timestamp: "3 hours ago",
+            status: "success"
+          }
+        ]
+      };
+
+      res.json(dashboardData);
+    } catch (error) {
+      console.error('Error fetching dashboard overview:', error);
+      res.status(500).json({ 
+        success: false, 
+        error: 'Failed to fetch dashboard overview' 
+      });
+    }
+  });
   
   // Get all social accounts
   app.get('/api/social-automation/accounts', (req, res) => {
