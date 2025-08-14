@@ -2480,8 +2480,6 @@ export default function ComprehensiveSocialDashboard() {
               </DialogContent>
             </Dialog>
           </div>
-            AI-powered social automation for maximum viral reach and engagement
-          </p>
         </div>
 
         {/* Main Dashboard */}
