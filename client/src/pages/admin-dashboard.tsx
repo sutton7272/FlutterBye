@@ -100,10 +100,10 @@ export default function AdminDashboard() {
       route: "/social-automation-dashboard",
       color: "electric-purple",
       features: [
-        "Multi-Bot Control Center",
-        "Engagement Amplification Network",
-        "AI Content Optimization",
-        "Real-time Analytics Dashboard"
+        "Response Account Management",
+        "Engagement Target Configuration", 
+        "Auto-Reply & Comment Bots",
+        "Viral Amplification Network"
       ]
     },
     {
