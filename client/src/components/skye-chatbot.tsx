@@ -24,6 +24,33 @@ export function SkyeChatbot() {
   const inputRef = useRef<HTMLInputElement>(null);
   const sessionId = useRef(`session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`);
 
+  // Load persisted chat data on mount
+  useEffect(() => {
+    const savedMessages = localStorage.getItem('skye_messages');
+    const savedSessionId = localStorage.getItem('skye_session_id');
+    
+    if (savedMessages) {
+      try {
+        setMessages(JSON.parse(savedMessages));
+      } catch (e) {
+        console.warn('Failed to load saved messages');
+      }
+    }
+    
+    if (savedSessionId) {
+      sessionId.current = savedSessionId;
+    } else {
+      localStorage.setItem('skye_session_id', sessionId.current);
+    }
+  }, []);
+
+  // Save messages to localStorage whenever they change
+  useEffect(() => {
+    if (messages.length > 0) {
+      localStorage.setItem('skye_messages', JSON.stringify(messages));
+    }
+  }, [messages]);
+
   // Auto-scroll to bottom
   useEffect(() => {
     if (messagesEndRef.current) {
