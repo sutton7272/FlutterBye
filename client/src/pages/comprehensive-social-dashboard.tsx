@@ -64,16 +64,16 @@ function ScheduleConfigDialog() {
   const [saving, setSaving] = useState(false);
   
   const timeSlots = [
-    { key: 'earlyMorning', label: 'Early Morning', description: 'Peak commuter time', defaultTime: '06:00' },
-    { key: 'breakfast', label: 'Breakfast', description: 'Morning routine', defaultTime: '08:30' },
-    { key: 'lateMorning', label: 'Late Morning', description: 'Work break', defaultTime: '10:00' },
-    { key: 'lunch', label: 'Lunch', description: 'Peak lunch hour', defaultTime: '12:00' },
-    { key: 'earlyAfternoon', label: 'Early Afternoon', description: 'Post-lunch', defaultTime: '14:00' },
-    { key: 'lateAfternoon', label: 'Late Afternoon', description: 'End of work day', defaultTime: '16:00' },
-    { key: 'dinner', label: 'Dinner', description: 'Evening routine', defaultTime: '18:30' },
-    { key: 'earlyEvening', label: 'Early Evening', description: 'Prime time', defaultTime: '20:00' },
-    { key: 'evening', label: 'Evening', description: 'Relaxation time', defaultTime: '21:30' },
-    { key: 'lateNight', label: 'Late Night', description: 'Night owls', defaultTime: '23:00' }
+    { key: 'earlyMorning', label: 'Early Morning', description: 'Peak commuter time', defaultTime: '6:00 AM' },
+    { key: 'breakfast', label: 'Breakfast', description: 'Morning routine', defaultTime: '8:30 AM' },
+    { key: 'lateMorning', label: 'Late Morning', description: 'Work break', defaultTime: '10:00 AM' },
+    { key: 'lunch', label: 'Lunch', description: 'Peak lunch hour', defaultTime: '12:00 PM' },
+    { key: 'earlyAfternoon', label: 'Early Afternoon', description: 'Post-lunch', defaultTime: '2:00 PM' },
+    { key: 'lateAfternoon', label: 'Late Afternoon', description: 'End of work day', defaultTime: '4:00 PM' },
+    { key: 'dinner', label: 'Dinner', description: 'Evening routine', defaultTime: '6:30 PM' },
+    { key: 'earlyEvening', label: 'Early Evening', description: 'Prime time', defaultTime: '8:00 PM' },
+    { key: 'evening', label: 'Evening', description: 'Relaxation time', defaultTime: '9:30 PM' },
+    { key: 'lateNight', label: 'Late Night', description: 'Night owls', defaultTime: '11:00 PM' }
   ];
 
   const [scheduleState, setScheduleState] = useState(() => {
@@ -249,9 +249,10 @@ function ScheduleConfigDialog() {
                     
                     <div className="space-y-1">
                       <Input
-                        type="time"
+                        type="text"
                         value={config.time}
                         onChange={(e) => updateTime(slot.key, e.target.value)}
+                        placeholder="9:00 AM"
                         className={`bg-slate-600 border-slate-500 text-white font-mono text-center text-sm h-8 ${config.enabled ? 'border-green-500/50' : ''}`}
                         disabled={!config.enabled}
                         data-testid={`schedule-time-${slot.key}`}
@@ -261,7 +262,7 @@ function ScheduleConfigDialog() {
                     {config.enabled && (
                       <div className="mt-2 p-1 bg-green-500/10 border border-green-500/20 rounded text-xs">
                         <p className="text-green-400 text-center">
-                          ✓ Posts at {config.time}
+                          ✓ Posts at {config.time} EST
                         </p>
                       </div>
                     )}
@@ -309,16 +310,16 @@ function AIContentGenerator() {
   const { toast } = useToast();
 
   const timeSlots = [
-    { id: 'earlyMorning', label: 'Early Morning (6:00 AM)', time: '06:00' },
-    { id: 'breakfast', label: 'Breakfast Time (8:30 AM)', time: '08:30' },
-    { id: 'lateMorning', label: 'Late Morning (10:00 AM)', time: '10:00' },
-    { id: 'lunch', label: 'Lunch Break (12:30 PM)', time: '12:30' },
-    { id: 'earlyAfternoon', label: 'Early Afternoon (2:00 PM)', time: '14:00' },
-    { id: 'lateAfternoon', label: 'Late Afternoon (4:30 PM)', time: '16:30' },
-    { id: 'dinner', label: 'Dinner Time (6:30 PM)', time: '18:30' },
-    { id: 'earlyEvening', label: 'Early Evening (8:00 PM)', time: '20:00' },
-    { id: 'evening', label: 'Evening (9:30 PM)', time: '21:30' },
-    { id: 'lateNight', label: 'Late Night (11:00 PM)', time: '23:00' }
+    { id: 'earlyMorning', label: 'Early Morning (6:00 AM EST)', time: '6:00 AM' },
+    { id: 'breakfast', label: 'Breakfast Time (8:30 AM EST)', time: '8:30 AM' },
+    { id: 'lateMorning', label: 'Late Morning (10:00 AM EST)', time: '10:00 AM' },
+    { id: 'lunch', label: 'Lunch Break (12:00 PM EST)', time: '12:00 PM' },
+    { id: 'earlyAfternoon', label: 'Early Afternoon (2:00 PM EST)', time: '2:00 PM' },
+    { id: 'lateAfternoon', label: 'Late Afternoon (4:00 PM EST)', time: '4:00 PM' },
+    { id: 'dinner', label: 'Dinner Time (6:30 PM EST)', time: '6:30 PM' },
+    { id: 'earlyEvening', label: 'Early Evening (8:00 PM EST)', time: '8:00 PM' },
+    { id: 'evening', label: 'Evening (9:30 PM EST)', time: '9:30 PM' },
+    { id: 'lateNight', label: 'Late Night (11:00 PM EST)', time: '11:00 PM' }
   ];
 
   // FlutterBye Content Strategy Indicators

@@ -94,16 +94,16 @@ export function registerSocialAutomationAPI(app: Express) {
   app.get('/api/social-automation/schedule', async (req, res) => {
     try {
       const defaultSchedule = {
-        earlyMorning: { enabled: false, time: '06:00' },
-        breakfast: { enabled: false, time: '08:30' },
-        lateMorning: { enabled: false, time: '10:00' },
-        lunch: { enabled: false, time: '12:00' },
-        earlyAfternoon: { enabled: false, time: '14:00' },
-        lateAfternoon: { enabled: false, time: '16:00' },
-        dinner: { enabled: false, time: '18:30' },
-        earlyEvening: { enabled: false, time: '20:00' },
-        evening: { enabled: false, time: '21:30' },
-        lateNight: { enabled: false, time: '23:00' }
+        earlyMorning: { enabled: false, time: '6:00 AM' },
+        breakfast: { enabled: false, time: '8:30 AM' },
+        lateMorning: { enabled: false, time: '10:00 AM' },
+        lunch: { enabled: false, time: '12:00 PM' },
+        earlyAfternoon: { enabled: false, time: '2:00 PM' },
+        lateAfternoon: { enabled: false, time: '4:00 PM' },
+        dinner: { enabled: false, time: '6:30 PM' },
+        earlyEvening: { enabled: false, time: '8:00 PM' },
+        evening: { enabled: false, time: '9:30 PM' },
+        lateNight: { enabled: false, time: '11:00 PM' }
       };
 
       res.json({ 
@@ -132,11 +132,24 @@ export function registerSocialAutomationAPI(app: Express) {
           const now = new Date();
           const currentTime = now.getHours() * 60 + now.getMinutes(); // Convert to minutes
           
+          // Helper function to convert AM/PM time to 24-hour format
+          const convertTo24Hour = (timeStr: string) => {
+            const [time, period] = timeStr.split(' ');
+            let [hours, minutes] = time.split(':').map(Number);
+            
+            if (period === 'PM' && hours !== 12) {
+              hours += 12;
+            } else if (period === 'AM' && hours === 12) {
+              hours = 0;
+            }
+            
+            return hours * 60 + minutes;
+          };
+
           // Find next scheduled time
           const sortedSlots = enabledSlots
             .map(([key, config]: [string, any]) => {
-              const [hours, minutes] = config.time.split(':').map(Number);
-              const timeInMinutes = hours * 60 + minutes;
+              const timeInMinutes = convertTo24Hour(config.time);
               return { key, config, timeInMinutes };
             })
             .sort((a, b) => a.timeInMinutes - b.timeInMinutes);
@@ -165,8 +178,8 @@ export function registerSocialAutomationAPI(app: Express) {
             nextPostTime = {
               countdown: `${hours}h ${mins}m`,
               scheduled: isToday ? 
-                `Today at ${nextSlot.config.time}` : 
-                `Tomorrow at ${nextSlot.config.time}`,
+                `Today at ${nextSlot.config.time} EST` : 
+                `Tomorrow at ${nextSlot.config.time} EST`,
               platform: "Twitter",
               contentType: "AI Generated"
             };
