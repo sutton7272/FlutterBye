@@ -73,6 +73,7 @@ import apiMonetizationRoutes from "./api-monetization-routes";
 import { aiContentService } from "./ai-content-service";
 import aiEnhancementRoutes from "./ai-enhancement-routes";
 import comprehensiveAIEnhancementRoutes from "./comprehensive-ai-enhancement-routes";
+import aiIntelligenceRoutes from "./ai-intelligence-routes";
 import { aiMonetizationService } from "./ai-monetization-service";
 import { aiPaymentService } from "./ai-payment-service";
 import { z } from "zod";
@@ -6643,6 +6644,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   registerSocialAutomationAPI(app);
   registerSocialAnalyticsRoutes(app);
   app.use('/api/social-optimization', socialOptimizationAPI);
+  app.use('/api/social-automation', aiIntelligenceRoutes);
   registerSocialTestEndpoints(app);
   registerInstantTestEndpoint(app);
   registerSimpleTestEndpoint(app);
