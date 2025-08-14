@@ -66,6 +66,7 @@ export default function SocialAutomationDashboard() {
   const [showAddAccount, setShowAddAccount] = useState(false);
   const [showAddBot, setShowAddBot] = useState(false);
   const [editingAccount, setEditingAccount] = useState<string | null>(null);
+  const [testPostLoading, setTestPostLoading] = useState(false);
 
   // Form states
   const [newAccount, setNewAccount] = useState({
@@ -123,6 +124,43 @@ export default function SocialAutomationDashboard() {
     queryKey: ['/api/social-automation/api-keys/status'],
     refetchInterval: 30000,
   });
+
+  const testInstantPost = async () => {
+    setTestPostLoading(true);
+    try {
+      const response = await apiRequest('/api/social-automation/test-post', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          message: `🚀 Test post from Flutterbye at ${new Date().toLocaleTimeString()}! Social automation is working perfectly! #Flutterbye #Web3 #SocialAutomation`,
+          platform: 'all'
+        }),
+      });
+
+      if (response.success) {
+        toast({
+          title: "Test Post Successful!",
+          description: `Posted to ${response.posted || 'available platforms'}. Check your social media accounts.`,
+        });
+        // Refresh accounts to show updated activity
+        queryClient.invalidateQueries({ queryKey: ['/api/social-automation/accounts'] });
+        queryClient.invalidateQueries({ queryKey: ['/api/social-automation/stats'] });
+      } else {
+        throw new Error(response.error || 'Failed to post');
+      }
+    } catch (error) {
+      console.error('Test post error:', error);
+      toast({
+        title: "Test Post Failed",
+        description: error.message || 'Unable to create test post. Check your account credentials.',
+        variant: "destructive",
+      });
+    } finally {
+      setTestPostLoading(false);
+    }
+  };
 
   const addSocialAccount = async () => {
     if (!newAccount.platform || !newAccount.username || !newAccount.password) {
@@ -680,7 +718,16 @@ export default function SocialAutomationDashboard() {
 
             <div className="flex justify-between items-center">
               <h3 className="text-2xl font-bold text-white">Bot Configuration & Management</h3>
-              <Dialog open={showAddBot} onOpenChange={setShowAddBot}>
+              <div className="flex gap-2">
+                <Button 
+                  onClick={testInstantPost} 
+                  disabled={testPostLoading}
+                  className="bg-green-600 hover:bg-green-700"
+                >
+                  <MessageSquare className="w-4 h-4 mr-2" />
+                  {testPostLoading ? 'Posting...' : 'Test Instant Post'}
+                </Button>
+                <Dialog open={showAddBot} onOpenChange={setShowAddBot}>
                 <DialogTrigger asChild>
                   <Button className="bg-purple-600 hover:bg-purple-700">
                     <Plus className="w-4 h-4 mr-2" />

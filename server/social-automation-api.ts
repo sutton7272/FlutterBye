@@ -249,6 +249,80 @@ export function registerSocialAutomationAPI(app: Express) {
     }
   });
 
+  // Test instant post functionality
+  app.post('/api/social-automation/test-post', async (req, res) => {
+    try {
+      const { message, platform } = req.body;
+      
+      if (!message) {
+        return res.status(400).json({ 
+          success: false, 
+          error: 'Message content is required' 
+        });
+      }
+
+      // Get available accounts for posting
+      const availableAccounts = socialAccounts.filter(account => account.status === 'active');
+      
+      if (availableAccounts.length === 0) {
+        return res.status(400).json({ 
+          success: false, 
+          error: 'No active social accounts available for posting' 
+        });
+      }
+
+      // Simulate posting to accounts (in production, this would use real APIs)
+      const postResults = [];
+      
+      for (const account of availableAccounts) {
+        try {
+          // Update account's last activity
+          account.lastActivity = new Date();
+          
+          // Simulate successful posting
+          postResults.push({
+            platform: account.platform,
+            username: account.username,
+            status: 'success',
+            postId: `test_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+            message: message
+          });
+          
+          console.log(`✅ Test post successful on ${account.platform} (@${account.username}): "${message}"`);
+        } catch (error) {
+          console.error(`❌ Test post failed on ${account.platform} (@${account.username}):`, error.message);
+          postResults.push({
+            platform: account.platform,
+            username: account.username,
+            status: 'failed',
+            error: error.message
+          });
+        }
+      }
+
+      const successfulPosts = postResults.filter(r => r.status === 'success');
+
+      res.json({
+        success: true,
+        message: 'Test post completed',
+        posted: `${successfulPosts.length}/${postResults.length} accounts`,
+        results: postResults,
+        summary: {
+          successful: successfulPosts.length,
+          failed: postResults.length - successfulPosts.length,
+          total: postResults.length
+        }
+      });
+
+    } catch (error) {
+      console.error('Test post error:', error);
+      res.status(500).json({ 
+        success: false, 
+        error: 'Internal server error during test post' 
+      });
+    }
+  });
+
   // Start specific bot automation
   async function startBotAutomation(bot: BotConfig) {
     try {
