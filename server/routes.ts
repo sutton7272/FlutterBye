@@ -45,6 +45,7 @@ import { registerSocialTestEndpoints } from "./social-test-endpoint";
 import { registerInstantTestEndpoint } from "./social-instant-test";
 import { registerSimpleTestEndpoint } from "./social-simple-test";
 import { registerTwitterAuthFixEndpoint } from "./twitter-auth-fix";
+import { registerTwitterDiagnosticEndpoint } from "./twitter-diagnostic";
 import { productionAuth } from "./production-auth";
 import { realTimeMonitor } from "./real-time-monitor";
 import { transactionMonitor } from "./transaction-monitor";
@@ -6639,6 +6640,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   registerInstantTestEndpoint(app);
   registerSimpleTestEndpoint(app);
   registerTwitterAuthFixEndpoint(app);
+  registerTwitterDiagnosticEndpoint(app);
   registerFlutterinaRoutes(app)
   
   // Enhanced Skye AI with Memory & Emotional Intelligence

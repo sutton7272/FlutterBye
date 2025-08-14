@@ -185,12 +185,30 @@ export class SocialPasswordAutomation {
         const url = page.url();
         console.log('Current URL:', url);
         
-        // Take screenshot for debugging (optional)
+        // Take screenshot for debugging and check for anti-bot measures
         try {
-          const screenshot = await page.screenshot({ encoding: 'base64' });
-          console.log('Screenshot taken (base64 length):', screenshot.length);
+          const screenshot = await page.screenshot({ encoding: 'base64', fullPage: true });
+          console.log('📸 Screenshot taken (base64 length):', screenshot.length);
+          
+          // Check for common anti-bot elements
+          const pageContent = await page.content();
+          const hasRecaptcha = pageContent.includes('recaptcha') || pageContent.includes('captcha');
+          const hasVerification = pageContent.includes('verification') || pageContent.includes('verify');
+          const hasChallenge = pageContent.includes('challenge') || pageContent.includes('suspicious');
+          
+          console.log('🔍 Anti-bot detection results:');
+          console.log('  - CAPTCHA detected:', hasRecaptcha);
+          console.log('  - Verification required:', hasVerification);
+          console.log('  - Challenge detected:', hasChallenge);
+          
+          if (hasRecaptcha || hasChallenge) {
+            return { success: false, message: 'Twitter is showing CAPTCHA/anti-bot challenge - manual completion required', screenshot };
+          }
+          if (hasVerification) {
+            return { success: false, message: 'Twitter requires phone/email verification - complete manually first', screenshot };
+          }
         } catch (e) {
-          console.log('Could not take screenshot');
+          console.log('Could not take screenshot or analyze page');
         }
         
         if (url.includes('login') || url.includes('password') || url.includes('verification')) {

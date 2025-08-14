@@ -132,6 +132,73 @@ export default function SocialAutomationDashboard() {
     }
   };
 
+  const runDiagnostic = async () => {
+    try {
+      setTestPostLoading(true);
+      toast({ 
+        title: 'Visual Diagnostic Starting', 
+        description: 'Opening Twitter to analyze login challenges...',
+        className: 'bg-blue-900 border-blue-500 text-white'
+      });
+
+      const response = await fetch('/api/social-automation/twitter-diagnostic', { 
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+      });
+      
+      if (response.ok) {
+        const reader = response.body?.getReader();
+        if (reader) {
+          let finalResult = null;
+          
+          while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+            
+            const chunk = new TextDecoder().decode(value);
+            const lines = chunk.split('\n').filter(line => line.trim());
+            
+            for (const line of lines) {
+              try {
+                const data = JSON.parse(line);
+                finalResult = data;
+                
+                if (data.step) {
+                  toast({ 
+                    title: `Step ${data.step}: ${data.status}`, 
+                    description: data.message,
+                    className: 'bg-blue-900 border-blue-500 text-white',
+                    duration: 2000
+                  });
+                }
+              } catch (e) {
+                // Invalid JSON line, skip
+              }
+            }
+          }
+          
+          if (finalResult?.analysis) {
+            const recommendations = finalResult.recommendations || [];
+            toast({ 
+              title: 'Diagnostic Complete', 
+              description: recommendations.length > 0 ? recommendations.join(', ') : 'Browser automation working correctly',
+              className: recommendations.some((r: string) => r.includes('CAPTCHA') || r.includes('verification')) ? 'bg-yellow-900 border-yellow-500 text-white' : 'bg-green-900 border-green-500 text-white',
+              duration: 8000
+            });
+          }
+        }
+      }
+    } catch (error) {
+      toast({ 
+        title: 'Diagnostic Failed', 
+        description: 'Could not run diagnostic test',
+        variant: 'destructive' 
+      });
+    } finally {
+      setTestPostLoading(false);
+    }
+  };
+
   const testInstantPost = async () => {
     setTestPostLoading(true);
     try {
@@ -520,6 +587,14 @@ export default function SocialAutomationDashboard() {
                   >
                     <MessageSquare className="w-4 h-4 mr-2" />
                     {testPostLoading ? 'Testing Browser Automation...' : 'Test Browser Automation'}
+                  </Button>
+                  <Button 
+                    onClick={() => runDiagnostic()} 
+                    disabled={testPostLoading}
+                    className="bg-blue-600 hover:bg-blue-700"
+                  >
+                    <Settings className="w-4 h-4 mr-2" />
+                    Visual Diagnostic
                   </Button>
                   <Dialog open={showAddBot} onOpenChange={setShowAddBot}>
                     <DialogTrigger asChild>
