@@ -726,6 +726,467 @@ function PostQueueContent() {
   );
 }
 
+// Component for Bot Configuration Content
+function BotConfigurationContent() {
+  const { toast } = useToast();
+  const [showBotConfig, setShowBotConfig] = useState(false);
+  const [showAccountManager, setShowAccountManager] = useState(false);
+  const [showAIAnalysis, setShowAIAnalysis] = useState(false);
+  const [botConfig, setBotConfig] = useState({
+    isActive: false,
+    postingSchedule: {
+      earlyMorning: { enabled: true, time: '06:00' },
+      breakfast: { enabled: true, time: '08:30' },
+      lateMorning: { enabled: false, time: '10:00' },
+      lunch: { enabled: true, time: '12:00' },
+      earlyAfternoon: { enabled: false, time: '14:00' },
+      lateAfternoon: { enabled: true, time: '16:00' },
+      dinner: { enabled: true, time: '18:30' },
+      earlyEvening: { enabled: false, time: '20:00' },
+      evening: { enabled: true, time: '21:30' },
+      lateNight: { enabled: false, time: '23:00' }
+    },
+    engagementAccounts: []
+  });
+
+  const [engagementAccounts, setEngagementAccounts] = useState([
+    {
+      id: '1',
+      name: 'FlutterBye Main',
+      username: '@FlutterByeHQ',
+      platform: 'Twitter',
+      isActive: true,
+      apiKeys: {
+        api_key: '***********',
+        api_secret: '***********',
+        access_token: '***********',
+        access_token_secret: '***********'
+      },
+      engagementSettings: {
+        likesPerHour: 15,
+        retweetsPerHour: 5,
+        followsPerHour: 3,
+        commentsPerHour: 2
+      }
+    }
+  ]);
+
+  const [aiAnalysis, setAiAnalysis] = useState({
+    recommendedPostVolume: 6,
+    optimalTimes: ['06:00', '12:00', '16:00', '18:30', '21:30'],
+    engagement: {
+      currentAvg: 2.4,
+      projectedImprovement: '+35%'
+    },
+    insights: [
+      'Your audience is most active during lunch and evening hours',
+      'Morning posts get 40% higher engagement rates',
+      'Weekend posting shows 25% lower performance',
+      'Video content performs 60% better than text-only posts'
+    ]
+  });
+
+  const timeSlots = [
+    { key: 'earlyMorning', label: 'Early Morning', description: '6:00 AM - Rise & Shine' },
+    { key: 'breakfast', label: 'Breakfast', description: '8:30 AM - Morning Routine' },
+    { key: 'lateMorning', label: 'Late Morning', description: '10:00 AM - Work Start' },
+    { key: 'lunch', label: 'Lunch', description: '12:00 PM - Midday Break' },
+    { key: 'earlyAfternoon', label: 'Early Afternoon', description: '2:00 PM - Post-Lunch' },
+    { key: 'lateAfternoon', label: 'Late Afternoon', description: '4:00 PM - Work Wind Down' },
+    { key: 'dinner', label: 'Dinner', description: '6:30 PM - Evening Meal' },
+    { key: 'earlyEvening', label: 'Early Evening', description: '8:00 PM - Prime Time' },
+    { key: 'evening', label: 'Evening', description: '9:30 PM - Relaxation' },
+    { key: 'lateNight', label: 'Late Night', description: '11:00 PM - Night Owls' }
+  ];
+
+  const handleScheduleToggle = (slot: string) => {
+    setBotConfig(prev => ({
+      ...prev,
+      postingSchedule: {
+        ...prev.postingSchedule,
+        [slot]: {
+          ...prev.postingSchedule[slot as keyof typeof prev.postingSchedule],
+          enabled: !prev.postingSchedule[slot as keyof typeof prev.postingSchedule].enabled
+        }
+      }
+    }));
+  };
+
+  const handleTimeChange = (slot: string, time: string) => {
+    setBotConfig(prev => ({
+      ...prev,
+      postingSchedule: {
+        ...prev.postingSchedule,
+        [slot]: {
+          ...prev.postingSchedule[slot as keyof typeof prev.postingSchedule],
+          time
+        }
+      }
+    }));
+  };
+
+  const handleBotToggle = () => {
+    setBotConfig(prev => ({ ...prev, isActive: !prev.isActive }));
+    toast({
+      title: botConfig.isActive ? "Bot Stopped" : "Bot Started",
+      description: botConfig.isActive ? "Social automation has been paused" : "Social automation is now active",
+    });
+  };
+
+  const handleRunAIAnalysis = () => {
+    setShowAIAnalysis(true);
+    toast({
+      title: "AI Analysis Starting",
+      description: "Analyzing your posting patterns and audience behavior...",
+    });
+  };
+
+  return (
+    <div className="space-y-6">
+      {/* Bot Status Overview */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+        <Card className="bg-slate-800/50 border-slate-700 backdrop-blur-sm">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-slate-400">Bot Status</p>
+                <p className="text-2xl font-bold text-white">{botConfig.isActive ? 'Active' : 'Inactive'}</p>
+              </div>
+              <div className={`w-4 h-4 rounded-full ${botConfig.isActive ? 'bg-green-500' : 'bg-red-500'}`} />
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-slate-800/50 border-slate-700 backdrop-blur-sm">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-slate-400">Daily Posts Scheduled</p>
+                <p className="text-2xl font-bold text-blue-400">
+                  {Object.values(botConfig.postingSchedule).filter(slot => slot.enabled).length}
+                </p>
+              </div>
+              <Calendar className="w-8 h-8 text-blue-400" />
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-slate-800/50 border-slate-700 backdrop-blur-sm">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-slate-400">Engagement Accounts</p>
+                <p className="text-2xl font-bold text-purple-400">{engagementAccounts.filter(acc => acc.isActive).length}</p>
+              </div>
+              <Users className="w-8 h-8 text-purple-400" />
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-slate-800/50 border-slate-700 backdrop-blur-sm">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-slate-400">AI Optimization</p>
+                <p className="text-2xl font-bold text-green-400">+35%</p>
+              </div>
+              <Brain className="w-8 h-8 text-green-400" />
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Main Controls */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Bot Configuration */}
+        <Card className="bg-slate-800/50 border-slate-700 backdrop-blur-sm">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Bot className="w-5 h-5" />
+              Bot Configuration
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="flex items-center justify-between">
+              <span className="text-slate-300">Master Control</span>
+              <Button 
+                onClick={handleBotToggle}
+                className={`${botConfig.isActive ? 'bg-red-600 hover:bg-red-700' : 'bg-green-600 hover:bg-green-700'}`}
+              >
+                {botConfig.isActive ? (
+                  <>
+                    <Pause className="w-4 h-4 mr-2" />
+                    Stop Bot
+                  </>
+                ) : (
+                  <>
+                    <Play className="w-4 h-4 mr-2" />
+                    Start Bot
+                  </>
+                )}
+              </Button>
+            </div>
+            <Dialog open={showBotConfig} onOpenChange={setShowBotConfig}>
+              <DialogTrigger asChild>
+                <Button variant="outline" className="w-full">
+                  <Settings className="w-4 h-4 mr-2" />
+                  Configure Posting Schedule
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="bg-slate-800 border-slate-700 max-w-4xl">
+                <DialogHeader>
+                  <DialogTitle>Strategic Posting Schedule</DialogTitle>
+                </DialogHeader>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-h-[60vh] overflow-y-auto">
+                  {timeSlots.map((slot) => (
+                    <Card key={slot.key} className="bg-slate-700/50 border-slate-600">
+                      <CardContent className="p-4">
+                        <div className="flex items-center justify-between mb-2">
+                          <div>
+                            <h4 className="font-semibold text-white">{slot.label}</h4>
+                            <p className="text-xs text-slate-400">{slot.description}</p>
+                          </div>
+                          <input
+                            type="checkbox"
+                            checked={botConfig.postingSchedule[slot.key as keyof typeof botConfig.postingSchedule].enabled}
+                            onChange={() => handleScheduleToggle(slot.key)}
+                            className="rounded"
+                          />
+                        </div>
+                        {botConfig.postingSchedule[slot.key as keyof typeof botConfig.postingSchedule].enabled && (
+                          <Input
+                            type="time"
+                            value={botConfig.postingSchedule[slot.key as keyof typeof botConfig.postingSchedule].time}
+                            onChange={(e) => handleTimeChange(slot.key, e.target.value)}
+                            className="bg-slate-600 border-slate-500 text-white"
+                          />
+                        )}
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              </DialogContent>
+            </Dialog>
+          </CardContent>
+        </Card>
+
+        {/* Engagement Accounts Management */}
+        <Card className="bg-slate-800/50 border-slate-700 backdrop-blur-sm">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Users className="w-5 h-5" />
+              Engagement Accounts
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="space-y-2">
+              {engagementAccounts.map((account) => (
+                <div key={account.id} className="flex items-center justify-between p-3 bg-slate-700/50 rounded-lg">
+                  <div className="flex items-center gap-3">
+                    <Twitter className="w-5 h-5 text-blue-400" />
+                    <div>
+                      <p className="text-sm font-medium text-white">{account.name}</p>
+                      <p className="text-xs text-slate-400">{account.username}</p>
+                    </div>
+                  </div>
+                  <Badge variant={account.isActive ? "default" : "secondary"}>
+                    {account.isActive ? "Active" : "Inactive"}
+                  </Badge>
+                </div>
+              ))}
+            </div>
+            <Dialog open={showAccountManager} onOpenChange={setShowAccountManager}>
+              <DialogTrigger asChild>
+                <Button variant="outline" className="w-full">
+                  <Plus className="w-4 h-4 mr-2" />
+                  Add Twitter Account
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="bg-slate-800 border-slate-700 max-w-2xl">
+                <DialogHeader>
+                  <DialogTitle>Add Engagement Account</DialogTitle>
+                </DialogHeader>
+                <div className="space-y-4">
+                  <div>
+                    <Label htmlFor="account-name">Account Name</Label>
+                    <Input
+                      id="account-name"
+                      placeholder="e.g., FlutterBye Support"
+                      className="bg-slate-700 border-slate-600"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="username">Username</Label>
+                    <Input
+                      id="username"
+                      placeholder="@username"
+                      className="bg-slate-700 border-slate-600"
+                    />
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor="api-key">API Key</Label>
+                      <Input
+                        id="api-key"
+                        type="password"
+                        placeholder="Twitter API Key"
+                        className="bg-slate-700 border-slate-600"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="api-secret">API Secret</Label>
+                      <Input
+                        id="api-secret"
+                        type="password"
+                        placeholder="Twitter API Secret"
+                        className="bg-slate-700 border-slate-600"
+                      />
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor="access-token">Access Token</Label>
+                      <Input
+                        id="access-token"
+                        type="password"
+                        placeholder="Access Token"
+                        className="bg-slate-700 border-slate-600"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="access-secret">Access Token Secret</Label>
+                      <Input
+                        id="access-secret"
+                        type="password"
+                        placeholder="Access Token Secret"
+                        className="bg-slate-700 border-slate-600"
+                      />
+                    </div>
+                  </div>
+                  <div className="space-y-3">
+                    <Label>Engagement Settings</Label>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <Label htmlFor="likes-per-hour" className="text-sm">Likes per Hour</Label>
+                        <Input
+                          id="likes-per-hour"
+                          type="number"
+                          defaultValue="15"
+                          className="bg-slate-700 border-slate-600"
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="retweets-per-hour" className="text-sm">Retweets per Hour</Label>
+                        <Input
+                          id="retweets-per-hour"
+                          type="number"
+                          defaultValue="5"
+                          className="bg-slate-700 border-slate-600"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                  <Button className="w-full bg-blue-600 hover:bg-blue-700">
+                    Add Account
+                  </Button>
+                </div>
+              </DialogContent>
+            </Dialog>
+          </CardContent>
+        </Card>
+
+        {/* AI Analysis */}
+        <Card className="bg-slate-800/50 border-slate-700 backdrop-blur-sm">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Brain className="w-5 h-5" />
+              AI Analysis & Recommendations
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="text-center">
+              <div className="text-3xl font-bold text-purple-400 mb-1">{aiAnalysis.recommendedPostVolume}</div>
+              <p className="text-sm text-slate-400">Recommended Daily Posts</p>
+            </div>
+            <div className="text-center">
+              <div className="text-2xl font-bold text-green-400 mb-1">{aiAnalysis.engagement.projectedImprovement}</div>
+              <p className="text-sm text-slate-400">Projected Improvement</p>
+            </div>
+            <Button onClick={handleRunAIAnalysis} className="w-full bg-purple-600 hover:bg-purple-700">
+              <Brain className="w-4 h-4 mr-2" />
+              Run AI Analysis
+            </Button>
+            <Dialog open={showAIAnalysis} onOpenChange={setShowAIAnalysis}>
+              <DialogContent className="bg-slate-800 border-slate-700 max-w-3xl">
+                <DialogHeader>
+                  <DialogTitle>AI Analysis Results</DialogTitle>
+                </DialogHeader>
+                <div className="space-y-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <Card className="bg-slate-700/50 border-slate-600">
+                      <CardHeader>
+                        <CardTitle className="text-lg">Optimal Posting Times</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="space-y-2">
+                          {aiAnalysis.optimalTimes.map((time, index) => (
+                            <div key={index} className="flex items-center gap-2">
+                              <Clock className="w-4 h-4 text-blue-400" />
+                              <span className="text-slate-300">{time}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </CardContent>
+                    </Card>
+
+                    <Card className="bg-slate-700/50 border-slate-600">
+                      <CardHeader>
+                        <CardTitle className="text-lg">Performance Metrics</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="space-y-3">
+                          <div className="flex justify-between">
+                            <span className="text-slate-400">Current Avg Engagement</span>
+                            <span className="text-white">{aiAnalysis.engagement.currentAvg}%</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-slate-400">Projected Improvement</span>
+                            <span className="text-green-400">{aiAnalysis.engagement.projectedImprovement}</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-slate-400">Recommended Volume</span>
+                            <span className="text-purple-400">{aiAnalysis.recommendedPostVolume} posts/day</span>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </div>
+
+                  <Card className="bg-slate-700/50 border-slate-600">
+                    <CardHeader>
+                      <CardTitle className="text-lg">AI Insights</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <ul className="space-y-3">
+                        {aiAnalysis.insights.map((insight, index) => (
+                          <li key={index} className="flex items-start gap-3">
+                            <Sparkles className="w-4 h-4 text-purple-400 mt-0.5" />
+                            <span className="text-slate-300">{insight}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </CardContent>
+                  </Card>
+                </div>
+              </DialogContent>
+            </Dialog>
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  );
+}
+
 // Component for AI Optimization Content
 function AIOptimizationContent() {
   const { toast } = useToast();
@@ -917,95 +1378,7 @@ export default function ComprehensiveSocialDashboard() {
 
           {/* Dashboard Overview */}
           <TabsContent value="dashboard" className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-              <Card className="bg-slate-800/50 border-slate-700 backdrop-blur-sm">
-                <CardContent className="p-6">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm font-medium text-slate-400">Active Bots</p>
-                      <p className="text-3xl font-bold text-blue-400">
-                        {botConfigs.filter(bot => bot.status === 'running').length}
-                      </p>
-                    </div>
-                    <Bot className="w-8 h-8 text-blue-400" />
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card className="bg-slate-800/50 border-slate-700 backdrop-blur-sm">
-                <CardContent className="p-6">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm font-medium text-slate-400">Posts Today</p>
-                      <p className="text-3xl font-bold text-green-400">42</p>
-                    </div>
-                    <MessageSquare className="w-8 h-8 text-green-400" />
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card className="bg-slate-800/50 border-slate-700 backdrop-blur-sm">
-                <CardContent className="p-6">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm font-medium text-slate-400">Engagement Rate</p>
-                      <p className="text-3xl font-bold text-purple-400">8.7%</p>
-                    </div>
-                    <TrendingUp className="w-8 h-8 text-purple-400" />
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card className="bg-slate-800/50 border-slate-700 backdrop-blur-sm">
-                <CardContent className="p-6">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm font-medium text-slate-400">Viral Score</p>
-                      <p className="text-3xl font-bold text-yellow-400">94</p>
-                    </div>
-                    <Zap className="w-8 h-8 text-yellow-400" />
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-
-            {/* Bot Status Overview */}
-            <Card className="bg-slate-800/50 border-slate-700 backdrop-blur-sm">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Bot className="w-5 h-5" />
-                  Bot Status Overview
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {botConfigs.length > 0 ? (
-                    botConfigs.map((bot) => (
-                      <div key={bot.id} className="flex items-center justify-between p-4 bg-slate-700/50 rounded-lg">
-                        <div className="flex items-center gap-3">
-                          <div className={`w-3 h-3 rounded-full ${
-                            bot.status === 'running' ? 'bg-green-400' : 'bg-gray-400'
-                          }`} />
-                          <div>
-                            <p className="font-medium text-white">{bot.name}</p>
-                            <p className="text-sm text-slate-400">{bot.platform} • {bot.postingFrequency} posts/day</p>
-                          </div>
-                        </div>
-                        <Badge variant={bot.status === 'running' ? 'default' : 'secondary'}>
-                          {bot.status}
-                        </Badge>
-                      </div>
-                    ))
-                  ) : (
-                    <div className="text-center py-8 text-slate-400">
-                      <Bot className="w-12 h-12 mx-auto mb-4 text-slate-500" />
-                      <p>No bots configured yet</p>
-                      <p className="text-sm">Create your first automation bot to get started</p>
-                    </div>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
+            <BotConfigurationContent />
           </TabsContent>
 
           {/* Analytics Dashboard */}
