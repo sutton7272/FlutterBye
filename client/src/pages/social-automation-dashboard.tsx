@@ -132,6 +132,141 @@ export default function SocialAutomationDashboard() {
     }
   };
 
+  const testTwitterAPI = async () => {
+    try {
+      setTestPostLoading(true);
+      toast({ 
+        title: 'Testing Twitter API', 
+        description: 'Verifying API credentials and posting test tweet...',
+        className: 'bg-indigo-900 border-indigo-500 text-white'
+      });
+
+      const response = await fetch('/api/social-automation/twitter-api-test', { 
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+      });
+      
+      if (response.ok) {
+        const reader = response.body?.getReader();
+        if (reader) {
+          let finalResult = null;
+          
+          while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+            
+            const chunk = new TextDecoder().decode(value);
+            const lines = chunk.split('\n').filter(line => line.trim());
+            
+            for (const line of lines) {
+              try {
+                const data = JSON.parse(line);
+                finalResult = data;
+                
+                if (data.step) {
+                  toast({ 
+                    title: `Step ${data.step}: ${data.status}`, 
+                    description: data.message,
+                    className: 'bg-indigo-900 border-indigo-500 text-white',
+                    duration: 2000
+                  });
+                }
+              } catch (e) {
+                // Invalid JSON line, skip
+              }
+            }
+          }
+          
+          if (finalResult?.success) {
+            toast({ 
+              title: 'Twitter API Connected!', 
+              description: `${finalResult.message} - Account: @${finalResult.accountInfo?.username}`,
+              className: 'bg-green-900 border-green-500 text-white',
+              duration: 5000
+            });
+            
+            // Now test posting
+            testAPIPost();
+          } else {
+            toast({ 
+              title: 'Twitter API Failed', 
+              description: finalResult?.message || 'API connection failed',
+              variant: 'destructive',
+              duration: 5000
+            });
+          }
+        }
+      }
+    } catch (error) {
+      toast({ 
+        title: 'API Test Failed', 
+        description: 'Could not test Twitter API',
+        variant: 'destructive' 
+      });
+    } finally {
+      setTestPostLoading(false);
+    }
+  };
+
+  const testAPIPost = async () => {
+    try {
+      const response = await fetch('/api/social-automation/twitter-api-post', { 
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          text: `FlutterBye social automation API test! ${new Date().toLocaleTimeString()}`,
+          hashtags: ['#FlutterBye', '#SocialAutomation', '#TwitterAPI']
+        })
+      });
+      
+      if (response.ok) {
+        const reader = response.body?.getReader();
+        if (reader) {
+          let finalResult = null;
+          
+          while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+            
+            const chunk = new TextDecoder().decode(value);
+            const lines = chunk.split('\n').filter(line => line.trim());
+            
+            for (const line of lines) {
+              try {
+                const data = JSON.parse(line);
+                finalResult = data;
+              } catch (e) {
+                // Invalid JSON line, skip
+              }
+            }
+          }
+          
+          if (finalResult?.success) {
+            toast({ 
+              title: 'Tweet Posted Successfully! 🎉', 
+              description: `Tweet ID: ${finalResult.tweetId}`,
+              className: 'bg-green-900 border-green-500 text-white',
+              duration: 8000
+            });
+          } else {
+            toast({ 
+              title: 'Tweet Failed', 
+              description: finalResult?.message || 'Posting failed',
+              variant: 'destructive',
+              duration: 5000
+            });
+          }
+        }
+      }
+    } catch (error) {
+      toast({ 
+        title: 'Post Test Failed', 
+        description: 'Could not test tweet posting',
+        variant: 'destructive' 
+      });
+    }
+  };
+
   const runDiagnostic = async () => {
     try {
       setTestPostLoading(true);
@@ -595,6 +730,14 @@ export default function SocialAutomationDashboard() {
                   >
                     <Settings className="w-4 h-4 mr-2" />
                     Visual Diagnostic
+                  </Button>
+                  <Button 
+                    onClick={() => testTwitterAPI()} 
+                    disabled={testPostLoading}
+                    className="bg-indigo-600 hover:bg-indigo-700"
+                  >
+                    <MessageSquare className="w-4 h-4 mr-2" />
+                    Test Twitter API
                   </Button>
                   <Dialog open={showAddBot} onOpenChange={setShowAddBot}>
                     <DialogTrigger asChild>
