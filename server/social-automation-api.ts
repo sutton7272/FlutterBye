@@ -1212,10 +1212,31 @@ export function registerSocialAutomationAPI(app: Express) {
         console.log(`📱 Platform: ${platform}`);
       }
 
-      // Simulate posting to the platform
-      const postId = `instant_${Date.now()}`;
       const timestamp = new Date().toISOString();
-      
+      let postResult = null;
+      let realPostId = null;
+      let realUrl = null;
+
+      // Try to post to real Twitter API
+      try {
+        console.log('🐦 Attempting to post to Twitter via API...');
+        const { TwitterAPIService } = await import('./twitter-api-service.js');
+        const twitterAPI = new TwitterAPIService();
+        
+        postResult = await twitterAPI.postTweet(content);
+        
+        if (postResult.success) {
+          realPostId = postResult.tweetId;
+          realUrl = `https://twitter.com/i/web/status/${realPostId}`;
+          console.log(`✅ Successfully posted to Twitter! Tweet ID: ${realPostId}`);
+        } else {
+          console.log(`⚠️ Twitter API failed: ${postResult.message}`);
+        }
+      } catch (error: any) {
+        console.log(`⚠️ Twitter API not available: ${error.message}`);
+        // Continue with simulation mode if Twitter API fails
+      }
+
       // Record the instant post in interaction stats
       interactionStats.push({
         targetAccount: 'FlutterBye_Official',
@@ -1223,19 +1244,41 @@ export function registerSocialAutomationAPI(app: Express) {
         platform: platform || 'Twitter',
         interactionType: 'post',
         timestamp,
-        success: true
+        success: postResult?.success || false,
+        realPost: !!postResult?.success
       });
 
-      res.json({
-        success: true,
-        postId,
-        platform: platform || 'Twitter',
-        timestamp,
-        bypassedSchedule: bypassSchedule,
-        url: `https://twitter.com/FlutterBye/status/${postId}`,
-        message: 'Post published instantly, bypassing bot schedule'
-      });
+      if (postResult && postResult.success) {
+        // Real posting succeeded
+        res.json({
+          success: true,
+          postId: realPostId,
+          platform: 'Twitter',
+          timestamp,
+          bypassedSchedule: bypassSchedule,
+          url: realUrl,
+          message: 'Post published successfully to Twitter!',
+          realPost: true
+        });
+      } else {
+        // Fallback to simulation mode
+        const simulatedPostId = `instant_${Date.now()}`;
+        res.json({
+          success: true,
+          postId: simulatedPostId,
+          platform: platform || 'Twitter',
+          timestamp,
+          bypassedSchedule: bypassSchedule,
+          url: `https://twitter.com/FlutterBye/status/${simulatedPostId}`,
+          message: postResult ? 
+            `Simulation mode: ${postResult.message}` : 
+            'Simulation mode: Twitter API not configured',
+          realPost: false,
+          note: 'Configure Twitter API keys for real posting'
+        });
+      }
     } catch (error) {
+      console.error('❌ Instant post error:', error);
       res.status(500).json({
         success: false,
         error: 'Failed to publish instant post'
