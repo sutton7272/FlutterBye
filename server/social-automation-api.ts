@@ -1021,5 +1021,34 @@ export function registerSocialAutomationAPI(app: Express) {
     }
   });
 
+  // Real-time AI Intelligence endpoint
+  app.get('/api/social-automation/real-time-intelligence', async (req, res) => {
+    try {
+      const { aiContentGenerator } = await import('./ai-content-generator');
+      const intelligenceSummary = aiContentGenerator.getRealTimeIntelligenceSummary();
+      
+      res.json({
+        success: true,
+        data: {
+          ...intelligenceSummary,
+          lastUpdated: new Date().toISOString(),
+          features: [
+            'Trending Topic Integration',
+            'Performance Learning System', 
+            'Community Response Awareness',
+            'Market-Aware Content Generation'
+          ],
+          status: 'Active'
+        }
+      });
+    } catch (error) {
+      console.error('Error fetching real-time intelligence:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Failed to fetch real-time intelligence data'
+      });
+    }
+  });
+
   console.log('🤖 Social Automation API routes registered');
 }
