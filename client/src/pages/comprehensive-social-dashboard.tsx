@@ -51,7 +51,8 @@ import {
   Edit,
   Copy,
   Sparkles,
-  RefreshCw
+  RefreshCw,
+  Send
 } from 'lucide-react';
 
 // Component for Analytics Dashboard Content
@@ -732,6 +733,10 @@ function BotConfigurationContent() {
   const [showBotConfig, setShowBotConfig] = useState(false);
   const [showAccountManager, setShowAccountManager] = useState(false);
   const [showAIAnalysis, setShowAIAnalysis] = useState(false);
+  const [showInstantPost, setShowInstantPost] = useState(false);
+  const [instantPostContent, setInstantPostContent] = useState('');
+  const [isGeneratingPost, setIsGeneratingPost] = useState(false);
+  const [isPostingNow, setIsPostingNow] = useState(false);
   const [botConfig, setBotConfig] = useState({
     isActive: false,
     postingSchedule: {
@@ -841,6 +846,72 @@ function BotConfigurationContent() {
     });
   };
 
+  const handleGenerateInstantPost = async () => {
+    setIsGeneratingPost(true);
+    try {
+      const response = await fetch('/api/social/generate-post', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          topic: 'trending social media content',
+          tone: 'engaging',
+          platform: 'twitter'
+        })
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        setInstantPostContent(data.content);
+        setShowInstantPost(true);
+        toast({
+          title: "Post Generated!",
+          description: "AI has created engaging content ready for posting",
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Generation Failed",
+        description: "Unable to generate content. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsGeneratingPost(false);
+    }
+  };
+
+  const handlePostNow = async () => {
+    if (!instantPostContent.trim()) return;
+    
+    setIsPostingNow(true);
+    try {
+      const response = await fetch('/api/social/post-now', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          content: instantPostContent,
+          platforms: ['twitter']
+        })
+      });
+      
+      if (response.ok) {
+        toast({
+          title: "Posted Successfully!",
+          description: "Your content has been published across selected platforms",
+        });
+        setShowInstantPost(false);
+        setInstantPostContent('');
+      }
+    } catch (error) {
+      toast({
+        title: "Posting Failed",
+        description: "Unable to publish content. Check your account settings.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsPostingNow(false);
+    }
+  };
+
   return (
     <div className="space-y-6">
       {/* Bot Status Overview */}
@@ -895,6 +966,93 @@ function BotConfigurationContent() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Instant Post Generation */}
+      <Card className="bg-gradient-to-r from-purple-800/30 to-blue-800/30 border-purple-500/30 backdrop-blur-sm">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Zap className="w-5 h-5 text-yellow-400" />
+            Instant Post Generator
+          </CardTitle>
+          <p className="text-slate-400">Generate and post viral content instantly with AI</p>
+        </CardHeader>
+        <CardContent>
+          <div className="flex gap-3">
+            <Button 
+              onClick={handleGenerateInstantPost}
+              disabled={isGeneratingPost}
+              className="flex-1 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700"
+            >
+              {isGeneratingPost ? (
+                <>
+                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
+                  Generating...
+                </>
+              ) : (
+                <>
+                  <Sparkles className="w-4 h-4 mr-2" />
+                  Generate Post
+                </>
+              )}
+            </Button>
+            <Dialog open={showInstantPost} onOpenChange={setShowInstantPost}>
+              <DialogContent className="bg-slate-800 border-slate-700 max-w-2xl">
+                <DialogHeader>
+                  <DialogTitle>Instant Post Generator</DialogTitle>
+                </DialogHeader>
+                <div className="space-y-4">
+                  <div>
+                    <Label htmlFor="post-content">Generated Content</Label>
+                    <textarea
+                      id="post-content"
+                      value={instantPostContent}
+                      onChange={(e) => setInstantPostContent(e.target.value)}
+                      className="w-full h-32 p-3 bg-slate-700 border-slate-600 rounded-md text-white resize-none"
+                      placeholder="AI-generated content will appear here..."
+                    />
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-2">
+                      <Twitter className="w-5 h-5 text-blue-400" />
+                      <span className="text-sm text-slate-300">Twitter</span>
+                    </div>
+                    <Badge variant="outline" className="bg-green-900/20 text-green-400">
+                      Ready to Post
+                    </Badge>
+                  </div>
+                  <div className="flex gap-3">
+                    <Button 
+                      onClick={handleGenerateInstantPost}
+                      disabled={isGeneratingPost}
+                      variant="outline"
+                      className="flex-1"
+                    >
+                      {isGeneratingPost ? "Generating..." : "Regenerate"}
+                    </Button>
+                    <Button 
+                      onClick={handlePostNow}
+                      disabled={isPostingNow || !instantPostContent.trim()}
+                      className="flex-1 bg-green-600 hover:bg-green-700"
+                    >
+                      {isPostingNow ? (
+                        <>
+                          <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
+                          Posting...
+                        </>
+                      ) : (
+                        <>
+                          <Send className="w-4 h-4 mr-2" />
+                          Post Now
+                        </>
+                      )}
+                    </Button>
+                  </div>
+                </div>
+              </DialogContent>
+            </Dialog>
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Main Controls */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

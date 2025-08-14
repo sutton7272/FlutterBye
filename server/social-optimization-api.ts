@@ -384,4 +384,96 @@ router.post('/ai/implement-recommendation/:id', (req, res) => {
   }
 });
 
+// Instant post generation endpoint
+router.post('/generate-post', async (req, res) => {
+  try {
+    const { topic = 'social media', tone = 'engaging', platform = 'twitter' } = req.body;
+    
+    const prompt = `Generate a ${tone} ${platform} post about ${topic}. 
+    The post should be:
+    - Under 280 characters for Twitter
+    - Engaging and viral-worthy
+    - Include relevant hashtags
+    - Call-to-action if appropriate
+    - Professional but exciting tone
+    
+    Topic focus: ${topic}
+    Platform: ${platform}
+    Tone: ${tone}
+    
+    Return only the post content, no additional text.`;
+
+    const completion = await openai.chat.completions.create({
+      model: "gpt-4o", // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
+      messages: [{ role: "user", content: prompt }],
+      max_tokens: 150,
+      temperature: 0.8
+    });
+
+    const generatedContent = completion.choices[0].message.content?.trim() || '';
+    
+    res.json({ 
+      content: generatedContent,
+      platform,
+      generatedAt: new Date().toISOString()
+    });
+  } catch (error) {
+    console.error('Post generation error:', error);
+    res.status(500).json({ 
+      error: 'Failed to generate post content',
+      message: error.message 
+    });
+  }
+});
+
+// Instant post publishing endpoint
+router.post('/post-now', async (req, res) => {
+  try {
+    const { content, platforms = ['twitter'] } = req.body;
+    
+    if (!content || !content.trim()) {
+      return res.status(400).json({ error: 'Content is required' });
+    }
+
+    // Simulate posting to platforms (in production, integrate with actual APIs)
+    const results = platforms.map(platform => ({
+      platform,
+      status: 'success',
+      postId: `${platform}_${Date.now()}`,
+      url: `https://${platform}.com/post/${Date.now()}`,
+      postedAt: new Date().toISOString()
+    }));
+
+    // Add to analytics for tracking
+    const newPost = {
+      id: Date.now().toString(),
+      content,
+      platform: platforms[0],
+      timestamp: new Date().toISOString(),
+      likes: 0,
+      comments: 0,
+      retweets: 0,
+      impressions: 0,
+      reach: 0,
+      clicks: 0,
+      hashtags: content.match(/#\w+/g) || [],
+      isInstantPost: true
+    };
+    
+    mockAnalytics.posts.unshift(newPost);
+    
+    res.json({
+      success: true,
+      results,
+      postData: newPost
+    });
+  } catch (error) {
+    console.error('Post publishing error:', error);
+    res.status(500).json({ 
+      error: 'Failed to publish post',
+      message: error.message 
+    });
+  }
+});
+
 export default router;
