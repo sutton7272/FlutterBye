@@ -122,13 +122,36 @@ export default function SocialAutomationDashboard() {
 
   const toggleBotStatus = async (botId: string) => {
     try {
+      setTestPostLoading(true);
+      
       const response = await fetch(`/api/social/bots/${botId}/toggle`, { method: 'POST' });
       if (response.ok) {
+        const data = await response.json();
+        const bot = data.bot;
+        
+        if (bot?.status === 'running') {
+          const freq = parseInt(bot.postingFrequency) || 4;
+          const hours = Math.floor(24 / freq);
+          toast({ 
+            title: 'Bot Started Successfully! 🚀', 
+            description: `${bot.name} posted immediately and will continue posting ${freq} times/day (every ${hours} hours) with AI-generated FlutterBye content`,
+            className: 'bg-green-900 border-green-500 text-white',
+            duration: 8000
+          });
+        } else {
+          toast({ 
+            title: 'Bot Stopped', 
+            description: `${bot?.name || 'Bot'} automation has been halted`,
+            className: 'bg-orange-900 border-orange-500 text-white'
+          });
+        }
+        
         await fetchBotConfigs();
-        toast({ title: 'Bot status updated!' });
       }
     } catch (error) {
       toast({ title: 'Error updating bot', variant: 'destructive' });
+    } finally {
+      setTestPostLoading(false);
     }
   };
 
@@ -721,7 +744,7 @@ export default function SocialAutomationDashboard() {
                     className="bg-green-600 hover:bg-green-700"
                   >
                     <MessageSquare className="w-4 h-4 mr-2" />
-                    {testPostLoading ? 'Testing Browser Automation...' : 'Test Browser Automation'}
+                    {testPostLoading ? 'Testing Twitter API...' : 'Test Twitter API'}
                   </Button>
                   <Button 
                     onClick={() => runDiagnostic()} 
@@ -800,10 +823,11 @@ export default function SocialAutomationDashboard() {
                                 <SelectValue />
                               </SelectTrigger>
                               <SelectContent>
-                                <SelectItem value="2">2 engagements/day</SelectItem>
-                                <SelectItem value="4">4 engagements/day</SelectItem>
-                                <SelectItem value="8">8 engagements/day</SelectItem>
-                                <SelectItem value="12">12 engagements/day</SelectItem>
+                                <SelectItem value="2">2 posts/day (every 12 hours)</SelectItem>
+                                <SelectItem value="4">4 posts/day (every 6 hours)</SelectItem>
+                                <SelectItem value="6">6 posts/day (every 4 hours)</SelectItem>
+                                <SelectItem value="8">8 posts/day (every 3 hours)</SelectItem>
+                                <SelectItem value="12">12 posts/day (every 2 hours)</SelectItem>
                               </SelectContent>
                             </Select>
                           </div>
@@ -873,26 +897,48 @@ export default function SocialAutomationDashboard() {
                             <p className="font-medium text-white">{bot.lastActivity || 'Never'}</p>
                           </div>
                         </div>
-                        <div className="flex gap-2 pt-4">
-                          <Button
-                            onClick={() => toggleBotStatus(bot.id)}
-                            className={bot.status === 'running' ? "bg-red-600 hover:bg-red-700 flex-1" : "bg-green-600 hover:bg-green-700 flex-1"}
-                          >
-                            {bot.status === 'running' ? (
-                              <>
-                                <Pause className="w-4 h-4 mr-2" />
-                                Stop Bot
-                              </>
-                            ) : (
-                              <>
-                                <Play className="w-4 h-4 mr-2" />
-                                Start Bot
-                              </>
-                            )}
-                          </Button>
-                          <Button variant="outline" className="border-slate-600">
-                            <Settings className="w-4 h-4" />
-                          </Button>
+                        <div className="space-y-3">
+                          <div className="p-3 bg-slate-900/50 rounded-lg border border-purple-500/20">
+                            <p className="text-sm text-slate-300 mb-2">
+                              <strong>Posting Schedule:</strong> {bot.postingFrequency || 4} posts/day 
+                              {(() => {
+                                const freq = parseInt(bot.postingFrequency) || 4;
+                                const hours = Math.floor(24 / freq);
+                                return ` (every ${hours} hours)`;
+                              })()}
+                            </p>
+                            <p className="text-xs text-slate-400">
+                              Platform: {bot.platform} | Engagement Rate: {bot.engagementRate}%
+                            </p>
+                          </div>
+                          
+                          <div className="flex gap-2">
+                            <Button
+                              onClick={() => toggleBotStatus(bot.id)}
+                              disabled={testPostLoading}
+                              className={bot.status === 'running' ? "bg-red-600 hover:bg-red-700 flex-1" : "bg-green-600 hover:bg-green-700 flex-1"}
+                            >
+                              {testPostLoading ? (
+                                <>
+                                  <Settings className="w-4 h-4 mr-2 animate-spin" />
+                                  Working...
+                                </>
+                              ) : bot.status === 'running' ? (
+                                <>
+                                  <Pause className="w-4 h-4 mr-2" />
+                                  Stop Bot
+                                </>
+                              ) : (
+                                <>
+                                  <Play className="w-4 h-4 mr-2" />
+                                  Start Bot & Post Now
+                                </>
+                              )}
+                            </Button>
+                            <Button variant="outline" className="border-slate-600">
+                              <Settings className="w-4 h-4" />
+                            </Button>
+                          </div>
                         </div>
                       </div>
                     </CardContent>

@@ -905,18 +905,45 @@ export function registerSocialRoutes(app: Express) {
           try {
             const twitterAPI = new TwitterAPIService();
             
-            // Create an immediate test post to verify functionality
-            const testContent = {
-              text: `🚀 FlutterBye Bot "${bot.name}" is now LIVE! Automated posting every ${bot.postingFrequency || 4} hours. #FlutterBye #Automation`,
-              hashtags: ['#FlutterByeBot', '#SocialAutomation', '#Web3']
-            };
+            // Generate initial activation content using FlutterBye data
+            const { contentGenerator } = await import('./social-content-generator.js');
+            let testContent;
+            
+            try {
+              const activationContent = await contentGenerator.generateContent('platform_update', 'twitter');
+              testContent = {
+                text: `🚀 ${bot.name} is now LIVE! Automated FlutterBye content every ${bot.postingFrequency || 4} hours. ${activationContent.content}`,
+                hashtags: activationContent.hashtags
+              };
+            } catch (error) {
+              console.log('Using fallback activation content');
+              testContent = {
+                text: `🚀 FlutterBye Bot "${bot.name}" is now LIVE! Automated posting every ${bot.postingFrequency || 4} hours. #FlutterBye #Automation`,
+                hashtags: ['#FlutterByeBot', '#SocialAutomation', '#Web3']
+              };
+            }
             
             const postResult = await twitterAPI.postTweet(testContent);
             console.log('🐦 Initial bot activation post result:', postResult);
             
             if (postResult.success) {
               // Schedule recurring posts using the bot's posting frequency
-              const intervalHours = parseInt(bot.postingFrequency) || 4;
+              // Convert posting frequency to hours - handle different formats
+              let intervalHours = 4; // default
+              const frequency = bot.postingFrequency;
+              
+              if (frequency) {
+                if (frequency.includes('every')) {
+                  const match = frequency.match(/(\d+)/);
+                  intervalHours = match ? parseInt(match[1]) : 4;
+                } else {
+                  // If it's just a number (posts per day), convert to hours
+                  const postsPerDay = parseInt(frequency);
+                  if (postsPerDay > 0) {
+                    intervalHours = Math.floor(24 / postsPerDay);
+                  }
+                }
+              }
               const intervalMs = intervalHours * 60 * 60 * 1000; // Convert to milliseconds
               
               // Store the interval reference so we can stop it later
@@ -928,22 +955,42 @@ export function registerSocialRoutes(app: Express) {
                 try {
                   console.log(`🔄 Automated posting for bot ${bot.name}`);
                   
-                  // Generate dynamic content for each post
-                  const messages = [
-                    'Building the future of Web3 communication with FlutterBye! Join our tokenized messaging revolution 🦋',
-                    'Every message has value! Experience the FlutterBye platform where communication meets blockchain innovation ⚡',
-                    'Tokenized messaging is here! Create, send, and monetize your messages on the FlutterBye platform 💎',
-                    'Web3 communication revolution! FlutterBye transforms how we share value through messages 🚀',
-                    'Join the FlutterBye ecosystem! Where every conversation has potential for viral value distribution 🌟'
-                  ];
+                  // Generate dynamic content based on FlutterBye platform data
+                  const { contentGenerator } = await import('./social-content-generator.js');
                   
-                  const randomMessage = messages[Math.floor(Math.random() * messages.length)];
-                  const hashtags = ['#FlutterBye', '#Web3', '#Blockchain', '#TokenizedMessaging', '#SocialFi'];
-                  
-                  const content = {
-                    text: randomMessage,
-                    hashtags: hashtags.slice(0, 3) // Use first 3 hashtags
-                  };
+                  // Try to generate AI-powered content first
+                  let content;
+                  try {
+                    const contentTypes = ['feature_highlight', 'user_success', 'platform_update', 'community_growth', 'innovation_showcase'];
+                    const randomType = contentTypes[Math.floor(Math.random() * contentTypes.length)];
+                    
+                    const generatedContent = await contentGenerator.generateContent(randomType, 'twitter');
+                    content = {
+                      text: generatedContent.content,
+                      hashtags: generatedContent.hashtags || ['#FlutterBye', '#Web3', '#TokenizedMessaging']
+                    };
+                  } catch (error) {
+                    console.log('🔄 Using fallback content generation');
+                    // Fallback to curated messages
+                    const messages = [
+                      'Building the future of Web3 communication with FlutterBye! Join our tokenized messaging revolution 🦋',
+                      'Every message has value! Experience the FlutterBye platform where communication meets blockchain innovation ⚡',
+                      'Tokenized messaging is here! Create, send, and monetize your messages on the FlutterBye platform 💎',
+                      'Web3 communication revolution! FlutterBye transforms how we share value through messages 🚀',
+                      'Join the FlutterBye ecosystem! Where every conversation has potential for viral value distribution 🌟',
+                      'Create your first token message in minutes! FlutterBye makes blockchain communication simple and rewarding 💫',
+                      'Experience the magic of viral token distribution! Send value with every message on FlutterBye ✨',
+                      'From idea to viral success! FlutterBye empowers creators to monetize their communications 🎯'
+                    ];
+                    
+                    const randomMessage = messages[Math.floor(Math.random() * messages.length)];
+                    const hashtags = ['#FlutterBye', '#Web3', '#Blockchain', '#TokenizedMessaging', '#SocialFi', '#Solana'];
+                    
+                    content = {
+                      text: randomMessage,
+                      hashtags: hashtags.slice(0, 3) // Use first 3 hashtags
+                    };
+                  }
                   
                   const result = await twitterAPI.postTweet(content);
                   if (result.success) {
