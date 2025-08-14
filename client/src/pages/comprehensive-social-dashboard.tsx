@@ -2923,14 +2923,13 @@ function BotConfigurationContent() {
                       <>
                         <Send className="w-4 h-4 mr-2" />
                         Post Now
-                        </>
-                      )}
-                    </Button>
-                  </div>
+                      </>
+                    )}
+                  </Button>
                 </div>
-              </DialogContent>
-            </Dialog>
-          </div>
+              </div>
+            </DialogContent>
+          </Dialog>
         </CardContent>
       </Card>
 
