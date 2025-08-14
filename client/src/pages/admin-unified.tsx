@@ -75,7 +75,6 @@ import {
   Lock,
   ArrowRightLeft,
   Wallet,
-  ArrowRightLeft,
   TestTube
 } from "lucide-react";
 
