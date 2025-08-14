@@ -58,9 +58,14 @@ export class SocialPasswordAutomation {
 
   // Twitter automation with password login
   async postToTwitter(credentials: SocialCredentials, postContent: PostContent): Promise<{success: boolean, message: string}> {
+    const chromiumPath = '/nix/store/zi4f80l169xlmivz8vja8wlphq74qqk0-chromium-125.0.6422.141/bin/chromium';
+    
+    console.log(`🔍 Using Chromium path: ${chromiumPath}`);
+    console.log(`🔍 Environment path: ${process.env.PUPPETEER_EXECUTABLE_PATH}`);
+    
     const browser = await puppeteer.launch({ 
       headless: true, // Run headless for server environment
-      executablePath: process.env.PUPPETEER_EXECUTABLE_PATH || 'chromium',
+      executablePath: chromiumPath,
       args: [
         '--no-sandbox', 
         '--disable-setuid-sandbox',

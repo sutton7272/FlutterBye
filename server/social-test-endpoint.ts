@@ -8,6 +8,8 @@ export function registerSocialTestEndpoints(app: Express) {
     try {
       const { platform, username, password, testMessage } = req.body;
       
+      console.log('🔍 Test endpoint received:', { platform, username: username ? '***' : 'missing', password: password ? '***' : 'missing', testMessage });
+      
       if (!platform || !username || !password) {
         return res.status(400).json({ 
           success: false, 
@@ -16,39 +18,36 @@ export function registerSocialTestEndpoints(app: Express) {
       }
 
       if (platform.toLowerCase() === 'twitter') {
+        // Set Chromium path before creating automation instance
+        process.env.PUPPETEER_EXECUTABLE_PATH = '/nix/store/zi4f80l169xlmivz8vja8wlphq74qqk0-chromium-125.0.6422.141/bin/chromium';
+        
         const automation = new SocialPasswordAutomation();
         
-        // Test login first
-        const loginTest = await automation.testLogin({ 
-          platform: 'twitter', 
-          username, 
-          password 
-        });
-
-        if (!loginTest.success) {
-          return res.json({ 
-            success: false, 
-            error: `Login failed: ${loginTest.message}`,
-            step: 'login_test'
-          });
-        }
-
-        // If login successful, attempt to post
+        // Direct posting attempt (login is handled within postToTwitter)
         const postContent = {
-          text: testMessage || "🚀 Testing FlutterBye Social Automation System! #FlutterBye #Crypto #AI",
-          hashtags: ['#FlutterBye', '#SocialAutomation', '#Crypto'],
+          text: testMessage || "🚀 Testing FlutterBye Social Automation System! Revolutionary Web3 platform with AI-powered token messaging!",
+          hashtags: ['#FlutterBye', '#SocialAutomation', '#Web3', '#AI', '#Crypto'],
         };
 
-        const postResult = await automation.postToTwitter(
-          { platform: 'twitter', username, password }, 
-          postContent
+        // Set longer timeout for real browser automation
+        const timeoutPromise = new Promise((_, reject) => 
+          setTimeout(() => reject(new Error('Browser automation timeout - Twitter process taking longer than expected')), 90000)
         );
+        
+        const postResult = await Promise.race([
+          automation.postToTwitter(
+            { platform: 'twitter', username, password }, 
+            postContent
+          ),
+          timeoutPromise
+        ]);
 
         return res.json({
           success: postResult.success,
           message: postResult.message,
           step: 'post_test',
-          loginVerified: true
+          method: 'browser_automation',
+          note: 'Real Twitter posting via browser automation'
         });
 
       } else {

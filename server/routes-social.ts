@@ -884,23 +884,73 @@ export function registerSocialRoutes(app: Express) {
                                    account.username !== 'dummy' && account.password !== 'dummy' &&
                                    account.username !== 'FlutterBye'; // Demo account
           
+          console.log(`🔍 Account: ${account.username}, hasRealCredentials: ${hasRealCredentials}`);
+          
           if (hasRealCredentials) {
-            // REAL POSTING MODE - Ready for production Twitter automation
-            // Current status: Demo mode for development safety
-            successful++;
-            account.postsToday = (account.postsToday || 0) + 1;
-            account.lastActivity = new Date().toISOString();
-            
-            results.push({
-              platform: account.platform,
-              username: account.username,
-              success: true,
-              message: '🎯 REAL CREDENTIALS DETECTED - Demo Success! Your FlutterBye social automation is ready!',
-              content: '🚀 FlutterBye Social Automation LIVE! Revolutionary Web3 communication platform with AI-powered token messaging. The future starts now! #FlutterBye #Web3 #AI #SocialAutomation',
-              note: 'Production-ready system with real Twitter credentials - Demo mode active for safety',
-              mode: 'production_ready',
-              credentials_status: 'authenticated'
-            });
+            // REAL POSTING MODE - Browser automation with login credentials
+            try {
+              // Set Chromium path for Puppeteer
+              process.env.PUPPETEER_EXECUTABLE_PATH = '/nix/store/zi4f80l169xlmivz8vja8wlphq74qqk0-chromium-125.0.6422.141/bin/chromium';
+              
+              const { SocialPasswordAutomation } = await import('./social-password-automation');
+              const passwordBot = new SocialPasswordAutomation();
+              
+              const postContent = {
+                text: "🚀 FlutterBye Social Automation is LIVE! Revolutionary Web3 communication platform with AI-powered token messaging. The future of blockchain social interaction starts now! 🌟",
+                hashtags: ['#FlutterBye', '#Web3', '#AI', '#SocialAutomation', '#Crypto', '#Blockchain']
+              };
+              
+              console.log(`🚀 Attempting REAL Twitter login and post for ${account.username}...`);
+              
+              // Use browser automation with actual login credentials
+              const result = await Promise.race([
+                passwordBot.postToTwitter(
+                  { 
+                    platform: 'twitter', 
+                    username: account.username.replace('@', ''), // Remove @ if present
+                    password: account.password 
+                  }, 
+                  postContent
+                ),
+                new Promise((_, reject) => 
+                  setTimeout(() => reject(new Error('Browser automation timeout after 45 seconds')), 45000)
+                )
+              ]);
+              
+              if (result.success) {
+                successful++;
+                account.postsToday = (account.postsToday || 0) + 1;
+                account.lastActivity = new Date().toISOString();
+                
+                results.push({
+                  platform: account.platform,
+                  username: account.username,
+                  success: true,
+                  message: '✅ REAL Twitter post successful via browser automation!',
+                  content: postContent.text,
+                  note: 'Posted live to Twitter using login credentials!',
+                  method: 'browser_automation'
+                });
+              } else {
+                results.push({
+                  platform: account.platform,
+                  username: account.username,
+                  success: false,
+                  message: `Twitter login/posting failed: ${result.message}`,
+                  note: 'Browser automation attempted but failed - check credentials',
+                  method: 'browser_automation'
+                });
+              }
+              
+            } catch (error) {
+              results.push({
+                platform: account.platform,
+                username: account.username,
+                success: false,
+                message: `Browser automation error: ${error instanceof Error ? error.message : 'Unknown error'}`,
+                note: 'Real browser automation attempted but encountered error'
+              });
+            }
           } else {
             // DEMO MODE - Simulate successful posting
             successful++;
@@ -926,22 +976,23 @@ export function registerSocialRoutes(app: Express) {
         }
       }
 
-      res.json({
+      return res.json({
         success: successful > 0,
         successful,
         total: activeAccounts.length,
         message: `Posted to ${successful}/${activeAccounts.length} accounts`,
         results,
-        mode: 'demo',
-        note: 'System ready for real posting when enabled'
+        mode: 'browser_automation',
+        note: 'Using browser automation with login credentials for real posting'
       });
     } catch (error) {
       console.error('Social automation test error:', error);
-      res.status(500).json({ 
+      return res.status(500).json({ 
         success: false, 
-        error: 'Test failed',
+        error: 'Twitter API posting failed',
         successful: 0,
-        total: 0
+        total: 0,
+        details: error instanceof Error ? error.message : 'Unknown error'
       });
     }
   });

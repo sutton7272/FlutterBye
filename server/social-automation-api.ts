@@ -249,8 +249,8 @@ export function registerSocialAutomationAPI(app: Express) {
     }
   });
 
-  // Test instant post functionality
-  app.post('/api/social-automation/test-post', async (req, res) => {
+  // Test instant post functionality (demo mode)
+  app.post('/api/social-automation/test-post-demo', async (req, res) => {
     try {
       const { message, platform } = req.body;
       
