@@ -1,5 +1,6 @@
 import { TwitterAPIService } from './twitter-api-service';
 import { aiContentGenerator, type GeneratedContent } from './ai-content-generator';
+import { socialBotStorage } from './social-bot-storage';
 import * as cron from 'node-cron';
 
 interface ScheduledPost {
@@ -13,9 +14,9 @@ interface ScheduledPost {
 
 export class TwitterContentScheduler {
   private twitterService: TwitterAPIService;
-  private scheduledPosts: ScheduledPost[] = [];
   private isInitialized = false;
   private isActive = false;
+  private activeBotConfigId?: string;
   private postingSchedule: any = {
     earlyMorning: { enabled: true, time: '06:00' },
     breakfast: { enabled: true, time: '08:30' },
@@ -40,6 +41,18 @@ export class TwitterContentScheduler {
     }
   }
 
+  activateBot(botConfigId?: string) {
+    this.isActive = true;
+    this.activeBotConfigId = botConfigId;
+    console.log(`🤖 Twitter bot activated with config: ${botConfigId || 'default'}`);
+  }
+
+  deactivateBot() {
+    this.isActive = false;
+    this.activeBotConfigId = undefined;
+    console.log('🔴 Twitter bot deactivated');
+  }
+
   private startScheduler() {
     if (!this.isInitialized) return;
 
@@ -52,74 +65,107 @@ export class TwitterContentScheduler {
   }
 
   private async checkAndPostScheduledContent() {
-    console.log(`🔄 Scheduler check - Bot active: ${this.isActive}, Pending posts: ${this.scheduledPosts.length}`);
-    
-    if (!this.isActive) return; // Only check if bot is active
-    
-    const now = new Date();
-    const pendingPosts = this.scheduledPosts.filter(post => 
-      post.status === 'pending' && new Date(post.scheduledTime) <= now
-    );
-    
-    if (pendingPosts.length > 0) {
-      console.log(`📤 Found ${pendingPosts.length} posts ready to publish`);
-    }
-
-    for (const post of pendingPosts) {
-      try {
-        console.log(`📤 Posting scheduled content: ${post.id}`);
+    try {
+      const pendingPosts = await socialBotStorage.getPendingScheduledPosts();
+      console.log(`🔄 Scheduler check - Bot active: ${this.isActive}, Pending posts: ${pendingPosts.length}`);
+      
+      if (!this.isActive) return; // Only check if bot is active
+      
+      const now = new Date();
+      const readyPosts = pendingPosts.filter(post => 
+        new Date(post.scheduledTime) <= now
+      );
+      
+      if (readyPosts.length > 0) {
+        console.log(`📤 Found ${readyPosts.length} posts ready to publish`);
         
-        const result = await this.twitterService.postTweet({
-          text: post.content,
-          hashtags: post.hashtags
-        });
-
-        if (result.success) {
-          post.status = 'posted';
-          post.posted = true;
-          console.log(`✅ Scheduled post ${post.id} posted successfully`);
-        } else {
-          post.status = 'failed';
-          console.error(`❌ Failed to post scheduled content ${post.id}:`, result.message);
+        for (const post of readyPosts) {
+          try {
+            console.log(`📤 Posting: "${post.content.substring(0, 50)}..."`);
+            const tweetResult = await this.twitterService.postTweet(post.content);
+            
+            if (tweetResult.success) {
+              await socialBotStorage.updateScheduledPostStatus(
+                post.id, 
+                'posted', 
+                tweetResult.tweetId
+              );
+              console.log(`✅ Posted successfully - Tweet ID: ${tweetResult.tweetId}`);
+            } else {
+              await socialBotStorage.updateScheduledPostStatus(
+                post.id, 
+                'failed', 
+                undefined, 
+                tweetResult.error
+              );
+              console.error(`❌ Failed to post: ${tweetResult.error}`);
+            }
+          } catch (error) {
+            await socialBotStorage.updateScheduledPostStatus(
+              post.id, 
+              'failed', 
+              undefined, 
+              error instanceof Error ? error.message : 'Unknown error'
+            );
+            console.error(`❌ Error posting scheduled content:`, error);
+          }
         }
-      } catch (error) {
-        post.status = 'failed';
-        console.error(`❌ Error posting scheduled content ${post.id}:`, error);
       }
+    } catch (error) {
+      console.error(`❌ Error in scheduler check:`, error);
     }
   }
 
-  schedulePost(content: string, hashtags: string[], scheduledTime: string): string {
-    const postId = `post_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-    
-    const scheduledPost: ScheduledPost = {
-      id: postId,
-      content,
-      hashtags,
-      scheduledTime,
-      status: 'pending'
-    };
-
-    this.scheduledPosts.push(scheduledPost);
-    console.log(`📅 Scheduled post ${postId} for ${scheduledTime}`);
-    
-    return postId;
-  }
-
-  getScheduledPosts(): ScheduledPost[] {
-    return this.scheduledPosts.map(post => ({ ...post }));
-  }
-
-  cancelScheduledPost(postId: string): boolean {
-    const postIndex = this.scheduledPosts.findIndex(post => post.id === postId);
-    
-    if (postIndex !== -1 && this.scheduledPosts[postIndex].status === 'pending') {
-      this.scheduledPosts.splice(postIndex, 1);
-      console.log(`🗑️ Cancelled scheduled post ${postId}`);
-      return true;
+  async schedulePost(content: string, hashtags: string[], scheduledTime: string, botConfigId?: string): Promise<string> {
+    try {
+      const post = await socialBotStorage.createScheduledPost({
+        botConfigId: botConfigId || this.activeBotConfigId,
+        platform: 'twitter',
+        content,
+        hashtags,
+        scheduledTime: new Date(scheduledTime),
+        status: 'pending',
+        isAIGenerated: false
+      });
+      
+      console.log(`📅 Scheduled post ${post.id} for ${scheduledTime}`);
+      return post.id;
+    } catch (error) {
+      console.error('❌ Failed to schedule post:', error);
+      throw error;
     }
-    
-    return false;
+  }
+
+  async getScheduledPosts(): Promise<any[]> {
+    try {
+      const posts = await socialBotStorage.getAllScheduledPosts(50);
+      return posts.map(post => ({
+        id: post.id,
+        content: post.content,
+        hashtags: post.hashtags,
+        scheduledTime: post.scheduledTime.toISOString(),
+        status: post.status,
+        posted: post.status === 'posted'
+      }));
+    } catch (error) {
+      console.error('❌ Failed to get scheduled posts:', error);
+      return [];
+    }
+  }
+
+  async cancelScheduledPost(postId: string): Promise<boolean> {
+    try {
+      const post = await socialBotStorage.getScheduledPost(postId);
+      if (post && post.status === 'pending') {
+        await socialBotStorage.updateScheduledPostStatus(postId, 'cancelled');
+        console.log(`🗑️ Cancelled scheduled post ${postId}`);
+        return true;
+      }
+      return false;
+    } catch (error) {
+      console.error('❌ Failed to cancel post:', error);
+      return false;
+    }
   }
 
   // Predefined content templates for FlutterBye

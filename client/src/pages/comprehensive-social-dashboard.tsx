@@ -803,41 +803,52 @@ function PostQueueContent() {
   const { toast } = useToast();
   const [queuedPosts, setQueuedPosts] = useState<any[]>([]);
   const [showCreatePost, setShowCreatePost] = useState(false);
-
-  const mockQueuedPosts = [
-    {
-      id: '1',
-      content: '🚀 FlutterBye is revolutionizing Web3 communication! Join our tokenized messaging platform #FlutterBye #Web3',
-      platforms: ['Twitter', 'LinkedIn'],
-      scheduledTime: '2025-01-14T15:00:00Z',
-      status: 'scheduled',
-      estimatedReach: 15000
-    },
-    {
-      id: '2',
-      content: 'Every message has value! Experience blockchain-powered communication ⚡ #SocialFi #Blockchain',
-      platforms: ['Twitter'],
-      scheduledTime: '2025-01-14T18:00:00Z',
-      status: 'scheduled',
-      estimatedReach: 12000
-    }
-  ];
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    setQueuedPosts(mockQueuedPosts);
-    loadBotStatus();
+    loadScheduledPosts();
   }, []);
 
-  const loadBotStatus = async () => {
+  const loadScheduledPosts = async () => {
     try {
-      const response = await fetch('/api/social-automation/bot/status');
-      const result = await response.json();
-      
-      if (result.success) {
-        setBotConfig(result.status);
+      setIsLoading(true);
+      const response = await fetch('/api/social-automation/scheduled-posts');
+      if (response.ok) {
+        const data = await response.json();
+        setQueuedPosts(data.success ? data.posts : []);
       }
     } catch (error) {
-      console.error('Failed to load bot status:', error);
+      console.error('Failed to load scheduled posts:', error);
+      toast({
+        title: "Error",
+        description: "Failed to load scheduled posts",
+        variant: "destructive"
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const cancelPost = async (postId: string) => {
+    try {
+      const response = await fetch(`/api/social-automation/scheduled-posts/${postId}`, {
+        method: 'DELETE'
+      });
+      
+      if (response.ok) {
+        await loadScheduledPosts(); // Refresh the list
+        toast({
+          title: "Post Cancelled",
+          description: "Scheduled post was cancelled successfully"
+        });
+      }
+    } catch (error) {
+      console.error('Failed to cancel post:', error);
+      toast({
+        title: "Error",
+        description: "Failed to cancel post",
+        variant: "destructive"
+      });
     }
   };
 
@@ -912,51 +923,87 @@ function PostQueueContent() {
       </div>
 
       <div className="space-y-4">
-        {queuedPosts.map((post) => (
-          <Card key={post.id} className="bg-slate-800/50 border-slate-700 backdrop-blur-sm">
-            <CardContent className="p-6">
-              <div className="flex items-start justify-between mb-4">
-                <div className="flex-1">
-                  <p className="text-slate-300 mb-3">{post.content}</p>
-                  <div className="flex items-center gap-4 text-sm text-slate-400">
-                    <div className="flex items-center gap-1">
-                      <Clock className="w-4 h-4" />
-                      {new Date(post.scheduledTime).toLocaleString()}
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <Users className="w-4 h-4" />
-                      Est. reach: {post.estimatedReach.toLocaleString()}
+        {isLoading ? (
+          <div className="text-center py-8 text-slate-400">Loading scheduled posts...</div>
+        ) : queuedPosts.length === 0 ? (
+          <div className="text-center py-8 text-slate-400">No scheduled posts found</div>
+        ) : (
+          queuedPosts.map((post) => (
+            <Card key={post.id} className="bg-slate-800/50 border-slate-700 backdrop-blur-sm">
+              <CardContent className="p-6">
+                <div className="flex items-start justify-between mb-4">
+                  <div className="flex-1">
+                    <p className="text-slate-300 mb-3">{post.content}</p>
+                    <div className="flex items-center gap-4 text-sm text-slate-400">
+                      <div className="flex items-center gap-1">
+                        <Clock className="w-4 h-4" />
+                        {new Date(post.scheduledTime).toLocaleString()}
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <Badge variant="secondary" className="text-xs">
+                          {post.platform || 'Twitter'}
+                        </Badge>
+                      </div>
                     </div>
                   </div>
+                  <div className="flex items-center gap-2">
+                    <div className={`w-3 h-3 rounded-full ${getStatusColor(post.status)}`} />
+                    <Badge variant="outline">{post.status}</Badge>
+                  </div>
                 </div>
-                <div className="flex items-center gap-2">
-                  <div className={`w-3 h-3 rounded-full ${getStatusColor(post.status)}`} />
-                  <Badge variant="outline">{post.status}</Badge>
+                
+                {post.hashtags && post.hashtags.length > 0 && (
+                  <div className="flex flex-wrap gap-1 mb-3">
+                    {post.hashtags.map((tag: string, idx: number) => (
+                      <Badge key={idx} variant="secondary" className="text-xs">
+                        {tag}
+                      </Badge>
+                    ))}
+                  </div>
+                )}
+                
+                <div className="flex items-center justify-between">
+                  <div className="text-xs text-slate-500">
+                    {post.isAIGenerated && (
+                      <Badge variant="outline" className="text-xs mr-2">
+                        AI Generated
+                      </Badge>
+                    )}
+                    ID: {post.id}
+                  </div>
+                  <div className="flex gap-2">
+                    {post.status === 'pending' && (
+                      <>
+                        <Button 
+                          size="sm" 
+                          variant="outline"
+                          onClick={() => cancelPost(post.id)}
+                        >
+                          <Trash2 className="w-3 h-3 mr-1" />
+                          Cancel
+                        </Button>
+                        <Button size="sm" variant="outline">
+                          <Edit className="w-3 h-3 mr-1" />
+                          Edit
+                        </Button>
+                      </>
+                    )}
+                    {post.status === 'posted' && post.platformPostId && (
+                      <Button 
+                        size="sm" 
+                        variant="outline"
+                        onClick={() => window.open(`https://twitter.com/i/web/status/${post.platformPostId}`, '_blank')}
+                      >
+                        <Eye className="w-3 h-3 mr-1" />
+                        View Tweet
+                      </Button>
+                    )}
+                  </div>
                 </div>
-              </div>
-              
-              <div className="flex items-center justify-between">
-                <div className="flex gap-2">
-                  {post.platforms.map((platform: string) => (
-                    <Badge key={platform} variant="secondary" className="text-xs">
-                      {platform}
-                    </Badge>
-                  ))}
-                </div>
-                <div className="flex gap-2">
-                  <Button size="sm" variant="outline">
-                    <Edit className="w-3 h-3 mr-1" />
-                    Edit
-                  </Button>
-                  <Button size="sm" variant="outline">
-                    <Play className="w-3 h-3 mr-1" />
-                    Post Now
-                  </Button>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
+              </CardContent>
+            </Card>
+          ))
+        )}
       </div>
     </div>
   );
@@ -1803,25 +1850,243 @@ function AIOptimizationContent() {
   );
 }
 
+// Bot Configuration Management Component
+function BotConfigurationManagement() {
+  const { toast } = useToast();
+  const [botConfigs, setBotConfigs] = useState<any[]>([]);
+  const [showCreateBot, setShowCreateBot] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [newBotConfig, setNewBotConfig] = useState({
+    name: '',
+    platform: 'twitter',
+    postingSchedule: {
+      earlyMorning: { enabled: true, time: '06:00' },
+      breakfast: { enabled: true, time: '08:30' },
+      lunch: { enabled: true, time: '12:30' },
+      dinner: { enabled: true, time: '18:30' },
+      evening: { enabled: true, time: '21:30' }
+    }
+  });
+
+  useEffect(() => {
+    fetchBotConfigs();
+  }, []);
+
+  const fetchBotConfigs = async () => {
+    try {
+      setIsLoading(true);
+      const response = await fetch('/api/social-automation/bot-configs');
+      if (response.ok) {
+        const data = await response.json();
+        setBotConfigs(data.success ? data.botConfigs : []);
+      }
+    } catch (error) {
+      console.error('Failed to fetch bot configurations:', error);
+      toast({
+        title: "Error",
+        description: "Failed to load bot configurations",
+        variant: "destructive"
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const createBotConfig = async () => {
+    try {
+      const response = await fetch('/api/social-automation/bot-configs', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newBotConfig)
+      });
+
+      if (response.ok) {
+        await fetchBotConfigs();
+        setShowCreateBot(false);
+        setNewBotConfig({
+          name: '',
+          platform: 'twitter',
+          postingSchedule: {
+            earlyMorning: { enabled: true, time: '06:00' },
+            breakfast: { enabled: true, time: '08:30' },
+            lunch: { enabled: true, time: '12:30' },
+            dinner: { enabled: true, time: '18:30' },
+            evening: { enabled: true, time: '21:30' }
+          }
+        });
+        toast({
+          title: "Bot Created",
+          description: "Bot configuration created successfully"
+        });
+      }
+    } catch (error) {
+      console.error('Failed to create bot:', error);
+      toast({
+        title: "Error",
+        description: "Failed to create bot configuration",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const toggleBotActive = async (botId: string, currentState: boolean) => {
+    try {
+      const response = await fetch(`/api/social-automation/bot-configs/${botId}/toggle`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ isActive: !currentState })
+      });
+
+      if (response.ok) {
+        await fetchBotConfigs();
+        toast({
+          title: !currentState ? "Bot Activated" : "Bot Deactivated",
+          description: `Bot has been ${!currentState ? 'activated' : 'deactivated'} successfully`
+        });
+      }
+    } catch (error) {
+      console.error('Failed to toggle bot:', error);
+      toast({
+        title: "Error",
+        description: "Failed to update bot status",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const deleteBotConfig = async (botId: string) => {
+    try {
+      const response = await fetch(`/api/social-automation/bot-configs/${botId}`, {
+        method: 'DELETE'
+      });
+
+      if (response.ok) {
+        await fetchBotConfigs();
+        toast({
+          title: "Bot Deleted",
+          description: "Bot configuration deleted successfully"
+        });
+      }
+    } catch (error) {
+      console.error('Failed to delete bot:', error);
+      toast({
+        title: "Error",
+        description: "Failed to delete bot configuration",
+        variant: "destructive"
+      });
+    }
+  };
+
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <h3 className="text-xl font-semibold text-white">Bot Configuration Management</h3>
+          <p className="text-slate-400">Create and manage your automated posting bots</p>
+        </div>
+        <Dialog open={showCreateBot} onOpenChange={setShowCreateBot}>
+          <DialogTrigger asChild>
+            <Button className="bg-blue-600 hover:bg-blue-700">
+              <Plus className="w-4 h-4 mr-2" />
+              Create Bot
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="bg-slate-800 border-slate-700 max-w-2xl">
+            <DialogHeader>
+              <DialogTitle>Create New Bot Configuration</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div>
+                <Label htmlFor="bot-name">Bot Name</Label>
+                <Input
+                  id="bot-name"
+                  placeholder="e.g., FlutterBye Main Bot"
+                  value={newBotConfig.name}
+                  onChange={(e) => setNewBotConfig({...newBotConfig, name: e.target.value})}
+                  className="bg-slate-700 border-slate-600"
+                />
+              </div>
+              <div>
+                <Label>Platform</Label>
+                <Select 
+                  value={newBotConfig.platform} 
+                  onValueChange={(value) => setNewBotConfig({...newBotConfig, platform: value})}
+                >
+                  <SelectTrigger className="bg-slate-700 border-slate-600">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="twitter">Twitter</SelectItem>
+                    <SelectItem value="linkedin">LinkedIn</SelectItem>
+                    <SelectItem value="instagram">Instagram</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <Button onClick={createBotConfig} className="w-full">Create Bot Configuration</Button>
+            </div>
+          </DialogContent>
+        </Dialog>
+      </div>
+
+      <div className="grid grid-cols-1 gap-4">
+        {isLoading ? (
+          <div className="text-center py-8 text-slate-400">Loading bot configurations...</div>
+        ) : botConfigs.length === 0 ? (
+          <div className="text-center py-8 text-slate-400">No bot configurations found</div>
+        ) : (
+          botConfigs.map((bot) => (
+            <Card key={bot.id} className="bg-slate-800/50 border-slate-700 backdrop-blur-sm">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <div>
+                    <h4 className="text-lg font-semibold text-white">{bot.name}</h4>
+                    <p className="text-slate-400">{bot.platform} • Created {new Date(bot.createdAt).toLocaleDateString()}</p>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <Badge variant={bot.isActive ? "default" : "secondary"}>
+                      {bot.isActive ? 'Active' : 'Inactive'}
+                    </Badge>
+                    <Button
+                      size="sm"
+                      variant={bot.isActive ? "destructive" : "default"}
+                      onClick={() => toggleBotActive(bot.id, bot.isActive)}
+                    >
+                      {bot.isActive ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => deleteBotConfig(bot.id)}
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </Button>
+                  </div>
+                </div>
+                
+                {bot.isActive && bot.lastActivated && (
+                  <div className="text-xs text-slate-500 mb-2">
+                    Last activated: {new Date(bot.lastActivated).toLocaleString()}
+                  </div>
+                )}
+                
+                <div className="text-xs text-slate-500">
+                  Bot ID: {bot.id}
+                </div>
+              </CardContent>
+            </Card>
+          ))
+        )}
+      </div>
+    </div>
+  );
+}
+
 export default function ComprehensiveSocialDashboard() {
   const { toast } = useToast();
   const [activeTab, setActiveTab] = useState('dashboard');
-  const [botConfigs, setBotConfigs] = useState<any[]>([]);
-
-  useEffect(() => {
-    fetchBots();
-  }, []);
 
   const fetchBots = async () => {
-    try {
-      const response = await fetch('/api/social/bots');
-      if (response.ok) {
-        const data = await response.json();
-        setBotConfigs(Array.isArray(data) ? data : []);
-      }
-    } catch (error) {
-      console.error('Failed to fetch bots:', error);
-    }
+    // This function is now handled by individual components
   };
 
   return (
@@ -1839,10 +2104,18 @@ export default function ComprehensiveSocialDashboard() {
 
         {/* Main Dashboard */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-6 bg-slate-800/50 backdrop-blur-sm">
+          <TabsList className="grid w-full grid-cols-7 bg-slate-800/50 backdrop-blur-sm">
             <TabsTrigger value="dashboard" className="flex items-center gap-2">
-              <BarChart3 className="w-4 h-4" />
-              Dashboard
+              <Settings className="w-4 h-4" />
+              Bot Config
+            </TabsTrigger>
+            <TabsTrigger value="ai-content" className="flex items-center gap-2">
+              <Brain className="w-4 h-4" />
+              AI Content
+            </TabsTrigger>
+            <TabsTrigger value="queue" className="flex items-center gap-2">
+              <Calendar className="w-4 h-4" />
+              Queue
             </TabsTrigger>
             <TabsTrigger value="analytics" className="flex items-center gap-2">
               <TrendingUp className="w-4 h-4" />
@@ -1856,19 +2129,15 @@ export default function ComprehensiveSocialDashboard() {
               <FileText className="w-4 h-4" />
               Content
             </TabsTrigger>
-            <TabsTrigger value="queue" className="flex items-center gap-2">
-              <Calendar className="w-4 h-4" />
-              Queue
-            </TabsTrigger>
             <TabsTrigger value="ai-optimization" className="flex items-center gap-2">
-              <Brain className="w-4 h-4" />
-              AI Center
+              <Sparkles className="w-4 h-4" />
+              AI Optimization
             </TabsTrigger>
           </TabsList>
 
           {/* Dashboard Overview */}
           <TabsContent value="dashboard" className="space-y-6">
-            <BotConfigurationContent />
+            <BotConfigurationManagement />
           </TabsContent>
 
           {/* Analytics Dashboard */}
@@ -1891,9 +2160,13 @@ export default function ComprehensiveSocialDashboard() {
             <PostQueueContent />
           </TabsContent>
 
+          {/* AI Content Generator */}
+          <TabsContent value="ai-content" className="space-y-6">
+            <AIContentGenerator />
+          </TabsContent>
+
           {/* AI Optimization Center */}
           <TabsContent value="ai-optimization" className="space-y-6">
-            <AIContentGenerator />
             <AIOptimizationContent />
           </TabsContent>
         </Tabs>

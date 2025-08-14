@@ -442,6 +442,12 @@ function Router() {
             <ComprehensiveSocialDashboard />
           </SuspenseWrapper>
         )} />
+        
+        <Route path="/comprehensive-social-dashboard" component={() => (
+          <SuspenseWrapper>
+            <ComprehensiveSocialDashboard />
+          </SuspenseWrapper>
+        )} />
         <Route path="/social-analytics" component={() => (
           <SuspenseWrapper>
             <SocialAnalyticsDashboard />

@@ -1901,3 +1901,53 @@ export const insertWalletSecurityLogSchema = createInsertSchema(walletSecurityLo
   id: true,
   createdAt: true,
 });
+
+// Social automation bot configurations
+export const socialBotConfigurations = pgTable("social_bot_configurations", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  name: text("name").notNull(),
+  platform: text("platform").notNull().default("twitter"), // twitter, instagram, etc.
+  isActive: boolean("is_active").default(false),
+  postingSchedule: json("posting_schedule").$type<Record<string, {enabled: boolean, time: string}>>(),
+  configuration: json("configuration").$type<Record<string, any>>(),
+  apiCredentials: json("api_credentials").$type<Record<string, string>>(), // Encrypted
+  lastActivated: timestamp("last_activated"),
+  createdBy: varchar("created_by").references(() => users.id),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Scheduled posts for social automation
+export const scheduledPosts = pgTable("scheduled_posts", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  botConfigId: varchar("bot_config_id").references(() => socialBotConfigurations.id),
+  platform: text("platform").notNull().default("twitter"),
+  content: text("content").notNull(),
+  hashtags: json("hashtags").$type<string[]>(),
+  scheduledTime: timestamp("scheduled_time").notNull(),
+  status: text("status").notNull().default("pending"), // pending, posted, failed, cancelled
+  isAIGenerated: boolean("is_ai_generated").default(false),
+  aiTemplate: text("ai_template"), // Template used for AI generation
+  customContext: text("custom_context"), // Custom context for AI generation
+  postedAt: timestamp("posted_at"),
+  platformPostId: text("platform_post_id"), // ID from the social platform
+  errorMessage: text("error_message"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Social automation types
+export type SocialBotConfiguration = typeof socialBotConfigurations.$inferSelect;
+export type InsertSocialBotConfiguration = typeof socialBotConfigurations.$inferInsert;
+export type ScheduledPost = typeof scheduledPosts.$inferSelect;
+export type InsertScheduledPost = typeof scheduledPosts.$inferInsert;
+
+export const insertSocialBotConfigurationSchema = createInsertSchema(socialBotConfigurations).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertScheduledPostSchema = createInsertSchema(scheduledPosts).omit({
+  id: true,
+  createdAt: true,
+});

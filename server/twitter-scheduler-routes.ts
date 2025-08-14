@@ -1,13 +1,14 @@
 import type { Express } from 'express';
 import { twitterScheduler } from './twitter-content-scheduler';
 import { aiContentGenerator } from './ai-content-generator';
+import { socialBotStorage } from './social-bot-storage';
 
 export function registerTwitterSchedulerRoutes(app: Express) {
   
   // Get scheduled posts
-  app.get('/api/social-automation/scheduled-posts', (req, res) => {
+  app.get('/api/social-automation/scheduled-posts', async (req, res) => {
     try {
-      const posts = twitterScheduler.getScheduledPosts();
+      const posts = await twitterScheduler.getScheduledPosts();
       res.json({ success: true, posts });
     } catch (error: any) {
       res.status(500).json({ success: false, message: error.message });
@@ -15,9 +16,9 @@ export function registerTwitterSchedulerRoutes(app: Express) {
   });
 
   // Schedule a new post
-  app.post('/api/social-automation/schedule-post', (req, res) => {
+  app.post('/api/social-automation/schedule-post', async (req, res) => {
     try {
-      const { content, hashtags, scheduledTime } = req.body;
+      const { content, hashtags, scheduledTime, botConfigId } = req.body;
       
       if (!content || !scheduledTime) {
         return res.status(400).json({ 
@@ -26,10 +27,11 @@ export function registerTwitterSchedulerRoutes(app: Express) {
         });
       }
 
-      const postId = twitterScheduler.schedulePost(
+      const postId = await twitterScheduler.schedulePost(
         content, 
         hashtags || [], 
-        scheduledTime
+        scheduledTime,
+        botConfigId
       );
 
       res.json({ 
@@ -43,16 +45,123 @@ export function registerTwitterSchedulerRoutes(app: Express) {
   });
 
   // Cancel scheduled post
-  app.delete('/api/social-automation/scheduled-posts/:postId', (req, res) => {
+  app.delete('/api/social-automation/scheduled-posts/:postId', async (req, res) => {
     try {
       const { postId } = req.params;
-      const cancelled = twitterScheduler.cancelScheduledPost(postId);
+      const cancelled = await twitterScheduler.cancelScheduledPost(postId);
       
       if (cancelled) {
         res.json({ success: true, message: 'Post cancelled successfully' });
       } else {
         res.status(404).json({ success: false, message: 'Post not found or already posted' });
       }
+    } catch (error: any) {
+      res.status(500).json({ success: false, message: error.message });
+    }
+  });
+
+  // Bot Configuration Management Routes
+  
+  // Get all bot configurations
+  app.get('/api/social-automation/bot-configs', async (req, res) => {
+    try {
+      const botConfigs = await socialBotStorage.getAllBotConfigurations();
+      res.json({ success: true, botConfigs });
+    } catch (error: any) {
+      res.status(500).json({ success: false, message: error.message });
+    }
+  });
+
+  // Create a new bot configuration
+  app.post('/api/social-automation/bot-configs', async (req, res) => {
+    try {
+      const { name, platform, postingSchedule, configuration, apiCredentials } = req.body;
+      
+      if (!name) {
+        return res.status(400).json({ 
+          success: false, 
+          message: 'Bot name is required' 
+        });
+      }
+
+      const botConfig = await socialBotStorage.createBotConfiguration({
+        name,
+        platform: platform || 'twitter',
+        postingSchedule,
+        configuration,
+        apiCredentials,
+        isActive: false
+      });
+
+      res.json({ 
+        success: true, 
+        message: 'Bot configuration created successfully',
+        botConfig 
+      });
+    } catch (error: any) {
+      res.status(500).json({ success: false, message: error.message });
+    }
+  });
+
+  // Update bot configuration
+  app.put('/api/social-automation/bot-configs/:botId', async (req, res) => {
+    try {
+      const { botId } = req.params;
+      const updates = req.body;
+      
+      const botConfig = await socialBotStorage.updateBotConfiguration(botId, {
+        ...updates,
+        updatedAt: new Date()
+      });
+      
+      if (botConfig) {
+        res.json({ success: true, message: 'Bot configuration updated', botConfig });
+      } else {
+        res.status(404).json({ success: false, message: 'Bot configuration not found' });
+      }
+    } catch (error: any) {
+      res.status(500).json({ success: false, message: error.message });
+    }
+  });
+
+  // Activate/Deactivate bot
+  app.patch('/api/social-automation/bot-configs/:botId/toggle', async (req, res) => {
+    try {
+      const { botId } = req.params;
+      const { isActive } = req.body;
+      
+      const botConfig = await socialBotStorage.updateBotConfiguration(botId, {
+        isActive,
+        lastActivated: isActive ? new Date() : undefined
+      });
+      
+      if (botConfig) {
+        // Update scheduler state
+        if (isActive) {
+          twitterScheduler.activateBot(botId);
+        } else {
+          twitterScheduler.deactivateBot();
+        }
+        
+        res.json({ 
+          success: true, 
+          message: `Bot ${isActive ? 'activated' : 'deactivated'} successfully`,
+          botConfig 
+        });
+      } else {
+        res.status(404).json({ success: false, message: 'Bot configuration not found' });
+      }
+    } catch (error: any) {
+      res.status(500).json({ success: false, message: error.message });
+    }
+  });
+
+  // Delete bot configuration
+  app.delete('/api/social-automation/bot-configs/:botId', async (req, res) => {
+    try {
+      const { botId } = req.params;
+      await socialBotStorage.deleteBotConfiguration(botId);
+      res.json({ success: true, message: 'Bot configuration deleted successfully' });
     } catch (error: any) {
       res.status(500).json({ success: false, message: error.message });
     }
