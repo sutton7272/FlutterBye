@@ -81,41 +81,86 @@ export class SocialPasswordAutomation {
       const page = await browser.newPage();
       await page.setViewport({ width: 1200, height: 800 });
       
+      console.log('🔍 Navigating to Twitter login page...');
       // Navigate to Twitter login
       await page.goto('https://twitter.com/login', { waitUntil: 'networkidle0' });
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      await new Promise(resolve => setTimeout(resolve, 3000));
 
-      // Enter username/email
-      const usernameSelector = 'input[name="text"]';
-      await page.waitForSelector(usernameSelector);
-      await page.type(usernameSelector, credentials.username);
+      console.log('🔍 Looking for username input...');
+      // Enter username/email - try multiple selectors
+      let usernameInput;
+      try {
+        usernameInput = await page.waitForSelector('input[name="text"]', { timeout: 5000 });
+      } catch {
+        try {
+          usernameInput = await page.waitForSelector('input[autocomplete="username"]', { timeout: 5000 });
+        } catch {
+          usernameInput = await page.waitForSelector('input[type="text"]', { timeout: 5000 });
+        }
+      }
       
-      // Click Next button
-      await page.evaluate(() => {
-        const buttons = Array.from(document.querySelectorAll('[role="button"]'));
-        const nextButton = buttons.find(btn => btn.textContent?.includes('Next'));
-        if (nextButton) nextButton.click();
-      });
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      if (!usernameInput) {
+        return { success: false, message: 'Could not find username input field' };
+      }
+      
+      console.log('🔍 Typing username...');
+      await page.type('input[name="text"], input[autocomplete="username"], input[type="text"]', credentials.username);
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      console.log('🔍 Looking for Next button...');
+      // Click Next button with more reliable selector
+      try {
+        await page.click('[role="button"]:has-text("Next")');
+      } catch {
+        await page.evaluate(() => {
+          const buttons = Array.from(document.querySelectorAll('[role="button"]'));
+          const nextButton = buttons.find(btn => 
+            btn.textContent?.includes('Next') || 
+            btn.textContent?.includes('next') ||
+            btn.textContent?.includes('Continue')
+          );
+          if (nextButton) nextButton.click();
+        });
+      }
+      await new Promise(resolve => setTimeout(resolve, 3000));
 
+      console.log('🔍 Looking for password input...');
       // Enter password
-      const passwordSelector = 'input[name="password"]';
-      await page.waitForSelector(passwordSelector);
-      await page.type(passwordSelector, credentials.password);
+      try {
+        await page.waitForSelector('input[name="password"]', { timeout: 10000 });
+        await page.type('input[name="password"]', credentials.password);
+      } catch {
+        return { success: false, message: 'Could not find password input - may need additional verification' };
+      }
       
+      console.log('🔍 Clicking login button...');
       // Click Log in button
-      await page.evaluate(() => {
-        const buttons = Array.from(document.querySelectorAll('[role="button"]'));
-        const loginButton = buttons.find(btn => btn.textContent?.includes('Log in'));
-        if (loginButton) loginButton.click();
-      });
-      await new Promise(resolve => setTimeout(resolve, 5000));
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      try {
+        await page.click('[role="button"]:has-text("Log in")');
+      } catch {
+        await page.evaluate(() => {
+          const buttons = Array.from(document.querySelectorAll('[role="button"]'));
+          const loginButton = buttons.find(btn => 
+            btn.textContent?.includes('Log in') ||
+            btn.textContent?.includes('Sign in') ||
+            btn.textContent?.includes('login')
+          );
+          if (loginButton) loginButton.click();
+        });
+      }
+      await new Promise(resolve => setTimeout(resolve, 8000));
 
+      console.log('🔍 Checking if login was successful...');
       // Check if login successful by looking for compose button
       try {
-        await page.waitForSelector('[data-testid="SideNav_NewTweet_Button"]', { timeout: 10000 });
+        await page.waitForSelector('[data-testid="SideNav_NewTweet_Button"], [aria-label="Post"], [role="button"]:has-text("Post")', { timeout: 15000 });
+        console.log('✅ Login successful!');
       } catch {
-        return { success: false, message: 'Login failed - check credentials' };
+        console.log('❌ Login failed - checking for errors...');
+        const url = page.url();
+        console.log('🔍 Current URL:', url);
+        return { success: false, message: 'Login failed - may need verification or credentials are incorrect' };
       }
 
       // Click compose tweet button
