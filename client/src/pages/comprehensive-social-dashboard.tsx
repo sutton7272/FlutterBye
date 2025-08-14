@@ -439,12 +439,14 @@ function AIContentGenerator() {
   const handleGenerateInstantPost = async () => {
     setIsGeneratingPost(true);
     try {
-      const response = await fetch('/api/social-automation/instant-post', {
+      const response = await fetch('/api/social-automation/generate-instant-post', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          customContext: customContext.trim() || undefined,
-          generateOnly: true
+          topic: customContext.trim() || 'FlutterBye platform features',
+          tone: 'engaging',
+          includeHashtags: true,
+          instant: false
         })
       });
 
@@ -459,7 +461,7 @@ function AIContentGenerator() {
           variant: "default"
         });
       } else {
-        throw new Error(result.message);
+        throw new Error(result.error || 'Failed to generate content');
       }
     } catch (error: any) {
       toast({
@@ -475,26 +477,47 @@ function AIContentGenerator() {
   const handleGenerateAndPostInstantly = async () => {
     setIsGeneratingPost(true);
     try {
-      const response = await fetch('/api/social-automation/instant-post', {
+      // First generate content
+      const generateResponse = await fetch('/api/social-automation/generate-instant-post', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          customContext: customContext.trim() || undefined,
-          postImmediately: true
+          topic: customContext.trim() || 'FlutterBye platform features',
+          tone: 'engaging',
+          includeHashtags: true,
+          instant: true
         })
       });
 
-      const result = await response.json();
+      const generateResult = await generateResponse.json();
       
-      if (result.success) {
+      if (!generateResult.success) {
+        throw new Error(generateResult.error || 'Failed to generate content');
+      }
+
+      // Then post it immediately
+      setIsPostingNow(true);
+      const postResponse = await fetch('/api/social-automation/post-instant', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          content: generateResult.content,
+          platform: 'all',
+          bypassSchedule: true
+        })
+      });
+
+      const postResult = await postResponse.json();
+      
+      if (postResult.success) {
         toast({
           title: "Post Published Successfully!",
-          description: `Posted to ${result.platforms?.length || 'available'} platforms instantly`,
+          description: `Posted instantly to active platforms`,
           variant: "default"
         });
         setCustomContext('');
       } else {
-        throw new Error(result.message);
+        throw new Error(postResult.error || 'Failed to publish post');
       }
     } catch (error: any) {
       toast({
@@ -504,17 +527,20 @@ function AIContentGenerator() {
       });
     } finally {
       setIsGeneratingPost(false);
+      setIsPostingNow(false);
     }
   };
 
   const handlePostInstantContent = async () => {
     setIsPostingNow(true);
     try {
-      const response = await fetch('/api/social-automation/post-now', {
+      const response = await fetch('/api/social-automation/post-instant', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          content: instantPostContent
+          content: instantPostContent,
+          platform: 'all',
+          bypassSchedule: true
         })
       });
 
@@ -525,11 +551,11 @@ function AIContentGenerator() {
         setInstantPostContent('');
         toast({
           title: "Post Published!",
-          description: `Successfully posted to ${result.platforms?.length || 'available'} platforms`,
+          description: `Successfully posted to active platforms`,
           variant: "default"
         });
       } else {
-        throw new Error(result.message);
+        throw new Error(result.error || 'Failed to publish post');
       }
     } catch (error: any) {
       toast({
