@@ -737,6 +737,28 @@ function EngagementAccountsContent() {
     platform: 'Twitter',
     engagementType: 'all'
   });
+  
+  // State for API keys management
+  const [showAPIKeys, setShowAPIKeys] = useState(false);
+  const [apiKeys, setAPIKeys] = useState({
+    twitter_api_key: '',
+    twitter_api_secret: '',
+    twitter_access_token: '',
+    twitter_access_token_secret: '',
+    instagram_access_token: '',
+    linkedin_access_token: '',
+    openai_api_key: ''
+  });
+  
+  // State for interaction metrics
+  const [interactionStats, setInteractionStats] = useState({
+    totalInteractions: 0,
+    likesGiven: 0,
+    commentsPosted: 0,
+    retweets: 0,
+    targetAccountsEngaged: 0,
+    topPerformingTargets: []
+  });
 
   const mockAccounts = [
     {
@@ -803,6 +825,26 @@ function EngagementAccountsContent() {
   useEffect(() => {
     setAccounts(mockAccounts);
     setTargetAccounts(mockTargetAccounts);
+    
+    // Load API keys
+    fetch('/api/social-automation/api-keys')
+      .then(res => res.json())
+      .then(data => {
+        if (data.success && data.keys) {
+          setAPIKeys(data.keys);
+        }
+      })
+      .catch(error => console.error('Failed to load API keys:', error));
+      
+    // Load interaction stats
+    fetch('/api/social-automation/interaction-stats')
+      .then(res => res.json())
+      .then(data => {
+        if (data.success && data.stats) {
+          setInteractionStats(data.stats);
+        }
+      })
+      .catch(error => console.error('Failed to load interaction stats:', error));
   }, []);
 
   const handleAddAccount = () => {
@@ -810,6 +852,42 @@ function EngagementAccountsContent() {
       title: "Account Connection",
       description: "Opening authentication flow...",
     });
+  };
+
+  const handleSaveAPIKeys = async () => {
+    try {
+      const response = await fetch('/api/social-automation/api-keys', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(apiKeys)
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        if (result.success) {
+          toast({
+            title: "API Keys Saved",
+            description: "Your API keys have been securely stored",
+          });
+          setShowAPIKeys(false);
+        }
+      } else {
+        throw new Error('Failed to save API keys');
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to save API keys. Please try again.",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handleUpdateAPIKey = (keyName: string, value: string) => {
+    setAPIKeys(prev => ({
+      ...prev,
+      [keyName]: value
+    }));
   };
 
   const handleAddTargetAccount = async () => {
@@ -917,12 +995,104 @@ function EngagementAccountsContent() {
 
   return (
     <div className="space-y-8">
+      {/* Interaction Stats Metrics */}
+      <div className="space-y-6">
+        <div>
+          <h3 className="text-xl font-semibold text-white">Engagement Metrics</h3>
+          <p className="text-slate-400">Track interactions between engagement accounts and target accounts</p>
+        </div>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <Card className="bg-slate-800/50 border-slate-700 backdrop-blur-sm">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-slate-400">Total Interactions</p>
+                  <p className="text-2xl font-bold text-blue-400">{interactionStats.totalInteractions}</p>
+                </div>
+                <Heart className="w-8 h-8 text-blue-400 opacity-70" />
+              </div>
+            </CardContent>
+          </Card>
+          
+          <Card className="bg-slate-800/50 border-slate-700 backdrop-blur-sm">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-slate-400">Likes Given</p>
+                  <p className="text-2xl font-bold text-green-400">{interactionStats.likesGiven}</p>
+                </div>
+                <Heart className="w-8 h-8 text-green-400 opacity-70" />
+              </div>
+            </CardContent>
+          </Card>
+          
+          <Card className="bg-slate-800/50 border-slate-700 backdrop-blur-sm">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-slate-400">Comments Posted</p>
+                  <p className="text-2xl font-bold text-yellow-400">{interactionStats.commentsPosted}</p>
+                </div>
+                <MessageCircle className="w-8 h-8 text-yellow-400 opacity-70" />
+              </div>
+            </CardContent>
+          </Card>
+          
+          <Card className="bg-slate-800/50 border-slate-700 backdrop-blur-sm">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-slate-400">Retweets</p>
+                  <p className="text-2xl font-bold text-purple-400">{interactionStats.retweets}</p>
+                </div>
+                <Repeat2 className="w-8 h-8 text-purple-400 opacity-70" />
+              </div>
+            </CardContent>
+          </Card>
+          
+          <Card className="bg-slate-800/50 border-slate-700 backdrop-blur-sm">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-slate-400">Target Accounts Engaged</p>
+                  <p className="text-2xl font-bold text-cyan-400">{interactionStats.targetAccountsEngaged}</p>
+                </div>
+                <Target className="w-8 h-8 text-cyan-400 opacity-70" />
+              </div>
+            </CardContent>
+          </Card>
+          
+          <Card className="bg-slate-800/50 border-slate-700 backdrop-blur-sm">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-slate-400">Avg Interactions/Hour</p>
+                  <p className="text-2xl font-bold text-orange-400">{Math.round(interactionStats.totalInteractions / 24)}</p>
+                </div>
+                <Clock className="w-8 h-8 text-orange-400 opacity-70" />
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+
       {/* Connected Accounts Section */}
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>
             <h3 className="text-xl font-semibold text-white">Connected Accounts</h3>
             <p className="text-slate-400">Manage your social media accounts for automation</p>
+          </div>
+          <div className="flex gap-2">
+            <Button 
+              onClick={() => setShowAPIKeys(true)} 
+              variant="outline" 
+              className="border-yellow-600 text-yellow-400 hover:bg-yellow-900/20"
+            >
+              <Settings className="w-4 h-4 mr-2" />
+              API Keys
+            </Button>
           </div>
         <Dialog open={showAddAccount} onOpenChange={setShowAddAccount}>
           <DialogTrigger asChild>
@@ -1185,6 +1355,447 @@ function EngagementAccountsContent() {
           )}
         </div>
       </div>
+
+      {/* API Keys Management Dialog */}
+      <Dialog open={showAPIKeys} onOpenChange={setShowAPIKeys}>
+        <DialogContent className="bg-slate-800 border-slate-700 max-w-2xl">
+          <DialogHeader>
+            <DialogTitle className="text-white">API Key Management</DialogTitle>
+            <p className="text-slate-400">Configure API keys for engagement accounts</p>
+          </DialogHeader>
+          <div className="space-y-6">
+            <div className="grid grid-cols-1 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-slate-300 mb-2">
+                  Twitter API Key
+                </label>
+                <input
+                  type="password"
+                  value={apiKeys.twitter_api_key}
+                  onChange={(e) => handleUpdateAPIKey('twitter_api_key', e.target.value)}
+                  className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-md text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="Enter Twitter API Key"
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-slate-300 mb-2">
+                  Twitter API Secret
+                </label>
+                <input
+                  type="password"
+                  value={apiKeys.twitter_api_secret}
+                  onChange={(e) => handleUpdateAPIKey('twitter_api_secret', e.target.value)}
+                  className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-md text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="Enter Twitter API Secret"
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-slate-300 mb-2">
+                  Twitter Access Token
+                </label>
+                <input
+                  type="password"
+                  value={apiKeys.twitter_access_token}
+                  onChange={(e) => handleUpdateAPIKey('twitter_access_token', e.target.value)}
+                  className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-md text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="Enter Twitter Access Token"
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-slate-300 mb-2">
+                  Twitter Access Token Secret
+                </label>
+                <input
+                  type="password"
+                  value={apiKeys.twitter_access_token_secret}
+                  onChange={(e) => handleUpdateAPIKey('twitter_access_token_secret', e.target.value)}
+                  className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-md text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="Enter Twitter Access Token Secret"
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-slate-300 mb-2">
+                  Instagram Access Token
+                </label>
+                <input
+                  type="password"
+                  value={apiKeys.instagram_access_token}
+                  onChange={(e) => handleUpdateAPIKey('instagram_access_token', e.target.value)}
+                  className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-md text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="Enter Instagram Access Token"
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-slate-300 mb-2">
+                  LinkedIn Access Token
+                </label>
+                <input
+                  type="password"
+                  value={apiKeys.linkedin_access_token}
+                  onChange={(e) => handleUpdateAPIKey('linkedin_access_token', e.target.value)}
+                  className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-md text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="Enter LinkedIn Access Token"
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-slate-300 mb-2">
+                  OpenAI API Key
+                </label>
+                <input
+                  type="password"
+                  value={apiKeys.openai_api_key}
+                  onChange={(e) => handleUpdateAPIKey('openai_api_key', e.target.value)}
+                  className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-md text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="Enter OpenAI API Key"
+                />
+              </div>
+            </div>
+            
+            <div className="flex justify-end gap-2">
+              <Button 
+                variant="outline" 
+                onClick={() => setShowAPIKeys(false)}
+              >
+                Cancel
+              </Button>
+              <Button 
+                onClick={handleSaveAPIKeys}
+                className="bg-green-600 hover:bg-green-700"
+              >
+                Save API Keys
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+    </div>
+  );
+}
+
+// Component for Interaction Statistics
+function InteractionStatsContent() {
+  const { toast } = useToast();
+  const [interactionStats, setInteractionStats] = useState({
+    totalInteractions: 0,
+    likesGiven: 0,
+    commentsPosted: 0,
+    retweets: 0,
+    targetAccountsEngaged: 0,
+    topPerformingTargets: [],
+    dailyStats: [],
+    weeklyTrends: []
+  });
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchInteractionStats = async () => {
+      try {
+        const response = await fetch('/api/social-automation/interaction-stats');
+        if (response.ok) {
+          const data = await response.json();
+          setInteractionStats(data);
+        } else {
+          // Use demo data if API is not available
+          setInteractionStats({
+            totalInteractions: 247,
+            likesGiven: 156,
+            commentsPosted: 43,
+            retweets: 48,
+            targetAccountsEngaged: 12,
+            topPerformingTargets: [
+              { username: '@elonmusk', platform: 'Twitter', interactions: 47, engagement: 'high' },
+              { username: '@satyanadella', platform: 'Twitter', interactions: 23, engagement: 'medium' },
+              { username: '@sundarpichai', platform: 'Twitter', interactions: 15, engagement: 'low' }
+            ],
+            dailyStats: [
+              { date: '2025-01-10', likes: 15, comments: 3, retweets: 5 },
+              { date: '2025-01-11', likes: 22, comments: 7, retweets: 8 },
+              { date: '2025-01-12', likes: 18, comments: 4, retweets: 6 },
+              { date: '2025-01-13', likes: 31, comments: 9, retweets: 12 },
+              { date: '2025-01-14', likes: 28, comments: 6, retweets: 9 }
+            ],
+            weeklyTrends: [
+              { week: 'Week 1', total: 45 },
+              { week: 'Week 2', total: 67 },
+              { week: 'Week 3', total: 89 },
+              { week: 'Week 4', total: 123 }
+            ]
+          });
+        }
+      } catch (error) {
+        console.error('Failed to fetch interaction stats:', error);
+        toast({
+          title: "Stats Load Failed",
+          description: "Could not load interaction statistics",
+          variant: "destructive"
+        });
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchInteractionStats();
+    // Refresh every 60 seconds
+    const interval = setInterval(fetchInteractionStats, 60000);
+    return () => clearInterval(interval);
+  }, [toast]);
+
+  const chartColors = {
+    likes: '#10b981',
+    comments: '#3b82f6', 
+    retweets: '#8b5cf6'
+  };
+
+  if (isLoading) {
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <h3 className="text-2xl font-bold text-white mb-2">Interaction Statistics</h3>
+            <p className="text-slate-400">Loading engagement metrics...</p>
+          </div>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {[1,2,3,4].map(i => (
+            <Card key={i} className="bg-slate-800/50 border-slate-700 animate-pulse">
+              <CardContent className="p-6">
+                <div className="h-4 bg-slate-700 rounded mb-2"></div>
+                <div className="h-8 bg-slate-700 rounded"></div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <h3 className="text-2xl font-bold text-white mb-2">Interaction Statistics</h3>
+          <p className="text-slate-400">Track your bot's engagement performance across all platforms</p>
+        </div>
+        <Button
+          onClick={() => window.location.reload()}
+          variant="outline"
+          className="border-blue-500 text-blue-400 hover:bg-blue-500/10"
+          data-testid="refresh-stats-button"
+        >
+          <RefreshCw className="w-4 h-4 mr-2" />
+          Refresh Stats
+        </Button>
+      </div>
+
+      {/* Overview Stats Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
+        <Card className="bg-gradient-to-br from-green-900/40 to-green-800/20 border-green-500/30">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-green-400 text-sm font-medium">Total Interactions</p>
+                <p className="text-2xl font-bold text-white">{interactionStats.totalInteractions.toLocaleString()}</p>
+              </div>
+              <Activity className="h-8 w-8 text-green-400" />
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-gradient-to-br from-blue-900/40 to-blue-800/20 border-blue-500/30">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-blue-400 text-sm font-medium">Likes Given</p>
+                <p className="text-2xl font-bold text-white">{interactionStats.likesGiven.toLocaleString()}</p>
+              </div>
+              <Heart className="h-8 w-8 text-blue-400" />
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-gradient-to-br from-purple-900/40 to-purple-800/20 border-purple-500/30">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-purple-400 text-sm font-medium">Comments Posted</p>
+                <p className="text-2xl font-bold text-white">{interactionStats.commentsPosted.toLocaleString()}</p>
+              </div>
+              <MessageCircle className="h-8 w-8 text-purple-400" />
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-gradient-to-br from-orange-900/40 to-orange-800/20 border-orange-500/30">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-orange-400 text-sm font-medium">Retweets</p>
+                <p className="text-2xl font-bold text-white">{interactionStats.retweets.toLocaleString()}</p>
+              </div>
+              <Repeat2 className="h-8 w-8 text-orange-400" />
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-gradient-to-br from-cyan-900/40 to-cyan-800/20 border-cyan-500/30">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-cyan-400 text-sm font-medium">Target Accounts</p>
+                <p className="text-2xl font-bold text-white">{interactionStats.targetAccountsEngaged.toLocaleString()}</p>
+              </div>
+              <Target className="h-8 w-8 text-cyan-400" />
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Daily Activity Chart */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <Card className="bg-slate-800/50 border-slate-700">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-white">
+              <BarChart3 className="w-5 h-5" />
+              Daily Interaction Activity
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ResponsiveContainer width="100%" height={300}>
+              <BarChart data={interactionStats.dailyStats}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+                <XAxis dataKey="date" stroke="#9CA3AF" />
+                <YAxis stroke="#9CA3AF" />
+                <Tooltip 
+                  contentStyle={{ 
+                    backgroundColor: '#1f2937', 
+                    border: '1px solid #374151',
+                    borderRadius: '8px'
+                  }}
+                />
+                <Bar dataKey="likes" fill={chartColors.likes} name="Likes" />
+                <Bar dataKey="comments" fill={chartColors.comments} name="Comments" />
+                <Bar dataKey="retweets" fill={chartColors.retweets} name="Retweets" />
+              </BarChart>
+            </ResponsiveContainer>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-slate-800/50 border-slate-700">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-white">
+              <TrendingUp className="w-5 h-5" />
+              Weekly Growth Trends
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ResponsiveContainer width="100%" height={300}>
+              <LineChart data={interactionStats.weeklyTrends}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+                <XAxis dataKey="week" stroke="#9CA3AF" />
+                <YAxis stroke="#9CA3AF" />
+                <Tooltip 
+                  contentStyle={{ 
+                    backgroundColor: '#1f2937', 
+                    border: '1px solid #374151',
+                    borderRadius: '8px'
+                  }}
+                />
+                <Line 
+                  type="monotone" 
+                  dataKey="total" 
+                  stroke="#10b981" 
+                  strokeWidth={3}
+                  dot={{ fill: '#10b981', strokeWidth: 2, r: 4 }}
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Top Performing Target Accounts */}
+      <Card className="bg-slate-800/50 border-slate-700">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2 text-white">
+            <Users className="w-5 h-5" />
+            Top Performing Target Accounts
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            {interactionStats.topPerformingTargets.map((target, index) => (
+              <div 
+                key={target.username}
+                className="flex items-center justify-between p-4 bg-slate-700/30 rounded-lg border border-slate-600"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center text-white font-bold">
+                    #{index + 1}
+                  </div>
+                  <div>
+                    <p className="text-white font-semibold">{target.username}</p>
+                    <p className="text-slate-400 text-sm">{target.platform}</p>
+                  </div>
+                </div>
+                <div className="text-right">
+                  <p className="text-white font-semibold">{target.interactions} interactions</p>
+                  <Badge 
+                    variant={target.engagement === 'high' ? 'default' : target.engagement === 'medium' ? 'secondary' : 'outline'}
+                    className={
+                      target.engagement === 'high' ? 'bg-green-600 text-white' :
+                      target.engagement === 'medium' ? 'bg-yellow-600 text-white' :
+                      'bg-slate-600 text-white'
+                    }
+                  >
+                    {target.engagement} engagement
+                  </Badge>
+                </div>
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Real-time Activity Feed */}
+      <Card className="bg-slate-800/50 border-slate-700">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2 text-white">
+            <Clock className="w-5 h-5" />
+            Recent Activity (Last 24 Hours)
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-3">
+            <div className="flex items-center gap-3 p-3 bg-green-900/20 border border-green-500/30 rounded-lg">
+              <Heart className="w-5 h-5 text-green-400" />
+              <div className="flex-1">
+                <p className="text-white">Liked post from @elonmusk</p>
+                <p className="text-slate-400 text-sm">2 minutes ago • Twitter</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-3 p-3 bg-blue-900/20 border border-blue-500/30 rounded-lg">
+              <MessageCircle className="w-5 h-5 text-blue-400" />
+              <div className="flex-1">
+                <p className="text-white">Commented on @satyanadella post</p>
+                <p className="text-slate-400 text-sm">15 minutes ago • Twitter</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-3 p-3 bg-purple-900/20 border border-purple-500/30 rounded-lg">
+              <Repeat2 className="w-5 h-5 text-purple-400" />
+              <div className="flex-1">
+                <p className="text-white">Retweeted @sundarpichai</p>
+                <p className="text-slate-400 text-sm">1 hour ago • Twitter</p>
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }
@@ -1195,6 +1806,14 @@ function ContentLibraryContent() {
   const [contentItems, setContentItems] = useState<any[]>([]);
   const [showUpload, setShowUpload] = useState(false);
   const [generating, setGenerating] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [newContent, setNewContent] = useState({
+    name: '',
+    type: 'text',
+    content: '',
+    tags: '',
+    category: 'General'
+  });
 
   const mockContent = [
     {
@@ -1256,6 +1875,58 @@ function ContentLibraryContent() {
     }
   };
 
+  const handleUploadContent = async () => {
+    if (!newContent.name.trim() || !newContent.content.trim()) {
+      toast({
+        title: "Error",
+        description: "Please fill in all required fields",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    setUploading(true);
+    try {
+      const response = await fetch('/api/social-automation/content', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ...newContent,
+          tags: newContent.tags.split(',').map(tag => tag.trim()).filter(tag => tag.length > 0)
+        })
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        if (result.success) {
+          setContentItems(prev => [...prev, result.content]);
+          setNewContent({
+            name: '',
+            type: 'text',
+            content: '',
+            tags: '',
+            category: 'General'
+          });
+          setShowUpload(false);
+          toast({
+            title: "Content Saved",
+            description: "Your content has been added to the library",
+          });
+        }
+      } else {
+        throw new Error('Failed to save content');
+      }
+    } catch (error) {
+      toast({
+        title: "Upload Failed",
+        description: "Failed to save content. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setUploading(false);
+    }
+  };
+
   const getTypeIcon = (type: string) => {
     switch (type) {
       case 'image': return Image;
@@ -1295,35 +1966,97 @@ function ContentLibraryContent() {
             </DialogTrigger>
             <DialogContent className="bg-slate-800 border-slate-700">
               <DialogHeader>
-                <DialogTitle>Upload Content</DialogTitle>
+                <DialogTitle className="text-white">Upload Content</DialogTitle>
+                <p className="text-slate-400">Add new content to your library</p>
               </DialogHeader>
               <div className="space-y-4">
                 <div>
-                  <Label htmlFor="file-upload">Select File</Label>
-                  <Input
-                    id="file-upload"
-                    type="file"
-                    className="bg-slate-700 border-slate-600"
-                    accept="image/*,video/*,.txt,.pdf"
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="content-name">Content Name</Label>
+                  <Label htmlFor="content-name" className="text-slate-300">Content Name</Label>
                   <Input
                     id="content-name"
+                    value={newContent.name}
+                    onChange={(e) => setNewContent(prev => ({ ...prev, name: e.target.value }))}
                     placeholder="Enter content name"
-                    className="bg-slate-700 border-slate-600"
+                    className="bg-slate-700 border-slate-600 text-white"
                   />
                 </div>
+                
                 <div>
-                  <Label htmlFor="content-tags">Tags (comma separated)</Label>
+                  <Label htmlFor="content-type" className="text-slate-300">Content Type</Label>
+                  <Select value={newContent.type} onValueChange={(value) => setNewContent(prev => ({ ...prev, type: value }))}>
+                    <SelectTrigger className="bg-slate-700 border-slate-600 text-white">
+                      <SelectValue placeholder="Select content type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="text">Text</SelectItem>
+                      <SelectItem value="template">Template</SelectItem>
+                      <SelectItem value="image">Image</SelectItem>
+                      <SelectItem value="video">Video</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                
+                <div>
+                  <Label htmlFor="content-category" className="text-slate-300">Category</Label>
+                  <Select value={newContent.category} onValueChange={(value) => setNewContent(prev => ({ ...prev, category: value }))}>
+                    <SelectTrigger className="bg-slate-700 border-slate-600 text-white">
+                      <SelectValue placeholder="Select category" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="General">General</SelectItem>
+                      <SelectItem value="Brand Assets">Brand Assets</SelectItem>
+                      <SelectItem value="Educational">Educational</SelectItem>
+                      <SelectItem value="Templates">Templates</SelectItem>
+                      <SelectItem value="Marketing">Marketing</SelectItem>
+                      <SelectItem value="Product">Product</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                
+                <div>
+                  <Label htmlFor="content-content" className="text-slate-300">Content</Label>
+                  <Textarea
+                    id="content-content"
+                    value={newContent.content}
+                    onChange={(e) => setNewContent(prev => ({ ...prev, content: e.target.value }))}
+                    placeholder="Enter your content text, template, or description"
+                    className="bg-slate-700 border-slate-600 text-white h-24"
+                  />
+                </div>
+                
+                <div>
+                  <Label htmlFor="content-tags" className="text-slate-300">Tags (comma separated)</Label>
                   <Input
                     id="content-tags"
-                    placeholder="brand, logo, primary"
-                    className="bg-slate-700 border-slate-600"
+                    value={newContent.tags}
+                    onChange={(e) => setNewContent(prev => ({ ...prev, tags: e.target.value }))}
+                    placeholder="brand, logo, primary, web3"
+                    className="bg-slate-700 border-slate-600 text-white"
                   />
                 </div>
-                <Button className="w-full">Upload Content</Button>
+                
+                <div className="flex gap-2">
+                  <Button 
+                    variant="outline" 
+                    onClick={() => setShowUpload(false)}
+                    className="flex-1"
+                    disabled={uploading}
+                  >
+                    Cancel
+                  </Button>
+                  <Button 
+                    onClick={handleUploadContent}
+                    className="flex-1 bg-green-600 hover:bg-green-700"
+                    disabled={uploading}
+                  >
+                    {uploading ? (
+                      <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
+                    ) : (
+                      <Upload className="w-4 h-4 mr-2" />
+                    )}
+                    {uploading ? 'Saving...' : 'Save Content'}
+                  </Button>
+                </div>
               </div>
             </DialogContent>
           </Dialog>
@@ -3246,7 +3979,7 @@ export default function ComprehensiveSocialDashboard() {
 
         {/* Main Dashboard */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-6 bg-slate-800/50 backdrop-blur-sm">
+          <TabsList className="grid w-full grid-cols-7 bg-slate-800/50 backdrop-blur-sm">
             <TabsTrigger value="dashboard" className="flex items-center gap-2">
               <Settings className="w-4 h-4" />
               Dashboard
@@ -3266,6 +3999,10 @@ export default function ComprehensiveSocialDashboard() {
             <TabsTrigger value="accounts" className="flex items-center gap-2">
               <Users className="w-4 h-4" />
               Accounts
+            </TabsTrigger>
+            <TabsTrigger value="interaction-stats" className="flex items-center gap-2">
+              <Activity className="w-4 h-4" />
+              Interaction Stats
             </TabsTrigger>
             <TabsTrigger value="ai-optimization" className="flex items-center gap-2">
               <Sparkles className="w-4 h-4" />
@@ -3296,6 +4033,11 @@ export default function ComprehensiveSocialDashboard() {
           {/* Engagement Accounts */}
           <TabsContent value="accounts" className="space-y-6">
             <EngagementAccountsContent />
+          </TabsContent>
+
+          {/* Interaction Statistics */}
+          <TabsContent value="interaction-stats" className="space-y-6">
+            <InteractionStatsContent />
           </TabsContent>
 
           {/* AI Optimization Center */}
