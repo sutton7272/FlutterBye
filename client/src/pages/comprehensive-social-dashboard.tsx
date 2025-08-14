@@ -55,6 +55,227 @@ import {
   Send
 } from 'lucide-react';
 
+// Component for AI Content Generation
+function AIContentGenerator() {
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [selectedTimeSlot, setSelectedTimeSlot] = useState('breakfast');
+  const [customContext, setCustomContext] = useState('');
+  const [previewContent, setPreviewContent] = useState<any>(null);
+  const [isLoadingPreview, setIsLoadingPreview] = useState(false);
+  const { toast } = useToast();
+
+  const timeSlots = [
+    { id: 'earlyMorning', label: 'Early Morning (6:00 AM)', time: '06:00' },
+    { id: 'breakfast', label: 'Breakfast Time (8:30 AM)', time: '08:30' },
+    { id: 'lateMorning', label: 'Late Morning (10:00 AM)', time: '10:00' },
+    { id: 'lunch', label: 'Lunch Break (12:30 PM)', time: '12:30' },
+    { id: 'earlyAfternoon', label: 'Early Afternoon (2:00 PM)', time: '14:00' },
+    { id: 'lateAfternoon', label: 'Late Afternoon (4:30 PM)', time: '16:30' },
+    { id: 'dinner', label: 'Dinner Time (6:30 PM)', time: '18:30' },
+    { id: 'earlyEvening', label: 'Early Evening (8:00 PM)', time: '20:00' },
+    { id: 'evening', label: 'Evening (9:30 PM)', time: '21:30' },
+    { id: 'lateNight', label: 'Late Night (11:00 PM)', time: '23:00' }
+  ];
+
+  const generateAndScheduleContent = async () => {
+    setIsGenerating(true);
+    try {
+      const response = await fetch('/api/social-automation/ai/generate-content', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          timeSlot: selectedTimeSlot,
+          customContext: customContext.trim() || undefined
+        })
+      });
+
+      const result = await response.json();
+      
+      if (result.success) {
+        toast({
+          title: "AI Content Generated!",
+          description: "Your AI-powered post has been scheduled successfully.",
+          variant: "default"
+        });
+        setCustomContext('');
+        setPreviewContent(null);
+      } else {
+        throw new Error(result.message);
+      }
+    } catch (error: any) {
+      toast({
+        title: "Generation Failed",
+        description: error.message || "Failed to generate AI content",
+        variant: "destructive"
+      });
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
+  const bulkGenerateContent = async () => {
+    setIsGenerating(true);
+    try {
+      const response = await fetch('/api/social-automation/ai/bulk-generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ count: 5 })
+      });
+
+      const result = await response.json();
+      
+      if (result.success) {
+        toast({
+          title: "Bulk Content Generated!",
+          description: `${result.postIds?.length || 5} AI posts have been scheduled across optimal time slots.`,
+          variant: "default"
+        });
+      } else {
+        throw new Error(result.message);
+      }
+    } catch (error: any) {
+      toast({
+        title: "Bulk Generation Failed",
+        description: error.message || "Failed to generate bulk AI content",
+        variant: "destructive"
+      });
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
+  const previewAIContent = async () => {
+    setIsLoadingPreview(true);
+    try {
+      const response = await fetch('/api/social-automation/ai/preview-content', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          timeSlot: selectedTimeSlot,
+          customContext: customContext.trim() || undefined
+        })
+      });
+
+      const result = await response.json();
+      
+      if (result.success) {
+        setPreviewContent(result.content);
+      } else {
+        throw new Error(result.message);
+      }
+    } catch (error: any) {
+      toast({
+        title: "Preview Failed",
+        description: error.message || "Failed to preview AI content",
+        variant: "destructive"
+      });
+    } finally {
+      setIsLoadingPreview(false);
+    }
+  };
+
+  return (
+    <div className="space-y-6">
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Brain className="h-5 w-5" />
+            AI Content Generator
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="time-slot">Target Time Slot</Label>
+              <Select value={selectedTimeSlot} onValueChange={setSelectedTimeSlot}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select time slot" />
+                </SelectTrigger>
+                <SelectContent>
+                  {timeSlots.map(slot => (
+                    <SelectItem key={slot.id} value={slot.id}>
+                      {slot.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="context">Custom Context (Optional)</Label>
+              <Input
+                id="context"
+                placeholder="e.g., Focus on weekend engagement"
+                value={customContext}
+                onChange={(e) => setCustomContext(e.target.value)}
+              />
+            </div>
+          </div>
+
+          <div className="flex gap-3 flex-wrap">
+            <Button 
+              onClick={previewAIContent}
+              disabled={isLoadingPreview}
+              variant="outline"
+              className="flex items-center gap-2"
+            >
+              <Eye className="h-4 w-4" />
+              {isLoadingPreview ? 'Previewing...' : 'Preview Content'}
+            </Button>
+            
+            <Button 
+              onClick={generateAndScheduleContent}
+              disabled={isGenerating}
+              className="flex items-center gap-2"
+            >
+              <Sparkles className="h-4 w-4" />
+              {isGenerating ? 'Generating...' : 'Generate & Schedule'}
+            </Button>
+            
+            <Button 
+              onClick={bulkGenerateContent}
+              disabled={isGenerating}
+              variant="secondary"
+              className="flex items-center gap-2"
+            >
+              <RefreshCw className="h-4 w-4" />
+              {isGenerating ? 'Generating...' : 'Bulk Generate (5 Posts)'}
+            </Button>
+          </div>
+
+          {previewContent && (
+            <Card className="bg-muted/50">
+              <CardHeader>
+                <CardTitle className="text-sm flex items-center gap-2">
+                  <Eye className="h-4 w-4" />
+                  AI Content Preview
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <div className="p-3 bg-background rounded border">
+                  <p className="text-sm">{previewContent.text}</p>
+                </div>
+                <div className="flex flex-wrap gap-1">
+                  {previewContent.hashtags?.map((tag: string, idx: number) => (
+                    <Badge key={idx} variant="secondary" className="text-xs">
+                      {tag}
+                    </Badge>
+                  ))}
+                </div>
+                <div className="flex justify-between text-xs text-muted-foreground">
+                  <span>Tone: {previewContent.tone}</span>
+                  <span>Est. Reach: {previewContent.estimatedReach?.toLocaleString()}</span>
+                  <span>Engagement Score: {previewContent.engagementScore}/10</span>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
+
 // Component for Analytics Dashboard Content
 function SocialAnalyticsDashboardContent() {
   const [posts, setPosts] = useState<any[]>([]);
@@ -1672,6 +1893,7 @@ export default function ComprehensiveSocialDashboard() {
 
           {/* AI Optimization Center */}
           <TabsContent value="ai-optimization" className="space-y-6">
+            <AIContentGenerator />
             <AIOptimizationContent />
           </TabsContent>
         </Tabs>

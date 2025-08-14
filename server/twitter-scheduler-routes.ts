@@ -1,5 +1,6 @@
 import type { Express } from 'express';
 import { twitterScheduler } from './twitter-content-scheduler';
+import { aiContentGenerator } from './ai-content-generator';
 
 export function registerTwitterSchedulerRoutes(app: Express) {
   
@@ -103,6 +104,84 @@ export function registerTwitterSchedulerRoutes(app: Express) {
       }
       const result = twitterScheduler.updateBotConfig(config);
       res.json(result);
+    } catch (error: any) {
+      res.status(500).json({ success: false, message: error.message });
+    }
+  });
+
+  // AI Content Generation endpoints
+  app.post('/api/social-automation/ai/generate-content', async (req, res) => {
+    try {
+      const { timeSlot, customContext } = req.body;
+      
+      if (!timeSlot) {
+        return res.status(400).json({ 
+          success: false, 
+          message: 'Time slot is required' 
+        });
+      }
+
+      const postId = await twitterScheduler.generateAndScheduleContent(timeSlot, customContext);
+      
+      res.json({ 
+        success: true, 
+        message: 'AI content generated and scheduled successfully',
+        postId 
+      });
+    } catch (error: any) {
+      res.status(500).json({ success: false, message: error.message });
+    }
+  });
+
+  app.post('/api/social-automation/ai/bulk-generate', async (req, res) => {
+    try {
+      const { count = 5 } = req.body;
+      
+      const postIds = await twitterScheduler.bulkGenerateAndSchedule(count);
+      
+      res.json({ 
+        success: true, 
+        message: `${postIds.length} AI-generated posts scheduled successfully`,
+        postIds 
+      });
+    } catch (error: any) {
+      res.status(500).json({ success: false, message: error.message });
+    }
+  });
+
+  app.get('/api/social-automation/ai/templates', (req, res) => {
+    try {
+      const templates = aiContentGenerator.getTemplates();
+      res.json({ success: true, templates });
+    } catch (error: any) {
+      res.status(500).json({ success: false, message: error.message });
+    }
+  });
+
+  app.post('/api/social-automation/ai/preview-content', async (req, res) => {
+    try {
+      const { timeSlot, templateId, customContext } = req.body;
+      
+      if (!timeSlot) {
+        return res.status(400).json({ 
+          success: false, 
+          message: 'Time slot is required' 
+        });
+      }
+
+      const templates = aiContentGenerator.getTemplates();
+      const template = templates.find((t: any) => t.id === templateId) || templates[0];
+      
+      const generatedContent = await aiContentGenerator.generateContent(
+        template, 
+        timeSlot, 
+        customContext
+      );
+      
+      res.json({ 
+        success: true, 
+        content: generatedContent 
+      });
     } catch (error: any) {
       res.status(500).json({ success: false, message: error.message });
     }

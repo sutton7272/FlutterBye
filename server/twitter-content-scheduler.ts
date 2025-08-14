@@ -1,4 +1,5 @@
 import { TwitterAPIService } from './twitter-api-service';
+import { aiContentGenerator, type GeneratedContent } from './ai-content-generator';
 import * as cron from 'node-cron';
 
 interface ScheduledPost {
@@ -51,12 +52,18 @@ export class TwitterContentScheduler {
   }
 
   private async checkAndPostScheduledContent() {
+    console.log(`🔄 Scheduler check - Bot active: ${this.isActive}, Pending posts: ${this.scheduledPosts.length}`);
+    
     if (!this.isActive) return; // Only check if bot is active
     
     const now = new Date();
     const pendingPosts = this.scheduledPosts.filter(post => 
       post.status === 'pending' && new Date(post.scheduledTime) <= now
     );
+    
+    if (pendingPosts.length > 0) {
+      console.log(`📤 Found ${pendingPosts.length} posts ready to publish`);
+    }
 
     for (const post of pendingPosts) {
       try {
@@ -205,6 +212,90 @@ export class TwitterContentScheduler {
     this.postingSchedule = config.postingSchedule;
     console.log('⚙️ Bot configuration updated:', config);
     return { success: true, message: 'Configuration updated successfully' };
+  }
+
+  // AI-powered content generation and scheduling
+  async generateAndScheduleContent(timeSlot: string, customContext?: string): Promise<string> {
+    try {
+      const template = aiContentGenerator.getTemplates().find(t => 
+        t.timeSlots.includes(timeSlot)
+      ) || aiContentGenerator.getTemplates()[0];
+      
+      const generatedContent = await aiContentGenerator.generateContent(
+        template, 
+        timeSlot, 
+        customContext
+      );
+      
+      // Schedule for next occurrence of this time slot
+      const scheduledTime = this.calculateNextTimeSlot(timeSlot);
+      
+      const postId = this.schedulePost(
+        generatedContent.text,
+        generatedContent.hashtags,
+        scheduledTime.toISOString()
+      );
+      
+      console.log(`🤖 AI-generated content scheduled for ${timeSlot}: ${postId}`);
+      return postId;
+      
+    } catch (error) {
+      console.error('Failed to generate and schedule AI content:', error);
+      throw error;
+    }
+  }
+
+  async bulkGenerateAndSchedule(count: number = 5): Promise<string[]> {
+    try {
+      const activeSlots = Object.entries(this.postingSchedule)
+        .filter(([_, config]) => config.enabled)
+        .map(([slot, _]) => slot);
+      
+      if (activeSlots.length === 0) {
+        throw new Error('No active time slots configured');
+      }
+      
+      const bulkContent = await aiContentGenerator.generateBulkContent(activeSlots, count);
+      const postIds: string[] = [];
+      
+      for (const { timeSlot, content } of bulkContent) {
+        const scheduledTime = this.calculateNextTimeSlot(timeSlot);
+        
+        const postId = this.schedulePost(
+          content.text,
+          content.hashtags,
+          scheduledTime.toISOString()
+        );
+        
+        postIds.push(postId);
+      }
+      
+      console.log(`🤖 Bulk AI content generated: ${postIds.length} posts scheduled`);
+      return postIds;
+      
+    } catch (error) {
+      console.error('Failed to bulk generate AI content:', error);
+      throw error;
+    }
+  }
+
+  private calculateNextTimeSlot(timeSlotKey: string): Date {
+    const slotConfig = this.postingSchedule[timeSlotKey];
+    if (!slotConfig) {
+      throw new Error(`Invalid time slot: ${timeSlotKey}`);
+    }
+    
+    const [hour, minute] = slotConfig.time.split(':').map(Number);
+    const nextSlot = new Date();
+    
+    nextSlot.setHours(hour, minute, 0, 0);
+    
+    // If the time has already passed today, schedule for tomorrow
+    if (nextSlot <= new Date()) {
+      nextSlot.setDate(nextSlot.getDate() + 1);
+    }
+    
+    return nextSlot;
   }
 }
 
