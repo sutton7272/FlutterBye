@@ -13,7 +13,8 @@ import {
   Wallet,
   Target,
   Wrench,
-  Home
+  Home,
+  Radio
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import Navbar from "@/components/navbar";
@@ -89,6 +90,20 @@ export default function AdminDashboard() {
         "Revenue Analytics",
         "Performance Monitoring",
         "Security Controls"
+      ]
+    },
+    {
+      id: "social-automation",
+      title: "Social Automation Management",
+      description: "AI-powered social media bots with multi-account engagement amplification",
+      icon: Radio,
+      route: "/admin/unified?tab=social-automation",
+      color: "electric-purple",
+      features: [
+        "Multi-Bot Control Center",
+        "Engagement Amplification Network",
+        "AI Content Optimization",
+        "Real-time Analytics Dashboard"
       ]
     },
     {
@@ -313,24 +328,66 @@ export default function AdminDashboard() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
             {adminCards.map((card) => {
               const IconComponent = card.icon;
-              const borderColor = card.color === "electric-blue" ? "border-electric-blue/30" : "border-electric-green/30";
-              const iconColor = card.color === "electric-blue" ? "text-electric-blue" : "text-electric-green";
-              const buttonGradient = card.color === "electric-blue" ? "bg-gradient-to-r from-electric-blue to-blue-500" : "bg-gradient-to-r from-electric-green to-green-500";
+              const getColorStyles = (color: string) => {
+                switch (color) {
+                  case "electric-blue":
+                    return {
+                      border: "border-electric-blue/30",
+                      icon: "text-electric-blue",
+                      gradient: "bg-gradient-to-r from-electric-blue to-blue-500",
+                      titleGradient: "from-electric-blue to-blue-400",
+                      dotGradient: "from-electric-blue to-blue-400",
+                      borderHover: "border-electric-blue/50 hover:border-electric-blue/70",
+                      bgGradient: "from-electric-blue/20 via-electric-green/10 to-electric-blue/20"
+                    };
+                  case "electric-green":
+                    return {
+                      border: "border-electric-green/30",
+                      icon: "text-electric-green",
+                      gradient: "bg-gradient-to-r from-electric-green to-green-500",
+                      titleGradient: "from-electric-green to-green-400",
+                      dotGradient: "from-electric-green to-green-400",
+                      borderHover: "border-electric-green/50 hover:border-electric-green/70",
+                      bgGradient: "from-electric-green/20 via-electric-blue/10 to-electric-green/20"
+                    };
+                  case "electric-purple":
+                    return {
+                      border: "border-purple-500/30",
+                      icon: "text-purple-400",
+                      gradient: "bg-gradient-to-r from-purple-600 to-purple-500",
+                      titleGradient: "from-purple-400 to-purple-300",
+                      dotGradient: "from-purple-400 to-purple-300",
+                      borderHover: "border-purple-500/50 hover:border-purple-500/70",
+                      bgGradient: "from-purple-500/20 via-pink-500/10 to-purple-500/20"
+                    };
+                  default:
+                    return {
+                      border: "border-electric-blue/30",
+                      icon: "text-electric-blue",
+                      gradient: "bg-gradient-to-r from-electric-blue to-blue-500",
+                      titleGradient: "from-electric-blue to-blue-400",
+                      dotGradient: "from-electric-blue to-blue-400",
+                      borderHover: "border-electric-blue/50 hover:border-electric-blue/70",
+                      bgGradient: "from-electric-blue/20 via-electric-green/10 to-electric-blue/20"
+                    };
+                }
+              };
+              const colors = getColorStyles(card.color);
               
               return (
-                <Card key={card.id} className={`relative bg-slate-800/40 backdrop-blur-sm border-2 ${borderColor} shadow-2xl overflow-hidden hover:border-opacity-70 transition-all duration-500 group`}>
+                <Card key={card.id} className={`relative bg-slate-800/40 backdrop-blur-sm border-2 ${colors.border} shadow-2xl overflow-hidden hover:border-opacity-70 transition-all duration-500 group`}>
                   {/* Animated Card Border */}
-                  <div className={`absolute inset-0 bg-gradient-to-r ${card.color === "electric-blue" ? "from-electric-blue/20 via-electric-green/10 to-electric-blue/20" : "from-electric-green/20 via-electric-blue/10 to-electric-green/20"} opacity-50 animate-pulse`} />
+                  <div className={`absolute inset-0 bg-gradient-to-r ${colors.bgGradient} opacity-50 animate-pulse`} />
                   <div className="absolute inset-[2px] bg-slate-800/90 rounded-lg" />
                   
                   <CardHeader className="relative pb-4">
                     <div className="flex items-center gap-4">
-                      <div className={`w-12 h-12 bg-${card.color}/20 rounded-xl flex items-center justify-center border-2 border-${card.color}/50 relative group-hover:scale-110 transition-transform duration-300`}>
-                        <div className={`absolute inset-0 bg-${card.color}/10 rounded-xl animate-ping`} />
-                        <IconComponent className={`w-6 h-6 ${iconColor} relative z-10`} />
+                      <div className={`w-12 h-12 ${card.color === 'electric-purple' ? 'bg-purple-500/20 border-2 border-purple-500/50' : `bg-${card.color}/20 border-2 border-${card.color}/50`} rounded-xl flex items-center justify-center relative group-hover:scale-110 transition-transform duration-300`}>
+                        <div className={`absolute inset-0 ${card.color === 'electric-purple' ? 'bg-purple-500/10' : `bg-${card.color}/10`} rounded-xl animate-ping`} />
+                        <IconComponent className={`w-6 h-6 ${colors.icon} relative z-10`} />
                       </div>
                       <div>
-                        <CardTitle className={`bg-gradient-to-r ${card.color === "electric-blue" ? "from-electric-blue to-blue-400" : "from-electric-green to-green-400"} bg-clip-text text-transparent text-lg font-bold`}>
+                        <CardTitle className={`bg-gradient-to-r ${colors.titleGradient} bg-clip-text text-transparent text-lg font-bold`}>
                           {card.title}
                         </CardTitle>
                         <p className="text-text-secondary text-sm mt-1">{card.description}</p>
@@ -343,7 +400,7 @@ export default function AdminDashboard() {
                     <div className="space-y-2">
                       {card.features.map((feature, index) => (
                         <div key={index} className="flex items-center gap-2">
-                          <div className={`w-1.5 h-1.5 rounded-full bg-gradient-to-r ${card.color === "electric-blue" ? "from-electric-blue to-blue-400" : "from-electric-green to-green-400"} animate-pulse`}></div>
+                          <div className={`w-1.5 h-1.5 rounded-full bg-gradient-to-r ${colors.dotGradient} animate-pulse`}></div>
                           <span className="text-sm text-slate-300">{feature}</span>
                         </div>
                       ))}
@@ -352,7 +409,7 @@ export default function AdminDashboard() {
                     {/* Action Button */}
                     <Button
                       onClick={() => setLocation(card.route)}
-                      className={`w-full ${buttonGradient} hover:opacity-90 transition-all duration-300 border-2 ${card.color === "electric-blue" ? "border-electric-blue/50 hover:border-electric-blue/70" : "border-electric-green/50 hover:border-electric-green/70"} relative overflow-hidden group`}
+                      className={`w-full ${colors.gradient} hover:opacity-90 transition-all duration-300 border-2 ${colors.borderHover} relative overflow-hidden group`}
                     >
                       <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
                       Access {card.title}
