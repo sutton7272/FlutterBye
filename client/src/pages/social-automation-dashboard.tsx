@@ -142,8 +142,8 @@ export default function SocialAutomationDashboard() {
         className: 'bg-blue-900 border-blue-500 text-white'
       });
 
-      // Use the simple test endpoint for reliable testing
-      const response = await fetch('/api/social-automation/simple-test', { 
+      // Use the Twitter auth fix endpoint for diagnosis
+      const response = await fetch('/api/social-automation/twitter-auth-test', { 
         method: 'POST',
         headers: { 'Content-Type': 'application/json' }
       });

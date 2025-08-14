@@ -125,42 +125,81 @@ export class SocialPasswordAutomation {
       await new Promise(resolve => setTimeout(resolve, 3000));
 
       console.log('🔍 Looking for password input...');
-      // Enter password
+      // Enter password with better error handling
       try {
-        await page.waitForSelector('input[name="password"]', { timeout: 10000 });
+        await page.waitForSelector('input[name="password"]', { timeout: 15000 });
+        console.log('✅ Found password input');
         await page.type('input[name="password"]', credentials.password);
-      } catch {
-        return { success: false, message: 'Could not find password input - may need additional verification' };
+        await new Promise(resolve => setTimeout(resolve, 1000));
+      } catch (error) {
+        console.log('❌ Password input not found, checking for verification...');
+        // Check if we need phone/email verification
+        const currentUrl = page.url();
+        console.log('Current URL:', currentUrl);
+        
+        if (currentUrl.includes('account_duplication_check') || currentUrl.includes('LoginVerification')) {
+          return { success: false, message: 'Twitter requires additional verification (phone/email) - please verify account manually first' };
+        }
+        return { success: false, message: 'Could not find password input - account may need verification' };
       }
       
       console.log('🔍 Clicking login button...');
-      // Click Log in button
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // Click Log in button with multiple attempts
+      let loginClicked = false;
       try {
-        await page.click('[role="button"]:has-text("Log in")');
-      } catch {
+        // Try direct selector first
+        const loginBtn = await page.$('[data-testid="LoginForm_Login_Button"]');
+        if (loginBtn) {
+          await loginBtn.click();
+          loginClicked = true;
+        }
+      } catch (e) {
+        console.log('Direct login button not found, trying alternative methods...');
+      }
+      
+      if (!loginClicked) {
         await page.evaluate(() => {
           const buttons = Array.from(document.querySelectorAll('[role="button"]'));
-          const loginButton = buttons.find(btn => 
-            btn.textContent?.includes('Log in') ||
-            btn.textContent?.includes('Sign in') ||
-            btn.textContent?.includes('login')
-          );
-          if (loginButton) loginButton.click();
+          const loginButton = buttons.find(btn => {
+            const text = btn.textContent?.toLowerCase() || '';
+            return text.includes('log in') || text.includes('sign in') || text.includes('next');
+          });
+          if (loginButton) {
+            loginButton.click();
+            return true;
+          }
+          return false;
         });
       }
-      await new Promise(resolve => setTimeout(resolve, 8000));
+      
+      // Wait longer for login to complete
+      await new Promise(resolve => setTimeout(resolve, 10000));
 
       console.log('🔍 Checking if login was successful...');
-      // Check if login successful by looking for compose button
+      // Check if login successful with multiple selectors
       try {
-        await page.waitForSelector('[data-testid="SideNav_NewTweet_Button"], [aria-label="Post"], [role="button"]:has-text("Post")', { timeout: 15000 });
-        console.log('✅ Login successful!');
+        await page.waitForSelector('[data-testid="SideNav_NewTweet_Button"], [aria-label="Post"], [data-testid="tweetButtonInline"], a[href="/compose/tweet"]', { timeout: 20000 });
+        console.log('✅ Login successful - found tweet button!');
       } catch {
-        console.log('❌ Login failed - checking for errors...');
+        console.log('❌ Login failed - checking current page...');
         const url = page.url();
-        console.log('🔍 Current URL:', url);
-        return { success: false, message: 'Login failed - may need verification or credentials are incorrect' };
+        console.log('Current URL:', url);
+        
+        // Take screenshot for debugging (optional)
+        try {
+          const screenshot = await page.screenshot({ encoding: 'base64' });
+          console.log('Screenshot taken (base64 length):', screenshot.length);
+        } catch (e) {
+          console.log('Could not take screenshot');
+        }
+        
+        if (url.includes('login') || url.includes('password') || url.includes('verification')) {
+          return { success: false, message: 'Login failed - credentials may be incorrect or account needs verification' };
+        } else if (url.includes('home') || url.includes('twitter.com') && !url.includes('login')) {
+          console.log('✅ Appears to be logged in based on URL');
+        } else {
+          return { success: false, message: 'Login status unclear - unexpected page reached' };
+        }
       }
 
       // Click compose tweet button
