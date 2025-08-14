@@ -674,6 +674,60 @@
     }
   }
 
+  /* Floating animation keyframes for Skye chatbot */
+  @keyframes float-0 {
+    0%, 100% { transform: translateY(0px) translateX(0px); }
+    50% { transform: translateY(-8px) translateX(4px); }
+  }
+
+  @keyframes float-1 {
+    0%, 100% { transform: translateY(0px) translateX(0px); }
+    50% { transform: translateY(-6px) translateX(-3px); }
+  }
+
+  @keyframes float-2 {
+    0%, 100% { transform: translateY(0px) translateX(0px); }
+    50% { transform: translateY(-10px) translateX(2px); }
+  }
+
+  @keyframes float-3 {
+    0%, 100% { transform: translateY(0px) translateX(0px); }
+    50% { transform: translateY(-4px) translateX(-5px); }
+  }
+
+  /* Slide in animations */
+  @keyframes slide-in-from-left-2 {
+    from { opacity: 0; transform: translateX(-8px); }
+    to { opacity: 1; transform: translateX(0); }
+  }
+
+  @keyframes slide-in-from-right-2 {
+    from { opacity: 0; transform: translateX(8px); }
+    to { opacity: 1; transform: translateX(0); }
+  }
+
+  @keyframes fade-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  /* Utility classes for animations */
+  .animate-in {
+    animation-fill-mode: both;
+  }
+
+  .slide-in-from-left-2 {
+    animation-name: slide-in-from-left-2;
+  }
+
+  .slide-in-from-right-2 {
+    animation-name: slide-in-from-right-2;
+  }
+
+  .fade-in {
+    animation-name: fade-in;
+  }
+
   @keyframes flutter-wing {
     0%, 100% { 
       transform: scaleY(1) rotateX(0deg);

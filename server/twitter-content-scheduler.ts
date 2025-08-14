@@ -1,5 +1,5 @@
 import { TwitterAPIService } from './twitter-api-service';
-import cron from 'node-cron';
+import * as cron from 'node-cron';
 
 interface ScheduledPost {
   id: string;

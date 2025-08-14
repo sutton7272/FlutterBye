@@ -78,6 +78,7 @@ const SocialAutomationNoKeys = lazy(() => import("@/pages/social-automation-no-k
 const SocialPasswordAutomation = lazy(() => import("@/pages/social-password-automation"));
 const AISocialOptimization = lazy(() => import("@/pages/ai-social-optimization"));
 const SocialAutomationDashboard = lazy(() => import("@/pages/social-automation-dashboard"));
+const SocialContentScheduler = lazy(() => import("@/pages/social-content-scheduler"));
 const UnifiedAdminDashboard = lazy(() => import("@/pages/admin-unified"));
 import TokenHolderMapPage from "@/pages/token-holder-map";
 import CollaborativeCreation from "@/pages/collaborative-creation";
@@ -427,6 +428,14 @@ function Router() {
           <SuspenseWrapper>
             <SocialAutomationDashboard />
           </SuspenseWrapper>
+        )} />
+        <Route path="/social-content-scheduler" component={() => (
+          <>
+            <Navbar />
+            <SuspenseWrapper>
+              <SocialContentScheduler />
+            </SuspenseWrapper>
+          </>
         )} />
         
         <Route path="/ai-social-optimization" component={() => (
