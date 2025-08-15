@@ -300,8 +300,8 @@ function ScheduleConfigDialog() {
   );
 }
 
-// AI Content Library Population Component
-function LibraryPopulationComponent() {
+// AI Content Library Population Component  
+function LibraryPopulationComponent({ onContentGenerated }: { onContentGenerated?: () => void }) {
   const [isPopulating, setIsPopulating] = useState(false);
   const [isGeneratingContent, setIsGeneratingContent] = useState(false);
   const [isGeneratingVisuals, setIsGeneratingVisuals] = useState(false);
@@ -349,6 +349,7 @@ function LibraryPopulationComponent() {
           description: `Generated ${result.content.length} AI items for your content library`,
           variant: "default"
         });
+        onContentGenerated?.();
       } else {
         throw new Error(result.error || 'Failed to populate library');
       }
@@ -388,6 +389,7 @@ function LibraryPopulationComponent() {
           variant: "default"
         });
         setCustomTopic('');
+        onContentGenerated?.();
       } else {
         throw new Error(result.error || 'Failed to generate content');
       }
@@ -425,6 +427,7 @@ function LibraryPopulationComponent() {
           variant: "default"
         });
         setVisualPrompt('');
+        onContentGenerated?.();
       } else {
         throw new Error(result.error || 'Failed to generate visuals');
       }
@@ -655,7 +658,7 @@ function LibraryPopulationComponent() {
 }
 
 // Component for AI Content Generation
-function AIContentGenerator() {
+function AIContentGenerator({ onContentGenerated }: { onContentGenerated?: () => void }) {
   const [isGenerating, setIsGenerating] = useState(false);
   const [selectedTimeSlot, setSelectedTimeSlot] = useState('breakfast');
   const [customContext, setCustomContext] = useState('');
@@ -925,7 +928,7 @@ function AIContentGenerator() {
   return (
     <div className="space-y-6">
       {/* AI Content Library Population */}
-      <LibraryPopulationComponent />
+      <LibraryPopulationComponent onContentGenerated={onContentGenerated} />
       
       <Card>
         <CardHeader>
@@ -2406,28 +2409,32 @@ function InteractionStatsContent() {
 }
 
 // Component for Content Library Content
-function ContentLibraryContent() {
+function ContentLibraryContent({ refreshTrigger }: { refreshTrigger?: number }) {
   const { toast } = useToast();
   const [contentItems, setContentItems] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  // Fetch content items on component mount
-  useEffect(() => {
-    const fetchContentItems = async () => {
-      try {
-        const response = await fetch('/api/social-automation/content');
-        if (response.ok) {
-          const result = await response.json();
-          if (result.success) {
-            setContentItems(result.content || []);
-          }
+  // Fetch content items on component mount and when refresh is triggered
+  const fetchContentItems = async () => {
+    try {
+      setIsLoading(true);
+      const response = await fetch('/api/social-automation/content');
+      if (response.ok) {
+        const result = await response.json();
+        if (result.success) {
+          setContentItems(result.content || []);
         }
-      } catch (error) {
-        console.error('Failed to fetch content items:', error);
       }
-    };
+    } catch (error) {
+      console.error('Failed to fetch content items:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
+  useEffect(() => {
     fetchContentItems();
-  }, []);
+  }, [refreshTrigger]);
   const [showUpload, setShowUpload] = useState(false);
   const [generating, setGenerating] = useState(false);
   const [uploading, setUploading] = useState(false);
@@ -2659,6 +2666,20 @@ function ContentLibraryContent() {
         </div>
         <div className="flex gap-2">
           <Button 
+            onClick={fetchContentItems}
+            variant="outline"
+            size="sm"
+            disabled={isLoading}
+            className="border-blue-500 text-blue-400 hover:bg-blue-500/10"
+          >
+            {isLoading ? (
+              <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
+            ) : (
+              <RefreshCw className="w-4 h-4 mr-2" />
+            )}
+            Refresh
+          </Button>
+          <Button 
             onClick={handleGenerateContent}
             disabled={generating}
             className="bg-purple-600 hover:bg-purple-700"
@@ -2842,8 +2863,29 @@ function ContentLibraryContent() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {contentItems.map((item) => {
+      {isLoading ? (
+        <div className="flex items-center justify-center py-12">
+          <div className="text-center">
+            <RefreshCw className="w-8 h-8 mx-auto mb-4 text-blue-400 animate-spin" />
+            <p className="text-slate-400">Loading content library...</p>
+          </div>
+        </div>
+      ) : contentItems.length === 0 ? (
+        <div className="text-center py-12">
+          <Folder className="w-16 h-16 mx-auto mb-4 text-slate-500" />
+          <h3 className="text-lg font-semibold text-white mb-2">No Content Yet</h3>
+          <p className="text-slate-400 mb-6">Generate AI content to populate your library automatically</p>
+          <Button 
+            onClick={() => window.location.hash = '#generator'}
+            className="bg-blue-600 hover:bg-blue-700"
+          >
+            <Brain className="w-4 h-4 mr-2" />
+            Generate AI Content
+          </Button>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {contentItems.map((item) => {
           const TypeIcon = getTypeIcon(item.type);
           
           return (
@@ -2911,9 +2953,10 @@ function ContentLibraryContent() {
                 </div>
               </CardContent>
             </Card>
-          );
-        })}
-      </div>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }
@@ -4732,6 +4775,15 @@ function DashboardOverview() {
 // Unified Content & AI Component
 function UnifiedContentAndAI() {
   const [activeContentTab, setActiveContentTab] = useState('generator');
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
+  
+  const triggerRefresh = () => {
+    setRefreshTrigger(prev => prev + 1);
+    // Switch to library tab to show new content
+    setTimeout(() => {
+      setActiveContentTab('library');
+    }, 1000);
+  };
 
   return (
     <div className="space-y-6">
@@ -4759,11 +4811,11 @@ function UnifiedContentAndAI() {
         </TabsList>
 
         <TabsContent value="generator" className="space-y-6">
-          <AIContentGenerator />
+          <AIContentGenerator onContentGenerated={triggerRefresh} />
         </TabsContent>
 
         <TabsContent value="library" className="space-y-6">
-          <ContentLibraryContent />
+          <ContentLibraryContent refreshTrigger={refreshTrigger} />
         </TabsContent>
 
         <TabsContent value="templates" className="space-y-6">
