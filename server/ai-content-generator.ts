@@ -1,9 +1,12 @@
 import OpenAI from 'openai';
 import { flutterByeContentStrategy } from './flutterbye-content-strategy';
+import { OpenAIService } from './openai-service';
 
 const openai = new OpenAI({ 
   apiKey: process.env.OPENAI_API_KEY 
 });
+
+const openaiService = new OpenAIService();
 
 export interface ContentTemplate {
   id: string;
@@ -147,7 +150,10 @@ ${customContext ? `Additional context: ${customContext}` : ''}
 
 Requirements:
 - Keep it under 280 characters
-- Include 3-5 relevant hashtags
+- Include 8-12 optimal hashtags for maximum engagement
+- Mix broad reach and niche targeting hashtags
+- Always include #FlutterBye as primary brand hashtag
+- Balance trending and evergreen hashtags
 - Make it engaging and authentic
 - Optimize for ${timeSlot} audience
 - Focus on FlutterBye's value proposition
@@ -275,7 +281,7 @@ Respond with JSON in this format:
       });
 
       const generatedText = completion.choices[0].message.content || '';
-      const hashtags = this.extractOptimalHashtags(generatedText, timeSlot);
+      const hashtags = await this.extractOptimalHashtags(generatedText, timeSlot, template.category);
       const engagementScore = this.calculateEngagementScore(generatedText, timeSlot, hashtags);
       
       const result: GeneratedContent = {
@@ -652,35 +658,126 @@ Respond with JSON in this format:
   }
 
   // Enhanced utility methods for real-time intelligence
-  private extractOptimalHashtags(text: string, timeSlot: string): string[] {
-    const baseHashtags = ['#FlutterBye', '#Web3', '#TokenizedMessages', '#Innovation'];
+  private async extractOptimalHashtags(text: string, timeSlot: string, category: string = 'general'): Promise<string[]> {
+    try {
+      // Use OpenAI service for intelligent hashtag optimization
+      const optimizedHashtags = await openaiService.generateOptimizedHashtags(text, category);
+      
+      // Ensure we have the optimal number (8-12 hashtags)
+      if (optimizedHashtags.length >= 8) {
+        console.log(`🏷️ Generated ${optimizedHashtags.length} optimal hashtags: ${optimizedHashtags.slice(0, 5).join(', ')}...`);
+        return optimizedHashtags;
+      }
+      
+      // If AI generated fewer, supplement with strategic hashtags
+      return this.supplementHashtags(optimizedHashtags, text, timeSlot, category);
+      
+    } catch (error) {
+      console.error('Hashtag optimization failed:', error);
+      return this.getFallbackOptimalHashtags(text, timeSlot, category);
+    }
+  }
+
+  private supplementHashtags(baseHashtags: string[], text: string, timeSlot: string, category: string): string[] {
+    const supplemental = this.getStrategicHashtags(text, timeSlot, category);
+    const combined = [...baseHashtags, ...supplemental];
     
-    // Time-specific hashtags
-    const timeHashtags = {
-      earlyMorning: ['#MorningMotivation', '#StartYourDay'],
-      breakfast: ['#MorningThoughts', '#CoffeeTime'],
-      lunch: ['#LunchBreak', '#MidDayUpdate'],
-      dinner: ['#EveningReflection', '#CommunityTime'],
-      evening: ['#TrendingNow', '#EveningVibes']
+    // Remove duplicates and ensure #FlutterBye is first
+    const unique = [...new Set(combined)];
+    const filtered = unique.filter(tag => tag !== '#FlutterBye');
+    
+    return ['#FlutterBye', ...filtered].slice(0, 12);
+  }
+
+  private getStrategicHashtags(text: string, timeSlot: string, category: string): string[] {
+    const strategic = [];
+    
+    // Category-specific hashtags
+    const categoryTags = {
+      product: ['#ProductInnovation', '#TechRevolution', '#FutureOfComm'],
+      technology: ['#Web3Tech', '#BlockchainInnovation', '#CryptoTech'],
+      community: ['#BuildTogether', '#CommunityFirst', '#Web3Community'],
+      educational: ['#LearnWeb3', '#BlockchainEducation', '#CryptoLearning'],
+      promotional: ['#JoinRevolution', '#EarlyAccess', '#Innovation']
     };
+    
+    strategic.push(...(categoryTags[category as keyof typeof categoryTags] || []));
+    
+    // Time-optimized hashtags
+    const timeOptimized = {
+      earlyMorning: ['#MorningInnovation', '#StartStrong'],
+      breakfast: ['#MorningTech', '#NewDay'],
+      lunch: ['#MidDayUpdate', '#TechBreak'],
+      earlyAfternoon: ['#AfternoonInsights', '#ProductivityBoost'],
+      lateAfternoon: ['#TechProgress', '#Innovation'],
+      dinner: ['#EveningTech', '#CommunityTime'],
+      evening: ['#TrendingTech', '#PrimeTech'],
+      lateNight: ['#NightOwls', '#TechThoughts']
+    };
+    
+    strategic.push(...(timeOptimized[timeSlot as keyof typeof timeOptimized] || []));
+    
+    // Content-intelligent hashtags
+    const contentTags = this.analyzeContentForHashtags(text);
+    strategic.push(...contentTags);
+    
+    // Core Web3/crypto hashtags for reach
+    strategic.push('#Web3', '#Solana', '#Crypto', '#Blockchain', '#DeFi', '#Innovation', '#Future');
+    
+    return strategic;
+  }
 
-    // Content-based hashtags
-    const contentHashtags = [];
-    if (text.toLowerCase().includes('ai')) contentHashtags.push('#AI');
-    if (text.toLowerCase().includes('blockchain')) contentHashtags.push('#Blockchain');
-    if (text.toLowerCase().includes('solana')) contentHashtags.push('#Solana');
-    if (text.toLowerCase().includes('defi')) contentHashtags.push('#DeFi');
-    if (text.toLowerCase().includes('nft')) contentHashtags.push('#NFT');
+  private analyzeContentForHashtags(text: string): string[] {
+    const tags = [];
+    const lowerText = text.toLowerCase();
+    
+    // AI and technology keywords
+    if (lowerText.includes('ai') || lowerText.includes('artificial')) tags.push('#AI', '#ArtificialIntelligence');
+    if (lowerText.includes('smart contract')) tags.push('#SmartContracts');
+    if (lowerText.includes('defi') || lowerText.includes('decentralized finance')) tags.push('#DeFi');
+    if (lowerText.includes('nft')) tags.push('#NFT');
+    if (lowerText.includes('token')) tags.push('#Tokenization', '#SPLTokens');
+    if (lowerText.includes('message') || lowerText.includes('messaging')) tags.push('#TokenizedMessages', '#Communication');
+    if (lowerText.includes('wallet')) tags.push('#CryptoWallet', '#WalletTech');
+    if (lowerText.includes('enterprise')) tags.push('#Enterprise', '#B2B');
+    if (lowerText.includes('security')) tags.push('#CryptoSecurity', '#BlockchainSecurity');
+    
+    // Engagement and community keywords
+    if (lowerText.includes('community')) tags.push('#CommunityBuilding');
+    if (lowerText.includes('growth')) tags.push('#Growth', '#Scaling');
+    if (lowerText.includes('launch')) tags.push('#ProductLaunch', '#NewTech');
+    if (lowerText.includes('revolution')) tags.push('#TechRevolution', '#GameChanger');
+    
+    return tags;
+  }
 
-    // Combine and limit to 6 hashtags maximum
-    const allHashtags = [
-      ...baseHashtags.slice(0, 2),
-      ...(timeHashtags[timeSlot as keyof typeof timeHashtags] || []),
-      ...contentHashtags,
-      '#Crypto', '#Communication'
-    ];
-
-    return [...new Set(allHashtags)].slice(0, 6);
+  private getFallbackOptimalHashtags(text: string, timeSlot: string, category: string): string[] {
+    // Optimized fallback with 8-10 strategic hashtags
+    const fallbackSets = {
+      general: [
+        '#FlutterBye', '#Web3', '#Solana', '#TokenizedMessages', '#Innovation', 
+        '#Blockchain', '#CryptoTech', '#FutureOfComm', '#Digital', '#Communication'
+      ],
+      technology: [
+        '#FlutterBye', '#Web3Tech', '#Solana', '#SPLTokens', '#BlockchainInnovation',
+        '#CryptoTech', '#SmartContracts', '#TechRevolution', '#Innovation', '#DeFi'
+      ],
+      community: [
+        '#FlutterBye', '#Web3Community', '#Solana', '#BuildTogether', '#CommunityFirst',
+        '#Innovation', '#JoinUs', '#FutureOfComm', '#TechCommunity', '#Growth'
+      ],
+      product: [
+        '#FlutterBye', '#ProductLaunch', '#TokenizedMessages', '#Web3', '#Innovation',
+        '#GameChanger', '#TechRevolution', '#Solana', '#Communication', '#FutureOfComm'
+      ]
+    };
+    
+    const baseSet = fallbackSets[category as keyof typeof fallbackSets] || fallbackSets.general;
+    const contentSpecific = this.analyzeContentForHashtags(text);
+    
+    // Combine and optimize
+    const combined = [...baseSet, ...contentSpecific.slice(0, 3)];
+    return [...new Set(combined)].slice(0, 10);
   }
 
   private detectTone(text: string): string {
