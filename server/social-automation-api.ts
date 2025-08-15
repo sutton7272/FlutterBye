@@ -73,18 +73,103 @@ interface InteractionStat {
   success: boolean;
 }
 
-// In-memory storage (in production, use database)
+// File-based persistent storage (in production, use database)
+const STORAGE_DIR = path.join(process.cwd(), 'data');
+const CONTENT_FILE = path.join(STORAGE_DIR, 'content-library.json');
+const API_KEYS_FILE = path.join(STORAGE_DIR, 'api-keys.json');
+const TARGET_ACCOUNTS_FILE = path.join(STORAGE_DIR, 'target-accounts.json');
+
+// Ensure storage directory exists
+const ensureStorageDir = async () => {
+  try {
+    await fs.mkdir(STORAGE_DIR, { recursive: true });
+  } catch (error) {
+    console.error('Error creating storage directory:', error);
+  }
+};
+
+// Load data from files
+const loadContentItems = async (): Promise<ContentItem[]> => {
+  try {
+    const data = await fs.readFile(CONTENT_FILE, 'utf8');
+    return JSON.parse(data);
+  } catch (error) {
+    return [];
+  }
+};
+
+const saveContentItems = async (items: ContentItem[]): Promise<void> => {
+  try {
+    await ensureStorageDir();
+    await fs.writeFile(CONTENT_FILE, JSON.stringify(items, null, 2), 'utf8');
+  } catch (error) {
+    console.error('Error saving content items:', error);
+  }
+};
+
+const loadAPIKeys = async (): Promise<APIKeys> => {
+  try {
+    const data = await fs.readFile(API_KEYS_FILE, 'utf8');
+    return JSON.parse(data);
+  } catch (error) {
+    return {
+      twitter: '',
+      instagram: '',
+      facebook: '',
+      tiktok: '',
+      openai: ''
+    };
+  }
+};
+
+const saveAPIKeys = async (keys: APIKeys): Promise<void> => {
+  try {
+    await ensureStorageDir();
+    await fs.writeFile(API_KEYS_FILE, JSON.stringify(keys, null, 2), 'utf8');
+  } catch (error) {
+    console.error('Error saving API keys:', error);
+  }
+};
+
+const loadTargetAccounts = async (): Promise<TargetAccount[]> => {
+  try {
+    const data = await fs.readFile(TARGET_ACCOUNTS_FILE, 'utf8');
+    return JSON.parse(data);
+  } catch (error) {
+    return [];
+  }
+};
+
+const saveTargetAccounts = async (accounts: TargetAccount[]): Promise<void> => {
+  try {
+    await ensureStorageDir();
+    await fs.writeFile(TARGET_ACCOUNTS_FILE, JSON.stringify(accounts, null, 2), 'utf8');
+  } catch (error) {
+    console.error('Error saving target accounts:', error);
+  }
+};
+
+// In-memory storage (temporary until database migration)
 const socialAccounts: SocialAccount[] = [];
 const botConfigs: BotConfig[] = [];
-const contentItems: ContentItem[] = [];
+let contentItems: ContentItem[] = [];
 const interactionStats: InteractionStat[] = [];
-const targetAccounts: TargetAccount[] = [];
+let targetAccounts: TargetAccount[] = [];
 let apiKeys: APIKeys = {
   twitter: '',
   instagram: '',
   facebook: '',
   tiktok: '',
   openai: ''
+};
+
+// Initialize storage on startup
+const initializeStorage = async () => {
+  console.log('📂 Initializing persistent storage...');
+  contentItems = await loadContentItems();
+  apiKeys = await loadAPIKeys();
+  targetAccounts = await loadTargetAccounts();
+  console.log(`✅ Loaded ${contentItems.length} content items, ${targetAccounts.length} target accounts`);
 };
 
 // Bot instances
@@ -96,6 +181,9 @@ let botEnabled: boolean = false;
 
 export function registerSocialAutomationAPI(app: Express) {
   console.log('🤖 Social Automation API routes registered');
+  
+  // Initialize persistent storage
+  initializeStorage();
   
   // Schedule management endpoints
   app.post('/api/social-automation/schedule', async (req, res) => {
@@ -505,12 +593,13 @@ export function registerSocialAutomationAPI(app: Express) {
   });
 
   // Save API keys
-  app.post('/api/social-automation/api-keys', (req, res) => {
+  app.post('/api/social-automation/api-keys', async (req, res) => {
     try {
       const keys = req.body;
       apiKeys = { ...apiKeys, ...keys };
+      await saveAPIKeys(apiKeys);
       
-      // In production, save to secure encrypted storage
+      console.log('🔑 API keys saved successfully');
       res.json({ success: true, message: 'API keys saved successfully' });
     } catch (error) {
       res.status(500).json({ 
@@ -637,7 +726,7 @@ export function registerSocialAutomationAPI(app: Express) {
   });
 
   // Add new target account
-  app.post('/api/social-automation/target-accounts', (req, res) => {
+  app.post('/api/social-automation/target-accounts', async (req, res) => {
     try {
       const { username, platform, engagementType } = req.body;
       
@@ -673,6 +762,9 @@ export function registerSocialAutomationAPI(app: Express) {
       };
 
       targetAccounts.push(newTargetAccount);
+      await saveTargetAccounts(targetAccounts);
+
+      console.log(`🎯 Target account added: @${username} on ${platform}`);
 
       res.json({ 
         success: true, 
@@ -688,7 +780,7 @@ export function registerSocialAutomationAPI(app: Express) {
   });
 
   // Toggle target account status
-  app.patch('/api/social-automation/target-accounts/:id/toggle', (req, res) => {
+  app.patch('/api/social-automation/target-accounts/:id/toggle', async (req, res) => {
     try {
       const { id } = req.params;
       const { isActive } = req.body;
@@ -699,6 +791,8 @@ export function registerSocialAutomationAPI(app: Express) {
       }
 
       account.isActive = isActive;
+      await saveTargetAccounts(targetAccounts);
+
       res.json({ 
         success: true, 
         message: `Target account ${isActive ? 'activated' : 'deactivated'}`,
@@ -713,7 +807,7 @@ export function registerSocialAutomationAPI(app: Express) {
   });
 
   // Delete target account
-  app.delete('/api/social-automation/target-accounts/:id', (req, res) => {
+  app.delete('/api/social-automation/target-accounts/:id', async (req, res) => {
     try {
       const { id } = req.params;
       
@@ -723,6 +817,10 @@ export function registerSocialAutomationAPI(app: Express) {
       }
 
       const removedAccount = targetAccounts.splice(accountIndex, 1)[0];
+      await saveTargetAccounts(targetAccounts);
+
+      console.log(`🗑️ Target account removed: @${removedAccount.username}`);
+
       res.json({ 
         success: true, 
         message: 'Target account removed successfully',
@@ -815,7 +913,7 @@ export function registerSocialAutomationAPI(app: Express) {
     res.json({ success: true, content: contentItems });
   });
 
-  app.post('/api/social-automation/content', (req, res) => {
+  app.post('/api/social-automation/content', async (req, res) => {
     try {
       const { name, type, content, tags, category, fileData, fileName, fileType } = req.body;
       
@@ -862,6 +960,9 @@ export function registerSocialAutomationAPI(app: Express) {
       }
 
       contentItems.push(newContent);
+      await saveContentItems(contentItems);
+      
+      console.log(`💾 Content saved: ${newContent.name} (${newContent.type})`);
       
       res.json({ 
         success: true, 
@@ -876,7 +977,7 @@ export function registerSocialAutomationAPI(app: Express) {
     }
   });
 
-  app.delete('/api/social-automation/content/:id', (req, res) => {
+  app.delete('/api/social-automation/content/:id', async (req, res) => {
     try {
       const { id } = req.params;
       
@@ -886,6 +987,10 @@ export function registerSocialAutomationAPI(app: Express) {
       }
 
       const removedContent = contentItems.splice(contentIndex, 1)[0];
+      await saveContentItems(contentItems);
+      
+      console.log(`🗑️ Content deleted: ${removedContent.name}`);
+      
       res.json({ 
         success: true, 
         message: 'Content deleted successfully',
