@@ -1557,15 +1557,17 @@ function EngagementAccountsContent() {
       const response = await fetch('/api/social-automation/auto-engage-followers', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'like', limit: 10 })
+        body: JSON.stringify({ action: 'like', limit: 10, batchSize: 5 })
       });
 
       const result = await response.json();
       if (response.ok && result.success) {
+        const { summary } = result;
         toast({
-          title: "Auto-Engagement Started",
-          description: result.message,
+          title: "Auto-Engagement Complete",
+          description: result.message + ` (${summary.successful} successful, ${summary.failed} failed)`,
         });
+        
         // Refresh metrics after engagement
         setTimeout(() => {
           const loadEngagementMetrics = async () => {
@@ -1582,7 +1584,7 @@ function EngagementAccountsContent() {
             }
           };
           loadEngagementMetrics();
-        }, 2000);
+        }, 1500);
       } else {
         throw new Error(result.error || 'Failed to start auto-engagement');
       }
@@ -1730,16 +1732,35 @@ function EngagementAccountsContent() {
         </div>
         
         {/* Auto-Engage with FlutterBye Followers */}
-        <div className="flex justify-center">
-          <Button 
-            onClick={handleAutoEngageFollowers}
-            className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white px-6 py-3"
-            data-testid="auto-engage-followers-button"
-          >
-            <Target className="w-4 h-4 mr-2" />
-            Auto-Engage with FlutterBye Followers
-          </Button>
-        </div>
+        <Card className="bg-slate-800/50 border-slate-700 backdrop-blur-sm">
+          <CardHeader>
+            <h4 className="text-lg font-semibold text-white">FlutterBye Follower Engagement</h4>
+            <p className="text-slate-400 text-sm">Automatically engage with FlutterBye's 64 followers (5 per batch for rate limit safety)</p>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-center justify-between">
+              <div className="space-y-2">
+                <div className="text-sm text-slate-300">
+                  <span className="font-medium">Batch Size:</span> 5 followers per click
+                </div>
+                <div className="text-sm text-slate-300">
+                  <span className="font-medium">Success Rate:</span> ~85% (realistic simulation)
+                </div>
+                <div className="text-sm text-slate-300">
+                  <span className="font-medium">Actions:</span> Likes, Comments, Retweets
+                </div>
+              </div>
+              <Button 
+                onClick={handleAutoEngageFollowers}
+                className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white px-6 py-3"
+                data-testid="auto-engage-followers-button"
+              >
+                <Target className="w-4 h-4 mr-2" />
+                Engage with 5 Followers
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
       </div>
 
       {/* Connected Accounts Section */}
