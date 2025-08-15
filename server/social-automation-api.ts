@@ -90,6 +90,7 @@ const STORAGE_DIR = path.join(process.cwd(), 'data');
 const CONTENT_FILE = path.join(STORAGE_DIR, 'content-library.json');
 const API_KEYS_FILE = path.join(STORAGE_DIR, 'api-keys.json');
 const TARGET_ACCOUNTS_FILE = path.join(STORAGE_DIR, 'target-accounts.json');
+const BOT_CONFIG_FILE = path.join(STORAGE_DIR, 'bot-config.json');
 
 // Ensure storage directory exists
 const ensureStorageDir = async () => {
@@ -161,6 +162,26 @@ const saveTargetAccounts = async (accounts: TargetAccount[]): Promise<void> => {
   }
 };
 
+// Bot configuration storage
+const loadBotConfig = async (): Promise<{schedule: any, botEnabled: boolean}> => {
+  try {
+    const data = await fs.readFile(BOT_CONFIG_FILE, 'utf8');
+    return JSON.parse(data);
+  } catch (error) {
+    return { schedule: null, botEnabled: false };
+  }
+};
+
+const saveBotConfig = async (schedule: any, botEnabled: boolean): Promise<void> => {
+  try {
+    await ensureStorageDir();
+    const config = { schedule, botEnabled };
+    await fs.writeFile(BOT_CONFIG_FILE, JSON.stringify(config, null, 2), 'utf8');
+  } catch (error) {
+    console.error('Error saving bot config:', error);
+  }
+};
+
 // In-memory storage (temporary until database migration)
 const socialAccounts: SocialAccount[] = [];
 const botConfigs: BotConfig[] = [];
@@ -186,7 +207,30 @@ const initializeStorage = async () => {
   contentItems = await loadContentItems();
   apiKeys = await loadAPIKeys();
   targetAccounts = await loadTargetAccounts();
+  
+  // Load bot configuration
+  const botConfig = await loadBotConfig();
+  savedSchedule = botConfig.schedule;
+  botEnabled = botConfig.botEnabled;
+  
   console.log(`✅ Loaded ${contentItems.length} content items, ${targetAccounts.length} target accounts`);
+  
+  if (savedSchedule) {
+    const enabledSlots = Object.entries(savedSchedule).filter(([key, config]: [string, any]) => config.enabled);
+    console.log(`📅 Restored schedule with ${enabledSlots.length} active time slots`);
+  }
+  
+  if (botEnabled) {
+    console.log('🤖 Restored bot status: enabled');
+    // Reactivate the scheduler if bot was enabled
+    const scheduler = initializeTwitterScheduler();
+    if (scheduler && savedSchedule) {
+      scheduler.activateBot('social-automation-bot');
+      console.log('📅 Reactivated Twitter scheduler on startup');
+    }
+  } else {
+    console.log('🤖 Restored bot status: disabled');
+  }
 };
 
 // Bot instances
@@ -231,8 +275,10 @@ export function registerSocialAutomationAPI(app: Express) {
         });
       }
 
-      // Store schedule configuration (in production, save to database)
+      // Store schedule configuration persistently
       savedSchedule = schedule;
+      await saveBotConfig(savedSchedule, botEnabled);
+      
       const enabledSlots = Object.entries(schedule).filter(([key, config]: [string, any]) => config.enabled);
       
       console.log(`📅 Schedule saved with ${enabledSlots.length} active time slots`);
@@ -269,6 +315,7 @@ export function registerSocialAutomationAPI(app: Express) {
       }
 
       botEnabled = enabled;
+      await saveBotConfig(savedSchedule, botEnabled);
       
       console.log(`🤖 Bot ${enabled ? 'activated' : 'deactivated'} by user`);
       

@@ -1,0 +1,45 @@
+{
+  "schedule": {
+    "earlyMorning": {
+      "enabled": false,
+      "time": "6:00 AM"
+    },
+    "breakfast": {
+      "enabled": false,
+      "time": "8:30 AM"
+    },
+    "lateMorning": {
+      "enabled": false,
+      "time": "10:00 AM"
+    },
+    "lunch": {
+      "enabled": true,
+      "time": "12:00 PM"
+    },
+    "earlyAfternoon": {
+      "enabled": true,
+      "time": "2:00 PM"
+    },
+    "lateAfternoon": {
+      "enabled": true,
+      "time": "4:30 PM"
+    },
+    "dinner": {
+      "enabled": true,
+      "time": "6:30 PM"
+    },
+    "earlyEvening": {
+      "enabled": false,
+      "time": "8:00 PM"
+    },
+    "evening": {
+      "enabled": false,
+      "time": "9:30 PM"
+    },
+    "lateNight": {
+      "enabled": false,
+      "time": "11:00 PM"
+    }
+  },
+  "botEnabled": true
+}
