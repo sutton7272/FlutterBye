@@ -330,7 +330,6 @@ function LibraryPopulationComponent({ onContentGenerated }: { onContentGenerated
 
   const autoPopulateLibrary = async () => {
     console.log('🚀 Auto-populate button clicked!');
-    alert('Auto-populate clicked! Check console for details.');
     setIsPopulating(true);
     try {
       const response = await fetch('/api/social-automation/ai-populate-library', {
@@ -370,7 +369,6 @@ function LibraryPopulationComponent({ onContentGenerated }: { onContentGenerated
 
   const generateCustomContent = async () => {
     console.log('🎯 Custom content button clicked!');
-    alert('Custom content clicked! Check console for details.');
     setIsGeneratingContent(true);
     try {
       const response = await fetch('/api/social-automation/ai-generate-content', {
