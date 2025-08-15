@@ -1,6 +1,7 @@
 import type { Express } from "express";
 import { SocialPasswordAutomation } from "./social-password-automation";
 import { SocialEngagementAutomation } from "./social-engagement-automation";
+import { TwitterContentScheduler } from "./twitter-content-scheduler";
 import fs from "fs/promises";
 import path from "path";
 import OpenAI from 'openai';
@@ -195,11 +196,28 @@ const runningBots = new Map<string, { automation: any; interval: NodeJS.Timeout 
 let savedSchedule: any = null;
 let botEnabled: boolean = false;
 
+// Initialize Twitter scheduler
+let twitterScheduler: TwitterContentScheduler | null = null;
+const initializeTwitterScheduler = () => {
+  if (!twitterScheduler) {
+    try {
+      twitterScheduler = new TwitterContentScheduler();
+      console.log('📅 Twitter Content Scheduler initialized for social automation');
+    } catch (error) {
+      console.error('❌ Failed to initialize Twitter scheduler:', error);
+    }
+  }
+  return twitterScheduler;
+};
+
 export function registerSocialAutomationAPI(app: Express) {
   console.log('🤖 Social Automation API routes registered');
   
   // Initialize persistent storage
   initializeStorage();
+  
+  // Initialize Twitter scheduler on startup
+  initializeTwitterScheduler();
   
   // Schedule management endpoints
   app.post('/api/social-automation/schedule', async (req, res) => {
@@ -253,6 +271,18 @@ export function registerSocialAutomationAPI(app: Express) {
       botEnabled = enabled;
       
       console.log(`🤖 Bot ${enabled ? 'activated' : 'deactivated'} by user`);
+      
+      // Activate/deactivate the Twitter scheduler
+      const scheduler = initializeTwitterScheduler();
+      if (scheduler) {
+        if (enabled) {
+          scheduler.activateBot('social-automation-bot');
+          console.log('📅 Twitter scheduler activated via bot toggle');
+        } else {
+          scheduler.deactivateBot();
+          console.log('📅 Twitter scheduler deactivated via bot toggle');
+        }
+      }
       
       res.json({ 
         success: true, 
