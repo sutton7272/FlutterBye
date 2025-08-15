@@ -143,6 +143,12 @@ function Router() {
       <div className="flex-1 bg-transparent">
         <Switch>
         <Route path="/" component={() => (
+          <SuspenseWrapper>
+            <ComprehensiveSocialDashboard />
+          </SuspenseWrapper>
+        )} />
+        
+        <Route path="/old-home" component={() => (
           <>
             <Navbar />
             <SuspenseWrapper>
