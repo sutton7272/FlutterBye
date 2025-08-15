@@ -18,22 +18,23 @@ export class TwitterContentScheduler {
   private isActive = false;
   private activeBotConfigId?: string;
   private postingSchedule: any = {
-    earlyMorning: { enabled: true, time: '06:00' },
-    breakfast: { enabled: true, time: '08:30' },
-    lateMorning: { enabled: false, time: '10:00' },
-    lunch: { enabled: true, time: '12:00' },
-    earlyAfternoon: { enabled: false, time: '14:00' },
-    lateAfternoon: { enabled: true, time: '16:00' },
-    dinner: { enabled: true, time: '18:30' },
-    earlyEvening: { enabled: false, time: '20:00' },
-    evening: { enabled: true, time: '21:30' },
-    lateNight: { enabled: false, time: '23:00' }
+    earlyMorning: { enabled: true, time: '6:00 AM' },
+    breakfast: { enabled: true, time: '8:30 AM' },
+    lateMorning: { enabled: true, time: '10:00 AM' },
+    lunch: { enabled: true, time: '12:00 PM' },
+    earlyAfternoon: { enabled: true, time: '2:00 PM' },
+    lateAfternoon: { enabled: true, time: '4:30 PM' },
+    dinner: { enabled: true, time: '6:30 PM' },
+    earlyEvening: { enabled: true, time: '8:00 PM' },
+    evening: { enabled: true, time: '9:30 PM' },
+    lateNight: { enabled: true, time: '11:00 PM' }
   };
 
   constructor() {
     try {
       this.twitterService = new TwitterAPIService();
       this.isInitialized = true;
+      this.isActive = true; // Auto-enable the bot
       this.startScheduler();
       console.log('📅 Twitter Content Scheduler initialized');
     } catch (error) {
@@ -62,6 +63,71 @@ export class TwitterContentScheduler {
     });
 
     console.log('🔄 Twitter scheduler active - checking every minute');
+    
+    // Also run an immediate check when starting
+    setTimeout(() => this.checkScheduleAndPost(), 5000);
+  }
+
+  private async checkScheduleAndPost() {
+    if (!this.isActive) return;
+    
+    const now = new Date();
+    const hours = now.getHours();
+    const minutes = now.getMinutes();
+    const currentTime = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+    
+    console.log(`⏰ Checking current time ${currentTime} against schedule...`);
+    
+    // Check if current time matches any enabled schedule slot
+    const enabledSlots = Object.entries(this.postingSchedule)
+      .filter(([key, config]) => config.enabled);
+    
+    for (const [slotName, config] of enabledSlots) {
+      const slotTime = config.time;
+      if (this.timeMatches(currentTime, slotTime)) {
+        console.log(`🎯 Time match! Posting for slot: ${slotName} at ${slotTime}`);
+        await this.createAndPostContent();
+        break;
+      }
+    }
+  }
+
+  private timeMatches(currentTime: string, scheduleTime: string): boolean {
+    // Convert 12-hour format to 24-hour format
+    const convert24Hour = (timeStr: string) => {
+      const [time, period] = timeStr.split(' ');
+      let [hours, minutes] = time.split(':').map(Number);
+      
+      if (period === 'PM' && hours !== 12) {
+        hours += 12;
+      } else if (period === 'AM' && hours === 12) {
+        hours = 0;
+      }
+      
+      return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+    };
+
+    const converted = convert24Hour(scheduleTime);
+    return currentTime === converted;
+  }
+
+  private async createAndPostContent() {
+    try {
+      console.log('🤖 Creating and posting new content...');
+      
+      const content = await aiContentGenerator.generateContent({
+        category: 'technology',
+        includeHashtags: true,
+        customPrompt: 'FlutterBye social media automation with AI-powered optimization'
+      });
+
+      const postResult = await this.twitterService.postTweet(content.content);
+      console.log(`✅ Successfully posted: ${content.content.substring(0, 50)}...`);
+      
+      return postResult;
+    } catch (error) {
+      console.error('❌ Error creating/posting content:', error);
+    }
   }
 
   private async checkAndPostScheduledContent() {
@@ -70,6 +136,9 @@ export class TwitterContentScheduler {
       console.log(`🔄 Scheduler check - Bot active: ${this.isActive}, Pending posts: ${pendingPosts.length}`);
       
       if (!this.isActive) return; // Only check if bot is active
+      
+      // Force create and post content at scheduled times
+      await this.checkScheduleAndPost();
       
       const now = new Date();
       const readyPosts = pendingPosts.filter(post => 
