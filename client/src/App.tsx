@@ -146,7 +146,7 @@ function Router() {
           <>
             <Navbar />
             <SuspenseWrapper>
-              <SocialAutomationDashboard />
+              <ComprehensiveSocialDashboard />
             </SuspenseWrapper>
           </>
         )} />
