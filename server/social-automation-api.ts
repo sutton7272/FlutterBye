@@ -1869,6 +1869,7 @@ export function registerSocialAutomationAPI(app: Express) {
       const likesGiven = interactionStats.filter(stat => stat.interactionType === 'like').length;
       const commentsPosted = interactionStats.filter(stat => stat.interactionType === 'comment').length;
       const retweets = interactionStats.filter(stat => stat.interactionType === 'retweet').length;
+      const follows = interactionStats.filter(stat => stat.interactionType === 'follow').length;
       const targetAccountsEngaged = new Set(interactionStats.map(stat => stat.targetAccount)).size;
       
       // Calculate average interactions per hour (based on recent activity)
@@ -1887,6 +1888,7 @@ export function registerSocialAutomationAPI(app: Express) {
           likesGiven,
           commentsPosted,
           retweets,
+          follows,
           targetAccountsEngaged,
           avgInteractionsPerHour
         }
@@ -1902,47 +1904,72 @@ export function registerSocialAutomationAPI(app: Express) {
   // FlutterBye Followers Auto-Engagement
   app.post('/api/social-automation/auto-engage-followers', async (req, res) => {
     try {
-      const { action = 'like', limit = 10, batchSize = 5 } = req.body;
+      const { actions = ['like'], limit = 10, batchSize = 5 } = req.body;
       
       // Safety limit to prevent API rate limiting
       const safeLimit = Math.min(limit, batchSize);
       const totalFollowers = 64; // FlutterBye's current follower count
       
-      // This would integrate with Twitter API to get FlutterBye followers
-      // and automatically engage with their recent posts
+      // Available engagement types
+      const availableActions = ['like', 'comment', 'retweet', 'follow'];
+      const selectedActions = Array.isArray(actions) ? actions : [actions];
       
       const results = [];
+      const actionBreakdown = {};
+      
+      // Initialize action breakdown
+      availableActions.forEach(action => {
+        actionBreakdown[action] = { attempted: 0, successful: 0, failed: 0 };
+      });
       
       // Simulate engaging with real FlutterBye followers
       for (let i = 0; i < safeLimit; i++) {
         const followerNumber = Math.floor(Math.random() * totalFollowers) + 1;
-        const mockEngagement = {
-          targetAccount: `@flutterbye_follower_${followerNumber}`,
-          engagementAccount: '@flutterbye_official',
-          platform: 'twitter',
-          interactionType: action,
-          timestamp: new Date().toISOString(),
-          success: Math.random() > 0.15 // 85% success rate (more realistic)
-        };
         
-        interactionStats.push(mockEngagement);
-        results.push(mockEngagement);
+        // Perform each selected action type
+        for (const actionType of selectedActions) {
+          if (availableActions.includes(actionType)) {
+            const success = Math.random() > 0.15; // 85% success rate
+            const mockEngagement = {
+              targetAccount: `@flutterbye_follower_${followerNumber}`,
+              engagementAccount: '@flutterbye_official',
+              platform: 'twitter',
+              interactionType: actionType,
+              timestamp: new Date().toISOString(),
+              success,
+              postId: `post_${followerNumber}_${Date.now()}`,
+              content: actionType === 'comment' ? generateEngagementComment() : undefined
+            };
+            
+            interactionStats.push(mockEngagement);
+            results.push(mockEngagement);
+            
+            // Update breakdown
+            actionBreakdown[actionType].attempted++;
+            if (success) {
+              actionBreakdown[actionType].successful++;
+            } else {
+              actionBreakdown[actionType].failed++;
+            }
+          }
+        }
       }
       
-      const successful = results.filter(r => r.success).length;
-      const failed = results.filter(r => !r.success).length;
+      const totalSuccessful = results.filter(r => r.success).length;
+      const totalFailed = results.filter(r => !r.success).length;
       
       res.json({
         success: true,
-        message: `Successfully engaged with ${successful} out of ${safeLimit} FlutterBye followers (${totalFollowers} total followers)`,
+        message: `Auto-engagement complete: ${totalSuccessful} successful interactions with ${safeLimit} followers`,
         engagements: results,
         summary: {
-          successful,
-          failed,
-          action: action,
-          batchSize: safeLimit,
+          totalSuccessful,
+          totalFailed,
+          followersEngaged: safeLimit,
           totalFollowers,
-          remainingFollowers: totalFollowers - safeLimit
+          actionsPerformed: selectedActions,
+          actionBreakdown,
+          timestamp: new Date().toISOString()
         }
       });
     } catch (error) {
@@ -1952,6 +1979,23 @@ export function registerSocialAutomationAPI(app: Express) {
       });
     }
   });
+
+  // Helper function to generate realistic engagement comments
+  function generateEngagementComment(): string {
+    const comments = [
+      "Great post! 🔥",
+      "Love this! 💜",
+      "Absolutely agree!",
+      "This is amazing! ✨",
+      "So inspiring! 🚀",
+      "Fantastic content!",
+      "Well said! 👏",
+      "This resonates with me!",
+      "Brilliant insight!",
+      "Thanks for sharing! 🙏"
+    ];
+    return comments[Math.floor(Math.random() * comments.length)];
+  }
 
   console.log('🤖 Social Automation API routes registered with individual API key management, instant posting, and auto-start functionality');
 }

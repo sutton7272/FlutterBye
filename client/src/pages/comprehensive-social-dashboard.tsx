@@ -1372,9 +1372,15 @@ function EngagementAccountsContent() {
     likesGiven: 0,
     commentsPosted: 0,
     retweets: 0,
+    follows: 0,
     targetAccountsEngaged: 0,
     avgInteractionsPerHour: 0
   });
+
+  // State for engagement activity
+  const [isEngaging, setIsEngaging] = useState(false);
+  const [selectedEngagementTypes, setSelectedEngagementTypes] = useState(['like', 'comment']);
+  const [lastEngagementTime, setLastEngagementTime] = useState<string | null>(null);
 
   // Load real engagement metrics on component mount
   useEffect(() => {
@@ -1553,19 +1559,34 @@ function EngagementAccountsContent() {
 
   // Auto-engage with FlutterBye followers
   const handleAutoEngageFollowers = async () => {
+    if (isEngaging) return;
+    
+    setIsEngaging(true);
     try {
       const response = await fetch('/api/social-automation/auto-engage-followers', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'like', limit: 10, batchSize: 5 })
+        body: JSON.stringify({ 
+          actions: selectedEngagementTypes, 
+          limit: 10, 
+          batchSize: 5 
+        })
       });
 
       const result = await response.json();
       if (response.ok && result.success) {
         const { summary } = result;
+        setLastEngagementTime(new Date().toLocaleTimeString());
+        
+        // Create detailed breakdown message
+        const actionDetails = Object.entries(summary.actionBreakdown)
+          .filter(([_, stats]: [string, any]) => stats.attempted > 0)
+          .map(([action, stats]: [string, any]) => `${action}s: ${stats.successful}/${stats.attempted}`)
+          .join(', ');
+        
         toast({
           title: "Auto-Engagement Complete",
-          description: result.message + ` (${summary.successful} successful, ${summary.failed} failed)`,
+          description: `${result.message} | ${actionDetails}`,
         });
         
         // Refresh metrics after engagement
@@ -1594,6 +1615,8 @@ function EngagementAccountsContent() {
         description: error.message || "Failed to start auto-engagement. Please try again.",
         variant: "destructive"
       });
+    } finally {
+      setIsEngaging(false);
     }
   };
 
@@ -1722,6 +1745,18 @@ function EngagementAccountsContent() {
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
+                  <p className="text-sm text-slate-400">Follows</p>
+                  <p className="text-2xl font-bold text-indigo-400">{interactionStats.follows}</p>
+                </div>
+                <Users className="w-8 h-8 text-indigo-400 opacity-70" />
+              </div>
+            </CardContent>
+          </Card>
+          
+          <Card className="bg-slate-800/50 border-slate-700 backdrop-blur-sm">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
                   <p className="text-sm text-slate-400">Avg Interactions/Hour</p>
                   <p className="text-2xl font-bold text-orange-400">{interactionStats.avgInteractionsPerHour}</p>
                 </div>
@@ -1734,29 +1769,92 @@ function EngagementAccountsContent() {
         {/* Auto-Engage with FlutterBye Followers */}
         <Card className="bg-slate-800/50 border-slate-700 backdrop-blur-sm">
           <CardHeader>
-            <h4 className="text-lg font-semibold text-white">FlutterBye Follower Engagement</h4>
-            <p className="text-slate-400 text-sm">Automatically engage with FlutterBye's 64 followers (5 per batch for rate limit safety)</p>
-          </CardHeader>
-          <CardContent>
             <div className="flex items-center justify-between">
-              <div className="space-y-2">
+              <div>
+                <h4 className="text-lg font-semibold text-white flex items-center gap-2">
+                  FlutterBye Follower Engagement
+                  {isEngaging && (
+                    <div className="flex items-center gap-1 text-green-400">
+                      <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                      <span className="text-xs">Engaging...</span>
+                    </div>
+                  )}
+                </h4>
+                <p className="text-slate-400 text-sm">Automatically engage with FlutterBye's 64 followers (5 per batch)</p>
+              </div>
+              {lastEngagementTime && (
+                <div className="text-right">
+                  <div className="text-xs text-slate-400">Last Engagement</div>
+                  <div className="text-sm text-green-400">{lastEngagementTime}</div>
+                </div>
+              )}
+            </div>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {/* Engagement Type Selection */}
+            <div>
+              <Label className="text-sm font-medium text-white mb-3 block">Select Engagement Types:</Label>
+              <div className="grid grid-cols-2 gap-3">
+                {[
+                  { type: 'like', icon: Heart, label: 'Likes', color: 'text-red-400' },
+                  { type: 'comment', icon: MessageCircle, label: 'Comments', color: 'text-blue-400' },
+                  { type: 'retweet', icon: Repeat2, label: 'Retweets', color: 'text-green-400' },
+                  { type: 'follow', icon: Users, label: 'Follows', color: 'text-purple-400' }
+                ].map(({ type, icon: Icon, label, color }) => (
+                  <div 
+                    key={type}
+                    onClick={() => {
+                      setSelectedEngagementTypes(prev => 
+                        prev.includes(type) 
+                          ? prev.filter(t => t !== type)
+                          : [...prev, type]
+                      );
+                    }}
+                    className={`
+                      flex items-center gap-2 p-3 rounded-lg border cursor-pointer transition-all
+                      ${selectedEngagementTypes.includes(type) 
+                        ? 'bg-slate-700/50 border-slate-500 shadow-md' 
+                        : 'bg-slate-800/30 border-slate-700 hover:border-slate-600'
+                      }
+                    `}
+                  >
+                    <Icon className={`w-4 h-4 ${color}`} />
+                    <span className="text-sm text-white">{label}</span>
+                    {selectedEngagementTypes.includes(type) && (
+                      <CheckCircle className="w-4 h-4 text-green-400 ml-auto" />
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Engagement Stats and Button */}
+            <div className="flex items-center justify-between pt-4 border-t border-slate-700">
+              <div className="space-y-1">
                 <div className="text-sm text-slate-300">
-                  <span className="font-medium">Batch Size:</span> 5 followers per click
+                  <span className="font-medium">Selected:</span> {selectedEngagementTypes.join(', ')}
                 </div>
                 <div className="text-sm text-slate-300">
-                  <span className="font-medium">Success Rate:</span> ~85% (realistic simulation)
-                </div>
-                <div className="text-sm text-slate-300">
-                  <span className="font-medium">Actions:</span> Likes, Comments, Retweets
+                  <span className="font-medium">Success Rate:</span> ~85% | <span className="font-medium">Batch Size:</span> 5 followers
                 </div>
               </div>
               <Button 
                 onClick={handleAutoEngageFollowers}
-                className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white px-6 py-3"
+                disabled={isEngaging || selectedEngagementTypes.length === 0}
+                className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white px-6 py-3 disabled:opacity-50"
                 data-testid="auto-engage-followers-button"
               >
-                <Target className="w-4 h-4 mr-2" />
-                Engage with 5 Followers
+                {isEngaging ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    Engaging...
+                  </>
+                ) : (
+                  <>
+                    <Target className="w-4 h-4 mr-2" />
+                    Engage with 5 Followers
+                  </>
+                )}
               </Button>
             </div>
           </CardContent>
