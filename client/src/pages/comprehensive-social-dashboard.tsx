@@ -1349,7 +1349,9 @@ function EngagementAccountsContent() {
   const [newTargetAccount, setNewTargetAccount] = useState({
     username: '',
     platform: 'Twitter',
-    engagementType: 'all'
+    engagementType: 'all',
+    accountType: 'target',
+    apiKeys: {}
   });
   
   // State for API keys management
@@ -1371,8 +1373,46 @@ function EngagementAccountsContent() {
     commentsPosted: 0,
     retweets: 0,
     targetAccountsEngaged: 0,
-    topPerformingTargets: []
+    avgInteractionsPerHour: 0
   });
+
+  // Load real engagement metrics on component mount
+  useEffect(() => {
+    const loadEngagementMetrics = async () => {
+      try {
+        const response = await fetch('/api/social-automation/engagement-metrics');
+        if (response.ok) {
+          const data = await response.json();
+          if (data.success) {
+            setInteractionStats(data.metrics);
+          }
+        }
+      } catch (error) {
+        console.error('Failed to load engagement metrics:', error);
+      }
+    };
+
+    const loadTargetAccounts = async () => {
+      try {
+        const response = await fetch('/api/social-automation/target-accounts');
+        if (response.ok) {
+          const data = await response.json();
+          if (data.success) {
+            setTargetAccounts(data.accounts);
+          }
+        }
+      } catch (error) {
+        console.error('Failed to load target accounts:', error);
+      }
+    };
+
+    loadEngagementMetrics();
+    loadTargetAccounts();
+
+    // Refresh metrics every 30 seconds
+    const interval = setInterval(loadEngagementMetrics, 30000);
+    return () => clearInterval(interval);
+  }, []);
 
   const mockAccounts = [
     {
@@ -1388,35 +1428,7 @@ function EngagementAccountsContent() {
     }
   ];
 
-  const mockTargetAccounts = [
-    {
-      id: '1',
-      username: '@elonmusk',
-      platform: 'Twitter',
-      engagementType: 'all',
-      isActive: true,
-      addedDate: '2025-01-14T10:00:00Z',
-      interactions: 47
-    },
-    {
-      id: '2',
-      username: '@satyanadella',
-      platform: 'Twitter',
-      engagementType: 'likes',
-      isActive: true,
-      addedDate: '2025-01-13T15:30:00Z',
-      interactions: 23
-    },
-    {
-      id: '3',
-      username: '@sundarpichai',
-      platform: 'Twitter',
-      engagementType: 'comments',
-      isActive: false,
-      addedDate: '2025-01-12T09:15:00Z',
-      interactions: 15
-    }
-  ];
+
 
   const platformConfigs = {
     Twitter: {
@@ -1438,7 +1450,6 @@ function EngagementAccountsContent() {
 
   useEffect(() => {
     setAccounts(mockAccounts);
-    setTargetAccounts(mockTargetAccounts);
     
     // Load API keys
     fetch('/api/social-automation/api-keys')
@@ -1449,16 +1460,6 @@ function EngagementAccountsContent() {
         }
       })
       .catch(error => console.error('Failed to load API keys:', error));
-      
-    // Load interaction stats
-    fetch('/api/social-automation/interaction-stats')
-      .then(res => res.json())
-      .then(data => {
-        if (data.success && data.stats) {
-          setInteractionStats(data.stats);
-        }
-      })
-      .catch(error => console.error('Failed to load interaction stats:', error));
   }, []);
 
   const handleAddAccount = () => {
@@ -1515,42 +1516,80 @@ function EngagementAccountsContent() {
     }
 
     try {
+      const username = newTargetAccount.username.startsWith('@') ? newTargetAccount.username.slice(1) : newTargetAccount.username;
       const response = await fetch('/api/social-automation/target-accounts', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          username: newTargetAccount.username.startsWith('@') ? newTargetAccount.username : `@${newTargetAccount.username}`,
+          username: username,
           platform: newTargetAccount.platform,
-          engagementType: newTargetAccount.engagementType
+          engagementType: newTargetAccount.engagementType,
+          accountType: newTargetAccount.accountType || 'target',
+          displayName: `@${username}`,
+          apiKeys: newTargetAccount.accountType === 'engagement' ? newTargetAccount.apiKeys : undefined
         })
       });
 
-      if (response.ok) {
-        const result = await response.json();
-        if (result.success) {
-          setTargetAccounts(prev => [...prev, {
-            id: Date.now().toString(),
-            username: newTargetAccount.username.startsWith('@') ? newTargetAccount.username : `@${newTargetAccount.username}`,
-            platform: newTargetAccount.platform,
-            engagementType: newTargetAccount.engagementType,
-            isActive: true,
-            addedDate: new Date().toISOString(),
-            interactions: 0
-          }]);
-          setNewTargetAccount({ username: '', platform: 'Twitter', engagementType: 'all' });
-          setShowAddTarget(false);
-          toast({
-            title: "Target Account Added",
-            description: `${newTargetAccount.username} has been added to your engagement targets`,
-          });
-        }
+      const result = await response.json();
+      if (response.ok && result.success) {
+        setTargetAccounts(prev => [...prev, result.account]);
+        setNewTargetAccount({ username: '', platform: 'Twitter', engagementType: 'all', accountType: 'target', apiKeys: {} });
+        setShowAddTarget(false);
+        toast({
+          title: "Target Account Added",
+          description: result.message,
+        });
       } else {
-        throw new Error('Failed to add target account');
+        throw new Error(result.error || 'Failed to add target account');
       }
     } catch (error) {
       toast({
         title: "Error",
-        description: "Failed to add target account. Please try again.",
+        description: error.message || "Failed to add target account. Please try again.",
+        variant: "destructive"
+      });
+    }
+  };
+
+  // Auto-engage with FlutterBye followers
+  const handleAutoEngageFollowers = async () => {
+    try {
+      const response = await fetch('/api/social-automation/auto-engage-followers', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'like', limit: 10 })
+      });
+
+      const result = await response.json();
+      if (response.ok && result.success) {
+        toast({
+          title: "Auto-Engagement Started",
+          description: result.message,
+        });
+        // Refresh metrics after engagement
+        setTimeout(() => {
+          const loadEngagementMetrics = async () => {
+            try {
+              const metricsResponse = await fetch('/api/social-automation/engagement-metrics');
+              if (metricsResponse.ok) {
+                const data = await metricsResponse.json();
+                if (data.success) {
+                  setInteractionStats(data.metrics);
+                }
+              }
+            } catch (error) {
+              console.error('Failed to refresh metrics:', error);
+            }
+          };
+          loadEngagementMetrics();
+        }, 2000);
+      } else {
+        throw new Error(result.error || 'Failed to start auto-engagement');
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to start auto-engagement. Please try again.",
         variant: "destructive"
       });
     }
@@ -1682,12 +1721,24 @@ function EngagementAccountsContent() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-slate-400">Avg Interactions/Hour</p>
-                  <p className="text-2xl font-bold text-orange-400">{Math.round(interactionStats.totalInteractions / 24)}</p>
+                  <p className="text-2xl font-bold text-orange-400">{interactionStats.avgInteractionsPerHour}</p>
                 </div>
                 <Clock className="w-8 h-8 text-orange-400 opacity-70" />
               </div>
             </CardContent>
           </Card>
+        </div>
+        
+        {/* Auto-Engage with FlutterBye Followers */}
+        <div className="flex justify-center">
+          <Button 
+            onClick={handleAutoEngageFollowers}
+            className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white px-6 py-3"
+            data-testid="auto-engage-followers-button"
+          >
+            <Target className="w-4 h-4 mr-2" />
+            Auto-Engage with FlutterBye Followers
+          </Button>
         </div>
       </div>
 
@@ -1845,6 +1896,22 @@ function EngagementAccountsContent() {
                 </div>
 
                 <div>
+                  <Label htmlFor="account-type">Account Type</Label>
+                  <Select 
+                    value={newTargetAccount.accountType || 'target'} 
+                    onValueChange={(value) => setNewTargetAccount(prev => ({ ...prev, accountType: value }))}
+                  >
+                    <SelectTrigger className="bg-slate-700 border-slate-600" data-testid="account-type-select">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent className="bg-slate-700 border-slate-600">
+                      <SelectItem value="target">Target Account (to engage with)</SelectItem>
+                      <SelectItem value="engagement">Engagement Account (with own API keys)</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div>
                   <Label htmlFor="engagement-type">Engagement Type</Label>
                   <Select 
                     value={newTargetAccount.engagementType} 
@@ -1861,6 +1928,71 @@ function EngagementAccountsContent() {
                     </SelectContent>
                   </Select>
                 </div>
+
+                {/* API Keys section for engagement accounts */}
+                {newTargetAccount.accountType === 'engagement' && (
+                  <div className="space-y-3 border-t border-slate-600 pt-4">
+                    <h4 className="text-sm font-medium text-white">Twitter API Keys (Required for Engagement Account)</h4>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <Label htmlFor="api-key">API Key</Label>
+                        <Input
+                          id="api-key"
+                          type="password"
+                          placeholder="Twitter API Key"
+                          value={newTargetAccount.apiKeys?.apiKey || ''}
+                          onChange={(e) => setNewTargetAccount(prev => ({ 
+                            ...prev, 
+                            apiKeys: { ...prev.apiKeys, apiKey: e.target.value }
+                          }))}
+                          className="bg-slate-700 border-slate-600"
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="api-secret">API Secret</Label>
+                        <Input
+                          id="api-secret"
+                          type="password"
+                          placeholder="Twitter API Secret"
+                          value={newTargetAccount.apiKeys?.apiSecret || ''}
+                          onChange={(e) => setNewTargetAccount(prev => ({ 
+                            ...prev, 
+                            apiKeys: { ...prev.apiKeys, apiSecret: e.target.value }
+                          }))}
+                          className="bg-slate-700 border-slate-600"
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="access-token">Access Token</Label>
+                        <Input
+                          id="access-token"
+                          type="password"
+                          placeholder="Twitter Access Token"
+                          value={newTargetAccount.apiKeys?.accessToken || ''}
+                          onChange={(e) => setNewTargetAccount(prev => ({ 
+                            ...prev, 
+                            apiKeys: { ...prev.apiKeys, accessToken: e.target.value }
+                          }))}
+                          className="bg-slate-700 border-slate-600"
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="access-token-secret">Access Token Secret</Label>
+                        <Input
+                          id="access-token-secret"
+                          type="password"
+                          placeholder="Twitter Access Token Secret"
+                          value={newTargetAccount.apiKeys?.accessTokenSecret || ''}
+                          onChange={(e) => setNewTargetAccount(prev => ({ 
+                            ...prev, 
+                            apiKeys: { ...prev.apiKeys, accessTokenSecret: e.target.value }
+                          }))}
+                          className="bg-slate-700 border-slate-600"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                )}
 
                 <div className="flex gap-3 pt-4">
                   <Button 
