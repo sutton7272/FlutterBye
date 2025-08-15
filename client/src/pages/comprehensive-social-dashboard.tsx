@@ -349,6 +349,7 @@ function LibraryPopulationComponent({ onContentGenerated }: { onContentGenerated
           description: `Generated ${result.content.length} AI items for your content library`,
           variant: "default"
         });
+        console.log('Auto-populate success, calling onContentGenerated...');
         onContentGenerated?.();
       } else {
         throw new Error(result.error || 'Failed to populate library');
@@ -389,6 +390,7 @@ function LibraryPopulationComponent({ onContentGenerated }: { onContentGenerated
           variant: "default"
         });
         setCustomTopic('');
+        console.log('Custom content success, calling onContentGenerated...');
         onContentGenerated?.();
       } else {
         throw new Error(result.error || 'Failed to generate content');
@@ -427,6 +429,7 @@ function LibraryPopulationComponent({ onContentGenerated }: { onContentGenerated
           variant: "default"
         });
         setVisualPrompt('');
+        console.log('Visual generation success, calling onContentGenerated...');
         onContentGenerated?.();
       } else {
         throw new Error(result.error || 'Failed to generate visuals');
@@ -2433,6 +2436,7 @@ function ContentLibraryContent({ refreshTrigger }: { refreshTrigger?: number }) 
   };
 
   useEffect(() => {
+    console.log('ContentLibraryContent: fetchContentItems triggered, refreshTrigger =', refreshTrigger);
     fetchContentItems();
   }, [refreshTrigger]);
   const [showUpload, setShowUpload] = useState(false);
@@ -4778,11 +4782,12 @@ function UnifiedContentAndAI() {
   const [refreshTrigger, setRefreshTrigger] = useState(0);
   
   const triggerRefresh = () => {
+    console.log('Triggering content refresh...');
     setRefreshTrigger(prev => prev + 1);
     // Switch to library tab to show new content
     setTimeout(() => {
       setActiveContentTab('library');
-    }, 1000);
+    }, 500);
   };
 
   return (
