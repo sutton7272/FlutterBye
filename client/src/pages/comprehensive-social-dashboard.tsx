@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -53,6 +53,7 @@ import {
   Copy,
   Sparkles,
   RefreshCw,
+  Loader2,
   Send,
   Info
 } from 'lucide-react';
@@ -328,6 +329,8 @@ function LibraryPopulationComponent({ onContentGenerated }: { onContentGenerated
   ];
 
   const autoPopulateLibrary = async () => {
+    console.log('🚀 Auto-populate button clicked!');
+    alert('Auto-populate clicked! Check console for details.');
     setIsPopulating(true);
     try {
       const response = await fetch('/api/social-automation/ai-populate-library', {
@@ -366,6 +369,8 @@ function LibraryPopulationComponent({ onContentGenerated }: { onContentGenerated
   };
 
   const generateCustomContent = async () => {
+    console.log('🎯 Custom content button clicked!');
+    alert('Custom content clicked! Check console for details.');
     setIsGeneratingContent(true);
     try {
       const response = await fetch('/api/social-automation/ai-generate-content', {
