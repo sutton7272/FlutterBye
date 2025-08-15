@@ -2052,6 +2052,25 @@ function InteractionStatsContent() {
 function ContentLibraryContent() {
   const { toast } = useToast();
   const [contentItems, setContentItems] = useState<any[]>([]);
+
+  // Fetch content items on component mount
+  useEffect(() => {
+    const fetchContentItems = async () => {
+      try {
+        const response = await fetch('/api/social-automation/content');
+        if (response.ok) {
+          const result = await response.json();
+          if (result.success) {
+            setContentItems(result.content || []);
+          }
+        }
+      } catch (error) {
+        console.error('Failed to fetch content items:', error);
+      }
+    };
+
+    fetchContentItems();
+  }, []);
   const [showUpload, setShowUpload] = useState(false);
   const [generating, setGenerating] = useState(false);
   const [uploading, setUploading] = useState(false);
