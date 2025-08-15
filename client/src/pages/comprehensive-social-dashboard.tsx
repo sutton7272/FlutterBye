@@ -300,6 +300,360 @@ function ScheduleConfigDialog() {
   );
 }
 
+// AI Content Library Population Component
+function LibraryPopulationComponent() {
+  const [isPopulating, setIsPopulating] = useState(false);
+  const [isGeneratingContent, setIsGeneratingContent] = useState(false);
+  const [isGeneratingVisuals, setIsGeneratingVisuals] = useState(false);
+  const [selectedTopics, setSelectedTopics] = useState<string[]>(['AI technology', 'Social media trends']);
+  const [selectedPlatforms, setSelectedPlatforms] = useState<string[]>(['twitter', 'instagram']);
+  const [includeVisuals, setIncludeVisuals] = useState(true);
+  const [customTopic, setCustomTopic] = useState('');
+  const [visualPrompt, setVisualPrompt] = useState('');
+  const [batchSize, setBatchSize] = useState(3);
+  
+  const { toast } = useToast();
+
+  const topicOptions = [
+    'AI technology', 'Social media trends', 'Business growth', 
+    'FlutterBye features', 'Blockchain innovation', 'Web3 adoption',
+    'Digital transformation', 'Cryptocurrency news', 'Tech startup life',
+    'Product updates', 'Community engagement', 'Market insights'
+  ];
+
+  const platformOptions = [
+    { id: 'twitter', label: 'Twitter', desc: 'Short, engaging posts' },
+    { id: 'instagram', label: 'Instagram', desc: 'Visual-first content' },
+    { id: 'linkedin', label: 'LinkedIn', desc: 'Professional tone' }
+  ];
+
+  const autoPopulateLibrary = async () => {
+    setIsPopulating(true);
+    try {
+      const response = await fetch('/api/social-automation/ai-populate-library', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          topics: selectedTopics,
+          platforms: selectedPlatforms,
+          contentTypes: ['text', 'template'],
+          includeVisuals
+        })
+      });
+
+      const result = await response.json();
+      
+      if (result.success) {
+        toast({
+          title: "Library Auto-Populated!",
+          description: `Generated ${result.content.length} AI items for your content library`,
+          variant: "default"
+        });
+      } else {
+        throw new Error(result.error || 'Failed to populate library');
+      }
+    } catch (error: any) {
+      toast({
+        title: "Auto-Population Failed",
+        description: error.message || "Failed to populate content library",
+        variant: "destructive"
+      });
+    } finally {
+      setIsPopulating(false);
+    }
+  };
+
+  const generateCustomContent = async () => {
+    setIsGeneratingContent(true);
+    try {
+      const response = await fetch('/api/social-automation/ai-generate-content', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          topic: customTopic,
+          platform: selectedPlatforms[0] || 'twitter',
+          tone: 'engaging',
+          category: 'Custom Generated',
+          includeImage: includeVisuals,
+          batchSize
+        })
+      });
+
+      const result = await response.json();
+      
+      if (result.success) {
+        toast({
+          title: "Custom Content Generated!",
+          description: `Created ${result.content.length} custom content items`,
+          variant: "default"
+        });
+        setCustomTopic('');
+      } else {
+        throw new Error(result.error || 'Failed to generate content');
+      }
+    } catch (error: any) {
+      toast({
+        title: "Content Generation Failed",
+        description: error.message || "Failed to generate custom content",
+        variant: "destructive"
+      });
+    } finally {
+      setIsGeneratingContent(false);
+    }
+  };
+
+  const generateVisuals = async () => {
+    setIsGeneratingVisuals(true);
+    try {
+      const response = await fetch('/api/social-automation/ai-generate-visuals', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          imagePrompt: visualPrompt,
+          style: 'modern',
+          category: 'AI Generated Visuals',
+          batchSize
+        })
+      });
+
+      const result = await response.json();
+      
+      if (result.success) {
+        toast({
+          title: "Visuals Generated!",
+          description: `Created ${result.content.length} AI-generated visuals`,
+          variant: "default"
+        });
+        setVisualPrompt('');
+      } else {
+        throw new Error(result.error || 'Failed to generate visuals');
+      }
+    } catch (error: any) {
+      toast({
+        title: "Visual Generation Failed",
+        description: error.message || "Failed to generate visuals",
+        variant: "destructive"
+      });
+    } finally {
+      setIsGeneratingVisuals(false);
+    }
+  };
+
+  return (
+    <Card className="bg-gradient-to-br from-blue-900/20 to-purple-900/20 border-blue-500/30 backdrop-blur-sm">
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <Brain className="w-6 h-6 text-blue-400" />
+          AI Content Library Auto-Population
+        </CardTitle>
+        <CardDescription>
+          Let AI automatically generate and populate your content library with engaging posts and visuals
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-6">
+        {/* Auto-Population Section */}
+        <div className="space-y-4">
+          <h4 className="text-lg font-semibold text-white flex items-center gap-2">
+            <Zap className="w-5 h-5 text-yellow-400" />
+            Smart Auto-Population
+          </h4>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Topic Selection */}
+            <div className="space-y-2">
+              <Label className="text-slate-300">Content Topics</Label>
+              <div className="grid grid-cols-2 gap-2 max-h-32 overflow-y-auto">
+                {topicOptions.map(topic => (
+                  <label key={topic} className="flex items-center space-x-2 text-sm">
+                    <input
+                      type="checkbox"
+                      checked={selectedTopics.includes(topic)}
+                      onChange={(e) => {
+                        if (e.target.checked) {
+                          setSelectedTopics([...selectedTopics, topic]);
+                        } else {
+                          setSelectedTopics(selectedTopics.filter(t => t !== topic));
+                        }
+                      }}
+                      className="rounded bg-slate-700 border-slate-600"
+                    />
+                    <span className="text-slate-300">{topic}</span>
+                  </label>
+                ))}
+              </div>
+            </div>
+
+            {/* Platform Selection */}
+            <div className="space-y-2">
+              <Label className="text-slate-300">Target Platforms</Label>
+              <div className="space-y-2">
+                {platformOptions.map(platform => (
+                  <label key={platform.id} className="flex items-center space-x-2 text-sm">
+                    <input
+                      type="checkbox"
+                      checked={selectedPlatforms.includes(platform.id)}
+                      onChange={(e) => {
+                        if (e.target.checked) {
+                          setSelectedPlatforms([...selectedPlatforms, platform.id]);
+                        } else {
+                          setSelectedPlatforms(selectedPlatforms.filter(p => p !== platform.id));
+                        }
+                      }}
+                      className="rounded bg-slate-700 border-slate-600"
+                    />
+                    <div>
+                      <span className="text-slate-300 font-medium">{platform.label}</span>
+                      <div className="text-xs text-slate-500">{platform.desc}</div>
+                    </div>
+                  </label>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-2">
+              <input
+                type="checkbox"
+                checked={includeVisuals}
+                onChange={(e) => setIncludeVisuals(e.target.checked)}
+                className="rounded bg-slate-700 border-slate-600"
+              />
+              <Label className="text-slate-300">Include AI-generated visuals</Label>
+            </div>
+            
+            <Button 
+              onClick={autoPopulateLibrary}
+              disabled={isPopulating || selectedTopics.length === 0 || selectedPlatforms.length === 0}
+              className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+            >
+              {isPopulating ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Populating...
+                </>
+              ) : (
+                <>
+                  <Sparkles className="w-4 h-4 mr-2" />
+                  Auto-Populate Library
+                </>
+              )}
+            </Button>
+          </div>
+        </div>
+
+        {/* Custom Content Generation */}
+        <div className="border-t border-slate-600 pt-4 space-y-4">
+          <h4 className="text-lg font-semibold text-white flex items-center gap-2">
+            <Edit className="w-5 h-5 text-green-400" />
+            Custom Content Generation
+          </h4>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-3">
+              <div>
+                <Label className="text-slate-300">Custom Topic</Label>
+                <Input
+                  value={customTopic}
+                  onChange={(e) => setCustomTopic(e.target.value)}
+                  placeholder="Enter your custom topic..."
+                  className="bg-slate-700/50 border-slate-600"
+                />
+              </div>
+              
+              <div>
+                <Label className="text-slate-300">Batch Size: {batchSize}</Label>
+                <input
+                  type="range"
+                  min="1"
+                  max="10"
+                  value={batchSize}
+                  onChange={(e) => setBatchSize(parseInt(e.target.value))}
+                  className="w-full"
+                />
+              </div>
+              
+              <Button 
+                onClick={generateCustomContent}
+                disabled={isGeneratingContent || !customTopic.trim()}
+                className="w-full bg-green-600 hover:bg-green-700"
+              >
+                {isGeneratingContent ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    Generating...
+                  </>
+                ) : (
+                  <>
+                    <FileText className="w-4 h-4 mr-2" />
+                    Generate Content
+                  </>
+                )}
+              </Button>
+            </div>
+
+            {/* Visual Generation */}
+            <div className="space-y-3">
+              <div>
+                <Label className="text-slate-300">Visual Prompt</Label>
+                <Input
+                  value={visualPrompt}
+                  onChange={(e) => setVisualPrompt(e.target.value)}
+                  placeholder="Describe the visual you want..."
+                  className="bg-slate-700/50 border-slate-600"
+                />
+              </div>
+              
+              <div className="text-sm text-slate-400">
+                Generate {batchSize} visual{batchSize > 1 ? 's' : ''}
+              </div>
+              
+              <Button 
+                onClick={generateVisuals}
+                disabled={isGeneratingVisuals || !visualPrompt.trim()}
+                className="w-full bg-purple-600 hover:bg-purple-700"
+              >
+                {isGeneratingVisuals ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    Creating Visuals...
+                  </>
+                ) : (
+                  <>
+                    <Image className="w-4 h-4 mr-2" />
+                    Generate Visuals
+                  </>
+                )}
+              </Button>
+            </div>
+          </div>
+        </div>
+
+        {/* AI Features Overview */}
+        <div className="border-t border-slate-600 pt-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
+            <div className="bg-slate-700/30 rounded-lg p-3">
+              <FileText className="w-6 h-6 mx-auto mb-2 text-blue-400" />
+              <div className="text-sm font-medium text-white">Smart Content</div>
+              <div className="text-xs text-slate-400">Platform-optimized posts</div>
+            </div>
+            <div className="bg-slate-700/30 rounded-lg p-3">
+              <Image className="w-6 h-6 mx-auto mb-2 text-purple-400" />
+              <div className="text-sm font-medium text-white">AI Visuals</div>
+              <div className="text-xs text-slate-400">Professional graphics</div>
+            </div>
+            <div className="bg-slate-700/30 rounded-lg p-3">
+              <Target className="w-6 h-6 mx-auto mb-2 text-green-400" />
+              <div className="text-sm font-medium text-white">Auto-Optimization</div>
+              <div className="text-xs text-slate-400">Engagement-focused</div>
+            </div>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
 // Component for AI Content Generation
 function AIContentGenerator() {
   const [isGenerating, setIsGenerating] = useState(false);
@@ -570,6 +924,9 @@ function AIContentGenerator() {
 
   return (
     <div className="space-y-6">
+      {/* AI Content Library Population */}
+      <LibraryPopulationComponent />
+      
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">

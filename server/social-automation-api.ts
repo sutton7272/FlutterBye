@@ -3,6 +3,7 @@ import { SocialPasswordAutomation } from "./social-password-automation";
 import { SocialEngagementAutomation } from "./social-engagement-automation";
 import fs from "fs/promises";
 import path from "path";
+import OpenAI from 'openai';
 
 // Storage for social accounts and bots (in production, use database)
 interface SocialAccount {
@@ -162,6 +163,11 @@ let apiKeys: APIKeys = {
   tiktok: '',
   openai: ''
 };
+
+// Initialize OpenAI for content generation
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY
+});
 
 // Initialize storage on startup
 const initializeStorage = async () => {
@@ -1003,6 +1009,346 @@ export function registerSocialAutomationAPI(app: Express) {
       });
     }
   });
+
+  // AI Content Generation Endpoints
+  app.post('/api/social-automation/ai-generate-content', async (req, res) => {
+    try {
+      const { 
+        contentType = 'text', 
+        topic, 
+        platform = 'twitter', 
+        tone = 'engaging', 
+        category = 'AI Generated',
+        includeImage = false,
+        batchSize = 1
+      } = req.body;
+
+      if (!topic) {
+        return res.status(400).json({ 
+          success: false, 
+          error: 'Topic is required for AI content generation' 
+        });
+      }
+
+      console.log(`🤖 AI generating ${batchSize} ${contentType} content about: ${topic}`);
+
+      const generatedContent = [];
+
+      for (let i = 0; i < batchSize; i++) {
+        try {
+          // Generate text content
+          const textPrompt = `Create ${tone} social media content for ${platform} about ${topic}. 
+            ${platform === 'twitter' ? 'Keep it under 280 characters.' : ''}
+            ${platform === 'instagram' ? 'Make it visually engaging with emojis.' : ''}
+            ${platform === 'linkedin' ? 'Keep it professional and informative.' : ''}
+            Include relevant hashtags. Make it engaging and shareable.`;
+
+          const textResponse = await openai.chat.completions.create({
+            model: "gpt-4o",
+            messages: [{ role: "user", content: textPrompt }],
+            max_tokens: 300,
+            temperature: 0.8
+          });
+
+          const generatedText = textResponse.choices[0]?.message?.content || '';
+
+          // Create content item
+          const newContent: ContentItem = {
+            id: `ai_${Date.now()}_${i}`,
+            name: `AI: ${topic} ${i + 1}`,
+            type: contentType as 'text' | 'template' | 'image' | 'video',
+            content: generatedText,
+            tags: extractHashtags(generatedText),
+            category,
+            createdAt: new Date().toISOString(),
+            usage: 0,
+            aiGenerated: true
+          };
+
+          // Generate image if requested
+          if (includeImage && openai) {
+            try {
+              const imagePrompt = `Create a vibrant, engaging social media image for ${platform} about ${topic}. 
+                Modern, professional design with bold colors and clear typography.`;
+
+              const imageResponse = await openai.images.generate({
+                model: "dall-e-3",
+                prompt: imagePrompt,
+                n: 1,
+                size: "1024x1024",
+                quality: "standard"
+              });
+
+              if (imageResponse.data[0]?.url) {
+                // Download and convert image to base64
+                const imageUrl = imageResponse.data[0].url;
+                const response = await fetch(imageUrl);
+                const arrayBuffer = await response.arrayBuffer();
+                const base64 = Buffer.from(arrayBuffer).toString('base64');
+                
+                newContent.url = `data:image/png;base64,${base64}`;
+                newContent.fileName = `ai_image_${topic}_${Date.now()}.png`;
+                newContent.fileType = 'image/png';
+                newContent.fileSize = Math.round(base64.length * 0.75);
+              }
+            } catch (imageError) {
+              console.error('Error generating image:', imageError);
+              // Continue without image
+            }
+          }
+
+          contentItems.push(newContent);
+          generatedContent.push(newContent);
+
+        } catch (contentError) {
+          console.error(`Error generating content ${i + 1}:`, contentError);
+        }
+      }
+
+      // Save all content
+      await saveContentItems(contentItems);
+
+      console.log(`✨ Generated ${generatedContent.length} AI content items for: ${topic}`);
+
+      res.json({ 
+        success: true, 
+        content: generatedContent,
+        message: `Generated ${generatedContent.length} AI content items successfully`
+      });
+
+    } catch (error) {
+      console.error('AI content generation error:', error);
+      res.status(500).json({ 
+        success: false, 
+        error: error instanceof Error ? error.message : 'Failed to generate AI content' 
+      });
+    }
+  });
+
+  // AI Visual Content Generation
+  app.post('/api/social-automation/ai-generate-visuals', async (req, res) => {
+    try {
+      const { 
+        imagePrompt, 
+        style = 'modern', 
+        category = 'AI Visuals',
+        batchSize = 1 
+      } = req.body;
+
+      if (!imagePrompt) {
+        return res.status(400).json({ 
+          success: false, 
+          error: 'Image prompt is required' 
+        });
+      }
+
+      console.log(`🎨 AI generating ${batchSize} visual content: ${imagePrompt}`);
+
+      const generatedVisuals = [];
+
+      for (let i = 0; i < batchSize; i++) {
+        try {
+          const enhancedPrompt = `${imagePrompt}. ${style} style, high quality, social media optimized, vibrant colors, professional design.`;
+
+          const imageResponse = await openai.images.generate({
+            model: "dall-e-3",
+            prompt: enhancedPrompt,
+            n: 1,
+            size: "1024x1024",
+            quality: "standard"
+          });
+
+          if (imageResponse.data[0]?.url) {
+            // Download and convert image to base64
+            const imageUrl = imageResponse.data[0].url;
+            const response = await fetch(imageUrl);
+            const arrayBuffer = await response.arrayBuffer();
+            const base64 = Buffer.from(arrayBuffer).toString('base64');
+
+            const newVisual: ContentItem = {
+              id: `ai_visual_${Date.now()}_${i}`,
+              name: `AI Visual: ${imagePrompt.substring(0, 30)}... ${i + 1}`,
+              type: 'image',
+              content: `AI generated visual: ${imagePrompt}`,
+              tags: ['ai-generated', 'visual', style],
+              category,
+              createdAt: new Date().toISOString(),
+              usage: 0,
+              aiGenerated: true,
+              url: `data:image/png;base64,${base64}`,
+              fileName: `ai_visual_${Date.now()}_${i}.png`,
+              fileType: 'image/png',
+              fileSize: Math.round(base64.length * 0.75)
+            };
+
+            contentItems.push(newVisual);
+            generatedVisuals.push(newVisual);
+          }
+
+        } catch (visualError) {
+          console.error(`Error generating visual ${i + 1}:`, visualError);
+        }
+      }
+
+      // Save all visuals
+      await saveContentItems(contentItems);
+
+      console.log(`🖼️ Generated ${generatedVisuals.length} AI visual items`);
+
+      res.json({ 
+        success: true, 
+        content: generatedVisuals,
+        message: `Generated ${generatedVisuals.length} AI visuals successfully`
+      });
+
+    } catch (error) {
+      console.error('AI visual generation error:', error);
+      res.status(500).json({ 
+        success: false, 
+        error: error instanceof Error ? error.message : 'Failed to generate AI visuals' 
+      });
+    }
+  });
+
+  // AI Content Library Auto-Population
+  app.post('/api/social-automation/ai-populate-library', async (req, res) => {
+    try {
+      const { 
+        topics = ['AI technology', 'Social media trends', 'Business growth'], 
+        platforms = ['twitter', 'instagram', 'linkedin'],
+        contentTypes = ['text', 'template'],
+        includeVisuals = true
+      } = req.body;
+
+      console.log(`🚀 AI auto-populating content library with ${topics.length} topics`);
+
+      const allGeneratedContent = [];
+
+      for (const topic of topics) {
+        for (const platform of platforms) {
+          for (const contentType of contentTypes) {
+            try {
+              // Generate content for each combination
+              const textPrompt = `Create engaging ${contentType} content for ${platform} about ${topic}. 
+                Make it ${platform === 'twitter' ? 'concise under 280 characters' : 
+                platform === 'instagram' ? 'visually engaging with emojis' : 
+                'professional and informative'}. Include relevant hashtags.`;
+
+              const textResponse = await openai.chat.completions.create({
+                model: "gpt-4o",
+                messages: [{ role: "user", content: textPrompt }],
+                max_tokens: 300,
+                temperature: 0.7
+              });
+
+              const generatedText = textResponse.choices[0]?.message?.content || '';
+
+              const newContent: ContentItem = {
+                id: `auto_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+                name: `Auto: ${topic} (${platform})`,
+                type: contentType as 'text' | 'template',
+                content: generatedText,
+                tags: [...extractHashtags(generatedText), platform, contentType],
+                category: 'Auto-Generated',
+                createdAt: new Date().toISOString(),
+                usage: 0,
+                aiGenerated: true
+              };
+
+              contentItems.push(newContent);
+              allGeneratedContent.push(newContent);
+
+              // Add small delay to avoid rate limits
+              await new Promise(resolve => setTimeout(resolve, 100));
+
+            } catch (error) {
+              console.error(`Error generating content for ${topic} on ${platform}:`, error);
+            }
+          }
+        }
+
+        // Generate visual content for topic if requested
+        if (includeVisuals) {
+          try {
+            const visualPrompt = `Create a professional social media image about ${topic}. Modern design, vibrant colors, engaging layout.`;
+
+            const imageResponse = await openai.images.generate({
+              model: "dall-e-3",
+              prompt: visualPrompt,
+              n: 1,
+              size: "1024x1024",
+              quality: "standard"
+            });
+
+            if (imageResponse.data[0]?.url) {
+              const imageUrl = imageResponse.data[0].url;
+              const response = await fetch(imageUrl);
+              const arrayBuffer = await response.arrayBuffer();
+              const base64 = Buffer.from(arrayBuffer).toString('base64');
+
+              const visualContent: ContentItem = {
+                id: `auto_visual_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+                name: `Auto Visual: ${topic}`,
+                type: 'image',
+                content: `Auto-generated visual for ${topic}`,
+                tags: ['auto-generated', 'visual', topic.toLowerCase().replace(/\s+/g, '-')],
+                category: 'Auto-Generated Visuals',
+                createdAt: new Date().toISOString(),
+                usage: 0,
+                aiGenerated: true,
+                url: `data:image/png;base64,${base64}`,
+                fileName: `auto_${topic.toLowerCase().replace(/\s+/g, '_')}_${Date.now()}.png`,
+                fileType: 'image/png',
+                fileSize: Math.round(base64.length * 0.75)
+              };
+
+              contentItems.push(visualContent);
+              allGeneratedContent.push(visualContent);
+            }
+
+            // Add delay for image generation
+            await new Promise(resolve => setTimeout(resolve, 200));
+
+          } catch (visualError) {
+            console.error(`Error generating visual for ${topic}:`, visualError);
+          }
+        }
+      }
+
+      // Save all generated content
+      await saveContentItems(contentItems);
+
+      console.log(`🎉 Auto-populated library with ${allGeneratedContent.length} AI-generated items`);
+
+      res.json({ 
+        success: true, 
+        content: allGeneratedContent,
+        message: `Auto-populated library with ${allGeneratedContent.length} AI-generated items`,
+        breakdown: {
+          total: allGeneratedContent.length,
+          byType: {
+            text: allGeneratedContent.filter(c => c.type === 'text').length,
+            template: allGeneratedContent.filter(c => c.type === 'template').length,
+            image: allGeneratedContent.filter(c => c.type === 'image').length
+          }
+        }
+      });
+
+    } catch (error) {
+      console.error('AI library population error:', error);
+      res.status(500).json({ 
+        success: false, 
+        error: error instanceof Error ? error.message : 'Failed to auto-populate library' 
+      });
+    }
+  });
+
+  // Helper function to extract hashtags
+  function extractHashtags(text: string): string[] {
+    const hashtagRegex = /#[a-zA-Z0-9_]+/g;
+    const matches = text.match(hashtagRegex);
+    return matches ? matches.map(tag => tag.substring(1)) : [];
+  }
 
   // Interaction Stats Endpoints
   app.get('/api/social-automation/interaction-stats', (req, res) => {
