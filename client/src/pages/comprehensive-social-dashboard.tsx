@@ -833,7 +833,7 @@ function SocialAnalyticsDashboardContent() {
   ];
 
   const calculateTotalMetrics = () => {
-    return recentPosts.reduce((totals, post) => ({
+    return recentPosts.reduce((totals: any, post: any) => ({
       likes: totals.likes + post.likes,
       comments: totals.comments + post.comments,
       retweets: totals.retweets + post.retweets,
@@ -1735,9 +1735,9 @@ function InteractionStatsContent() {
     commentsPosted: 0,
     retweets: 0,
     targetAccountsEngaged: 0,
-    topPerformingTargets: [],
-    dailyStats: [],
-    weeklyTrends: []
+    topPerformingTargets: [] as any[],
+    dailyStats: [] as any[],
+    weeklyTrends: [] as any[]
   });
   const [isLoading, setIsLoading] = useState(true);
 
@@ -4122,9 +4122,9 @@ function BotConfigurationManagement() {
 function DashboardOverview() {
   const { toast } = useToast();
   const [dashboardData, setDashboardData] = useState({
-    recentPost: null,
-    nextPostTime: null,
-    botActivity: [],
+    recentPost: null as any,
+    nextPostTime: null as any,
+    botActivity: [] as any[],
     isActive: false,
     totalPosts: 0,
     engagement: 0
@@ -4490,9 +4490,9 @@ function ContentTemplatesSection() {
 // AI Intelligence Content Component
 function AIIntelligenceContent() {
   const { toast } = useToast();
-  const [intelligenceData, setIntelligenceData] = useState(null);
+  const [intelligenceData, setIntelligenceData] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [lastUpdated, setLastUpdated] = useState(null);
+  const [lastUpdated, setLastUpdated] = useState<string | null>(null);
   const [optimization, setOptimization] = useState({
     viralScore: 87,
     engagementPrediction: 2.4,
@@ -4545,7 +4545,7 @@ function AIIntelligenceContent() {
         setOptimization(prev => ({
           ...prev,
           viralScore: Math.floor(Math.random() * 15 + 85), // 85-100
-          engagementPrediction: (Math.random() * 2 + 2).toFixed(1), // 2.0-4.0
+          engagementPrediction: parseFloat((Math.random() * 2 + 2).toFixed(1)), // 2.0-4.0
           bestPostingTime: '8:00 PM EDT', // Peak engagement time
           recommendedHashtags: ['#FlutterBye', '#Web3', '#AI', '#TechTrends', '#Innovation']
         }));
