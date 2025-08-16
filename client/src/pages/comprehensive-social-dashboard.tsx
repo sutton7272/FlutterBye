@@ -813,6 +813,16 @@ function AIContentGenerator({ onContentGenerated }: { onContentGenerated?: () =>
         })
       });
 
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const contentType = response.headers.get('content-type');
+      if (!contentType || !contentType.includes('application/json')) {
+        const text = await response.text();
+        throw new Error('Server returned HTML instead of JSON. Check network configuration.');
+      }
+
       const result = await response.json();
       
       if (result.success) {
@@ -852,6 +862,15 @@ function AIContentGenerator({ onContentGenerated }: { onContentGenerated?: () =>
         })
       });
 
+      if (!generateResponse.ok) {
+        throw new Error(`HTTP error! status: ${generateResponse.status}`);
+      }
+
+      const contentType = generateResponse.headers.get('content-type');
+      if (!contentType || !contentType.includes('application/json')) {
+        throw new Error('Server returned HTML instead of JSON. Check network configuration.');
+      }
+
       const generateResult = await generateResponse.json();
       
       if (!generateResult.success) {
@@ -869,6 +888,15 @@ function AIContentGenerator({ onContentGenerated }: { onContentGenerated?: () =>
           bypassSchedule: true
         })
       });
+
+      if (!postResponse.ok) {
+        throw new Error(`HTTP error! status: ${postResponse.status}`);
+      }
+
+      const postContentType = postResponse.headers.get('content-type');
+      if (!postContentType || !postContentType.includes('application/json')) {
+        throw new Error('Server returned HTML instead of JSON. Check network configuration.');
+      }
 
       const postResult = await postResponse.json();
       
