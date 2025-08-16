@@ -304,13 +304,32 @@ Respond with JSON in this format:
     }
   }
 
-  // Legacy method for backward compatibility
+  // Main public method for content generation
   async generateContent(
-    template: ContentTemplate, 
-    timeSlot: string,
-    customContext?: string
-  ): Promise<GeneratedContent> {
-    return this.generateContentWithRealTimeIntelligence(template, timeSlot, customContext);
+    options: { category?: string; customPrompt?: string; includeHashtags?: boolean; timeSlot?: string } = {}
+  ): Promise<{ content: string; hashtags: string[] }> {
+    const { category = 'product', customPrompt, timeSlot = 'general' } = options;
+    
+    try {
+      const template = this.getRandomTemplate(category);
+      const result = await this.generateContentWithRealTimeIntelligence(template, timeSlot, customPrompt);
+      
+      // Convert to expected format
+      const hashtagString = result.hashtags.map(h => h.startsWith('#') ? h : `#${h}`).join(' ');
+      const content = `${result.text} ${hashtagString}`;
+      
+      return {
+        content: content,
+        hashtags: result.hashtags
+      };
+    } catch (error) {
+      console.error('AI content generation failed:', error);
+      // Return fallback content
+      return {
+        content: "🚀 FlutterBye: The future of Web3 communication is here! Revolutionary blockchain-powered messaging with SPL tokens, AI optimization, and real-time engagement. #FlutterBye #Web3 #Blockchain #AI #SocialAutomation #Innovation #Crypto #Future #Technology #Engagement",
+        hashtags: ['#FlutterBye', '#Web3', '#Blockchain', '#AI', '#SocialAutomation']
+      };
+    }
   }
 
   private getFlutterByeBrandContext(): string {

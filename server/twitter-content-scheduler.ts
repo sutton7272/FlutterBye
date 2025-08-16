@@ -64,17 +64,23 @@ export class TwitterContentScheduler {
 
     console.log('🔄 Twitter scheduler active - checking every minute');
     
-    // Also run an immediate check when starting
-    setTimeout(() => this.checkScheduleAndPost(), 5000);
+    // Also run an immediate check when starting and force a test post
+    setTimeout(async () => {
+      console.log('🚀 Running startup auto-post test...');
+      await this.createAndPostContent();
+      this.checkScheduleAndPost();
+    }, 5000);
   }
 
   private async checkScheduleAndPost() {
     if (!this.isActive) return;
     
+    // Get current time in EDT (UTC-4)
     const now = new Date();
-    const hours = now.getHours();
-    const minutes = now.getMinutes();
-    const currentTime = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+    const utcHour = now.getUTCHours();
+    const utcMinute = now.getUTCMinutes();
+    const edtHour = (utcHour - 4 + 24) % 24;
+    const currentTime = `${edtHour.toString().padStart(2, '0')}:${utcMinute.toString().padStart(2, '0')}`;
     
     console.log(`⏰ Checking current time ${currentTime} against schedule...`);
     
@@ -87,7 +93,7 @@ export class TwitterContentScheduler {
       if (this.timeMatches(currentTime, slotTime)) {
         console.log(`🎯 Time match! Posting for slot: ${slotName} at ${slotTime}`);
         await this.createAndPostContent();
-        break;
+        return; // Exit after posting to prevent multiple posts
       }
     }
   }
@@ -113,20 +119,52 @@ export class TwitterContentScheduler {
 
   private async createAndPostContent() {
     try {
-      console.log('🤖 Creating and posting new content...');
+      console.log('🤖 AUTO-POSTING: Creating and posting new content...');
       
-      const content = await aiContentGenerator.generateContent({
+      // Generate content with proper structure
+      const generatedContent = await aiContentGenerator.generateContent({
         category: 'technology',
         includeHashtags: true,
-        customPrompt: 'FlutterBye social media automation with AI-powered optimization'
+        customPrompt: 'FlutterBye social media automation with AI-powered optimization and smart engagement'
       });
+      
+      // Handle the content structure properly
+      let content;
+      if (generatedContent && generatedContent.content) {
+        content = generatedContent;
+      } else if (generatedContent && generatedContent.text) {
+        content = { content: generatedContent.text, hashtags: generatedContent.hashtags || [] };
+      } else {
+        // Fallback content if AI generation fails
+        content = {
+          content: "🚀 FlutterBye: The future of Web3 communication is here! Revolutionary blockchain-powered messaging with SPL tokens, AI optimization, and real-time engagement. Transform your social media strategy today! #FlutterBye #Web3 #Blockchain #AI #SocialAutomation #Innovation #Crypto #Future #Technology #Engagement",
+          hashtags: []
+        };
+      }
 
+      console.log(`📝 Generated content object:`, content);
+      
+      // Check if content is valid
+      if (!content || !content.content) {
+        console.error('❌ Generated content is invalid:', content);
+        return { success: false, error: 'Invalid content generated' };
+      }
+      
+      console.log(`📝 Generated content text: ${content.content}`);
+      
       const postResult = await this.twitterService.postTweet(content.content);
-      console.log(`✅ Successfully posted: ${content.content.substring(0, 50)}...`);
+      
+      if (postResult.success) {
+        console.log(`✅ AUTO-POST SUCCESS: Posted tweet with ID ${postResult.tweetId}`);
+        console.log(`📊 Content: ${content.content.substring(0, 100)}...`);
+      } else {
+        console.error(`❌ AUTO-POST FAILED: ${postResult.error}`);
+      }
       
       return postResult;
     } catch (error) {
-      console.error('❌ Error creating/posting content:', error);
+      console.error('❌ Error in auto-posting system:', error);
+      return { success: false, error: error.message };
     }
   }
 
