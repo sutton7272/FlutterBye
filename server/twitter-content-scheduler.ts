@@ -159,6 +159,27 @@ export class TwitterContentScheduler {
         console.log(`📊 Content: ${content.content.substring(0, 100)}...`);
       } else {
         console.error(`❌ AUTO-POST FAILED: ${postResult.error}`);
+        
+        // Handle specific Twitter API errors
+        if (postResult.error && postResult.error.includes('duplicate content')) {
+          console.log('🔄 Attempting to generate new unique content...');
+          
+          // Try generating new unique content one more time
+          const uniqueContent = await aiContentGenerator.generateContent({
+            category: 'technology',
+            includeHashtags: true,
+            customPrompt: `FlutterBye unique post ${Date.now()} - blockchain innovation and Web3 advancement`,
+            forceUnique: true
+          });
+          
+          if (uniqueContent && uniqueContent.content) {
+            const retryResult = await this.twitterService.postTweet(uniqueContent.content);
+            if (retryResult.success) {
+              console.log(`✅ RETRY SUCCESS: Posted unique tweet with ID ${retryResult.tweetId}`);
+              return retryResult;
+            }
+          }
+        }
       }
       
       return postResult;

@@ -26,6 +26,9 @@ export interface GeneratedContent {
 }
 
 export class AIContentGenerator {
+  private recentContent: string[] = []; // Track recent content to avoid duplicates
+  private contentCounter = 0; // Ensure uniqueness
+  
   private flutterByeBrandAssets = {
     tagline: "Tokens That Talk",
     motto: "The Web3 communication layer",
@@ -189,7 +192,7 @@ Respond with JSON in this format:
         text: result.text,
         hashtags: result.hashtags || ['#FlutterBye', '#Web3', '#Blockchain'],
         estimatedReach: this.calculateEstimatedReach(timeSlot, template.category),
-        engagementScore: this.calculateEngagementScore(result.tone, timeSlot),
+        engagementScore: this.calculateEngagementScore(result.text || '', timeSlot, result.hashtags || []),
         tone: result.tone || 'professional',
         category: template.category
       };
@@ -304,19 +307,57 @@ Respond with JSON in this format:
     }
   }
 
+  // Add unique content generation tracking
+  private addToRecentContent(content: string) {
+    this.recentContent.push(content);
+    if (this.recentContent.length > 50) { // Keep last 50 posts
+      this.recentContent.shift();
+    }
+  }
+
+  private isContentUnique(content: string): boolean {
+    return !this.recentContent.some(recent => 
+      this.calculateSimilarity(content, recent) > 0.7
+    );
+  }
+
+  private calculateSimilarity(str1: string, str2: string): number {
+    const words1 = str1.toLowerCase().split(/\s+/);
+    const words2 = str2.toLowerCase().split(/\s+/);
+    const commonWords = words1.filter(word => words2.includes(word));
+    return commonWords.length / Math.max(words1.length, words2.length);
+  }
+
   // Main public method for content generation
   async generateContent(
-    options: { category?: string; customPrompt?: string; includeHashtags?: boolean; timeSlot?: string } = {}
+    options: { category?: string; customPrompt?: string; includeHashtags?: boolean; timeSlot?: string; forceUnique?: boolean } = {}
   ): Promise<{ content: string; hashtags: string[] }> {
-    const { category = 'product', customPrompt, timeSlot = 'general' } = options;
+    const { category = 'product', customPrompt, timeSlot = 'general', forceUnique = false } = options;
     
     try {
-      const template = this.getRandomTemplate(category);
-      const result = await this.generateContentWithRealTimeIntelligence(template, timeSlot, customPrompt);
+      this.contentCounter++;
+      const uniqueId = forceUnique ? `_${Date.now()}_${this.contentCounter}` : '';
+      const enhancedPrompt = customPrompt ? `${customPrompt}${uniqueId}` : undefined;
+      
+      const template = this.templates.find(t => t.category === category) || this.templates[0];
+      let result = await this.generateContentWithRealTimeIntelligence(template, timeSlot, enhancedPrompt);
+      
+      // Check for uniqueness if required
+      if (forceUnique) {
+        let attempts = 0;
+        while (!this.isContentUnique(result.text) && attempts < 3) {
+          attempts++;
+          console.log(`🔄 Attempt ${attempts}: Generating more unique content...`);
+          result = await this.generateContentWithRealTimeIntelligence(template, timeSlot, `${enhancedPrompt}_retry_${attempts}`);
+        }
+      }
       
       // Convert to expected format
       const hashtagString = result.hashtags.map(h => h.startsWith('#') ? h : `#${h}`).join(' ');
       const content = `${result.text} ${hashtagString}`;
+      
+      // Track this content
+      this.addToRecentContent(result.text);
       
       return {
         content: content,
