@@ -16,6 +16,11 @@ export const users = pgTable("users", {
   adminPermissions: json("admin_permissions").$type<string[]>(), // ['dashboard', 'users', 'wallet_management', 'settings']
   adminAddedBy: varchar("admin_added_by"),
   adminAddedAt: timestamp("admin_added_at"),
+  // Early access management
+  hasEarlyAccess: boolean("has_early_access").default(false),
+  earlyAccessMethod: text("early_access_method"), // 'code', 'email', 'admin'
+  earlyAccessGrantedAt: timestamp("early_access_granted_at"),
+  earlyAccessGrantedBy: varchar("early_access_granted_by"),
   createdAt: timestamp("created_at").defaultNow(),
 });
 
@@ -120,6 +125,40 @@ export const chatParticipants = pgTable("chat_participants", {
   joinedAt: timestamp("joined_at").defaultNow(),
   lastSeenAt: timestamp("last_seen_at").defaultNow(),
   isOnline: boolean("is_online").default(false),
+});
+
+// Early Access Management
+export const earlyAccessCodes = pgTable("early_access_codes", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  code: text("code").notNull().unique(),
+  isActive: boolean("is_active").default(true),
+  maxUses: integer("max_uses").default(1),
+  currentUses: integer("current_uses").default(0),
+  expiresAt: timestamp("expires_at"),
+  createdBy: varchar("created_by").references(() => users.id),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const approvedEmails = pgTable("approved_emails", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  email: text("email").notNull().unique(),
+  isActive: boolean("is_active").default(true),
+  notes: text("notes"),
+  addedBy: varchar("added_by").references(() => users.id),
+  addedAt: timestamp("added_at").defaultNow(),
+});
+
+export const earlyAccessSessions = pgTable("early_access_sessions", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  sessionToken: text("session_token").notNull().unique(),
+  email: text("email"),
+  accessMethod: text("access_method"), // 'code', 'email', 'admin'
+  accessCodeUsed: text("access_code_used"),
+  ipAddress: text("ip_address"),
+  userAgent: text("user_agent"),
+  isActive: boolean("is_active").default(true),
+  expiresAt: timestamp("expires_at"),
+  createdAt: timestamp("created_at").defaultNow(),
 });
 
 // Redemption Codes
