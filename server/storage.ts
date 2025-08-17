@@ -61,12 +61,12 @@ import {
   type InsertCustodialWalletTransaction,
   type WalletSecurityLog,
   type InsertWalletSecurityLog,
-  type FlutterinaConversation,
-  type InsertFlutterinaConversation,
-  type FlutterinaMessage,
-  type InsertFlutterinaMessage,
-  type FlutterinaPersonalityProfile,
-  type InsertFlutterinaPersonalityProfile,
+  type SkyeConversations,
+  type InsertSkyeConversation,
+  type SkyeMessages,
+  type InsertSkyeMessage,
+  type SkyePersonalityProfiles,
+  type InsertSkyePersonalityProfile,
   pricingTiers,
   walletIntelligence,
   walletBatches,
@@ -819,15 +819,7 @@ export class MemStorage implements IStorage {
       .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
   }
 
-  async updateToken(tokenId: string, updateData: Partial<Token>): Promise<Token> {
-    const token = this.tokens.get(tokenId);
-    if (!token) {
-      throw new Error("Token not found");
-    }
-    const updatedToken = { ...token, ...updateData, updatedAt: new Date() };
-    this.tokens.set(tokenId, updatedToken);
-    return updatedToken;
-  }
+
 
   async deleteToken(tokenId: string): Promise<void> {
     this.tokens.delete(tokenId);
@@ -869,16 +861,7 @@ export class MemStorage implements IStorage {
   }
 
   // Transactions
-  async createTransaction(insertTransaction: InsertTransaction): Promise<Transaction> {
-    const id = randomUUID();
-    const transaction: Transaction = { 
-      ...insertTransaction, 
-      id,
-      createdAt: new Date()
-    };
-    this.transactions.set(id, transaction);
-    return transaction;
-  }
+
 
   async getTransactionsByUser(userId: string): Promise<Transaction[]> {
     return Array.from(this.transactions.values())
@@ -907,16 +890,7 @@ export class MemStorage implements IStorage {
       .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
   }
 
-  async createRedemption(insertRedemption: InsertRedemption): Promise<Redemption> {
-    const id = randomUUID();
-    const redemption: Redemption = { 
-      ...insertRedemption, 
-      id,
-      createdAt: new Date()
-    };
-    this.redemptions.set(id, redemption);
-    return redemption;
-  }
+
 
   async getRedemptionsByUser(userId: string): Promise<Redemption[]> {
     return Array.from(this.redemptions.values())
