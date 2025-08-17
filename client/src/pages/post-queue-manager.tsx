@@ -11,7 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Calendar } from '@/components/ui/calendar';
 import { useToast } from '@/hooks/use-toast';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
-import { Calendar as CalendarIcon, Clock, Plus, Play, Pause, Edit, Trash2, Image, Video, FileText, Target, Zap, BarChart3, Users, Send, Schedule } from 'lucide-react';
+import { Calendar as CalendarIcon, Clock, Plus, Play, Pause, Edit, Trash2, Image, Video, FileText, Target, Zap, BarChart3, Users, Send } from 'lucide-react';
 
 interface QueuedPost {
   id: string;
@@ -259,7 +259,7 @@ export default function PostQueueManager() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
           <Card className="bg-slate-800/50 border-blue-500/30">
             <CardContent className="p-4 text-center">
-              <Schedule className="w-6 h-6 mx-auto mb-2 text-blue-400" />
+              <Clock className="w-6 h-6 mx-auto mb-2 text-blue-400" />
               <p className="text-2xl font-bold text-white">{scheduledPosts.length}</p>
               <p className="text-sm text-slate-400">Scheduled</p>
             </CardContent>
