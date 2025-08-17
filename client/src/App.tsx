@@ -137,6 +137,7 @@ import AdminGateway from "@/pages/admin-gateway";
 import AdminDashboard from "@/pages/admin-dashboard";
 import AdminEscrow from "@/pages/admin-escrow";
 import { AdminRouteGuard } from "@/components/admin-route-guard";
+import { EarlyAccessGuard } from "@/components/early-access-guard";
 function Router() {
   return (
     <div className="dark min-h-screen flex flex-col bg-transparent">
@@ -146,23 +147,27 @@ function Router() {
 
         {/* Admin Social Automation Dashboard */}
         <Route path="/admin/social-automation" component={() => (
-          <SuspenseWrapper>
-            <ComprehensiveSocialDashboard />
-          </SuspenseWrapper>
+          <AdminRouteGuard>
+            <SuspenseWrapper>
+              <ComprehensiveSocialDashboard />
+            </SuspenseWrapper>
+          </AdminRouteGuard>
         )} />
         
         <Route path="/social-automation" component={() => (
-          <SuspenseWrapper>
-            <ComprehensiveSocialDashboard />
-          </SuspenseWrapper>
+          <EarlyAccessGuard>
+            <SuspenseWrapper>
+              <ComprehensiveSocialDashboard />
+            </SuspenseWrapper>
+          </EarlyAccessGuard>
         )} />
         <Route path="/flutterbye-dashboard" component={() => (
-          <>
+          <EarlyAccessGuard>
             <Navbar />
             <SuspenseWrapper>
               <Home />
             </SuspenseWrapper>
-          </>
+          </EarlyAccessGuard>
         )} />
         
         <Route path="/launch" component={LaunchCountdown} />
@@ -175,44 +180,44 @@ function Router() {
         
         {/* Simplified Routes with navbar - unified navigation structure */}
         <Route path="/dashboard" component={() => (
-          <>
+          <EarlyAccessGuard>
             <Navbar />
             <Suspense fallback={<LoadingSpinner />}>
               <Dashboard />
             </Suspense>
-          </>
+          </EarlyAccessGuard>
         )} />
         <Route path="/create" component={() => (
-          <>
+          <EarlyAccessGuard>
             <Navbar />
             <Suspense fallback={<LoadingSpinner />}>
               <Create />
             </Suspense>
-          </>
+          </EarlyAccessGuard>
         )} />
         <Route path="/campaign-builder" component={() => (
-          <>
+          <EarlyAccessGuard>
             <Navbar />
             <SuspenseWrapper>
               <CampaignBuilder />
             </SuspenseWrapper>
-          </>
+          </EarlyAccessGuard>
         )} />
         <Route path="/trade" component={() => (
-          <>
+          <EarlyAccessGuard>
             <Navbar />
             <Suspense fallback={<LoadingSpinner />}>
               <Trade />
             </Suspense>
-          </>
+          </EarlyAccessGuard>
         )} />
         <Route path="/flutterai" component={() => (
-          <>
+          <EarlyAccessGuard>
             <Navbar />
             <SuspenseWrapper>
               <FlutterAIDashboard />
             </SuspenseWrapper>
-          </>
+          </EarlyAccessGuard>
         )} />
         <Route path="/flutter-wave" component={() => (
           <>
