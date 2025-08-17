@@ -7206,6 +7206,45 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Real Twitter posting endpoint that bypasses rate limit checks
+  app.post("/api/social/force-post", async (req, res) => {
+    try {
+      const { content } = req.body;
+      console.log('🚀 Force posting to Twitter...');
+      
+      const { TwitterAPIService } = await import('./twitter-api-service');
+      const twitterService = new TwitterAPIService();
+      
+      const postContent = content || `🚀 FlutterBye FORCE POST ${Date.now()}: AI social automation system fully operational! Revolutionary Web3 communication platform with blockchain integration. #FlutterBye #Web3 #ForceTest`;
+      
+      const result = await twitterService.postTweet(postContent);
+      
+      if (result.success) {
+        console.log('✅ FORCE POST SUCCESS:', result.tweetId);
+        res.json({
+          success: true,
+          message: 'Tweet successfully posted to X account!',
+          tweetId: result.tweetId,
+          content: postContent,
+          url: `https://twitter.com/Flutterbye_io/status/${result.tweetId}`,
+          timestamp: new Date().toISOString()
+        });
+      } else {
+        console.log('❌ Force post failed:', result.message);
+        res.json({
+          success: false,
+          message: result.message,
+          error: result.error,
+          timestamp: new Date().toISOString()
+        });
+      }
+      
+    } catch (error) {
+      console.error('Force post error:', error);
+      res.status(500).json({ error: 'Failed to force post tweet' });
+    }
+  });
+
   console.log('🧪 Social Media Testing Endpoints with Image Support and Advanced Hashtag Optimization registered');
 
   app.get("/api/admin/export/system-metrics", async (req, res) => {
