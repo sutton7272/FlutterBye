@@ -143,7 +143,11 @@ function Router() {
     <div className="dark min-h-screen flex flex-col bg-transparent">
       <div className="flex-1 bg-transparent">
         <Switch>
-        <Route path="/" component={LaunchCountdown} />
+        <Route path="/" component={() => {
+          console.log('ROOT ROUTE HIT - LaunchCountdown should load');
+          return <LaunchCountdown />;
+        }} />
+        <Route path="/test" component={() => <div style={{padding: '20px', backgroundColor: 'red', color: 'white'}}><h1>TEST ROUTE WORKING</h1><p>If you see this at /test, React routing works</p></div>} />
 
         {/* Admin Social Automation Dashboard */}
         <Route path="/admin/social-automation" component={() => (
