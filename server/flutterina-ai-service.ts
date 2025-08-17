@@ -946,16 +946,7 @@ Generate JSON response:
     }
   }
 
-  async emergencyStop() {
-    this.isSystemEnabled = false;
-    console.log('🚨 EMERGENCY STOP: Flutterina AI system has been disabled by admin');
-    
-    // Clear all usage tracking to prevent any further processing
-    this.tokenUsageTracking.clear();
-    this.globalTokenUsage = { daily: 0, lastReset: new Date() };
-    
-    return true;
-  }
+
 
   async resetAllUsage() {
     this.tokenUsageTracking.clear();

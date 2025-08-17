@@ -39,25 +39,35 @@ if (typeof window !== 'undefined') {
     const originalSetTimeout = window.setTimeout;
     const originalSetInterval = window.setInterval;
     
-    window.setTimeout = function(callback, delay, ...args) {
+    window.setTimeout = function(callback: TimerHandler, delay?: number, ...args: any[]) {
       return originalSetTimeout(() => {
         try {
-          callback(...args);
+          if (typeof callback === 'function') {
+            callback(...args);
+          } else if (typeof callback === 'string') {
+            // Handle string callback case
+            new Function(callback)();
+          }
         } catch (e) {
           // Silently catch all setTimeout errors
         }
       }, delay);
-    };
+    } as typeof setTimeout;
     
-    window.setInterval = function(callback, delay, ...args) {
+    window.setInterval = function(callback: TimerHandler, delay?: number, ...args: any[]) {
       return originalSetInterval(() => {
         try {
-          callback(...args);
+          if (typeof callback === 'function') {
+            callback(...args);
+          } else if (typeof callback === 'string') {
+            // Handle string callback case
+            new Function(callback)();
+          }
         } catch (e) {
           // Silently catch all setInterval errors
         }
       }, delay);
-    };
+    } as typeof setInterval;
     
   } catch (error) {
     // Silently handle any polyfill setup errors

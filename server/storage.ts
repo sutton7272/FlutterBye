@@ -2090,10 +2090,7 @@ export class MemStorage implements IStorage {
     return intelligence;
   }
 
-  async getWalletIntelligence(walletAddress: string): Promise<any> {
-    const items = Array.from(this.walletIntelligenceData.values());
-    return items.find(item => item.walletAddress === walletAddress);
-  }
+
 
   async updateWalletIntelligence(walletAddress: string, updates: any): Promise<any> {
     const items = Array.from(this.walletIntelligenceData.entries());
@@ -2126,28 +2123,7 @@ export class MemStorage implements IStorage {
     return false;
   }
 
-  async getAllWalletIntelligence(filters?: {
-    minSocialCreditScore?: number;
-    maxSocialCreditScore?: number;
-    riskLevel?: string;
-    marketingSegment?: string;
-    portfolioSize?: string;
-  }): Promise<any[]> {
-    let items = Array.from(this.walletIntelligenceData.values());
-    
-    if (filters) {
-      items = items.filter(item => {
-        if (filters.minSocialCreditScore && item.socialCreditScore < filters.minSocialCreditScore) return false;
-        if (filters.maxSocialCreditScore && item.socialCreditScore > filters.maxSocialCreditScore) return false;
-        if (filters.riskLevel && item.riskLevel !== filters.riskLevel) return false;
-        if (filters.marketingSegment && item.marketingSegment !== filters.marketingSegment) return false;
-        if (filters.portfolioSize && item.portfolioSize !== filters.portfolioSize) return false;
-        return true;
-      });
-    }
-    
-    return items.sort((a, b) => b.socialCreditScore - a.socialCreditScore);
-  }
+
 
   async getWalletIntelligenceStats(): Promise<{
     totalWallets: number;

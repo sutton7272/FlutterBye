@@ -560,43 +560,7 @@ Provide the enhanced version that incorporates all requested improvements while 
     return JSON.parse(response.choices[0].message.content || '{}');
   }
 
-  /**
-   * AI-powered A/B testing title generation
-   */
-  async generateTitleVariations(originalTitle: string, count: number = 5): Promise<{
-    variations: string[];
-    recommendedTest: string[];
-  }> {
-    const response = await openai.chat.completions.create({
-      model: "gpt-4o",
-      messages: [
-        {
-          role: "system",
-          content: `You are a marketing expert specializing in A/B testing for content titles. Generate compelling variations that test different psychological triggers and value propositions.`
-        },
-        {
-          role: "user",
-          content: `Generate ${count} A/B testing variations for this title: "${originalTitle}"
-          
-          Each variation should test different approaches:
-          - Emotional vs logical appeal
-          - Question vs statement format
-          - Benefit-focused vs feature-focused
-          - Urgency vs curiosity
-          - Number-driven vs concept-driven
-          
-          Response in JSON format:
-          {
-            "variations": ["variation1", "variation2", "variation3"],
-            "recommendedTest": ["Best variation for testing A", "Best variation for testing B"]
-          }`
-        }
-      ],
-      response_format: { type: "json_object" },
-    });
 
-    return JSON.parse(response.choices[0].message.content || '{}');
-  }
 
   // =====================================================
   // BUNDLE 3: Advanced Analytics & Automation
@@ -733,50 +697,7 @@ Provide the enhanced version that incorporates all requested improvements while 
     return JSON.parse(response.choices[0].message.content || '{}');
   }
 
-  /**
-   * Advanced SEO content optimization with real-time suggestions
-   */
-  async optimizeForSEO(content: string, targetKeywords: string[], competitionLevel: string): Promise<{
-    optimizedContent: string;
-    seoScore: number;
-    improvements: string[];
-    keywordDensity: any[];
-    metaOptimizations: any;
-    structureRecommendations: string[];
-  }> {
-    const response = await openai.chat.completions.create({
-      model: "gpt-4o",
-      messages: [
-        {
-          role: "system",
-          content: `You are an advanced SEO optimization expert. Enhance content for maximum search engine visibility while maintaining readability and engagement.`
-        },
-        {
-          role: "user",
-          content: `Optimize this content for SEO:
-          
-          Target Keywords: ${targetKeywords.join(', ')}
-          Competition Level: ${competitionLevel}
-          
-          Content to optimize:
-          ${content.substring(0, 1500)}...
-          
-          Return optimization in JSON format:
-          {
-            "optimizedContent": "SEO-optimized content",
-            "seoScore": 85,
-            "improvements": ["improvement1", "improvement2"],
-            "keywordDensity": [{"keyword": "term", "density": 2.5}],
-            "metaOptimizations": {"title": "...", "description": "..."},
-            "structureRecommendations": ["recommendation1", "recommendation2"]
-          }`
-        }
-      ],
-      response_format: { type: "json_object" },
-    });
 
-    return JSON.parse(response.choices[0].message.content || '{}');
-  }
 
   /**
    * Automated content distribution recommendations

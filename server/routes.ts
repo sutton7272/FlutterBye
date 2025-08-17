@@ -64,7 +64,7 @@ import { openaiService } from "./openai-service";
 import { messageNFTService } from "./message-nft-service";
 import { livingAIService } from "./living-ai-service";
 import { immersiveAIService } from "./immersive-ai-service";
-import * as phantomMetadataFixer from "./phantom-metadata-fixer";
+import { phantomMetadataFixer } from "./phantom-metadata-fixer";
 import { AutoMetadataService } from "./auto-metadata-service";
 import FlutterbeyeWebSocketServer from "./websocket-server";
 import { aiAdminService } from "./ai-admin-service";
