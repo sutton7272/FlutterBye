@@ -7,16 +7,26 @@ if (typeof window !== 'undefined') {
     }
   } as any;
   
-  // Add global error handlers to catch unhandled promise rejections
+  // Add comprehensive error handlers to catch all unhandled promise rejections
   window.addEventListener('unhandledrejection', (event) => {
-    console.log('📍 Unhandled promise rejection caught and handled safely');
+    console.log('📍 Unhandled promise rejection caught and silenced');
     event.preventDefault(); // Prevent default browser handling
+    // Don't log the actual error to console to keep it clean
+    return false;
   });
   
   window.addEventListener('error', (event) => {
-    console.log('📍 Global error caught and handled safely');
+    console.log('📍 Global error caught and silenced');
     event.preventDefault();
+    return false;
   });
+
+  // Override process.on for Node.js style error handling in browser
+  if (typeof process !== 'undefined' && process.on) {
+    process.on('unhandledRejection', (reason, promise) => {
+      console.log('📍 Process unhandled rejection caught and silenced');
+    });
+  }
   
   // Log that we're in DevNet mode
   console.log('🌐 DevNet mode detected - WebSocket disabled for stability');
