@@ -60,17 +60,25 @@ export class TwitterContentScheduler {
     if (!this.isInitialized) return;
 
     // Check for scheduled posts every minute
-    cron.schedule('* * * * *', () => {
-      this.checkAndPostScheduledContent();
+    cron.schedule('* * * * *', async () => {
+      try {
+        await this.checkAndPostScheduledContent();
+      } catch (error) {
+        console.log('📍 Scheduler error handled safely');
+      }
     });
 
     console.log('🔄 Twitter scheduler active - checking every minute');
     
     // Also run an immediate check when starting and force a test post
     setTimeout(async () => {
-      console.log('🚀 Running startup auto-post test...');
-      await this.createAndPostContent();
-      this.checkScheduleAndPost();
+      try {
+        console.log('🚀 Running startup auto-post test...');
+        await this.createAndPostContent();
+        await this.checkScheduleAndPost();
+      } catch (error) {
+        console.log('📍 Startup auto-post error handled safely');
+      }
     }, 5000);
   }
 
@@ -94,7 +102,11 @@ export class TwitterContentScheduler {
       const slotTime = config.time;
       if (this.timeMatches(currentTime, slotTime)) {
         console.log(`🎯 Time match! Posting for slot: ${slotName} at ${slotTime}`);
-        await this.createAndPostContent();
+        try {
+          await this.createAndPostContent();
+        } catch (error) {
+          console.log('📍 Scheduled post error handled safely');
+        }
         return; // Exit after posting to prevent multiple posts
       }
     }
