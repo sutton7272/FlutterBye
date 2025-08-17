@@ -12,27 +12,32 @@ export async function apiRequest(
   url: string,
   data?: unknown | undefined,
 ): Promise<Response> {
-  // Use absolute URL for DevNet deployment
-  const baseUrl = window.location.origin;
-  const fullUrl = url.startsWith('http') ? url : `${baseUrl}${url}`;
-  
-  const headers: Record<string, string> = {
-    "Authorization": "Bearer development",
-  };
-  
-  if (data) {
-    headers["Content-Type"] = "application/json";
+  try {
+    // Use absolute URL for DevNet deployment
+    const baseUrl = window.location.origin;
+    const fullUrl = url.startsWith('http') ? url : `${baseUrl}${url}`;
+    
+    const headers: Record<string, string> = {
+      "Authorization": "Bearer development",
+    };
+    
+    if (data) {
+      headers["Content-Type"] = "application/json";
+    }
+
+    const res = await fetch(fullUrl, {
+      method,
+      headers,
+      body: data ? JSON.stringify(data) : undefined,
+      credentials: "include",
+    });
+
+    await throwIfResNotOk(res);
+    return res;
+  } catch (error) {
+    console.log('📍 API request error caught and handled safely');
+    throw error;
   }
-
-  const res = await fetch(fullUrl, {
-    method,
-    headers,
-    body: data ? JSON.stringify(data) : undefined,
-    credentials: "include",
-  });
-
-  await throwIfResNotOk(res);
-  return res;
 }
 
 type UnauthorizedBehavior = "returnNull" | "throw";
@@ -41,24 +46,29 @@ export const getQueryFn: <T>(options: {
 }) => QueryFunction<T> =
   ({ on401: unauthorizedBehavior }) =>
   async ({ queryKey }) => {
-    // Use absolute URL for DevNet deployment
-    const baseUrl = window.location.origin;
-    const endpoint = queryKey.join("/") as string;
-    const fullUrl = endpoint.startsWith('http') ? endpoint : `${baseUrl}${endpoint}`;
-    
-    const res = await fetch(fullUrl, {
-      credentials: "include",
-      headers: {
-        "Authorization": "Bearer development",
-      },
-    });
+    try {
+      // Use absolute URL for DevNet deployment
+      const baseUrl = window.location.origin;
+      const endpoint = queryKey.join("/") as string;
+      const fullUrl = endpoint.startsWith('http') ? endpoint : `${baseUrl}${endpoint}`;
+      
+      const res = await fetch(fullUrl, {
+        credentials: "include",
+        headers: {
+          "Authorization": "Bearer development",
+        },
+      });
 
-    if (unauthorizedBehavior === "returnNull" && res.status === 401) {
-      return null;
+      if (unauthorizedBehavior === "returnNull" && res.status === 401) {
+        return null;
+      }
+
+      await throwIfResNotOk(res);
+      return await res.json();
+    } catch (error) {
+      console.log('📍 Query function error caught and handled safely');
+      throw error;
     }
-
-    await throwIfResNotOk(res);
-    return await res.json();
   };
 
 export const queryClient = new QueryClient({

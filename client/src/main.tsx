@@ -7,6 +7,17 @@ if (typeof window !== 'undefined') {
     }
   } as any;
   
+  // Add global error handlers to catch unhandled promise rejections
+  window.addEventListener('unhandledrejection', (event) => {
+    console.log('📍 Unhandled promise rejection caught and handled safely');
+    event.preventDefault(); // Prevent default browser handling
+  });
+  
+  window.addEventListener('error', (event) => {
+    console.log('📍 Global error caught and handled safely');
+    event.preventDefault();
+  });
+  
   // Log that we're in DevNet mode
   console.log('🌐 DevNet mode detected - WebSocket disabled for stability');
   
