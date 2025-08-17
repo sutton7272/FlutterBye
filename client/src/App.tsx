@@ -143,12 +143,6 @@ function Router() {
       <div className="flex-1 bg-transparent">
         <Switch>
         <Route path="/" component={() => (
-          <SuspenseWrapper>
-            <ComprehensiveSocialDashboard />
-          </SuspenseWrapper>
-        )} />
-        
-        <Route path="/flutterbye-home" component={() => (
           <>
             <Navbar />
             <SuspenseWrapper>
@@ -157,6 +151,13 @@ function Router() {
           </>
         )} />
 
+        {/* Admin Social Automation Dashboard */}
+        <Route path="/admin/social-automation" component={() => (
+          <SuspenseWrapper>
+            <ComprehensiveSocialDashboard />
+          </SuspenseWrapper>
+        )} />
+        
         <Route path="/social-automation" component={() => (
           <SuspenseWrapper>
             <ComprehensiveSocialDashboard />
