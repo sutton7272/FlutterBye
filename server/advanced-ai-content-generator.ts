@@ -1,6 +1,8 @@
-import { openai } from "./openai-service";
+import { OpenAIService } from "./openai-service";
 import { aiCostOptimizer } from "./ai-cost-optimizer";
 import { databaseOptimizer } from "./database-optimizer";
+
+const openaiService = new OpenAIService();
 
 interface ContentRequest {
   id: string;

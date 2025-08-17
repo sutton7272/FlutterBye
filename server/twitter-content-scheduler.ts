@@ -10,6 +10,8 @@ interface ScheduledPost {
   scheduledTime: string;
   status: 'pending' | 'posted' | 'failed';
   posted?: boolean;
+  imageUrl?: string;
+  imageDescription?: string;
 }
 
 export class TwitterContentScheduler {
@@ -133,12 +135,18 @@ export class TwitterContentScheduler {
       if (generatedContent && generatedContent.content) {
         content = generatedContent;
       } else if (generatedContent && generatedContent.text) {
-        content = { content: generatedContent.text, hashtags: generatedContent.hashtags || [] };
+        content = { 
+          content: generatedContent.text, 
+          hashtags: generatedContent.hashtags || [],
+          imageUrl: generatedContent.imageUrl,
+          imageDescription: generatedContent.imageDescription
+        };
       } else {
         // Fallback content if AI generation fails
         content = {
           content: "🚀 FlutterBye: The future of Web3 communication is here! Revolutionary blockchain-powered messaging with SPL tokens, AI optimization, and real-time engagement. Transform your social media strategy today! #FlutterBye #Web3 #Blockchain #AI #SocialAutomation #Innovation #Crypto #Future #Technology #Engagement",
-          hashtags: []
+          hashtags: [],
+          imageUrl: '/public/butterfly-logo.png'
         };
       }
 
@@ -152,7 +160,14 @@ export class TwitterContentScheduler {
       
       console.log(`📝 Generated content text: ${content.content}`);
       
-      const postResult = await this.twitterService.postTweet(content.content);
+      // Post with image if available
+      let postResult;
+      if (content.imageUrl) {
+        console.log(`📷 Posting with image: ${content.imageUrl}`);
+        postResult = await this.twitterService.postTweetWithImage(content.content, content.imageUrl);
+      } else {
+        postResult = await this.twitterService.postTweet(content.content);
+      }
       
       if (postResult.success) {
         console.log(`✅ AUTO-POST SUCCESS: Posted tweet with ID ${postResult.tweetId}`);
@@ -173,7 +188,12 @@ export class TwitterContentScheduler {
           });
           
           if (uniqueContent && uniqueContent.content) {
-            const retryResult = await this.twitterService.postTweet(uniqueContent.content);
+            let retryResult;
+            if (uniqueContent.imageUrl) {
+              retryResult = await this.twitterService.postTweetWithImage(uniqueContent.content, uniqueContent.imageUrl);
+            } else {
+              retryResult = await this.twitterService.postTweet(uniqueContent.content);
+            }
             if (retryResult.success) {
               console.log(`✅ RETRY SUCCESS: Posted unique tweet with ID ${retryResult.tweetId}`);
               return retryResult;

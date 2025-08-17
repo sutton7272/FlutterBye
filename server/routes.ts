@@ -7097,6 +7097,56 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: "Failed to export viral analytics" });
     }
   });
+  // Social Media Testing Endpoints with Image Support and Advanced Hashtag Optimization
+  const { socialMediaTester } = await import('./social-media-testing');
+  
+  app.post("/api/social/test/image-post", async (req, res) => {
+    try {
+      console.log('🧪 Testing image-supported social media post...');
+      const result = await socialMediaTester.testImageSupportedPost();
+      res.json(result);
+    } catch (error) {
+      console.error('Social media image test error:', error);
+      res.status(500).json({ error: 'Failed to test image-supported post' });
+    }
+  });
+
+  app.post("/api/social/test/hashtag-optimization", async (req, res) => {
+    try {
+      const { text = 'FlutterBye blockchain innovation' } = req.body;
+      console.log('🏷️ Testing hashtag optimization...');
+      const result = await socialMediaTester.testHashtagOptimization(text);
+      res.json({ success: true, optimization: result });
+    } catch (error) {
+      console.error('Hashtag optimization test error:', error);
+      res.status(500).json({ error: 'Failed to test hashtag optimization' });
+    }
+  });
+
+  app.post("/api/social/test/comprehensive", async (req, res) => {
+    try {
+      console.log('🎯 Running comprehensive social media strategy test...');
+      const result = await socialMediaTester.testComprehensiveSocialStrategy();
+      res.json(result);
+    } catch (error) {
+      console.error('Comprehensive social test error:', error);
+      res.status(500).json({ error: 'Failed to run comprehensive social test' });
+    }
+  });
+
+  app.post("/api/social/test/image-library", async (req, res) => {
+    try {
+      console.log('📚 Testing image library selection...');
+      const result = await socialMediaTester.testImageLibrarySelection();
+      res.json(result);
+    } catch (error) {
+      console.error('Image library test error:', error);
+      res.status(500).json({ error: 'Failed to test image library selection' });
+    }
+  });
+
+  console.log('🧪 Social Media Testing Endpoints with Image Support and Advanced Hashtag Optimization registered');
+
   app.get("/api/admin/export/system-metrics", async (req, res) => {
     try {
       const metrics = {

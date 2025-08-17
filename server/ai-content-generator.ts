@@ -8,6 +8,33 @@ const openai = new OpenAI({
 
 const openaiService = new OpenAIService();
 
+// Enhanced image library for posts
+const SITE_IMAGES = [
+  '/public/butterfly-logo.png',
+  // FlutterBye brand assets
+  'https://storage.googleapis.com/replit-public-bucket/flutterbye-logo.png',
+  'https://storage.googleapis.com/replit-public-bucket/web3-butterfly.jpg'
+];
+
+// Enhanced hashtag analysis and optimization
+const HASHTAG_ANALYTICS = {
+  trending: ['#Web3', '#Crypto', '#AI', '#Innovation', '#Blockchain'],
+  high_engagement: ['#BuildTogether', '#TechRevolution', '#FutureOfComm'],
+  platform_specific: ['#FlutterBye', '#TokensThatTalk', '#Web3Communication'],
+  time_optimized: {
+    morning: ['#MorningInnovation', '#StartStrong', '#TechBreakfast'],
+    afternoon: ['#MidDayTech', '#ProductivityBoost', '#Innovation'],
+    evening: ['#EveningTech', '#CommunityTime', '#TrendingTech'],
+    night: ['#NightOwls', '#TechThoughts', '#LateNightInnovation']
+  },
+  category_specific: {
+    product: ['#ProductInnovation', '#TechLaunch', '#Revolutionary'],
+    community: ['#BuildTogether', '#CommunityFirst', '#Web3Community'],
+    education: ['#LearnWeb3', '#TechEducation', '#Innovation'],
+    marketing: ['#JoinRevolution', '#EarlyAccess', '#TechMarketing']
+  }
+};
+
 export interface ContentTemplate {
   id: string;
   name: string;
@@ -23,6 +50,8 @@ export interface GeneratedContent {
   engagementScore: number;
   tone: string;
   category: string;
+  imageUrl?: string;
+  imageDescription?: string;
 }
 
 export class AIContentGenerator {
@@ -287,13 +316,18 @@ Respond with JSON in this format:
       const hashtags = await this.extractOptimalHashtags(generatedText, timeSlot, template.category);
       const engagementScore = this.calculateEngagementScore(generatedText, timeSlot, hashtags);
       
+      // Select optimal image for the post
+      const imageData = await this.selectOptimalImage(generatedText, template.category, timeSlot);
+      
       const result: GeneratedContent = {
         text: generatedText.replace(/#\w+/g, '').trim(),
         hashtags,
         estimatedReach: this.calculateEstimatedReach(timeSlot, template.category),
         engagementScore,
         tone: this.detectTone(generatedText),
-        category: template.category
+        category: template.category,
+        imageUrl: imageData?.imageUrl,
+        imageDescription: imageData?.description
       };
 
       // Store this generation for future performance learning
@@ -717,25 +751,139 @@ Respond with JSON in this format:
     ];
   }
 
+  // Image selection and generation
+  async selectOptimalImage(text: string, category: string, timeSlot: string): Promise<{ imageUrl: string; description: string } | null> {
+    try {
+      // First, check if we have appropriate site images
+      const siteImage = this.selectSiteImage(text, category);
+      if (siteImage) {
+        return {
+          imageUrl: siteImage,
+          description: "FlutterBye brand asset"
+        };
+      }
+
+      // Generate AI image if no site image is available and we have API access
+      if (process.env.OPENAI_API_KEY) {
+        const imagePrompt = this.createImagePrompt(text, category);
+        const generatedImage = await openaiService.generateImage(imagePrompt);
+        return {
+          imageUrl: generatedImage.url,
+          description: `AI-generated: ${imagePrompt}`
+        };
+      }
+
+      return null;
+    } catch (error) {
+      console.error('Image selection failed:', error);
+      return null;
+    }
+  }
+
+  private selectSiteImage(text: string, category: string): string | null {
+    // Smart selection based on content and category
+    const lowerText = text.toLowerCase();
+    
+    if (lowerText.includes('flutterbye') || lowerText.includes('logo') || category === 'product') {
+      return '/public/butterfly-logo.png';
+    }
+    
+    // Return one of the available images
+    return SITE_IMAGES[Math.floor(Math.random() * SITE_IMAGES.length)] || null;
+  }
+
+  private createImagePrompt(text: string, category: string): string {
+    const basePrompts = {
+      product: "Professional tech product showcase, modern design, Web3 themes, butterfly motifs, electric blue and green colors",
+      community: "Community engagement, people connecting, Web3 social network, vibrant colors, inclusive design",
+      educational: "Educational technology content, learning concepts, blockchain visualization, clean modern design",
+      promotional: "Marketing promotional content, exciting technology announcement, dynamic composition, eye-catching",
+      engagement: "Social media engagement, interactive content, modern UI elements, friendly approachable design"
+    };
+
+    const basePrompt = basePrompts[category as keyof typeof basePrompts] || basePrompts.product;
+    return `${basePrompt}, high quality, professional, suitable for social media posting`;
+  }
+
   // Enhanced utility methods for real-time intelligence
   private async extractOptimalHashtags(text: string, timeSlot: string, category: string = 'general'): Promise<string[]> {
     try {
-      // Use OpenAI service for intelligent hashtag optimization
-      const optimizedHashtags = await openaiService.generateOptimizedHashtags(text, category);
+      // Use advanced hashtag analytics first
+      const analyticsHashtags = this.getAnalyticsOptimizedHashtags(text, timeSlot, category);
       
-      // Ensure we have the optimal number (8-12 hashtags)
-      if (optimizedHashtags.length >= 8) {
-        console.log(`🏷️ Generated ${optimizedHashtags.length} optimal hashtags: ${optimizedHashtags.slice(0, 5).join(', ')}...`);
-        return optimizedHashtags;
-      }
+      // Use OpenAI service for intelligent hashtag optimization as supplement
+      const aiHashtags = await openaiService.generateOptimizedHashtags(text, category);
       
-      // If AI generated fewer, supplement with strategic hashtags
-      return this.supplementHashtags(optimizedHashtags, text, timeSlot, category);
+      // Combine and optimize the hashtags
+      const combined = [...analyticsHashtags, ...aiHashtags];
+      const optimized = this.optimizeHashtagSelection(combined, text, timeSlot, category);
+      
+      console.log(`🏷️ Generated ${optimized.length} optimized hashtags: ${optimized.slice(0, 5).join(', ')}...`);
+      return optimized;
       
     } catch (error) {
       console.error('Hashtag optimization failed:', error);
       return this.getFallbackOptimalHashtags(text, timeSlot, category);
     }
+  }
+
+  private getAnalyticsOptimizedHashtags(text: string, timeSlot: string, category: string): string[] {
+    const hashtags = ['#FlutterBye']; // Always start with brand hashtag
+    
+    // Add trending hashtags
+    hashtags.push(...HASHTAG_ANALYTICS.trending.slice(0, 2));
+    
+    // Add high engagement hashtags
+    hashtags.push(...HASHTAG_ANALYTICS.high_engagement.slice(0, 2));
+    
+    // Add platform specific
+    hashtags.push(...HASHTAG_ANALYTICS.platform_specific.slice(0, 2));
+    
+    // Add time-optimized hashtags
+    const timeOfDay = this.getTimeOfDay(timeSlot);
+    const timeHashtags = HASHTAG_ANALYTICS.time_optimized[timeOfDay as keyof typeof HASHTAG_ANALYTICS.time_optimized] || [];
+    hashtags.push(...timeHashtags.slice(0, 2));
+    
+    // Add category-specific hashtags
+    const categoryHashtags = HASHTAG_ANALYTICS.category_specific[category as keyof typeof HASHTAG_ANALYTICS.category_specific] || [];
+    hashtags.push(...categoryHashtags.slice(0, 2));
+    
+    return [...new Set(hashtags)]; // Remove duplicates
+  }
+
+  private getTimeOfDay(timeSlot: string): string {
+    const timeMapping = {
+      earlyMorning: 'morning',
+      breakfast: 'morning', 
+      lateMorning: 'morning',
+      lunch: 'afternoon',
+      earlyAfternoon: 'afternoon',
+      lateAfternoon: 'afternoon',
+      dinner: 'evening',
+      earlyEvening: 'evening',
+      evening: 'evening',
+      lateNight: 'night'
+    };
+    
+    return timeMapping[timeSlot as keyof typeof timeMapping] || 'afternoon';
+  }
+
+  private optimizeHashtagSelection(hashtags: string[], text: string, timeSlot: string, category: string): string[] {
+    // Remove duplicates and clean hashtags
+    const cleaned = [...new Set(hashtags)]
+      .map(tag => tag.startsWith('#') ? tag : `#${tag}`)
+      .filter(tag => tag.length > 1);
+    
+    // Ensure #FlutterBye is first
+    const filtered = cleaned.filter(tag => tag !== '#FlutterBye');
+    const final = ['#FlutterBye', ...filtered];
+    
+    // Add content-intelligent hashtags
+    const contentTags = this.analyzeContentForHashtags(text);
+    final.push(...contentTags.slice(0, 3));
+    
+    // Return optimal number (8-12 hashtags)
+    return [...new Set(final)].slice(0, 12);
   }
 
   private supplementHashtags(baseHashtags: string[], text: string, timeSlot: string, category: string): string[] {
