@@ -143,21 +143,21 @@ function Router() {
       <div className="flex-1 bg-transparent">
         <Switch>
         <Route path="/" component={() => (
+          <>
+            <Navbar />
+            <SuspenseWrapper>
+              <Home />
+            </SuspenseWrapper>
+          </>
+        )} />
+        
+        <Route path="/social-automation" component={() => (
           <SuspenseWrapper>
             <ComprehensiveSocialDashboard />
           </SuspenseWrapper>
         )} />
-        
-        <Route path="/old-home" component={() => (
-          <>
-            <Navbar />
-            <SuspenseWrapper>
-              <ComprehensiveSocialDashboard />
-            </SuspenseWrapper>
-          </>
-        )} />
         <Route path="/launch" component={LaunchCountdown} />
-        <Route path="/home" component={() => (
+        <Route path="/old-home" component={() => (
           <>
             <Navbar />
             <Home />
