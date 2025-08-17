@@ -105,15 +105,10 @@ app.use((req, res, next) => {
 
   // Remove problematic fallback routes
 
-  // For DevNet deployment, always use Vite for proper development serving
-  // Only use static serving for true production builds
-  const useStaticServing = process.env.NODE_ENV === 'production' && process.env.BUILD_STATIC === 'true';
-  
-  if (useStaticServing) {
-    serveStatic(app);
-  } else {
-    await setupVite(app, server);
-  }
+  // For DevNet deployment, ALWAYS use Vite for proper development serving
+  // Force Vite dev mode to prevent caching issues
+  console.log('🔧 Forcing Vite development mode for DevNet deployment');
+  await setupVite(app, server);
 
   // ALWAYS serve the app on the port specified in the environment variable PORT
   // Other ports are firewalled. Default to 5000 if not specified.
