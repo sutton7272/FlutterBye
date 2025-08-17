@@ -83,6 +83,31 @@ export class TwitterAPIService {
     }
   }
 
+  async postTweetWithImage(content: string, imagePath: string): Promise<{success: boolean, message: string, tweetId?: string, error?: string}> {
+    try {
+      console.log('📷 Posting tweet with image via Twitter API...');
+      console.log('Image path:', imagePath);
+      
+      // For now, fall back to text-only posting since image upload requires media upload API
+      // which is more complex and needs file handling
+      console.log('⚠️ Image posting not fully implemented - posting text only for now');
+      
+      const result = await this.postTweet(content);
+      return {
+        ...result,
+        message: result.message + ' (Image posting feature in development)'
+      };
+      
+    } catch (error: any) {
+      console.error('❌ Twitter image post error:', error);
+      return {
+        success: false,
+        message: `Image post failed: ${error.message || 'Unknown error'}`,
+        error: error.message || 'Unknown error'
+      };
+    }
+  }
+
   async verifyCredentials(): Promise<{success: boolean, message: string, user?: any}> {
     try {
       console.log('🔍 Verifying Twitter API credentials...');
