@@ -70,14 +70,13 @@ export class TwitterContentScheduler {
 
     console.log('🔄 Twitter scheduler active - checking every minute');
     
-    // Also run an immediate check when starting and force a test post
+    // Only run initial check, no auto-posting on startup
     setTimeout(async () => {
       try {
-        console.log('🚀 Running startup auto-post test...');
-        await this.createAndPostContent();
+        console.log('🔍 Initial scheduler check...');
         await this.checkScheduleAndPost();
       } catch (error) {
-        console.log('📍 Startup auto-post error handled safely');
+        console.log('📍 Initial check error handled safely');
       }
     }, 5000);
   }
@@ -96,20 +95,42 @@ export class TwitterContentScheduler {
     
     // Check if current time matches any enabled schedule slot
     const enabledSlots = Object.entries(this.postingSchedule)
-      .filter(([key, config]) => config.enabled);
+      .filter(([key, config]: [string, any]) => config.enabled);
     
     for (const [slotName, config] of enabledSlots) {
       const slotTime = config.time;
       if (this.timeMatches(currentTime, slotTime)) {
         console.log(`🎯 Time match! Posting for slot: ${slotName} at ${slotTime}`);
+        
+        // Add cooldown check to prevent duplicate posts within same minute
+        const lastPostKey = `lastPost_${slotName}`;
+        const lastPostTime = this.getLastPostTime(lastPostKey);
+        const currentMinute = Math.floor(Date.now() / 60000);
+        
+        if (lastPostTime === currentMinute) {
+          console.log(`⏸️ Already posted for ${slotName} this minute, skipping...`);
+          return;
+        }
+        
         try {
           await this.createAndPostContent();
+          this.setLastPostTime(lastPostKey, currentMinute);
         } catch (error) {
           console.log('📍 Scheduled post error handled safely');
         }
         return; // Exit after posting to prevent multiple posts
       }
     }
+  }
+
+  private lastPostTimes: Map<string, number> = new Map();
+
+  private getLastPostTime(key: string): number {
+    return this.lastPostTimes.get(key) || 0;
+  }
+
+  private setLastPostTime(key: string, time: number): void {
+    this.lastPostTimes.set(key, time);
   }
 
   private timeMatches(currentTime: string, scheduleTime: string): boolean {
@@ -143,15 +164,26 @@ export class TwitterContentScheduler {
       });
       
       // Handle the content structure properly
-      let content;
+      let content: {
+        content: string;
+        hashtags: string[];
+        imageUrl?: string;
+        imageDescription?: string;
+      };
+      
       if (generatedContent && generatedContent.content) {
-        content = generatedContent;
-      } else if (generatedContent && generatedContent.text) {
-        content = { 
-          content: generatedContent.text, 
+        content = {
+          content: generatedContent.content,
           hashtags: generatedContent.hashtags || [],
-          imageUrl: generatedContent.imageUrl,
-          imageDescription: generatedContent.imageDescription
+          imageUrl: (generatedContent as any).imageUrl,
+          imageDescription: (generatedContent as any).imageDescription
+        };
+      } else if (generatedContent && (generatedContent as any).text) {
+        content = { 
+          content: (generatedContent as any).text, 
+          hashtags: generatedContent.hashtags || [],
+          imageUrl: (generatedContent as any).imageUrl,
+          imageDescription: (generatedContent as any).imageDescription
         };
       } else {
         // Fallback content if AI generation fails
@@ -201,8 +233,8 @@ export class TwitterContentScheduler {
           
           if (uniqueContent && uniqueContent.content) {
             let retryResult;
-            if (uniqueContent.imageUrl) {
-              retryResult = await this.twitterService.postTweetWithImage(uniqueContent.content, uniqueContent.imageUrl);
+            if ((uniqueContent as any).imageUrl) {
+              retryResult = await this.twitterService.postTweetWithImage(uniqueContent.content, (uniqueContent as any).imageUrl);
             } else {
               retryResult = await this.twitterService.postTweet(uniqueContent.content);
             }
@@ -217,7 +249,7 @@ export class TwitterContentScheduler {
       return postResult;
     } catch (error) {
       console.error('❌ Error in auto-posting system:', error);
-      return { success: false, error: error.message };
+      return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
     }
   }
 
@@ -228,20 +260,21 @@ export class TwitterContentScheduler {
       
       if (!this.isActive) return; // Only check if bot is active
       
-      // Force create and post content at scheduled times
+      // Check for scheduled time slots (this handles auto-generated content)
       await this.checkScheduleAndPost();
       
+      // Handle manually scheduled posts separately
       const now = new Date();
       const readyPosts = pendingPosts.filter(post => 
         new Date(post.scheduledTime) <= now
       );
       
       if (readyPosts.length > 0) {
-        console.log(`📤 Found ${readyPosts.length} posts ready to publish`);
+        console.log(`📤 Found ${readyPosts.length} manual posts ready to publish`);
         
         for (const post of readyPosts) {
           try {
-            console.log(`📤 Posting: "${post.content.substring(0, 50)}..."`);
+            console.log(`📤 Posting manual: "${post.content.substring(0, 50)}..."`);
             const tweetResult = await this.twitterService.postTweet(post.content);
             
             if (tweetResult.success) {
@@ -250,7 +283,7 @@ export class TwitterContentScheduler {
                 'posted', 
                 tweetResult.tweetId
               );
-              console.log(`✅ Posted successfully - Tweet ID: ${tweetResult.tweetId}`);
+              console.log(`✅ Posted manually scheduled successfully - Tweet ID: ${tweetResult.tweetId}`);
             } else {
               await socialBotStorage.updateScheduledPostStatus(
                 post.id, 
@@ -258,7 +291,7 @@ export class TwitterContentScheduler {
                 undefined, 
                 tweetResult.error
               );
-              console.error(`❌ Failed to post: ${tweetResult.error}`);
+              console.error(`❌ Failed to post manual: ${tweetResult.error}`);
             }
           } catch (error) {
             await socialBotStorage.updateScheduledPostStatus(
@@ -374,21 +407,21 @@ export class TwitterContentScheduler {
   }
 
   // Quick scheduling methods
-  scheduleDaily(content: string, hashtags: string[], hour: number, minute: number = 0): string {
+  async scheduleDaily(content: string, hashtags: string[], hour: number, minute: number = 0): Promise<string> {
     const tomorrow = new Date();
     tomorrow.setDate(tomorrow.getDate() + 1);
     tomorrow.setHours(hour, minute, 0, 0);
     
-    return this.schedulePost(content, hashtags, tomorrow.toISOString());
+    return await this.schedulePost(content, hashtags, tomorrow.toISOString());
   }
 
-  scheduleWeekly(content: string, hashtags: string[], dayOfWeek: number, hour: number): string {
+  async scheduleWeekly(content: string, hashtags: string[], dayOfWeek: number, hour: number): Promise<string> {
     const nextWeek = new Date();
     const daysUntilTarget = (dayOfWeek + 7 - nextWeek.getDay()) % 7 || 7;
     nextWeek.setDate(nextWeek.getDate() + daysUntilTarget);
     nextWeek.setHours(hour, 0, 0, 0);
     
-    return this.schedulePost(content, hashtags, nextWeek.toISOString());
+    return await this.schedulePost(content, hashtags, nextWeek.toISOString());
   }
 
   // Bot control methods
@@ -409,7 +442,7 @@ export class TwitterContentScheduler {
       isActive: this.isActive,
       isInitialized: this.isInitialized,
       postingSchedule: this.postingSchedule,
-      scheduledPostsCount: this.scheduledPosts.length
+      scheduledPostsCount: 0
     };
   }
 
@@ -423,23 +456,21 @@ export class TwitterContentScheduler {
   // AI-powered content generation and scheduling
   async generateAndScheduleContent(timeSlot: string, customContext?: string): Promise<string> {
     try {
-      const template = aiContentGenerator.getTemplates().find(t => 
-        t.timeSlots.includes(timeSlot)
-      ) || aiContentGenerator.getTemplates()[0];
+      const generatedContent = await aiContentGenerator.generateContent({
+        category: 'technology',
+        includeHashtags: true,
+        customPrompt: customContext || `FlutterBye content for ${timeSlot}`
+      });
       
-      const generatedContent = await aiContentGenerator.generateContent(
-        template, 
-        timeSlot, 
-        customContext
-      );
+      // Schedule for next occurrence of this time slot  
+      const tomorrow = new Date();
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      tomorrow.setHours(12, 0, 0, 0); // Default to noon
       
-      // Schedule for next occurrence of this time slot
-      const scheduledTime = this.calculateNextTimeSlot(timeSlot);
-      
-      const postId = this.schedulePost(
-        generatedContent.text,
+      const postId = await this.schedulePost(
+        generatedContent.content,
         generatedContent.hashtags,
-        scheduledTime.toISOString()
+        tomorrow.toISOString()
       );
       
       console.log(`🤖 AI-generated content scheduled for ${timeSlot}: ${postId}`);

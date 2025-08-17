@@ -223,9 +223,9 @@ const initializeStorage = async () => {
   if (botEnabled) {
     console.log('🤖 Restored bot status: enabled');
     // Reactivate the scheduler if bot was enabled
-    const scheduler = initializeTwitterScheduler();
-    if (scheduler && savedSchedule) {
-      scheduler.activateBot('social-automation-bot');
+    initializeTwitterScheduler();
+    if (savedSchedule) {
+      TwitterSchedulerSingleton.activateBot('social-automation-bot');
       console.log('📅 Reactivated Twitter scheduler on startup');
     }
   } else {
@@ -240,18 +240,15 @@ const runningBots = new Map<string, { automation: any; interval: NodeJS.Timeout 
 let savedSchedule: any = null;
 let botEnabled: boolean = false;
 
-// Initialize Twitter scheduler
-let twitterScheduler: TwitterContentScheduler | null = null;
+// Use singleton Twitter scheduler to prevent duplicates
+import TwitterSchedulerSingleton from './twitter-scheduler-singleton';
+
 const initializeTwitterScheduler = () => {
-  if (!twitterScheduler) {
-    try {
-      twitterScheduler = new TwitterContentScheduler();
-      console.log('📅 Twitter Content Scheduler initialized for social automation');
-    } catch (error) {
-      console.error('❌ Failed to initialize Twitter scheduler:', error);
-    }
+  const scheduler = TwitterSchedulerSingleton.getInstance();
+  if (scheduler) {
+    console.log('📅 Twitter Content Scheduler singleton ready for social automation');
   }
-  return twitterScheduler;
+  return scheduler;
 };
 
 export function registerSocialAutomationAPI(app: Express) {
@@ -320,15 +317,12 @@ export function registerSocialAutomationAPI(app: Express) {
       console.log(`🤖 Bot ${enabled ? 'activated' : 'deactivated'} by user`);
       
       // Activate/deactivate the Twitter scheduler
-      const scheduler = initializeTwitterScheduler();
-      if (scheduler) {
-        if (enabled) {
-          scheduler.activateBot('social-automation-bot');
-          console.log('📅 Twitter scheduler activated via bot toggle');
-        } else {
-          scheduler.deactivateBot();
-          console.log('📅 Twitter scheduler deactivated via bot toggle');
-        }
+      if (enabled) {
+        TwitterSchedulerSingleton.activateBot('social-automation-bot');
+        console.log('📅 Twitter scheduler activated via bot toggle');
+      } else {
+        TwitterSchedulerSingleton.deactivateBot();
+        console.log('📅 Twitter scheduler deactivated via bot toggle');
       }
       
       res.json({ 
