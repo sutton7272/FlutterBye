@@ -1,6 +1,45 @@
-node_modules
-dist
+# Dependencies
+node_modules/
+*.log
+
+# Build output
+dist/
+
+# Environment files
+.env
+.env.local
+.env.production
+
+# OS files
 .DS_Store
-server/public
-vite.config.ts.*
-*.tar.gz
+Thumbs.db
+
+# IDE files
+.vscode/
+.idea/
+
+# Replit specific
+.replit
+.upm/
+
+# Local development
+.local/
+
+# Large assets (not needed for production)
+attached_assets/
+
+# Database
+*.db
+*.sqlite
+
+# Temporary files
+*.tmp
+*.temp
+
+# Cache
+.cache/
+.parcel-cache/
+
+# Testing
+coverage/
+.nyc_output/
