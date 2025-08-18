@@ -1,0 +1,143 @@
+name: Create AWS Infrastructure and Deploy
+
+on:
+  workflow_dispatch:
+
+jobs:
+  setup-and-deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+      
+    - name: Configure AWS CLI
+      uses: aws-actions/configure-aws-credentials@v2
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: us-east-2
+        
+    - name: List current AWS resources
+      run: |
+        echo "=== Current Elastic Beanstalk Applications ==="
+        aws elasticbeanstalk describe-applications --region us-east-2 --query 'Applications[*].ApplicationName' --output table || echo "No applications found"
+        echo ""
+        echo "=== Current Environments ==="
+        aws elasticbeanstalk describe-environments --region us-east-2 --query 'Environments[*].[ApplicationName,EnvironmentName,Status]' --output table || echo "No environments found"
+        
+    - name: Create application
+      run: |
+        # Delete existing application if it exists
+        if aws elasticbeanstalk describe-applications --application-names FlutterBye --region us-east-2 2>/dev/null; then
+          echo "Deleting existing FlutterBye application..."
+          aws elasticbeanstalk delete-application --application-name FlutterBye --terminate-env-by-force --region us-east-2
+          echo "Waiting for deletion to complete..."
+          sleep 60
+        fi
+        
+        # Create new application
+        echo "Creating FlutterBye application..."
+        aws elasticbeanstalk create-application \
+          --application-name FlutterBye \
+          --description "FlutterBye Web3 Social Media Platform" \
+          --region us-east-2
+          
+    - name: Create environment
+      run: |
+        echo "Creating production environment..."
+        aws elasticbeanstalk create-environment \
+          --application-name FlutterBye \
+          --environment-name production \
+          --solution-stack-name "64bit Amazon Linux 2023 v6.1.6 running Node.js 20" \
+          --option-settings \
+            Namespace=aws:autoscaling:launchconfiguration,OptionName=InstanceType,Value=t3.micro \
+            Namespace=aws:elasticbeanstalk:environment,OptionName=EnvironmentType,Value=SingleInstance \
+            Namespace=aws:elasticbeanstalk:application:environment,OptionName=NODE_ENV,Value=production \
+            Namespace=aws:elasticbeanstalk:application:environment,OptionName=PORT,Value=8080 \
+          --region us-east-2
+          
+    - name: Wait for environment
+      run: |
+        echo "Waiting for environment to be ready (this takes 5-10 minutes)..."
+        aws elasticbeanstalk wait environment-ready \
+          --application-name FlutterBye \
+          --environment-names production \
+          --region us-east-2
+          
+    - name: Setup Node.js and build
+      uses: actions/setup-node@v3
+      with:
+        node-version: '20'
+        cache: 'npm'
+        
+    - name: Install and build
+      run: |
+        npm ci
+        npm run build
+        
+    - name: Create deployment package
+      run: |
+        zip -r flutterbye-app.zip . \
+          -x "*.git*" \
+          -x "*node_modules*" \
+          -x "*attached_assets*" \
+          -x "*.local*" \
+          -x "*dist/client*" \
+          -x "*.md"
+        echo "Package size: $(du -h flutterbye-app.zip)"
+        
+    - name: Deploy application
+      run: |
+        # Create application version
+        VERSION_LABEL="production-$(date +%s)"
+        
+        aws elasticbeanstalk create-application-version \
+          --application-name FlutterBye \
+          --version-label "$VERSION_LABEL" \
+          --description "FlutterBye production deployment" \
+          --source-bundle S3Bucket="",S3Key="" \
+          --region us-east-2
+          
+        # Get AWS account ID and create S3 bucket name
+        ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
+        S3_BUCKET="elasticbeanstalk-us-east-2-$ACCOUNT_ID"
+        
+        # Upload to S3
+        aws s3 cp flutterbye-app.zip "s3://$S3_BUCKET/flutterbye-$VERSION_LABEL.zip"
+        
+        # Create version with S3 location
+        aws elasticbeanstalk create-application-version \
+          --application-name FlutterBye \
+          --version-label "$VERSION_LABEL" \
+          --source-bundle "S3Bucket=$S3_BUCKET,S3Key=flutterbye-$VERSION_LABEL.zip" \
+          --region us-east-2
+          
+        # Deploy to environment
+        aws elasticbeanstalk update-environment \
+          --application-name FlutterBye \
+          --environment-name production \
+          --version-label "$VERSION_LABEL" \
+          --region us-east-2
+          
+        echo "Deployment initiated with version: $VERSION_LABEL"
+        
+    - name: Get application URL
+      run: |
+        echo "Waiting for deployment to complete..."
+        sleep 60
+        
+        URL=$(aws elasticbeanstalk describe-environments \
+          --application-name FlutterBye \
+          --environment-names production \
+          --region us-east-2 \
+          --query 'Environments[0].CNAME' \
+          --output text)
+          
+        echo ""
+        echo "🎉 FlutterBye deployment complete!"
+        echo "🌐 Live URL: http://$URL"
+        echo "📊 Environment: production"
+        echo "🔧 Region: us-east-2"
+        echo ""
+        echo "You can now map www.flutterbye.io to this URL"
