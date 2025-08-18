@@ -1,0 +1,15 @@
+{
+  "name": "flutterbye",
+  "version": "1.0.0",
+  "description": "FlutterBye Web3 Social Media Platform",
+  "scripts": {
+    "build": "npm run build:frontend",
+    "build:frontend": "vite build",
+    "dev": "vite",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "vite": "^5.4.19",
+    "@vitejs/plugin-react": "^4.3.3"
+  }
+}
