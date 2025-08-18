@@ -227,6 +227,16 @@ export default function Navbar() {
         
         {/* Right Side Actions */}
         <div className="ml-auto flex items-center space-x-3">
+          {/* DevNet Test Button */}
+          <Button
+            variant="outline"
+            size="sm"
+            className="hidden sm:flex items-center gap-2 border-electric-blue/50 text-electric-blue hover:bg-electric-blue/10 hover:text-electric-blue transition-all duration-200"
+            onClick={() => window.open('https://dev.flutterbye.io/', '_blank')}
+          >
+            <Rocket className="h-4 w-4" />
+            Test Flutterbye on DevNet!
+          </Button>
           <WalletConnect />
         </div>
         
@@ -267,6 +277,23 @@ export default function Navbar() {
                 </Link>
               ))}
               
+              {/* DevNet Test Button for Mobile */}
+              <div className="mt-6 pt-4 border-t border-border">
+                <Button
+                  variant="outline"
+                  className="w-full justify-start h-12 border-electric-blue/50 text-electric-blue hover:bg-electric-blue/10"
+                  onClick={() => {
+                    window.open('https://dev.flutterbye.io/', '_blank');
+                    setIsOpen(false);
+                  }}
+                >
+                  <Rocket className="h-5 w-5 mr-3" />
+                  <div className="flex flex-col items-start">
+                    <span className="font-medium">Test Flutterbye on DevNet!</span>
+                    <span className="text-xs opacity-70">Try the live development environment</span>
+                  </div>
+                </Button>
+              </div>
 
             </nav>
           </SheetContent>
