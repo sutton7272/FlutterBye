@@ -20,7 +20,31 @@ export default function Navbar() {
   
   // Don't render navbar if no early access
   if (!hasEarlyAccess) {
-    return null;
+    // Still show DevNet button even without early access
+    return (
+      <nav className="w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50">
+        <div className="flex h-16 items-center justify-between px-4 lg:px-6">
+          <div className="flex items-center space-x-4">
+            <Link href="/" className="flex items-center space-x-3">
+              <span className="font-bold text-xl text-white">Flutterbye</span>
+            </Link>
+          </div>
+          
+          <div className="ml-auto flex items-center space-x-3">
+            <Button
+              variant="outline"
+              size="sm"
+              className="flex items-center gap-2 border-blue-400 text-blue-400 hover:bg-blue-400/10 hover:text-blue-300 bg-background/90 transition-all duration-200 font-medium"
+              onClick={() => window.open('https://dev.flutterbye.io/', '_blank')}
+              data-testid="button-devnet-test"
+            >
+              <Rocket className="h-4 w-4" />
+              Test DevNet
+            </Button>
+          </div>
+        </div>
+      </nav>
+    );
   }
 
   // Get navigation control state
@@ -231,11 +255,12 @@ export default function Navbar() {
           <Button
             variant="outline"
             size="sm"
-            className="hidden sm:flex items-center gap-2 border-electric-blue/50 text-electric-blue hover:bg-electric-blue/10 hover:text-electric-blue transition-all duration-200"
+            className="flex items-center gap-2 border-blue-400 text-blue-400 hover:bg-blue-400/10 hover:text-blue-300 bg-background/90 transition-all duration-200 font-medium"
             onClick={() => window.open('https://dev.flutterbye.io/', '_blank')}
+            data-testid="button-devnet-test"
           >
             <Rocket className="h-4 w-4" />
-            Test Flutterbye on DevNet!
+            Test DevNet
           </Button>
           <WalletConnect />
         </div>
