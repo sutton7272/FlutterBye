@@ -317,6 +317,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // Production monitoring is handled by performanceMiddleware above
   
+  // Simple health check for AWS load balancer
+  app.get('/health', (req, res) => {
+    res.status(200).send('OK');
+  });
+
+  // Root health check for AWS (no file dependencies)
+  app.get('/', (req, res) => {
+    // Simple health check response
+    res.status(200).send('FlutterBye API Running');
+  });
+
   // Enhanced health check endpoint with real-time metrics
   app.get('/api/health', (req, res) => {
     const metrics = realTimeMonitor.getMetrics();
