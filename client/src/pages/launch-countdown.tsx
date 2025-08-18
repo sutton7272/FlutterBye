@@ -360,6 +360,19 @@ export default function LaunchCountdown() {
   return (
     <div className="min-h-screen text-white relative overflow-hidden">
 
+      {/* DevNet Test Button - Always visible below navbar area */}
+      <div className="fixed top-20 right-4 z-50">
+        <Button
+          variant="outline"
+          size="sm"
+          className="flex items-center gap-2 border-blue-400 text-blue-400 hover:bg-blue-400/10 hover:text-blue-300 bg-black/80 backdrop-blur-sm transition-all duration-200 font-medium shadow-lg"
+          onClick={() => window.open('https://dev.flutterbye.io/', '_blank')}
+          data-testid="button-devnet-test"
+        >
+          <Rocket className="h-4 w-4" />
+          Test DevNet
+        </Button>
+      </div>
       
       {/* Show navbar if access is granted */}
       {hasAccess && (
