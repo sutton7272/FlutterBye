@@ -1,0 +1,95 @@
+name: AWS Simple Deploy
+
+on:
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+      
+    - name: Configure AWS CLI
+      uses: aws-actions/configure-aws-credentials@v2
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: us-east-1
+        
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '20'
+        
+    - name: Create simple app
+      run: |
+        mkdir deploy-app
+        cd deploy-app
+        
+        cat > app.js << 'EOF'
+        const express = require('express');
+        const app = express();
+        const port = process.env.PORT || 8080;
+
+        app.get('/', (req, res) => {
+          res.send(`
+            <html>
+              <head><title>FlutterBye Live!</title></head>
+              <body style="font-family: Arial; text-align: center; padding: 50px;">
+                <h1 style="color: #00ff88;">🎉 FlutterBye Platform is Live!</h1>
+                <p>Deployed successfully on AWS Elastic Beanstalk</p>
+                <p>Environment: ${process.env.NODE_ENV || 'production'}</p>
+                <p>Time: ${new Date().toISOString()}</p>
+                <div style="margin: 20px; padding: 20px; background: #f0f8ff; border-radius: 10px;">
+                  <h2>FlutterBye Web3 Social Media Platform</h2>
+                  <p>🚀 Ready for www.flutterbye.io domain mapping</p>
+                </div>
+              </body>
+            </html>
+          `);
+        });
+
+        app.get('/health', (req, res) => {
+          res.json({ status: 'healthy', timestamp: new Date().toISOString() });
+        });
+
+        app.listen(port, () => {
+          console.log('FlutterBye server running on port ' + port);
+        });
+        EOF
+        
+        cat > package.json << 'EOF'
+        {
+          "name": "flutterbye",
+          "version": "1.0.0",
+          "main": "app.js",
+          "scripts": {
+            "start": "node app.js"
+          },
+          "engines": {
+            "node": "20.x"
+          },
+          "dependencies": {
+            "express": "4.18.2"
+          }
+        }
+        EOF
+        
+    - name: Create deployment package
+      run: |
+        cd deploy-app
+        zip -r ../deploy.zip .
+        
+    - name: Deploy to Elastic Beanstalk
+      uses: einaregilsson/beanstalk-deploy@v22
+      with:
+        aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        application_name: FlutterBye
+        environment_name: flutterbye-production
+        region: us-east-1
+        version_label: production-${{ github.run_number }}
+        deployment_package: deploy.zip
+        wait_for_deployment: true
