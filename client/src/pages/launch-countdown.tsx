@@ -365,7 +365,7 @@ export default function LaunchCountdown() {
         <Button
           variant="outline"
           size="sm"
-          className="flex items-center gap-2 border-blue-400 text-blue-400 hover:bg-blue-400/10 hover:text-blue-300 bg-black/80 backdrop-blur-sm transition-all duration-200 font-medium shadow-lg"
+          className="flex items-center gap-2 border-blue-400 text-blue-400 hover:bg-blue-400/10 hover:text-blue-300 bg-black/80 backdrop-blur-sm transition-all duration-200 font-medium shadow-lg animate-pulse hover:animate-none"
           onClick={() => window.open('https://dev.flutterbye.io/', '_blank')}
           data-testid="button-devnet-test"
         >

@@ -255,7 +255,7 @@ export default function Navbar() {
           <Button
             variant="outline"
             size="sm"
-            className="flex items-center gap-2 border-blue-400 text-blue-400 hover:bg-blue-400/10 hover:text-blue-300 bg-background/90 transition-all duration-200 font-medium"
+            className="flex items-center gap-2 border-blue-400 text-blue-400 hover:bg-blue-400/10 hover:text-blue-300 bg-background/90 transition-all duration-200 font-medium animate-pulse hover:animate-none"
             onClick={() => window.open('https://dev.flutterbye.io/', '_blank')}
             data-testid="button-devnet-test"
           >
@@ -306,7 +306,7 @@ export default function Navbar() {
               <div className="mt-6 pt-4 border-t border-border">
                 <Button
                   variant="outline"
-                  className="w-full justify-start h-12 border-electric-blue/50 text-electric-blue hover:bg-electric-blue/10"
+                  className="w-full justify-start h-12 border-electric-blue/50 text-electric-blue hover:bg-electric-blue/10 animate-pulse hover:animate-none"
                   onClick={() => {
                     window.open('https://dev.flutterbye.io/', '_blank');
                     setIsOpen(false);
