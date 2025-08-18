@@ -1,8 +1,9 @@
 # FlutterBye AWS Migration Plan
 
 ## Migration Overview
-- **Production**: flutterbye.io (AWS hosting with custom minting backend)
-- **Development**: flutterbye.io/dev (bare bones MVP version)
+- **Production**: www.flutterbye.io (AWS hosting with custom minting backend)
+- **Development**: Continue on Replit for development workflow
+- **Important**: dev.flutterbye.io is a separate site by other developers (NOT our development environment)
 - **Backend**: Replace Replit's blockchain services with your dev team's minting process
 
 ## Phase 1: Code Export & Preparation
@@ -77,8 +78,9 @@ TWILIO_AUTH_TOKEN=your_twilio_token
 7. **Certificate Manager**: SSL certificates
 
 ### 3.2 Domain Configuration
-- **Production**: flutterbye.io → AWS CloudFront
-- **Development**: flutterbye.io/dev → Subdirectory or subdomain
+- **Production**: www.flutterbye.io → AWS CloudFront
+- **Development**: Continue on Replit (no public URL change needed)
+- **Note**: dev.flutterbye.io is a separate site by other developers
 
 ## Phase 4: Deployment Architecture
 
@@ -91,9 +93,11 @@ User → Route 53 → CloudFront → ALB → ECS/EC2
                    RDS (Database)
 ```
 
-### 4.2 Development (flutterbye.io/dev)
-Option A: Subdirectory routing
-Option B: dev.flutterbye.io subdomain
+### 4.2 Development Workflow
+After migration:
+- **Active Development**: Continue on Replit
+- **Production Deployment**: AWS (www.flutterbye.io)
+- **Optional Staging**: staging.flutterbye.io on AWS
 
 ## Phase 5: Step-by-Step Migration
 
@@ -155,10 +159,39 @@ aws s3 sync dist/ s3://flutterbye-frontend/
 # 4. Set up Route 53 DNS
 ```
 
-### Step 6: Set Up Development Environment
+### Step 6: Configure Domain and DNS
 ```bash
-# Option A: Deploy to flutterbye.io/dev
-# Option B: Set up dev.flutterbye.io
+# 1. Configure Route 53 for www.flutterbye.io
+# 2. Point to CloudFront distribution
+# 3. Test SSL certificate
+# 4. Update DNS propagation
+```
+
+## Phase 7: Post-Migration Development Workflow
+
+### Continued Development on Replit
+After migration, you can continue developing on Replit with this workflow:
+
+1. **Code Development**: Continue using Replit for all development work
+2. **Testing**: Test features in your Replit environment
+3. **Deployment**: Deploy changes to AWS production when ready
+
+### Development Environment Options
+**Option A: Keep Replit as Pure Dev Environment**
+- Develop and test on Replit
+- Deploy to AWS for production
+- No public dev URL needed
+
+**Option B: Create Staging Environment**
+- Deploy a staging version to AWS (e.g., staging.flutterbye.io)
+- Use for final testing before production
+- Replit remains for active development
+
+### Deployment Pipeline
+```bash
+# Development → Replit
+# Testing → Replit or AWS Staging
+# Production → AWS (www.flutterbye.io)
 ```
 
 ## Phase 6: Backend Integration Checklist
