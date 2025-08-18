@@ -9,7 +9,6 @@ import {
   Sparkles, 
   MessageSquare, 
   Heart, 
-  Mic, 
   Image,
   Zap,
   Star,
@@ -17,13 +16,12 @@ import {
   ArrowRight,
   Brain,
   Palette,
-  Music,
   Video,
   Users,
   Wallet
 } from "lucide-react";
 import Mint from "./mint";
-import { VoiceMessageRecorder } from "@/components/voice-message-recorder";
+
 import { ContextualChatButton } from "@/components/contextual-chat-button";
 
 
@@ -37,8 +35,7 @@ export default function Create() {
         return "/mint/basic";
       case "ai-enhanced":
         return "/mint/ai-enhanced";
-      case "voice-token":
-        return "/mint/voice";
+
       case "multimedia":
         return "/mint/multimedia";
       case "targeted-marketing":
