@@ -754,72 +754,84 @@ export default function Mint({ tokenType }: MintProps = {}) {
                   </div>
                 </div>
                 
-                <div>
-                  <Label>Target Distribution</Label>
-                  <RadioGroup value={targetType} onValueChange={setTargetType} className="mt-2">
-                    <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="manual" id="manual" />
-                      <Label htmlFor="manual">Manual Entry</Label>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="csv" id="csv" />
-                      <Label htmlFor="csv">CSV Upload</Label>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="holders" id="holders" />
-                      <Label htmlFor="holders">Top Token Holders</Label>
-                    </div>
-                  </RadioGroup>
-                  
-                  {targetType === "manual" && (
-                    <div className="mt-4">
-                      <Textarea
-                        value={manualWallets}
-                        onChange={(e) => setManualWallets(e.target.value)}
-                        placeholder="Enter wallet addresses, one per line"
-                        rows={4}
-                      />
-                    </div>
-                  )}
-                  
-                  {targetType === "csv" && (
-                    <div className="mt-4">
-                      <div className="border-2 border-dashed border-border rounded-lg p-6 text-center">
-                        <Upload className="w-8 h-8 mx-auto text-muted-foreground mb-2" />
-                        <p className="text-sm text-muted-foreground mb-2">
-                          Upload CSV file with wallet addresses
-                        </p>
-                        <input
-                          type="file"
-                          accept=".csv"
-                          onChange={handleCsvUpload}
-                          className="hidden"
-                          id="csv-upload"
-                        />
-                        <Label htmlFor="csv-upload" className="cursor-pointer">
-                          <Button type="button" variant="outline" size="sm">
-                            Choose File
-                          </Button>
-                        </Label>
-                        {csvFile && (
-                          <p className="text-xs text-primary mt-2">
-                            Selected: {csvFile.name}
-                          </p>
-                        )}
-                      </div>
-                      <p className="text-xs text-muted-foreground mt-1">
-                        CSV should contain wallet addresses in first column
-                      </p>
-                    </div>
-                  )}
-                  
-                  {targetType === "holders" && (
+                <div className="space-y-6">
+                  {/* Token Holder Analysis - Always Visible */}
+                  <div className="bg-gradient-to-br from-blue-900/20 to-purple-900/20 border border-blue-500/30 rounded-xl p-4">
+                    <h4 className="text-lg font-semibold flex items-center mb-3 text-blue-400">
+                      <Users className="w-5 h-5 mr-2" />
+                      Token Holder Analysis
+                    </h4>
+                    <p className="text-sm text-muted-foreground mb-4">
+                      Powerful wallet targeting for precision marketing campaigns
+                    </p>
                     <TokenHolderAnalysis 
                       onHoldersSelected={(holders) => {
                         setManualWallets(holders.map(h => h.address).join('\n'));
+                        setTargetType("holders");
                       }}
                     />
-                  )}
+                  </div>
+
+                  {/* Alternative Distribution Methods */}
+                  <div>
+                    <Label>Alternative Target Methods</Label>
+                    <RadioGroup value={targetType} onValueChange={setTargetType} className="mt-2">
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="manual" id="manual" />
+                        <Label htmlFor="manual">Manual Entry</Label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="csv" id="csv" />
+                        <Label htmlFor="csv">CSV Upload</Label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="holders" id="holders" />
+                        <Label htmlFor="holders">Use Token Holder Analysis Above</Label>
+                      </div>
+                    </RadioGroup>
+                    
+                    {targetType === "manual" && (
+                      <div className="mt-4">
+                        <Textarea
+                          value={manualWallets}
+                          onChange={(e) => setManualWallets(e.target.value)}
+                          placeholder="Enter wallet addresses, one per line"
+                          rows={4}
+                        />
+                      </div>
+                    )}
+                    
+                    {targetType === "csv" && (
+                      <div className="mt-4">
+                        <div className="border-2 border-dashed border-border rounded-lg p-6 text-center">
+                          <Upload className="w-8 h-8 mx-auto text-muted-foreground mb-2" />
+                          <p className="text-sm text-muted-foreground mb-2">
+                            Upload CSV file with wallet addresses
+                          </p>
+                          <input
+                            type="file"
+                            accept=".csv"
+                            onChange={handleCsvUpload}
+                            className="hidden"
+                            id="csv-upload"
+                          />
+                          <Label htmlFor="csv-upload" className="cursor-pointer">
+                            <Button type="button" variant="outline" size="sm">
+                              Choose File
+                            </Button>
+                          </Label>
+                          {csvFile && (
+                            <p className="text-xs text-primary mt-2">
+                              Selected: {csvFile.name}
+                            </p>
+                          )}
+                        </div>
+                        <p className="text-xs text-muted-foreground mt-1">
+                          CSV should contain wallet addresses in first column
+                        </p>
+                      </div>
+                    )}
+                  </div>
                 </div>
                 
                 {/* Token Image Upload Section */}
@@ -1198,179 +1210,8 @@ export default function Mint({ tokenType }: MintProps = {}) {
               </CardContent>
             </Card>
 
-            {/* Token Holder Analysis - Permanently Displayed */}
-            <Card className="premium-card electric-frame">
-              <CardHeader className="pb-4">
-                <CardTitle className="flex items-center gap-2 text-lg">
-                  <Users className="w-5 h-5" />
-                  Token Holder Analysis
-                </CardTitle>
-                <CardDescription className="text-sm">
-                  Analyze token holders for targeted campaigns
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="p-4">
-                <div className="text-center">
-                  <Users className="w-10 h-10 mx-auto text-blue-400 mb-3" />
-                  <h3 className="text-sm font-semibold mb-2">Token Holder Map</h3>
-                  <p className="text-muted-foreground mb-3 text-xs">
-                    Analyze wallets and distribution patterns for marketing optimization.
-                  </p>
-                  <div className="grid grid-cols-1 gap-2 mb-3">
-                    <div className="border border-blue-500/20 bg-blue-500/5 rounded-lg p-2">
-                      <h4 className="font-medium text-blue-400 mb-1 text-xs">Wallet Analysis</h4>
-                      <p className="text-[10px] text-muted-foreground">Identify high-value holders</p>
-                    </div>
-                    <div className="border border-green-500/20 bg-green-500/5 rounded-lg p-2">
-                      <h4 className="font-medium text-green-400 mb-1 text-xs">Geographic Mapping</h4>
-                      <p className="text-[10px] text-muted-foreground">See global token distribution</p>
-                    </div>
-                    <div className="border border-purple-500/20 bg-purple-500/5 rounded-lg p-2">
-                      <h4 className="font-medium text-purple-400 mb-1 text-xs">Engagement Tracking</h4>
-                      <p className="text-[10px] text-muted-foreground">Monitor holder activity</p>
-                    </div>
-                    <div className="border border-orange-500/20 bg-orange-500/5 rounded-lg p-2">
-                      <h4 className="font-medium text-orange-400 mb-1 text-xs">Influence Scoring</h4>
-                      <p className="text-[10px] text-muted-foreground">Rate holder influence</p>
-                    </div>
-                  </div>
-                  <div className="space-y-2">
-                    <Button 
-                      className="w-full" 
-                      size="sm"
-                      onClick={() => navigate('/token-map')}
-                    >
-                      <Users className="w-3 h-3 mr-1" />
-                      View Token Map
-                    </Button>
-                    <Button 
-                      variant="outline" 
-                      className="w-full" 
-                      size="sm"
-                      onClick={async () => {
-                        if (!message.trim()) {
-                          toast({
-                            title: "Enter a message first",
-                            description: "Please enter a token message to analyze holders for.",
-                            variant: "destructive",
-                          });
-                          return;
-                        }
-                        
-                        try {
-                          const response = await fetch('/api/tokens/analyze-holders', {
-                            method: 'POST',
-                            headers: {
-                              'Content-Type': 'application/json',
-                            },
-                            body: JSON.stringify({
-                              tokenName: message,
-                              holderCount: parseInt(mintAmount) || 25,
-                            }),
-                          });
-                          
-                          if (!response.ok) {
-                            throw new Error('Failed to analyze holders');
-                          }
-                          
-                          const holders = await response.json();
-                          
-                          toast({
-                            title: "Analysis Complete",
-                            description: `Found ${holders.length} token holders for analysis.`,
-                          });
-                          
-                          console.log("Token holders:", holders);
-                          
-                        } catch (error) {
-                          console.error('Error analyzing holders:', error);
-                          toast({
-                            title: "Analysis Failed",
-                            description: "Failed to analyze token holders. Please try again.",
-                            variant: "destructive",
-                          });
-                        }
-                      }}
-                    >
-                      <Target className="w-3 h-3 mr-1" />
-                      Analyze Holders
-                    </Button>
-                    <Button 
-                      variant="outline" 
-                      className="w-full" 
-                      size="sm"
-                      onClick={async () => {
-                        if (!message.trim()) {
-                          toast({
-                            title: "Enter a message first",
-                            description: "Please enter a token message for export.",
-                            variant: "destructive",
-                          });
-                          return;
-                        }
-                        
-                        try {
-                          const response = await fetch('/api/tokens/export-holders', {
-                            method: 'POST',
-                            headers: {
-                              'Content-Type': 'application/json',
-                            },
-                            body: JSON.stringify({
-                              tokenName: message,
-                              format: 'csv'
-                            }),
-                          });
-                          
-                          if (!response.ok) {
-                            throw new Error('Failed to export data');
-                          }
-                          
-                          const blob = await response.blob();
-                          const url = window.URL.createObjectURL(blob);
-                          const a = document.createElement('a');
-                          a.href = url;
-                          a.download = `${message}-holders.csv`;
-                          document.body.appendChild(a);
-                          a.click();
-                          window.URL.revokeObjectURL(url);
-                          document.body.removeChild(a);
-                          
-                          toast({
-                            title: "Export Complete",
-                            description: "Holder data exported successfully.",
-                          });
-                          
-                        } catch (error) {
-                          console.error('Error exporting holders:', error);
-                          toast({
-                            title: "Export Failed",
-                            description: "Failed to export holder data. Please try again.",
-                            variant: "destructive",
-                          });
-                        }
-                      }}
-                    >
-                      <FileImage className="w-3 h-3 mr-1" />
-                      Export Data
-                    </Button>
-                    <Button 
-                      variant="ghost" 
-                      className="w-full text-xs" 
-                      size="sm"
-                      onClick={() => {
-                        toast({
-                          title: "Campaign Builder",
-                          description: "Advanced campaign tools coming soon with AI-powered targeting.",
-                        });
-                      }}
-                    >
-                      <Wand2 className="w-3 h-3 mr-1" />
-                      Campaign Builder
-                    </Button>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+
+
           </div>
                 </div>
 

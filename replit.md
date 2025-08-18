@@ -21,6 +21,8 @@ Navigation features "🚀 Trending" with comprehensive viral acceleration tools.
 
 **Token Price Comparison**: Component removed from mint page as it was not functioning properly. The pricing comparison widget has been cleaned up from the user interface.
 
+**Token Holder Analysis Enhancement**: Repositioned the powerful Token Holder Analysis feature to be permanently visible in the main form column rather than hidden behind a button click. This valuable wallet targeting tool is now prominently displayed in the mint page to emphasize its importance for precision marketing campaigns.
+
 ## User Preferences
 Preferred communication style: Simple, everyday language.
 Design preference: Electric blue and green color scheme with animated electrical pulse effects running through frames and borders, creating a high-energy circuit aesthetic.
