@@ -25,7 +25,7 @@ import { type InsertToken } from "@shared/schema";
 import TokenHolderAnalysis from "@/components/token-holder-analysis";
 import { TransactionSuccessOverlay } from "@/components/confetti-celebration";
 import { ShareSuccessModal } from "@/components/ShareSuccessModal";
-import { TokenPriceComparison } from "@/components/token-price-comparison";
+
 import { MintingProgressOverlay } from "@/components/MintingProgressOverlay";
 
 import RealTimeAIAssistant from "@/components/RealTimeAIAssistant";
@@ -1067,18 +1067,7 @@ export default function Mint({ tokenType }: MintProps = {}) {
                 </Card>
                 
                 {/* Price Comparison Widget - Moved to bottom for better UX */}
-                <div className="mb-6">
-                  <TokenPriceComparison 
-                    onQuantitySelect={(quantity) => {
-                      setMintAmount(quantity.toString());
-                      // Scroll to mint button
-                      document.querySelector('button[type="submit"]')?.scrollIntoView({ 
-                        behavior: 'smooth',
-                        block: 'center'
-                      });
-                    }}
-                  />
-                </div>
+
                 
                 {/* Free Minting Code Section - Positioned before payment */}
                 <div className="mb-6 p-4 bg-gradient-to-r from-green-900/20 to-emerald-900/20 border border-green-500/30 rounded-xl">

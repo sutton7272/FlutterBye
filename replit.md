@@ -19,6 +19,8 @@ Navigation features "🚀 Trending" with comprehensive viral acceleration tools.
 
 **Voice & Music Attachment**: Functionality temporarily removed from create/mint pages as requested by user (not yet fully developed). Feature will be added back later when development is complete. All related imports, components, and UI elements have been cleaned up.
 
+**Token Price Comparison**: Component removed from mint page as it was not functioning properly. The pricing comparison widget has been cleaned up from the user interface.
+
 ## User Preferences
 Preferred communication style: Simple, everyday language.
 Design preference: Electric blue and green color scheme with animated electrical pulse effects running through frames and borders, creating a high-energy circuit aesthetic.
