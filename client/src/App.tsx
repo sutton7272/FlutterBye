@@ -140,52 +140,15 @@ import AdminEscrow from "@/pages/admin-escrow";
 import { AdminRouteGuard } from "@/components/admin-route-guard";
 import { EarlyAccessGuard } from "@/components/early-access-guard";
 function Router() {
-  const [hasEarlyAccess, setHasEarlyAccess] = useState(false);
-  const [isCheckingAccess, setIsCheckingAccess] = useState(true);
 
-  useEffect(() => {
-    // Check for early access session
-    const sessionToken = localStorage.getItem("flutterbye_early_access_token");
-    if (sessionToken) {
-      // Verify with server if needed
-      setHasEarlyAccess(true);
-    }
-    setIsCheckingAccess(false);
-  }, []);
-
-  // Show loading while checking access
-  if (isCheckingAccess) {
-    return (
-      <div className="min-h-screen bg-black flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin w-12 h-12 border-4 border-electric-blue border-t-transparent rounded-full mx-auto mb-4"></div>
-          <p className="text-white text-lg">Loading FlutterBye...</p>
-        </div>
-      </div>
-    );
-  }
-
-  // Show early access gateway if no access
-  if (!hasEarlyAccess) {
-    return (
-      <EarlyAccessGateway onAccessGranted={() => setHasEarlyAccess(true)} />
-    );
-  }
-
-  // Main application with full navigation access
+  // Main application - landing page always accessible, navigation controlled by early access
   return (
     <div className="dark min-h-screen flex flex-col bg-transparent">
       <div className="flex-1 bg-transparent">
         <Switch>
         <Route path="/" component={() => {
-          console.log('ROOT ROUTE HIT - Home Dashboard should load');
-          return (
-            <>
-              <Navbar />
-              <Home />
-              <Footer />
-            </>
-          );
+          console.log('ROOT ROUTE HIT - LaunchCountdown should load');
+          return <LaunchCountdown />;
         }} />
         <Route path="/test" component={() => <div style={{padding: '20px', backgroundColor: 'red', color: 'white'}}><h1>TEST ROUTE WORKING</h1><p>If you see this at /test, React routing works</p></div>} />
         <Route path="/public-landing" component={() => <LaunchCountdown />} />

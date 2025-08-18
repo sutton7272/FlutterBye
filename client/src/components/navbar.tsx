@@ -13,6 +13,15 @@ export default function Navbar() {
   const [location] = useLocation();
   const [isOpen, setIsOpen] = useState(false);
   const { isFeatureEnabled, isLoading: featuresLoading } = useFeatureToggles();
+  
+  // Check for early access before showing navigation
+  const hasEarlyAccess = localStorage.getItem("flutterbye_early_access_token") || 
+                        localStorage.getItem("flutterbye_launch_mode") === "true";
+  
+  // Don't render navbar if no early access
+  if (!hasEarlyAccess) {
+    return null;
+  }
 
   // Get navigation control state
   const { data: navItems = [], isLoading: navLoading } = useQuery({

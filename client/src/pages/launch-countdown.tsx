@@ -161,13 +161,43 @@ export default function LaunchCountdown() {
 
   // Check early access on component mount
   useEffect(() => {
-    const storedAccess = localStorage.getItem("flutterbye_early_access");
-    const isLaunchMode = localStorage.getItem("flutterbye_launch_mode") === "true";
-    
-    if (isLaunchMode || storedAccess === "granted") {
-      setHasAccess(true);
-    }
-    setIsCheckingAccess(false);
+    const checkExistingAccess = async () => {
+      const sessionToken = localStorage.getItem("flutterbye_early_access_token");
+      const isLaunchMode = localStorage.getItem("flutterbye_launch_mode") === "true";
+      
+      if (isLaunchMode) {
+        setHasAccess(true);
+        setIsCheckingAccess(false);
+        return;
+      }
+      
+      if (sessionToken) {
+        try {
+          const response = await apiRequest("POST", "/api/early-access/verify-session", { 
+            sessionToken 
+          });
+          const data = await response.json();
+          
+          if (data.isValid) {
+            console.log("Valid early access session found");
+            setHasAccess(true);
+          } else {
+            localStorage.removeItem("flutterbye_early_access_token");
+            setHasAccess(false);
+          }
+        } catch (error) {
+          console.log("Error verifying session:", error);
+          localStorage.removeItem("flutterbye_early_access_token");
+          setHasAccess(false);
+        }
+      } else {
+        setHasAccess(false);
+      }
+      
+      setIsCheckingAccess(false);
+    };
+
+    checkExistingAccess();
   }, []);
 
   useEffect(() => {
@@ -243,33 +273,34 @@ export default function LaunchCountdown() {
 
   const checkAccessMutation = useMutation({
     mutationFn: async () => {
-      const result = await apiRequest("POST", "/api/admin/check-access", { 
-        accessCode, 
-        email: authorizedEmail 
+      const result = await apiRequest("POST", "/api/early-access/request-access", { 
+        accessCode: accessCode.trim().toUpperCase(), 
+        email: authorizedEmail.trim().toLowerCase() 
       });
       return result.json();
     },
     onSuccess: (data: any) => {
-      if (data.hasAccess) {
-        localStorage.setItem("flutterbye_early_access", "granted");
+      if (data.accessGranted) {
+        // Store the session token
+        localStorage.setItem("flutterbye_early_access_token", data.sessionToken);
         setHasAccess(true);
         toast({
-          title: "Access Granted!",
-          description: `Welcome to Flutterbye (${data.accessMethod} verification).`
+          title: "🎉 Access Granted!",
+          description: `Welcome to FlutterBye! Early access granted via ${data.accessMethod === 'access_code' ? 'access code' : 'approved email'}.`
         });
-        // No redirect - stay on launch page
+        // No redirect - stay on launch page but enable navigation
       } else {
         toast({
           title: "Access Denied",
-          description: "Invalid access code or email. Please contact support.",
+          description: data.message || "Invalid access code or email. Please contact support for early access.",
           variant: "destructive"
         });
       }
     },
     onError: () => {
       toast({
-        title: "Error",
-        description: "Unable to verify access. Please try again.",
+        title: "Connection Error",
+        description: "Unable to verify access. Please check your connection and try again.",
         variant: "destructive"
       });
     }
@@ -617,71 +648,123 @@ export default function LaunchCountdown() {
           <Card className="electric-frame">
             <CardHeader>
               <CardTitle className="text-gradient text-xl flex items-center gap-2">
-                <Key className="w-5 h-5 text-purple-400" />
-                Early Access
+                {hasAccess ? (
+                  <CheckCircle className="w-5 h-5 text-electric-green" />
+                ) : (
+                  <Key className="w-5 h-5 text-purple-400" />
+                )}
+                {hasAccess ? "Access Granted" : "Early Access"}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="text-center mb-4">
-                <h4 className="text-sm font-semibold text-white mb-2">🔐 Exclusive Access Portal</h4>
-                <p className="text-xs text-muted-foreground">
-                  Enter your access credentials
-                </p>
-              </div>
+              {hasAccess ? (
+                // Success state when access is granted
+                <div className="text-center space-y-4">
+                  <div className="w-16 h-16 mx-auto bg-gradient-to-br from-electric-green/20 to-green-500/20 rounded-full flex items-center justify-center">
+                    <CheckCircle className="w-8 h-8 text-electric-green" />
+                  </div>
+                  <div>
+                    <h4 className="text-lg font-bold text-electric-green mb-2">Welcome to FlutterBye!</h4>
+                    <p className="text-sm text-muted-foreground mb-4">
+                      Early access granted. Navigation is now available above.
+                    </p>
+                  </div>
+                  
+                  <div className="bg-electric-green/10 border border-electric-green/20 rounded-lg p-4 electric-frame">
+                    <h5 className="font-medium text-electric-green mb-3 text-sm">🚀 You now have access to:</h5>
+                    <ul className="text-xs text-muted-foreground space-y-2 text-left">
+                      <li className="flex items-center gap-2">
+                        <CheckCircle className="w-3 h-3 text-electric-green" />
+                        FlutterbyeMSG - Create value tokens
+                      </li>
+                      <li className="flex items-center gap-2">
+                        <CheckCircle className="w-3 h-3 text-electric-green" />
+                        FlutterArt - NFT message tokens
+                      </li>
+                      <li className="flex items-center gap-2">
+                        <CheckCircle className="w-3 h-3 text-electric-green" />
+                        AI Hub - Intelligence analytics
+                      </li>
+                      <li className="flex items-center gap-2">
+                        <CheckCircle className="w-3 h-3 text-electric-green" />
+                        Admin Panel - Platform management
+                      </li>
+                    </ul>
+                  </div>
 
-              <form onSubmit={handleAccessRequest} className="space-y-3">
-                <div>
-                  <Label htmlFor="accessCode" className="text-sm">Access Code</Label>
-                  <Input
-                    id="accessCode"
-                    type="text"
-                    placeholder="Enter access code"
-                    value={accessCode}
-                    onChange={(e) => setAccessCode(e.target.value)}
-                    className="bg-slate-800/80 border-slate-600 text-white placeholder:text-slate-400 focus:border-purple-400"
-                  />
+                  <Button 
+                    className="w-full bg-gradient-to-r from-electric-green to-green-600 hover:from-electric-green/80 hover:to-green-600/80 text-black font-semibold"
+                    onClick={() => window.location.href = '/dashboard'}
+                  >
+                    <Rocket className="w-4 h-4 mr-2" />
+                    Explore Platform
+                  </Button>
                 </div>
+              ) : (
+                // Request access form
+                <>
+                  <div className="text-center mb-4">
+                    <h4 className="text-sm font-semibold text-white mb-2">🔐 Exclusive Access Portal</h4>
+                    <p className="text-xs text-muted-foreground">
+                      Enter your access credentials
+                    </p>
+                  </div>
 
-                <div>
-                  <Label htmlFor="authorizedEmail" className="text-sm">Authorized Email</Label>
-                  <Input
-                    id="authorizedEmail"
-                    type="email"
-                    placeholder="authorized@email.com"
-                    value={authorizedEmail}
-                    onChange={(e) => setAuthorizedEmail(e.target.value)}
-                    className="bg-slate-800/80 border-slate-600 text-white placeholder:text-slate-400 focus:border-purple-400"
-                  />
-                </div>
+                  <form onSubmit={handleAccessRequest} className="space-y-3">
+                    <div>
+                      <Label htmlFor="accessCode" className="text-sm">Access Code</Label>
+                      <Input
+                        id="accessCode"
+                        type="text"
+                        placeholder="Enter access code"
+                        value={accessCode}
+                        onChange={(e) => setAccessCode(e.target.value)}
+                        className="bg-slate-800/80 border-slate-600 text-white placeholder:text-slate-400 focus:border-purple-400"
+                      />
+                    </div>
 
-                <Button 
-                  type="submit"
-                  className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700"
-                  disabled={checkAccessMutation.isPending}
-                >
-                  {checkAccessMutation.isPending ? (
-                    <>
-                      <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2"></div>
-                      Verifying...
-                    </>
-                  ) : (
-                    <>
-                      <Unlock className="w-4 h-4 mr-2" />
-                      Request Access
-                    </>
-                  )}
-                </Button>
-              </form>
+                    <div>
+                      <Label htmlFor="authorizedEmail" className="text-sm">Authorized Email</Label>
+                      <Input
+                        id="authorizedEmail"
+                        type="email"
+                        placeholder="authorized@email.com"
+                        value={authorizedEmail}
+                        onChange={(e) => setAuthorizedEmail(e.target.value)}
+                        className="bg-slate-800/80 border-slate-600 text-white placeholder:text-slate-400 focus:border-purple-400"
+                      />
+                    </div>
 
-              <div className="bg-purple-500/10 border border-purple-500/20 rounded-lg p-3">
-                <h4 className="font-medium text-purple-400 mb-2 text-sm">Access Levels:</h4>
-                <ul className="text-xs text-muted-foreground space-y-1">
-                  <li>• Developer Preview Access</li>
-                  <li>• Beta Testing Privileges</li>
-                  <li>• Advanced Feature Access</li>
-                  <li>• Priority Support Channel</li>
-                </ul>
-              </div>
+                    <Button 
+                      type="submit"
+                      className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700"
+                      disabled={checkAccessMutation.isPending}
+                    >
+                      {checkAccessMutation.isPending ? (
+                        <>
+                          <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2"></div>
+                          Verifying...
+                        </>
+                      ) : (
+                        <>
+                          <Unlock className="w-4 h-4 mr-2" />
+                          Request Access
+                        </>
+                      )}
+                    </Button>
+                  </form>
+
+                  <div className="bg-purple-500/10 border border-purple-500/20 rounded-lg p-3">
+                    <h4 className="font-medium text-purple-400 mb-2 text-sm">Access Levels:</h4>
+                    <ul className="text-xs text-muted-foreground space-y-1">
+                      <li>• Developer Preview Access</li>
+                      <li>• Beta Testing Privileges</li>
+                      <li>• Advanced Feature Access</li>
+                      <li>• Priority Support Channel</li>
+                    </ul>
+                  </div>
+                </>
+              )}
             </CardContent>
           </Card>
         </div>
