@@ -2,7 +2,13 @@
 
 A Solana blockchain-powered platform for tokenized messaging and value distribution, aiming to be the Web3 communication layer.
 
-🚀 **Production Deployment Status:** GitHub Actions automated deployment to AWS Elastic Beanstalk configured and ready.
+🚀 **Production Deployment Status:** Complete AWS infrastructure setup and deployment ready via GitHub Actions.
+
+## Quick AWS Deployment
+Run the "Create AWS Environment and Deploy" workflow to automatically:
+- Create AWS Elastic Beanstalk application and environment
+- Deploy FlutterBye platform to production
+- Configure Node.js 20 with proper environment variables
 
 ## Features
 
