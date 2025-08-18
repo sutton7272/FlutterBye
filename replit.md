@@ -27,7 +27,7 @@ Navigation features "🚀 Trending" with comprehensive viral acceleration tools.
 Preferred communication style: Simple, everyday language.
 Design preference: Electric blue and green color scheme with animated electrical pulse effects running through frames and borders, creating a high-energy circuit aesthetic.
 Priority focus: Initial release strategy focusing on coin minting as the core entry point, with strategic roadmap for $100M ARR target.
-Migration Strategy: Planning AWS migration for www.flutterbye.io while keeping Replit for development. Note: dev.flutterbye.io is a separate site by other developers, not our development environment.
+Migration Strategy: Planning AWS migration for www.flutterbye.io while keeping Replit for development. Note: dev.flutterbye.io is a separate site by other developers, not our development environment. Simplified deployment approach using AWS Amplify for direct deployment without local setup required.
 
 ## System Architecture
 
