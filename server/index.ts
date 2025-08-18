@@ -105,16 +105,19 @@ app.use((req, res, next) => {
 
   // Remove problematic fallback routes
 
-  // For DevNet deployment, ALWAYS use Vite for proper development serving
-  // Force Vite dev mode to prevent caching issues
-  console.log('🔧 Forcing Vite development mode for DevNet deployment');
-  await setupVite(app, server);
+  // Configure for production or development based on NODE_ENV
+  if (process.env.NODE_ENV === 'production') {
+    console.log('🚀 Production mode: serving static files');
+    await serveStatic(app);
+  } else {
+    console.log('🔧 Development mode: using Vite dev server');
+    await setupVite(app, server);
+  }
 
   // ALWAYS serve the app on the port specified in the environment variable PORT
-  // Other ports are firewalled. Default to 5000 if not specified.
+  // AWS Elastic Beanstalk uses port 8080 by default, Replit uses 5000
   // this serves both the API and the client.
-  // It is the only port that is not firewalled.
-  const port = parseInt(process.env.PORT || '5000', 10);
+  const port = parseInt(process.env.PORT || '8080', 10);
   server.listen({
     port,
     host: "0.0.0.0",
