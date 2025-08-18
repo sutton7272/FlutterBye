@@ -2,6 +2,7 @@ import express, { type Request, Response, NextFunction } from "express";
 import path from "path";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
+import { serveStaticProduction } from "./production";
 const app = express();
 
 // Performance headers middleware
@@ -108,7 +109,7 @@ app.use((req, res, next) => {
   // Configure for production or development based on NODE_ENV
   if (process.env.NODE_ENV === 'production') {
     console.log('🚀 Production mode: serving static files');
-    await serveStatic(app);
+    serveStaticProduction(app);
   } else {
     console.log('🔧 Development mode: using Vite dev server');
     await setupVite(app, server);
