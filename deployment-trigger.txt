@@ -1,2 +1,2 @@
-Deployment trigger: August 18, 2025 - 21:07 UTC
-Fixed Vercel configuration for Node.js server deployment
+Deployment trigger: August 18, 2025 - 21:11 UTC
+Reverted to static deployment configuration - working approach
