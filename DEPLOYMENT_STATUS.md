@@ -15,4 +15,11 @@
 ## Next Step:
 Push changes to GitHub to make workflows visible in Actions tab.
 
-Last Updated: $(date)
+## Latest Update:
+New workflow created: **AWS Setup and Deploy FlutterBye**
+- Automatically detects existing AWS resources
+- Creates clean environment names
+- Uses native AWS CLI for reliable deployment
+- Handles environment creation from scratch
+
+Last Updated: August 18, 2025
