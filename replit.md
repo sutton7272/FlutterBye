@@ -27,7 +27,7 @@ Navigation features "🚀 Trending" with comprehensive viral acceleration tools.
 Preferred communication style: Simple, everyday language.
 Design preference: Electric blue and green color scheme with animated electrical pulse effects running through frames and borders, creating a high-energy circuit aesthetic.
 Priority focus: Initial release strategy focusing on coin minting as the core entry point, with strategic roadmap for $100M ARR target.
-Migration Strategy: AWS deployment in progress using Elastic Beanstalk for www.flutterbye.io while keeping Replit for development. Note: dev.flutterbye.io is a separate site by other developers, not our development environment. Successfully initiated deployment to AWS Elastic Beanstalk with full FlutterBye codebase.
+Migration Strategy: GitHub Actions automated deployment to AWS Elastic Beanstalk configured for www.flutterbye.io. Replit remains the development environment. Complete AWS infrastructure setup workflows created with automated application and environment creation. GitHub repository: sutton7272/FlutterBye with three deployment workflows ready for production deployment.
 
 ## System Architecture
 
