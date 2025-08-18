@@ -2,21 +2,15 @@
   "version": 2,
   "builds": [
     {
-      "src": "dist/index.js",
+      "src": "server/index.ts",
       "use": "@vercel/node"
     }
   ],
   "routes": [
     {
       "src": "/(.*)",
-      "dest": "/dist/index.js"
+      "dest": "/"
     }
   ],
-  "installCommand": "npm install",
-  "buildCommand": "npm run build",
-  "functions": {
-    "dist/index.js": {
-      "maxDuration": 30
-    }
-  }
+  "installCommand": "npm install"
 }
