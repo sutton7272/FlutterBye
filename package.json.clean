@@ -1,0 +1,30 @@
+{
+  "name": "flutterbye",
+  "version": "1.0.0",
+  "description": "FlutterBye Web3 Social Media Platform",
+  "main": "dist/index.js",
+  "scripts": {
+    "start": "node dist/index.js"
+  },
+  "engines": {
+    "node": "20.x"
+  },
+  "dependencies": {
+    "@coral-xyz/anchor": "^0.30.1",
+    "@neondatabase/serverless": "^0.9.5",
+    "@solana/spl-token": "^0.4.8",
+    "@solana/web3.js": "^1.95.4",
+    "axios": "^1.7.7",
+    "compression": "^1.7.4",
+    "cors": "^2.8.5",
+    "drizzle-orm": "^0.36.4",
+    "express": "^4.21.1",
+    "helmet": "^8.0.0",
+    "multer": "^1.4.5-lts.1",
+    "openai": "^4.67.3",
+    "twilio": "^5.3.2",
+    "twitter-api-v2": "^1.17.2",
+    "ws": "^8.18.0",
+    "zod": "^3.23.8"
+  }
+}
