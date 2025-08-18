@@ -2,6 +2,8 @@
 
 A Solana blockchain-powered platform for tokenized messaging and value distribution, aiming to be the Web3 communication layer.
 
+🚀 **Production Deployment Status:** GitHub Actions automated deployment to AWS Elastic Beanstalk configured and ready.
+
 ## Features
 
 - SPL token creation and distribution
