@@ -33,14 +33,32 @@
    - Test: Type `aws --version`
 
 ### Test Your Code Locally
-1. Open terminal in your FlutterBye folder
-2. Run these commands:
+1. Open Command Prompt/Terminal
+2. Navigate to your FlutterBye folder:
+   ```bash
+   cd Desktop/FlutterBye
+   ```
+   (Replace with your actual folder path)
+3. Run these commands one by one:
    ```bash
    npm install
-   npm run build
    npm run dev
    ```
-3. If it works, you'll see your site at localhost:5000
+4. If it works, you'll see your site at localhost:5000
+
+### Common Fixes for Errors
+**If you get "npm not found":**
+- Node.js didn't install properly
+- Restart Command Prompt and try again
+- Reinstall Node.js from nodejs.org
+
+**If you get dependency errors:**
+- Try: `npm install --legacy-peer-deps`
+- Or: `npm install --force`
+
+**If you get permission errors:**
+- Windows: Run Command Prompt as Administrator
+- Mac: Try `sudo npm install` (will ask for password)
 
 **What you should have now:** Your FlutterBye site running on your computer
 
