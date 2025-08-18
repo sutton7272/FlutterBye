@@ -260,7 +260,7 @@ export default function Navbar() {
             data-testid="button-devnet-test"
           >
             <Rocket className="h-4 w-4" />
-            Test DevNet
+            Test Mint on DevNet
           </Button>
           <WalletConnect />
         </div>
@@ -314,8 +314,8 @@ export default function Navbar() {
                 >
                   <Rocket className="h-5 w-5 mr-3" />
                   <div className="flex flex-col items-start">
-                    <span className="font-medium">Test Flutterbye on DevNet!</span>
-                    <span className="text-xs opacity-70">Try the live development environment</span>
+                    <span className="font-medium">Test Mint on DevNet</span>
+                    <span className="text-xs opacity-70">Try minting on the development environment</span>
                   </div>
                 </Button>
               </div>

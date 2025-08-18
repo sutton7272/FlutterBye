@@ -370,7 +370,7 @@ export default function LaunchCountdown() {
           data-testid="button-devnet-test"
         >
           <Rocket className="h-4 w-4" />
-          Test DevNet
+          Test Mint on DevNet
         </Button>
       </div>
       
