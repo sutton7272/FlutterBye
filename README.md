@@ -6,9 +6,12 @@ A Solana blockchain-powered platform for tokenized messaging and value distribut
 
 ## Quick AWS Deployment
 Run the "Create AWS Environment and Deploy" workflow to automatically:
-- Create AWS Elastic Beanstalk application and environment
+- Create AWS Elastic Beanstalk application and environment  
 - Deploy FlutterBye platform to production
 - Configure Node.js 20 with proper environment variables
+- Set up production monitoring and health checks
+
+**Alternative:** Use the "Flexible AWS Deployment" workflow for custom configuration options.
 
 ## Features
 
