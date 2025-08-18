@@ -1,9 +1,18 @@
-name: Deploy to AWS Elastic Beanstalk
+name: Flexible AWS Deployment
 
 on:
-  push:
-    branches: [ main ]
   workflow_dispatch:
+    inputs:
+      environment_name:
+        description: 'AWS Environment Name'
+        required: true
+        default: 'Flutterbye-env'
+        type: string
+      application_name:
+        description: 'AWS Application Name'
+        required: true
+        default: 'FlutterBye'
+        type: string
 
 jobs:
   deploy:
@@ -39,10 +48,10 @@ jobs:
       with:
         aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
         aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        application_name: FlutterBye
-        environment_name: Flutterbye-env
+        application_name: ${{ github.event.inputs.application_name }}
+        environment_name: ${{ github.event.inputs.environment_name }}
         region: us-east-2
-        version_label: v${{ github.run_number }}-${{ github.sha }}
+        version_label: manual-v${{ github.run_number }}-${{ github.sha }}
         deployment_package: flutterbye-deployment.zip
         wait_for_deployment: false
         use_existing_version_if_available: true
