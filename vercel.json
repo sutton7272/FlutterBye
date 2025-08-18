@@ -13,5 +13,10 @@
     }
   ],
   "installCommand": "npm install",
-  "buildCommand": "npm run build"
+  "buildCommand": "npm run build",
+  "functions": {
+    "dist/index.js": {
+      "maxDuration": 30
+    }
+  }
 }
