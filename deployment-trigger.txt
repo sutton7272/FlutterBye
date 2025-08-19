@@ -1,1 +1,1 @@
-Deployment trigger: August 19, 2025 - 02:23 UTC - Fixed Vercel routing to serve frontend correctly instead of API message
+Deployment trigger: August 19, 2025 - 03:46 UTC - Added VIP waitlist endpoint to serverless function and fixed Vercel API routing

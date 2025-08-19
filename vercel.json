@@ -18,6 +18,16 @@
       "destination": "/index.html"
     }
   ],
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "/api/index"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/index.html"
+    }
+  ],
   "headers": [
     {
       "source": "/(.*)",

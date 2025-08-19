@@ -158,6 +158,52 @@ async function getApp() {
       res.json({ status: 'ok', service: 'FlutterBye API' });
     });
     
+    // VIP Waitlist endpoint
+    app.post('/api/launch/waitlist', async (req, res) => {
+      try {
+        const { email, walletAddress } = req.body;
+        
+        if (!email || !email.includes('@')) {
+          return res.status(400).json({
+            success: false,
+            message: 'Valid email address is required'
+          });
+        }
+
+        // Generate unique entry ID
+        const entryId = `waitlist_${Date.now()}_${Math.random().toString(36).substring(2)}`;
+        
+        // Store waitlist entry (in production this would go to database)
+        const waitlistEntry = {
+          entryId,
+          email: email.toLowerCase().trim(),
+          walletAddress: walletAddress || '',
+          joinedAt: new Date().toISOString(),
+          benefits: [
+            "Early access before public launch",
+            "Exclusive FLBY token airdrops",
+            "Beta testing privileges", 
+            "VIP community access"
+          ]
+        };
+
+        console.log(`📝 New waitlist signup: ${email} (${walletAddress})`);
+        
+        res.json({
+          success: true,
+          entryId: waitlistEntry.entryId,
+          message: 'Successfully joined the VIP waitlist',
+          benefits: waitlistEntry.benefits
+        });
+      } catch (error) {
+        console.error('❌ Error processing waitlist signup:', error);
+        res.status(500).json({
+          success: false,
+          message: 'Server error processing signup'
+        });
+      }
+    });
+
     // Basic API endpoints
     app.get('/api/tokens', async (req, res) => {
       try {
