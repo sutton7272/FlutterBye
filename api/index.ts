@@ -44,6 +44,7 @@ async function getApp() {
     ]);
     
     const activeSessions = new Map();
+    const waitlistEntries = new Map(); // Store waitlist entries in memory
     
     // Generate session token
     function generateSessionToken() {
@@ -187,7 +188,11 @@ async function getApp() {
           ]
         };
 
+        // Store in memory (in production this would go to database)
+        waitlistEntries.set(waitlistEntry.entryId, waitlistEntry);
+        
         console.log(`📝 New waitlist signup: ${email} (${walletAddress})`);
+        console.log(`📊 Total waitlist entries: ${waitlistEntries.size}`);
         
         res.json({
           success: true,
@@ -200,6 +205,35 @@ async function getApp() {
         res.status(500).json({
           success: false,
           message: 'Server error processing signup'
+        });
+      }
+    });
+
+    // Admin endpoint to view all waitlist entries
+    app.get('/api/admin/waitlist', async (req, res) => {
+      try {
+        // Convert Map to Array for easy viewing
+        const entries = Array.from(waitlistEntries.values());
+        
+        // Sort by join date (newest first)
+        entries.sort((a, b) => new Date(b.joinedAt).getTime() - new Date(a.joinedAt).getTime());
+        
+        res.json({
+          success: true,
+          totalEntries: entries.length,
+          entries: entries,
+          summary: {
+            totalEmails: entries.length,
+            withWallets: entries.filter(e => e.walletAddress).length,
+            withoutWallets: entries.filter(e => !e.walletAddress).length,
+            lastEntry: entries[0]?.joinedAt || null
+          }
+        });
+      } catch (error) {
+        console.error('❌ Error fetching waitlist entries:', error);
+        res.status(500).json({
+          success: false,
+          message: 'Failed to fetch waitlist entries'
         });
       }
     });

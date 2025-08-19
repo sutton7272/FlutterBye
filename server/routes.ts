@@ -3709,33 +3709,85 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: "Failed to calculate enhanced staking rewards" });
     }
   });
+  // In-memory storage for waitlist entries (replace with database in production)
+  const waitlistStorage = new Map();
+  
   // Launch Countdown & Early Access APIs
   app.post("/api/launch/waitlist", async (req, res) => {
     try {
       const { email, walletAddress } = req.body;
       
-      if (!email) {
-        return res.status(400).json({ error: "Email is required" });
+      if (!email || !email.includes('@')) {
+        return res.status(400).json({ 
+          success: false,
+          error: "Valid email address is required" 
+        });
       }
+      
       // Generate unique ID for waitlist entry
       const entryId = `waitlist_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
       
-      console.log(`📝 New waitlist signup: ${email} ${walletAddress ? `(${walletAddress})` : ''}`);
-      
-      res.json({
-        success: true,
+      // Create waitlist entry
+      const waitlistEntry = {
         entryId,
-        message: "Successfully joined the VIP waitlist",
+        email: email.toLowerCase().trim(),
+        walletAddress: walletAddress || '',
+        joinedAt: new Date().toISOString(),
         benefits: [
           "Early access before public launch",
           "Exclusive FLBY token airdrops",
           "Beta testing privileges",
           "VIP community access"
         ]
+      };
+      
+      // Store in memory (in production use database)
+      waitlistStorage.set(entryId, waitlistEntry);
+      
+      console.log(`📝 New waitlist signup: ${email} ${walletAddress ? `(${walletAddress})` : ''}`);
+      console.log(`📊 Total waitlist entries: ${waitlistStorage.size}`);
+      
+      res.json({
+        success: true,
+        entryId,
+        message: "Successfully joined the VIP waitlist",
+        benefits: waitlistEntry.benefits
       });
     } catch (error) {
       console.error("Error adding to waitlist:", error);
-      res.status(500).json({ error: "Failed to join waitlist" });
+      res.status(500).json({ 
+        success: false,
+        error: "Failed to join waitlist" 
+      });
+    }
+  });
+
+  // Admin endpoint to view all waitlist entries  
+  app.get("/api/admin/waitlist-entries", async (req, res) => {
+    try {
+      // Convert Map to Array for easy viewing
+      const entries = Array.from(waitlistStorage.values());
+      
+      // Sort by join date (newest first)
+      entries.sort((a, b) => new Date(b.joinedAt).getTime() - new Date(a.joinedAt).getTime());
+      
+      res.json({
+        success: true,
+        totalEntries: entries.length,
+        entries: entries,
+        summary: {
+          totalEmails: entries.length,
+          withWallets: entries.filter(e => e.walletAddress && e.walletAddress.length > 0).length,
+          withoutWallets: entries.filter(e => !e.walletAddress || e.walletAddress.length === 0).length,
+          lastEntry: entries[0]?.joinedAt || null
+        }
+      });
+    } catch (error) {
+      console.error("Error fetching waitlist entries:", error);
+      res.status(500).json({
+        success: false,
+        error: "Failed to fetch waitlist entries"
+      });
     }
   });
   app.get("/api/launch/stats", async (req, res) => {
