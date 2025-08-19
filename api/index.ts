@@ -44,7 +44,7 @@ async function getApp() {
     ]);
     
     const activeSessions = new Map();
-    const waitlistEntries = new Map(); // Store waitlist entries in memory
+    // VIP Waitlist now uses persistent PostgreSQL database storage via VipWaitlistDB
     
     // Generate session token
     function generateSessionToken() {
@@ -212,25 +212,19 @@ async function getApp() {
       }
     });
 
-    // Admin endpoint to view all waitlist entries
+    // Admin endpoint to view all waitlist entries with persistent database storage
     app.get('/api/admin/waitlist', async (req, res) => {
       try {
-        // Convert Map to Array for easy viewing
-        const entries = Array.from(waitlistEntries.values());
+        const { VipWaitlistDB } = await import('../server/db-utils');
         
-        // Sort by join date (newest first)
-        entries.sort((a, b) => new Date(b.joinedAt).getTime() - new Date(a.joinedAt).getTime());
+        const entries = await VipWaitlistDB.getAll();
+        const summary = await VipWaitlistDB.getSummary();
         
         res.json({
           success: true,
           totalEntries: entries.length,
           entries: entries,
-          summary: {
-            totalEmails: entries.length,
-            withWallets: entries.filter(e => e.walletAddress).length,
-            withoutWallets: entries.filter(e => !e.walletAddress).length,
-            lastEntry: entries[0]?.joinedAt || null
-          }
+          summary
         });
       } catch (error) {
         console.error('❌ Error fetching waitlist entries:', error);
