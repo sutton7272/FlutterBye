@@ -67,6 +67,8 @@ import {
   type InsertSkyeMessage,
   type SkyePersonalityProfiles,
   type InsertSkyePersonalityProfile,
+  type VipWaitlist,
+  type InsertVipWaitlist,
   pricingTiers,
   walletIntelligence,
   walletBatches,

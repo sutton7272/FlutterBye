@@ -864,10 +864,31 @@ export const skyePersonalityProfiles = pgTable("skye_personality_profiles", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
+// VIP Waitlist table for persistent storage
+export const vipWaitlist = pgTable("vip_waitlist", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  entryId: varchar("entry_id").notNull().unique(),
+  email: text("email").notNull(),
+  walletAddress: text("wallet_address"),
+  joinedAt: timestamp("joined_at").defaultNow(),
+  benefits: json("benefits").$type<string[]>().default(sql`'["Early access before public launch", "Exclusive FLBY token airdrops", "Beta testing privileges", "VIP community access"]'`),
+  status: text("status").default("active"), // active, contacted, converted
+  source: text("source").default("website"), // website, referral, social
+  metadata: json("metadata").$type<Record<string, any>>(),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
 // Insert schemas
 export const insertUserSchema = createInsertSchema(users).omit({
   id: true,
   createdAt: true,
+});
+
+export const insertVipWaitlistSchema = createInsertSchema(vipWaitlist).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
 });
 
 export const insertBlogCategorySchema = createInsertSchema(blogCategories, {
@@ -1485,6 +1506,10 @@ export type SkyeEmotionalAnalysis = typeof skyeEmotionalAnalysis.$inferSelect;
 export type InsertSkyeEmotionalAnalysis = z.infer<typeof insertSkyeEmotionalAnalysisSchema>;
 export type SkyeConversationThreads = typeof skyeConversationThreads.$inferSelect;
 export type InsertSkyeConversationThreads = z.infer<typeof insertSkyeConversationThreadsSchema>;
+
+// VIP Waitlist types
+export type VipWaitlist = typeof vipWaitlist.$inferSelect;
+export type InsertVipWaitlist = z.infer<typeof insertVipWaitlistSchema>;
 
 export type UserBadge = typeof userBadges.$inferSelect;
 

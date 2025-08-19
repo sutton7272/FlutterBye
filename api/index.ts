@@ -159,9 +159,10 @@ async function getApp() {
       res.json({ status: 'ok', service: 'FlutterBye API' });
     });
     
-    // VIP Waitlist endpoint
+    // VIP Waitlist endpoint with persistent database storage
     app.post('/api/launch/waitlist', async (req, res) => {
       try {
+        const { VipWaitlistDB } = await import('../server/db-utils');
         const { email, walletAddress } = req.body;
         
         if (!email || !email.includes('@')) {
@@ -172,33 +173,35 @@ async function getApp() {
         }
 
         // Generate unique entry ID
-        const entryId = `waitlist_${Date.now()}_${Math.random().toString(36).substring(2)}`;
+        const entryId = `waitlist_${Date.now()}_${Math.random().toString(36).substring(2, 10)}`;
         
-        // Store waitlist entry (in production this would go to database)
-        const waitlistEntry = {
+        const benefits = [
+          "Early access before public launch",
+          "Exclusive FLBY token airdrops",
+          "Beta testing privileges", 
+          "VIP community access"
+        ];
+        
+        // Store in database permanently
+        const entry = await VipWaitlistDB.add({
           entryId,
           email: email.toLowerCase().trim(),
-          walletAddress: walletAddress || '',
-          joinedAt: new Date().toISOString(),
-          benefits: [
-            "Early access before public launch",
-            "Exclusive FLBY token airdrops",
-            "Beta testing privileges", 
-            "VIP community access"
-          ]
-        };
-
-        // Store in memory (in production this would go to database)
-        waitlistEntries.set(waitlistEntry.entryId, waitlistEntry);
+          walletAddress: walletAddress || null,
+          benefits,
+          status: 'active',
+          source: 'website'
+        });
         
-        console.log(`📝 New waitlist signup: ${email} (${walletAddress})`);
-        console.log(`📊 Total waitlist entries: ${waitlistEntries.size}`);
+        console.log(`📝 New waitlist signup: ${email}${walletAddress ? ` (${walletAddress})` : ''}`);
+        
+        const summary = await VipWaitlistDB.getSummary();
+        console.log(`📊 Total waitlist entries: ${summary.totalEmails}`);
         
         res.json({
           success: true,
-          entryId: waitlistEntry.entryId,
+          entryId,
           message: 'Successfully joined the VIP waitlist',
-          benefits: waitlistEntry.benefits
+          benefits
         });
       } catch (error) {
         console.error('❌ Error processing waitlist signup:', error);
