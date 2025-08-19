@@ -26,19 +26,130 @@ async function getApp() {
       next();
     });
     
-    // Essential routes for early access and basic functionality
-    app.post('/api/early-access/validate', async (req, res) => {
+    // Early Access Authentication - Complete implementation
+    const activeAccessCodes = new Set([
+      'FLBY-EARLY-2025-001',
+      'FLBY-EARLY-2025-002', 
+      'FLBY-EARLY-2025-003',
+      'FLBY-BETA-ACCESS-001',
+      'FLBY-FOUNDER-001',
+      'FLBY-VIP-2025'
+    ]);
+    
+    const approvedEmails = new Set([
+      'admin@flutterbye.io',
+      'support@flutterbye.io',
+      'demo@flutterbye.io',
+      'test@flutterbye.io'
+    ]);
+    
+    const activeSessions = new Map();
+    
+    // Generate session token
+    function generateSessionToken() {
+      return Math.random().toString(36).substring(2) + Date.now().toString(36);
+    }
+    
+    // Request early access
+    app.post('/api/early-access/request-access', async (req, res) => {
       try {
-        const { code } = req.body;
-        const validCodes = ['FLBY-EARLY-2025-001', 'FLBY-EARLY-2025'];
+        const { accessCode, email } = req.body;
         
-        if (validCodes.includes(code)) {
-          res.json({ valid: true, message: 'Access granted' });
+        let accessGranted = false;
+        let accessMethod = '';
+        let sessionToken = '';
+
+        // Check access code
+        if (accessCode && activeAccessCodes.has(accessCode.toUpperCase())) {
+          accessGranted = true;
+          accessMethod = 'access_code';
+          sessionToken = generateSessionToken();
+          
+          // Create session
+          const session = {
+            sessionToken,
+            accessMethod,
+            accessCodeUsed: accessCode.toUpperCase(),
+            createdAt: new Date(),
+            expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) // 7 days
+          };
+          
+          activeSessions.set(sessionToken, session);
+          console.log(`✅ Early access granted via code: ${accessCode}`);
+        }
+        // Check approved email
+        else if (email && approvedEmails.has(email.toLowerCase())) {
+          accessGranted = true;
+          accessMethod = 'approved_email';
+          sessionToken = generateSessionToken();
+          
+          // Create session
+          const session = {
+            sessionToken,
+            email: email.toLowerCase(),
+            accessMethod,
+            createdAt: new Date(),
+            expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000) // 30 days for email access
+          };
+          
+          activeSessions.set(sessionToken, session);
+          console.log(`✅ Early access granted via email: ${email}`);
+        }
+
+        if (accessGranted) {
+          res.json({
+            accessGranted: true,
+            sessionToken,
+            accessMethod,
+            message: `Access granted via ${accessMethod === 'access_code' ? 'access code' : 'approved email'}`
+          });
         } else {
-          res.status(400).json({ valid: false, message: 'Invalid access code' });
+          console.log(`❌ Early access denied for code: ${accessCode}, email: ${email}`);
+          res.json({
+            accessGranted: false,
+            message: 'Invalid access code or email not approved for early access'
+          });
         }
       } catch (error) {
-        res.status(500).json({ valid: false, message: 'Server error' });
+        console.error('❌ Error processing early access request:', error);
+        res.status(500).json({
+          accessGranted: false,
+          message: 'Server error processing access request'
+        });
+      }
+    });
+
+    // Verify existing session
+    app.post('/api/early-access/verify-session', async (req, res) => {
+      try {
+        const { sessionToken } = req.body;
+        
+        if (!sessionToken) {
+          return res.json({ isValid: false, message: 'No session token provided' });
+        }
+
+        const session = activeSessions.get(sessionToken);
+        
+        if (!session) {
+          return res.json({ isValid: false, message: 'Session not found' });
+        }
+        
+        // Check if session expired
+        if (session.expiresAt < new Date()) {
+          activeSessions.delete(sessionToken);
+          return res.json({ isValid: false, message: 'Session expired' });
+        }
+
+        console.log(`✅ Valid early access session verified: ${session.accessMethod}`);
+        res.json({
+          isValid: true,
+          accessMethod: session.accessMethod,
+          email: session.email,
+          expiresAt: session.expiresAt
+        });
+      } catch (error) {
+        console.error('❌ Error verifying session:', error);
+        res.status(500).json({ isValid: false, message: 'Server error' });
       }
     });
     
