@@ -1,1 +1,1 @@
-Deployment trigger: August 19, 2025 - 01:17 UTC - Fixed early access fallback for static deployment
+Deployment trigger: August 19, 2025 - 01:33 UTC - Full-stack Vercel deployment with serverless functions
