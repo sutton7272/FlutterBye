@@ -4,7 +4,8 @@
   "outputDirectory": "dist/public",
   "functions": {
     "api/*.ts": {
-      "runtime": "@vercel/node"
+      "runtime": "@vercel/node",
+      "maxDuration": 10
     }
   },
   "rewrites": [
@@ -19,5 +20,6 @@
   ],
   "env": {
     "NODE_ENV": "production"
-  }
+  },
+  "installCommand": "npm install"
 }
