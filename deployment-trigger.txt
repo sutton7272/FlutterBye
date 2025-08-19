@@ -1,1 +1,1 @@
-Deployment trigger: August 19, 2025 - 02:13 UTC - Fixed TypeScript compilation errors and improved serverless function
+Deployment trigger: August 19, 2025 - 02:23 UTC - Fixed Vercel routing to serve frontend correctly instead of API message
