@@ -106,7 +106,7 @@ import AllOpportunities from "@/pages/AllOpportunities";
 import AdminAPIMonetization from "@/pages/admin-api-monetization";
 import FlutterBlogBot from "@/pages/flutterblog-bot";
 import MonitoringDashboard from "@/pages/monitoring-dashboard";
-import FlutterBlogPerformance from "@/pages/FlutterBlog-Performance";
+// import FlutterBlogPerformance from "@/pages/FlutterBlog-Performance"; // Temporarily removed due to flashing issue
 import CampaignBuilder from "@/pages/campaign-builder";
 import AIMarketingBot from "@/pages/ai-marketing-bot";
 import WalletTest from "@/pages/WalletTest";
@@ -862,11 +862,12 @@ function Router() {
             <MonitoringDashboard />
           </>
         )} />
-        <Route path="/admin/blog-performance" component={() => (
+        {/* <Route path="/admin/blog-performance" component={() => (
           <>
             <FlutterBlogPerformance />
           </>
-        )} />
+        )} /> */}
+        {/* Temporarily removed FlutterBlog Performance route due to flashing issue */}
         
         <Route path="/revolutionary-ai" component={() => {
           const RevolutionaryAIShowcase = lazy(() => import('./pages/revolutionary-ai-showcase'));
