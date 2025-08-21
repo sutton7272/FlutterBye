@@ -9,7 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
-import { Brain, Database, Search, Plus, TrendingUp, Users, Activity, Zap } from "lucide-react";
+import { Brain, Database, Search, Plus, TrendingUp, Users, Activity, Zap, Download } from "lucide-react";
 import FlutterAIDashboard from "./flutterai-dashboard";
 
 interface WalletIntelligence {
@@ -185,6 +185,55 @@ function DatabaseManagement() {
     bulkAddMutation.mutate({ wallets });
   };
 
+  const downloadCSV = async () => {
+    try {
+      toast({
+        title: "Downloading...",
+        description: "Preparing your wallet intelligence CSV export",
+      });
+
+      const response = await fetch('/api/flutterai/intelligence/export/csv');
+      
+      if (!response.ok) {
+        throw new Error('Failed to download CSV');
+      }
+
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.style.display = 'none';
+      a.href = url;
+      
+      // Get filename from response headers or generate one
+      const contentDisposition = response.headers.get('content-disposition');
+      let filename = 'flutterbye-wallet-intelligence.csv';
+      if (contentDisposition) {
+        const filenameMatch = contentDisposition.match(/filename="(.+)"/);
+        if (filenameMatch) {
+          filename = filenameMatch[1];
+        }
+      }
+      
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+
+      toast({
+        title: "Download Complete",
+        description: `Successfully exported ${stats?.stats?.totalWallets || 0} wallet records to CSV`,
+      });
+    } catch (error) {
+      console.error('CSV download error:', error);
+      toast({
+        title: "Download Failed",
+        description: "Could not download CSV file. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
   const getScoreColor = (score: number) => {
     for (const [rating, range] of Object.entries(SCORE_RANGES)) {
       if (score >= range.min && score <= range.max) {
@@ -203,14 +252,25 @@ function DatabaseManagement() {
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 text-white p-6">
       <div className="max-w-7xl mx-auto space-y-6">
         {/* Header */}
-        <div className="flex items-center gap-3">
-          <div className="p-3 bg-blue-600 rounded-xl">
-            <Brain className="h-8 w-8" />
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="p-3 bg-blue-600 rounded-xl">
+              <Brain className="h-8 w-8" />
+            </div>
+            <div>
+              <h1 className="text-3xl font-bold">FlutterAI Intelligence</h1>
+              <p className="text-slate-300">Multi-Blockchain Wallet Analysis & Scoring System</p>
+            </div>
           </div>
-          <div>
-            <h1 className="text-3xl font-bold">FlutterAI Intelligence</h1>
-            <p className="text-slate-300">Multi-Blockchain Wallet Analysis & Scoring System</p>
-          </div>
+          
+          <Button
+            onClick={downloadCSV}
+            className="bg-green-600 hover:bg-green-700 text-white"
+            data-testid="button-download-csv"
+          >
+            <Download className="h-4 w-4 mr-2" />
+            Download CSV
+          </Button>
         </div>
 
         {/* Analytics Overview */}

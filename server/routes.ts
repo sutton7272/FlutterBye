@@ -97,7 +97,8 @@ import {
   getMarketingRecommendations,
   deleteWalletIntelligence,
   getAutoCollectionStats,
-  triggerWalletCollection
+  triggerWalletCollection,
+  downloadWalletIntelligenceCSV
 } from "./flutterai-intelligence-routes";
 import flutterAIPricingRoutes, { apiRateLimitMiddleware } from "./flutterai-pricing-routes";
 import { flutterAIAutoCollection } from './flutterai-auto-collection';
@@ -5303,6 +5304,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // Manual wallet collection trigger for testing
   app.post("/api/flutterai/collect-wallet", triggerWalletCollection);
+  
+  // CSV download for entire wallet intelligence database
+  app.get("/api/flutterai/intelligence/export/csv", downloadWalletIntelligenceCSV);
   
   // Register FlutterAI Pricing and Monetization routes
   app.use("/api/flutterai", flutterAIPricingRoutes);

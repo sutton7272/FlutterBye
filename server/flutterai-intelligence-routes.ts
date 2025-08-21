@@ -410,3 +410,120 @@ export async function triggerWalletCollection(req: Request, res: Response) {
     });
   }
 }
+
+/**
+ * Download entire wallet intelligence database as CSV
+ */
+export async function downloadWalletIntelligenceCSV(req: Request, res: Response) {
+  try {
+    console.log('📥 Starting CSV download of wallet intelligence database');
+    
+    // Get all wallet intelligence data
+    const allWallets = await storage.getAllWalletIntelligence();
+    
+    if (allWallets.length === 0) {
+      return res.status(404).json({
+        success: false,
+        error: 'No wallet data found in database'
+      });
+    }
+
+    // Define CSV headers
+    const csvHeaders = [
+      'Wallet Address',
+      'Blockchain',
+      'Network',
+      'Social Credit Score',
+      'Risk Level',
+      'Trading Behavior Score',
+      'Portfolio Quality Score',
+      'Liquidity Score',
+      'Activity Score',
+      'DeFi Engagement Score',
+      'Marketing Segment',
+      'Communication Style',
+      'Preferred Token Types',
+      'Risk Tolerance',
+      'Investment Profile',
+      'Trading Frequency',
+      'Portfolio Size',
+      'Influence Score',
+      'Social Connections',
+      'Source Platform',
+      'Collection Method',
+      'Created At',
+      'Last Analyzed',
+      'Target Audience',
+      'Messaging Strategy',
+      'Best Contact Times',
+      'Preferred Channels',
+      'Interests',
+      'Behavior Patterns'
+    ].join(',');
+
+    // Convert wallet data to CSV rows
+    const csvRows = allWallets.map(wallet => {
+      const marketingInsights = wallet.marketingInsights || {};
+      const preferredTokenTypes = Array.isArray(wallet.preferredTokenTypes) 
+        ? wallet.preferredTokenTypes.join(';') 
+        : (wallet.preferredTokenTypes || '');
+      
+      return [
+        `"${wallet.walletAddress || ''}"`,
+        `"${wallet.blockchain || ''}"`,
+        `"${wallet.network || ''}"`,
+        wallet.socialCreditScore || 0,
+        `"${wallet.riskLevel || ''}"`,
+        wallet.tradingBehaviorScore || 0,
+        wallet.portfolioQualityScore || 0,
+        wallet.liquidityScore || 0,
+        wallet.activityScore || 0,
+        wallet.defiEngagementScore || 0,
+        `"${wallet.marketingSegment || ''}"`,
+        `"${wallet.communicationStyle || ''}"`,
+        `"${preferredTokenTypes}"`,
+        `"${wallet.riskTolerance || ''}"`,
+        `"${wallet.investmentProfile || ''}"`,
+        `"${wallet.tradingFrequency || ''}"`,
+        `"${wallet.portfolioSize || ''}"`,
+        wallet.influenceScore || 0,
+        wallet.socialConnections || 0,
+        `"${wallet.sourcePlatform || ''}"`,
+        `"${wallet.collectionMethod || ''}"`,
+        `"${wallet.createdAt || ''}"`,
+        `"${wallet.lastAnalyzed || ''}"`,
+        `"${marketingInsights.targetAudience || ''}"`,
+        `"${marketingInsights.messagingStrategy || ''}"`,
+        `"${Array.isArray(marketingInsights.bestContactTimes) ? marketingInsights.bestContactTimes.join(';') : (marketingInsights.bestContactTimes || '')}"`,
+        `"${Array.isArray(marketingInsights.preferredCommunicationChannels) ? marketingInsights.preferredCommunicationChannels.join(';') : (marketingInsights.preferredCommunicationChannels || '')}"`,
+        `"${Array.isArray(marketingInsights.interests) ? marketingInsights.interests.join(';') : (marketingInsights.interests || '')}"`,
+        `"${Array.isArray(marketingInsights.behaviorPatterns) ? marketingInsights.behaviorPatterns.join(';') : (marketingInsights.behaviorPatterns || '')}"`,
+      ].join(',');
+    });
+
+    // Combine headers and rows
+    const csvContent = [csvHeaders, ...csvRows].join('\n');
+
+    // Generate filename with timestamp
+    const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
+    const filename = `flutterbye-wallet-intelligence-${timestamp}.csv`;
+
+    // Set response headers for file download
+    res.setHeader('Content-Type', 'text/csv');
+    res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+    res.setHeader('Content-Length', Buffer.byteLength(csvContent));
+
+    console.log(`📥 CSV download complete: ${allWallets.length} wallets exported to ${filename}`);
+    
+    // Send CSV content
+    res.send(csvContent);
+    
+  } catch (error) {
+    console.error('Error generating CSV download:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to generate CSV download',
+      details: error instanceof Error ? error.message : 'Unknown error'
+    });
+  }
+}
