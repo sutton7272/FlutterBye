@@ -77,6 +77,9 @@ import aiIntelligenceRoutes from "./ai-intelligence-routes";
 import { aiMonetizationService } from "./ai-monetization-service";
 import { aiPaymentService } from "./ai-payment-service";
 import { z } from "zod";
+import { db } from "./db";
+import { eq, desc, sql } from "drizzle-orm";
+import { vipWaitlist } from "@shared/schema";
 import { registerNextGenAIRoutes } from "./next-gen-ai-routes";
 import { flutterAIRoutes } from "./flutterai-routes";
 import { registerFlutterAIWalletRoutes } from "./flutterai-wallet-routes";
@@ -3724,28 +3727,55 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
       
+      const cleanEmail = email.toLowerCase().trim();
+      const cleanWallet = walletAddress ? walletAddress.trim() : '';
+      
+      // Check for duplicate email
+      const existingByEmail = await db.select()
+        .from(vipWaitlist)
+        .where(eq(vipWaitlist.email, cleanEmail))
+        .limit(1);
+      
+      if (existingByEmail.length > 0) {
+        return res.status(400).json({
+          success: false,
+          error: "Email address already registered in waitlist"
+        });
+      }
+      
+      // Check for duplicate wallet if provided
+      if (cleanWallet) {
+        const existingByWallet = await db.select()
+          .from(vipWaitlist)
+          .where(eq(vipWaitlist.walletAddress, cleanWallet))
+          .limit(1);
+        
+        if (existingByWallet.length > 0) {
+          return res.status(400).json({
+            success: false,
+            error: "Wallet address already registered in waitlist"
+          });
+        }
+      }
+      
       // Generate unique ID for waitlist entry
       const entryId = `waitlist_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
       
-      // Create waitlist entry
-      const waitlistEntry = {
+      // Create waitlist entry in database
+      const [waitlistEntry] = await db.insert(vipWaitlist).values({
         entryId,
-        email: email.toLowerCase().trim(),
-        walletAddress: walletAddress || '',
-        joinedAt: new Date().toISOString(),
-        benefits: [
-          "Early access before public launch",
-          "Exclusive FLBY token airdrops",
-          "Beta testing privileges",
-          "VIP community access"
-        ]
-      };
+        email: cleanEmail,
+        walletAddress: cleanWallet || null,
+        status: 'active',
+        source: 'website'
+      }).returning();
       
-      // Store in memory (in production use database)
-      waitlistStorage.set(entryId, waitlistEntry);
+      console.log(`📝 New waitlist signup: ${cleanEmail} ${cleanWallet ? `(${cleanWallet})` : ''}`);
       
-      console.log(`📝 New waitlist signup: ${email} ${walletAddress ? `(${walletAddress})` : ''}`);
-      console.log(`📊 Total waitlist entries: ${waitlistStorage.size}`);
+      // Get total count for logging
+      const totalCount = await db.select({ count: sql<number>`count(*)` })
+        .from(vipWaitlist);
+      console.log(`📊 Total waitlist entries: ${totalCount[0]?.count || 0}`);
       
       res.json({
         success: true,
@@ -3762,25 +3792,113 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Admin endpoint to update waitlist entry status
+  app.patch("/api/admin/waitlist-entries/:entryId/status", async (req, res) => {
+    try {
+      const { entryId } = req.params;
+      const { status } = req.body;
+      
+      if (!["active", "contacted", "converted"].includes(status)) {
+        return res.status(400).json({
+          success: false,
+          error: "Invalid status. Must be 'active', 'contacted', or 'converted'"
+        });
+      }
+      
+      const [updatedEntry] = await db.update(vipWaitlist)
+        .set({ 
+          status, 
+          updatedAt: new Date()
+        })
+        .where(eq(vipWaitlist.entryId, entryId))
+        .returning();
+      
+      if (!updatedEntry) {
+        return res.status(404).json({
+          success: false,
+          error: "Waitlist entry not found"
+        });
+      }
+      
+      res.json({
+        success: true,
+        entry: updatedEntry
+      });
+    } catch (error) {
+      console.error("Error updating waitlist entry status:", error);
+      res.status(500).json({
+        success: false,
+        error: "Failed to update entry status"
+      });
+    }
+  });
+
+  // Admin endpoint to export waitlist entries as CSV
+  app.get("/api/admin/waitlist-entries/export", async (req, res) => {
+    try {
+      const entries = await db.select()
+        .from(vipWaitlist)
+        .orderBy(desc(vipWaitlist.createdAt));
+      
+      // Create CSV content
+      const csvHeaders = "Entry ID,Email,Wallet Address,Status,Source,Joined Date,Created Date\n";
+      const csvRows = entries.map(entry => {
+        const row = [
+          entry.entryId,
+          entry.email,
+          entry.walletAddress || "",
+          entry.status,
+          entry.source,
+          entry.joinedAt?.toISOString() || "",
+          entry.createdAt?.toISOString() || ""
+        ];
+        return row.map(field => `"${field}"`).join(",");
+      }).join("\n");
+      
+      const csvContent = csvHeaders + csvRows;
+      
+      res.setHeader("Content-Type", "text/csv");
+      res.setHeader("Content-Disposition", `attachment; filename="vip-waitlist-${new Date().toISOString().split("T")[0]}.csv"`);
+      res.send(csvContent);
+    } catch (error) {
+      console.error("Error exporting waitlist entries:", error);
+      res.status(500).json({
+        success: false,
+        error: "Failed to export waitlist entries"
+      });
+    }
+  });
+
   // Admin endpoint to view all waitlist entries  
   app.get("/api/admin/waitlist-entries", async (req, res) => {
     try {
-      // Convert Map to Array for easy viewing
-      const entries = Array.from(waitlistStorage.values());
+      // Fetch all waitlist entries from database, sorted by newest first
+      const entries = await db.select()
+        .from(vipWaitlist)
+        .orderBy(desc(vipWaitlist.createdAt));
       
-      // Sort by join date (newest first)
-      entries.sort((a, b) => new Date(b.joinedAt).getTime() - new Date(a.joinedAt).getTime());
+      const summary = {
+        totalEmails: entries.length,
+        withWallets: entries.filter(e => e.walletAddress && e.walletAddress.length > 0).length,
+        withoutWallets: entries.filter(e => !e.walletAddress || e.walletAddress.length === 0).length,
+        lastEntry: entries[0]?.createdAt || null,
+        byStatus: {
+          active: entries.filter(e => e.status === 'active').length,
+          contacted: entries.filter(e => e.status === 'contacted').length,
+          converted: entries.filter(e => e.status === 'converted').length
+        },
+        bySource: {
+          website: entries.filter(e => e.source === 'website').length,
+          referral: entries.filter(e => e.source === 'referral').length,
+          social: entries.filter(e => e.source === 'social').length
+        }
+      };
       
       res.json({
         success: true,
         totalEntries: entries.length,
         entries: entries,
-        summary: {
-          totalEmails: entries.length,
-          withWallets: entries.filter(e => e.walletAddress && e.walletAddress.length > 0).length,
-          withoutWallets: entries.filter(e => !e.walletAddress || e.walletAddress.length === 0).length,
-          lastEntry: entries[0]?.joinedAt || null
-        }
+        summary: summary
       });
     } catch (error) {
       console.error("Error fetching waitlist entries:", error);

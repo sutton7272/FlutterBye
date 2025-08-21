@@ -104,6 +104,7 @@ import CostEffectiveAIPanel from "@/components/cost-effective-ai-panel";
 import NFTClaim from "@/pages/nft-claim";
 import AllOpportunities from "@/pages/AllOpportunities";
 import AdminAPIMonetization from "@/pages/admin-api-monetization";
+const AdminMarketing = lazy(() => import("@/pages/admin-marketing"));
 import FlutterBlogBot from "@/pages/flutterblog-bot";
 import MonitoringDashboard from "@/pages/monitoring-dashboard";
 // import FlutterBlogPerformance from "@/pages/FlutterBlog-Performance"; // Temporarily removed due to flashing issue
@@ -166,6 +167,14 @@ function Router() {
           <AdminRouteGuard>
             <SuspenseWrapper>
               <AdminEarlyAccessManagement />
+            </SuspenseWrapper>
+          </AdminRouteGuard>
+        )} />
+
+        <Route path="/admin/marketing" component={() => (
+          <AdminRouteGuard>
+            <SuspenseWrapper>
+              <AdminMarketing />
             </SuspenseWrapper>
           </AdminRouteGuard>
         )} />
