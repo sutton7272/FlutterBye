@@ -190,6 +190,7 @@ export async function getAllWalletIntelligence(req: Request, res: Response) {
 export async function getWalletIntelligenceStats(req: Request, res: Response) {
   try {
     const rawStats = await storage.getWalletIntelligenceStats();
+    console.log(`🔍 Stats API: Raw stats from storage:`, rawStats);
     
     // Structure the response to match dashboard expectations
     const stats = {

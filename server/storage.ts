@@ -2516,6 +2516,8 @@ export class MemStorage implements IStorage {
 
     stats.avgSocialCreditScore = Math.round(totalScore / items.length);
     
+    console.log(`📊 In-memory calculation: ${items.length} wallets, total score: ${totalScore}, avg: ${stats.avgSocialCreditScore}`);
+    
     // Top performers (top 10%)
     const sortedByScore = items.sort((a, b) => b.socialCreditScore - a.socialCreditScore);
     const topCount = Math.max(1, Math.floor(items.length * 0.1));
