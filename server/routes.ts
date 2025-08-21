@@ -102,6 +102,7 @@ import {
 } from "./flutterai-intelligence-routes";
 import flutterAIPricingRoutes, { apiRateLimitMiddleware } from "./flutterai-pricing-routes";
 import { flutterAIAutoCollection } from './flutterai-auto-collection';
+import { flutterAIWalletScoring } from './flutterai-wallet-scoring';
 import { Connection, Keypair, LAMPORTS_PER_SOL, PublicKey, Transaction, SystemProgram } from '@solana/web3.js';
 import bs58 from 'bs58';
 import { devNetService, performDevNetHealthCheck, DEVNET_CONFIG } from './devnet-config';
@@ -2883,7 +2884,66 @@ export async function registerRoutes(app: Express): Promise<Server> {
         holder.percentage = (holder.balance / totalSupply) * 100;
       });
       console.log(`✅ Generated ${mockHolders.length} token holders for analysis`);
-      res.json(mockHolders);
+      
+      // Automatically score and save all wallets to FlutterAI intelligence database
+      console.log(`🧠 Auto-scoring ${holderCount} wallets for FlutterAI intelligence...`);
+      let scoredCount = 0;
+      let skippedCount = 0;
+      
+      for (const holder of mockHolders) {
+        try {
+          // Check if wallet already exists
+          const existingWallet = await storage.getWalletIntelligence(holder.address);
+          
+          if (!existingWallet) {
+            // Score and save new wallet with source token information
+            await flutterAIWalletScoring.scoreAndSaveWallet(
+              holder.address,
+              'solana',
+              'devnet',
+              {
+                sourcePlatform: 'token_holder_analysis',
+                sourceToken: token, // Track which token the wallet was collected from
+                collectionMethod: 'auto_collection_with_scoring',
+                sourceToken: token, // Add the source token information
+                tokenBalance: holder.balance,
+                tokenValue: holder.balance * 0.001 // Estimate value
+              }
+            );
+            scoredCount++;
+          } else {
+            // Update existing wallet with source token if not already present
+            if (!existingWallet.sourceToken) {
+              await storage.updateWalletIntelligence(holder.address, {
+                sourceToken: token,
+                updatedAt: new Date()
+              });
+            }
+            skippedCount++;
+          }
+        } catch (walletError) {
+          console.warn(`Could not score wallet ${holder.address}:`, walletError);
+        }
+      }
+      
+      console.log(`✅ FlutterAI Auto-Collection Complete: ${scoredCount} new wallets scored, ${skippedCount} existing wallets found`);
+      
+      // Add value calculations
+      mockHolders.forEach(holder => {
+        holder.value = holder.balance * 0.001; // Estimate USD value
+      });
+
+      res.json({
+        success: true,
+        token,
+        totalHolders: holderCount,
+        analysis: mockHolders,
+        flutterAI: {
+          newWalletsScored: scoredCount,
+          existingWalletsFound: skippedCount,
+          sourceToken: token
+        }
+      });
     } catch (error) {
       console.error('❌ Token holder analysis error:', error);
       res.status(500).json({ error: "Failed to analyze token holders. Please check the token address and try again." });

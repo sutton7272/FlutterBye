@@ -1818,6 +1818,7 @@ export const walletIntelligence = pgTable("wallet_intelligence", {
   // Collection metadata
   sourcePlatform: varchar("source_platform", { length: 50 }), // FlutterBye, PerpeTrader, Manual
   collectionMethod: varchar("collection_method", { length: 50 }), // automatic, manual, imported
+  sourceToken: varchar("source_token", { length: 50 }), // Token address/symbol that wallets were collected from
   lastAnalyzed: timestamp("last_analyzed").defaultNow(),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),

@@ -81,6 +81,7 @@ export class FlutterAIAutoCollectionService {
         collectedBy: 'FlutterAI Auto-Collection Service',
         collectionMethod: 'automatic',
         sourcePlatform,
+        sourceToken: additionalMetadata?.sourceToken, // Add source token tracking
         socialCreditScore: 0,
         riskLevel: 'unknown',
         tradingBehaviorScore: 0,

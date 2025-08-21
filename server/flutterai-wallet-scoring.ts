@@ -587,4 +587,73 @@ export class FlutterAIWalletScoringService {
 
     return summary;
   }
+
+  /**
+   * Score and save wallet with additional metadata including source token
+   * Combines scoring and storage into a single operation
+   */
+  async scoreAndSaveWallet(
+    walletAddress: string,
+    blockchain: string = 'solana',
+    network: string = 'devnet',
+    additionalMetadata?: {
+      sourcePlatform?: string;
+      sourceToken?: string;
+      collectionMethod?: string;
+      [key: string]: any;
+    }
+  ): Promise<void> {
+    try {
+      console.log(`🧠 Scoring and saving wallet: ${walletAddress}`);
+      
+      // Score the wallet using our comprehensive analysis
+      const scores = await this.scoreWallet(walletAddress);
+      
+      // Import storage here to avoid circular dependency
+      const { storage } = await import('./storage');
+      
+      // Prepare wallet intelligence data with source token tracking
+      const walletIntelligence = {
+        walletAddress,
+        blockchain,
+        network,
+        source: additionalMetadata?.sourcePlatform || 'flutterai_scoring',
+        collectedBy: 'FlutterAI Scoring Service',
+        collectionMethod: additionalMetadata?.collectionMethod || 'automatic_scoring',
+        sourcePlatform: additionalMetadata?.sourcePlatform || 'flutterai_scoring',
+        sourceToken: additionalMetadata?.sourceToken, // Track which token this wallet was collected from
+        socialCreditScore: scores.socialCreditScore,
+        riskLevel: scores.riskLevel,
+        tradingBehaviorScore: scores.tradingBehaviorScore,
+        portfolioQualityScore: scores.portfolioQualityScore,
+        liquidityScore: scores.liquidityScore,
+        activityScore: scores.activityScore,
+        defiEngagementScore: scores.defiEngagementScore,
+        marketingSegment: scores.marketingSegment,
+        communicationStyle: scores.communicationStyle,
+        preferredTokenTypes: scores.preferredTokenTypes,
+        riskTolerance: scores.riskTolerance,
+        investmentProfile: scores.investmentProfile,
+        tradingFrequency: scores.tradingFrequency,
+        portfolioSize: scores.portfolioSize,
+        influenceScore: scores.influenceScore,
+        socialConnections: scores.socialConnections,
+        marketingInsights: scores.marketingInsights,
+        analysisData: scores.analysisData,
+        lastAnalyzed: new Date().toISOString(),
+      };
+      
+      // Save to database
+      await storage.createWalletIntelligence(walletIntelligence);
+      
+      console.log(`✅ Wallet scored and saved: ${walletAddress} - Score: ${scores.socialCreditScore}`);
+      
+    } catch (error) {
+      console.error(`❌ Error scoring and saving wallet ${walletAddress}:`, error);
+      throw error;
+    }
+  }
 }
+
+// Export the instance
+export const flutterAIWalletScoring = new FlutterAIWalletScoringService();

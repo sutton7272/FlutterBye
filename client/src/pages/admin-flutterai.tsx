@@ -454,6 +454,11 @@ function DatabaseManagement() {
                             <Badge variant="secondary" className="text-xs">
                               Risk: {wallet.riskTolerance}
                             </Badge>
+                            {wallet.sourceToken && (
+                              <Badge variant="outline" className="text-xs bg-purple-600 text-white">
+                                Source: {wallet.sourceToken}
+                              </Badge>
+                            )}
                           </div>
                         </div>
                         
