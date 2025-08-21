@@ -28,10 +28,7 @@ export async function analyzeWallet(req: Request, res: Response) {
     // Perform comprehensive scoring analysis
     const analysis = await scoringService.scoreWallet(walletAddress);
     
-    // Check if intelligence record already exists
-    const existingIntelligence = await storage.getWalletIntelligence(walletAddress);
-    
-    // Always create new intelligence record (upsert pattern)
+    // Always try to create new record first (safer approach)
     try {
       const intelligenceData = {
         walletAddress,
@@ -46,7 +43,7 @@ export async function analyzeWallet(req: Request, res: Response) {
         defiEngagementScore: analysis.defiEngagementScore,
         marketingSegment: analysis.marketingSegment,
         communicationStyle: analysis.communicationStyle,
-        preferredTokenTypes: analysis.preferredTokenTypes,
+        preferredTokenTypes: Array.isArray(analysis.preferredTokenTypes) ? analysis.preferredTokenTypes : [analysis.preferredTokenTypes].filter(Boolean),
         riskTolerance: analysis.riskTolerance,
         investmentProfile: analysis.investmentProfile,
         tradingFrequency: analysis.tradingFrequency,
@@ -60,20 +57,25 @@ export async function analyzeWallet(req: Request, res: Response) {
         lastAnalyzed: new Date()
       };
 
+      // Try to create new record first, fallback to update if exists
       let intelligenceRecord;
-      if (existingIntelligence) {
-        // Update existing record
-        intelligenceRecord = await storage.updateWalletIntelligence(walletAddress, intelligenceData);
-        console.log(`✅ Updated wallet intelligence for ${walletAddress}`);
-      } else {
-        // Create new record
+      try {
         intelligenceRecord = await storage.createWalletIntelligence(intelligenceData);
         console.log(`✅ Created new wallet intelligence for ${walletAddress}`);
+      } catch (createError) {
+        console.log(`⚠️ Create failed, trying update for ${walletAddress}`);
+        try {
+          intelligenceRecord = await storage.updateWalletIntelligence(walletAddress, intelligenceData);
+          console.log(`✅ Updated existing wallet intelligence for ${walletAddress}`);
+        } catch (updateError) {
+          console.error(`❌ Both create and update failed for ${walletAddress}:`, createError, updateError);
+          throw new Error("Failed to save wallet intelligence to database");
+        }
       }
       
       return res.json({
         success: true,
-        message: existingIntelligence ? 'Wallet intelligence updated' : 'Wallet intelligence created',
+        message: 'Wallet intelligence saved successfully',
         walletAddress,
         analysis: intelligenceRecord
       });
