@@ -78,9 +78,10 @@ function DatabaseManagement() {
     queryKey: ["/api/flutterai/intelligence", searchTerm, filterBlockchain, filterStatus],
     queryFn: async () => {
       console.log("🔍 Frontend: Fetching wallet intelligence data...");
-      const response = await apiRequest(`/api/flutterai/intelligence?search=${searchTerm}&blockchain=${filterBlockchain}&status=${filterStatus}`);
-      console.log("🔍 Frontend: Response received:", response);
-      return response;
+      const response = await apiRequest("GET", `/api/flutterai/intelligence?search=${searchTerm}&blockchain=${filterBlockchain}&status=${filterStatus}`);
+      const data = await response.json();
+      console.log("🔍 Frontend: Response received:", data);
+      return data;
     }
   });
 
@@ -91,9 +92,10 @@ function DatabaseManagement() {
   const { data: stats, isLoading: statsLoading } = useQuery({
     queryKey: ["/api/flutterai/intelligence-stats"],
     queryFn: async () => {
-      const response = await apiRequest("/api/flutterai/intelligence-stats");
-      console.log("🔍 Frontend: Stats received:", response);
-      return response;
+      const response = await apiRequest("GET", "/api/flutterai/intelligence-stats");
+      const data = await response.json();
+      console.log("🔍 Frontend: Stats received:", data);
+      return data;
     }
   });
 

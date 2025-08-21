@@ -2398,6 +2398,47 @@ export class MemStorage implements IStorage {
 
 
   async updateWalletIntelligence(walletAddress: string, updates: any): Promise<any> {
+    try {
+      // Try to update in database first
+      const { db } = await import("./db");
+      const { sql } = await import("drizzle-orm");
+      
+      const result = await db.execute(sql`
+        UPDATE wallet_intelligence 
+        SET 
+          social_credit_score = ${updates.socialCreditScore || 500},
+          risk_level = ${updates.riskLevel || 'medium'},
+          trading_behavior_score = ${updates.tradingBehaviorScore || 50},
+          portfolio_quality_score = ${updates.portfolioQualityScore || 50},
+          liquidity_score = ${updates.liquidityScore || 50},
+          activity_score = ${updates.activityScore || 50},
+          defi_engagement_score = ${updates.defiEngagementScore || 50},
+          marketing_segment = ${updates.marketingSegment || 'retail'},
+          communication_style = ${updates.communicationStyle || 'casual'},
+          preferred_token_types = ${JSON.stringify(updates.preferredTokenTypes || [])},
+          risk_tolerance = ${updates.riskTolerance || 'moderate'},
+          investment_profile = ${updates.investmentProfile || 'balanced'},
+          trading_frequency = ${updates.tradingFrequency || 'weekly'},
+          portfolio_size = ${updates.portfolioSize || 'small'},
+          influence_score = ${Math.round(updates.influenceScore || 0)},
+          social_connections = ${Math.round(updates.socialConnections || 0)},
+          marketing_insights = ${JSON.stringify(updates.marketingInsights || {})},
+          analysis_data = ${JSON.stringify(updates.analysisData || {})},
+          last_analyzed = ${new Date()},
+          updated_at = ${new Date()}
+        WHERE wallet_address = ${walletAddress}
+        RETURNING *
+      `);
+      
+      if (result.rows.length > 0) {
+        console.log(`✅ Database: Updated wallet intelligence for ${walletAddress}`);
+        return result.rows[0];
+      }
+    } catch (error) {
+      console.error('Database update error:', error);
+    }
+    
+    // Fallback to in-memory storage
     const items = Array.from(this.walletIntelligenceData.entries());
     const existingEntry = items.find(([_, item]) => item.walletAddress === walletAddress);
     
