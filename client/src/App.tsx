@@ -105,6 +105,7 @@ import NFTClaim from "@/pages/nft-claim";
 import AllOpportunities from "@/pages/AllOpportunities";
 import AdminAPIMonetization from "@/pages/admin-api-monetization";
 const AdminMarketing = lazy(() => import("@/pages/admin-marketing"));
+const AdminFlutterAI = lazy(() => import("@/pages/admin-flutterai"));
 import FlutterBlogBot from "@/pages/flutterblog-bot";
 import MonitoringDashboard from "@/pages/monitoring-dashboard";
 // import FlutterBlogPerformance from "@/pages/FlutterBlog-Performance"; // Temporarily removed due to flashing issue
@@ -175,6 +176,14 @@ function Router() {
           <AdminRouteGuard>
             <SuspenseWrapper>
               <AdminMarketing />
+            </SuspenseWrapper>
+          </AdminRouteGuard>
+        )} />
+
+        <Route path="/admin/flutterai" component={() => (
+          <AdminRouteGuard>
+            <SuspenseWrapper>
+              <AdminFlutterAI />
             </SuspenseWrapper>
           </AdminRouteGuard>
         )} />

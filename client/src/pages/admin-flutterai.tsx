@@ -14,14 +14,27 @@ import { Brain, Database, Search, Plus, TrendingUp, Users, Activity, Zap } from 
 interface WalletIntelligence {
   id: string;
   walletAddress: string;
-  blockchain: string;
-  flutteraiScore: number;
-  socialCreditRating: string;
-  wealthIndicator: string;
-  activityLevel: string;
-  aiAnalysisData: any;
-  targetingSegments: string[];
-  status: string;
+  blockchain?: string;
+  network?: string;
+  socialCreditScore: number;
+  riskLevel: string;
+  tradingBehaviorScore: number;
+  portfolioQualityScore: number;
+  liquidityScore: number;
+  activityScore: number;
+  defiEngagementScore: number;
+  marketingSegment: string;
+  communicationStyle: string;
+  preferredTokenTypes: string[];
+  riskTolerance: string;
+  investmentProfile: string;
+  tradingFrequency: string;
+  portfolioSize: string;
+  influenceScore: number;
+  socialConnections: number;
+  marketingInsights: any;
+  analysisData: any;
+  lastAnalyzed: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -60,32 +73,33 @@ export default function AdminFlutterAI() {
   const queryClient = useQueryClient();
 
   // Fetch wallet intelligence data
-  const { data: wallets = [], isLoading: walletsLoading } = useQuery({
-    queryKey: ["/api/admin/flutterai/wallets", searchTerm, filterBlockchain, filterStatus],
-    queryFn: () => apiRequest(`/api/admin/flutterai/wallets?search=${searchTerm}&blockchain=${filterBlockchain}&status=${filterStatus}`)
+  const { data: walletData, isLoading: walletsLoading } = useQuery({
+    queryKey: ["/api/flutterai/intelligence", searchTerm, filterBlockchain, filterStatus],
+    queryFn: () => apiRequest(`/api/flutterai/intelligence?search=${searchTerm}&blockchain=${filterBlockchain}&status=${filterStatus}`)
   });
 
-  // Fetch analytics stats
+  const wallets = walletData?.data || [];
+
+  // Fetch analytics stats  
   const { data: stats, isLoading: statsLoading } = useQuery({
-    queryKey: ["/api/admin/flutterai/stats"],
-    queryFn: () => apiRequest("/api/admin/flutterai/stats")
+    queryKey: ["/api/flutterai/intelligence-stats"],
+    queryFn: () => apiRequest("/api/flutterai/intelligence-stats")
   });
 
   // Add single wallet mutation
   const addWalletMutation = useMutation({
     mutationFn: (data: { walletAddress: string; blockchain: string }) =>
-      apiRequest("/api/admin/flutterai/add-wallet", {
-        method: "POST",
-        body: data
+      apiRequest(`/api/flutterai/analyze/${data.walletAddress}`, {
+        method: "POST"
       }),
     onSuccess: () => {
       toast({
         title: "Wallet Added",
-        description: "Wallet has been queued for FlutterAI analysis",
+        description: "Wallet has been analyzed and saved to database",
       });
       setNewWalletAddress("");
-      queryClient.invalidateQueries({ queryKey: ["/api/admin/flutterai/wallets"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/admin/flutterai/stats"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/flutterai/intelligence"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/flutterai/intelligence-stats"] });
     },
     onError: (error) => {
       toast({
@@ -99,22 +113,22 @@ export default function AdminFlutterAI() {
   // Bulk add wallets mutation
   const bulkAddMutation = useMutation({
     mutationFn: (data: { wallets: Array<{ walletAddress: string; blockchain: string }> }) =>
-      apiRequest("/api/admin/flutterai/bulk-add", {
+      apiRequest("/api/flutterai/batch-analyze", {
         method: "POST",
-        body: data
+        body: { walletAddresses: data.wallets.map(w => w.walletAddress) }
       }),
     onSuccess: (data) => {
       toast({
-        title: "Bulk Import Complete",
-        description: `Added ${data.added} wallets, ${data.skipped} duplicates skipped`,
+        title: "Bulk Analysis Started",
+        description: `Processing ${data.total || 0} wallets for FlutterAI analysis`,
       });
       setBulkWallets("");
-      queryClient.invalidateQueries({ queryKey: ["/api/admin/flutterai/wallets"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/admin/flutterai/stats"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/flutterai/intelligence"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/flutterai/intelligence-stats"] });
     },
     onError: (error) => {
       toast({
-        title: "Bulk Import Error",
+        title: "Bulk Analysis Error",
         description: error.message,
         variant: "destructive",
       });
@@ -123,16 +137,16 @@ export default function AdminFlutterAI() {
 
   // Reanalyze wallet mutation
   const reanalyzeMutation = useMutation({
-    mutationFn: (walletId: string) =>
-      apiRequest(`/api/admin/flutterai/reanalyze/${walletId}`, {
+    mutationFn: (walletAddress: string) =>
+      apiRequest(`/api/flutterai/analyze/${walletAddress}`, {
         method: "POST"
       }),
     onSuccess: () => {
       toast({
-        title: "Reanalysis Started",
-        description: "Wallet has been queued for fresh FlutterAI analysis",
+        title: "Reanalysis Complete",
+        description: "Wallet has been reanalyzed with updated FlutterAI scoring",
       });
-      queryClient.invalidateQueries({ queryKey: ["/api/admin/flutterai/wallets"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/flutterai/intelligence"] });
     },
   });
 
@@ -344,46 +358,46 @@ export default function AdminFlutterAI() {
                             </Badge>
                           </div>
                           
-                          {wallet.status === 'completed' && wallet.flutteraiScore && (
+                          {wallet.socialCreditScore && (
                             <div className="flex items-center gap-4">
                               <div className="flex items-center gap-2">
-                                <span className="text-sm text-slate-400">FlutterAI Score:</span>
-                                <Badge className={`${getScoreColor(wallet.flutteraiScore)} text-white`}>
-                                  {wallet.flutteraiScore}/1000 ({wallet.socialCreditRating})
+                                <span className="text-sm text-slate-400">Social Credit Score:</span>
+                                <Badge className={`${getScoreColor(wallet.socialCreditScore)} text-white`}>
+                                  {wallet.socialCreditScore}/1000
                                 </Badge>
                               </div>
                               <div className="flex items-center gap-2">
-                                <span className="text-sm text-slate-400">Wealth:</span>
-                                <Badge variant="outline">{wallet.wealthIndicator}</Badge>
+                                <span className="text-sm text-slate-400">Risk Level:</span>
+                                <Badge variant="outline">{wallet.riskLevel}</Badge>
                               </div>
                               <div className="flex items-center gap-2">
-                                <span className="text-sm text-slate-400">Activity:</span>
-                                <Badge variant="outline">{wallet.activityLevel}</Badge>
+                                <span className="text-sm text-slate-400">Portfolio Size:</span>
+                                <Badge variant="outline">{wallet.portfolioSize}</Badge>
                               </div>
                             </div>
                           )}
                           
-                          {wallet.targetingSegments && wallet.targetingSegments.length > 0 && (
-                            <div className="flex flex-wrap gap-1">
-                              {wallet.targetingSegments.slice(0, 3).map((segment: string) => (
-                                <Badge key={segment} variant="secondary" className="text-xs">
-                                  {segment.replace('_', ' ')}
-                                </Badge>
-                              ))}
-                              {wallet.targetingSegments.length > 3 && (
-                                <Badge variant="secondary" className="text-xs">
-                                  +{wallet.targetingSegments.length - 3} more
-                                </Badge>
-                              )}
-                            </div>
-                          )}
+                          <div className="flex flex-wrap gap-1">
+                            <Badge variant="secondary" className="text-xs">
+                              {wallet.marketingSegment}
+                            </Badge>
+                            <Badge variant="secondary" className="text-xs">
+                              {wallet.communicationStyle}
+                            </Badge>
+                            <Badge variant="secondary" className="text-xs">
+                              {wallet.tradingFrequency}
+                            </Badge>
+                            <Badge variant="secondary" className="text-xs">
+                              Risk: {wallet.riskTolerance}
+                            </Badge>
+                          </div>
                         </div>
                         
                         <div className="flex gap-2">
                           <Button
                             variant="outline"
                             size="sm"
-                            onClick={() => reanalyzeMutation.mutate(wallet.id)}
+                            onClick={() => reanalyzeMutation.mutate(wallet.walletAddress)}
                             disabled={reanalyzeMutation.isPending}
                             data-testid={`reanalyze-${wallet.id}`}
                           >
