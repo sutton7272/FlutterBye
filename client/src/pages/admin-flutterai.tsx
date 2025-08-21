@@ -1,0 +1,534 @@
+import { useState, useEffect } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { apiRequest } from "@/lib/queryClient";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Textarea } from "@/components/ui/textarea";
+import { useToast } from "@/hooks/use-toast";
+import { Brain, Database, Search, Plus, TrendingUp, Users, Activity, Zap } from "lucide-react";
+
+interface WalletIntelligence {
+  id: string;
+  walletAddress: string;
+  blockchain: string;
+  flutteraiScore: number;
+  socialCreditRating: string;
+  wealthIndicator: string;
+  activityLevel: string;
+  aiAnalysisData: any;
+  targetingSegments: string[];
+  status: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+interface AnalysisStats {
+  totalWallets: number;
+  analyzedWallets: number;
+  pendingAnalysis: number;
+  avgFlutteraiScore: number;
+  blockchainDistribution: Record<string, number>;
+  scoreDistribution: Record<string, number>;
+}
+
+const SUPPORTED_BLOCKCHAINS = [
+  "solana", "ethereum", "polygon", "arbitrum", "optimism", 
+  "base", "avalanche", "fantom", "binance_smart_chain", "near", "aptos"
+];
+
+const SCORE_RANGES = {
+  "S": { min: 900, max: 1000, color: "bg-yellow-500" },
+  "A": { min: 800, max: 899, color: "bg-green-500" },
+  "B": { min: 700, max: 799, color: "bg-blue-500" },
+  "C": { min: 600, max: 699, color: "bg-orange-500" },
+  "D": { min: 400, max: 599, color: "bg-red-500" },
+  "F": { min: 0, max: 399, color: "bg-gray-500" }
+};
+
+export default function AdminFlutterAI() {
+  const [newWalletAddress, setNewWalletAddress] = useState("");
+  const [selectedBlockchain, setSelectedBlockchain] = useState("solana");
+  const [bulkWallets, setBulkWallets] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filterBlockchain, setFilterBlockchain] = useState("all");
+  const [filterStatus, setFilterStatus] = useState("all");
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+
+  // Fetch wallet intelligence data
+  const { data: wallets = [], isLoading: walletsLoading } = useQuery({
+    queryKey: ["/api/admin/flutterai/wallets", searchTerm, filterBlockchain, filterStatus],
+    queryFn: () => apiRequest(`/api/admin/flutterai/wallets?search=${searchTerm}&blockchain=${filterBlockchain}&status=${filterStatus}`)
+  });
+
+  // Fetch analytics stats
+  const { data: stats, isLoading: statsLoading } = useQuery({
+    queryKey: ["/api/admin/flutterai/stats"],
+    queryFn: () => apiRequest("/api/admin/flutterai/stats")
+  });
+
+  // Add single wallet mutation
+  const addWalletMutation = useMutation({
+    mutationFn: (data: { walletAddress: string; blockchain: string }) =>
+      apiRequest("/api/admin/flutterai/add-wallet", {
+        method: "POST",
+        body: data
+      }),
+    onSuccess: () => {
+      toast({
+        title: "Wallet Added",
+        description: "Wallet has been queued for FlutterAI analysis",
+      });
+      setNewWalletAddress("");
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/flutterai/wallets"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/flutterai/stats"] });
+    },
+    onError: (error) => {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Bulk add wallets mutation
+  const bulkAddMutation = useMutation({
+    mutationFn: (data: { wallets: Array<{ walletAddress: string; blockchain: string }> }) =>
+      apiRequest("/api/admin/flutterai/bulk-add", {
+        method: "POST",
+        body: data
+      }),
+    onSuccess: (data) => {
+      toast({
+        title: "Bulk Import Complete",
+        description: `Added ${data.added} wallets, ${data.skipped} duplicates skipped`,
+      });
+      setBulkWallets("");
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/flutterai/wallets"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/flutterai/stats"] });
+    },
+    onError: (error) => {
+      toast({
+        title: "Bulk Import Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Reanalyze wallet mutation
+  const reanalyzeMutation = useMutation({
+    mutationFn: (walletId: string) =>
+      apiRequest(`/api/admin/flutterai/reanalyze/${walletId}`, {
+        method: "POST"
+      }),
+    onSuccess: () => {
+      toast({
+        title: "Reanalysis Started",
+        description: "Wallet has been queued for fresh FlutterAI analysis",
+      });
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/flutterai/wallets"] });
+    },
+  });
+
+  const handleAddWallet = () => {
+    if (!newWalletAddress.trim()) return;
+    addWalletMutation.mutate({
+      walletAddress: newWalletAddress.trim(),
+      blockchain: selectedBlockchain
+    });
+  };
+
+  const handleBulkAdd = () => {
+    const lines = bulkWallets.split('\n').filter(line => line.trim());
+    const wallets = lines.map(line => {
+      const [address, blockchain = "solana"] = line.trim().split(',');
+      return { walletAddress: address.trim(), blockchain: blockchain.trim() };
+    }).filter(w => w.walletAddress);
+
+    if (wallets.length === 0) {
+      toast({
+        title: "No Valid Wallets",
+        description: "Please enter wallet addresses (one per line, optionally with blockchain)",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    bulkAddMutation.mutate({ wallets });
+  };
+
+  const getScoreColor = (score: number) => {
+    for (const [rating, range] of Object.entries(SCORE_RANGES)) {
+      if (score >= range.min && score <= range.max) {
+        return range.color;
+      }
+    }
+    return "bg-gray-500";
+  };
+
+  const formatWalletAddress = (address: string) => {
+    if (address.length <= 16) return address;
+    return `${address.slice(0, 8)}...${address.slice(-8)}`;
+  };
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 text-white p-6">
+      <div className="max-w-7xl mx-auto space-y-6">
+        {/* Header */}
+        <div className="flex items-center gap-3">
+          <div className="p-3 bg-blue-600 rounded-xl">
+            <Brain className="h-8 w-8" />
+          </div>
+          <div>
+            <h1 className="text-3xl font-bold">FlutterAI Intelligence</h1>
+            <p className="text-slate-300">Multi-Blockchain Wallet Analysis & Scoring System</p>
+          </div>
+        </div>
+
+        {/* Analytics Overview */}
+        {stats && (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <Card className="bg-slate-800 border-slate-700">
+              <CardContent className="p-6">
+                <div className="flex items-center gap-3">
+                  <Database className="h-8 w-8 text-blue-500" />
+                  <div>
+                    <p className="text-sm text-slate-400">Total Wallets</p>
+                    <p className="text-2xl font-bold">{stats.totalWallets?.toLocaleString() || 0}</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-slate-800 border-slate-700">
+              <CardContent className="p-6">
+                <div className="flex items-center gap-3">
+                  <TrendingUp className="h-8 w-8 text-green-500" />
+                  <div>
+                    <p className="text-sm text-slate-400">Analyzed</p>
+                    <p className="text-2xl font-bold">{stats.analyzedWallets?.toLocaleString() || 0}</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-slate-800 border-slate-700">
+              <CardContent className="p-6">
+                <div className="flex items-center gap-3">
+                  <Activity className="h-8 w-8 text-orange-500" />
+                  <div>
+                    <p className="text-sm text-slate-400">Pending Analysis</p>
+                    <p className="text-2xl font-bold">{stats.pendingAnalysis?.toLocaleString() || 0}</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-slate-800 border-slate-700">
+              <CardContent className="p-6">
+                <div className="flex items-center gap-3">
+                  <Zap className="h-8 w-8 text-yellow-500" />
+                  <div>
+                    <p className="text-sm text-slate-400">Avg FlutterAI Score</p>
+                    <p className="text-2xl font-bold">{stats.avgFlutteraiScore?.toFixed(0) || 0}</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        )}
+
+        <Tabs defaultValue="wallets" className="space-y-6">
+          <TabsList className="grid w-full grid-cols-3 bg-slate-800">
+            <TabsTrigger value="wallets" className="data-[state=active]:bg-blue-600">
+              Wallet Database
+            </TabsTrigger>
+            <TabsTrigger value="add" className="data-[state=active]:bg-blue-600">
+              Add Wallets
+            </TabsTrigger>
+            <TabsTrigger value="analytics" className="data-[state=active]:bg-blue-600">
+              Analytics
+            </TabsTrigger>
+          </TabsList>
+
+          {/* Wallet Database Tab */}
+          <TabsContent value="wallets" className="space-y-4">
+            {/* Filters */}
+            <Card className="bg-slate-800 border-slate-700">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Search className="h-5 w-5" />
+                  Search & Filter
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <Input
+                  placeholder="Search wallet addresses..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="bg-slate-700 border-slate-600"
+                  data-testid="search-wallets"
+                />
+                <Select value={filterBlockchain} onValueChange={setFilterBlockchain}>
+                  <SelectTrigger className="bg-slate-700 border-slate-600" data-testid="filter-blockchain">
+                    <SelectValue placeholder="Filter by blockchain" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Blockchains</SelectItem>
+                    {SUPPORTED_BLOCKCHAINS.map(chain => (
+                      <SelectItem key={chain} value={chain}>
+                        {chain.replace('_', ' ').toUpperCase()}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <Select value={filterStatus} onValueChange={setFilterStatus}>
+                  <SelectTrigger className="bg-slate-700 border-slate-600" data-testid="filter-status">
+                    <SelectValue placeholder="Filter by status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Statuses</SelectItem>
+                    <SelectItem value="completed">Analyzed</SelectItem>
+                    <SelectItem value="pending">Pending</SelectItem>
+                    <SelectItem value="analyzing">Analyzing</SelectItem>
+                    <SelectItem value="failed">Failed</SelectItem>
+                  </SelectContent>
+                </Select>
+              </CardContent>
+            </Card>
+
+            {/* Wallets List */}
+            <div className="grid gap-4">
+              {walletsLoading ? (
+                <Card className="bg-slate-800 border-slate-700">
+                  <CardContent className="p-6 text-center">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white mx-auto"></div>
+                    <p className="mt-2">Loading wallets...</p>
+                  </CardContent>
+                </Card>
+              ) : wallets.length === 0 ? (
+                <Card className="bg-slate-800 border-slate-700">
+                  <CardContent className="p-6 text-center">
+                    <Database className="h-12 w-12 text-slate-500 mx-auto mb-2" />
+                    <p className="text-slate-400">No wallets found</p>
+                  </CardContent>
+                </Card>
+              ) : (
+                wallets.map((wallet: WalletIntelligence) => (
+                  <Card key={wallet.id} className="bg-slate-800 border-slate-700" data-testid={`wallet-card-${wallet.id}`}>
+                    <CardContent className="p-6">
+                      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                        <div className="flex-1 space-y-2">
+                          <div className="flex items-center gap-3">
+                            <code className="bg-slate-700 px-2 py-1 rounded text-sm font-mono">
+                              {formatWalletAddress(wallet.walletAddress)}
+                            </code>
+                            <Badge variant="outline" className="text-xs">
+                              {wallet.blockchain.toUpperCase()}
+                            </Badge>
+                            <Badge 
+                              variant="outline" 
+                              className={`text-xs text-white ${
+                                wallet.status === 'completed' ? 'bg-green-600' :
+                                wallet.status === 'pending' ? 'bg-yellow-600' :
+                                wallet.status === 'analyzing' ? 'bg-blue-600' : 'bg-red-600'
+                              }`}
+                            >
+                              {wallet.status}
+                            </Badge>
+                          </div>
+                          
+                          {wallet.status === 'completed' && wallet.flutteraiScore && (
+                            <div className="flex items-center gap-4">
+                              <div className="flex items-center gap-2">
+                                <span className="text-sm text-slate-400">FlutterAI Score:</span>
+                                <Badge className={`${getScoreColor(wallet.flutteraiScore)} text-white`}>
+                                  {wallet.flutteraiScore}/1000 ({wallet.socialCreditRating})
+                                </Badge>
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <span className="text-sm text-slate-400">Wealth:</span>
+                                <Badge variant="outline">{wallet.wealthIndicator}</Badge>
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <span className="text-sm text-slate-400">Activity:</span>
+                                <Badge variant="outline">{wallet.activityLevel}</Badge>
+                              </div>
+                            </div>
+                          )}
+                          
+                          {wallet.targetingSegments && wallet.targetingSegments.length > 0 && (
+                            <div className="flex flex-wrap gap-1">
+                              {wallet.targetingSegments.slice(0, 3).map((segment: string) => (
+                                <Badge key={segment} variant="secondary" className="text-xs">
+                                  {segment.replace('_', ' ')}
+                                </Badge>
+                              ))}
+                              {wallet.targetingSegments.length > 3 && (
+                                <Badge variant="secondary" className="text-xs">
+                                  +{wallet.targetingSegments.length - 3} more
+                                </Badge>
+                              )}
+                            </div>
+                          )}
+                        </div>
+                        
+                        <div className="flex gap-2">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => reanalyzeMutation.mutate(wallet.id)}
+                            disabled={reanalyzeMutation.isPending}
+                            data-testid={`reanalyze-${wallet.id}`}
+                          >
+                            {reanalyzeMutation.isPending ? "Reanalyzing..." : "Reanalyze"}
+                          </Button>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))
+              )}
+            </div>
+          </TabsContent>
+
+          {/* Add Wallets Tab */}
+          <TabsContent value="add" className="space-y-4">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* Single Wallet */}
+              <Card className="bg-slate-800 border-slate-700">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Plus className="h-5 w-5" />
+                    Add Single Wallet
+                  </CardTitle>
+                  <CardDescription>
+                    Add a single wallet address for FlutterAI analysis
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div>
+                    <label className="text-sm font-medium mb-2 block">Wallet Address</label>
+                    <Input
+                      placeholder="Enter wallet address..."
+                      value={newWalletAddress}
+                      onChange={(e) => setNewWalletAddress(e.target.value)}
+                      className="bg-slate-700 border-slate-600"
+                      data-testid="input-wallet-address"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium mb-2 block">Blockchain</label>
+                    <Select value={selectedBlockchain} onValueChange={setSelectedBlockchain}>
+                      <SelectTrigger className="bg-slate-700 border-slate-600" data-testid="select-blockchain">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {SUPPORTED_BLOCKCHAINS.map(chain => (
+                          <SelectItem key={chain} value={chain}>
+                            {chain.replace('_', ' ').toUpperCase()}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <Button 
+                    onClick={handleAddWallet} 
+                    disabled={addWalletMutation.isPending || !newWalletAddress.trim()}
+                    className="w-full bg-blue-600 hover:bg-blue-700"
+                    data-testid="button-add-wallet"
+                  >
+                    {addWalletMutation.isPending ? "Adding..." : "Add Wallet"}
+                  </Button>
+                </CardContent>
+              </Card>
+
+              {/* Bulk Import */}
+              <Card className="bg-slate-800 border-slate-700">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Database className="h-5 w-5" />
+                    Bulk Import
+                  </CardTitle>
+                  <CardDescription>
+                    Import multiple wallets (one per line, format: address,blockchain)
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div>
+                    <label className="text-sm font-medium mb-2 block">Wallet Addresses</label>
+                    <Textarea
+                      placeholder={`7J9XfJK2P3wN5yQq8oLmCz4vR1sE6dT9mV3uA7bF5cG\n9WzDXwBbmkg8ZTbNMqUxvQRAyrZzDsGYdLVL9zYtAWWM,ethereum\n4rL8kKaKzEq9UqNEzP6e7QDHdHrQ2jEZ8hg7YvUZXqrE,polygon`}
+                      value={bulkWallets}
+                      onChange={(e) => setBulkWallets(e.target.value)}
+                      className="bg-slate-700 border-slate-600 min-h-[120px]"
+                      data-testid="textarea-bulk-wallets"
+                    />
+                  </div>
+                  <Button 
+                    onClick={handleBulkAdd} 
+                    disabled={bulkAddMutation.isPending || !bulkWallets.trim()}
+                    className="w-full bg-green-600 hover:bg-green-700"
+                    data-testid="button-bulk-import"
+                  >
+                    {bulkAddMutation.isPending ? "Importing..." : "Bulk Import"}
+                  </Button>
+                </CardContent>
+              </Card>
+            </div>
+          </TabsContent>
+
+          {/* Analytics Tab */}
+          <TabsContent value="analytics" className="space-y-4">
+            {stats && (
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {/* Blockchain Distribution */}
+                <Card className="bg-slate-800 border-slate-700">
+                  <CardHeader>
+                    <CardTitle>Blockchain Distribution</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    {stats.blockchainDistribution && Object.entries(stats.blockchainDistribution).map(([blockchain, count]) => (
+                      <div key={blockchain} className="flex justify-between items-center py-2">
+                        <span className="capitalize">{blockchain.replace('_', ' ')}</span>
+                        <Badge variant="outline">{count}</Badge>
+                      </div>
+                    ))}
+                  </CardContent>
+                </Card>
+
+                {/* Score Distribution */}
+                <Card className="bg-slate-800 border-slate-700">
+                  <CardHeader>
+                    <CardTitle>FlutterAI Score Distribution</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    {stats.scoreDistribution && Object.entries(stats.scoreDistribution).map(([rating, count]) => (
+                      <div key={rating} className="flex justify-between items-center py-2">
+                        <div className="flex items-center gap-2">
+                          <Badge className={`${SCORE_RANGES[rating as keyof typeof SCORE_RANGES]?.color || 'bg-gray-500'} text-white`}>
+                            {rating}
+                          </Badge>
+                          <span>
+                            {SCORE_RANGES[rating as keyof typeof SCORE_RANGES]?.min}-{SCORE_RANGES[rating as keyof typeof SCORE_RANGES]?.max}
+                          </span>
+                        </div>
+                        <Badge variant="outline">{count}</Badge>
+                      </div>
+                    ))}
+                  </CardContent>
+                </Card>
+              </div>
+            )}
+          </TabsContent>
+        </Tabs>
+      </div>
+    </div>
+  );
+}
