@@ -222,6 +222,36 @@ export default function FlutterBlogBot() {
   });
   const analytics = analyticsResponse?.summary || {};
 
+  // Bot status query and mutation
+  const { data: botSettings } = useQuery({
+    queryKey: ["/api/admin/system-settings/flutterblog_bot_enabled"],
+    retry: false,
+  });
+
+  const updateBotStatusMutation = useMutation({
+    mutationFn: async (enabled: boolean) => {
+      return await apiRequest("PUT", "/api/admin/system-settings/flutterblog_bot_enabled", {
+        value: enabled.toString(),
+        category: "bot_settings"
+      });
+    },
+    onSuccess: () => {
+      const newStatus = botSettings?.value !== "true";
+      toast({
+        title: "Bot Status Updated",
+        description: `FlutterBlog Bot has been ${newStatus ? "enabled" : "disabled"}.`,
+      });
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/system-settings"] });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Update Failed",
+        description: error.message || "Failed to update bot status",
+        variant: "destructive",
+      });
+    },
+  });
+
   const handleGenerateBlog = () => {
     if (!blogForm.topic) {
       toast({
@@ -1001,19 +1031,76 @@ export default function FlutterBlogBot() {
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
-                <div className="text-center py-12 text-slate-400">
-                  <Settings className="h-16 w-16 mx-auto mb-4 opacity-50" />
-                  <h3 className="text-lg font-medium mb-2">Settings Coming Soon</h3>
-                  <p>Advanced configuration options will be available in the next update</p>
-                  <div className="mt-4 text-sm text-slate-500">
-                    Features in development:
-                    <ul className="mt-2 space-y-1">
-                      <li>• Custom AI model selection</li>
-                      <li>• Content template management</li>
-                      <li>• SEO optimization settings</li>
-                      <li>• Publishing automation rules</li>
-                    </ul>
+                {/* Bot Enable/Disable Control */}
+                <div className="p-4 bg-slate-900/50 rounded-lg border border-slate-700">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="space-y-1">
+                      <h4 className="font-medium text-slate-200">FlutterBlog Bot Status</h4>
+                      <p className="text-sm text-slate-400">
+                        Control bot functionality and visibility on the landing page
+                      </p>
+                    </div>
+                    <Badge 
+                      variant={botSettings?.value === "true" ? "default" : "secondary"}
+                      className={botSettings?.value === "true" ? "bg-green-500/20 text-green-400" : "bg-red-500/20 text-red-400"}
+                    >
+                      {botSettings?.value === "true" ? "Active" : "Disabled"}
+                    </Badge>
                   </div>
+                  
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-2">
+                      <Switch
+                        id="bot-enabled"
+                        checked={botSettings?.value === "true"}
+                        onCheckedChange={(checked) => updateBotStatusMutation.mutate(checked)}
+                        disabled={updateBotStatusMutation.isPending}
+                      />
+                      <Label htmlFor="bot-enabled" className="text-sm text-slate-300">
+                        Enable FlutterBlog Bot
+                      </Label>
+                    </div>
+                    
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => updateBotStatusMutation.mutate(botSettings?.value !== "true")}
+                      disabled={updateBotStatusMutation.isPending}
+                      className="border-slate-600 hover:bg-slate-800"
+                      data-testid="button-toggle-bot-status"
+                    >
+                      {updateBotStatusMutation.isPending ? (
+                        <>
+                          <Settings className="mr-2 h-3 w-3 animate-spin" />
+                          Updating...
+                        </>
+                      ) : (
+                        <>
+                          <Zap className="mr-2 h-3 w-3" />
+                          {botSettings?.value === "true" ? "Disable Bot" : "Enable Bot"}
+                        </>
+                      )}
+                    </Button>
+                  </div>
+                  
+                  <div className="mt-4 p-3 bg-slate-800/50 rounded-md">
+                    <p className="text-xs text-slate-500">
+                      <strong>When enabled:</strong> Bot appears on landing page and can generate content<br/>
+                      <strong>When disabled:</strong> Bot is hidden from landing page and generation is paused
+                    </p>
+                  </div>
+                </div>
+
+                {/* Future Settings Placeholder */}
+                <div className="p-4 bg-slate-900/50 rounded-lg border border-slate-700 opacity-50">
+                  <h4 className="font-medium text-slate-300 mb-2">Advanced Settings</h4>
+                  <p className="text-sm text-slate-400">Additional configuration options coming soon:</p>
+                  <ul className="mt-2 text-xs text-slate-500 space-y-1">
+                    <li>• Custom AI model selection</li>
+                    <li>• Content template management</li>
+                    <li>• SEO optimization settings</li>
+                    <li>• Publishing automation rules</li>
+                  </ul>
                 </div>
               </CardContent>
             </Card>

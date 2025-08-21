@@ -69,6 +69,13 @@ export default function LaunchCountdown() {
   const [, setLocation] = useLocation();
   const [signupCount, setSignupCount] = useState(12847);
 
+  // Check FlutterBlog bot status to conditionally show bot features
+  const { data: botSettings } = useQuery({
+    queryKey: ["/api/admin/system-settings/flutterblog_bot_enabled"],
+    retry: false,
+  });
+  const isBotEnabled = (botSettings as any)?.value === "true";
+
   // Set launch date to September 1, 2025 (moved outside component to prevent re-renders)
 
   // AI Content Showcase Component
@@ -808,21 +815,23 @@ export default function LaunchCountdown() {
           </Card>
         </div>
         
-        {/* SECTION 5: SINGLE COLUMN - FlutterBlog */}
-        <Card className="electric-frame max-w-4xl mx-auto mb-16">
-          <CardHeader className="text-center pb-6">
-            <CardTitle className="text-4xl text-gradient flex items-center justify-center gap-3">
-              <Bot className="w-10 h-10" />
-              FlutterBlog
-            </CardTitle>
-            <CardDescription className="text-lg text-muted-foreground max-w-3xl mx-auto">
-              AI-powered content generation with revolutionary SEO optimization and 60-70% cost reduction
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <AIContentShowcase />
-          </CardContent>
-        </Card>
+        {/* SECTION 5: SINGLE COLUMN - FlutterBlog (only show if bot enabled) */}
+        {isBotEnabled && (
+          <Card className="electric-frame max-w-4xl mx-auto mb-16">
+            <CardHeader className="text-center pb-6">
+              <CardTitle className="text-4xl text-gradient flex items-center justify-center gap-3">
+                <Bot className="w-10 h-10" />
+                FlutterBlog
+              </CardTitle>
+              <CardDescription className="text-lg text-muted-foreground max-w-3xl mx-auto">
+                AI-powered content generation with revolutionary SEO optimization and 60-70% cost reduction
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <AIContentShowcase />
+            </CardContent>
+          </Card>
+        )}
       </div>
     </div>
   );

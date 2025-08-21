@@ -6562,11 +6562,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   app.get("/api/admin/system-settings/:key", async (req, res) => {
     try {
-      const setting = await storage.getSystemSetting(req.params.key);
+      let setting = await storage.getSystemSetting(req.params.key);
+      
+      // Initialize FlutterBlog bot setting if it doesn't exist
+      if (!setting && req.params.key === "flutterblog_bot_enabled") {
+        setting = await storage.createSystemSetting({
+          key: "flutterblog_bot_enabled",
+          value: "true",
+          category: "bot_settings",
+          description: "Controls FlutterBlog bot functionality and visibility",
+          dataType: "boolean",
+          isEditable: true
+        });
+      }
+      
       if (!setting) {
         return res.status(404).json({ success: false, error: "Setting not found" });
       }
-      res.json({ success: true, setting });
+      res.json(setting);
     } catch (error) {
       res.status(500).json({ 
         success: false, 
