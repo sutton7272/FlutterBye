@@ -31,16 +31,6 @@ export default function Navbar() {
           </div>
           
           <div className="ml-auto flex items-center space-x-3">
-            <Button
-              variant="outline"
-              size="sm"
-              className="flex items-center gap-2 border-blue-400 text-blue-400 hover:bg-blue-400/10 hover:text-blue-300 bg-background/90 transition-all duration-200 font-medium"
-              onClick={() => window.open('https://dev.flutterbye.io/', '_blank')}
-              data-testid="button-devnet-test"
-            >
-              <Rocket className="h-4 w-4" />
-              Test DevNet
-            </Button>
           </div>
         </div>
       </nav>
@@ -251,17 +241,7 @@ export default function Navbar() {
         
         {/* Right Side Actions */}
         <div className="ml-auto flex items-center space-x-3">
-          {/* DevNet Test Button */}
-          <Button
-            variant="outline"
-            size="sm"
-            className="flex items-center gap-2 border-blue-400 text-blue-400 hover:bg-blue-400/10 hover:text-blue-300 bg-background/90 transition-all duration-200 font-medium animate-pulse hover:animate-none"
-            onClick={() => window.open('https://dev.flutterbye.io/', '_blank')}
-            data-testid="button-devnet-test"
-          >
-            <Rocket className="h-4 w-4" />
-            Test Mint on DevNet
-          </Button>
+
           <WalletConnect />
         </div>
         
@@ -302,23 +282,7 @@ export default function Navbar() {
                 </Link>
               ))}
               
-              {/* DevNet Test Button for Mobile */}
-              <div className="mt-6 pt-4 border-t border-border">
-                <Button
-                  variant="outline"
-                  className="w-full justify-start h-12 border-electric-blue/50 text-electric-blue hover:bg-electric-blue/10 animate-pulse hover:animate-none"
-                  onClick={() => {
-                    window.open('https://dev.flutterbye.io/', '_blank');
-                    setIsOpen(false);
-                  }}
-                >
-                  <Rocket className="h-5 w-5 mr-3" />
-                  <div className="flex flex-col items-start">
-                    <span className="font-medium">Test Mint on DevNet</span>
-                    <span className="text-xs opacity-70">Try minting on the development environment</span>
-                  </div>
-                </Button>
-              </div>
+
 
             </nav>
           </SheetContent>
