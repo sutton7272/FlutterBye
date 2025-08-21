@@ -247,12 +247,12 @@ function InteractiveTutorialContent() {
         achievements: [...prev.achievements, getStepAchievement(step)]
       }));
 
-      // Success feedback
-      toast({
-        title: "✅ Demo Complete!",
-        description: `${step.title} completed successfully!`,
-        duration: 2000
-      });
+      // Success feedback - completion popup removed per user request
+      // toast({
+      //   title: "✅ Demo Complete!",
+      //   description: `${step.title} completed successfully!`,
+      //   duration: 2000
+      // });
     } catch (error) {
       console.error(`Demo failed for step ${step.id}:`, error);
     } finally {

@@ -231,10 +231,11 @@ export function FlutterAIInteractiveDemo() {
         totalScore: prev.totalScore + score
       }));
       
-      toast({
-        title: "Analysis Complete!",
-        description: currentStep.expectedResult.split(':')[0] + " analysis completed!"
-      });
+      // Completion popup removed per user request
+      // toast({
+      //   title: "Analysis Complete!",
+      //   description: currentStep.expectedResult.split(':')[0] + " analysis completed!"
+      // });
     } catch (error) {
       setTourState(prev => ({ ...prev, isLoading: false }));
       toast({
