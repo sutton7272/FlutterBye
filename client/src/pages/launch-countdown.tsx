@@ -818,55 +818,7 @@ export default function LaunchCountdown() {
           </Card>
         </div>
         
-        {/* SECTION 5: TWO COLUMN - FlutterBlog (only show if bot enabled) */}
-        {isBotEnabled && (
-          <div className="grid lg:grid-cols-2 gap-8 max-w-6xl mx-auto mb-16">
-            
-            {/* Column 1: FlutterBlog Info */}
-            <Card className="electric-frame">
-              <CardHeader className="text-center pb-6">
-                <CardTitle className="text-3xl text-gradient flex items-center justify-center gap-3">
-                  <Bot className="w-8 h-8" />
-                  FlutterBlog
-                </CardTitle>
-                <CardDescription className="text-base text-muted-foreground">
-                  AI-powered content generation with revolutionary SEO optimization and 60-70% cost reduction
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="text-center space-y-3">
-                  <Brain className="w-10 h-10 text-electric-blue mx-auto" />
-                  <h3 className="font-bold text-lg text-gradient">AI Content Engine</h3>
-                  <p className="text-sm text-muted-foreground">Advanced GPT-4o powered content generation with intelligent SEO optimization</p>
-                </div>
-                <div className="text-center space-y-3">
-                  <DollarSign className="w-10 h-10 text-electric-green mx-auto" />
-                  <h3 className="font-bold text-lg text-gradient">Cost Reduction</h3>
-                  <p className="text-sm text-muted-foreground">60-70% cost reduction through intelligent batch processing and automation</p>
-                </div>
-                <div className="text-center space-y-3">
-                  <TrendingUp className="w-10 h-10 text-purple-400 mx-auto" />
-                  <h3 className="font-bold text-lg text-gradient">SEO Performance</h3>
-                  <p className="text-sm text-muted-foreground">Revolutionary SEO optimization with real-time content analytics</p>
-                </div>
-              </CardContent>
-            </Card>
 
-            {/* Column 2: FlutterBlog Content Showcase */}
-            <Card className="electric-frame">
-              <CardHeader className="text-center pb-4">
-                <CardTitle className="text-2xl text-gradient">Live Content Feed</CardTitle>
-                <CardDescription className="text-sm text-muted-foreground">
-                  Real-time AI-generated content showcase
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <AIContentShowcase />
-              </CardContent>
-            </Card>
-            
-          </div>
-        )}
       </div>
     </div>
   );
