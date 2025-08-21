@@ -1851,8 +1851,80 @@ export class MemStorage implements IStorage {
   }
 
   async getWalletIntelligence(walletAddress: string, blockchain?: string): Promise<WalletIntelligence | undefined> {
-    // For Phase 1, we'll use walletAddress as primary key, blockchain filtering can be added later
-    return this.walletIntelligence.get(walletAddress);
+    // Check in-memory first
+    const memoryResult = this.walletIntelligence.get(walletAddress);
+    if (memoryResult) {
+      return memoryResult;
+    }
+
+    // If not in memory, check database
+    try {
+      const { db } = await import("./db");
+      const { sql } = await import("drizzle-orm");
+      
+      const result = await db.execute(sql`
+        SELECT * FROM wallet_intelligence 
+        WHERE wallet_address = ${walletAddress}
+        ${blockchain ? sql`AND blockchain = ${blockchain}` : sql``}
+        LIMIT 1
+      `);
+      
+      if (result.rows.length > 0) {
+        const row = result.rows[0];
+        
+        // Parse JSON fields
+        const preferredTokenTypes = typeof row.preferred_token_types === 'string' 
+          ? row.preferred_token_types.replace(/[{}]/g, '').split(',').filter(t => t.trim())
+          : row.preferred_token_types || [];
+        
+        const marketingInsights = typeof row.marketing_insights === 'string'
+          ? JSON.parse(row.marketing_insights)
+          : row.marketing_insights || {};
+          
+        const analysisData = typeof row.analysis_data === 'string'
+          ? JSON.parse(row.analysis_data)
+          : row.analysis_data || {};
+
+        const dbResult = {
+          id: row.id,
+          walletAddress: row.wallet_address,
+          blockchain: row.blockchain,
+          network: row.network,
+          socialCreditScore: row.social_credit_score,
+          riskLevel: row.risk_level,
+          tradingBehaviorScore: row.trading_behavior_score,
+          portfolioQualityScore: row.portfolio_quality_score,
+          liquidityScore: row.liquidity_score,
+          activityScore: row.activity_score,
+          defiEngagementScore: row.defi_engagement_score,
+          marketingSegment: row.marketing_segment,
+          communicationStyle: row.communication_style,
+          preferredTokenTypes,
+          riskTolerance: row.risk_tolerance,
+          investmentProfile: row.investment_profile,
+          tradingFrequency: row.trading_frequency,
+          portfolioSize: row.portfolio_size,
+          influenceScore: row.influence_score,
+          socialConnections: row.social_connections,
+          marketingInsights,
+          analysisData,
+          sourcePlatform: row.source_platform,
+          collectionMethod: row.collection_method,
+          lastAnalyzed: row.last_analyzed,
+          createdAt: row.created_at,
+          updatedAt: row.updated_at
+        };
+        
+        // Store in memory for faster access
+        this.walletIntelligenceData.set(row.id, dbResult);
+        
+        return dbResult;
+      }
+    } catch (error) {
+      console.error('Database retrieval error:', error);
+    }
+    
+    return undefined;
   }
 
   // PHASE 1: Enhanced upsert method for revolutionary 1-1000 scoring system
@@ -1886,6 +1958,70 @@ export class MemStorage implements IStorage {
 
   // PHASE 1: Enhanced list method with filtering for revolutionary dashboard
   async getWalletIntelligenceList(limit: number, offset: number, filters?: any): Promise<WalletIntelligence[]> {
+    try {
+      // Try to get from database first for persistent data
+      const { db } = await import("./db");
+      const { sql } = await import("drizzle-orm");
+      
+      let query = sql`
+        SELECT * FROM wallet_intelligence 
+        ORDER BY social_credit_score DESC 
+        LIMIT ${limit} OFFSET ${offset}
+      `;
+      
+      const result = await db.execute(query);
+      
+      if (result.rows.length > 0) {
+        return result.rows.map(row => {
+          // Parse JSON fields
+          const preferredTokenTypes = typeof row.preferred_token_types === 'string' 
+            ? row.preferred_token_types.replace(/[{}]/g, '').split(',').filter(t => t.trim())
+            : row.preferred_token_types || [];
+          
+          const marketingInsights = typeof row.marketing_insights === 'string'
+            ? JSON.parse(row.marketing_insights)
+            : row.marketing_insights || {};
+            
+          const analysisData = typeof row.analysis_data === 'string'
+            ? JSON.parse(row.analysis_data)
+            : row.analysis_data || {};
+
+          return {
+            id: row.id,
+            walletAddress: row.wallet_address,
+            blockchain: row.blockchain,
+            network: row.network,
+            socialCreditScore: row.social_credit_score,
+            riskLevel: row.risk_level,
+            tradingBehaviorScore: row.trading_behavior_score,
+            portfolioQualityScore: row.portfolio_quality_score,
+            liquidityScore: row.liquidity_score,
+            activityScore: row.activity_score,
+            defiEngagementScore: row.defi_engagement_score,
+            marketingSegment: row.marketing_segment,
+            communicationStyle: row.communication_style,
+            preferredTokenTypes,
+            riskTolerance: row.risk_tolerance,
+            investmentProfile: row.investment_profile,
+            tradingFrequency: row.trading_frequency,
+            portfolioSize: row.portfolio_size,
+            influenceScore: row.influence_score,
+            socialConnections: row.social_connections,
+            marketingInsights,
+            analysisData,
+            sourcePlatform: row.source_platform,
+            collectionMethod: row.collection_method,
+            lastAnalyzed: row.last_analyzed,
+            createdAt: row.created_at,
+            updatedAt: row.updated_at
+          };
+        });
+      }
+    } catch (error) {
+      console.error('Database list retrieval error:', error);
+    }
+    
+    // Fallback to in-memory storage
     let wallets = Array.from(this.walletIntelligence.values());
     
     // Apply filters if provided
@@ -1930,11 +2066,71 @@ export class MemStorage implements IStorage {
     return updatedWallet;
   }
 
-  async getAllWalletIntelligence(limit?: number, offset?: number): Promise<WalletIntelligence[]> {
+  async getAllWalletIntelligence(filters?: any): Promise<WalletIntelligence[]> {
+    try {
+      // Try to get from database first for persistent data
+      const { db } = await import("./db");
+      const { sql } = await import("drizzle-orm");
+      
+      let query = sql`SELECT * FROM wallet_intelligence ORDER BY social_credit_score DESC`;
+      
+      const result = await db.execute(query);
+      
+      if (result.rows.length > 0) {
+        console.log(`📊 Retrieved ${result.rows.length} wallet intelligence records from database`);
+        return result.rows.map(row => {
+          // Parse JSON fields safely
+          const preferredTokenTypes = typeof row.preferred_token_types === 'string' 
+            ? row.preferred_token_types.replace(/[{}]/g, '').split(',').filter(t => t.trim())
+            : row.preferred_token_types || [];
+          
+          const marketingInsights = typeof row.marketing_insights === 'string'
+            ? JSON.parse(row.marketing_insights)
+            : row.marketing_insights || {};
+            
+          const analysisData = typeof row.analysis_data === 'string'
+            ? JSON.parse(row.analysis_data)
+            : row.analysis_data || {};
+
+          return {
+            id: row.id,
+            walletAddress: row.wallet_address,
+            blockchain: row.blockchain,
+            network: row.network,
+            socialCreditScore: row.social_credit_score,
+            riskLevel: row.risk_level,
+            tradingBehaviorScore: row.trading_behavior_score,
+            portfolioQualityScore: row.portfolio_quality_score,
+            liquidityScore: row.liquidity_score,
+            activityScore: row.activity_score,
+            defiEngagementScore: row.defi_engagement_score,
+            marketingSegment: row.marketing_segment,
+            communicationStyle: row.communication_style,
+            preferredTokenTypes,
+            riskTolerance: row.risk_tolerance,
+            investmentProfile: row.investment_profile,
+            tradingFrequency: row.trading_frequency,
+            portfolioSize: row.portfolio_size,
+            influenceScore: row.influence_score,
+            socialConnections: row.social_connections,
+            marketingInsights,
+            analysisData,
+            sourcePlatform: row.source_platform,
+            collectionMethod: row.collection_method,
+            lastAnalyzed: row.last_analyzed,
+            createdAt: row.created_at,
+            updatedAt: row.updated_at
+          };
+        });
+      }
+    } catch (error) {
+      console.error('Database retrieval error in getAllWalletIntelligence:', error);
+    }
+    
+    // Fallback to in-memory storage
     const wallets = Array.from(this.walletIntelligence.values());
-    const start = offset || 0;
-    const end = limit ? start + limit : undefined;
-    return wallets.slice(start, end);
+    console.log(`📊 Fallback: Retrieved ${wallets.length} wallet intelligence records from memory`);
+    return wallets;
   }
 
   async searchWalletIntelligence(query: string): Promise<WalletIntelligence[]> {

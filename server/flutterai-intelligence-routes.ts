@@ -151,12 +151,16 @@ export async function getAllWalletIntelligence(req: Request, res: Response) {
     }
     
     const allIntelligence = await storage.getAllWalletIntelligence(filters);
+    console.log(`🔍 Route handler: Retrieved ${allIntelligence.length} records from storage`);
+    console.log(`🔍 First record sample:`, allIntelligence[0] ? JSON.stringify(allIntelligence[0], null, 2) : 'No records');
+    
     const limitNum = parseInt(limit as string);
     const offsetNum = parseInt(offset as string);
     
     const paginatedResults = allIntelligence.slice(offsetNum, offsetNum + limitNum);
+    console.log(`🔍 Pagination: offset=${offsetNum}, limit=${limitNum}, paginated=${paginatedResults.length}`);
     
-    res.json({
+    const response = {
       data: paginatedResults,
       pagination: {
         total: allIntelligence.length,
@@ -164,7 +168,14 @@ export async function getAllWalletIntelligence(req: Request, res: Response) {
         offset: offsetNum,
         hasMore: offsetNum + limitNum < allIntelligence.length
       }
+    };
+    
+    console.log(`🔍 Final response structure:`, { 
+      dataLength: response.data.length, 
+      pagination: response.pagination 
     });
+    
+    res.json(response);
   } catch (error) {
     console.error('Error getting all wallet intelligence:', error);
     res.status(500).json({ error: "Failed to get wallet intelligence data" });
