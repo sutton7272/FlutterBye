@@ -3772,6 +3772,65 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       console.log(`📝 New waitlist signup: ${cleanEmail} ${cleanWallet ? `(${cleanWallet})` : ''}`);
       
+      // AUTO-ANALYZE WALLET FOR INTELLIGENCE DATA
+      let walletAnalysis = null;
+      if (cleanWallet && cleanWallet.length > 20) {
+        try {
+          console.log(`🧠 Auto-analyzing VIP waitlist wallet: ${cleanWallet}`);
+          
+          // Import the scoring service for wallet analysis
+          const { FlutterAIWalletScoringService } = await import("./flutterai-wallet-scoring");
+          const scoringService = new FlutterAIWalletScoringService();
+          
+          // Perform comprehensive wallet analysis
+          const analysis = await scoringService.scoreWallet(cleanWallet);
+          
+          // Check if wallet intelligence already exists
+          const existingIntelligence = await storage.getWalletIntelligence(cleanWallet);
+          
+          const intelligenceData = {
+            walletAddress: cleanWallet,
+            blockchain: 'solana',
+            network: 'devnet',
+            socialCreditScore: analysis.socialCreditScore,
+            riskLevel: analysis.riskLevel,
+            tradingBehaviorScore: analysis.tradingBehaviorScore,
+            portfolioQualityScore: analysis.portfolioQualityScore,
+            liquidityScore: analysis.liquidityScore,
+            activityScore: analysis.activityScore,
+            defiEngagementScore: analysis.defiEngagementScore,
+            marketingSegment: analysis.marketingSegment,
+            communicationStyle: analysis.communicationStyle,
+            preferredTokenTypes: analysis.preferredTokenTypes,
+            riskTolerance: analysis.riskTolerance,
+            investmentProfile: analysis.investmentProfile,
+            tradingFrequency: analysis.tradingFrequency,
+            portfolioSize: analysis.portfolioSize,
+            influenceScore: analysis.influenceScore,
+            socialConnections: analysis.socialConnections,
+            marketingInsights: analysis.marketingInsights,
+            analysisData: analysis.analysisData,
+            sourcePlatform: 'vip_waitlist',
+            collectionMethod: 'auto_waitlist',
+            lastAnalyzed: new Date()
+          };
+          
+          if (existingIntelligence) {
+            // Update existing record
+            walletAnalysis = await storage.updateWalletIntelligence(cleanWallet, intelligenceData);
+            console.log(`✅ Updated VIP wallet intelligence: ${cleanWallet} (Score: ${analysis.socialCreditScore})`);
+          } else {
+            // Create new record
+            walletAnalysis = await storage.createWalletIntelligence(intelligenceData);
+            console.log(`✅ Created VIP wallet intelligence: ${cleanWallet} (Score: ${analysis.socialCreditScore})`);
+          }
+          
+        } catch (walletError) {
+          console.error(`⚠️ VIP wallet analysis failed for ${cleanWallet}:`, walletError);
+          // Don't fail the waitlist signup if wallet analysis fails
+        }
+      }
+      
       // Get total count for logging
       const totalCount = await db.select({ count: sql<number>`count(*)` })
         .from(vipWaitlist);
@@ -3781,7 +3840,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         success: true,
         entryId,
         message: "Successfully joined the VIP waitlist",
-        benefits: waitlistEntry.benefits
+        benefits: waitlistEntry.benefits,
+        walletAnalyzed: !!walletAnalysis,
+        walletScore: walletAnalysis?.socialCreditScore || null
       });
     } catch (error) {
       console.error("Error adding to waitlist:", error);
@@ -3829,6 +3890,57 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({
         success: false,
         error: "Failed to update entry status"
+      });
+    }
+  });
+
+  // Admin endpoint to get VIP waitlist wallet analysis stats
+  app.get("/api/admin/vip-wallet-analysis-stats", async (req, res) => {
+    try {
+      // Get all VIP waitlist entries with wallet addresses
+      const vipWallets = await db.select()
+        .from(vipWaitlist)
+        .where(sql`wallet_address IS NOT NULL AND length(wallet_address) > 20`);
+      
+      // Check which ones have been analyzed in wallet intelligence
+      let analyzedCount = 0;
+      let totalScore = 0;
+      let highValueWallets = 0;
+      
+      for (const entry of vipWallets) {
+        try {
+          const intelligence = await storage.getWalletIntelligence(entry.walletAddress!);
+          if (intelligence) {
+            analyzedCount++;
+            totalScore += intelligence.socialCreditScore || 0;
+            if ((intelligence.socialCreditScore || 0) > 600) {
+              highValueWallets++;
+            }
+          }
+        } catch (error) {
+          // Skip if wallet not found in intelligence database
+        }
+      }
+      
+      const avgScore = analyzedCount > 0 ? Math.round(totalScore / analyzedCount) : 0;
+      
+      res.json({
+        success: true,
+        stats: {
+          totalVipSignups: vipWallets.length,
+          walletsAnalyzed: analyzedCount,
+          walletsNotAnalyzed: vipWallets.length - analyzedCount,
+          analysisRate: vipWallets.length > 0 ? Math.round((analyzedCount / vipWallets.length) * 100) : 0,
+          averageScore: avgScore,
+          highValueWallets: highValueWallets,
+          highValueRate: analyzedCount > 0 ? Math.round((highValueWallets / analyzedCount) * 100) : 0
+        }
+      });
+    } catch (error) {
+      console.error("Error fetching VIP wallet analysis stats:", error);
+      res.status(500).json({
+        success: false,
+        error: "Failed to fetch VIP wallet analysis stats"
       });
     }
   });
