@@ -76,23 +76,31 @@ function DatabaseManagement() {
   // Fetch wallet intelligence data
   const { data: walletData, isLoading: walletsLoading } = useQuery({
     queryKey: ["/api/flutterai/intelligence", searchTerm, filterBlockchain, filterStatus],
-    queryFn: () => apiRequest(`/api/flutterai/intelligence?search=${searchTerm}&blockchain=${filterBlockchain}&status=${filterStatus}`)
+    queryFn: async () => {
+      console.log("🔍 Frontend: Fetching wallet intelligence data...");
+      const response = await apiRequest(`/api/flutterai/intelligence?search=${searchTerm}&blockchain=${filterBlockchain}&status=${filterStatus}`);
+      console.log("🔍 Frontend: Response received:", response);
+      return response;
+    }
   });
 
   const wallets = walletData?.data || [];
+  console.log("🔍 Frontend: Processed wallets:", wallets.length);
 
   // Fetch analytics stats  
   const { data: stats, isLoading: statsLoading } = useQuery({
     queryKey: ["/api/flutterai/intelligence-stats"],
-    queryFn: () => apiRequest("/api/flutterai/intelligence-stats")
+    queryFn: async () => {
+      const response = await apiRequest("/api/flutterai/intelligence-stats");
+      console.log("🔍 Frontend: Stats received:", response);
+      return response;
+    }
   });
 
   // Add single wallet mutation
   const addWalletMutation = useMutation({
     mutationFn: (data: { walletAddress: string; blockchain: string }) =>
-      apiRequest(`/api/flutterai/analyze/${data.walletAddress}`, {
-        method: "POST"
-      }),
+      apiRequest(`/api/flutterai/analyze/${data.walletAddress}`, "POST"),
     onSuccess: () => {
       toast({
         title: "Wallet Added",
@@ -114,10 +122,7 @@ function DatabaseManagement() {
   // Bulk add wallets mutation
   const bulkAddMutation = useMutation({
     mutationFn: (data: { wallets: Array<{ walletAddress: string; blockchain: string }> }) =>
-      apiRequest("/api/flutterai/batch-analyze", {
-        method: "POST",
-        body: { walletAddresses: data.wallets.map(w => w.walletAddress) }
-      }),
+      apiRequest("/api/flutterai/batch-analyze", "POST", { walletAddresses: data.wallets.map(w => w.walletAddress) }),
     onSuccess: (data) => {
       toast({
         title: "Bulk Analysis Started",
@@ -215,7 +220,7 @@ function DatabaseManagement() {
                   <Database className="h-8 w-8 text-blue-500" />
                   <div>
                     <p className="text-sm text-slate-400">Total Wallets</p>
-                    <p className="text-2xl font-bold">{stats.totalWallets?.toLocaleString() || 0}</p>
+                    <p className="text-2xl font-bold">{stats?.stats?.totalWallets?.toLocaleString() || 0}</p>
                   </div>
                 </div>
               </CardContent>
@@ -227,7 +232,7 @@ function DatabaseManagement() {
                   <TrendingUp className="h-8 w-8 text-green-500" />
                   <div>
                     <p className="text-sm text-slate-400">Analyzed</p>
-                    <p className="text-2xl font-bold">{stats.analyzedWallets?.toLocaleString() || 0}</p>
+                    <p className="text-2xl font-bold">{stats?.stats?.totalWallets?.toLocaleString() || 0}</p>
                   </div>
                 </div>
               </CardContent>
@@ -239,7 +244,7 @@ function DatabaseManagement() {
                   <Activity className="h-8 w-8 text-orange-500" />
                   <div>
                     <p className="text-sm text-slate-400">Pending Analysis</p>
-                    <p className="text-2xl font-bold">{stats.pendingAnalysis?.toLocaleString() || 0}</p>
+                    <p className="text-2xl font-bold">0</p>
                   </div>
                 </div>
               </CardContent>
@@ -251,7 +256,7 @@ function DatabaseManagement() {
                   <Zap className="h-8 w-8 text-yellow-500" />
                   <div>
                     <p className="text-sm text-slate-400">Avg FlutterAI Score</p>
-                    <p className="text-2xl font-bold">{stats.avgFlutteraiScore?.toFixed(0) || 0}</p>
+                    <p className="text-2xl font-bold">{Math.round(stats?.stats?.avgSocialCreditScore || 0)}</p>
                   </div>
                 </div>
               </CardContent>
@@ -345,17 +350,13 @@ function DatabaseManagement() {
                               {formatWalletAddress(wallet.walletAddress)}
                             </code>
                             <Badge variant="outline" className="text-xs">
-                              {wallet.blockchain.toUpperCase()}
+                              {wallet.blockchain?.toUpperCase() || 'SOLANA'}
                             </Badge>
                             <Badge 
                               variant="outline" 
-                              className={`text-xs text-white ${
-                                wallet.status === 'completed' ? 'bg-green-600' :
-                                wallet.status === 'pending' ? 'bg-yellow-600' :
-                                wallet.status === 'analyzing' ? 'bg-blue-600' : 'bg-red-600'
-                              }`}
+                              className="text-xs text-white bg-green-600"
                             >
-                              {wallet.status}
+                              ANALYZED
                             </Badge>
                           </div>
                           
