@@ -1,5 +1,5 @@
 import { TwitterAPIService } from './twitter-api-service';
-import { aiContentGenerator, type GeneratedContent } from './ai-content-generator';
+import { aiContentGenerator } from './ai-content-generator';
 import { socialBotStorage } from './social-bot-storage';
 import * as cron from 'node-cron';
 
@@ -12,6 +12,7 @@ interface ScheduledPost {
   posted?: boolean;
   imageUrl?: string;
   imageDescription?: string;
+  imageSource?: string;
 }
 
 export class TwitterContentScheduler {
@@ -133,6 +134,22 @@ export class TwitterContentScheduler {
     this.lastPostTimes.set(key, time);
   }
 
+  private getCurrentTimeSlot(): string {
+    const now = new Date();
+    const hours = now.getHours();
+    
+    if (hours >= 5 && hours < 7) return 'earlyMorning';
+    if (hours >= 7 && hours < 9) return 'breakfast';
+    if (hours >= 9 && hours < 11) return 'lateMorning';
+    if (hours >= 11 && hours < 13) return 'lunch';
+    if (hours >= 13 && hours < 15) return 'earlyAfternoon';
+    if (hours >= 15 && hours < 17) return 'lateAfternoon';
+    if (hours >= 17 && hours < 19) return 'dinner';
+    if (hours >= 19 && hours < 21) return 'earlyEvening';
+    if (hours >= 21 && hours < 23) return 'evening';
+    return 'lateNight';
+  }
+
   private timeMatches(currentTime: string, scheduleTime: string): boolean {
     // Convert 12-hour format to 24-hour format
     const convert24Hour = (timeStr: string) => {
@@ -154,43 +171,50 @@ export class TwitterContentScheduler {
 
   private async createAndPostContent() {
     try {
-      console.log('🤖 AUTO-POSTING: Creating and posting new content...');
+      console.log('🤖 AUTO-POSTING: Creating content with MANDATORY visual attachment...');
       
-      // Generate content with proper structure
+      // Generate content with ENHANCED VISUAL SYSTEM - guarantees visual attachment
       const generatedContent = await aiContentGenerator.generateContent({
         category: 'technology',
         includeHashtags: true,
-        customPrompt: 'FlutterBye social media automation with AI-powered optimization and smart engagement'
+        timeSlot: this.getCurrentTimeSlot(),
+        customPrompt: 'FlutterBye revolutionary social media automation with AI-powered optimization and smart engagement',
+        forceUnique: true
       });
       
-      // Handle the content structure properly
+      // Enhanced content structure with guaranteed visual data
       let content: {
         content: string;
         hashtags: string[];
-        imageUrl?: string;
+        imageUrl: string; // Now guaranteed to exist
         imageDescription?: string;
+        imageSource?: string;
       };
       
       if (generatedContent && generatedContent.content) {
+        console.log(`📸 Visual attachment confirmed: ${generatedContent.imageSource} - ${generatedContent.imageUrl}`);
         content = {
           content: generatedContent.content,
           hashtags: generatedContent.hashtags || [],
-          imageUrl: (generatedContent as any).imageUrl,
-          imageDescription: (generatedContent as any).imageDescription
-        };
-      } else if (generatedContent && (generatedContent as any).text) {
-        content = { 
-          content: (generatedContent as any).text, 
-          hashtags: generatedContent.hashtags || [],
-          imageUrl: (generatedContent as any).imageUrl,
-          imageDescription: (generatedContent as any).imageDescription
+          imageUrl: generatedContent.imageUrl || '/images/cosmic-butterfly.png', // Emergency fallback
+          imageDescription: generatedContent.imageDescription,
+          imageSource: generatedContent.imageSource
         };
       } else {
-        // Fallback content if AI generation fails
+        // Enhanced fallback with mandatory visual
+        console.log('🔄 Using enhanced fallback with guaranteed visual...');
+        const fallbackVisual = await aiContentGenerator.selectOptimalImage(
+          "FlutterBye Web3 platform",
+          "technology",
+          this.getCurrentTimeSlot()
+        );
+        
         content = {
           content: "🚀 FlutterBye: The future of Web3 communication is here! Revolutionary blockchain-powered messaging with SPL tokens, AI optimization, and real-time engagement. Transform your social media strategy today! #FlutterBye #Web3 #Blockchain #AI #SocialAutomation #Innovation #Crypto #Future #Technology #Engagement",
-          hashtags: [],
-          imageUrl: '/public/butterfly-logo.png'
+          hashtags: ['#FlutterBye', '#Web3', '#Blockchain', '#AI', '#SocialAutomation'],
+          imageUrl: fallbackVisual.imageUrl,
+          imageDescription: fallbackVisual.description,
+          imageSource: fallbackVisual.source
         };
       }
 
@@ -223,23 +247,25 @@ export class TwitterContentScheduler {
         if (postResult.error && postResult.error.includes('duplicate content')) {
           console.log('🔄 Attempting to generate new unique content...');
           
-          // Try generating new unique content one more time
+          // Try generating new unique content with MANDATORY visual
           const uniqueContent = await aiContentGenerator.generateContent({
-            category: 'technology',
+            category: 'promotional',
             includeHashtags: true,
-            customPrompt: `FlutterBye unique post ${Date.now()} - blockchain innovation and Web3 advancement`,
+            timeSlot: this.getCurrentTimeSlot(),
+            customPrompt: `FlutterBye unique breakthrough post ${Date.now()} - revolutionary blockchain innovation and Web3 advancement`,
             forceUnique: true
           });
           
           if (uniqueContent && uniqueContent.content) {
-            let retryResult;
-            if ((uniqueContent as any).imageUrl) {
-              retryResult = await this.twitterService.postTweetWithImage(uniqueContent.content, (uniqueContent as any).imageUrl);
-            } else {
-              retryResult = await this.twitterService.postTweet(uniqueContent.content);
-            }
+            console.log(`🔄 Retry with guaranteed visual: ${uniqueContent.imageSource} - ${uniqueContent.imageUrl}`);
+            // GUARANTEED: Every retry includes visual attachment
+            const retryResult = await this.twitterService.postTweetWithImage(
+              uniqueContent.content, 
+              uniqueContent.imageUrl! // Now guaranteed to exist
+            );
+            
             if (retryResult.success) {
-              console.log(`✅ RETRY SUCCESS: Posted unique tweet with ID ${retryResult.tweetId}`);
+              console.log(`✅ RETRY SUCCESS: Posted unique tweet with ID ${retryResult.tweetId} + visual`);
               return retryResult;
             }
           }

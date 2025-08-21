@@ -25,10 +25,34 @@ export function registerInstantTestEndpoint(app: Express) {
       
       const automation = new SocialPasswordAutomation();
       
+      // Import AI content generator for enhanced posts with guaranteed visuals
+      const { aiContentGenerator } = await import('./ai-content-generator');
+      
+      // Generate content with mandatory visual attachment
+      const generatedContent = await aiContentGenerator.generateContent({
+        category: 'promotional',
+        customPrompt: '🚀 FlutterBye INSTANT Social Bot LIVE! Real Twitter posting from dashboard! Revolutionary Web3 platform breakthrough!',
+        includeHashtags: true,
+        timeSlot: 'general',
+        forceUnique: true
+      });
+
+      // Get mandatory visual for the post
+      const visualData = await aiContentGenerator.selectOptimalImage(
+        generatedContent.content,
+        'promotional',
+        'general'
+      );
+
       const postContent = {
-        text: "🚀 FlutterBye INSTANT Social Bot LIVE! Real Twitter posting from dashboard! Revolutionary Web3 platform! #FlutterBye #Web3 #AI #SocialBot #LivePosting",
-        hashtags: ['#FlutterBye', '#SocialAutomation', '#Web3', '#AI'],
+        text: generatedContent.content,
+        hashtags: generatedContent.hashtags,
+        imageUrl: visualData.imageUrl,
+        imageDescription: visualData.description,
+        imageSource: visualData.source
       };
+
+      console.log(`📸 Post will include visual: ${visualData.source} - ${visualData.imageUrl}`);
       
       // Update status
       res.write(JSON.stringify({

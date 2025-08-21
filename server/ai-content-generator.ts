@@ -362,13 +362,14 @@ Respond with JSON in this format:
     return commonWords.length / Math.max(words1.length, words2.length);
   }
 
-  // Main public method for content generation
+  // Enhanced main public method for content generation with MANDATORY visual attachment
   async generateContent(
     options: { category?: string; customPrompt?: string; includeHashtags?: boolean; timeSlot?: string; forceUnique?: boolean } = {}
-  ): Promise<{ content: string; hashtags: string[] }> {
+  ): Promise<{ content: string; hashtags: string[]; imageUrl?: string; imageDescription?: string; imageSource?: string }> {
     const { category = 'product', customPrompt, timeSlot = 'general', forceUnique = false } = options;
     
     try {
+      console.log(`🎨 Generating content with MANDATORY visual attachment...`);
       this.contentCounter++;
       const uniqueId = forceUnique ? `_${Date.now()}_${this.contentCounter}` : '';
       const enhancedPrompt = customPrompt ? `${customPrompt}${uniqueId}` : undefined;
@@ -386,6 +387,11 @@ Respond with JSON in this format:
         }
       }
       
+      // MANDATORY: Get visual attachment for EVERY post (NO EXCEPTIONS)
+      console.log(`📸 MANDATORY: Attaching visual to post...`);
+      const visualData = await this.selectOptimalImage(result.text, category, timeSlot);
+      console.log(`✅ Visual attached: ${visualData.source} - ${visualData.description}`);
+      
       // Convert to expected format
       const hashtagString = result.hashtags.map(h => h.startsWith('#') ? h : `#${h}`).join(' ');
       const content = `${result.text} ${hashtagString}`;
@@ -393,16 +399,30 @@ Respond with JSON in this format:
       // Track this content
       this.addToRecentContent(result.text);
       
+      // GUARANTEED RETURN: Every post includes visual data
       return {
         content: content,
-        hashtags: result.hashtags
+        hashtags: result.hashtags,
+        imageUrl: visualData.imageUrl,
+        imageDescription: visualData.description,
+        imageSource: visualData.source
       };
     } catch (error) {
-      console.error('AI content generation failed:', error);
-      // Return fallback content
+      console.error('AI content generation failed, using fallback with visual:', error);
+      
+      // Enhanced fallback with guaranteed visual
+      const fallbackVisual = await this.selectOptimalImage(
+        "FlutterBye Web3 platform",
+        category,
+        timeSlot
+      );
+      
       return {
         content: "🚀 FlutterBye: The future of Web3 communication is here! Revolutionary blockchain-powered messaging with SPL tokens, AI optimization, and real-time engagement. #FlutterBye #Web3 #Blockchain #AI #SocialAutomation #Innovation #Crypto #Future #Technology #Engagement",
-        hashtags: ['#FlutterBye', '#Web3', '#Blockchain', '#AI', '#SocialAutomation']
+        hashtags: ['#FlutterBye', '#Web3', '#Blockchain', '#AI', '#SocialAutomation'],
+        imageUrl: fallbackVisual.imageUrl,
+        imageDescription: fallbackVisual.description,
+        imageSource: fallbackVisual.source
       };
     }
   }
@@ -751,45 +771,232 @@ Respond with JSON in this format:
     ];
   }
 
-  // Image selection and generation
-  async selectOptimalImage(text: string, category: string, timeSlot: string): Promise<{ imageUrl: string; description: string } | null> {
+  // Enhanced mandatory visual attachment system - GUARANTEES every post has a visual
+  async selectOptimalImage(text: string, category: string, timeSlot: string): Promise<{ imageUrl: string; description: string; source: string }> {
+    console.log(`🖼️ Selecting mandatory visual for: "${text.substring(0, 50)}..."`);
+    
     try {
-      // First, check if we have appropriate site images
+      // Strategy 1: Smart site image selection (highest priority)
       const siteImage = this.selectSiteImage(text, category);
       if (siteImage) {
+        console.log(`✅ Selected site image: ${siteImage}`);
         return {
           imageUrl: siteImage,
-          description: "FlutterBye brand asset"
+          description: "FlutterBye brand asset - professional site image",
+          source: "site_library"
         };
       }
 
-      // Generate AI image if no site image is available and we have API access
+      // Strategy 2: AI image generation (when API key available)
       if (process.env.OPENAI_API_KEY) {
-        const imagePrompt = this.createImagePrompt(text, category);
+        console.log(`🎨 Generating AI image for content...`);
+        const imagePrompt = this.createEnhancedImagePrompt(text, category, timeSlot);
         const generatedImage = await openaiService.generateImage(imagePrompt);
-        return {
-          imageUrl: generatedImage.url,
-          description: `AI-generated: ${imagePrompt}`
-        };
+        
+        if (generatedImage.url && !generatedImage.url.includes('placeholder')) {
+          console.log(`✅ Generated AI image successfully`);
+          return {
+            imageUrl: generatedImage.url,
+            description: `AI-generated DALL-E image: ${imagePrompt}`,
+            source: "dall_e_generated"
+          };
+        }
       }
 
-      return null;
+      // Strategy 3: Fallback to curated site images (always available)
+      const fallbackImage = this.getFallbackSiteImage(category, timeSlot);
+      console.log(`⚡ Using fallback image: ${fallbackImage}`);
+      return {
+        imageUrl: fallbackImage,
+        description: "FlutterBye curated brand image - optimized for social media",
+        source: "fallback_curated"
+      };
+
     } catch (error) {
-      console.error('Image selection failed:', error);
-      return null;
+      console.error('Image selection failed, using emergency fallback:', error);
+      // Emergency fallback - guarantee an image is always returned
+      return {
+        imageUrl: '/images/cosmic-butterfly.png',
+        description: "FlutterBye cosmic butterfly logo - emergency fallback",
+        source: "emergency_fallback"
+      };
     }
   }
 
   private selectSiteImage(text: string, category: string): string | null {
-    // Smart selection based on content and category
+    // Enhanced smart selection based on content and category with expanded image library
     const lowerText = text.toLowerCase();
     
-    if (lowerText.includes('flutterbye') || lowerText.includes('logo') || category === 'product') {
-      return '/public/butterfly-logo.png';
+    // Category-specific smart matching
+    if (category === 'product' || lowerText.includes('flutterbye') || lowerText.includes('platform')) {
+      return this.flutterByeBrandAssets.visualAssets[0]; // Main logo
     }
     
-    // Return one of the available images
-    return SITE_IMAGES[Math.floor(Math.random() * SITE_IMAGES.length)] || null;
+    if (category === 'community' || lowerText.includes('community') || lowerText.includes('together')) {
+      return this.flutterByeBrandAssets.visualAssets[1]; // Banner image
+    }
+    
+    if (category === 'educational' || lowerText.includes('web3') || lowerText.includes('blockchain')) {
+      return this.flutterByeBrandAssets.visualAssets[2]; // Web3 integration visual
+    }
+    
+    if (lowerText.includes('ai') || lowerText.includes('intelligent') || lowerText.includes('scoring')) {
+      return this.flutterByeBrandAssets.visualAssets[3]; // AI features visual
+    }
+    
+    // Intelligent text analysis for other matches
+    if (lowerText.includes('token') || lowerText.includes('mint') || lowerText.includes('message')) {
+      return '/images/token-creation-flow.png';
+    }
+    
+    if (lowerText.includes('enterprise') || lowerText.includes('business') || lowerText.includes('escrow')) {
+      return '/images/enterprise-solution.png';
+    }
+    
+    // Return contextually relevant image from expanded library
+    const contextualImages = [
+      '/images/cosmic-butterfly.png',
+      '/images/flutterbye-banner.jpg',
+      '/images/web3-communication.gif',
+      '/images/ai-dashboard-preview.png'
+    ];
+    
+    return contextualImages[Math.floor(Math.random() * contextualImages.length)];
+  }
+
+  // Enhanced AI image generation with detailed prompts
+  private createEnhancedImagePrompt(text: string, category: string, timeSlot: string): string {
+    const contextualElements = this.analyzeContentForVisualElements(text);
+    const timeContext = this.getTimeVisualContext(timeSlot);
+    const categoryStyle = this.getCategoryVisualStyle(category);
+    
+    const enhancedPrompt = `Create a professional, high-quality social media image for FlutterBye platform.
+
+CONTENT CONTEXT: ${text.substring(0, 100)}...
+VISUAL ELEMENTS: ${contextualElements.join(', ')}
+TIME CONTEXT: ${timeContext}
+STYLE: ${categoryStyle}
+
+DESIGN REQUIREMENTS:
+- Resolution: 1200x675 (Twitter optimized)
+- Brand colors: Electric blue (#0EA5E9), Electric green (#10B981), Dark navy (#1E293B)
+- Modern, clean, professional aesthetic
+- Subtle circuit or tech pattern background
+- High-energy, innovative feel
+- No text overlay (will be added separately)
+- Cosmic butterfly motif integration when appropriate
+- Web3/blockchain visual elements
+- Engaging composition that attracts attention
+
+STYLE SPECIFICATIONS:
+- Professional yet innovative
+- Clean typography areas (if any background text)
+- High contrast for social media visibility
+- Mobile-friendly visual hierarchy
+- Brand-consistent electric theme
+- Future-tech aesthetic with subtle animations feel
+
+Create an image that perfectly complements the FlutterBye brand identity while being optimized for social media engagement.`;
+
+    return enhancedPrompt;
+  }
+
+  // Enhanced fallback system with curated images
+  private getFallbackSiteImage(category: string, timeSlot: string): string {
+    // Curated image selection based on category and time
+    const curatedLibrary = {
+      product: [
+        '/images/cosmic-butterfly.png',
+        '/images/flutterbye-logo.png',
+        '/images/platform-showcase.png'
+      ],
+      community: [
+        '/images/community-banner.png',
+        '/images/web3-community.jpg',
+        '/images/social-connection.gif'
+      ],
+      educational: [
+        '/images/blockchain-education.png',
+        '/images/web3-learning.jpg',
+        '/images/tech-tutorial.png'
+      ],
+      promotional: [
+        '/images/promotional-banner.png',
+        '/images/launch-announcement.jpg',
+        '/images/feature-highlight.png'
+      ],
+      engagement: [
+        '/images/engagement-visual.png',
+        '/images/interactive-content.jpg',
+        '/images/community-interaction.gif'
+      ]
+    };
+
+    // Time-optimized selections
+    const timeOptimizedImages = {
+      morning: '/images/morning-innovation.png',
+      afternoon: '/images/productivity-boost.png', 
+      evening: '/images/evening-tech.png',
+      night: '/images/night-development.png'
+    };
+
+    // Get category-specific images
+    const categoryImages = curatedLibrary[category as keyof typeof curatedLibrary] || curatedLibrary.product;
+    
+    // Return random from category or time-optimized
+    if (Math.random() > 0.7) {
+      const timeOfDay = this.getTimeOfDay(timeSlot);
+      return timeOptimizedImages[timeOfDay as keyof typeof timeOptimizedImages] || categoryImages[0];
+    }
+    
+    return categoryImages[Math.floor(Math.random() * categoryImages.length)];
+  }
+
+  // Analyze content for visual element suggestions
+  private analyzeContentForVisualElements(text: string): string[] {
+    const elements = [];
+    const lowerText = text.toLowerCase();
+    
+    if (lowerText.includes('token') || lowerText.includes('mint')) elements.push('token creation visual');
+    if (lowerText.includes('ai') || lowerText.includes('intelligent')) elements.push('AI technology graphics');
+    if (lowerText.includes('community') || lowerText.includes('social')) elements.push('community connection');
+    if (lowerText.includes('web3') || lowerText.includes('blockchain')) elements.push('blockchain network');
+    if (lowerText.includes('enterprise') || lowerText.includes('business')) elements.push('enterprise solution');
+    if (lowerText.includes('innovation') || lowerText.includes('future')) elements.push('futuristic technology');
+    if (lowerText.includes('communication') || lowerText.includes('message')) elements.push('digital communication');
+    
+    return elements.length > 0 ? elements : ['modern technology', 'innovative platform'];
+  }
+
+  // Time-specific visual context
+  private getTimeVisualContext(timeSlot: string): string {
+    const contexts = {
+      earlyMorning: 'Fresh, energetic, new beginning aesthetic',
+      breakfast: 'Casual, approachable, friendly morning vibe',
+      lateMorning: 'Professional, focused, business-oriented',
+      lunch: 'Clean, informative, easy to digest visually',
+      earlyAfternoon: 'Productive, efficient, results-focused',
+      lateAfternoon: 'Dynamic, engaging, community-oriented',
+      dinner: 'Relaxed, comfortable, personal connection',
+      earlyEvening: 'Vibrant, trending, high-energy',
+      evening: 'Sophisticated, premium, engaging',
+      lateNight: 'Thoughtful, deep, contemplative'
+    };
+    
+    return contexts[timeSlot as keyof typeof contexts] || 'Professional, engaging';
+  }
+
+  // Category-specific visual styling
+  private getCategoryVisualStyle(category: string): string {
+    const styles = {
+      product: 'Professional product showcase, clean modern design, tech-focused',
+      community: 'Warm, inclusive, social connection, collaborative feel',
+      educational: 'Clear, informative, learning-focused, approachable',
+      promotional: 'Dynamic, exciting, attention-grabbing, premium',
+      engagement: 'Interactive, friendly, conversation-starting, vibrant'
+    };
+    
+    return styles[category as keyof typeof styles] || 'Modern, professional, innovative';
   }
 
   private createImagePrompt(text: string, category: string): string {
