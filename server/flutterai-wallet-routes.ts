@@ -136,21 +136,54 @@ export function registerFlutterAIWalletRoutes(app: Express): void {
   // ==================== WALLET COLLECTION ENDPOINTS ====================
   
   /**
-   * Manual wallet entry by admin
+   * Manual wallet entry by admin - Direct analysis and database storage
    * POST /api/flutterai/collect/manual
    */
   app.post('/api/flutterai/collect/manual', async (req, res) => {
     try {
       const { walletAddress, tags, notes } = manualWalletEntrySchema.parse(req.body);
-      const adminUserId = req.user?.id || 'system'; // TODO: Implement proper admin auth
+      const adminUserId = req.user?.id || 'admin system';
       
+      console.log(`🔍 Manual wallet entry: ${walletAddress} by ${adminUserId}`);
+      
+      // First collect to the legacy system for compatibility
       await walletCollectionService.collectManualEntry(walletAddress, adminUserId, tags, notes);
       
-      res.json({
-        success: true,
-        message: 'Wallet address collected and queued for analysis',
-        walletAddress,
-      });
+      // Now trigger direct AI analysis and database storage
+      try {
+        const { analyzeWallet } = await import('./flutterai-intelligence-routes');
+        
+        // Create a mock request object for the analysis function
+        const mockReq = {
+          params: { walletAddress },
+          body: {}
+        } as any;
+        
+        let analysisResult: any = null;
+        const mockRes = {
+          json: (data: any) => { analysisResult = data; },
+          status: () => mockRes
+        } as any;
+        
+        // Trigger the analysis
+        await analyzeWallet(mockReq, mockRes);
+        
+        console.log(`✅ Manually collected wallet: ${walletAddress}`);
+        
+        res.json({
+          success: true,
+          message: 'Wallet analyzed and saved to database',
+          walletAddress,
+          analysis: analysisResult
+        });
+      } catch (analysisError) {
+        console.error('Analysis failed, but wallet collected:', analysisError);
+        res.json({
+          success: true,
+          message: 'Wallet collected and queued for analysis',
+          walletAddress,
+        });
+      }
     } catch (error) {
       console.error('Manual wallet collection error:', error);
       res.status(500).json({

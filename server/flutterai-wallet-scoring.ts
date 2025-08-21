@@ -282,7 +282,11 @@ export class FlutterAIWalletScoringService {
         }
       `;
 
-      const aiResponse = await openaiService.generateResponse(analysisPrompt);
+      const aiResponse = await openaiService.generateTextCompletion({
+        prompt: analysisPrompt,
+        maxTokens: 1000,
+        temperature: 0.7
+      });
       
       try {
         return JSON.parse(aiResponse);

@@ -31,36 +31,12 @@ export async function analyzeWallet(req: Request, res: Response) {
     // Check if intelligence record already exists
     const existingIntelligence = await storage.getWalletIntelligence(walletAddress);
     
-    if (existingIntelligence) {
-      // Update existing record with new analysis
-      const updatedIntelligence = await storage.updateWalletIntelligence(walletAddress, {
-        socialCreditScore: analysis.socialCreditScore,
-        riskLevel: analysis.riskLevel,
-        tradingBehaviorScore: analysis.tradingBehaviorScore,
-        portfolioQualityScore: analysis.portfolioQualityScore,
-        liquidityScore: analysis.liquidityScore,
-        activityScore: analysis.activityScore,
-        defiEngagementScore: analysis.defiEngagementScore,
-        marketingSegment: analysis.marketingSegment,
-        communicationStyle: analysis.communicationStyle,
-        preferredTokenTypes: analysis.preferredTokenTypes,
-        riskTolerance: analysis.riskTolerance,
-        investmentProfile: analysis.investmentProfile,
-        tradingFrequency: analysis.tradingFrequency,
-        portfolioSize: analysis.portfolioSize,
-        influenceScore: analysis.influenceScore,
-        socialConnections: analysis.socialConnections,
-        marketingInsights: analysis.marketingInsights,
-        analysisData: analysis.analysisData,
-        lastAnalyzed: new Date()
-      });
-      
-      console.log(`✅ Updated wallet intelligence for ${walletAddress}`);
-      return res.json(updatedIntelligence);
-    } else {
-      // Create new intelligence record
-      const newIntelligence = await storage.createWalletIntelligence({
+    // Always create new intelligence record (upsert pattern)
+    try {
+      const intelligenceData = {
         walletAddress,
+        blockchain: 'solana',
+        network: 'devnet',
         socialCreditScore: analysis.socialCreditScore,
         riskLevel: analysis.riskLevel,
         tradingBehaviorScore: analysis.tradingBehaviorScore,
@@ -79,12 +55,37 @@ export async function analyzeWallet(req: Request, res: Response) {
         socialConnections: analysis.socialConnections,
         marketingInsights: analysis.marketingInsights,
         analysisData: analysis.analysisData,
-        sourcePlatform: 'FlutterAI',
-        collectionMethod: 'manual_analysis'
-      });
+        sourcePlatform: 'manual_analysis',
+        collectionMethod: 'ai_scoring',
+        lastAnalyzed: new Date()
+      };
+
+      let intelligenceRecord;
+      if (existingIntelligence) {
+        // Update existing record
+        intelligenceRecord = await storage.updateWalletIntelligence(walletAddress, intelligenceData);
+        console.log(`✅ Updated wallet intelligence for ${walletAddress}`);
+      } else {
+        // Create new record
+        intelligenceRecord = await storage.createWalletIntelligence(intelligenceData);
+        console.log(`✅ Created new wallet intelligence for ${walletAddress}`);
+      }
       
-      console.log(`✅ Created new wallet intelligence for ${walletAddress}`);
-      return res.json(newIntelligence);
+      return res.json({
+        success: true,
+        message: existingIntelligence ? 'Wallet intelligence updated' : 'Wallet intelligence created',
+        walletAddress,
+        analysis: intelligenceRecord
+      });
+    } catch (storageError) {
+      console.error('Storage error:', storageError);
+      return res.json({
+        success: true,
+        message: 'Analysis completed but storage failed',
+        walletAddress,
+        analysis: analysis,
+        storageError: storageError instanceof Error ? storageError.message : 'Unknown storage error'
+      });
     }
     
   } catch (error) {

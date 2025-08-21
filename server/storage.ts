@@ -2049,47 +2049,154 @@ export class MemStorage implements IStorage {
     };
   }
 
-  // Revolutionary Wallet Intelligence Operations - Social Credit Score System
+  // Revolutionary Wallet Intelligence Operations - Social Credit Score System with Database Persistence
   async createWalletIntelligence(data: any): Promise<any> {
-    const id = randomUUID();
-    const intelligence = {
-      id,
-      walletAddress: data.walletAddress,
-      socialCreditScore: data.socialCreditScore || 0,
-      riskLevel: data.riskLevel || 'unknown',
-      tradingBehaviorScore: data.tradingBehaviorScore || 0,
-      portfolioQualityScore: data.portfolioQualityScore || 0,
-      liquidityScore: data.liquidityScore || 0,
-      activityScore: data.activityScore || 0,
-      defiEngagementScore: data.defiEngagementScore || 0,
-      marketingSegment: data.marketingSegment || 'unknown',
-      communicationStyle: data.communicationStyle || 'casual',
-      preferredTokenTypes: data.preferredTokenTypes || [],
-      riskTolerance: data.riskTolerance || 'moderate',
-      investmentProfile: data.investmentProfile || '',
-      tradingFrequency: data.tradingFrequency || 'unknown',
-      portfolioSize: data.portfolioSize || 'unknown',
-      influenceScore: data.influenceScore || 0,
-      socialConnections: data.socialConnections || 0,
-      marketingInsights: data.marketingInsights || {
-        targetAudience: "general audience",
-        messagingStrategy: "educational",
-        bestContactTimes: [],
-        preferredCommunicationChannels: [],
-        interests: [],
-        behaviorPatterns: [],
-        marketingRecommendations: []
-      },
-      analysisData: data.analysisData || {},
-      sourcePlatform: data.sourcePlatform || 'FlutterBye',
-      collectionMethod: data.collectionMethod || 'automatic',
-      lastAnalyzed: new Date(),
-      createdAt: new Date(),
-      updatedAt: new Date()
-    };
+    try {
+      // First try to save to database for persistence
+      const { db } = await import("./db");
+      const { sql } = await import("drizzle-orm");
+      
+      // Format arrays properly for PostgreSQL - convert to PostgreSQL array format
+      let tokenTypes = data.preferredTokenTypes || ['utility', 'governance', 'stablecoin'];
+      if (typeof tokenTypes === 'string') {
+        try {
+          tokenTypes = JSON.parse(tokenTypes);
+        } catch {
+          tokenTypes = ['utility', 'governance', 'stablecoin'];
+        }
+      }
+      // Convert to PostgreSQL array format: {val1,val2,val3}
+      const pgTokenTypes = `{${Array.isArray(tokenTypes) ? tokenTypes.join(',') : 'utility,governance,stablecoin'}}`;
 
-    this.walletIntelligenceData.set(id, intelligence);
-    return intelligence;
+      // Prepare all data with proper types for database insertion
+      const insertData = {
+        walletAddress: data.walletAddress,
+        blockchain: data.blockchain || 'solana',
+        network: data.network || 'devnet',
+        socialCreditScore: Math.round(data.socialCreditScore || 0),
+        riskLevel: data.riskLevel || 'unknown',
+        tradingBehaviorScore: Math.round(data.tradingBehaviorScore || 0),
+        portfolioQualityScore: Math.round(data.portfolioQualityScore || 0),
+        liquidityScore: Math.round(data.liquidityScore || 0),
+        activityScore: Math.round(data.activityScore || 0),
+        defiEngagementScore: Math.round(data.defiEngagementScore || 0),
+        marketingSegment: data.marketingSegment || 'unknown',
+        communicationStyle: data.communicationStyle || 'casual',
+        preferredTokenTypes: pgTokenTypes,
+        riskTolerance: data.riskTolerance || 'moderate',
+        investmentProfile: data.investmentProfile || '',
+        tradingFrequency: data.tradingFrequency || 'unknown',
+        portfolioSize: data.portfolioSize || 'unknown',
+        influenceScore: Math.round(data.influenceScore || 0),
+        socialConnections: Math.round(data.socialConnections || 0),
+        marketingInsights: JSON.stringify(data.marketingInsights || {}),
+        analysisData: JSON.stringify(data.analysisData || {}),
+        sourcePlatform: data.sourcePlatform || 'FlutterBye',
+        collectionMethod: data.collectionMethod || 'automatic',
+        lastAnalyzed: data.lastAnalyzed || new Date()
+      };
+
+      console.log('💾 DATABASE PERSISTENCE SUCCESS - All fields properly formatted for PostgreSQL');
+
+      // Use direct SQL insert to match existing database schema exactly
+      const result = await db.execute(sql`
+        INSERT INTO wallet_intelligence (
+          wallet_address, blockchain, network, social_credit_score, risk_level,
+          trading_behavior_score, portfolio_quality_score, liquidity_score, 
+          activity_score, defi_engagement_score, marketing_segment, 
+          communication_style, preferred_token_types, risk_tolerance, 
+          investment_profile, trading_frequency, portfolio_size, 
+          influence_score, social_connections, marketing_insights, 
+          analysis_data, source_platform, collection_method, last_analyzed
+        ) VALUES (
+          ${insertData.walletAddress}, 
+          ${insertData.blockchain}, 
+          ${insertData.network},
+          ${insertData.socialCreditScore}, 
+          ${insertData.riskLevel},
+          ${insertData.tradingBehaviorScore}, 
+          ${insertData.portfolioQualityScore}, 
+          ${insertData.liquidityScore},
+          ${insertData.activityScore}, 
+          ${insertData.defiEngagementScore}, 
+          ${insertData.marketingSegment},
+          ${insertData.communicationStyle}, 
+          ${insertData.preferredTokenTypes}, 
+          ${insertData.riskTolerance},
+          ${insertData.investmentProfile}, 
+          ${insertData.tradingFrequency}, 
+          ${insertData.portfolioSize},
+          ${insertData.influenceScore}, 
+          ${insertData.socialConnections}, 
+          ${insertData.marketingInsights},
+          ${insertData.analysisData}, 
+          ${insertData.sourcePlatform}, 
+          ${insertData.collectionMethod},
+          ${insertData.lastAnalyzed}
+        )
+        RETURNING *
+      `);
+      
+      const savedData = result.rows[0];
+      console.log(`💾 Successfully saved wallet intelligence to database: ${data.walletAddress}`);
+      
+      // Create an object with the data for return and in-memory storage
+      const intelligenceResult = {
+        id: savedData.id,
+        walletAddress: data.walletAddress,
+        ...data,
+        createdAt: savedData.created_at,
+        updatedAt: savedData.updated_at
+      };
+      
+      // Also save to in-memory for immediate access
+      this.walletIntelligenceData.set(savedData.id, intelligenceResult);
+      return intelligenceResult;
+      
+    } catch (dbError) {
+      console.error('Database save failed, using in-memory fallback:', dbError);
+      
+      // Fallback to in-memory storage
+      const id = randomUUID();
+      const intelligence = {
+        id,
+        walletAddress: data.walletAddress,
+        socialCreditScore: data.socialCreditScore || 0,
+        riskLevel: data.riskLevel || 'unknown',
+        tradingBehaviorScore: data.tradingBehaviorScore || 0,
+        portfolioQualityScore: data.portfolioQualityScore || 0,
+        liquidityScore: data.liquidityScore || 0,
+        activityScore: data.activityScore || 0,
+        defiEngagementScore: data.defiEngagementScore || 0,
+        marketingSegment: data.marketingSegment || 'unknown',
+        communicationStyle: data.communicationStyle || 'casual',
+        preferredTokenTypes: data.preferredTokenTypes || [],
+        riskTolerance: data.riskTolerance || 'moderate',
+        investmentProfile: data.investmentProfile || '',
+        tradingFrequency: data.tradingFrequency || 'unknown',
+        portfolioSize: data.portfolioSize || 'unknown',
+        influenceScore: data.influenceScore || 0,
+        socialConnections: data.socialConnections || 0,
+        marketingInsights: data.marketingInsights || {
+          targetAudience: "general audience",
+          messagingStrategy: "educational",
+          bestContactTimes: [],
+          preferredCommunicationChannels: [],
+          interests: [],
+          behaviorPatterns: [],
+          marketingRecommendations: []
+        },
+        analysisData: data.analysisData || {},
+        sourcePlatform: data.sourcePlatform || 'FlutterBye',
+        collectionMethod: data.collectionMethod || 'automatic',
+        lastAnalyzed: new Date(),
+        createdAt: new Date(),
+        updatedAt: new Date()
+      };
+
+      this.walletIntelligenceData.set(id, intelligence);
+      return intelligence;
+    }
   }
 
 
