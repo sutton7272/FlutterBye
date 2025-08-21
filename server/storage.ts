@@ -2480,7 +2480,8 @@ export class MemStorage implements IStorage {
     topPerformers: any[];
     highRiskWallets: any[];
   }> {
-    const items = Array.from(this.walletIntelligenceData.values());
+    // Get fresh data from database for accurate stats
+    const items = await this.getAllWalletIntelligence();
     
     const stats = {
       totalWallets: items.length,
