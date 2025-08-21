@@ -47,6 +47,7 @@ import socialOptimizationAPI from "./social-optimization-api";
 import { registerSocialTestEndpoints } from "./social-test-endpoint";
 import { registerInstantTestEndpoint } from "./social-instant-test";
 import { registerSimpleTestEndpoint } from "./social-simple-test";
+import { registerVisualTestEndpoint } from "./test-visual-endpoint";
 import { registerTwitterAuthFixEndpoint } from "./twitter-auth-fix";
 import { registerTwitterDiagnosticEndpoint } from "./twitter-diagnostic";
 import { registerTwitterAPIRoutes } from "./twitter-api-routes";
@@ -7021,6 +7022,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   registerSocialTestEndpoints(app);
   registerInstantTestEndpoint(app);
   registerSimpleTestEndpoint(app);
+  registerVisualTestEndpoint(app);
   registerTwitterAuthFixEndpoint(app);
   registerTwitterDiagnosticEndpoint(app);
   registerTwitterAPIRoutes(app);

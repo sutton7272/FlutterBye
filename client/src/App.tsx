@@ -73,6 +73,7 @@ const SearchPage = lazy(() => import("@/pages/search"));
 const AdminFreeCodes = lazy(() => import("@/pages/admin-free-codes"));
 const AdminPricing = lazy(() => import("@/pages/admin-pricing"));
 const AdminDefaultImage = lazy(() => import("@/pages/admin-default-image"));
+const VisualTestPage = lazy(() => import("@/pages/VisualTestPage"));
 const AdminCustodialWallet = lazy(() => import("@/pages/admin-custodial-wallet"));
 const SocialAutomation = lazy(() => import("@/pages/social-automation"));
 const SocialAutomationNoKeys = lazy(() => import("@/pages/social-automation-no-keys"));
@@ -738,6 +739,13 @@ function Router() {
         <Route path="/admin/subscriptions" component={() => {
           window.location.href = '/admin-unified?tab=pricing';
           return null;
+        }} />
+        <Route path="/admin/visual-test" component={() => {
+          return (
+            <SuspenseWrapper>
+              <VisualTestPage />
+            </SuspenseWrapper>
+          );
         }} />
         <Route path="/referrals" component={() => (
           <>
