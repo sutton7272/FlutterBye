@@ -34,7 +34,8 @@ import {
   Bot,
   ArrowRight,
   MessageSquare,
-  Activity
+  Activity,
+  DollarSign
 } from "lucide-react";
 import flutterbeyeLogoPath from "@assets/image_1754068877999.png";
 import Navbar from "@/components/navbar";
@@ -461,88 +462,90 @@ export default function LaunchCountdown() {
           </div>
         </div>
         
-        {/* SECTION 1: SINGLE COLUMN - What is Flutterbye */}
-        <Card className="electric-frame max-w-4xl mx-auto mb-12">
-          <CardHeader className="text-center pb-6">
-            <div className="flex items-center justify-center gap-3 mb-4">
-              <img src={flutterbeyeLogoPath} alt="Flutterbye" className="w-12 h-12" />
-              <CardTitle className="text-4xl text-gradient">
-                What is Flutterbye?
-              </CardTitle>
-            </div>
-            <CardDescription className="text-lg text-muted-foreground max-w-3xl mx-auto leading-relaxed">
-              Revolutionary blockchain messaging platform that transforms communication into valuable, tradeable tokens. 
-              Create 27-character message tokens with attached value, distribute them across networks, and watch as your words become assets.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="grid md:grid-cols-3 gap-6">
-            <div className="text-center space-y-3">
-              <MessageSquare className="w-12 h-12 text-electric-blue mx-auto" />
-              <h3 className="font-bold text-xl text-gradient">Message Tokens</h3>
-              <p className="text-sm text-muted-foreground">Transform words into blockchain assets with our unique 27-character message token system</p>
-            </div>
-            <div className="text-center space-y-3">
-              <Coins className="w-12 h-12 text-electric-green mx-auto" />
-              <h3 className="font-bold text-xl text-gradient">Value Attachment</h3>
-              <p className="text-sm text-muted-foreground">Attach SOL, USDC, or FLBY value to messages with expiration dates and secure escrow</p>
-            </div>
-            <div className="text-center space-y-3">
-              <TrendingUp className="w-12 h-12 text-purple-400 mx-auto" />
-              <h3 className="font-bold text-xl text-gradient">Viral Distribution</h3>
-              <p className="text-sm text-muted-foreground">AI-powered viral acceleration engine multiplies your message reach exponentially</p>
-            </div>
-          </CardContent>
-        </Card>
+        {/* SECTION 1-2: TWO COLUMN LAYOUT */}
+        <div className="grid lg:grid-cols-2 gap-8 max-w-6xl mx-auto mb-12">
+          
+          {/* Column 1: What is Flutterbye */}
+          <Card className="electric-frame">
+            <CardHeader className="text-center pb-6">
+              <div className="flex items-center justify-center gap-3 mb-4">
+                <img src={flutterbeyeLogoPath} alt="Flutterbye" className="w-10 h-10" />
+                <CardTitle className="text-3xl text-gradient">
+                  What is Flutterbye?
+                </CardTitle>
+              </div>
+              <CardDescription className="text-base text-muted-foreground leading-relaxed">
+                Revolutionary blockchain messaging platform that transforms communication into valuable, tradeable tokens.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="text-center space-y-3">
+                <MessageSquare className="w-10 h-10 text-electric-blue mx-auto" />
+                <h3 className="font-bold text-lg text-gradient">Message Tokens</h3>
+                <p className="text-sm text-muted-foreground">Transform words into blockchain assets with our unique 27-character message token system</p>
+              </div>
+              <div className="text-center space-y-3">
+                <Coins className="w-10 h-10 text-electric-green mx-auto" />
+                <h3 className="font-bold text-lg text-gradient">Value Attachment</h3>
+                <p className="text-sm text-muted-foreground">Attach SOL, USDC, or FLBY value to messages with expiration dates and secure escrow</p>
+              </div>
+              <div className="text-center space-y-3">
+                <TrendingUp className="w-10 h-10 text-purple-400 mx-auto" />
+                <h3 className="font-bold text-lg text-gradient">Viral Distribution</h3>
+                <p className="text-sm text-muted-foreground">AI-powered viral acceleration engine multiplies your message reach exponentially</p>
+              </div>
+            </CardContent>
+          </Card>
 
-        {/* SECTION 2: SINGLE COLUMN - Platform Tutorial with FlutterAI */}
-        <Card className="electric-frame max-w-4xl mx-auto mb-12">
-          <CardHeader className="text-center pb-6">
-            <CardTitle className="text-4xl text-gradient flex items-center justify-center gap-3">
-              <Play className="w-10 h-10" />
-              Complete Platform Tutorial
-            </CardTitle>
-            <CardDescription className="text-lg text-muted-foreground max-w-3xl mx-auto">
-              Master token creation, FlutterAI intelligence, and experience FlutterART & FlutterWave previews in one unified walkthrough
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="grid md:grid-cols-2 gap-8 items-center">
+          {/* Column 2: Platform Tutorial with FlutterAI */}
+          <Card className="electric-frame">
+            <CardHeader className="text-center pb-6">
+              <CardTitle className="text-3xl text-gradient flex items-center justify-center gap-3">
+                <Play className="w-8 h-8" />
+                Complete Platform Tutorial
+              </CardTitle>
+              <CardDescription className="text-base text-muted-foreground">
+                Master token creation, FlutterAI intelligence, and experience FlutterART & FlutterWave previews
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
               <div className="space-y-4">
-                <div className="flex items-start gap-4">
-                  <Badge className="bg-electric-blue/20 text-electric-blue border-electric-blue/30 shrink-0">1</Badge>
+                <div className="flex items-start gap-3">
+                  <Badge className="bg-electric-blue/20 text-electric-blue border-electric-blue/30 shrink-0 text-xs">1</Badge>
                   <div>
-                    <h4 className="font-bold mb-2">Token Creation Mastery</h4>
-                    <p className="text-sm text-muted-foreground">60-second SPL token creation with FlutterAI wallet intelligence scoring</p>
+                    <h4 className="font-bold text-sm mb-1">Token Creation Mastery</h4>
+                    <p className="text-xs text-muted-foreground">60-second SPL token creation with FlutterAI wallet intelligence scoring</p>
                   </div>
                 </div>
-                <div className="flex items-start gap-4">
-                  <Badge className="bg-electric-green/20 text-electric-green border-electric-green/30 shrink-0">2</Badge>
+                <div className="flex items-start gap-3">
+                  <Badge className="bg-electric-green/20 text-electric-green border-electric-green/30 shrink-0 text-xs">2</Badge>
                   <div>
-                    <h4 className="font-bold mb-2">AI-Powered Features</h4>
-                    <p className="text-sm text-muted-foreground">Experience FlutterAI intelligence, volume pricing, and FLBY economics</p>
+                    <h4 className="font-bold text-sm mb-1">AI-Powered Features</h4>
+                    <p className="text-xs text-muted-foreground">Experience FlutterAI intelligence, volume pricing, and FLBY economics</p>
                   </div>
                 </div>
-                <div className="flex items-start gap-4">
-                  <Badge className="bg-purple-400/20 text-purple-400 border-purple-400/30 shrink-0">3</Badge>
+                <div className="flex items-start gap-3">
+                  <Badge className="bg-purple-400/20 text-purple-400 border-purple-400/30 shrink-0 text-xs">3</Badge>
                   <div>
-                    <h4 className="font-bold mb-2">Coming Soon Preview</h4>
-                    <p className="text-sm text-muted-foreground">FlutterART NFT creation and FlutterWave SMS integration demonstrations</p>
+                    <h4 className="font-bold text-sm mb-1">Coming Soon Preview</h4>
+                    <p className="text-xs text-muted-foreground">FlutterART NFT creation and FlutterWave SMS integration demonstrations</p>
                   </div>
                 </div>
-                <div className="flex items-start gap-4">
-                  <Badge className="bg-orange-400/20 text-orange-400 border-orange-400/30 shrink-0">4</Badge>
+                <div className="flex items-start gap-3">
+                  <Badge className="bg-orange-400/20 text-orange-400 border-orange-400/30 shrink-0 text-xs">4</Badge>
                   <div>
-                    <h4 className="font-bold mb-2">Marketing & Trading</h4>
-                    <p className="text-sm text-muted-foreground">Viral growth engine, marketplace dynamics, and launch strategies</p>
+                    <h4 className="font-bold text-sm mb-1">Marketing & Trading</h4>
+                    <p className="text-xs text-muted-foreground">Viral growth engine, marketplace dynamics, and launch strategies</p>
                   </div>
                 </div>
               </div>
-              <div className="bg-gradient-to-br from-electric-blue/10 to-purple-500/10 rounded-xl p-6 electric-frame">
+              <div className="bg-gradient-to-br from-electric-blue/10 to-purple-500/10 rounded-xl p-4 electric-frame">
                 <InteractiveTutorial />
               </div>
-            </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+          
+        </div>
 
 
 
@@ -815,22 +818,54 @@ export default function LaunchCountdown() {
           </Card>
         </div>
         
-        {/* SECTION 5: SINGLE COLUMN - FlutterBlog (only show if bot enabled) */}
+        {/* SECTION 5: TWO COLUMN - FlutterBlog (only show if bot enabled) */}
         {isBotEnabled && (
-          <Card className="electric-frame max-w-4xl mx-auto mb-16">
-            <CardHeader className="text-center pb-6">
-              <CardTitle className="text-4xl text-gradient flex items-center justify-center gap-3">
-                <Bot className="w-10 h-10" />
-                FlutterBlog
-              </CardTitle>
-              <CardDescription className="text-lg text-muted-foreground max-w-3xl mx-auto">
-                AI-powered content generation with revolutionary SEO optimization and 60-70% cost reduction
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <AIContentShowcase />
-            </CardContent>
-          </Card>
+          <div className="grid lg:grid-cols-2 gap-8 max-w-6xl mx-auto mb-16">
+            
+            {/* Column 1: FlutterBlog Info */}
+            <Card className="electric-frame">
+              <CardHeader className="text-center pb-6">
+                <CardTitle className="text-3xl text-gradient flex items-center justify-center gap-3">
+                  <Bot className="w-8 h-8" />
+                  FlutterBlog
+                </CardTitle>
+                <CardDescription className="text-base text-muted-foreground">
+                  AI-powered content generation with revolutionary SEO optimization and 60-70% cost reduction
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="text-center space-y-3">
+                  <Brain className="w-10 h-10 text-electric-blue mx-auto" />
+                  <h3 className="font-bold text-lg text-gradient">AI Content Engine</h3>
+                  <p className="text-sm text-muted-foreground">Advanced GPT-4o powered content generation with intelligent SEO optimization</p>
+                </div>
+                <div className="text-center space-y-3">
+                  <DollarSign className="w-10 h-10 text-electric-green mx-auto" />
+                  <h3 className="font-bold text-lg text-gradient">Cost Reduction</h3>
+                  <p className="text-sm text-muted-foreground">60-70% cost reduction through intelligent batch processing and automation</p>
+                </div>
+                <div className="text-center space-y-3">
+                  <TrendingUp className="w-10 h-10 text-purple-400 mx-auto" />
+                  <h3 className="font-bold text-lg text-gradient">SEO Performance</h3>
+                  <p className="text-sm text-muted-foreground">Revolutionary SEO optimization with real-time content analytics</p>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Column 2: FlutterBlog Content Showcase */}
+            <Card className="electric-frame">
+              <CardHeader className="text-center pb-4">
+                <CardTitle className="text-2xl text-gradient">Live Content Feed</CardTitle>
+                <CardDescription className="text-sm text-muted-foreground">
+                  Real-time AI-generated content showcase
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <AIContentShowcase />
+              </CardContent>
+            </Card>
+            
+          </div>
         )}
       </div>
     </div>
