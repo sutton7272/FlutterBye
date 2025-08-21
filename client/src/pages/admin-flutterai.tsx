@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { Button } from "@/components/ui/button";
@@ -10,6 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { Brain, Database, Search, Plus, TrendingUp, Users, Activity, Zap } from "lucide-react";
+import FlutterAIDashboard from "./flutterai-dashboard";
 
 interface WalletIntelligence {
   id: string;
@@ -62,7 +63,7 @@ const SCORE_RANGES = {
   "F": { min: 0, max: 399, color: "bg-gray-500" }
 };
 
-export default function AdminFlutterAI() {
+function DatabaseManagement() {
   const [newWalletAddress, setNewWalletAddress] = useState("");
   const [selectedBlockchain, setSelectedBlockchain] = useState("solana");
   const [bulkWallets, setBulkWallets] = useState("");
@@ -261,13 +262,13 @@ export default function AdminFlutterAI() {
         <Tabs defaultValue="wallets" className="space-y-6">
           <TabsList className="grid w-full grid-cols-3 bg-slate-800">
             <TabsTrigger value="wallets" className="data-[state=active]:bg-blue-600">
-              Wallet Database
+              Database View
             </TabsTrigger>
             <TabsTrigger value="add" className="data-[state=active]:bg-blue-600">
-              Add Wallets
+              Quick Add
             </TabsTrigger>
             <TabsTrigger value="analytics" className="data-[state=active]:bg-blue-600">
-              Analytics
+              Database Stats
             </TabsTrigger>
           </TabsList>
 
@@ -540,6 +541,48 @@ export default function AdminFlutterAI() {
                 </Card>
               </div>
             )}
+          </TabsContent>
+        </Tabs>
+      </div>
+    </div>
+  );
+}
+
+export default function AdminFlutterAI() {
+  const [activeTab, setActiveTab] = useState("flutterai");
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 text-white">
+      <div className="max-w-7xl mx-auto p-6 space-y-6">
+        {/* Header */}
+        <div className="flex items-center gap-3">
+          <div className="p-3 bg-blue-600 rounded-xl">
+            <Brain className="h-8 w-8" />
+          </div>
+          <div>
+            <h1 className="text-3xl font-bold">FlutterAI Intelligence Hub</h1>
+            <p className="text-slate-300">Multi-Blockchain AI Analysis & Data Collection System</p>
+          </div>
+        </div>
+
+        <Tabs defaultValue="flutterai" className="space-y-6">
+          <TabsList className="grid w-full grid-cols-2 bg-slate-800">
+            <TabsTrigger value="flutterai" className="data-[state=active]:bg-blue-600">
+              FlutterAI Analysis System
+            </TabsTrigger>
+            <TabsTrigger value="database" className="data-[state=active]:bg-blue-600">
+              Database Management
+            </TabsTrigger>
+          </TabsList>
+
+          {/* Original FlutterAI Dashboard */}
+          <TabsContent value="flutterai">
+            <FlutterAIDashboard />
+          </TabsContent>
+
+          {/* Database Management Tab */}
+          <TabsContent value="database">
+            <DatabaseManagement />
           </TabsContent>
         </Tabs>
       </div>
