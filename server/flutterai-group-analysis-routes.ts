@@ -245,10 +245,59 @@ router.post('/collect-wallets', async (req, res) => {
           }
           duplicatesSkipped++;
         } else {
-          // Collect new wallet using the wallet collection service
-          await walletService.collectWalletFromTokenAnalysis(address, source, metadata);
-          newWallets++;
-          aiScoringQueued++;
+          // Collect new wallet and automatically score it
+          try {
+            // Import scoring service for automatic analysis
+            const { FlutterAIWalletScoringService } = await import('./flutterai-wallet-scoring');
+            const scoringService = new FlutterAIWalletScoringService();
+            
+            // Score the wallet first
+            const analysis = await scoringService.scoreWallet(address);
+            
+            // Create wallet intelligence data with scoring results
+            const intelligenceData = {
+              walletAddress: address,
+              blockchain: 'solana',
+              network: 'devnet',
+              socialCreditScore: analysis.socialCreditScore,
+              riskLevel: analysis.riskLevel,
+              tradingBehaviorScore: analysis.tradingBehaviorScore,
+              portfolioQualityScore: analysis.portfolioQualityScore,
+              liquidityScore: analysis.liquidityScore,
+              activityScore: analysis.activityScore,
+              defiEngagementScore: analysis.defiEngagementScore,
+              marketingSegment: analysis.marketingSegment,
+              communicationStyle: analysis.communicationStyle,
+              preferredTokenTypes: Array.isArray(analysis.preferredTokenTypes) ? analysis.preferredTokenTypes : [analysis.preferredTokenTypes].filter(Boolean),
+              riskTolerance: analysis.riskTolerance,
+              investmentProfile: analysis.investmentProfile,
+              tradingFrequency: analysis.tradingFrequency,
+              portfolioSize: analysis.portfolioSize,
+              influenceScore: analysis.influenceScore,
+              socialConnections: analysis.socialConnections,
+              marketingInsights: analysis.marketingInsights,
+              analysisData: {
+                ...analysis.analysisData,
+                tokenAnalysisSource: source,
+                collectionMetadata: metadata,
+                autoCollected: true
+              },
+              sourcePlatform: 'token_holder_analysis',
+              collectionMethod: 'auto_collection_with_scoring',
+              lastAnalyzed: new Date()
+            };
+
+            // Save to database
+            await storage.createWalletIntelligence(intelligenceData);
+            console.log(`🧠 Auto-collected and scored wallet: ${address} from ${source}`);
+            newWallets++;
+            aiScoringQueued++;
+          } catch (scoringError) {
+            console.error(`Failed to auto-score collected wallet ${address}:`, scoringError);
+            // Fallback: collect without scoring
+            await walletService.collectWalletFromTokenAnalysis(address, source, metadata);
+            newWallets++;
+          }
         }
         totalCollected++;
       } catch (error) {
