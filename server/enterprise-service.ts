@@ -287,8 +287,8 @@ export class EnterpriseService {
     const usage = await db
       .select({
         totalRequests: sql<number>`count(*)`,
-        averageResponseTime: sql<number>`avg(${apiUsageAnalytics.responseTimeAvg})`,
-        errorRate: sql<number>`avg(${apiUsageAnalytics.errorCount}) * 100`,
+        averageResponseTime: sql<number>`avg(CAST(${apiUsageAnalytics.responseTimeAvg} AS NUMERIC))`,
+        errorRate: sql<number>`avg(CAST(${apiUsageAnalytics.errorCount} AS NUMERIC)) * 100`,
         endpoint: apiUsageAnalytics.endpoint,
       })
       .from(apiUsageAnalytics)
