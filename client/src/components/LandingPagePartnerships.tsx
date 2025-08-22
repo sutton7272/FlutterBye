@@ -67,8 +67,9 @@ export function LandingPagePartnerships() {
   }
 
   return (
-    <section className="py-16 bg-slate-900/40 backdrop-blur-sm border-t border-electric-blue/20">
+    <section className="py-16">
       <div className="max-w-7xl mx-auto px-6">
+        <Card className="electric-frame p-8">
         <div className="text-center mb-12">
           <h2 className="text-3xl font-bold bg-gradient-to-r from-electric-blue to-electric-green bg-clip-text text-transparent mb-4">
             Trusted Partners
@@ -136,7 +137,7 @@ export function LandingPagePartnerships() {
           </div>
         )}
 
-
+        </Card>
       </div>
     </section>
   );
