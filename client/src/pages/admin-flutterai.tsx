@@ -9,8 +9,9 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
-import { Brain, Database, Search, Plus, TrendingUp, Users, Activity, Zap, Download } from "lucide-react";
+import { Brain, Database, Search, Plus, TrendingUp, Users, Activity, Zap, Download, BarChart3 } from "lucide-react";
 import FlutterAIDashboard from "./flutterai-dashboard";
+import MarketingIntelligence from "./MarketingIntelligence";
 
 interface WalletIntelligence {
   id: string;
@@ -35,6 +36,7 @@ interface WalletIntelligence {
   socialConnections: number;
   marketingInsights: any;
   analysisData: any;
+  sourceToken?: string;
   lastAnalyzed: string;
   createdAt: string;
   updatedAt: string;
@@ -128,7 +130,7 @@ function DatabaseManagement() {
     onSuccess: (data) => {
       toast({
         title: "Bulk Analysis Started",
-        description: `Processing ${data.total || 0} wallets for FlutterAI analysis`,
+        description: `Processing ${(data as any)?.total || 0} wallets for FlutterAI analysis`,
       });
       setBulkWallets("");
       queryClient.invalidateQueries({ queryKey: ["/api/flutterai/intelligence"] });
@@ -146,9 +148,7 @@ function DatabaseManagement() {
   // Reanalyze wallet mutation
   const reanalyzeMutation = useMutation({
     mutationFn: (walletAddress: string) =>
-      apiRequest(`/api/flutterai/analyze/${walletAddress}`, {
-        method: "POST"
-      }),
+      apiRequest(`/api/flutterai/analyze/${walletAddress}`, "POST"),
     onSuccess: () => {
       toast({
         title: "Reanalysis Complete",
@@ -580,7 +580,7 @@ function DatabaseManagement() {
                     {stats.blockchainDistribution && Object.entries(stats.blockchainDistribution).map(([blockchain, count]) => (
                       <div key={blockchain} className="flex justify-between items-center py-2">
                         <span className="capitalize">{blockchain.replace('_', ' ')}</span>
-                        <Badge variant="outline">{count}</Badge>
+                        <Badge variant="outline">{String(count)}</Badge>
                       </div>
                     ))}
                   </CardContent>
@@ -602,7 +602,7 @@ function DatabaseManagement() {
                             {SCORE_RANGES[rating as keyof typeof SCORE_RANGES]?.min}-{SCORE_RANGES[rating as keyof typeof SCORE_RANGES]?.max}
                           </span>
                         </div>
-                        <Badge variant="outline">{count}</Badge>
+                        <Badge variant="outline">{String(count)}</Badge>
                       </div>
                     ))}
                   </CardContent>
@@ -634,12 +634,15 @@ export default function AdminFlutterAI() {
         </div>
 
         <Tabs defaultValue="flutterai" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-2 bg-slate-800">
+          <TabsList className="grid w-full grid-cols-3 bg-slate-800">
             <TabsTrigger value="flutterai" className="data-[state=active]:bg-blue-600">
               FlutterAI Analysis System
             </TabsTrigger>
             <TabsTrigger value="database" className="data-[state=active]:bg-blue-600">
               Database Management
+            </TabsTrigger>
+            <TabsTrigger value="marketing" className="data-[state=active]:bg-blue-600">
+              SEO & Marketing Intelligence
             </TabsTrigger>
           </TabsList>
 
@@ -651,6 +654,28 @@ export default function AdminFlutterAI() {
           {/* Database Management Tab */}
           <TabsContent value="database">
             <DatabaseManagement />
+          </TabsContent>
+
+          {/* SEO & Marketing Intelligence Tab */}
+          <TabsContent value="marketing">
+            <Card className="bg-slate-800 border-slate-700">
+              <CardHeader>
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-blue-600 rounded-lg">
+                    <BarChart3 className="h-6 w-6" />
+                  </div>
+                  <div>
+                    <CardTitle className="text-white">SEO & Marketing Intelligence Platform</CardTitle>
+                    <CardDescription className="text-slate-300">
+                      Bloomberg Terminal of Web3 Marketing - Combining blockchain intelligence with traditional marketing analytics
+                    </CardDescription>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <MarketingIntelligence />
+              </CardContent>
+            </Card>
           </TabsContent>
         </Tabs>
       </div>

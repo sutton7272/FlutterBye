@@ -75,7 +75,7 @@ export default function AdminDashboard() {
         "Skye AI Knowledge Management",
         "AI Personality Configuration", 
         "Wallet Intelligence Scoring",
-        "Advanced Marketing Analytics"
+        "SEO & Marketing Intelligence"
       ]
     },
     {
