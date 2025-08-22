@@ -109,6 +109,7 @@ import AllOpportunities from "@/pages/AllOpportunities";
 import AdminAPIMonetization from "@/pages/admin-api-monetization";
 const AdminMarketing = lazy(() => import("@/pages/admin-marketing"));
 const AdminFlutterAI = lazy(() => import("@/pages/admin-flutterai"));
+const PartnershipAnalyticsDashboard = lazy(() => import("@/pages/PartnershipAnalyticsDashboard"));
 import FlutterBlogBot from "@/pages/flutterblog-bot";
 import MonitoringDashboard from "@/pages/monitoring-dashboard";
 // import FlutterBlogPerformance from "@/pages/FlutterBlog-Performance"; // Temporarily removed due to flashing issue
@@ -189,6 +190,14 @@ function Router() {
           <AdminRouteGuard>
             <SuspenseWrapper>
               <AdminFlutterAI />
+            </SuspenseWrapper>
+          </AdminRouteGuard>
+        )} />
+
+        <Route path="/admin/partnerships-analytics" component={() => (
+          <AdminRouteGuard>
+            <SuspenseWrapper>
+              <PartnershipAnalyticsDashboard />
             </SuspenseWrapper>
           </AdminRouteGuard>
         )} />

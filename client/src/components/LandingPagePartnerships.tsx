@@ -1,6 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent } from "@/components/ui/card";
-import { ExternalLink } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { ExternalLink, TrendingUp } from "lucide-react";
+import { PartnershipAnalytics } from "./PartnershipAnalytics";
 
 interface Partnership {
   id: string;
@@ -134,6 +136,20 @@ export function LandingPagePartnerships() {
             </p>
           </div>
         )}
+
+        {/* Live Analytics Dashboard */}
+        <div className="mt-12">
+          <div className="text-center mb-8">
+            <h3 className="text-2xl font-bold text-white mb-2 flex items-center justify-center gap-2">
+              <TrendingUp className="w-6 h-6 text-electric-green" />
+              Live Partnership Analytics
+            </h3>
+            <p className="text-slate-400">
+              Real-time click tracking and performance metrics
+            </p>
+          </div>
+          <PartnershipAnalytics />
+        </div>
       </div>
     </section>
   );
