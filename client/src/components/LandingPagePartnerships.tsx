@@ -20,7 +20,7 @@ export function LandingPagePartnerships() {
     queryKey: ["/api/partnerships"],
   });
 
-  const partnerships = (partnershipsData?.partnerships || []).filter((p: Partnership) => p.isActive);
+  const partnerships = ((partnershipsData as any)?.partnerships || []).filter((p: Partnership) => p.isActive);
 
   const handlePartnerClick = async (partnership: Partnership) => {
     // Track click analytics
