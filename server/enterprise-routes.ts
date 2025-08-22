@@ -252,3 +252,8 @@ router.get('/dashboard/:clientId', async (req, res) => {
 });
 
 export { router };
+
+// Named export for compatibility with routes.ts
+export function registerEnterpriseRoutes(app: any) {
+  app.use('/api/enterprise', router);
+}

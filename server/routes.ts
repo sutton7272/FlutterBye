@@ -1,5 +1,5 @@
 import type { Express } from "express";
-// Enterprise routes will be loaded dynamically
+import { registerEnterpriseRoutes } from "./enterprise-routes";
 import { createServer, type Server } from "http";
 import { productionConfig } from "./production-config";
 import { mainNetService } from "./mainnet-config";
@@ -11973,8 +11973,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Enterprise Client Management & AI Campaign Intelligence Routes
-  // Temporarily disabled until router export is fixed
-  console.log('🏢 Enterprise routes temporarily disabled - will be enabled after router fix');
+  try {
+    await registerEnterpriseRoutes(app);
+    console.log('🏢 Enterprise Client Management & AI Campaign Intelligence routes activated!');
+  } catch (error) {
+    console.warn('⚠️ Enterprise routes not available:', error.message);
+  }
 
   return httpServer;
 }
