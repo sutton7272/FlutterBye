@@ -864,6 +864,33 @@ export const skyePersonalityProfiles = pgTable("skye_personality_profiles", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
+// Partnership Management System
+export const partnerships = pgTable("partnerships", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  name: text("name").notNull(),
+  description: text("description").notNull(),
+  websiteUrl: text("website_url").notNull(),
+  logoUrl: text("logo_url").notNull(), // Base64 encoded image or URL
+  
+  // Display settings
+  isActive: boolean("is_active").default(true),
+  displayOrder: integer("display_order").default(0), // For ordering on landing page
+  
+  // Partnership details
+  partnershipType: text("partnership_type").default("strategic"), // strategic, technology, marketing, sponsor
+  startDate: timestamp("start_date").defaultNow(),
+  endDate: timestamp("end_date"), // null for ongoing partnerships
+  
+  // Analytics
+  clickCount: integer("click_count").default(0),
+  lastClickedAt: timestamp("last_clicked_at"),
+  
+  // Admin metadata
+  addedBy: varchar("added_by").references(() => users.id),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
 // VIP Waitlist table for persistent storage
 export const vipWaitlist = pgTable("vip_waitlist", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),

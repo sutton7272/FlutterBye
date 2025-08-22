@@ -135,6 +135,20 @@ export default function AdminDashboard() {
       ]
     },
     {
+      id: "partnerships",
+      title: "Partnership Management",
+      description: "Strategic partnership management with clickable landing page integration",
+      icon: Users,
+      route: "/admin/partnerships",
+      color: "electric-purple",
+      features: [
+        "Partnership Creation & Management",
+        "Logo Upload & Display",
+        "Landing Page Integration",
+        "Click Analytics & Tracking"
+      ]
+    },
+    {
       id: "system",
       title: "System Tools",
       description: "System monitoring, maintenance tools, and technical administration",

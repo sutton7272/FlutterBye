@@ -19,6 +19,7 @@ import { MobileOnboardingWizard } from "@/components/mobile-onboarding-wizard";
 import { usePerformance } from "@/hooks/use-performance";
 import { FlutterAIDemoCards } from "@/components/flutterai-demo-cards";
 import { SimpleTestModal } from "@/components/simple-test-modal";
+import { LandingPagePartnerships } from "@/components/LandingPagePartnerships";
 import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 

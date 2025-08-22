@@ -73,6 +73,7 @@ import { AutoMetadataService } from "./auto-metadata-service";
 import FlutterbeyeWebSocketServer from "./websocket-server";
 import { aiAdminService } from "./ai-admin-service";
 import apiMonetizationRoutes from "./api-monetization-routes";
+import partnershipRoutes from "./partnership-routes";
 import seoMarketingRoutes from "./seo-marketing-routes";
 import { aiContentService } from "./ai-content-service";
 import aiEnhancementRoutes from "./ai-enhancement-routes";
@@ -11976,6 +11977,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       affected_items: items.length
     });
   });
+
+  // Partnership Management Routes
+  const { default: partnershipRoutes } = await import("./partnership-routes.js");
+  app.use("/api/partnerships", partnershipRoutes);
 
   // Enterprise Client Management & AI Campaign Intelligence Routes
   try {

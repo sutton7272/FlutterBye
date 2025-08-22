@@ -73,6 +73,7 @@ const SearchPage = lazy(() => import("@/pages/search"));
 const AdminFreeCodes = lazy(() => import("@/pages/admin-free-codes"));
 const AdminPricing = lazy(() => import("@/pages/admin-pricing"));
 const AdminDefaultImage = lazy(() => import("@/pages/admin-default-image"));
+const PartnershipManagementPage = lazy(() => import("@/pages/PartnershipManagementPage"));
 const EnterpriseManagement = lazy(() => import("@/pages/EnterpriseManagement"));
 const VisualTestPage = lazy(() => import("@/pages/VisualTestPage"));
 const AdminCustodialWallet = lazy(() => import("@/pages/admin-custodial-wallet"));
@@ -1058,6 +1059,15 @@ function Router() {
             <AdminCustodialWallet />
           </>
         )} />
+        
+        <Route path="/admin/partnerships" component={() => (
+          <AdminRouteGuard>
+            <SuspenseWrapper>
+              <PartnershipManagementPage />
+            </SuspenseWrapper>
+          </AdminRouteGuard>
+        )} />
+        
         <Route component={NotFound} />
         </Switch>
         </div>
