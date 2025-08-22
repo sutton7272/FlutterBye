@@ -3,58 +3,91 @@ import { randomUUID } from "crypto";
 
 const router = express.Router();
 
-// Mock partnership data (in production, this would be database operations)
+// Mock partnership data with six diverse test partners
 let partnerships: any[] = [
   {
     id: "partnership-001",
     name: "Solana Foundation",
-    description: "Official blockchain partnership providing infrastructure and developer support",
+    description: "Official blockchain partnership providing infrastructure and developer support for Web3 innovation",
     websiteUrl: "https://solana.com",
-    logoUrl: "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgdmlld0JveD0iMCAwIDEwMCAxMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iNTAiIGN5PSI1MCIgcj0iNTAiIGZpbGw9IiM5MUFBM0EiLz48dGV4dCB4PSI1MCIgeT0iNTAiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxOCIgZmlsbD0id2hpdGUiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGR5PSIwLjNlbSI+U09MPC90ZXh0Pjwvc3ZnPg==",
+    logoUrl: "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgdmlld0JveD0iMCAwIDEwMCAxMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iNTAiIGN5PSI1MCIgcj0iNDgiIGZpbGw9IiM5MUFBM0EiLz48cGF0aCBkPSJNMjAgNDBsMjAgLTEwIDIwIDEwdjIwbC0yMCAxMC0yMCAtMTB2LTIweiIgZmlsbD0iI2ZmZiIvPjx0ZXh0IHg9IjUwIiB5PSI3NSIgZm9udC1mYW1pbHk9IkFyaWFsLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjEyIiBmaWxsPSIjZmZmIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj5TT0xBTkE8L3RleHQ+PC9zdmc+",
     isActive: true,
     displayOrder: 1,
     partnershipType: "strategic",
-    startDate: "2024-01-01T00:00:00Z",
-    endDate: null,
-    clickCount: 1247,
-    lastClickedAt: "2024-08-20T14:30:00Z",
-    addedBy: "admin-001",
+    clickCount: 2847,
+    lastClickedAt: "2025-08-22T14:30:00Z",
     createdAt: "2024-01-01T00:00:00Z",
-    updatedAt: "2024-08-20T14:30:00Z"
+    updatedAt: "2025-08-22T14:30:00Z"
   },
   {
-    id: "partnership-002",
-    name: "Phantom Wallet",
-    description: "Leading Solana wallet provider enabling seamless user onboarding",
-    websiteUrl: "https://phantom.app",
-    logoUrl: "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgdmlld0JveD0iMCAwIDEwMCAxMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iNTAiIGN5PSI1MCIgcj0iNTAiIGZpbGw9IiM0QzFFRjUiLz48dGV4dCB4PSI1MCIgeT0iNTAiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNCIgZmlsbD0id2hpdGUiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGR5PSIwLjNlbSI+UEJUTQ==",
+    id: "partnership-002", 
+    name: "Magic Eden",
+    description: "Leading NFT marketplace driving digital asset adoption and creator economy growth",
+    websiteUrl: "https://magiceden.io",
+    logoUrl: "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgdmlld0JveD0iMCAwIDEwMCAxMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iNTAiIGN5PSI1MCIgcj0iNDgiIGZpbGw9IiNFMzMxRTYiLz48cGF0aCBkPSJNMzAgMzBsMjAgMTAgMjAgLTEwdjI1bC0yMCAxMC0yMCAtMTB2LTI1eiIgZmlsbD0iI2ZmZiIvPjx0ZXh0IHg9IjUwIiB5PSI3NSIgZm9udC1mYW1pbHk9IkFyaWFsLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjEwIiBmaWxsPSIjZmZmIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj5NQUdJQzwvdGV4dD48L3N2Zz4=",
     isActive: true,
     displayOrder: 2,
     partnershipType: "technology",
-    startDate: "2024-02-15T00:00:00Z",
-    endDate: null,
-    clickCount: 823,
-    lastClickedAt: "2024-08-19T11:15:00Z",
-    addedBy: "admin-001",
+    clickCount: 1923,
+    lastClickedAt: "2025-08-21T09:15:00Z",
     createdAt: "2024-02-15T00:00:00Z",
-    updatedAt: "2024-08-19T11:15:00Z"
+    updatedAt: "2025-08-21T09:15:00Z"
   },
   {
     id: "partnership-003",
-    name: "OpenAI",
-    description: "AI technology partnership powering FlutterBye's intelligent features",
-    websiteUrl: "https://openai.com",
-    logoUrl: "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgdmlld0JveD0iMCAwIDEwMCAxMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iNTAiIGN5PSI1MCIgcj0iNTAiIGZpbGw9IiMwMEE2RkIiLz48dGV4dCB4PSI1MCIgeT0iNTAiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNCIgZmlsbD0id2hpdGUiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGR5PSIwLjNlbSI+QUk8L3RleHQ+PC9zdmc+",
+    name: "Chainlink Labs",
+    description: "Oracle network powering secure and reliable data feeds for DeFi and Web3 applications",
+    websiteUrl: "https://chainlinklabs.com",
+    logoUrl: "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgdmlld0JveD0iMCAwIDEwMCAxMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iNTAiIGN5PSI1MCIgcj0iNDgiIGZpbGw9IiMyNDU3QUIiLz48cmVjdCB4PSIzNSIgeT0iMzUiIHdpZHRoPSIzMCIgaGVpZ2h0PSIzMCIgZmlsbD0iI2ZmZiIgcng9IjQiLz48Y2lyY2xlIGN4PSI0NSIgY3k9IjQ1IiByPSIzIiBmaWxsPSIjMjQ1N0FCIi8+PGNpcmNsZSBjeD0iNTUiIGN5PSI0NSIgcj0iMyIgZmlsbD0iIzI0NTdBQiIvPjxjaXJjbGUgY3g9IjQ1IiBjeT0iNTUiIHI9IjMiIGZpbGw9IiMyNDU3QUIiLz48Y2lyY2xlIGN4PSI1NSIgY3k9IjU1IiByPSIzIiBmaWxsPSIjMjQ1N0FCIi8+PHRleHQgeD0iNTAiIHk9Ijc4IiBmb250LWZhbWlseT0iQXJpYWwsIHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iOSIgZmlsbD0iI2ZmZiIgdGV4dC1hbmNob3I9Im1pZGRsZSI+Q0hBSU5MSU5LPC90ZXh0Pjwvc3ZnPg==",
     isActive: true,
     displayOrder: 3,
     partnershipType: "technology",
-    startDate: "2024-03-01T00:00:00Z",
-    endDate: null,
-    clickCount: 654,
-    lastClickedAt: "2024-08-18T16:45:00Z",
-    addedBy: "admin-001",
+    clickCount: 1654,
+    lastClickedAt: "2025-08-20T16:45:00Z",
     createdAt: "2024-03-01T00:00:00Z",
-    updatedAt: "2024-08-18T16:45:00Z"
+    updatedAt: "2025-08-20T16:45:00Z"
+  },
+  {
+    id: "partnership-004",
+    name: "Coinbase Ventures",
+    description: "Strategic investment partner supporting the next generation of blockchain innovation and adoption",
+    websiteUrl: "https://ventures.coinbase.com",
+    logoUrl: "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgdmlld0JveD0iMCAwIDEwMCAxMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iNTAiIGN5PSI1MCIgcj0iNDgiIGZpbGw9IiMwMDUyRkYiLz48cmVjdCB4PSI0MCIgeT0iNDAiIHdpZHRoPSIyMCIgaGVpZ2h0PSIyMCIgZmlsbD0iI2ZmZiIgcng9IjEwIi8+PHRleHQgeD0iNTAiIHk9Ijc1IiBmb250LWZhbWlseT0iQXJpYWwsIHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iOSIgZmlsbD0iI2ZmZiIgdGV4dC1hbmNob3I9Im1pZGRsZSI+Q09JTkJBU0U8L3RleHQ+PC9zdmc+",
+    isActive: true,
+    displayOrder: 4,
+    partnershipType: "sponsor",
+    clickCount: 1287,
+    lastClickedAt: "2025-08-19T12:20:00Z",
+    createdAt: "2024-04-10T00:00:00Z",
+    updatedAt: "2025-08-19T12:20:00Z"
+  },
+  {
+    id: "partnership-005",
+    name: "ConsenSys",
+    description: "Ethereum infrastructure leader building the foundational tools for decentralized applications",
+    websiteUrl: "https://consensys.net",
+    logoUrl: "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgdmlld0JveD0iMCAwIDEwMCAxMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iNTAiIGN5PSI1MCIgcj0iNDgiIGZpbGw9IiMzMjU5RDEiLz48cG9seWdvbiBwb2ludHM9IjM1LDM1IDY1LDM1IDU3LjUsNTAgNjUsNjUgMzUsNjUgNDIuNSw1MCIgZmlsbD0iI2ZmZiIvPjx0ZXh0IHg9IjUwIiB5PSI3OCIgZm9udC1mYW1pbHk9IkFyaWFsLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjgiIGZpbGw9IiNmZmYiIHRleHQtYW5jaG9yPSJtaWRkbGUiPkNPTlNFTlNZUzwvdGV4dD48L3N2Zz4=",
+    isActive: true,
+    displayOrder: 5,
+    partnershipType: "strategic",
+    clickCount: 945,
+    lastClickedAt: "2025-08-18T08:30:00Z",
+    createdAt: "2024-05-20T00:00:00Z",
+    updatedAt: "2025-08-18T08:30:00Z"
+  },
+  {
+    id: "partnership-006",
+    name: "Helius",
+    description: "High-performance Solana RPC provider enabling scalable dApp development with superior reliability",
+    websiteUrl: "https://helius.xyz",
+    logoUrl: "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgdmlld0JveD0iMCAwIDEwMCAxMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi0vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iNTAiIGN5PSI1MCIgcj0iNDgiIGZpbGw9IiNGRjcwMDAiLz48Y2lyY2xlIGN4PSI1MCIgY3k9IjQwIiByPSI4IiBmaWxsPSIjZmZmIi8+PGNpcmNsZSBjeD0iNDAiIGN5PSI1NSIgcj0iNiIgZmlsbD0iI2ZmZiIvPjxjaXJjbGUgY3g9IjYwIiBjeT0iNTUiIHI9IjYiIGZpbGw9IiNmZmYiLz48dGV4dCB4PSI1MCIgeT0iNzgiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMCIgZmlsbD0iI2ZmZiIgdGV4dC1hbmNob3I9Im1pZGRsZSI+SEVMSVVTPC90ZXh0Pjwvc3ZnPg==",
+    isActive: true,
+    displayOrder: 6,
+    partnershipType: "technology",
+    clickCount: 721,
+    lastClickedAt: "2025-08-17T15:45:00Z",
+    createdAt: "2024-06-15T00:00:00Z",
+    updatedAt: "2025-08-17T15:45:00Z"
   }
 ];
 

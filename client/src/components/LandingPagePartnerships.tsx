@@ -15,11 +15,11 @@ interface Partnership {
 }
 
 export function LandingPagePartnerships() {
-  const { data: partnershipsResponse, isLoading } = useQuery({
-    queryKey: ["/api/partnerships", "active"],
+  const { data: partnershipsData, isLoading } = useQuery({
+    queryKey: ["/api/partnerships"],
   });
 
-  const partnerships = (partnershipsResponse?.partnerships || []).filter((p: Partnership) => p.isActive);
+  const partnerships = (partnershipsData?.partnerships || []).filter((p: Partnership) => p.isActive);
 
   const handlePartnerClick = async (partnership: Partnership) => {
     // Track click analytics
