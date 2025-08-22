@@ -72,6 +72,33 @@ export default function WalletManagement() {
     }
   });
 
+  // Fetch payment collection wallets
+  const { data: paymentData, isLoading: paymentLoading } = useQuery({
+    queryKey: ["/api/payment/wallets"],
+    queryFn: async () => {
+      const response = await apiRequest("GET", "/api/payment/wallets");
+      return response.json();
+    }
+  });
+
+  // Fetch attached value escrows
+  const { data: attachedValueData, isLoading: attachedValueLoading } = useQuery({
+    queryKey: ["/api/attached-value/escrows"],
+    queryFn: async () => {
+      const response = await apiRequest("GET", "/api/attached-value/escrows");
+      return response.json();
+    }
+  });
+
+  // Fetch comprehensive overview
+  const { data: overviewData, isLoading: overviewLoading } = useQuery({
+    queryKey: ["/api/wallet/comprehensive-overview"],
+    queryFn: async () => {
+      const response = await apiRequest("GET", "/api/wallet/comprehensive-overview");
+      return response.json();
+    }
+  });
+
   // Create escrow contract mutation
   const createEscrowMutation = useMutation({
     mutationFn: (data: { amount: number; description: string }) =>
@@ -117,12 +144,17 @@ export default function WalletManagement() {
 
   const escrowContracts: EscrowContract[] = escrowData?.contracts || [];
   const custodialWallets: CustodialWallet[] = custodialData?.wallets || [];
+  const paymentWallets = paymentData?.wallets || [];
+  const attachedValueEscrows = attachedValueData?.escrows || [];
 
-  // Calculate overview stats
+  // Calculate comprehensive overview stats
   const totalEscrowValue = escrowContracts.reduce((sum, contract) => sum + contract.amount, 0);
   const totalCustodialBalance = custodialWallets.reduce((sum, wallet) => sum + wallet.balance, 0);
+  const totalPaymentBalance = paymentWallets.reduce((sum, wallet) => sum + wallet.balance, 0);
+  const totalAttachedValue = attachedValueEscrows.filter(e => e.status === 'escrowed').reduce((sum, escrow) => sum + escrow.attachedValue, 0);
   const activeContracts = escrowContracts.filter(c => c.status === 'active').length;
   const activeWallets = custodialWallets.filter(w => w.status === 'active').length;
+  const activeEscrows = attachedValueEscrows.filter(e => e.status === 'escrowed').length;
 
   const handleCreateEscrow = () => {
     const amount = parseFloat(newEscrowAmount);
@@ -190,6 +222,12 @@ export default function WalletManagement() {
               <TabsTrigger value="custodial" className="data-[state=active]:bg-blue-600">
                 Custodial Wallets
               </TabsTrigger>
+              <TabsTrigger value="payment" className="data-[state=active]:bg-blue-600">
+                Payment Collection
+              </TabsTrigger>
+              <TabsTrigger value="attached-value" className="data-[state=active]:bg-blue-600">
+                Attached Value Escrow
+              </TabsTrigger>
               <TabsTrigger value="management" className="data-[state=active]:bg-blue-600">
                 Create & Manage
               </TabsTrigger>
@@ -202,12 +240,13 @@ export default function WalletManagement() {
                   <CardContent className="p-6">
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-slate-400 text-sm">Total Escrow Value</p>
+                        <p className="text-slate-400 text-sm">Payment Collection</p>
                         <p className="text-2xl font-bold text-green-400">
-                          ${totalEscrowValue.toLocaleString()}
+                          ${totalPaymentBalance.toLocaleString()}
                         </p>
+                        <p className="text-xs text-slate-500">FlutterBye Revenue</p>
                       </div>
-                      <Shield className="h-8 w-8 text-green-400" />
+                      <DollarSign className="h-8 w-8 text-green-400" />
                     </div>
                   </CardContent>
                 </Card>
@@ -216,40 +255,83 @@ export default function WalletManagement() {
                   <CardContent className="p-6">
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-slate-400 text-sm">Custodial Balance</p>
+                        <p className="text-slate-400 text-sm">Attached Value Escrow</p>
+                        <p className="text-2xl font-bold text-purple-400">
+                          ${totalAttachedValue.toLocaleString()}
+                        </p>
+                        <p className="text-xs text-slate-500">{activeEscrows} Active</p>
+                      </div>
+                      <Shield className="h-8 w-8 text-purple-400" />
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card className="bg-slate-800 border-slate-700">
+                  <CardContent className="p-6">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-slate-400 text-sm">Enterprise Contracts</p>
+                        <p className="text-2xl font-bold text-orange-400">
+                          ${totalEscrowValue.toLocaleString()}
+                        </p>
+                        <p className="text-xs text-slate-500">{activeContracts} Active</p>
+                      </div>
+                      <CheckCircle className="h-8 w-8 text-orange-400" />
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card className="bg-slate-800 border-slate-700">
+                  <CardContent className="p-6">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-slate-400 text-sm">Custodial Wallets</p>
                         <p className="text-2xl font-bold text-blue-400">
                           ${totalCustodialBalance.toLocaleString()}
                         </p>
+                        <p className="text-xs text-slate-500">{activeWallets} Active</p>
                       </div>
                       <Wallet className="h-8 w-8 text-blue-400" />
                     </div>
                   </CardContent>
                 </Card>
-
-                <Card className="bg-slate-800 border-slate-700">
-                  <CardContent className="p-6">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="text-slate-400 text-sm">Active Contracts</p>
-                        <p className="text-2xl font-bold">{activeContracts}</p>
-                      </div>
-                      <CheckCircle className="h-8 w-8 text-green-400" />
-                    </div>
-                  </CardContent>
-                </Card>
-
-                <Card className="bg-slate-800 border-slate-700">
-                  <CardContent className="p-6">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="text-slate-400 text-sm">Active Wallets</p>
-                        <p className="text-2xl font-bold">{activeWallets}</p>
-                      </div>
-                      <Users className="h-8 w-8 text-blue-400" />
-                    </div>
-                  </CardContent>
-                </Card>
               </div>
+
+              {/* FlutterBye Platform Revenue Summary */}
+              <Card className="bg-slate-800 border-slate-700">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <TrendingUp className="h-5 w-5 text-green-400" />
+                    FlutterBye Platform Revenue Summary
+                  </CardTitle>
+                  <CardDescription>
+                    Complete overview of all FlutterBye payment collection and value escrow systems
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div className="space-y-2">
+                      <h4 className="font-semibold text-green-400">Total Platform Value</h4>
+                      <p className="text-3xl font-bold">
+                        ${(totalPaymentBalance + totalAttachedValue + totalEscrowValue + totalCustodialBalance).toLocaleString()}
+                      </p>
+                      <p className="text-sm text-slate-400">Across all wallet systems</p>
+                    </div>
+                    <div className="space-y-2">
+                      <h4 className="font-semibold text-blue-400">Active Operations</h4>
+                      <p className="text-3xl font-bold">
+                        {paymentWallets.length + activeEscrows + activeContracts + activeWallets}
+                      </p>
+                      <p className="text-sm text-slate-400">Combined active entities</p>
+                    </div>
+                    <div className="space-y-2">
+                      <h4 className="font-semibold text-purple-400">Security Rating</h4>
+                      <p className="text-3xl font-bold">AAA</p>
+                      <p className="text-sm text-slate-400">Bank-level security</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
 
               {/* Quick Actions */}
               <Card className="bg-slate-800 border-slate-700">
@@ -284,6 +366,192 @@ export default function WalletManagement() {
                       View Reports
                     </Button>
                   </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            {/* Payment Collection Tab */}
+            <TabsContent value="payment" className="space-y-6">
+              <Card className="bg-slate-800 border-slate-700">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <DollarSign className="h-5 w-5 text-green-400" />
+                    FlutterBye Payment Collection Wallets
+                  </CardTitle>
+                  <CardDescription>
+                    Main payment collection wallets for all FlutterBye products and services
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  {paymentLoading ? (
+                    <div className="flex items-center justify-center py-8">
+                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-400"></div>
+                    </div>
+                  ) : (
+                    <div className="space-y-4">
+                      {paymentWallets.map((wallet) => (
+                        <Card key={wallet.id} className="bg-slate-700 border-slate-600">
+                          <CardContent className="p-4">
+                            <div className="flex items-center justify-between">
+                              <div className="flex-1">
+                                <h4 className="font-semibold text-lg">{wallet.purpose}</h4>
+                                <p className="text-sm text-slate-400 font-mono">
+                                  {wallet.walletAddress.slice(0, 20)}...{wallet.walletAddress.slice(-8)}
+                                </p>
+                                <div className="flex items-center gap-4 mt-2">
+                                  <div>
+                                    <p className="text-sm text-slate-400">Current Balance</p>
+                                    <p className="font-bold text-lg">
+                                      {wallet.currency === 'FLBY' 
+                                        ? `${wallet.balance.toLocaleString()} FLBY`
+                                        : `$${wallet.balance.toLocaleString()}`
+                                      }
+                                    </p>
+                                  </div>
+                                  <div>
+                                    <p className="text-sm text-slate-400">Total Collected</p>
+                                    <p className="font-bold text-green-400">
+                                      {wallet.currency === 'FLBY' 
+                                        ? `${wallet.totalCollected.toLocaleString()} FLBY`
+                                        : `$${wallet.totalCollected.toLocaleString()}`
+                                      }
+                                    </p>
+                                  </div>
+                                  <div>
+                                    <p className="text-sm text-slate-400">Monthly Volume</p>
+                                    <p className="font-bold text-blue-400">
+                                      {wallet.currency === 'FLBY' 
+                                        ? `${wallet.monthlyVolume.toLocaleString()} FLBY`
+                                        : `$${wallet.monthlyVolume.toLocaleString()}`
+                                      }
+                                    </p>
+                                  </div>
+                                </div>
+                                <div className="mt-3">
+                                  <p className="text-sm text-slate-400">Associated Products:</p>
+                                  <div className="flex flex-wrap gap-1 mt-1">
+                                    {wallet.associatedProducts.map((product, index) => (
+                                      <span key={index} className="px-2 py-1 bg-blue-600 text-xs rounded">
+                                        {product}
+                                      </span>
+                                    ))}
+                                  </div>
+                                </div>
+                              </div>
+                              <div className="text-right">
+                                <div className={`inline-block px-3 py-1 rounded-full text-sm ${
+                                  wallet.status === 'active' 
+                                    ? 'bg-green-600 text-green-100' 
+                                    : 'bg-red-600 text-red-100'
+                                }`}>
+                                  {wallet.status}
+                                </div>
+                                {wallet.isMainWallet && (
+                                  <p className="text-xs text-yellow-400 mt-1">Main Wallet</p>
+                                )}
+                              </div>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      ))}
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            {/* Attached Value Escrow Tab */}
+            <TabsContent value="attached-value" className="space-y-6">
+              <Card className="bg-slate-800 border-slate-700">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Shield className="h-5 w-5 text-purple-400" />
+                    Attached Value Escrow System
+                  </CardTitle>
+                  <CardDescription>
+                    Escrow wallets holding attached values for FlutterBye minted tokens
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  {attachedValueLoading ? (
+                    <div className="flex items-center justify-center py-8">
+                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-400"></div>
+                    </div>
+                  ) : (
+                    <div className="space-y-4">
+                      {attachedValueEscrows.map((escrow) => (
+                        <Card key={escrow.id} className="bg-slate-700 border-slate-600">
+                          <CardContent className="p-4">
+                            <div className="flex items-center justify-between">
+                              <div className="flex-1">
+                                <div className="flex items-center gap-2">
+                                  <h4 className="font-semibold">{escrow.message.slice(0, 50)}...</h4>
+                                  <div className={`px-2 py-1 rounded-full text-xs ${
+                                    escrow.status === 'escrowed' 
+                                      ? 'bg-purple-600 text-purple-100'
+                                      : escrow.status === 'redeemed'
+                                      ? 'bg-green-600 text-green-100'
+                                      : 'bg-gray-600 text-gray-100'
+                                  }`}>
+                                    {escrow.status}
+                                  </div>
+                                </div>
+                                <p className="text-sm text-slate-400 font-mono mt-1">
+                                  Token: {escrow.tokenId}
+                                </p>
+                                <p className="text-sm text-slate-400 font-mono">
+                                  Escrow: {escrow.escrowWallet.slice(0, 20)}...{escrow.escrowWallet.slice(-8)}
+                                </p>
+                                <div className="flex items-center gap-6 mt-3">
+                                  <div>
+                                    <p className="text-sm text-slate-400">Attached Value</p>
+                                    <p className="font-bold text-lg text-purple-400">
+                                      ${escrow.attachedValue} {escrow.currency}
+                                    </p>
+                                  </div>
+                                  <div>
+                                    <p className="text-sm text-slate-400">Creator</p>
+                                    <p className="text-sm font-mono">
+                                      {escrow.creatorWallet.slice(0, 12)}...{escrow.creatorWallet.slice(-6)}
+                                    </p>
+                                  </div>
+                                  {escrow.recipientWallet && (
+                                    <div>
+                                      <p className="text-sm text-slate-400">Recipient</p>
+                                      <p className="text-sm font-mono">
+                                        {escrow.recipientWallet.slice(0, 12)}...{escrow.recipientWallet.slice(-6)}
+                                      </p>
+                                    </div>
+                                  )}
+                                  <div>
+                                    <p className="text-sm text-slate-400">Expires</p>
+                                    <p className="text-sm">
+                                      {new Date(escrow.expiresAt).toLocaleDateString()}
+                                    </p>
+                                  </div>
+                                </div>
+                                {escrow.redemptionCode && (
+                                  <div className="mt-2">
+                                    <p className="text-sm text-slate-400">Redemption Code</p>
+                                    <p className="font-mono text-sm bg-slate-600 px-2 py-1 rounded inline-block">
+                                      {escrow.redemptionCode}
+                                    </p>
+                                  </div>
+                                )}
+                                {escrow.redeemedAt && (
+                                  <div className="mt-2">
+                                    <p className="text-sm text-green-400">
+                                      Redeemed on {new Date(escrow.redeemedAt).toLocaleString()}
+                                    </p>
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      ))}
+                    </div>
+                  )}
                 </CardContent>
               </Card>
             </TabsContent>
