@@ -71,6 +71,7 @@ import { AutoMetadataService } from "./auto-metadata-service";
 import FlutterbeyeWebSocketServer from "./websocket-server";
 import { aiAdminService } from "./ai-admin-service";
 import apiMonetizationRoutes from "./api-monetization-routes";
+import seoMarketingRoutes from "./seo-marketing-routes";
 import { aiContentService } from "./ai-content-service";
 import aiEnhancementRoutes from "./ai-enhancement-routes";
 import comprehensiveAIEnhancementRoutes from "./comprehensive-ai-enhancement-routes";
@@ -5371,6 +5372,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // Register FlutterAI Pricing and Monetization routes
   app.use("/api/flutterai", flutterAIPricingRoutes);
+  
+  // SEO & Marketing Intelligence routes
+  app.use('/api/seo-marketing', seoMarketingRoutes);
+  console.log('🧠 SEO & Marketing Intelligence API routes activated!');
   
   // Register Enterprise Sales and API Monetization routes
   app.use('/api', apiMonetizationRoutes);

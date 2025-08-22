@@ -118,6 +118,7 @@ import NFTMarketplace from "@/pages/nft-marketplace";
 import AIShowcase from "@/pages/ai-showcase";
 import { LivingAIPage } from "@/pages/living-ai";
 import AIComprehensiveOverview from "@/pages/ai-comprehensive-overview";
+import MarketingIntelligence from "@/pages/MarketingIntelligence";
 import RevolutionaryAIShowcase from "@/pages/revolutionary-ai-showcase";
 import AIFeaturesTest from "@/pages/ai-features-test";
 import DynamicPricingDashboard from "@/pages/dynamic-pricing-dashboard";
@@ -283,6 +284,14 @@ function Router() {
             <Navbar />
             <SuspenseWrapper>
               <Intelligence />
+            </SuspenseWrapper>
+          </>
+        )} />
+        <Route path="/marketing-intelligence" component={() => (
+          <>
+            <Navbar />
+            <SuspenseWrapper>
+              <MarketingIntelligence />
             </SuspenseWrapper>
           </>
         )} />
