@@ -9,9 +9,10 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
-import { Brain, Database, Search, Plus, TrendingUp, Users, Activity, Zap, Download, BarChart3 } from "lucide-react";
+import { Brain, Database, Search, Plus, TrendingUp, Users, Activity, Zap, Download, BarChart3, Building2 } from "lucide-react";
 import FlutterAIDashboard from "./flutterai-dashboard";
 import MarketingIntelligence from "./MarketingIntelligence";
+import EnterpriseManagement from "./EnterpriseManagement";
 
 interface WalletIntelligence {
   id: string;
@@ -634,7 +635,7 @@ export default function AdminFlutterAI() {
         </div>
 
         <Tabs defaultValue="flutterai" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-3 bg-slate-800">
+          <TabsList className="grid w-full grid-cols-4 bg-slate-800">
             <TabsTrigger value="flutterai" className="data-[state=active]:bg-blue-600">
               FlutterAI Analysis System
             </TabsTrigger>
@@ -643,6 +644,9 @@ export default function AdminFlutterAI() {
             </TabsTrigger>
             <TabsTrigger value="marketing" className="data-[state=active]:bg-blue-600">
               SEO & Marketing Intelligence
+            </TabsTrigger>
+            <TabsTrigger value="enterprise" className="data-[state=active]:bg-blue-600">
+              Enterprise Management
             </TabsTrigger>
           </TabsList>
 
@@ -674,6 +678,28 @@ export default function AdminFlutterAI() {
               </CardHeader>
               <CardContent>
                 <MarketingIntelligence />
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Enterprise Management Tab */}
+          <TabsContent value="enterprise">
+            <Card className="bg-slate-800 border-slate-700">
+              <CardHeader>
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-blue-600 rounded-lg">
+                    <Building2 className="h-6 w-6" />
+                  </div>
+                  <div>
+                    <CardTitle className="text-white">Enterprise Client Management & AI Campaign Intelligence</CardTitle>
+                    <CardDescription className="text-slate-300">
+                      Manage high-value enterprise contracts ($50K-500K+ annually) with advanced AI campaign intelligence
+                    </CardDescription>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <EnterpriseManagement />
               </CardContent>
             </Card>
           </TabsContent>

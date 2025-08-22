@@ -297,14 +297,7 @@ function Router() {
           </>
         )} />
         
-        <Route path="/enterprise-management" component={() => (
-          <EarlyAccessGuard>
-            <Navbar />
-            <SuspenseWrapper>
-              <EnterpriseManagement />
-            </SuspenseWrapper>
-          </EarlyAccessGuard>
-        )} />
+
         
         {/* Legacy routes for backward compatibility */}
         <Route path="/home" component={() => (
