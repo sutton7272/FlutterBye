@@ -55,9 +55,9 @@ export default function Footer() {
               <span className="hidden md:inline">Tokenized Messaging Platform</span>
             </div>
             <div className="flex items-center gap-4">
-              <a href="/privacy" className="hover:text-electric-blue transition-colors">Privacy Policy</a>
+              <a href="/privacy-policy" className="hover:text-electric-blue transition-colors">Privacy Policy</a>
               <span className="text-electric-blue/40">•</span>
-              <a href="/terms" className="hover:text-electric-blue transition-colors">Terms of Service</a>
+              <a href="/terms-of-service" className="hover:text-electric-blue transition-colors">Terms of Service</a>
               <span className="text-electric-blue/40">•</span>
               <a href="/contact" className="hover:text-electric-blue transition-colors">Contact</a>
             </div>

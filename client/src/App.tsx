@@ -110,6 +110,9 @@ import AdminAPIMonetization from "@/pages/admin-api-monetization";
 const AdminMarketing = lazy(() => import("@/pages/admin-marketing"));
 const AdminFlutterAI = lazy(() => import("@/pages/admin-flutterai"));
 const PartnershipAnalyticsDashboard = lazy(() => import("@/pages/PartnershipAnalyticsDashboard"));
+const PrivacyPolicy = lazy(() => import("@/pages/PrivacyPolicy"));
+const TermsOfService = lazy(() => import("@/pages/TermsOfService"));
+const Contact = lazy(() => import("@/pages/Contact"));
 import FlutterBlogBot from "@/pages/flutterblog-bot";
 import MonitoringDashboard from "@/pages/monitoring-dashboard";
 // import FlutterBlogPerformance from "@/pages/FlutterBlog-Performance"; // Temporarily removed due to flashing issue
@@ -200,6 +203,25 @@ function Router() {
               <PartnershipAnalyticsDashboard />
             </SuspenseWrapper>
           </AdminRouteGuard>
+        )} />
+
+        {/* Legal Pages */}
+        <Route path="/privacy-policy" component={() => (
+          <SuspenseWrapper>
+            <PrivacyPolicy />
+          </SuspenseWrapper>
+        )} />
+        
+        <Route path="/terms-of-service" component={() => (
+          <SuspenseWrapper>
+            <TermsOfService />
+          </SuspenseWrapper>
+        )} />
+        
+        <Route path="/contact" component={() => (
+          <SuspenseWrapper>
+            <Contact />
+          </SuspenseWrapper>
         )} />
         
         <Route path="/social-automation" component={() => (
