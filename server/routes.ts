@@ -1,5 +1,6 @@
 import type { Express } from "express";
 import { registerEnterpriseRoutes } from "./enterprise-routes";
+import walletRoutes from "./wallet-routes";
 import { createServer, type Server } from "http";
 import { productionConfig } from "./production-config";
 import { mainNetService } from "./mainnet-config";
@@ -5333,6 +5334,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   registerCostEffectiveAIRoutes(app);
   
   registerFlutterAIWalletRoutes(app);
+  
+  // Wallet Management Routes
+  app.use('/api', walletRoutes);
+  console.log('💰 Comprehensive Wallet Management routes activated!');
   
   // Enterprise FlutterAI Routes - temporarily disabled
   // const enterpriseRoutes = await import('./enterprise-routes');
