@@ -46,6 +46,7 @@ import { FlutterAIInteractiveDemo } from "@/components/flutterai-interactive-dem
 import { FlutterAIAnimatedTutorial } from "@/components/flutterai-animated-tutorial";
 import { InteractiveTutorial } from "@/components/interactive-tutorial";
 import { DevNetNavigation } from "@/components/devnet-navigation";
+import { LandingPagePartnerships } from "@/components/LandingPagePartnerships";
 
 interface TimeLeft {
   days: number;
@@ -818,6 +819,8 @@ export default function LaunchCountdown() {
           </Card>
         </div>
         
+        {/* Strategic Partnerships Section */}
+        <LandingPagePartnerships />
 
       </div>
     </div>
