@@ -451,15 +451,24 @@ export default function LaunchCountdown() {
             Revolutionary blockchain communication platform transforming messages into valuable, tradeable digital assets
           </p>
           <div className="mt-8 flex items-center justify-center gap-6">
-            <Badge className="bg-electric-blue/20 text-electric-blue border-electric-blue/30 px-4 py-2 text-sm">
+            <a 
+              href="/quantum-pioneer" 
+              className="bg-electric-blue/20 text-electric-blue border-electric-blue/30 px-4 py-2 text-sm border rounded-full hover:bg-electric-blue/30 transition-all duration-200 cursor-pointer"
+            >
               🚀 Quantum Pioneer Platform
-            </Badge>
-            <Badge className="bg-electric-green/20 text-electric-green border-electric-green/30 px-4 py-2 text-sm">
-              🎯 $250M+ ARR Target
-            </Badge>
-            <Badge className="bg-purple-400/20 text-purple-400 border-purple-400/30 px-4 py-2 text-sm">
+            </a>
+            <a 
+              href="/revenue-target" 
+              className="bg-electric-green/20 text-electric-green border-electric-green/30 px-4 py-2 text-sm border rounded-full hover:bg-electric-green/30 transition-all duration-200 cursor-pointer"
+            >
+              🎯 $200M ARR Target
+            </a>
+            <a 
+              href="/flutterai-intelligence" 
+              className="bg-purple-400/20 text-purple-400 border-purple-400/30 px-4 py-2 text-sm border rounded-full hover:bg-purple-400/30 transition-all duration-200 cursor-pointer"
+            >
               🧠 FlutterAI Intelligence
-            </Badge>
+            </a>
           </div>
         </div>
         

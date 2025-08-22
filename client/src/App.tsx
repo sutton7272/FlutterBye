@@ -113,6 +113,9 @@ const PartnershipAnalyticsDashboard = lazy(() => import("@/pages/PartnershipAnal
 const PrivacyPolicy = lazy(() => import("@/pages/PrivacyPolicy"));
 const TermsOfService = lazy(() => import("@/pages/TermsOfService"));
 const Contact = lazy(() => import("@/pages/Contact"));
+const QuantumPioneerShowcase = lazy(() => import("@/pages/QuantumPioneerShowcase"));
+const RevenueTargetShowcase = lazy(() => import("@/pages/RevenueTargetShowcase"));
+const FlutterAIShowcase = lazy(() => import("@/pages/FlutterAIShowcase"));
 import FlutterBlogBot from "@/pages/flutterblog-bot";
 import MonitoringDashboard from "@/pages/monitoring-dashboard";
 // import FlutterBlogPerformance from "@/pages/FlutterBlog-Performance"; // Temporarily removed due to flashing issue
@@ -221,6 +224,25 @@ function Router() {
         <Route path="/contact" component={() => (
           <SuspenseWrapper>
             <Contact />
+          </SuspenseWrapper>
+        )} />
+
+        {/* Showcase Pages */}
+        <Route path="/quantum-pioneer" component={() => (
+          <SuspenseWrapper>
+            <QuantumPioneerShowcase />
+          </SuspenseWrapper>
+        )} />
+        
+        <Route path="/revenue-target" component={() => (
+          <SuspenseWrapper>
+            <RevenueTargetShowcase />
+          </SuspenseWrapper>
+        )} />
+        
+        <Route path="/flutterai-intelligence" component={() => (
+          <SuspenseWrapper>
+            <FlutterAIShowcase />
           </SuspenseWrapper>
         )} />
         
