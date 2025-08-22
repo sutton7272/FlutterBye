@@ -136,8 +136,8 @@ export default function AdminDashboard() {
     },
     {
       id: "partnerships",
-      title: "Partnership Management",
-      description: "Strategic partnership management with clickable landing page integration",
+      title: "Partnership Management & Analytics",
+      description: "Strategic partnership management with real-time click tracking and performance analytics",
       icon: Users,
       route: "/admin/partnerships",
       color: "electric-purple",
@@ -145,8 +145,13 @@ export default function AdminDashboard() {
         "Partnership Creation & Management",
         "Logo Upload & Display",
         "Landing Page Integration",
-        "Click Analytics & Tracking"
-      ]
+        "Real-time Click Analytics"
+      ],
+      additionalRoute: {
+        label: "Analytics Dashboard",
+        route: "/admin/partnerships-analytics",
+        description: "Comprehensive analytics"
+      }
     },
     {
       id: "system",
@@ -407,15 +412,29 @@ export default function AdminDashboard() {
                       ))}
                     </div>
 
-                    {/* Action Button */}
-                    <Button
-                      onClick={() => setLocation(card.route)}
-                      className={`w-full ${colors.gradient} hover:opacity-90 transition-all duration-300 border-2 ${colors.borderHover} relative overflow-hidden group`}
-                    >
-                      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
-                      Access {card.title}
-                      <IconComponent className="w-4 h-4 ml-2" />
-                    </Button>
+                    {/* Action Buttons */}
+                    <div className="space-y-2">
+                      <Button
+                        onClick={() => setLocation(card.route)}
+                        className={`w-full ${colors.gradient} hover:opacity-90 transition-all duration-300 border-2 ${colors.borderHover} relative overflow-hidden group`}
+                      >
+                        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
+                        Access {card.title}
+                        <IconComponent className="w-4 h-4 ml-2" />
+                      </Button>
+                      
+                      {/* Additional action for partnerships */}
+                      {(card as any).additionalRoute && (
+                        <Button
+                          onClick={() => setLocation((card as any).additionalRoute.route)}
+                          variant="outline"
+                          className={`w-full ${colors.borderHover} text-slate-300 hover:text-white transition-all duration-300`}
+                        >
+                          <BarChart3 className="w-4 h-4 mr-2" />
+                          {(card as any).additionalRoute.label}
+                        </Button>
+                      )}
+                    </div>
                   </CardContent>
                 </Card>
               );
