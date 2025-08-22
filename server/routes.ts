@@ -1,4 +1,5 @@
 import type { Express } from "express";
+// Enterprise routes will be loaded dynamically
 import { createServer, type Server } from "http";
 import { productionConfig } from "./production-config";
 import { mainNetService } from "./mainnet-config";
@@ -5333,9 +5334,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   registerFlutterAIWalletRoutes(app);
   
-  // Enterprise FlutterAI Routes
-  const enterpriseRoutes = await import('./enterprise-routes');
-  app.use('/api/flutterai/enterprise', enterpriseRoutes.default);
+  // Enterprise FlutterAI Routes - temporarily disabled
+  // const enterpriseRoutes = await import('./enterprise-routes');
+  // app.use('/api/flutterai/enterprise', enterpriseRoutes.default);
+  console.log('🏢 Enterprise FlutterAI routes temporarily disabled');
   
   // === FLUTTERAI COMPREHENSIVE INTELLIGENCE ROUTES ===
   // Revolutionary Social Credit Score System
@@ -11969,6 +11971,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       affected_items: items.length
     });
   });
+
+  // Enterprise Client Management & AI Campaign Intelligence Routes
+  // Temporarily disabled until router export is fixed
+  console.log('🏢 Enterprise routes temporarily disabled - will be enabled after router fix');
 
   return httpServer;
 }
