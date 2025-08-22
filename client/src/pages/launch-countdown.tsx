@@ -453,19 +453,19 @@ export default function LaunchCountdown() {
           <div className="mt-8 flex items-center justify-center gap-6">
             <a 
               href="/quantum-pioneer" 
-              className="bg-electric-blue/20 text-electric-blue border-electric-blue/30 px-4 py-2 text-sm border rounded-full hover:bg-electric-blue/30 transition-all duration-200 cursor-pointer"
+              className="bg-electric-blue/40 text-white border-electric-blue/50 px-4 py-2 text-sm border rounded-full hover:bg-electric-blue/60 transition-all duration-200 cursor-pointer font-medium shadow-lg"
             >
               🚀 Quantum Pioneer Platform
             </a>
             <a 
               href="/revenue-target" 
-              className="bg-electric-green/20 text-electric-green border-electric-green/30 px-4 py-2 text-sm border rounded-full hover:bg-electric-green/30 transition-all duration-200 cursor-pointer"
+              className="bg-electric-green/40 text-white border-electric-green/50 px-4 py-2 text-sm border rounded-full hover:bg-electric-green/60 transition-all duration-200 cursor-pointer font-medium shadow-lg"
             >
               🎯 $200M ARR Target
             </a>
             <a 
               href="/flutterai-intelligence" 
-              className="bg-purple-400/20 text-purple-400 border-purple-400/30 px-4 py-2 text-sm border rounded-full hover:bg-purple-400/30 transition-all duration-200 cursor-pointer"
+              className="bg-purple-400/40 text-white border-purple-400/50 px-4 py-2 text-sm border rounded-full hover:bg-purple-400/60 transition-all duration-200 cursor-pointer font-medium shadow-lg"
             >
               🧠 FlutterAI Intelligence
             </a>
