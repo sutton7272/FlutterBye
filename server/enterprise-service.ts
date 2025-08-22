@@ -68,22 +68,27 @@ export class EnterpriseService {
 
   // Campaign Intelligence
   async createCampaign(data: InsertCampaignIntelligence): Promise<CampaignIntelligence> {
-    // Generate AI predictions
-    const aiPredictions = await this.generateCampaignPredictions(data);
-    
-    const [campaign] = await db
-      .insert(campaignIntelligence)
-      .values({
-        ...data,
-        aiPredictions,
-        performanceScore: aiPredictions.expectedScore || 75,
-      })
-      .returning();
-    
-    // Generate initial recommendations
-    await this.generateCampaignRecommendations(campaign.id);
-    
-    return campaign;
+    try {
+      // Generate AI predictions
+      const aiPredictions = await this.generateCampaignPredictions(data);
+      
+      const [campaign] = await db
+        .insert(campaignIntelligence)
+        .values({
+          ...data,
+          aiPredictions,
+          performanceScore: aiPredictions.expectedScore || 75,
+        })
+        .returning();
+      
+      // Generate initial recommendations asynchronously to avoid blocking
+      this.generateCampaignRecommendations(campaign.id).catch(console.error);
+      
+      return campaign;
+    } catch (error) {
+      console.error('Campaign creation error:', error);
+      throw new Error('Failed to create campaign: ' + (error as Error).message);
+    }
   }
 
   async getCampaignsByClient(clientId: string): Promise<CampaignIntelligence[]> {
@@ -264,9 +269,8 @@ export class EnterpriseService {
       clientId,
       endpoint,
       method,
-      responseTime,
-      statusCode,
-      errorRate: statusCode >= 400 ? 1 : 0,
+      responseTimeAvg: responseTime,
+      errorCount: statusCode >= 400 ? 1 : 0,
     });
   }
 
@@ -283,8 +287,8 @@ export class EnterpriseService {
     const usage = await db
       .select({
         totalRequests: sql<number>`count(*)`,
-        averageResponseTime: sql<number>`avg(${apiUsageAnalytics.responseTime})`,
-        errorRate: sql<number>`avg(${apiUsageAnalytics.errorRate}) * 100`,
+        averageResponseTime: sql<number>`avg(${apiUsageAnalytics.responseTimeAvg})`,
+        errorRate: sql<number>`avg(${apiUsageAnalytics.errorCount}) * 100`,
         endpoint: apiUsageAnalytics.endpoint,
       })
       .from(apiUsageAnalytics)
