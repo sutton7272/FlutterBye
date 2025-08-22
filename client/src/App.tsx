@@ -154,13 +154,8 @@ function Router() {
       <div className="flex-1 bg-transparent">
         <Switch>
         <Route path="/" component={() => {
-          console.log('ROOT ROUTE HIT - Home with partnerships should load');
-          return (
-            <>
-              <Navbar />
-              <Home />
-            </>
-          );
+          console.log('ROOT ROUTE HIT - LaunchCountdown should load');
+          return <LaunchCountdown />;
         }} />
         <Route path="/test" component={() => <div style={{padding: '20px', backgroundColor: 'red', color: 'white'}}><h1>TEST ROUTE WORKING</h1><p>If you see this at /test, React routing works</p></div>} />
         <Route path="/public-landing" component={() => <LaunchCountdown />} />
