@@ -1310,9 +1310,9 @@ function FlutterAIDashboard() {
           </div>
         )}
 
-        {/* Enhanced FlutterAI Dashboard - 5 Essential Tabs */}
+        {/* Enhanced FlutterAI Dashboard - 8 Essential Tabs */}
         <Tabs defaultValue="overview" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-9 bg-slate-800/50 mb-6">
+          <TabsList className="grid w-full grid-cols-8 bg-slate-800/50 mb-6">
             <TabsTrigger value="overview" className="data-[state=active]:bg-purple-600">
               <Brain className="h-4 w-4 mr-2" />
               Intelligence Overview
@@ -1340,10 +1340,6 @@ function FlutterAIDashboard() {
             <TabsTrigger value="settings" className="data-[state=active]:bg-orange-600">
               <Settings className="h-4 w-4 mr-2" />
               Settings
-            </TabsTrigger>
-            <TabsTrigger value="enhanced-ai" className="data-[state=active]:bg-purple-600">
-              <MessageCircle className="h-4 w-4 mr-2" />
-              Enhanced AI Test
             </TabsTrigger>
             <TabsTrigger value="marketing" className="data-[state=active]:bg-cyan-600">
               <BarChart3 className="h-4 w-4 mr-2" />
@@ -2156,11 +2152,6 @@ function FlutterAIDashboard() {
                 </Alert>
               </CardContent>
             </Card>
-          </TabsContent>
-
-          {/* ENHANCED AI TESTING TAB - Memory & Emotional Intelligence */}
-          <TabsContent value="enhanced-ai" className="space-y-6">
-            <EnhancedAITestingInterface />
           </TabsContent>
 
           {/* 5. SCORING METHODOLOGY TAB - Complete Scoring Framework */}
