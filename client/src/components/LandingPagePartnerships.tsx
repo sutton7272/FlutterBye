@@ -15,7 +15,7 @@ interface Partnership {
 }
 
 export function LandingPagePartnerships() {
-  const { data: partnershipsData, isLoading } = useQuery({
+  const { data: partnershipsData, isLoading, error } = useQuery({
     queryKey: ["/api/partnerships"],
   });
 
@@ -35,8 +35,34 @@ export function LandingPagePartnerships() {
     window.open(partnership.websiteUrl, '_blank', 'noopener,noreferrer');
   };
 
-  if (isLoading || partnerships.length === 0) {
-    return null; // Don't show anything if no partnerships or loading
+  if (isLoading) {
+    return (
+      <section className="py-16 bg-slate-900/40 backdrop-blur-sm border-t border-electric-blue/20">
+        <div className="max-w-7xl mx-auto px-6 text-center">
+          <div className="text-electric-blue">Loading partnerships...</div>
+        </div>
+      </section>
+    );
+  }
+
+  if (error) {
+    return (
+      <section className="py-16 bg-slate-900/40 backdrop-blur-sm border-t border-electric-blue/20">
+        <div className="max-w-7xl mx-auto px-6 text-center">
+          <div className="text-red-400">Error loading partnerships</div>
+        </div>
+      </section>
+    );
+  }
+
+  if (partnerships.length === 0) {
+    return (
+      <section className="py-16 bg-slate-900/40 backdrop-blur-sm border-t border-electric-blue/20">
+        <div className="max-w-7xl mx-auto px-6 text-center">
+          <div className="text-slate-400">No partnerships available</div>
+        </div>
+      </section>
+    );
   }
 
   return (
@@ -46,7 +72,7 @@ export function LandingPagePartnerships() {
           <h2 className="text-3xl font-bold bg-gradient-to-r from-electric-blue to-electric-green bg-clip-text text-transparent mb-4">
             Trusted Partners
           </h2>
-          <p className="text-text-secondary max-w-2xl mx-auto">
+          <p className="text-slate-400 max-w-2xl mx-auto">
             FlutterBye collaborates with leading organizations to bring you the best Web3 marketing intelligence
           </p>
         </div>
@@ -72,26 +98,10 @@ export function LandingPagePartnerships() {
                     </div>
                   </div>
                 </div>
-                <h3 className="font-semibold text-sm text-white group-hover:text-electric-blue transition-colors">
+                <h3 className="font-semibold text-sm text-white group-hover:text-electric-blue transition-colors mb-2">
                   {partnership.name}
                 </h3>
-                <p className="text-xs text-slate-400 mt-1 line-clamp-2">
-                  {partnership.description}
-                </p>
-                <div className="text-xs text-electric-green mt-2">
-                  {partnership.clickCount.toLocaleString()} clicks
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-                  {partnership.name}
-                </h3>
-                <p className="text-xs text-slate-400 mt-1 overflow-hidden text-ellipsis"
+                <p className="text-xs text-slate-400 mb-2 overflow-hidden"
                    style={{ 
                      display: '-webkit-box',
                      WebkitLineClamp: 2,
@@ -99,7 +109,7 @@ export function LandingPagePartnerships() {
                    }}>
                   {partnership.description}
                 </p>
-                <div className="mt-2">
+                <div className="mb-2">
                   <span className={`px-2 py-1 rounded-full text-xs ${
                     partnership.partnershipType === 'strategic' ? 'bg-purple-600/20 text-purple-300' :
                     partnership.partnershipType === 'technology' ? 'bg-blue-600/20 text-blue-300' :
@@ -108,6 +118,9 @@ export function LandingPagePartnerships() {
                   }`}>
                     {partnership.partnershipType}
                   </span>
+                </div>
+                <div className="text-xs text-electric-green">
+                  {partnership.clickCount.toLocaleString()} clicks
                 </div>
               </CardContent>
             </Card>
