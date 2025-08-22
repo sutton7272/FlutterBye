@@ -819,8 +819,10 @@ export default function LaunchCountdown() {
           </Card>
         </div>
         
-        {/* Strategic Partnerships Section */}
-        <LandingPagePartnerships />
+        {/* Strategic Partnerships Section - Always show for debugging */}
+        <div className="mt-16">
+          <LandingPagePartnerships />
+        </div>
 
       </div>
     </div>
