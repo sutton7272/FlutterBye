@@ -75,6 +75,22 @@ export function LandingPagePartnerships() {
                 <h3 className="font-semibold text-sm text-white group-hover:text-electric-blue transition-colors">
                   {partnership.name}
                 </h3>
+                <p className="text-xs text-slate-400 mt-1 line-clamp-2">
+                  {partnership.description}
+                </p>
+                <div className="text-xs text-electric-green mt-2">
+                  {partnership.clickCount.toLocaleString()} clicks
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+                  {partnership.name}
+                </h3>
                 <p className="text-xs text-slate-400 mt-1 overflow-hidden text-ellipsis"
                    style={{ 
                      display: '-webkit-box',

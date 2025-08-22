@@ -776,6 +776,9 @@ export default function Home() {
             </Link>
           </div>
         </div>
+
+        {/* Strategic Partnerships Section */}
+        <LandingPagePartnerships />
       </div>
 
         {/* FlutterAI Demo Cards */}
