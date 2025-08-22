@@ -142,6 +142,7 @@ import { TestImage } from "@/components/test-image";
 import AdminGateway from "@/pages/admin-gateway";
 import AdminDashboard from "@/pages/admin-dashboard";
 import AdminEscrow from "@/pages/admin-escrow";
+import WalletManagement from "@/pages/WalletManagement";
 import { AdminRouteGuard } from "@/components/admin-route-guard";
 import { EarlyAccessGuard } from "@/components/early-access-guard";
 function Router() {
@@ -561,6 +562,12 @@ function Router() {
         <Route path="/admin/escrow" component={() => (
           <AdminRouteGuard>
             <AdminEscrow />
+          </AdminRouteGuard>
+        )} />
+        
+        <Route path="/admin/wallet-management" component={() => (
+          <AdminRouteGuard>
+            <WalletManagement />
           </AdminRouteGuard>
         )} />
         

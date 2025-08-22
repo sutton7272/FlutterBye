@@ -51,17 +51,17 @@ export default function AdminDashboard() {
 
   const adminCards = [
     {
-      id: "escrow",
-      title: "Escrow Wallet Management",
-      description: "Enterprise escrow contracts and profit withdrawal system",
-      icon: Shield,
-      route: "/admin/escrow",
+      id: "wallet-management",
+      title: "Wallet Management",
+      description: "Comprehensive wallet system with enterprise escrow contracts and secure custodial services",
+      icon: Wallet,
+      route: "/admin/wallet-management",
       color: "electric-blue",
       features: [
-        "Create Escrow Contracts",
-        "Monitor Active Contracts",
-        "Withdraw Accumulated Profits",
-        "Enterprise Security"
+        "Enterprise Escrow Contracts",
+        "Custodial Wallet Services", 
+        "Transaction Security & Monitoring",
+        "Profit Withdrawal & Compliance"
       ]
     },
     {
@@ -148,20 +148,7 @@ export default function AdminDashboard() {
         "Maintenance Tools"
       ]
     },
-    {
-      id: "custodial",
-      title: "Custodial Wallets",
-      description: "Secure custodial wallet system for user value-attachment with recipient redemption",
-      icon: Wallet,
-      route: "/admin-custodial-wallet",
-      color: "electric-blue",
-      features: [
-        "Create Custodial Wallets",
-        "Monitor Wallet Balances",
-        "Transaction Security",
-        "Compliance Reporting"
-      ]
-    }
+
   ];
 
   return (
