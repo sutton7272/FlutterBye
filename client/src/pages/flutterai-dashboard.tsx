@@ -20,6 +20,7 @@ import { SolviturBrandBadge } from '@/components/solvitur-brand-badge';
 import { FlutterinaAdminPanel } from '@/components/flutterina-admin-panel';
 import { SkyeKnowledgeAdmin } from "@/components/skye-knowledge-admin";
 import { EnhancedSkyeChat } from "@/components/enhanced-skye-chat";
+import MarketingIntelligence from "./MarketingIntelligence";
 import { 
   Brain, 
   Wallet, 
@@ -1311,7 +1312,7 @@ function FlutterAIDashboard() {
 
         {/* Enhanced FlutterAI Dashboard - 5 Essential Tabs */}
         <Tabs defaultValue="overview" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-8 bg-slate-800/50 mb-6">
+          <TabsList className="grid w-full grid-cols-9 bg-slate-800/50 mb-6">
             <TabsTrigger value="overview" className="data-[state=active]:bg-purple-600">
               <Brain className="h-4 w-4 mr-2" />
               Intelligence Overview
@@ -1343,6 +1344,10 @@ function FlutterAIDashboard() {
             <TabsTrigger value="enhanced-ai" className="data-[state=active]:bg-purple-600">
               <MessageCircle className="h-4 w-4 mr-2" />
               Enhanced AI Test
+            </TabsTrigger>
+            <TabsTrigger value="marketing" className="data-[state=active]:bg-cyan-600">
+              <BarChart3 className="h-4 w-4 mr-2" />
+              Marketing Intelligence
             </TabsTrigger>
           </TabsList>
 
@@ -2489,6 +2494,28 @@ function FlutterAIDashboard() {
           {/* 6. FLUTTERINA AI MANAGEMENT TAB */}
           <TabsContent value="flutterina" className="space-y-6">
             <FlutterinaAdminPanel />
+          </TabsContent>
+
+          {/* 7. SEO & MARKETING INTELLIGENCE TAB */}
+          <TabsContent value="marketing" className="space-y-6">
+            <Card className="bg-slate-800/50 border-cyan-500/20">
+              <CardHeader>
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-cyan-600 rounded-lg">
+                    <BarChart3 className="h-6 w-6" />
+                  </div>
+                  <div>
+                    <CardTitle className="text-white">SEO & Marketing Intelligence Platform</CardTitle>
+                    <CardDescription className="text-cyan-200">
+                      Bloomberg Terminal of Web3 Marketing - Combining blockchain intelligence with traditional marketing analytics
+                    </CardDescription>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <MarketingIntelligence />
+              </CardContent>
+            </Card>
           </TabsContent>
         </Tabs>
       </div>
